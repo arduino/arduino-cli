@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -31,7 +32,7 @@ import (
 func TestArduinoCliDaemonCompileWithLotOfOutput(t *testing.T) {
 	// See: https://github.com/arduino/arduino-cli/issues/2169
 
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	_, _, err := cli.Run("core", "install", "arduino:avr")

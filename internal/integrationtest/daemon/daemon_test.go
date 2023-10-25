@@ -37,7 +37,7 @@ import (
 func TestArduinoCliDaemon(t *testing.T) {
 	// See: https://github.com/arduino/arduino-cli/pull/1804
 
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -96,7 +96,7 @@ func TestArduinoCliDaemon(t *testing.T) {
 func TestDaemonAutoUpdateIndexOnFirstInit(t *testing.T) {
 	// https://github.com/arduino/arduino-cli/issues/1529
 
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -110,26 +110,11 @@ func TestDaemonAutoUpdateIndexOnFirstInit(t *testing.T) {
 	require.FileExists(t, cli.DataDir().Join("package_index.json").String())
 }
 
-// createEnvForDaemon performs the minimum required operations to start the arduino-cli daemon.
-// It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
-// The Environment must be disposed by calling the CleanUp method via defer.
-func createEnvForDaemon(t *testing.T) (*integrationtest.Environment, *integrationtest.ArduinoCLI) {
-	env := integrationtest.NewEnvironment(t)
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         integrationtest.FindRepositoryRootPath(t).Join("arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
-
-	_ = cli.StartDaemon(false)
-	return env, cli
-}
-
 func TestDaemonCompileOptions(t *testing.T) {
 	// See: https://github.com/arduino/arduino-cli/issues/1614
 	// See: https://github.com/arduino/arduino-cli/pull/1820
 
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -203,7 +188,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
 	// See: https://github.com/arduino/arduino-cli/issues/1812
 
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -233,7 +218,7 @@ func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
 }
 
 func TestDaemonCoreUpdateIndex(t *testing.T) {
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -269,7 +254,7 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 }
 
 func TestDaemonBundleLibInstall(t *testing.T) {
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -409,7 +394,7 @@ func TestDaemonLibrariesRescanOnInstall(t *testing.T) {
 		   with the gprc instance
 		The last attempt is expected to not raise an error
 	*/
-	env, cli := createEnvForDaemon(t)
+	env, cli := integrationtest.CreateEnvForDaemon(t)
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
@@ -465,7 +450,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 
 	t.Run("upgraded successfully with additional urls", func(t *testing.T) {
 		t.Run("and install.json is present", func(t *testing.T) {
-			env, cli := createEnvForDaemon(t)
+			env, cli := integrationtest.CreateEnvForDaemon(t)
 			defer env.CleanUp()
 
 			grpcInst := cli.Create()
@@ -481,7 +466,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
 		})
 		t.Run("and install.json is missing", func(t *testing.T) {
-			env, cli := createEnvForDaemon(t)
+			env, cli := integrationtest.CreateEnvForDaemon(t)
 			defer env.CleanUp()
 
 			grpcInst := cli.Create()
@@ -504,7 +489,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 
 	t.Run("upgrade failed", func(t *testing.T) {
 		t.Run("without additional URLs", func(t *testing.T) {
-			env, cli := createEnvForDaemon(t)
+			env, cli := integrationtest.CreateEnvForDaemon(t)
 			defer env.CleanUp()
 
 			grpcInst := cli.Create()
@@ -524,7 +509,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
 		})
 		t.Run("missing both additional URLs and install.json", func(t *testing.T) {
-			env, cli := createEnvForDaemon(t)
+			env, cli := integrationtest.CreateEnvForDaemon(t)
 			defer env.CleanUp()
 
 			grpcInst := cli.Create()

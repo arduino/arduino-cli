@@ -119,6 +119,21 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 	return cli
 }
 
+// CreateEnvForDaemon performs the minimum required operations to start the arduino-cli daemon.
+// It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
+// The Environment must be disposed by calling the CleanUp method via defer.
+func CreateEnvForDaemon(t *testing.T) (*Environment, *ArduinoCLI) {
+	env := NewEnvironment(t)
+
+	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
+		ArduinoCLIPath:         FindRepositoryRootPath(t).Join("arduino-cli"),
+		UseSharedStagingFolder: true,
+	})
+
+	_ = cli.StartDaemon(false)
+	return env, cli
+}
+
 // CleanUp closes the Arduino CLI client.
 func (cli *ArduinoCLI) CleanUp() {
 	if cli.proc != nil {
