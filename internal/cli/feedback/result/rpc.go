@@ -766,23 +766,21 @@ func NewLibrarySearchResponse(l *rpc.LibrarySearchResponse) *LibrarySearchRespon
 }
 
 type SearchedLibrary struct {
-	Name              string                                  `json:"name,omitempty"`
-	Releases          orderedmap.Map[string, *LibraryRelease] `json:"releases,omitempty"`
-	Latest            *LibraryRelease                         `json:"latest,omitempty"`
-	AvailableVersions []string                                `json:"available_versions,omitempty"`
+	Name              string                                           `json:"name,omitempty"`
+	Releases          orderedmap.Map[*semver.Version, *LibraryRelease] `json:"releases,omitempty"`
+	Latest            *LibraryRelease                                  `json:"latest,omitempty"`
+	AvailableVersions []string                                         `json:"available_versions,omitempty"`
 }
 
 func NewSearchedLibrary(l *rpc.SearchedLibrary) *SearchedLibrary {
 	if l == nil {
 		return nil
 	}
-	// TODO understand if we want semver keys
-	releasesMap := orderedmap.New[string, *LibraryRelease]()
+	releasesMap := orderedmap.NewWithConversionFunc[*semver.Version, *LibraryRelease, string]((*semver.Version).String)
 	for k, v := range l.GetReleases() {
-		releasesMap.Set(k, NewLibraryRelease(v))
+		releasesMap.Set(semver.MustParse(k), NewLibraryRelease(v))
 	}
-	releasesMap.SortStableKeys(cmp.Compare)
-
+	releasesMap.SortKeys((*semver.Version).CompareTo)
 	return &SearchedLibrary{
 		Name:              l.GetName(),
 		Releases:          releasesMap,

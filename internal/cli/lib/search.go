@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -128,8 +129,8 @@ func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 		feedback.Fatal(tr("Error searching for Libraries: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(result{
-		results:   searchResp,
+	feedback.PrintResult(librarySearchResult{
+		results:   result.NewLibrarySearchResponse(searchResp),
 		namesOnly: namesOnly,
 	})
 
@@ -138,12 +139,12 @@ func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
-type result struct {
-	results   *rpc.LibrarySearchResponse
+type librarySearchResult struct {
+	results   *result.LibrarySearchResponse
 	namesOnly bool
 }
 
-func (res result) Data() interface{} {
+func (res librarySearchResult) Data() interface{} {
 	if res.namesOnly {
 		type LibName struct {
 			Name string `json:"name"`
@@ -154,33 +155,36 @@ func (res result) Data() interface{} {
 		}
 
 		names := []LibName{}
-		results := res.results.GetLibraries()
-		for _, lib := range results {
+		for _, lib := range res.results.Libraries {
+			if lib == nil {
+				continue
+			}
 			names = append(names, LibName{lib.Name})
 		}
 
-		return NamesOnly{
-			names,
-		}
+		return NamesOnly{names}
 	}
 
 	return res.results
 }
 
-func (res result) String() string {
-	results := res.results.GetLibraries()
+func (res librarySearchResult) String() string {
+	results := res.results.Libraries
 	if len(results) == 0 {
 		return tr("No libraries matching your search.")
 	}
 
 	var out strings.Builder
 
-	if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED {
+	if string(res.results.Status) == rpc.LibrarySearchStatus_name[int32(rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED)] {
 		out.WriteString(tr("No libraries matching your search.\nDid you mean...\n"))
 	}
 
 	for _, lib := range results {
-		if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS {
+		if lib == nil {
+			continue
+		}
+		if string(res.results.Status) == rpc.LibrarySearchStatus_name[int32(rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)] {
 			out.WriteString(tr(`Name: "%s"`, lib.Name) + "\n")
 			if res.namesOnly {
 				continue
@@ -190,14 +194,17 @@ func (res result) String() string {
 			continue
 		}
 
-		latest := lib.GetLatest()
+		latest := lib.Latest
 
 		deps := []string{}
-		for _, dep := range latest.GetDependencies() {
-			if dep.GetVersionConstraint() == "" {
-				deps = append(deps, dep.GetName())
+		for _, dep := range latest.Dependencies {
+			if dep == nil {
+				continue
+			}
+			if dep.VersionConstraint == "" {
+				deps = append(deps, dep.Name)
 			} else {
-				deps = append(deps, dep.GetName()+" ("+dep.GetVersionConstraint()+")")
+				deps = append(deps, dep.Name+" ("+dep.VersionConstraint+")")
 			}
 		}
 
@@ -212,7 +219,7 @@ func (res result) String() string {
 		out.WriteString(fmt.Sprintf("  "+tr("Category: %s")+"\n", latest.Category))
 		out.WriteString(fmt.Sprintf("  "+tr("Architecture: %s")+"\n", strings.Join(latest.Architectures, ", ")))
 		out.WriteString(fmt.Sprintf("  "+tr("Types: %s")+"\n", strings.Join(latest.Types, ", ")))
-		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.ReplaceAll(fmt.Sprint(lib.GetAvailableVersions()), " ", ", ")))
+		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.ReplaceAll(fmt.Sprint(lib.AvailableVersions), " ", ", ")))
 		if len(latest.ProvidesIncludes) > 0 {
 			out.WriteString(fmt.Sprintf("  "+tr("Provides includes: %s")+"\n", strings.Join(latest.ProvidesIncludes, ", ")))
 		}
