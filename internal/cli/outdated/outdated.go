@@ -78,7 +78,7 @@ func newOutdatedResult(inPlatforms []*rpc.PlatformSummary, inLibraries []*rpc.In
 		res.Platforms[i] = result.NewPlatformSummary(v)
 	}
 	for i, v := range inLibraries {
-		res.InstalledLibs[i] = result.NewInstalledLibraryResult(v)
+		res.InstalledLibs[i] = result.NewInstalledLibrary(v)
 	}
 	return res
 }

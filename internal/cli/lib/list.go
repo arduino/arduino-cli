@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -59,9 +60,14 @@ not listed, they can be listed by adding the --all flag.`),
 // List gets and prints a list of installed libraries.
 func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 	installedLibs := GetList(instance, args, all, updatable)
+
+	installedLibsResult := make([]*result.InstalledLibrary, len(installedLibs))
+	for i, v := range installedLibs {
+		installedLibsResult[i] = result.NewInstalledLibrary(v)
+	}
 	feedback.PrintResult(installedResult{
 		onlyUpdates:   updatable,
-		installedLibs: installedLibs,
+		installedLibs: installedLibsResult,
 	})
 	logrus.Info("Done")
 }
@@ -113,7 +119,7 @@ func GetList(
 // feedback.Result implementation
 type installedResult struct {
 	onlyUpdates   bool
-	installedLibs []*rpc.InstalledLibrary
+	installedLibs []*result.InstalledLibrary
 }
 
 func (ir installedResult) Data() interface{} {
@@ -140,7 +146,10 @@ func (ir installedResult) String() string {
 
 	lastName := ""
 	for _, libMeta := range ir.installedLibs {
-		lib := libMeta.GetLibrary()
+		if libMeta == nil {
+			continue
+		}
+		lib := libMeta.Library
 		name := lib.Name
 		if name == lastName {
 			name = ` "`
@@ -148,15 +157,15 @@ func (ir installedResult) String() string {
 			lastName = name
 		}
 
-		location := lib.GetLocation().String()
+		location := string(lib.Location)
 		if lib.ContainerPlatform != "" {
-			location = lib.GetContainerPlatform()
+			location = lib.ContainerPlatform
 		}
 
 		available := ""
 		sentence := ""
-		if libMeta.GetRelease() != nil {
-			available = libMeta.GetRelease().GetVersion()
+		if libMeta.Release != nil {
+			available = libMeta.Release.Version
 			sentence = lib.Sentence
 		}
 
