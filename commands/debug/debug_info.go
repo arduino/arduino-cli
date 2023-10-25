@@ -197,6 +197,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),
 		ToolchainConfiguration: &toolchainConfiguration,
 		CortexDebugCustomJson:  cortexDebugCustomJson,
+		Programmer:             req.GetProgrammer(),
 	}, nil
 }
 
