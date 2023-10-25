@@ -621,6 +621,17 @@ type BoardListItem struct {
 	Platform *Platform `json:"platform,omitempty"`
 }
 
+func NewBoardListItems(b []*rpc.BoardListItem) []*BoardListItem {
+	if b == nil {
+		return nil
+	}
+	res := make([]*BoardListItem, len(b))
+	for i, v := range b {
+		res[i] = NewBoardListItem(v)
+	}
+	return res
+}
+
 func NewBoardListItem(b *rpc.BoardListItem) *BoardListItem {
 	if b == nil {
 		return nil
