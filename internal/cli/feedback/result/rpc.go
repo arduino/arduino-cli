@@ -23,15 +23,15 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// NewPlatformResult creates a new result.Platform from rpc.PlatformSummary
-func NewPlatformResult(in *rpc.PlatformSummary) *Platform {
+// NewPlatformSummary creates a new result.Platform from rpc.PlatformSummary
+func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease, string]((*semver.Version).String)
 	for k, v := range in.Releases {
 		releases.Set(semver.MustParse(k), NewPlatformReleaseResult(v))
 	}
 	releases.SortKeys((*semver.Version).CompareTo)
 
-	return &Platform{
+	return &PlatformSummary{
 		Id:                in.Metadata.Id,
 		Maintainer:        in.Metadata.Maintainer,
 		Website:           in.Metadata.Website,
@@ -45,8 +45,8 @@ func NewPlatformResult(in *rpc.PlatformSummary) *Platform {
 	}
 }
 
-// Platform maps a rpc.Platform
-type Platform struct {
+// PlatformSummary maps a rpc.PlatformSummary
+type PlatformSummary struct {
 	Id                string `json:"id,omitempty"`
 	Maintainer        string `json:"maintainer,omitempty"`
 	Website           string `json:"website,omitempty"`
@@ -62,12 +62,12 @@ type Platform struct {
 }
 
 // GetLatestRelease returns the latest relase of this platform or nil if none available.
-func (p *Platform) GetLatestRelease() *PlatformRelease {
+func (p *PlatformSummary) GetLatestRelease() *PlatformRelease {
 	return p.Releases.Get(p.LatestVersion)
 }
 
 // GetInstalledRelease returns the installed relase of this platform or nil if none available.
-func (p *Platform) GetInstalledRelease() *PlatformRelease {
+func (p *PlatformSummary) GetInstalledRelease() *PlatformRelease {
 	return p.Releases.Get(p.InstalledVersion)
 }
 

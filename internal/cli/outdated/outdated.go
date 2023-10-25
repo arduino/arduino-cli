@@ -65,17 +65,17 @@ func Outdated(inst *rpc.Instance) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type outdatedResult struct {
-	Platforms     []*result.Platform         `json:"platforms,omitempty"`
+	Platforms     []*result.PlatformSummary  `json:"platforms,omitempty"`
 	InstalledLibs []*result.InstalledLibrary `json:"libraries,omitempty"`
 }
 
 func newOutdatedResult(inPlatforms []*rpc.PlatformSummary, inLibraries []*rpc.InstalledLibrary) *outdatedResult {
 	res := &outdatedResult{
-		Platforms:     make([]*result.Platform, len(inPlatforms)),
+		Platforms:     make([]*result.PlatformSummary, len(inPlatforms)),
 		InstalledLibs: make([]*result.InstalledLibrary, len(inLibraries)),
 	}
 	for i, v := range inPlatforms {
-		res.Platforms[i] = result.NewPlatformResult(v)
+		res.Platforms[i] = result.NewPlatformSummary(v)
 	}
 	for i, v := range inLibraries {
 		res.InstalledLibs[i] = result.NewInstalledLibraryResult(v)

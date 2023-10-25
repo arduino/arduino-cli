@@ -91,13 +91,13 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 func newCoreListResult(in []*rpc.PlatformSummary) *coreListResult {
 	res := &coreListResult{}
 	for _, platformSummary := range in {
-		res.platforms = append(res.platforms, result.NewPlatformResult(platformSummary))
+		res.platforms = append(res.platforms, result.NewPlatformSummary(platformSummary))
 	}
 	return res
 }
 
 type coreListResult struct {
-	platforms []*result.Platform
+	platforms []*result.PlatformSummary
 }
 
 // Data implements Result interface
