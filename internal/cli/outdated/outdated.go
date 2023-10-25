@@ -65,16 +65,21 @@ func Outdated(inst *rpc.Instance) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type outdatedResult struct {
-	Platforms     []*result.Platform      `json:"platforms,omitempty"`
-	InstalledLibs []*rpc.InstalledLibrary `json:"libraries,omitempty"`
+	Platforms     []*result.Platform         `json:"platforms,omitempty"`
+	InstalledLibs []*result.InstalledLibrary `json:"libraries,omitempty"`
 }
 
 func newOutdatedResult(inPlatforms []*rpc.PlatformSummary, inLibraries []*rpc.InstalledLibrary) *outdatedResult {
-	res := &outdatedResult{}
-	for _, platformSummary := range inPlatforms {
-		res.Platforms = append(res.Platforms, result.NewPlatformResult(platformSummary))
+	res := &outdatedResult{
+		Platforms:     make([]*result.Platform, len(inPlatforms)),
+		InstalledLibs: make([]*result.InstalledLibrary, len(inLibraries)),
 	}
-	res.InstalledLibs = inLibraries
+	for i, v := range inPlatforms {
+		res.Platforms[i] = result.NewPlatformResult(v)
+	}
+	for i, v := range inLibraries {
+		res.InstalledLibs[i] = result.NewInstalledLibraryResult(v)
+	}
 	return res
 }
 
@@ -128,7 +133,7 @@ func (ir outdatedResult) String() string {
 	})
 	lastName := ""
 	for _, libMeta := range ir.InstalledLibs {
-		lib := libMeta.GetLibrary()
+		lib := libMeta.Library
 		name := lib.Name
 		if name == lastName {
 			name = ` "`
@@ -136,15 +141,15 @@ func (ir outdatedResult) String() string {
 			lastName = name
 		}
 
-		location := lib.GetLocation().String()
+		location := string(lib.Location)
 		if lib.ContainerPlatform != "" {
-			location = lib.GetContainerPlatform()
+			location = lib.ContainerPlatform
 		}
 
 		available := ""
 		sentence := ""
-		if libMeta.GetRelease() != nil {
-			available = libMeta.GetRelease().GetVersion()
+		if libMeta.Release != nil {
+			available = libMeta.Release.Version
 			sentence = lib.Sentence
 		}
 
