@@ -137,13 +137,11 @@ message LibraryDependencyStatus {
 message LibrarySearchRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // Deprecated. Use search_args instead.
-  string query = 2 [ deprecated = true ];
   // Set to true to not populate the releases field in the response (may save a
   // lot of bandwidth/CPU).
-  bool omit_releases_details = 3;
+  bool omit_releases_details = 2;
   // Keywords for the search.
-  string search_args = 4;
+  string search_args = 3;
 }
 
 enum LibrarySearchStatus {

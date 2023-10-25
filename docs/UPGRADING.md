@@ -4,6 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### gRPC `cc.arduino.cli.commands.v1.LibrarySearchRequest` message has been changed.
+
+The `query` field has been removed, use `search_args` instead.
+
 ### CLI `core list` and `core search` changed JSON output.
 
 Below is an example of the response containing an object with all possible keys set.
