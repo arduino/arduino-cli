@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -81,7 +82,8 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 	for _, err := range discoveryErrors {
 		feedback.Warning(tr("Error starting discovery: %v", err))
 	}
-	feedback.PrintResult(result{ports})
+
+	feedback.PrintResult(listResult{result.NewDetectedPorts(ports)})
 }
 
 func watchList(inst *rpc.Instance) {
@@ -98,10 +100,10 @@ func watchList(inst *rpc.Instance) {
 	}
 
 	for event := range eventsChan {
-		feedback.PrintResult(watchEvent{
+		feedback.PrintResult(watchEventResult{
 			Type:   event.EventType,
-			Boards: event.Port.MatchingBoards,
-			Port:   event.Port.Port,
+			Boards: result.NewBoardListItems(event.Port.MatchingBoards),
+			Port:   result.NewPort(event.Port.Port),
 			Error:  event.Error,
 		})
 	}
@@ -109,47 +111,50 @@ func watchList(inst *rpc.Instance) {
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
-type result struct {
-	ports []*rpc.DetectedPort
+type listResult struct {
+	ports []*result.DetectedPort
 }
 
-func (dr result) Data() interface{} {
+func (dr listResult) Data() interface{} {
 	return dr.ports
 }
 
-func (dr result) String() string {
+func (dr listResult) String() string {
 	if len(dr.ports) == 0 {
 		return tr("No boards found.")
 	}
 
 	sort.Slice(dr.ports, func(i, j int) bool {
 		x, y := dr.ports[i].Port, dr.ports[j].Port
-		return x.GetProtocol() < y.GetProtocol() ||
-			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
+		return x.Protocol < y.Protocol ||
+			(x.Protocol == y.Protocol && x.Address < y.Address)
 	})
 
 	t := table.New()
 	t.SetHeader(tr("Port"), tr("Protocol"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
 	for _, detectedPort := range dr.ports {
-		port := detectedPort.Port
-		protocol := port.GetProtocol()
-		address := port.GetAddress()
-		if port.GetProtocol() == "serial" {
-			address = port.GetAddress()
+		if detectedPort == nil {
+			continue
 		}
-		protocolLabel := port.GetProtocolLabel()
-		if boards := detectedPort.GetMatchingBoards(); len(boards) > 0 {
+		port := detectedPort.Port
+		protocol := port.Protocol
+		address := port.Address
+		if port.Protocol == "serial" {
+			address = port.Address
+		}
+		protocolLabel := port.ProtocolLabel
+		if boards := detectedPort.MatchingBoards; len(boards) > 0 {
 			sort.Slice(boards, func(i, j int) bool {
 				x, y := boards[i], boards[j]
-				return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFqbn() < y.GetFqbn())
+				return x.Name < y.Name || (x.Name == y.Name && x.Fqbn < y.Fqbn)
 			})
 			for _, b := range boards {
-				board := b.GetName()
+				board := b.Name
 
 				// to improve the user experience, show on a dedicated column
 				// the name of the core supporting the board detected
 				var coreName = ""
-				fqbn, err := cores.ParseFQBN(b.GetFqbn())
+				fqbn, err := cores.ParseFQBN(b.Fqbn)
 				if err == nil {
 					coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
 				}
@@ -170,18 +175,18 @@ func (dr result) String() string {
 	return t.Render()
 }
 
-type watchEvent struct {
-	Type   string               `json:"eventType"`
-	Boards []*rpc.BoardListItem `json:"matching_boards,omitempty"`
-	Port   *rpc.Port            `json:"port,omitempty"`
-	Error  string               `json:"error,omitempty"`
+type watchEventResult struct {
+	Type   string                  `json:"eventType"`
+	Boards []*result.BoardListItem `json:"matching_boards,omitempty"`
+	Port   *result.Port            `json:"port,omitempty"`
+	Error  string                  `json:"error,omitempty"`
 }
 
-func (dr watchEvent) Data() interface{} {
+func (dr watchEventResult) Data() interface{} {
 	return dr
 }
 
-func (dr watchEvent) String() string {
+func (dr watchEventResult) String() string {
 	t := table.New()
 
 	event := map[string]string{
@@ -197,15 +202,15 @@ func (dr watchEvent) String() string {
 	if boards := dr.Boards; len(boards) > 0 {
 		sort.Slice(boards, func(i, j int) bool {
 			x, y := boards[i], boards[j]
-			return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFqbn() < y.GetFqbn())
+			return x.Name < y.Name || (x.Name == y.Name && x.Fqbn < y.Fqbn)
 		})
 		for _, b := range boards {
-			board := b.GetName()
+			board := b.Name
 
 			// to improve the user experience, show on a dedicated column
 			// the name of the core supporting the board detected
 			var coreName = ""
-			fqbn, err := cores.ParseFQBN(b.GetFqbn())
+			fqbn, err := cores.ParseFQBN(b.Fqbn)
 			if err == nil {
 				coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
 			}
