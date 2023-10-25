@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	fResult "github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/fatih/color"
@@ -65,13 +66,13 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(&checkDepResult{deps: deps})
+	feedback.PrintResult(&checkDepResult{deps: fResult.NewLibraryResolveDependenciesResponse(deps)})
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type checkDepResult struct {
-	deps *rpc.LibraryResolveDependenciesResponse
+	deps *fResult.LibraryResolveDependenciesResponse
 }
 
 func (dr checkDepResult) Data() interface{} {
@@ -79,6 +80,9 @@ func (dr checkDepResult) Data() interface{} {
 }
 
 func (dr checkDepResult) String() string {
+	if dr.deps == nil || dr.deps.Dependencies == nil {
+		return ""
+	}
 	res := ""
 	deps := dr.deps.Dependencies
 
@@ -91,26 +95,29 @@ func (dr checkDepResult) String() string {
 	})
 
 	for _, dep := range deps {
+		if dep == nil {
+			continue
+		}
 		res += outputDep(dep)
 	}
 	return res
 }
 
-func outputDep(dep *rpc.LibraryDependencyStatus) string {
+func outputDep(dep *fResult.LibraryDependencyStatus) string {
 	res := ""
 	green := color.New(color.FgGreen)
 	red := color.New(color.FgRed)
 	yellow := color.New(color.FgYellow)
-	if dep.GetVersionInstalled() == "" {
+	if dep.VersionInstalled == "" {
 		res += tr("%s must be installed.",
-			red.Sprintf("✕ %s %s", dep.GetName(), dep.GetVersionRequired()))
-	} else if dep.GetVersionInstalled() == dep.GetVersionRequired() {
+			red.Sprintf("✕ %s %s", dep.Name, dep.VersionRequired))
+	} else if dep.VersionInstalled == dep.VersionRequired {
 		res += tr("%s is already installed.",
-			green.Sprintf("✓ %s %s", dep.GetName(), dep.GetVersionRequired()))
+			green.Sprintf("✓ %s %s", dep.Name, dep.VersionRequired))
 	} else {
 		res += tr("%[1]s is required but %[2]s is currently installed.",
-			yellow.Sprintf("✕ %s %s", dep.GetName(), dep.GetVersionRequired()),
-			yellow.Sprintf("%s", dep.GetVersionInstalled()))
+			yellow.Sprintf("✕ %s %s", dep.Name, dep.VersionRequired),
+			yellow.Sprintf("%s", dep.VersionInstalled))
 	}
 	res += "\n"
 	return res
