@@ -27,7 +27,7 @@ import (
 func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease, string]((*semver.Version).String)
 	for k, v := range in.Releases {
-		releases.Set(semver.MustParse(k), NewPlatformReleaseResult(v))
+		releases.Set(semver.MustParse(k), NewPlatformRelease(v))
 	}
 	releases.SortKeys((*semver.Version).CompareTo)
 
@@ -71,8 +71,8 @@ func (p *PlatformSummary) GetInstalledRelease() *PlatformRelease {
 	return p.Releases.Get(p.InstalledVersion)
 }
 
-// NewPlatformReleaseResult creates a new result.PlatformRelease from rpc.PlatformRelease
-func NewPlatformReleaseResult(in *rpc.PlatformRelease) *PlatformRelease {
+// NewPlatformRelease creates a new result.PlatformRelease from rpc.PlatformRelease
+func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 	var boards []*Board
 	for _, board := range in.Boards {
 		boards = append(boards, &Board{
@@ -160,6 +160,52 @@ type Library struct {
 	InDevelopment     bool                           `json:"in_development,omitempty"`
 }
 
+func NewLibrary(l *rpc.Library) *Library {
+	if l == nil {
+		return nil
+	}
+	libraryPropsMap := orderedmap.New[string, string]()
+	for k, v := range l.GetProperties() {
+		libraryPropsMap.Set(k, v)
+	}
+	libraryPropsMap.SortStableKeys(cmp.Compare)
+
+	libraryCompatibleWithMap := orderedmap.New[string, bool]()
+	for k, v := range l.GetCompatibleWith() {
+		libraryCompatibleWithMap.Set(k, v)
+	}
+	libraryCompatibleWithMap.SortStableKeys(cmp.Compare)
+
+	return &Library{
+		Name:              l.GetName(),
+		Author:            l.GetAuthor(),
+		Maintainer:        l.GetMaintainer(),
+		Sentence:          l.GetSentence(),
+		Paragraph:         l.GetParagraph(),
+		Website:           l.GetWebsite(),
+		Category:          l.GetCategory(),
+		Architectures:     l.GetArchitectures(),
+		Types:             l.GetTypes(),
+		InstallDir:        l.GetInstallDir(),
+		SourceDir:         l.GetSourceDir(),
+		UtilityDir:        l.GetUtilityDir(),
+		ContainerPlatform: l.GetContainerPlatform(),
+		DotALinkage:       l.GetDotALinkage(),
+		Precompiled:       l.GetPrecompiled(),
+		LdFlags:           l.GetLdFlags(),
+		IsLegacy:          l.GetIsLegacy(),
+		Version:           l.GetVersion(),
+		License:           l.GetLicense(),
+		Properties:        libraryPropsMap,
+		Location:          LibraryLocation(l.GetLocation().String()),
+		Layout:            LibraryLayout(l.GetLayout().String()),
+		Examples:          l.GetExamples(),
+		ProvidesIncludes:  l.GetProvidesIncludes(),
+		CompatibleWith:    libraryCompatibleWithMap,
+		InDevelopment:     l.GetInDevelopment(),
+	}
+}
+
 type LibraryRelease struct {
 	Author           string               `json:"author,omitempty"`
 	Version          string               `json:"version,omitempty"`
@@ -176,6 +222,27 @@ type LibraryRelease struct {
 	Dependencies     []*LibraryDependency `json:"dependencies,omitempty"`
 }
 
+func NewLibraryRelease(l *rpc.LibraryRelease) *LibraryRelease {
+	if l == nil {
+		return nil
+	}
+	return &LibraryRelease{
+		Author:           l.GetAuthor(),
+		Version:          l.GetVersion(),
+		Maintainer:       l.GetMaintainer(),
+		Sentence:         l.GetSentence(),
+		Paragraph:        l.GetParagraph(),
+		Website:          l.GetWebsite(),
+		Category:         l.GetCategory(),
+		Architectures:    l.GetArchitectures(),
+		Types:            l.GetTypes(),
+		Resources:        NewDownloadResource(l.GetResources()),
+		License:          l.GetLicense(),
+		ProvidesIncludes: l.GetProvidesIncludes(),
+		Dependencies:     NewLibraryDependencies(l.GetDependencies()),
+	}
+}
+
 type DownloadResource struct {
 	Url             string `json:"url,omitempty"`
 	ArchiveFilename string `json:"archive_filename,omitempty"`
@@ -189,63 +256,10 @@ type LibraryDependency struct {
 	VersionConstraint string `json:"version_constraint,omitempty"`
 }
 
-func NewInstalledLibraryResult(l *rpc.InstalledLibrary) *InstalledLibrary {
-	libraryPropsMap := orderedmap.New[string, string]()
-	for k, v := range l.GetLibrary().GetProperties() {
-		libraryPropsMap.Set(k, v)
-	}
-	libraryPropsMap.SortStableKeys(cmp.Compare)
-
-	libraryCompatibleWithMap := orderedmap.New[string, bool]()
-	for k, v := range l.GetLibrary().GetCompatibleWith() {
-		libraryCompatibleWithMap.Set(k, v)
-	}
-	libraryCompatibleWithMap.SortStableKeys(cmp.Compare)
-
+func NewInstalledLibrary(l *rpc.InstalledLibrary) *InstalledLibrary {
 	return &InstalledLibrary{
-		Library: &Library{
-			Name:              l.GetLibrary().GetName(),
-			Author:            l.GetLibrary().GetAuthor(),
-			Maintainer:        l.GetLibrary().GetMaintainer(),
-			Sentence:          l.GetLibrary().GetSentence(),
-			Paragraph:         l.GetLibrary().GetParagraph(),
-			Website:           l.GetLibrary().GetWebsite(),
-			Category:          l.GetLibrary().GetCategory(),
-			Architectures:     l.GetLibrary().GetArchitectures(),
-			Types:             l.GetLibrary().GetTypes(),
-			InstallDir:        l.GetLibrary().GetInstallDir(),
-			SourceDir:         l.GetLibrary().GetSourceDir(),
-			UtilityDir:        l.GetLibrary().GetUtilityDir(),
-			ContainerPlatform: l.GetLibrary().GetContainerPlatform(),
-			DotALinkage:       l.GetLibrary().GetDotALinkage(),
-			Precompiled:       l.GetLibrary().GetPrecompiled(),
-			LdFlags:           l.GetLibrary().GetLdFlags(),
-			IsLegacy:          l.GetLibrary().GetIsLegacy(),
-			Version:           l.GetLibrary().GetVersion(),
-			License:           l.GetLibrary().GetLicense(),
-			Properties:        libraryPropsMap,
-			Location:          LibraryLocation(l.GetLibrary().GetLocation().String()),
-			Layout:            LibraryLayout(l.GetLibrary().GetLayout().String()),
-			Examples:          l.GetLibrary().GetExamples(),
-			ProvidesIncludes:  l.GetLibrary().GetProvidesIncludes(),
-			CompatibleWith:    libraryCompatibleWithMap,
-			InDevelopment:     l.GetLibrary().GetInDevelopment(),
-		},
-		Release: &LibraryRelease{
-			Author:           l.GetRelease().GetAuthor(),
-			Version:          l.GetRelease().GetVersion(),
-			Maintainer:       l.GetRelease().GetMaintainer(),
-			Sentence:         l.GetRelease().GetSentence(),
-			Paragraph:        l.GetRelease().GetParagraph(),
-			Website:          l.GetRelease().GetWebsite(),
-			Category:         l.GetRelease().GetCategory(),
-			Architectures:    l.GetRelease().GetArchitectures(),
-			Types:            l.GetRelease().GetTypes(),
-			Resources:        NewDownloadResource(l.GetRelease().GetResources()),
-			License:          l.GetRelease().GetLicense(),
-			ProvidesIncludes: l.GetRelease().GetProvidesIncludes(),
-			Dependencies:     NewLibraryDependencies(l.GetRelease().GetDependencies()),
-		},
+		Library: NewLibrary(l.GetLibrary()),
+		Release: NewLibraryRelease(l.GetRelease()),
 	}
 }
 
@@ -293,14 +307,14 @@ type Port struct {
 }
 
 func NewPort(p *rpc.Port) *Port {
+	if p == nil {
+		return nil
+	}
 	propertiesMap := orderedmap.New[string, string]()
 	for k, v := range p.GetProperties() {
 		propertiesMap.Set(k, v)
 	}
 	propertiesMap.SortStableKeys(cmp.Compare)
-	if p == nil {
-		return nil
-	}
 	return &Port{
 		Address:       p.GetAddress(),
 		Label:         p.GetLabel(),
@@ -583,4 +597,278 @@ func NewBoardIndentificationProperty(p *rpc.BoardIdentificationProperties) *Boar
 	propertiesMap.SortStableKeys(cmp.Compare)
 
 	return &BoardIdentificationProperties{Properties: propertiesMap}
+}
+
+type BoardListAllResponse struct {
+	Boards []*BoardListItem `json:"boards,omitempty"`
+}
+
+func NewBoardListAllResponse(p *rpc.BoardListAllResponse) *BoardListAllResponse {
+	if p == nil {
+		return nil
+	}
+	boards := make([]*BoardListItem, len(p.GetBoards()))
+	for i, v := range p.GetBoards() {
+		boards[i] = NewBoardListItem(v)
+	}
+	return &BoardListAllResponse{Boards: boards}
+}
+
+type BoardListItem struct {
+	Name     string    `json:"name,omitempty"`
+	Fqbn     string    `json:"fqbn,omitempty"`
+	IsHidden bool      `json:"is_hidden,omitempty"`
+	Platform *Platform `json:"platform,omitempty"`
+}
+
+func NewBoardListItem(b *rpc.BoardListItem) *BoardListItem {
+	if b == nil {
+		return nil
+	}
+	return &BoardListItem{
+		Name:     b.GetName(),
+		Fqbn:     b.GetFqbn(),
+		IsHidden: b.GetIsHidden(),
+		Platform: NewPlatform(b.GetPlatform()),
+	}
+}
+
+type Platform struct {
+	Metadata *PlatformMetadata `json:"metadata,omitempty"`
+	Release  *PlatformRelease  `json:"release,omitempty"`
+}
+
+func NewPlatform(p *rpc.Platform) *Platform {
+	if p == nil {
+		return nil
+	}
+	return &Platform{
+		Metadata: NewPlatformMetadata(p.GetMetadata()),
+		Release:  NewPlatformRelease(p.GetRelease()),
+	}
+}
+
+type PlatformMetadata struct {
+	Id                string `json:"id,omitempty"`
+	Maintainer        string `json:"maintainer,omitempty"`
+	Website           string `json:"website,omitempty"`
+	Email             string `json:"email,omitempty"`
+	ManuallyInstalled bool   `json:"manually_installed,omitempty"`
+	Deprecated        bool   `json:"deprecated,omitempty"`
+	Indexed           bool   `json:"indexed,omitempty"`
+}
+
+func NewPlatformMetadata(p *rpc.PlatformMetadata) *PlatformMetadata {
+	if p == nil {
+		return nil
+	}
+	return &PlatformMetadata{
+		Id:                p.Id,
+		Maintainer:        p.Maintainer,
+		Website:           p.Website,
+		Email:             p.Email,
+		ManuallyInstalled: p.ManuallyInstalled,
+		Deprecated:        p.Deprecated,
+		Indexed:           p.Indexed,
+	}
+}
+
+type DetectedPort struct {
+	MatchingBoards []*BoardListItem `json:"matching_boards,omitempty"`
+	Port           *Port            `json:"port,omitempty"`
+}
+
+func NewDetectedPorts(p []*rpc.DetectedPort) []*DetectedPort {
+	if p == nil {
+		return nil
+	}
+	res := make([]*DetectedPort, len(p))
+	for i, v := range p {
+		res[i] = NewDetectedPort(v)
+	}
+	return res
+}
+
+func NewDetectedPort(p *rpc.DetectedPort) *DetectedPort {
+	if p == nil {
+		return nil
+	}
+	return &DetectedPort{
+		MatchingBoards: NewBoardListItems(p.GetMatchingBoards()),
+		Port:           NewPort(p.GetPort()),
+	}
+}
+
+type LibraryResolveDependenciesResponse struct {
+	Dependencies []*LibraryDependencyStatus `json:"dependencies,omitempty"`
+}
+
+func NewLibraryResolveDependenciesResponse(l *rpc.LibraryResolveDependenciesResponse) *LibraryResolveDependenciesResponse {
+	if l == nil {
+		return nil
+	}
+	dependencies := make([]*LibraryDependencyStatus, len(l.GetDependencies()))
+	for i, v := range l.GetDependencies() {
+		dependencies[i] = NewLibraryDependencyStatus(v)
+	}
+	return &LibraryResolveDependenciesResponse{Dependencies: dependencies}
+}
+
+type LibraryDependencyStatus struct {
+	Name             string `json:"name,omitempty"`
+	VersionRequired  string `json:"version_required,omitempty"`
+	VersionInstalled string `json:"version_installed,omitempty"`
+}
+
+func NewLibraryDependencyStatus(l *rpc.LibraryDependencyStatus) *LibraryDependencyStatus {
+	if l == nil {
+		return nil
+	}
+	return &LibraryDependencyStatus{
+		Name:             l.GetName(),
+		VersionRequired:  l.GetVersionRequired(),
+		VersionInstalled: l.GetVersionInstalled(),
+	}
+}
+
+type LibrarySearchStatus string
+
+type LibrarySearchResponse struct {
+	Libraries []*SearchedLibrary  `json:"libraries,omitempty"`
+	Status    LibrarySearchStatus `json:"status,omitempty"`
+}
+
+func NewLibrarySearchResponse(l *rpc.LibrarySearchResponse) *LibrarySearchResponse {
+	if l == nil {
+		return nil
+	}
+
+	searchedLibraries := make([]*SearchedLibrary, len(l.GetLibraries()))
+	for i, v := range l.GetLibraries() {
+		searchedLibraries[i] = NewSearchedLibrary(v)
+	}
+
+	return &LibrarySearchResponse{
+		Libraries: searchedLibraries,
+		Status:    LibrarySearchStatus(l.GetStatus().Enum().String()),
+	}
+}
+
+type SearchedLibrary struct {
+	Name              string                                  `json:"name,omitempty"`
+	Releases          orderedmap.Map[string, *LibraryRelease] `json:"releases,omitempty"`
+	Latest            *LibraryRelease                         `json:"latest,omitempty"`
+	AvailableVersions []string                                `json:"available_versions,omitempty"`
+}
+
+func NewSearchedLibrary(l *rpc.SearchedLibrary) *SearchedLibrary {
+	if l == nil {
+		return nil
+	}
+	// TODO understand if we want semver keys
+	releasesMap := orderedmap.New[string, *LibraryRelease]()
+	for k, v := range l.GetReleases() {
+		releasesMap.Set(k, NewLibraryRelease(v))
+	}
+	releasesMap.SortStableKeys(cmp.Compare)
+
+	return &SearchedLibrary{
+		Name:              l.GetName(),
+		Releases:          releasesMap,
+		Latest:            NewLibraryRelease(l.GetLatest()),
+		AvailableVersions: l.GetAvailableVersions(),
+	}
+}
+
+type MonitorPortSettingDescriptor struct {
+	SettingId  string   `json:"setting_id,omitempty"`
+	Label      string   `json:"label,omitempty"`
+	Type       string   `json:"type,omitempty"`
+	EnumValues []string `json:"enum_values,omitempty"`
+	Value      string   `json:"value,omitempty"`
+}
+
+func NewMonitorPortSettingDescriptor(m *rpc.MonitorPortSettingDescriptor) *MonitorPortSettingDescriptor {
+	if m == nil {
+		return nil
+	}
+	return &MonitorPortSettingDescriptor{
+		SettingId:  m.GetSettingId(),
+		Label:      m.GetLabel(),
+		Type:       m.GetType(),
+		EnumValues: m.GetEnumValues(),
+		Value:      m.GetValue(),
+	}
+}
+
+type CompileResponse struct {
+	OutStream              []byte                      `json:"out_stream,omitempty"`
+	ErrStream              []byte                      `json:"err_stream,omitempty"`
+	BuildPath              string                      `json:"build_path,omitempty"`
+	UsedLibraries          []*Library                  `json:"used_libraries,omitempty"`
+	ExecutableSectionsSize []*ExecutableSectionSize    `json:"executable_sections_size,omitempty"`
+	BoardPlatform          *InstalledPlatformReference `json:"board_platform,omitempty"`
+	BuildPlatform          *InstalledPlatformReference `json:"build_platform,omitempty"`
+	BuildProperties        []string                    `json:"build_properties,omitempty"`
+}
+
+func NewCompileResponse(c *rpc.CompileResponse) *CompileResponse {
+	if c == nil {
+		return nil
+	}
+	usedLibs := make([]*Library, len(c.GetUsedLibraries()))
+	for i, v := range c.GetUsedLibraries() {
+		usedLibs[i] = NewLibrary(v)
+	}
+	executableSectionsSizes := make([]*ExecutableSectionSize, len(c.GetExecutableSectionsSize()))
+	for i, v := range c.GetExecutableSectionsSize() {
+		executableSectionsSizes[i] = NewExecutableSectionSize(v)
+	}
+
+	return &CompileResponse{
+		OutStream:              c.GetOutStream(),
+		ErrStream:              c.GetErrStream(),
+		BuildPath:              c.GetBuildPath(),
+		UsedLibraries:          usedLibs,
+		ExecutableSectionsSize: executableSectionsSizes,
+		BoardPlatform:          &InstalledPlatformReference{},
+		BuildPlatform:          &InstalledPlatformReference{},
+		BuildProperties:        c.GetBuildProperties(),
+	}
+}
+
+type ExecutableSectionSize struct {
+	Name    string `json:"name,omitempty"`
+	Size    int64  `json:"size,omitempty"`
+	MaxSize int64  `json:"max_size,omitempty"`
+}
+
+func NewExecutableSectionSize(s *rpc.ExecutableSectionSize) *ExecutableSectionSize {
+	if s == nil {
+		return nil
+	}
+	return &ExecutableSectionSize{
+		Name:    s.GetName(),
+		Size:    s.GetSize(),
+		MaxSize: s.GetMaxSize(),
+	}
+}
+
+type InstalledPlatformReference struct {
+	Id         string `json:"id,omitempty"`
+	Version    string `json:"version,omitempty"`
+	InstallDir string `json:"install_dir,omitempty"`
+	PackageUrl string `json:"package_url,omitempty"`
+}
+
+func NewInstalledPlatformReference(r *rpc.InstalledPlatformReference) *InstalledPlatformReference {
+	if r == nil {
+		return nil
+	}
+	return &InstalledPlatformReference{
+		Id:         r.GetId(),
+		Version:    r.GetVersion(),
+		InstallDir: r.GetInstallDir(),
+		PackageUrl: r.GetPackageUrl(),
+	}
 }
