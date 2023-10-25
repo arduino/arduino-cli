@@ -24,7 +24,9 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"time"
 
+	"github.com/arduino/go-paths-helper"
 	monitor "github.com/arduino/pluggable-monitor-protocol-handler"
 )
 
@@ -41,6 +43,7 @@ type SerialMonitor struct {
 	mockedSerialPort io.ReadWriteCloser
 	serialSettings   *monitor.PortDescriptor
 	openedPort       bool
+	muxFile          *paths.Path
 }
 
 // NewSerialMonitor will initialize and return a SerialMonitor
@@ -129,9 +132,16 @@ func (d *SerialMonitor) Open(boardPort string) (io.ReadWriter, error) {
 	d.openedPort = true
 	sideA, sideB := newBidirectionalPipe()
 	d.mockedSerialPort = sideA
+	if muxFile, err := paths.MkTempFile(nil, ""); err == nil {
+		d.muxFile = paths.NewFromFile(muxFile)
+		muxFile.Close()
+	}
 	go func() {
 		buff := make([]byte, 1024)
 		d.mockedSerialPort.Write([]byte("Opened port: " + boardPort + "\n"))
+		if d.muxFile != nil {
+			d.mockedSerialPort.Write([]byte("Tmpfile: " + d.muxFile.String() + "\n"))
+		}
 		for parameter, descriptor := range d.serialSettings.ConfigurationParameter {
 			d.mockedSerialPort.Write([]byte(
 				fmt.Sprintf("Configuration %s = %s\n", parameter, descriptor.Selected)))
@@ -186,6 +196,11 @@ func (d *SerialMonitor) Close() error {
 	}
 	d.mockedSerialPort.Close()
 	d.openedPort = false
+	if d.muxFile != nil {
+		time.Sleep(500 * time.Millisecond) // Emulate a small delay closing the port to check gRPC synchronization
+		d.muxFile.Remove()
+		d.muxFile = nil
+	}
 	return nil
 }
 

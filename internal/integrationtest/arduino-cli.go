@@ -611,3 +611,22 @@ func (inst *ArduinoCLIInstance) PlatformSearch(ctx context.Context, args string,
 	resp, err := inst.cli.daemonClient.PlatformSearch(ctx, req)
 	return resp, err
 }
+
+// Monitor calls the "Monitor" gRPC method and sends the OpenRequest message.
+func (inst *ArduinoCLIInstance) Monitor(ctx context.Context, port *commands.Port) (commands.ArduinoCoreService_MonitorClient, error) {
+	req := &commands.MonitorRequest{}
+	logCallf(">>> Monitor(%+v)\n", req)
+	monitorClient, err := inst.cli.daemonClient.Monitor(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = monitorClient.Send(&commands.MonitorRequest{
+		Message: &commands.MonitorRequest_OpenRequest{
+			OpenRequest: &commands.MonitorPortOpenRequest{
+				Instance: inst.instance,
+				Port:     port,
+			},
+		},
+	})
+	return monitorClient, err
+}
