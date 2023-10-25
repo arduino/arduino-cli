@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -154,7 +155,11 @@ func runMonitorCmd(
 		feedback.Fatal(tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
 	}
 	if describe {
-		feedback.PrintResult(&detailsResult{Settings: enumerateResp.Settings})
+		settings := make([]*result.MonitorPortSettingDescriptor, len(enumerateResp.Settings))
+		for i, v := range enumerateResp.Settings {
+			settings[i] = result.NewMonitorPortSettingDescriptor(v)
+		}
+		feedback.PrintResult(&detailsResult{Settings: settings})
 		return
 	}
 
@@ -277,7 +282,7 @@ func (cd *charDetectorWriter) Write(buf []byte) (int, error) {
 }
 
 type detailsResult struct {
-	Settings []*rpc.MonitorPortSettingDescriptor `json:"settings"`
+	Settings []*result.MonitorPortSettingDescriptor `json:"settings"`
 }
 
 func (r *detailsResult) Data() interface{} {
@@ -286,8 +291,13 @@ func (r *detailsResult) Data() interface{} {
 
 func (r *detailsResult) String() string {
 	t := table.New()
-	green := color.New(color.FgGreen)
 	t.SetHeader(tr("ID"), tr("Setting"), tr("Default"), tr("Values"))
+
+	if len(r.Settings) == 0 {
+		return t.Render()
+	}
+
+	green := color.New(color.FgGreen)
 	sort.Slice(r.Settings, func(i, j int) bool {
 		return r.Settings[i].Label < r.Settings[j].Label
 	})
