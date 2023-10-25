@@ -17,6 +17,7 @@ package monitor_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -88,7 +89,7 @@ func TestMonitorGRPCClose(t *testing.T) {
 		var tmpFile *paths.Path
 		for {
 			monResp, err := mon.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				fmt.Println("MON>", err)
 				break
 			}
