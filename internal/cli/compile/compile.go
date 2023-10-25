@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -340,10 +341,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 	stdIO := stdIORes()
 	res := &compileResult{
-		CompilerOut:        stdIO.Stdout,
-		CompilerErr:        stdIO.Stderr,
-		BuilderResult:      compileRes,
-		UploadResult:       uploadRes,
+		CompilerOut:   stdIO.Stdout,
+		CompilerErr:   stdIO.Stderr,
+		BuilderResult: result.NewCompileResponse(compileRes),
+		UploadResult: struct {
+			UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
+		}{
+			UpdatedUploadPort: result.NewPort(uploadRes.GetUpdatedUploadPort()),
+		},
 		ProfileOut:         profileOut,
 		Success:            compileError == nil,
 		showPropertiesMode: showProperties,
@@ -385,13 +390,15 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 }
 
 type compileResult struct {
-	CompilerOut   string               `json:"compiler_out"`
-	CompilerErr   string               `json:"compiler_err"`
-	BuilderResult *rpc.CompileResponse `json:"builder_result"`
-	UploadResult  *rpc.UploadResult    `json:"upload_result"`
-	Success       bool                 `json:"success"`
-	ProfileOut    string               `json:"profile_out,omitempty"`
-	Error         string               `json:"error,omitempty"`
+	CompilerOut   string                  `json:"compiler_out"`
+	CompilerErr   string                  `json:"compiler_err"`
+	BuilderResult *result.CompileResponse `json:"builder_result"`
+	UploadResult  struct {
+		UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
+	} `json:"upload_result"`
+	Success    bool   `json:"success"`
+	ProfileOut string `json:"profile_out,omitempty"`
+	Error      string `json:"error,omitempty"`
 
 	showPropertiesMode arguments.ShowPropertiesMode
 	hideStats          bool
@@ -402,8 +409,8 @@ func (r *compileResult) Data() interface{} {
 }
 
 func (r *compileResult) String() string {
-	if r.showPropertiesMode != arguments.ShowPropertiesDisabled {
-		return strings.Join(r.BuilderResult.GetBuildProperties(), fmt.Sprintln())
+	if r.BuilderResult != nil && r.showPropertiesMode != arguments.ShowPropertiesDisabled {
+		return strings.Join(r.BuilderResult.BuildProperties, fmt.Sprintln())
 	}
 
 	if r.hideStats {
@@ -419,38 +426,41 @@ func (r *compileResult) String() string {
 	if r.CompilerOut != "" || r.CompilerErr != "" {
 		res += fmt.Sprintln()
 	}
-	if len(build.GetUsedLibraries()) > 0 {
+	if build != nil && len(build.UsedLibraries) > 0 {
 		libraries := table.New()
 		libraries.SetHeader(
 			table.NewCell(tr("Used library"), titleColor),
 			table.NewCell(tr("Version"), titleColor),
 			table.NewCell(tr("Path"), pathColor))
-		for _, l := range build.GetUsedLibraries() {
+		for _, l := range build.UsedLibraries {
+			if l == nil {
+				continue
+			}
 			libraries.AddRow(
-				table.NewCell(l.GetName(), nameColor),
-				l.GetVersion(),
-				table.NewCell(l.GetInstallDir(), pathColor))
+				table.NewCell(l.Name, nameColor),
+				l.Version,
+				table.NewCell(l.InstallDir, pathColor))
 		}
 		res += fmt.Sprintln(libraries.Render())
 	}
-
-	if boardPlatform := build.GetBoardPlatform(); boardPlatform != nil {
+	if build != nil && build.BoardPlatform != nil {
+		boardPlatform := build.BoardPlatform
 		platforms := table.New()
 		platforms.SetHeader(
 			table.NewCell(tr("Used platform"), titleColor),
 			table.NewCell(tr("Version"), titleColor),
 			table.NewCell(tr("Path"), pathColor))
 		platforms.AddRow(
-			table.NewCell(boardPlatform.GetId(), nameColor),
-			boardPlatform.GetVersion(),
-			table.NewCell(boardPlatform.GetInstallDir(), pathColor))
-		if buildPlatform := build.GetBuildPlatform(); buildPlatform != nil &&
+			table.NewCell(boardPlatform.Id, nameColor),
+			boardPlatform.Version,
+			table.NewCell(boardPlatform.InstallDir, pathColor))
+		if buildPlatform := build.BuildPlatform; buildPlatform != nil &&
 			buildPlatform.Id != boardPlatform.Id &&
 			buildPlatform.Version != boardPlatform.Version {
 			platforms.AddRow(
-				table.NewCell(buildPlatform.GetId(), nameColor),
-				buildPlatform.GetVersion(),
-				table.NewCell(buildPlatform.GetInstallDir(), pathColor))
+				table.NewCell(buildPlatform.Id, nameColor),
+				buildPlatform.Version,
+				table.NewCell(buildPlatform.InstallDir, pathColor))
 		}
 		res += fmt.Sprintln(platforms.Render())
 	}

@@ -840,8 +840,8 @@ func NewCompileResponse(c *rpc.CompileResponse) *CompileResponse {
 		BuildPath:              c.GetBuildPath(),
 		UsedLibraries:          usedLibs,
 		ExecutableSectionsSize: executableSectionsSizes,
-		BoardPlatform:          &InstalledPlatformReference{},
-		BuildPlatform:          &InstalledPlatformReference{},
+		BoardPlatform:          NewInstalledPlatformReference(c.GetBoardPlatform()),
+		BuildPlatform:          NewInstalledPlatformReference(c.GetBuildPlatform()),
 		BuildProperties:        c.GetBuildProperties(),
 	}
 }
