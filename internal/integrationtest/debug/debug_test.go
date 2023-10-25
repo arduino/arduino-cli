@@ -147,7 +147,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 					"thb setup",
 					"c"
 				]
-			}
+			},
+			"programmer": "atmel_ice"
 		}`)
 	}
 
@@ -189,7 +190,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 					"thb setup",
 					"c"
 				]
-			}
+			},
+			"programmer": "my_cold_ice"
 		}`)
 
 		{
@@ -211,7 +213,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 						"single-script"
 					]
 				},
-				"svd_file": "svd-file"
+				"svd_file": "svd-file",
+				"programmer": "atmel_ice"
 			}`)
 		}
 
@@ -234,7 +237,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 						"cold_ice_script"
 					]
 				},
-				"svd_file": "svd-file"
+				"svd_file": "svd-file",
+				"programmer": "my_cold_ice"
 			}`)
 		}
 

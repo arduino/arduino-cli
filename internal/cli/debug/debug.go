@@ -126,6 +126,7 @@ type debugInfoResult struct {
 	ServerConfig            any    `json:"server_configuration,omitempty"`
 	SvdFile                 string `json:"svd_file,omitempty"`
 	CortexDebugCustomConfig any    `json:"cortex-debug_custom_configuration,omitempty"`
+	Programmer              string `json:"programmer"`
 }
 
 type openOcdServerConfigResult struct {
@@ -166,6 +167,7 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 		ServerConfig:            serverConfig,
 		SvdFile:                 info.SvdFile,
 		CortexDebugCustomConfig: cortexDebugCustomConfig,
+		Programmer:              info.Programmer,
 	}
 }
 

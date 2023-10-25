@@ -96,6 +96,8 @@ message GetDebugConfigResponse {
   string cortex_debug_custom_json = 9;
   // the SVD file to use
   string svd_file = 10;
+  // The programmer specified in the request
+  string programmer = 11;
 }
 
 // Configurations specific for the 'gcc' toolchain
