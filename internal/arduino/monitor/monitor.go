@@ -292,7 +292,7 @@ func (mon *PluggableMonitor) Close() error {
 	if err := mon.sendCommand("CLOSE\n"); err != nil {
 		return err
 	}
-	_, err := mon.waitMessage(time.Millisecond*250, "close")
+	_, err := mon.waitMessage(time.Millisecond*5000, "close")
 	return err
 }
 
