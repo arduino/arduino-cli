@@ -25,23 +25,27 @@ import (
 
 // NewPlatformSummary creates a new result.Platform from rpc.PlatformSummary
 func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
+	if in == nil {
+		return nil
+	}
+
 	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease, string]((*semver.Version).String)
-	for k, v := range in.Releases {
+	for k, v := range in.GetReleases() {
 		releases.Set(semver.MustParse(k), NewPlatformRelease(v))
 	}
 	releases.SortKeys((*semver.Version).CompareTo)
 
 	return &PlatformSummary{
-		Id:                in.Metadata.Id,
-		Maintainer:        in.Metadata.Maintainer,
-		Website:           in.Metadata.Website,
-		Email:             in.Metadata.Email,
-		ManuallyInstalled: in.Metadata.ManuallyInstalled,
-		Deprecated:        in.Metadata.Deprecated,
-		Indexed:           in.Metadata.Indexed,
+		Id:                in.GetMetadata().GetId(),
+		Maintainer:        in.GetMetadata().GetMaintainer(),
+		Website:           in.GetMetadata().GetWebsite(),
+		Email:             in.GetMetadata().GetEmail(),
+		ManuallyInstalled: in.GetMetadata().GetManuallyInstalled(),
+		Deprecated:        in.GetMetadata().GetDeprecated(),
+		Indexed:           in.GetMetadata().GetIndexed(),
 		Releases:          releases,
-		InstalledVersion:  semver.MustParse(in.InstalledVersion),
-		LatestVersion:     semver.MustParse(in.LatestVersion),
+		InstalledVersion:  semver.MustParse(in.GetInstalledVersion()),
+		LatestVersion:     semver.MustParse(in.GetLatestVersion()),
 	}
 }
 
@@ -73,6 +77,9 @@ func (p *PlatformSummary) GetInstalledRelease() *PlatformRelease {
 
 // NewPlatformRelease creates a new result.PlatformRelease from rpc.PlatformRelease
 func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
+	if in == nil {
+		return nil
+	}
 	var boards []*Board
 	for _, board := range in.Boards {
 		boards = append(boards, &Board{
