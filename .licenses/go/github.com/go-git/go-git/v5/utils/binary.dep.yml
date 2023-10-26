@@ -2,7 +2,7 @@
 name: github.com/go-git/go-git/v5/utils/binary
 version: v5.4.2
 type: go
-summary: Package binary implements sintax-sugar functions on top of the standard library
+summary: Package binary implements syntax-sugar functions on top of the standard library
   binary package
 homepage: https://pkg.go.dev/github.com/go-git/go-git/v5/utils/binary
 license: apache-2.0
