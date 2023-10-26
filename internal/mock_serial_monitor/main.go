@@ -197,7 +197,7 @@ func (d *SerialMonitor) Close() error {
 	d.mockedSerialPort.Close()
 	d.openedPort = false
 	if d.muxFile != nil {
-		time.Sleep(500 * time.Millisecond) // Emulate a small delay closing the port to check gRPC synchronization
+		time.Sleep(2000 * time.Millisecond) // Emulate a small delay closing the port to check gRPC synchronization
 		d.muxFile.Remove()
 		d.muxFile = nil
 	}

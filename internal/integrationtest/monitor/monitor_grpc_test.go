@@ -82,7 +82,7 @@ func TestMonitorGRPCClose(t *testing.T) {
 	}
 
 	// Now close the monitor using MonitorRequest_Close
-	for tries := 0; tries < 5; tries++ { // Try the test 5 times to avoid flukes
+	{
 		// Keep a timeout to allow the test to exit in any case
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		mon, err := grpcInst.Monitor(ctx, ports[0].Port)
