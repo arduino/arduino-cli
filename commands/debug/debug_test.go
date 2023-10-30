@@ -63,6 +63,14 @@ func TestGetCommandLine(t *testing.T) {
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()
+
+	{
+		// Check programmer required
+		_, err := getCommandLine(req, pme)
+		require.Error(t, err)
+	}
+
+	req.Programmer = "edbg"
 	command, err := getCommandLine(req, pme)
 	require.Nil(t, err)
 	commandToTest := strings.Join(command, " ")
@@ -76,6 +84,7 @@ func TestGetCommandLine(t *testing.T) {
 		SketchPath:  sketchPath.String(),
 		Interpreter: "mi1",
 		ImportDir:   sketchPath.Join("build", "arduino-test.samd.mkr1000").String(),
+		Programmer:  "edbg",
 	}
 
 	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin/arm-none-eabi-gdb%s", dataDir, toolExtension) +
