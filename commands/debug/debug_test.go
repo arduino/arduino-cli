@@ -70,6 +70,13 @@ func TestGetCommandLine(t *testing.T) {
 		require.Error(t, err)
 	}
 
+	{
+		// Check programmer not found
+		req.Programmer = "not-existent"
+		_, err := getCommandLine(req, pme)
+		require.Error(t, err)
+	}
+
 	req.Programmer = "edbg"
 	command, err := getCommandLine(req, pme)
 	require.Nil(t, err)
