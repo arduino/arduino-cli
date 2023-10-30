@@ -44,6 +44,12 @@ my.debug.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
 my.debug.cortex-debug.custom.overrideRestartCommands.2=thb setup
 my.debug.cortex-debug.custom.overrideRestartCommands.3=c
 my.debug.cortex-debug.custom.anotherStringParamer=hellooo
+my.debug.cortex-debug.custom.aBoolean=[boolean]true
+my.debug.cortex-debug.custom.aStringBoolean=true
+my.debug.cortex-debug.custom.aNumber=[number]10
+my.debug.cortex-debug.custom.anotherNumber=[number]10.20
+my.debug.cortex-debug.custom.aStringNumber=10
+my.debug.cortex-debug.custom.anObject=[object]{"key":"value", "boolean":true}
 my.debug.svd_file=svd-file
 
 my2.name=My Cool Board
