@@ -1403,6 +1403,37 @@ will result in the following JSON to be merged in the Arduino IDE generated `lau
 }
 ```
 
+All the values are converted by default to a string in the resulting JSON. If another type is needed the value can be
+prefixed with the tags `[boolean]`, `[number]`, `[string]` or `[object]` to force a specific type in the JSON. Moreover
+the hierarchy of the properties may be used to build JSON objects. For example:
+
+```
+debug.cortex-debug.custom.aBoolean=[boolean]true
+debug.cortex-debug.custom.aNumber=[number]10
+debug.cortex-debug.custom.anotherNumber=[number]10.20
+debug.cortex-debug.custom.anObject=[object]{"key":"value", "boolean":true}
+debug.cortex-debug.custom.anotherObject.key=value
+debug.cortex-debug.custom.anotherObject.boolean=[boolean]true
+```
+
+will result in the following JSON:
+
+```json
+{
+  "aBoolean": true,
+  "aNumber": 10,
+  "anotherNumber": 10.2,
+  "anObject": {
+    "boolean": true,
+    "key": "value"
+  },
+  "anotherObject": {
+    "boolean": true,
+    "key": "value"
+  }
+}
+```
+
 ### Optimization level for debugging
 
 The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
