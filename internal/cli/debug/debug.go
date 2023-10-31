@@ -116,17 +116,17 @@ func runDebugCommand(command *cobra.Command, args []string) {
 }
 
 type debugInfoResult struct {
-	Executable              string `json:"executable,omitempty"`
-	Toolchain               string `json:"toolchain,omitempty"`
-	ToolchainPath           string `json:"toolchain_path,omitempty"`
-	ToolchainPrefix         string `json:"toolchain_prefix,omitempty"`
-	ToolchainConfig         any    `json:"toolchain_configuration,omitempty"`
-	Server                  string `json:"server,omitempty"`
-	ServerPath              string `json:"server_path,omitempty"`
-	ServerConfig            any    `json:"server_configuration,omitempty"`
-	SvdFile                 string `json:"svd_file,omitempty"`
-	CortexDebugCustomConfig any    `json:"cortex-debug_custom_configuration,omitempty"`
-	Programmer              string `json:"programmer"`
+	Executable      string         `json:"executable,omitempty"`
+	Toolchain       string         `json:"toolchain,omitempty"`
+	ToolchainPath   string         `json:"toolchain_path,omitempty"`
+	ToolchainPrefix string         `json:"toolchain_prefix,omitempty"`
+	ToolchainConfig any            `json:"toolchain_configuration,omitempty"`
+	Server          string         `json:"server,omitempty"`
+	ServerPath      string         `json:"server_path,omitempty"`
+	ServerConfig    any            `json:"server_configuration,omitempty"`
+	SvdFile         string         `json:"svd_file,omitempty"`
+	CustomConfigs   map[string]any `json:"custom_configs,omitempty"`
+	Programmer      string         `json:"programmer"`
 }
 
 type openOcdServerConfigResult struct {
@@ -150,24 +150,25 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 			Scripts:    openocdConf.Scripts,
 		}
 	}
-	var cortexDebugCustomConfig any
-	if info.CortexDebugCustomJson != "" {
-		if err := json.Unmarshal([]byte(info.CortexDebugCustomJson), &cortexDebugCustomConfig); err != nil {
-			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
+	customConfigs := map[string]any{}
+	for id, configJson := range info.GetCustomConfigurationsJson() {
+		var config any
+		if err := json.Unmarshal([]byte(configJson), &config); err == nil {
+			customConfigs[id] = config
 		}
 	}
 	return &debugInfoResult{
-		Executable:              info.Executable,
-		Toolchain:               info.Toolchain,
-		ToolchainPath:           info.ToolchainPath,
-		ToolchainPrefix:         info.ToolchainPrefix,
-		ToolchainConfig:         toolchainConfig,
-		Server:                  info.Server,
-		ServerPath:              info.ServerPath,
-		ServerConfig:            serverConfig,
-		SvdFile:                 info.SvdFile,
-		CortexDebugCustomConfig: cortexDebugCustomConfig,
-		Programmer:              info.Programmer,
+		Executable:      info.Executable,
+		Toolchain:       info.Toolchain,
+		ToolchainPath:   info.ToolchainPath,
+		ToolchainPrefix: info.ToolchainPrefix,
+		ToolchainConfig: toolchainConfig,
+		Server:          info.Server,
+		ServerPath:      info.ServerPath,
+		ServerConfig:    serverConfig,
+		SvdFile:         info.SvdFile,
+		CustomConfigs:   customConfigs,
+		Programmer:      info.Programmer,
 	}
 }
 
@@ -209,10 +210,12 @@ func (r *debugInfoResult) String() string {
 		}
 	default:
 	}
-	if r.CortexDebugCustomConfig != nil {
-		t.AddRow(tr("Custom configuration for cortex-debug IDE plugin:"))
-		data, _ := json.MarshalIndent(r.CortexDebugCustomConfig, "  ", "  ")
-		return t.Render() + "  " + string(data)
+	if custom := r.CustomConfigs; custom != nil {
+		for id, config := range custom {
+			configJson, _ := json.MarshalIndent(config, "", "  ")
+			t.AddRow(tr("Custom configuration for %s:", id))
+			return t.Render() + "  " + string(configJson)
+		}
 	}
 	return t.Render()
 }
