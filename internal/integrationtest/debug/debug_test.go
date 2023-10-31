@@ -132,34 +132,36 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				]
 			},
 			"svd_file": "svd-file",
-			"cortex-debug_custom_configuration": {
-				"aBoolean": true,
-				"aStringBoolean": "true",
-				"aStringNumber": "10",
-				"aNumber": 10,
-				"anotherNumber": 10.2,
-				"anObject": {
-					"boolean": true,
-					"key": "value"
+			"custom_configs": {
+				"cortex-debug": {
+					"aBoolean": true,
+					"aStringBoolean": "true",
+					"aStringNumber": "10",
+					"aNumber": 10,
+					"anotherNumber": 10.2,
+					"anObject": {
+						"boolean": true,
+						"key": "value"
+					},
+					"anotherObject": {
+						"boolean": true,
+						"key": "value"
+					},
+					"anotherStringParamer": "hellooo",
+					"overrideRestartCommands": [
+						"monitor reset halt",
+						"monitor gdb_sync",
+						"thb setup",
+						"c"
+					],
+					"postAttachCommands": [
+						"set remote hardware-watchpoint-limit 2",
+						"monitor reset halt",
+						"monitor gdb_sync",
+						"thb setup",
+						"c"
+					]
 				},
-				"anotherObject": {
-					"boolean": true,
-					"key": "value"
-				},
-				"anotherStringParamer": "hellooo",
-				"overrideRestartCommands": [
-					"monitor reset halt",
-					"monitor gdb_sync",
-					"thb setup",
-					"c"
-				],
-				"postAttachCommands": [
-					"set remote hardware-watchpoint-limit 2",
-					"monitor reset halt",
-					"monitor gdb_sync",
-					"thb setup",
-					"c"
-				]
 			},
 			"programmer": "atmel_ice"
 		}`)
@@ -188,34 +190,36 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				]
 			},
 			"svd_file": "svd-file",
-			"cortex-debug_custom_configuration": {
-				"aBoolean": true,
-				"aStringBoolean": "true",
-				"aStringNumber": "10",
-				"aNumber": 10,
-				"anotherNumber": 10.2,
-				"anObject": {
-					"boolean": true,
-					"key": "value"
+			"custom_configs": {
+				"cortex-debug": {
+					"aBoolean": true,
+					"aStringBoolean": "true",
+					"aStringNumber": "10",
+					"aNumber": 10,
+					"anotherNumber": 10.2,
+					"anObject": {
+						"boolean": true,
+						"key": "value"
+					},
+					"anotherObject": {
+						"boolean": true,
+						"key": "value"
+					},
+					"anotherStringParamer": "hellooo",
+					"overrideRestartCommands": [
+						"monitor reset halt",
+						"monitor gdb_sync",
+						"thb setup",
+						"c"
+					],
+					"postAttachCommands": [
+						"set remote hardware-watchpoint-limit 2",
+						"monitor reset halt",
+						"monitor gdb_sync",
+						"thb setup",
+						"c"
+					]
 				},
-				"anotherObject": {
-					"boolean": true,
-					"key": "value"
-				},
-				"anotherStringParamer": "hellooo",
-				"overrideRestartCommands": [
-					"monitor reset halt",
-					"monitor gdb_sync",
-					"thb setup",
-					"c"
-				],
-				"postAttachCommands": [
-					"set remote hardware-watchpoint-limit 2",
-					"monitor reset halt",
-					"monitor gdb_sync",
-					"thb setup",
-					"c"
-				]
 			},
 			"programmer": "my_cold_ice"
 		}`)
