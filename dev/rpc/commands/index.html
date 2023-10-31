@@ -1753,6 +1753,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#getdebugconfigresponsecustomconfigurationsjsonentry" class="md-nav__link">
+    GetDebugConfigResponse.CustomConfigurationsJsonEntry
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3152,6 +3159,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#getdebugconfigresponsecustomconfigurationsjsonentry" class="md-nav__link">
+    GetDebugConfigResponse.CustomConfigurationsJsonEntry
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3749,7 +3763,8 @@
     - <a href="#cc.arduino.cli.commands.v1.DebugRequest">DebugRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.DebugResponse">DebugResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a>
-    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a></li>
+    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigurationsJsonEntry">GetDebugConfigResponse.CustomConfigurationsJsonEntry</a></li>
 </ul>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/lib.proto">cc/arduino/cli/commands/v1/lib.proto</a>
@@ -6788,10 +6803,10 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 <td>Extra configuration parameters wrt GDB server</td>
 </tr>
 <tr>
-<td>cortex_debug_custom_json</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>cortex-debug custom JSON configuration, it is provided as is from the platform developers.</td>
+<td>custom_configurations_json</td>
+<td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigurationsJsonEntry">GetDebugConfigResponse.CustomConfigurationsJsonEntry</a></td>
+<td>repeated</td>
+<td>Custom debugger configurations (not handled directly by Arduino CLI but provided for 3rd party plugins/debuggers)</td>
 </tr>
 <tr>
 <td>svd_file</td>
@@ -6804,6 +6819,32 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The programmer specified in the request</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigurationsJsonEntry"></a></p>
+<h3 id="getdebugconfigresponsecustomconfigurationsjsonentry">GetDebugConfigResponse.CustomConfigurationsJsonEntry<a class="headerlink" href="#getdebugconfigresponsecustomconfigurationsjsonentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
