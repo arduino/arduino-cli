@@ -133,6 +133,19 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 			},
 			"svd_file": "svd-file",
 			"cortex-debug_custom_configuration": {
+				"aBoolean": true,
+				"aStringBoolean": "true",
+				"aStringNumber": "10",
+				"aNumber": 10,
+				"anotherNumber": 10.2,
+				"anObject": {
+					"boolean": true,
+					"key": "value"
+				},
+				"anotherObject": {
+					"boolean": true,
+					"key": "value"
+				},
 				"anotherStringParamer": "hellooo",
 				"overrideRestartCommands": [
 					"monitor reset halt",
@@ -176,6 +189,19 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 			},
 			"svd_file": "svd-file",
 			"cortex-debug_custom_configuration": {
+				"aBoolean": true,
+				"aStringBoolean": "true",
+				"aStringNumber": "10",
+				"aNumber": 10,
+				"anotherNumber": 10.2,
+				"anObject": {
+					"boolean": true,
+					"key": "value"
+				},
+				"anotherObject": {
+					"boolean": true,
+					"key": "value"
+				},
 				"anotherStringParamer": "hellooo",
 				"overrideRestartCommands": [
 					"monitor reset halt",

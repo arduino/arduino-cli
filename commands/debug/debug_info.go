@@ -18,7 +18,8 @@ package debug
 import (
 	"context"
 	"encoding/json"
-	"regexp"
+	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -210,33 +211,89 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 //	my.indexed.array.2=third
 //
 // into the corresponding JSON arrays.
+// If a value should be converted into a JSON type different from string, the value
+// may be prefiex with "[boolean]", "[number]", or "[object]":
+//
+//	my.stringValue=a string
+//	my.booleanValue=[boolean]true
+//	my.numericValue=[number]20
 func convertToJsonMap(in *properties.Map) string {
-	// XXX: Maybe this method could be a good candidate for propertis.Map?
+	data, _ := json.MarshalIndent(convertToRawInterface(in), "", "  ")
+	return string(data)
+}
 
-	// Find the values that should be kept as is, and the indexed arrays
-	// that should be later converted into arrays.
-	arraysKeys := map[string]bool{}
-	stringKeys := []string{}
-	trailingNumberMatcher := regexp.MustCompile(`^(.*)\.[0-9]+$`)
-	for _, k := range in.Keys() {
-		match := trailingNumberMatcher.FindAllStringSubmatch(k, -1)
-		if len(match) > 0 && len(match[0]) > 1 {
-			arraysKeys[match[0][1]] = true
-		} else {
-			stringKeys = append(stringKeys, k)
+func allNumerics(in []string) bool {
+	for _, i := range in {
+		for _, c := range i {
+			if c < '0' || c > '9' {
+				return false
+			}
 		}
 	}
+	return true
+}
 
-	// Compose a map that can be later marshaled into JSON keeping
-	// the arrays where they are expected to be.
+func convertToRawInterface(in *properties.Map) any {
+	subtrees := in.FirstLevelOf()
+	keys := in.FirstLevelKeys()
+
+	if allNumerics(keys) {
+		// Compose an array
+		res := []any{}
+		slices.SortFunc(keys, func(x, y string) int {
+			nx, _ := strconv.Atoi(x)
+			ny, _ := strconv.Atoi(y)
+			return nx - ny
+		})
+		for _, k := range keys {
+			switch {
+			case subtrees[k] != nil:
+				res = append(res, convertToRawInterface(subtrees[k]))
+			default:
+				res = append(res, convertToRawValue(in.Get(k)))
+			}
+		}
+		return res
+	}
+
+	// Compose an object
 	res := map[string]any{}
-	for _, k := range stringKeys {
-		res[k] = in.Get(k)
+	for _, k := range keys {
+		switch {
+		case subtrees[k] != nil:
+			res[k] = convertToRawInterface(subtrees[k])
+		default:
+			res[k] = convertToRawValue(in.Get(k))
+		}
 	}
-	for k := range arraysKeys {
-		res[k] = in.ExtractSubIndexLists(k)
-	}
+	return res
+}
 
-	data, _ := json.MarshalIndent(res, "", "  ")
-	return string(data)
+func convertToRawValue(v string) any {
+	switch {
+	case strings.HasPrefix(v, "[boolean]"):
+		v = strings.TrimSpace(strings.TrimPrefix(v, "[boolean]"))
+		if strings.EqualFold(v, "true") {
+			return true
+		} else if strings.EqualFold(v, "false") {
+			return false
+		}
+	case strings.HasPrefix(v, "[number]"):
+		v = strings.TrimPrefix(v, "[number]")
+		if i, err := strconv.Atoi(v); err == nil {
+			return i
+		} else if f, err := strconv.ParseFloat(v, 64); err == nil {
+			return f
+		}
+	case strings.HasPrefix(v, "[object]"):
+		v = strings.TrimPrefix(v, "[object]")
+		var o interface{}
+		if err := json.Unmarshal([]byte(v), &o); err == nil {
+			return o
+		}
+	case strings.HasPrefix(v, "[string]"):
+		v = strings.TrimPrefix(v, "[string]")
+	}
+	// default or conversion error, return string as is
+	return v
 }

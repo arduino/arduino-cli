@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -105,4 +106,100 @@ func TestGetCommandLine(t *testing.T) {
 	assert.Nil(t, err)
 	commandToTest2 := strings.Join(command2, " ")
 	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))
+}
+
+func TestConvertToJSONMap(t *testing.T) {
+	testIn := properties.NewFromHashmap(map[string]string{
+		"k":                   "v",
+		"string":              "[string]aaa",
+		"bool":                "[boolean]true",
+		"number":              "[number]10",
+		"number2":             "[number]10.2",
+		"object":              `[object]{ "key":"value", "bool":true }`,
+		"array.0":             "first",
+		"array.1":             "second",
+		"array.2":             "[boolean]true",
+		"array.3":             "[number]10",
+		"array.4":             `[object]{ "key":"value", "bool":true }`,
+		"array.5.k":           "v",
+		"array.5.bool":        "[boolean]true",
+		"array.5.number":      "[number]10",
+		"array.5.number2":     "[number]10.2",
+		"array.5.object":      `[object]{ "key":"value", "bool":true }`,
+		"array.6.sub.k":       "v",
+		"array.6.sub.bool":    "[boolean]true",
+		"array.6.sub.number":  "[number]10",
+		"array.6.sub.number2": "[number]10.2",
+		"array.6.sub.object":  `[object]{ "key":"value", "bool":true }`,
+		"array.7.0":           "v",
+		"array.7.1":           "[boolean]true",
+		"array.7.2":           "[number]10",
+		"array.7.3":           "[number]10.2",
+		"array.7.4":           `[object]{ "key":"value", "bool":true }`,
+		"array.8.array.0":     "v",
+		"array.8.array.1":     "[boolean]true",
+		"array.8.array.2":     "[number]10",
+		"array.8.array.3":     "[number]10.2",
+		"array.8.array.4":     `[object]{ "key":"value", "bool":true }`,
+		"sub.k":               "v",
+		"sub.bool":            "[boolean]true",
+		"sub.number":          "[number]10",
+		"sub.number2":         "[number]10.2",
+		"sub.object":          `[object]{ "key":"value", "bool":true }`,
+	})
+	jsonString := convertToJsonMap(testIn)
+	require.JSONEq(t, `{
+		"k": "v",
+		"string": "aaa",
+		"bool": true,
+		"number": 10,
+		"number2": 10.2,
+		"object": { "key":"value", "bool":true },
+		"array": [
+			"first",
+			"second",
+			true,
+			10,
+			{ "key":"value", "bool":true },
+			{
+				"k": "v",
+				"bool": true,
+				"number": 10,
+				"number2": 10.2,
+				"object": { "key":"value", "bool":true }
+			},
+			{
+				"sub": {
+					"k": "v",
+					"bool": true,
+					"number": 10,
+					"number2": 10.2,
+					"object": { "key":"value", "bool":true }
+				}
+			},
+			[
+				"v",
+				true,
+				10,
+				10.2,
+				{ "key":"value", "bool":true }
+			],
+			{
+				"array": [
+					"v",
+					true,
+					10,
+					10.2,
+					{ "key":"value", "bool":true }
+				]
+			}
+		],
+		"sub": {
+			"k": "v",
+			"bool": true,
+			"number": 10,
+			"number2": 10.2,
+			"object": { "key":"value", "bool":true }
+		}
+	}`, jsonString)
 }
