@@ -142,6 +142,10 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 					"boolean": true,
 					"key": "value"
 				},
+				"anotherObject": {
+					"boolean": true,
+					"key": "value"
+				},
 				"anotherStringParamer": "hellooo",
 				"overrideRestartCommands": [
 					"monitor reset halt",
@@ -191,6 +195,10 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"aNumber": 10,
 				"anotherNumber": 10.2,
 				"anObject": {
+					"boolean": true,
+					"key": "value"
+				},
+				"anotherObject": {
 					"boolean": true,
 					"key": "value"
 				},

@@ -50,6 +50,8 @@ my.debug.cortex-debug.custom.aNumber=[number]10
 my.debug.cortex-debug.custom.anotherNumber=[number]10.20
 my.debug.cortex-debug.custom.aStringNumber=10
 my.debug.cortex-debug.custom.anObject=[object]{"key":"value", "boolean":true}
+my.debug.cortex-debug.custom.anotherObject.key=value
+my.debug.cortex-debug.custom.anotherObject.boolean=[boolean]true
 my.debug.svd_file=svd-file
 
 my2.name=My Cool Board
