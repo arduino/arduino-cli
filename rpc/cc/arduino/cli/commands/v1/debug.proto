@@ -91,9 +91,9 @@ message GetDebugConfigResponse {
   google.protobuf.Any toolchain_configuration = 7;
   // Extra configuration parameters wrt GDB server
   google.protobuf.Any server_configuration = 8;
-  // cortex-debug custom JSON configuration, it is provided as is from
-  // the platform developers.
-  string cortex_debug_custom_json = 9;
+  // Custom debugger configurations (not handled directly by Arduino CLI but
+  // provided for 3rd party plugins/debuggers)
+  map<string, string> custom_configurations_json = 9;
   // the SVD file to use
   string svd_file = 10;
   // The programmer specified in the request
