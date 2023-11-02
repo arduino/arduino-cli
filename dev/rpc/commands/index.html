@@ -1754,8 +1754,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#getdebugconfigresponsecustomconfigurationsjsonentry" class="md-nav__link">
-    GetDebugConfigResponse.CustomConfigurationsJsonEntry
+  <a href="#getdebugconfigresponsecustomconfigsentry" class="md-nav__link">
+    GetDebugConfigResponse.CustomConfigsEntry
   </a>
   
 </li>
@@ -3160,8 +3160,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#getdebugconfigresponsecustomconfigurationsjsonentry" class="md-nav__link">
-    GetDebugConfigResponse.CustomConfigurationsJsonEntry
+  <a href="#getdebugconfigresponsecustomconfigsentry" class="md-nav__link">
+    GetDebugConfigResponse.CustomConfigsEntry
   </a>
   
 </li>
@@ -3764,7 +3764,7 @@
     - <a href="#cc.arduino.cli.commands.v1.DebugResponse">DebugResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a>
-    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigurationsJsonEntry">GetDebugConfigResponse.CustomConfigurationsJsonEntry</a></li>
+    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigsEntry">GetDebugConfigResponse.CustomConfigsEntry</a></li>
 </ul>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/lib.proto">cc/arduino/cli/commands/v1/lib.proto</a>
@@ -6803,10 +6803,10 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 <td>Extra configuration parameters wrt GDB server</td>
 </tr>
 <tr>
-<td>custom_configurations_json</td>
-<td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigurationsJsonEntry">GetDebugConfigResponse.CustomConfigurationsJsonEntry</a></td>
+<td>custom_configs</td>
+<td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigsEntry">GetDebugConfigResponse.CustomConfigsEntry</a></td>
 <td>repeated</td>
-<td>Custom debugger configurations (not handled directly by Arduino CLI but provided for 3rd party plugins/debuggers)</td>
+<td>Custom debugger configurations (not handled directly by Arduino CLI but provided for 3rd party plugins/debuggers). The map keys identifies which 3rd party plugin/debugger is referred, the map string values contains a JSON configuration for it.</td>
 </tr>
 <tr>
 <td>svd_file</td>
@@ -6822,8 +6822,8 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 </tr>
 </tbody>
 </table>
-<p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigurationsJsonEntry"></a></p>
-<h3 id="getdebugconfigresponsecustomconfigurationsjsonentry">GetDebugConfigResponse.CustomConfigurationsJsonEntry<a class="headerlink" href="#getdebugconfigresponsecustomconfigurationsjsonentry" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigsEntry"></a></p>
+<h3 id="getdebugconfigresponsecustomconfigsentry">GetDebugConfigResponse.CustomConfigsEntry<a class="headerlink" href="#getdebugconfigresponsecustomconfigsentry" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
