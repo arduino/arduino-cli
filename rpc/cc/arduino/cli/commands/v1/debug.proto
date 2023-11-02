@@ -92,7 +92,9 @@ message GetDebugConfigResponse {
   // Extra configuration parameters wrt GDB server
   google.protobuf.Any server_configuration = 8;
   // Custom debugger configurations (not handled directly by Arduino CLI but
-  // provided for 3rd party plugins/debuggers)
+  // provided for 3rd party plugins/debuggers). The map keys identifies which
+  // 3rd party plugin/debugger is referred, the map string values contains a
+  // JSON configuration for it.
   map<string, string> custom_configs = 9;
   // the SVD file to use
   string svd_file = 10;

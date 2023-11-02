@@ -296,7 +296,9 @@ type GetDebugConfigResponse struct {
 	// Extra configuration parameters wrt GDB server
 	ServerConfiguration *anypb.Any `protobuf:"bytes,8,opt,name=server_configuration,json=serverConfiguration,proto3" json:"server_configuration,omitempty"`
 	// Custom debugger configurations (not handled directly by Arduino CLI but
-	// provided for 3rd party plugins/debuggers)
+	// provided for 3rd party plugins/debuggers). The map keys identifies which
+	// 3rd party plugin/debugger is referred, the map string values contains a
+	// JSON configuration for it.
 	CustomConfigs map[string]string `protobuf:"bytes,9,rep,name=custom_configs,json=customConfigs,proto3" json:"custom_configs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// the SVD file to use
 	SvdFile string `protobuf:"bytes,10,opt,name=svd_file,json=svdFile,proto3" json:"svd_file,omitempty"`
