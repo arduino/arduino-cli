@@ -93,7 +93,7 @@ message GetDebugConfigResponse {
   google.protobuf.Any server_configuration = 8;
   // Custom debugger configurations (not handled directly by Arduino CLI but
   // provided for 3rd party plugins/debuggers)
-  map<string, string> custom_configurations_json = 9;
+  map<string, string> custom_configs = 9;
   // the SVD file to use
   string svd_file = 10;
   // The programmer specified in the request
