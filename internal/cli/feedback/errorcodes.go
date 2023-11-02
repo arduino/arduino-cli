@@ -42,4 +42,11 @@ const (
 
 	// ErrBadArgument is returned when the arguments are not valid (7)
 	ErrBadArgument
+
+	// ErrFailedToListenToTCPPort is returned if the CLI failed to open a TCP port
+	// to listen for incoming connections (8)
+	ErrFailedToListenToTCPPort
+
+	// ErrBadTCPPortArgument is returned if the TCP port argument is not valid (9)
+	ErrBadTCPPortArgument
 )
