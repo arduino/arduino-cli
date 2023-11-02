@@ -136,18 +136,18 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", port, err), feedback.ErrFailedToListenToTCPPort)
 	}
 
-	// We need to parse the port used only if the user let
-	// us choose it randomly, in all other cases we already
-	// know which is used.
+	// We need to retrieve the port used only if the user did not specify it
+	// and let the OS choose it randomly, in all other cases we already know
+	// which port is used.
 	if port == "0" {
 		address := lis.Addr()
 		split := strings.Split(address.String(), ":")
 
-		if len(split) == 0 {
+		if len(split) <= 1 {
 			feedback.Fatal(tr("Invalid TCP address: port is missing"), feedback.ErrBadTCPPortArgument)
 		}
 
-		port = split[len(split)-1]
+		port = split[1]
 	}
 
 	feedback.PrintResult(daemonResult{
