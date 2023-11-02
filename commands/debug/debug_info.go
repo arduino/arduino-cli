@@ -184,9 +184,9 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 	}
 
-	cortexDebugCustomJson := map[string]string{}
+	customConfigs := map[string]string{}
 	if cortexDebugProps := debugProperties.SubTree("cortex-debug.custom"); cortexDebugProps.Size() > 0 {
-		cortexDebugCustomJson["cortex-debug"] = convertToJsonMap(cortexDebugProps)
+		customConfigs["cortex-debug"] = convertToJsonMap(cortexDebugProps)
 	}
 	return &rpc.GetDebugConfigResponse{
 		Executable:             debugProperties.Get("executable"),
@@ -198,7 +198,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		ToolchainPath:          debugProperties.Get("toolchain.path"),
 		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),
 		ToolchainConfiguration: &toolchainConfiguration,
-		CustomConfigs:          cortexDebugCustomJson,
+		CustomConfigs:          customConfigs,
 		Programmer:             req.GetProgrammer(),
 	}, nil
 }
