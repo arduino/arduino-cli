@@ -151,7 +151,7 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 		}
 	}
 	customConfigs := map[string]any{}
-	for id, configJson := range info.GetCustomConfigurationsJson() {
+	for id, configJson := range info.GetCustomConfigs() {
 		var config any
 		if err := json.Unmarshal([]byte(configJson), &config); err == nil {
 			customConfigs[id] = config
