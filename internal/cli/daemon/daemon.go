@@ -121,33 +121,33 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
 		if errors.As(err, &dnsError) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", port, dnsError.Name), feedback.ErrCoreConfig)
+			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", port, dnsError.Name), feedback.ErrBadTCPPortArgument)
 		}
 		// Invalid port number, such as -1
 		var addrError *net.AddrError
 		if errors.As(err, &addrError) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", port, addrError.Addr), feedback.ErrCoreConfig)
+			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", port, addrError.Addr), feedback.ErrBadTCPPortArgument)
 		}
 		// Port is already in use
 		var syscallErr *os.SyscallError
 		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %s. Address already in use.", port), feedback.ErrNetwork)
+			feedback.Fatal(tr("Failed to listen on TCP port: %s. Address already in use.", port), feedback.ErrFailedToListenToTCPPort)
 		}
-		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", port, err), feedback.ErrGeneric)
+		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", port, err), feedback.ErrFailedToListenToTCPPort)
 	}
 
-	// We need to parse the port used only if the user let
-	// us choose it randomly, in all other cases we already
-	// know which is used.
+	// We need to retrieve the port used only if the user did not specify it
+	// and let the OS choose it randomly, in all other cases we already know
+	// which port is used.
 	if port == "0" {
 		address := lis.Addr()
 		split := strings.Split(address.String(), ":")
 
-		if len(split) == 0 {
-			feedback.Fatal(tr("Invalid TCP address: port is missing"), feedback.ErrBadArgument)
+		if len(split) <= 1 {
+			feedback.Fatal(tr("Invalid TCP address: port is missing"), feedback.ErrBadTCPPortArgument)
 		}
 
-		port = split[len(split)-1]
+		port = split[1]
 	}
 
 	feedback.PrintResult(daemonResult{
@@ -156,7 +156,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	})
 
 	if err := s.Serve(lis); err != nil {
-		logrus.Fatalf("Failed to serve: %v", err)
+		feedback.Fatal(fmt.Sprintf("Failed to serve: %v", err), feedback.ErrFailedToListenToTCPPort)
 	}
 }
 
