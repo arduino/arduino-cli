@@ -90,9 +90,6 @@ func (dr resultAll) String() string {
 	})
 
 	for _, item := range dr.list.Boards {
-		if item == nil {
-			continue
-		}
 		hidden := ""
 		if item.IsHidden {
 			hidden = tr("(hidden)")

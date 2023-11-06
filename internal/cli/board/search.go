@@ -87,9 +87,6 @@ func (r searchResults) String() string {
 	})
 
 	for _, item := range r.boards {
-		if item == nil {
-			continue
-		}
 		hidden := ""
 		if item.IsHidden {
 			hidden = tr("(hidden)")

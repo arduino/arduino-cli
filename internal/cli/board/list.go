@@ -133,9 +133,6 @@ func (dr listResult) String() string {
 	t := table.New()
 	t.SetHeader(tr("Port"), tr("Protocol"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
 	for _, detectedPort := range dr.ports {
-		if detectedPort == nil {
-			continue
-		}
 		port := detectedPort.Port
 		protocol := port.Protocol
 		address := port.Address

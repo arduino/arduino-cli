@@ -146,9 +146,6 @@ func (ir installedResult) String() string {
 
 	lastName := ""
 	for _, libMeta := range ir.installedLibs {
-		if libMeta == nil {
-			continue
-		}
 		lib := libMeta.Library
 		name := lib.Name
 		if name == lastName {

@@ -433,9 +433,6 @@ func (r *compileResult) String() string {
 			table.NewCell(tr("Version"), titleColor),
 			table.NewCell(tr("Path"), pathColor))
 		for _, l := range build.UsedLibraries {
-			if l == nil {
-				continue
-			}
 			libraries.AddRow(
 				table.NewCell(l.Name, nameColor),
 				l.Version,

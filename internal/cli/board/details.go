@@ -110,9 +110,6 @@ func (dr detailsResult) String() string {
 		t := table.New()
 		t.AddRow(tr("Id"), tr("Programmer name"))
 		for _, programmer := range details.Programmers {
-			if programmer == nil {
-				continue
-			}
 			t.AddRow(programmer.Id, programmer.Name)
 		}
 		return t.Render()
@@ -153,7 +150,7 @@ func (dr detailsResult) String() string {
 	}
 
 	for _, idp := range details.IdentificationProperties {
-		if idp == nil || idp.Properties == nil {
+		if idp.Properties == nil {
 			continue
 		}
 		t.AddRow() // get some space from above
@@ -221,9 +218,6 @@ func (dr detailsResult) String() string {
 
 	tab.AddRow(tr("Programmers:"), tr("ID"), tr("Name"))
 	for _, programmer := range details.Programmers {
-		if programmer == nil {
-			continue
-		}
 		tab.AddRow("", programmer.Id, programmer.Name)
 	}
 

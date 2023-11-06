@@ -156,9 +156,6 @@ func (res librarySearchResult) Data() interface{} {
 
 		names := []LibName{}
 		for _, lib := range res.results.Libraries {
-			if lib == nil {
-				continue
-			}
 			names = append(names, LibName{lib.Name})
 		}
 
@@ -181,9 +178,6 @@ func (res librarySearchResult) String() string {
 	}
 
 	for _, lib := range results {
-		if lib == nil {
-			continue
-		}
 		if string(res.results.Status) == rpc.LibrarySearchStatus_name[int32(rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)] {
 			out.WriteString(tr(`Name: "%s"`, lib.Name) + "\n")
 			if res.namesOnly {
@@ -198,9 +192,6 @@ func (res librarySearchResult) String() string {
 
 		deps := []string{}
 		for _, dep := range latest.Dependencies {
-			if dep == nil {
-				continue
-			}
 			if dep.VersionConstraint == "" {
 				deps = append(deps, dep.Name)
 			} else {
