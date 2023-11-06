@@ -23,7 +23,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// NewPlatformSummary creates a new result.Platform from rpc.PlatformSummary
+// NewPlatformSummary creates a new result.PlatformSummary from rpc.PlatformSummary
 func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 	if in == nil {
 		return nil

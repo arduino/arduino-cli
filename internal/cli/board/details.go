@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
-	fResult "github.com/arduino/arduino-cli/internal/cli/feedback/result"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -75,7 +75,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 	}
 
 	feedback.PrintResult(detailsResult{
-		details:         fResult.NewBoardDetailsResponse(res),
+		details:         result.NewBoardDetailsResponse(res),
 		listProgrammers: listProgrammers,
 		showFullDetails: showFullDetails,
 		showProperties:  showPropertiesMode != arguments.ShowPropertiesDisabled,
@@ -85,7 +85,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type detailsResult struct {
-	details         *fResult.BoardDetailsResponse
+	details         *result.BoardDetailsResponse
 	listProgrammers bool
 	showFullDetails bool
 	showProperties  bool
