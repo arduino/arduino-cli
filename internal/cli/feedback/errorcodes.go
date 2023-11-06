@@ -49,4 +49,8 @@ const (
 
 	// ErrBadTCPPortArgument is returned if the TCP port argument is not valid (9)
 	ErrBadTCPPortArgument
+
+	// ErrInitializingInventory is returned when the inventory cannot be initialized,
+	// usually depends on a wrong configuration of the data dir (10)
+	ErrInitializingInventory
 )
