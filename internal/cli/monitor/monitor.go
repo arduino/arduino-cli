@@ -290,12 +290,11 @@ func (r *detailsResult) Data() interface{} {
 }
 
 func (r *detailsResult) String() string {
+	if len(r.Settings) == 0 {
+		return ""
+	}
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Setting"), tr("Default"), tr("Values"))
-
-	if len(r.Settings) == 0 {
-		return t.Render()
-	}
 
 	green := color.New(color.FgGreen)
 	sort.Slice(r.Settings, func(i, j int) bool {

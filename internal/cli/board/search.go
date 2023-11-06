@@ -75,12 +75,12 @@ func (r searchResults) Data() interface{} {
 }
 
 func (r searchResults) String() string {
+	if len(r.boards) == 0 {
+		return ""
+	}
+
 	t := table.New()
 	t.SetHeader(tr("Board Name"), tr("FQBN"), tr("Platform ID"), "")
-
-	if len(r.boards) == 0 {
-		return t.Render()
-	}
 
 	sort.Slice(r.boards, func(i, j int) bool {
 		return r.boards[i].Name < r.boards[j].Name
