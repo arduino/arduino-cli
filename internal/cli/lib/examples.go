@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -75,7 +76,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 	found := []*libraryExamples{}
 	for _, lib := range res.GetInstalledLibraries() {
 		found = append(found, &libraryExamples{
-			Library:  lib.Library,
+			Library:  result.NewLibrary(lib.Library),
 			Examples: lib.Library.Examples,
 		})
 	}
@@ -88,8 +89,8 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 // feedback.Result implementation
 
 type libraryExamples struct {
-	Library  *rpc.Library `json:"library"`
-	Examples []string     `json:"examples"`
+	Library  *result.Library `json:"library"`
+	Examples []string        `json:"examples"`
 }
 
 type libraryExamplesResult struct {
@@ -113,9 +114,9 @@ func (ir libraryExamplesResult) String() string {
 	for _, lib := range ir.Examples {
 		name := lib.Library.Name
 		if lib.Library.ContainerPlatform != "" {
-			name += " (" + lib.Library.GetContainerPlatform() + ")"
-		} else if lib.Library.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER {
-			name += " (" + lib.Library.GetLocation().String() + ")"
+			name += " (" + lib.Library.ContainerPlatform + ")"
+		} else if lib.Library.Location != result.LibraryLocationUser {
+			name += " (" + string(lib.Library.Location) + ")"
 		}
 		r := tr("Examples for library %s", color.GreenString("%s", name)) + "\n"
 		sort.Slice(lib.Examples, func(i, j int) bool {

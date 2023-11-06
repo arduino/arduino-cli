@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
@@ -199,15 +200,15 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		feedback.PrintResult(&uploadResult{
 			Stdout:            io.Stdout,
 			Stderr:            io.Stderr,
-			UpdatedUploadPort: res.UpdatedUploadPort,
+			UpdatedUploadPort: result.NewPort(res.GetUpdatedUploadPort()),
 		})
 	}
 }
 
 type uploadResult struct {
-	Stdout            string    `json:"stdout"`
-	Stderr            string    `json:"stderr"`
-	UpdatedUploadPort *rpc.Port `json:"updated_upload_port,omitempty"`
+	Stdout            string       `json:"stdout"`
+	Stderr            string       `json:"stderr"`
+	UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
 }
 
 func (r *uploadResult) Data() interface{} {

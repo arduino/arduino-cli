@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -74,7 +75,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 	}
 
 	feedback.PrintResult(detailsResult{
-		details:         res,
+		details:         result.NewBoardDetailsResponse(res),
 		listProgrammers: listProgrammers,
 		showFullDetails: showFullDetails,
 		showProperties:  showPropertiesMode != arguments.ShowPropertiesDisabled,
@@ -84,7 +85,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type detailsResult struct {
-	details         *rpc.BoardDetailsResponse
+	details         *result.BoardDetailsResponse
 	listProgrammers bool
 	showFullDetails bool
 	showProperties  bool
@@ -99,7 +100,7 @@ func (dr detailsResult) String() string {
 
 	if dr.showProperties {
 		res := ""
-		for _, prop := range details.GetBuildProperties() {
+		for _, prop := range details.BuildProperties {
 			res += fmt.Sprintln(prop)
 		}
 		return res
@@ -109,7 +110,7 @@ func (dr detailsResult) String() string {
 		t := table.New()
 		t.AddRow(tr("Id"), tr("Programmer name"))
 		for _, programmer := range details.Programmers {
-			t.AddRow(programmer.GetId(), programmer.GetName())
+			t.AddRow(programmer.Id, programmer.Name)
 		}
 		return t.Render()
 	}
@@ -138,7 +139,7 @@ func (dr detailsResult) String() string {
 	t.AddRow(tr("Board name:"), details.Name)
 	t.AddRow(tr("FQBN:"), details.Fqbn)
 	addIfNotEmpty(tr("Board version:"), details.Version)
-	if details.GetDebuggingSupported() {
+	if details.DebuggingSupported {
 		t.AddRow(tr("Debugging supported:"), table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
@@ -148,11 +149,15 @@ func (dr detailsResult) String() string {
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
-	for _, idp := range details.GetIdentificationProperties() {
+	for _, idp := range details.IdentificationProperties {
+		if idp.Properties == nil {
+			continue
+		}
 		t.AddRow() // get some space from above
 		header := tr("Identification properties:")
-		for k, v := range idp.GetProperties() {
-			t.AddRow(header, k+"="+v)
+		keys := idp.Properties.Keys()
+		for _, k := range keys {
+			t.AddRow(header, k+"="+idp.Properties.Get(k))
 			header = ""
 		}
 	}
@@ -213,7 +218,7 @@ func (dr detailsResult) String() string {
 
 	tab.AddRow(tr("Programmers:"), tr("ID"), tr("Name"))
 	for _, programmer := range details.Programmers {
-		tab.AddRow("", programmer.GetId(), programmer.GetName())
+		tab.AddRow("", programmer.Id, programmer.Name)
 	}
 
 	return t.Render() + tab.Render()

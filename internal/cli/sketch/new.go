@@ -81,5 +81,17 @@ func runNewCommand(args []string, overwrite bool) {
 		feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.Print(tr("Sketch created in: %s", sketchDirPath))
+	feedback.PrintResult(sketchResult{SketchDirPath: sketchDirPath})
+}
+
+type sketchResult struct {
+	SketchDirPath *paths.Path `json:"sketch_path"`
+}
+
+func (ir sketchResult) Data() interface{} {
+	return ir
+}
+
+func (ir sketchResult) String() string {
+	return tr("Sketch created in: %s", ir.SketchDirPath)
 }

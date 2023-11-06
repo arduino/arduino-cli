@@ -88,13 +88,13 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	platforms []*result.Platform
+	platforms []*result.PlatformSummary
 }
 
 func newSearchResult(in []*rpc.PlatformSummary) *searchResults {
 	res := &searchResults{}
 	for _, platformSummary := range in {
-		res.platforms = append(res.platforms, result.NewPlatformResult(platformSummary))
+		res.platforms = append(res.platforms, result.NewPlatformSummary(platformSummary))
 	}
 	return res
 }
