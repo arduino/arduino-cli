@@ -344,9 +344,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
 		BuilderResult: result.NewCompileResponse(compileRes),
-		UploadResult: struct {
-			UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
-		}{
+		UploadResult: updatedUploadPortResult{
 			UpdatedUploadPort: result.NewPort(uploadRes.GetUpdatedUploadPort()),
 		},
 		ProfileOut:         profileOut,
@@ -389,16 +387,18 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(res)
 }
 
+type updatedUploadPortResult struct {
+	UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
+}
+
 type compileResult struct {
 	CompilerOut   string                  `json:"compiler_out"`
 	CompilerErr   string                  `json:"compiler_err"`
 	BuilderResult *result.CompileResponse `json:"builder_result"`
-	UploadResult  struct {
-		UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
-	} `json:"upload_result"`
-	Success    bool   `json:"success"`
-	ProfileOut string `json:"profile_out,omitempty"`
-	Error      string `json:"error,omitempty"`
+	UploadResult  updatedUploadPortResult `json:"upload_result"`
+	Success       bool                    `json:"success"`
+	ProfileOut    string                  `json:"profile_out,omitempty"`
+	Error         string                  `json:"error,omitempty"`
 
 	showPropertiesMode arguments.ShowPropertiesMode
 	hideStats          bool
