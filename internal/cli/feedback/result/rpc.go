@@ -136,7 +136,46 @@ type InstalledLibrary struct {
 
 type LibraryLocation string
 
+const (
+	LibraryLocationUser                      LibraryLocation = "user"
+	LibraryLocationIDEBuiltin                LibraryLocation = "ide"
+	LibraryLocationPlatformBuiltin           LibraryLocation = "platform"
+	LibraryLocationReferencedPlatformBuiltin LibraryLocation = "ref-platform"
+	LibraryLocationUnmanged                  LibraryLocation = "unmanaged"
+)
+
+func NewLibraryLocation(r rpc.LibraryLocation) LibraryLocation {
+	switch r {
+	case rpc.LibraryLocation_LIBRARY_LOCATION_BUILTIN:
+		return LibraryLocationIDEBuiltin
+	case rpc.LibraryLocation_LIBRARY_LOCATION_PLATFORM_BUILTIN:
+		return LibraryLocationPlatformBuiltin
+	case rpc.LibraryLocation_LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN:
+		return LibraryLocationReferencedPlatformBuiltin
+	case rpc.LibraryLocation_LIBRARY_LOCATION_USER:
+		return LibraryLocationUser
+	case rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED:
+		return LibraryLocationUnmanged
+	}
+	return LibraryLocationIDEBuiltin
+}
+
 type LibraryLayout string
+
+const (
+	LibraryLayoutFlat      LibraryLayout = "flat"
+	LibraryLayoutRecursive LibraryLayout = "recursive"
+)
+
+func NewLibraryLayout(r rpc.LibraryLayout) LibraryLayout {
+	switch r {
+	case rpc.LibraryLayout_LIBRARY_LAYOUT_FLAT:
+		return LibraryLayoutFlat
+	case rpc.LibraryLayout_LIBRARY_LAYOUT_RECURSIVE:
+		return LibraryLayoutRecursive
+	}
+	return LibraryLayoutFlat
+}
 
 type Library struct {
 	Name              string                         `json:"name,omitempty"`
@@ -204,8 +243,8 @@ func NewLibrary(l *rpc.Library) *Library {
 		Version:           l.GetVersion(),
 		License:           l.GetLicense(),
 		Properties:        libraryPropsMap,
-		Location:          LibraryLocation(l.GetLocation().String()),
-		Layout:            LibraryLayout(l.GetLayout().String()),
+		Location:          NewLibraryLocation(l.GetLocation()),
+		Layout:            NewLibraryLayout(l.GetLayout()),
 		Examples:          l.GetExamples(),
 		ProvidesIncludes:  l.GetProvidesIncludes(),
 		CompatibleWith:    libraryCompatibleWithMap,
@@ -751,6 +790,21 @@ func NewLibraryDependencyStatus(l *rpc.LibraryDependencyStatus) *LibraryDependen
 
 type LibrarySearchStatus string
 
+const (
+	LibrarySearchStatusFailed  LibrarySearchStatus = "failed"
+	LibrarySearchStatusSuccess LibrarySearchStatus = "success"
+)
+
+func NewLibrarySearchStatus(r rpc.LibrarySearchStatus) LibrarySearchStatus {
+	switch r {
+	case rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED:
+		return LibrarySearchStatusFailed
+	case rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS:
+		return LibrarySearchStatusSuccess
+	}
+	return LibrarySearchStatusFailed
+}
+
 type LibrarySearchResponse struct {
 	Libraries []*SearchedLibrary  `json:"libraries,omitempty"`
 	Status    LibrarySearchStatus `json:"status,omitempty"`
@@ -768,7 +822,7 @@ func NewLibrarySearchResponse(l *rpc.LibrarySearchResponse) *LibrarySearchRespon
 
 	return &LibrarySearchResponse{
 		Libraries: searchedLibraries,
-		Status:    LibrarySearchStatus(l.GetStatus().Enum().String()),
+		Status:    NewLibrarySearchStatus(l.GetStatus()),
 	}
 }
 

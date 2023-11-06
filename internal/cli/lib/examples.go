@@ -115,7 +115,7 @@ func (ir libraryExamplesResult) String() string {
 		name := lib.Library.Name
 		if lib.Library.ContainerPlatform != "" {
 			name += " (" + lib.Library.ContainerPlatform + ")"
-		} else if string(lib.Library.Location) != rpc.LibraryLocation_LIBRARY_LOCATION_USER.String() {
+		} else if lib.Library.Location != result.LibraryLocationUser {
 			name += " (" + string(lib.Library.Location) + ")"
 		}
 		r := tr("Examples for library %s", color.GreenString("%s", name)) + "\n"

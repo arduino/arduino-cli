@@ -173,12 +173,12 @@ func (res librarySearchResult) String() string {
 
 	var out strings.Builder
 
-	if string(res.results.Status) == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED.String() {
+	if res.results.Status == result.LibrarySearchStatusFailed {
 		out.WriteString(tr("No libraries matching your search.\nDid you mean...\n"))
 	}
 
 	for _, lib := range results {
-		if string(res.results.Status) == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS.String() {
+		if res.results.Status == result.LibrarySearchStatusSuccess {
 			out.WriteString(tr(`Name: "%s"`, lib.Name) + "\n")
 			if res.namesOnly {
 				continue

@@ -206,3 +206,44 @@ func TestAllFieldAreMapped(t *testing.T) {
 	boardListWatchResponseResult := result.NewBoardListWatchResponse(boardListWatchResponseRpc)
 	mustContainsAllPropertyOfRpcStruct(t, boardListWatchResponseRpc, boardListWatchResponseResult)
 }
+
+func TestEnumsMapsEveryRpcCounterpart(t *testing.T) {
+	t.Run("LibraryLocation enums maps every element", func(t *testing.T) {
+		results := make([]result.LibraryLocation, 0, len(rpc.LibraryLocation_name))
+		for key := range rpc.LibraryLocation_name {
+			results = append(results, result.NewLibraryLocation(rpc.LibraryLocation(key)))
+		}
+		require.NotEmpty(t, results)
+		require.Len(t, results, len(rpc.LibraryLocation_name))
+		require.True(t, isUnique(results))
+	})
+	t.Run("LibraryLayout enums maps every element", func(t *testing.T) {
+		results := make([]result.LibraryLayout, 0, len(rpc.LibraryLayout_name))
+		for key := range rpc.LibraryLayout_name {
+			results = append(results, result.NewLibraryLayout(rpc.LibraryLayout(key)))
+		}
+		require.NotEmpty(t, results)
+		require.Len(t, results, len(rpc.LibraryLayout_name))
+		require.True(t, isUnique(results))
+	})
+	t.Run("LibrarySearchStatus enums maps every element", func(t *testing.T) {
+		results := make([]result.LibrarySearchStatus, 0, len(rpc.LibrarySearchStatus_name))
+		for key := range rpc.LibrarySearchStatus_name {
+			results = append(results, result.NewLibrarySearchStatus(rpc.LibrarySearchStatus(key)))
+		}
+		require.NotEmpty(t, results)
+		require.Len(t, results, len(rpc.LibrarySearchStatus_name))
+		require.True(t, isUnique(results))
+	})
+}
+
+func isUnique[T comparable](s []T) bool {
+	seen := map[T]bool{}
+	for _, v := range s {
+		if _, ok := seen[v]; ok {
+			return false
+		}
+		seen[v] = true
+	}
+	return true
+}
