@@ -888,3 +888,20 @@ func NewInstalledPlatformReference(r *rpc.InstalledPlatformReference) *Installed
 		PackageUrl: r.GetPackageUrl(),
 	}
 }
+
+type BoardListWatchResponse struct {
+	EventType string        `json:"event_type,omitempty"`
+	Port      *DetectedPort `json:"port,omitempty"`
+	Error     string        `json:"error,omitempty"`
+}
+
+func NewBoardListWatchResponse(r *rpc.BoardListWatchResponse) *BoardListWatchResponse {
+	if r == nil {
+		return nil
+	}
+	return &BoardListWatchResponse{
+		EventType: r.EventType,
+		Port:      NewDetectedPort(r.Port),
+		Error:     r.Error,
+	}
+}

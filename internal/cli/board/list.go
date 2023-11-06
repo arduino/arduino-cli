@@ -100,12 +100,14 @@ func watchList(inst *rpc.Instance) {
 	}
 
 	for event := range eventsChan {
-		feedback.PrintResult(watchEventResult{
-			Type:   event.EventType,
-			Boards: result.NewBoardListItems(event.Port.MatchingBoards),
-			Port:   result.NewPort(event.Port.Port),
-			Error:  event.Error,
-		})
+		if res := result.NewBoardListWatchResponse(event); res != nil {
+			feedback.PrintResult(watchEventResult{
+				Type:   res.EventType,
+				Boards: res.Port.MatchingBoards,
+				Port:   res.Port.Port,
+				Error:  res.Error,
+			})
+		}
 	}
 }
 

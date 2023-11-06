@@ -45,7 +45,7 @@ func getStructJsonTags(t *testing.T, a any) []string {
 }
 
 func mustContainsAllPropertyOfRpcStruct(t *testing.T, a, b any, excludeFields ...string) {
-	// must not be the same pointer, a and b struct must be of differnt type
+	// must not be the same pointer, a and b struct must be of different type
 	require.NotSame(t, a, b)
 	rta, rtb := reflect.TypeOf(a), reflect.TypeOf(b)
 	if rta.Kind() != reflect.Struct {
@@ -201,4 +201,8 @@ func TestAllFieldAreMapped(t *testing.T) {
 	installedPlatformReferenceRpc := &rpc.InstalledPlatformReference{}
 	installedPlatformReferenceResult := result.NewInstalledPlatformReference(installedPlatformReferenceRpc)
 	mustContainsAllPropertyOfRpcStruct(t, installedPlatformReferenceRpc, installedPlatformReferenceResult)
+
+	boardListWatchResponseRpc := &rpc.BoardListWatchResponse{}
+	boardListWatchResponseResult := result.NewBoardListWatchResponse(boardListWatchResponseRpc)
+	mustContainsAllPropertyOfRpcStruct(t, boardListWatchResponseRpc, boardListWatchResponseResult)
 }
