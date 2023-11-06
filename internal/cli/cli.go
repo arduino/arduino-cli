@@ -150,7 +150,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// initialize inventory
 	err := inventory.Init(configuration.DataDir(configuration.Settings).String())
 	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrInitializingInventory)
 	}
 
 	// https://no-color.org/
