@@ -236,21 +236,15 @@ func (platform *Platform) GetLatestCompatibleRelease() *PlatformRelease {
 	if len(platform.Releases) == 0 {
 		return nil
 	}
-	maximum := &PlatformRelease{Version: &semver.Version{}}
+	var maximum *PlatformRelease
 	for _, release := range platform.Releases {
 		if !release.IsCompatible() {
 			continue
 		}
-		if release.Version.GreaterThan(maximum.Version) {
+		if maximum == nil || release.Version.GreaterThan(maximum.Version) {
 			maximum = release
 		}
 	}
-
-	// In case no compatible versions found return nil
-	if maximum.Version.Equal(&semver.Version{}) {
-		return nil
-	}
-
 	return maximum
 }
 
@@ -306,18 +300,13 @@ func (platform *Platform) latestReleaseVersion() *semver.Version {
 // latestCompatibleReleaseVersion obtains latest version number, for platforms that contains compatible tools, or nil if no release available
 func (platform *Platform) latestCompatibleReleaseVersion() *semver.Version {
 	versions := platform.GetAllCompatibleReleasesVersions()
-	if len(versions) == 0 {
-		return nil
-	}
-	max := versions[0]
-
-	for i := 1; i < len(versions); i++ {
-		if versions[i].GreaterThan(max) {
-			max = versions[i]
+	var maxVer *semver.Version
+	for _, v := range versions {
+		if maxVer == nil || v.GreaterThan(maxVer) {
+			maxVer = v
 		}
 	}
-
-	return max
+	return maxVer
 }
 
 // GetAllInstalled returns all installed PlatformRelease

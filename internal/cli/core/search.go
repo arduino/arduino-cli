@@ -107,33 +107,35 @@ func (sr searchResults) Data() interface{} {
 }
 
 func (sr searchResults) String() string {
-	if len(sr.platforms) > 0 {
-		t := table.New()
-		t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
-		for _, platform := range sr.platforms {
-			// When allVersions is not requested we only show the latest compatible version
-			if !sr.allVersions {
-				if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
-					name := latestCompatible.Name
-					if latestCompatible.Deprecated {
-						name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), latestCompatible.Name)
-					}
-					t.AddRow(platform.Id, latestCompatible.Version, name)
-				}
-				continue
-			}
-
-			for _, release := range platform.Releases.Values() {
-				name := release.Name
-				if platform.Deprecated {
-					name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), release.Name)
-				}
-				t.AddRow(platform.Id, release.Version, name)
-			}
-		}
-		return t.Render()
+	if len(sr.platforms) == 0 {
+		return tr("No platforms matching your search.")
 	}
-	return tr("No platforms matching your search.")
+
+	t := table.New()
+	t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
+
+	addRow := func(platform *result.PlatformSummary, release *result.PlatformRelease) {
+		name := release.Name
+		if release.Deprecated {
+			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), release.Name)
+		}
+		t.AddRow(platform.Id, release.Version, name)
+	}
+
+	for _, platform := range sr.platforms {
+		// When allVersions is not requested we only show the latest compatible version
+		if !sr.allVersions {
+			if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
+				addRow(platform, latestCompatible)
+			}
+			continue
+		}
+
+		for _, release := range platform.Releases.Values() {
+			addRow(platform, release)
+		}
+	}
+	return t.Render()
 }
 
 // indexesNeedUpdating returns whether one or more index files need updating.
