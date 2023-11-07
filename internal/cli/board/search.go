@@ -24,7 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
-	fResult "github.com/arduino/arduino-cli/internal/cli/feedback/result"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -61,13 +61,13 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error searching boards: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(searchResults{fResult.NewBoardListItems(res.Boards)})
+	feedback.PrintResult(searchResults{result.NewBoardListItems(res.Boards)})
 }
 
 // output from this command requires special formatting so we create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	Boards []*fResult.BoardListItem `json:"boards"`
+	Boards []*result.BoardListItem `json:"boards"`
 }
 
 func (r searchResults) Data() interface{} {

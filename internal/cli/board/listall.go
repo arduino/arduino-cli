@@ -23,7 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
-	fResult "github.com/arduino/arduino-cli/internal/cli/feedback/result"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -64,13 +64,13 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error listing boards: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(resultAll{fResult.NewBoardListAllResponse(list)})
+	feedback.PrintResult(resultAll{result.NewBoardListAllResponse(list)})
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type resultAll struct {
-	list *fResult.BoardListAllResponse
+	list *result.BoardListAllResponse
 }
 
 func (dr resultAll) Data() interface{} {
