@@ -67,26 +67,26 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting so we create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	boards []*fResult.BoardListItem
+	Boards []*fResult.BoardListItem `json:"boards"`
 }
 
 func (r searchResults) Data() interface{} {
-	return r.boards
+	return r
 }
 
 func (r searchResults) String() string {
-	if len(r.boards) == 0 {
+	if len(r.Boards) == 0 {
 		return ""
 	}
 
 	t := table.New()
 	t.SetHeader(tr("Board Name"), tr("FQBN"), tr("Platform ID"), "")
 
-	sort.Slice(r.boards, func(i, j int) bool {
-		return r.boards[i].Name < r.boards[j].Name
+	sort.Slice(r.Boards, func(i, j int) bool {
+		return r.Boards[i].Name < r.Boards[j].Name
 	})
 
-	for _, item := range r.boards {
+	for _, item := range r.Boards {
 		hidden := ""
 		if item.IsHidden {
 			hidden = tr("(hidden)")
