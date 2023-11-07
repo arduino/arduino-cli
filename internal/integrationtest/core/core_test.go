@@ -48,17 +48,19 @@ func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
 	// Trigger problematic call
 	out, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Contains(t, out, `[
-		{
-			"id":"DxCore-dev:megaavr",
-			"installed_version":"1.4.10",
-			"releases": {
-				"1.4.10": {
-					"name":"DxCore"
+	requirejson.Contains(t, out, `{
+		"platforms": [
+			{
+				"id":"DxCore-dev:megaavr",
+				"installed_version":"1.4.10",
+				"releases": {
+					"1.4.10": {
+						"name":"DxCore"
+					}
 				}
 			}
-		}
-	]`)
+		]
+	}`)
 }
 
 func TestCoreSearch(t *testing.T) {
@@ -84,20 +86,20 @@ func TestCoreSearch(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, out)
 	// Verify that "installed_version" is set
-	requirejson.Contains(t, out, `[{installed_version: "1.8.6"}]`)
+	requirejson.Contains(t, out, `{"platforms":[{installed_version: "1.8.6"}]}`)
 
 	// additional URL
 	out, _, err = cli.Run("core", "search", "test_core", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	requirejson.Len(t, out, 1)
+	requirejson.Query(t, out, `.platforms | length`, `1`)
 
 	// show all versions
 	out, _, err = cli.Run("core", "search", "test_core", "--all", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	requirejson.Query(t, out, `.[].releases | length`, "3")
+	requirejson.Query(t, out, `.platforms.[].releases | length`, "3")
 
 	checkPlatformIsInJSONOutput := func(stdout []byte, id, version string) {
-		jqquery := fmt.Sprintf(`[{id:"%s", releases:{"%s":{}}}]`, id, version)
+		jqquery := fmt.Sprintf(`{"platforms":[{id:"%s", releases:{"%s":{}}}]}`, id, version)
 		requirejson.Contains(t, out, jqquery, "platform %s@%s is missing from the output", id, version)
 	}
 
@@ -131,7 +133,7 @@ func TestCoreSearch(t *testing.T) {
 		require.NoError(t, err)
 
 		for _, id := range expectedIDs {
-			jqquery := fmt.Sprintf(`[{id:"%s"}]`, id)
+			jqquery := fmt.Sprintf(`{"platforms":[{id:"%s"}]}`, id)
 			requirejson.Contains(t, out, jqquery, "platform %s is missing from the output", id)
 		}
 	}
@@ -181,8 +183,8 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	// Same thing in JSON format, also check the number of platforms found is the same
 	stdout, _, err = cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `[{"id": "test:x86", "releases": { "2.0.0": {"name":"test_core"}}}]`)
-	requirejson.Len(t, stdout, numPlatforms)
+	requirejson.Contains(t, stdout, `{"platforms":[{"id": "test:x86", "releases": { "2.0.0": {"name":"test_core"}}}]}`)
+	requirejson.Query(t, stdout, ".platforms | length", fmt.Sprint(numPlatforms))
 
 	// list all with additional urls, check the test core is there
 	stdout, _, err = cli.Run("core", "search", "--additional-urls="+url.String())
@@ -199,19 +201,20 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	// same thing in JSON format, also check the number of platforms found is the same
 	stdout, _, err = cli.Run("core", "search", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `[
-		{
-			"id": "test:x86",
-			"installed_version": "2.0.0",
-			"latest_version": "2.0.0",
-			"releases": {
-				"1.0.0": {"name":"test_core", "compatible": true},
-				"2.0.0": {"name":"test_core", "compatible": true},
-				"3.0.0": {"name":"test_core", "compatible": false}
+	requirejson.Contains(t, stdout, `{
+		"platforms": [
+			{
+				"id": "test:x86",
+				"installed_version": "2.0.0",
+				"latest_version": "2.0.0",
+				"releases": {
+					"1.0.0": {"name":"test_core", "compatible": true},
+					"2.0.0": {"name":"test_core", "compatible": true},
+					"3.0.0": {"name":"test_core", "compatible": false}
+				}
 			}
-		}
-	]`)
-	requirejson.Len(t, stdout, numPlatforms)
+	]}`)
+	requirejson.Query(t, stdout, `.platforms | length`, fmt.Sprint(numPlatforms))
 }
 
 func TestCoreUpdateIndexUrlNotFound(t *testing.T) {
@@ -325,7 +328,7 @@ func TestCoreInstall(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "arduino:avr") | .installed_version`, `"1.6.16"`)
+	requirejson.Query(t, stdout, `.platforms.[] | select(.id == "arduino:avr") | .installed_version`, `"1.6.16"`)
 
 	// Replace it with the same with --no-overwrite (should NOT fail)
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.16", "--no-overwrite")
@@ -340,13 +343,13 @@ func TestCoreInstall(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "arduino:avr") | .installed_version`, `"1.6.17"`)
+	requirejson.Query(t, stdout, `.platforms.[] | select(.id == "arduino:avr") | .installed_version`, `"1.6.17"`)
 
 	// Confirm core is listed as "updatable"
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
 	require.NoError(t, err)
 	jsonout := requirejson.Parse(t, stdout)
-	q := jsonout.Query(`.[] | select(.id == "arduino:avr")`)
+	q := jsonout.Query(`.platforms.[] | select(.id == "arduino:avr")`)
 	q.Query(".installed_version").MustEqual(`"1.6.17"`)
 	latest := q.Query(".latest_version")
 
@@ -355,12 +358,12 @@ func TestCoreInstall(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "arduino:avr") | .installed_version`, latest.String())
+	requirejson.Query(t, stdout, `.platforms.[] | select(.id == "arduino:avr") | .installed_version`, latest.String())
 
 	// double check the core isn't updatable anymore
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Empty(t, stdout)
+	requirejson.Query(t, stdout, `.platforms | length`, `0`)
 }
 
 func TestCoreUninstall(t *testing.T) {
@@ -373,12 +376,12 @@ func TestCoreUninstall(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `[ { "id": "arduino:avr" } ]`)
+	requirejson.Contains(t, stdout, `{"platforms":[ { "id": "arduino:avr" } ]}`)
 	_, _, err = cli.Run("core", "uninstall", "arduino:avr")
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Empty(t, stdout)
+	requirejson.Query(t, stdout, `.platforms | length`, `0`)
 }
 
 func TestCoreUninstallToolDependencyRemoval(t *testing.T) {
@@ -456,7 +459,7 @@ func TestCoreSearchManuallyInstalledCoresNotPrinted(t *testing.T) {
 	// Verifies only cores in board manager are shown
 	stdout, _, err := cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
-	requirejson.NotEmpty(t, stdout)
+	requirejson.Query(t, stdout, `.platforms | length > 0`, `true`)
 	oldJson := stdout
 
 	// Manually installs a core in sketchbooks hardware folder
@@ -471,7 +474,7 @@ func TestCoreSearchManuallyInstalledCoresNotPrinted(t *testing.T) {
 	// Verifies manually installed core is not shown
 	stdout, _, err = cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
-	requirejson.NotContains(t, stdout, `[{"id": "arduino-beta-development:avr"}]`)
+	requirejson.NotContains(t, stdout, `{"platforms":[{"id": "arduino-beta-development:avr"}]}`)
 	require.Equal(t, oldJson, stdout)
 }
 
@@ -485,8 +488,8 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 	// Verifies only cores in board manager are shown
 	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json")
 	require.NoError(t, err)
-	requirejson.NotEmpty(t, stdout)
-	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+	requirejson.Query(t, stdout, `.platforms | length > 0`, `true`)
+	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".platforms | length").String())
 	require.NoError(t, err)
 
 	// Manually installs a core in sketchbooks hardware folder
@@ -501,8 +504,8 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 	// Verifies manually installed core is shown
 	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, length+1)
-	requirejson.Contains(t, stdout, `[
+	requirejson.Query(t, stdout, `.platforms | length`, fmt.Sprint(length+1))
+	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "arduino-beta-development:avr",
 			"latest_version": "1.8.3",
@@ -512,7 +515,7 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 				}
 			}
 		}
-	]`)
+	]}`)
 }
 
 func TestCoreListUpdatableAllFlags(t *testing.T) {
@@ -525,8 +528,8 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 	// Verifies only cores in board manager are shown
 	stdout, _, err := cli.Run("core", "list", "--all", "--updatable", "--format", "json")
 	require.NoError(t, err)
-	requirejson.NotEmpty(t, stdout)
-	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+	requirejson.Query(t, stdout, `.platforms | length > 0`, `true`)
+	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".platforms | length").String())
 	require.NoError(t, err)
 
 	// Manually installs a core in sketchbooks hardware folder
@@ -541,8 +544,8 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 	// Verifies using both --updatable and --all flags --all takes precedence
 	stdout, _, err = cli.Run("core", "list", "--all", "--updatable", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, length+1)
-	requirejson.Contains(t, stdout, `[
+	requirejson.Query(t, stdout, `.platforms | length`, fmt.Sprint(length+1))
+	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "arduino-beta-development:avr",
 			"latest_version": "1.8.3",
@@ -552,7 +555,7 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 				}
 			}
 		}
-	]`)
+	]}`)
 }
 
 func TestCoreUpgradeRemovesUnusedTools(t *testing.T) {
@@ -618,8 +621,8 @@ func TestCoreListWithInstalledJson(t *testing.T) {
 	// Verifies installed core is correctly found and name is set
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 1)
-	requirejson.Contains(t, stdout, `[
+	requirejson.Query(t, stdout, `.platforms | length`, `1`)
+	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "adafruit:avr",
 			"releases": {
@@ -628,7 +631,7 @@ func TestCoreListWithInstalledJson(t *testing.T) {
 				}
 			}
 		}
-	]`)
+	]}`)
 
 	// Deletes installed.json file, this file stores information about the core,
 	// that is used mostly when removing package indexes and their cores are still installed;
@@ -641,11 +644,11 @@ func TestCoreListWithInstalledJson(t *testing.T) {
 	// Verifies installed core is still found and name is set
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, `.platforms | length`, `1`)
 	// Name for this core changes since if there's installed.json file we read it from
 	// platform.txt, turns out that this core has different names used in different files
 	// thus the change.
-	requirejson.Contains(t, stdout, `[
+	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "adafruit:avr",
 			"releases": {
@@ -654,7 +657,7 @@ func TestCoreListWithInstalledJson(t *testing.T) {
 				}
 			}
 		}
-	]`)
+	]}`)
 }
 
 func TestCoreSearchUpdateIndexDelay(t *testing.T) {
@@ -737,20 +740,20 @@ func TestCoreSearchSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	sortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id] | sort").String()
+		"[ .platforms.[] | select(.deprecated == true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id]").String()
+		"[ .platforms.[] | select(.deprecated == true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedDeprecated, notSortedDeprecated)
 
 	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id] | sort").String()
+		"[ .platforms.[] | select(.deprecated != true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id]").String()
+		"[ .platforms.[] | select(.deprecated != true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
 
 	// verify that deprecated platforms are the last ones
 	platform := requirejson.Parse(t, stdout).Query(
-		"[ .[] | .id |=ascii_downcase | .id]").String()
+		"[ .platforms.[] | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
@@ -805,24 +808,23 @@ func TestCoreListSortedResults(t *testing.T) {
 	// test same behaviour with json output
 	stdout, _, err = cli.Run("core", "list", "--additional-urls="+url.String(), "--format=json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 3)
+	requirejson.Query(t, stdout, `.platforms | length`, `3`)
 
 	// verify that results are already sorted correctly
 	sortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id] | sort").String()
+		"[ .platforms.[] | select(.deprecated == true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id]").String()
+		"[ .platforms.[] | select(.deprecated == true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedDeprecated, notSortedDeprecated)
 
 	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id] | sort").String()
+		"[ .platforms.[] | select(.deprecated != true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id]").String()
+		"[ .platforms.[] | select(.deprecated != true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
 
 	// verify that deprecated platforms are the last ones
-	platform := requirejson.Parse(t, stdout).Query(
-		"[ .[] | .id |=ascii_downcase | .id]").String()
+	platform := requirejson.Parse(t, stdout).Query("[ .platforms.[] | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
@@ -854,8 +856,8 @@ func TestCoreListDeprecatedPlatformWithInstalledJson(t *testing.T) {
 	stdout, _, err := cli.Run("core", "list", "--additional-urls="+url.String(), "--format=json")
 	require.NoError(t, err)
 
-	requirejson.Len(t, stdout, 1)
-	requirejson.Query(t, stdout, ".[] | .deprecated", "true")
+	requirejson.Query(t, stdout, `.platforms | length`, `1`)
+	requirejson.Query(t, stdout, ".platforms.[] | .deprecated", "true")
 }
 
 func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
@@ -867,7 +869,7 @@ func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
 
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 0)
+	requirejson.Query(t, stdout, `.platforms | length`, `0`)
 
 	// Simulates creation of a new core in the sketchbook hardware folder
 	// without a platforms.txt
@@ -879,9 +881,9 @@ func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
 	// Verifies no core is installed
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 1)
-	requirejson.Query(t, stdout, ".[] | .id", `"some-packager:some-arch"`)
-	requirejson.Query(t, stdout, ".[] | .releases[.installed_version].name", `"some-packager-some-arch"`)
+	requirejson.Query(t, stdout, `.platforms | length`, `1`)
+	requirejson.Query(t, stdout, ".platforms.[] | .id", `"some-packager:some-arch"`)
+	requirejson.Query(t, stdout, ".platforms.[] | .releases[.installed_version].name", `"some-packager-some-arch"`)
 }
 
 func TestCoreDownloadMultiplePlatforms(t *testing.T) {
@@ -899,7 +901,7 @@ func TestCoreDownloadMultiplePlatforms(t *testing.T) {
 	// Verifies no core is installed
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 0)
+	requirejson.Query(t, stdout, `.platforms | length`, `0`)
 
 	// Simulates creation of two new cores in the sketchbook hardware folder
 	wd, _ := paths.Getwd()
@@ -915,7 +917,7 @@ func TestCoreDownloadMultiplePlatforms(t *testing.T) {
 	// Verifies the two cores are detected
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 2)
+	requirejson.Query(t, stdout, `.platforms | length`, `2`)
 
 	// Try to do an operation on the fake cores.
 	// The cli should not allow it since optimizing the casing results in finding two cores
@@ -939,13 +941,13 @@ func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
 
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, `.platforms | length`, `1`)
 	// Verifies platform is loaded except excluding board with missing options
-	requirejson.Contains(t, stdout, `[{"id": "arduino-beta-dev:platform_with_missing_custom_board_options"}]`)
-	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino-beta-dev:platform_with_missing_custom_board_options\") | .releases[.installed_version].boards | length", "2")
+	requirejson.Contains(t, stdout, `{"platforms":[{"id": "arduino-beta-dev:platform_with_missing_custom_board_options"}]}`)
+	requirejson.Query(t, stdout, ".platforms.[] | select(.id == \"arduino-beta-dev:platform_with_missing_custom_board_options\") | .releases[.installed_version].boards | length", "2")
 	// Verify board with malformed options is not loaded
 	// while other board is loaded
-	requirejson.Contains(t, stdout, `[
+	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "arduino-beta-dev:platform_with_missing_custom_board_options",
 			"releases": {
@@ -961,7 +963,7 @@ func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
 				}
 			}
 		}
-	]`)
+	]}`)
 }
 
 func TestCoreListOutdatedCore(t *testing.T) {
@@ -977,11 +979,11 @@ func TestCoreListOutdatedCore(t *testing.T) {
 
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, 1)
-	requirejson.Query(t, stdout, ".[0] | .installed_version", "\"1.8.6\"")
-	installedVersion, err := semver.Parse(strings.Trim(requirejson.Parse(t, stdout).Query(".[0] | .installed_version").String(), "\""))
+	requirejson.Query(t, stdout, `.platforms | length`, `1`)
+	requirejson.Query(t, stdout, ".platforms.[0] | .installed_version", "\"1.8.6\"")
+	installedVersion, err := semver.Parse(strings.Trim(requirejson.Parse(t, stdout).Query(".platforms.[0] | .installed_version").String(), "\""))
 	require.NoError(t, err)
-	latestVersion, err := semver.Parse(strings.Trim(requirejson.Parse(t, stdout).Query(".[0] | .latest_version").String(), "\""))
+	latestVersion, err := semver.Parse(strings.Trim(requirejson.Parse(t, stdout).Query(".platforms.[0] | .latest_version").String(), "\""))
 	require.NoError(t, err)
 	// Installed version must be older than latest
 	require.True(t, installedVersion.LessThan(latestVersion))
@@ -1115,7 +1117,7 @@ func TestCoreListWhenNoPlatformAreInstalled(t *testing.T) {
 
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Empty(t, stdout)
+	requirejson.Query(t, stdout, `.platforms | length`, `0`)
 
 	stdout, _, err = cli.Run("core", "list")
 	require.NoError(t, err)
@@ -1136,7 +1138,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Parse(t, stdout).
-		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		Query(`.platforms | .[] | select(.id == "foo_vendor:avr")`).
 		MustContain(`{
 			"installed_version": "",
 			"latest_version": "1.0.1",
@@ -1153,7 +1155,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Parse(t, stdout).
-		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		Query(`.platforms | .[] | select(.id == "foo_vendor:avr")`).
 		MustContain(`{
 			"latest_version": "1.0.1",
 			"installed_version": "1.0.1",
@@ -1171,14 +1173,14 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Parse(t, stdout).
-		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		Query(`.platforms | .[] | select(.id == "foo_vendor:avr")`).
 		MustContain(`{"installed_version": "1.0.0", "releases": {"1.0.0": {"compatible": true}}}`)
 
 	// Lists all updatable cores
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Parse(t, stdout).
-		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		Query(`.platforms | .[] | select(.id == "foo_vendor:avr")`).
 		MustContain(`{"latest_version": "1.0.1", "releases": {"1.0.1": {"compatible": true}}}`)
 
 	// Show outdated cores, must show latest compatible
@@ -1194,7 +1196,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Parse(t, stdout).
-		Query(`.[] | select(.id == "foo_vendor:avr") | .releases[.installed_version]`).
+		Query(`.platforms | .[] | select(.id == "foo_vendor:avr") | .releases[.installed_version]`).
 		MustContain(`{"version": "1.0.1", "compatible": true}`)
 
 	// upgrade to latest incompatible not possible (1.0.1 -> 1.0.2)
@@ -1202,7 +1204,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.platforms | .[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.1"`)
 
 	// When no compatible version are found return error
 	// When trying to install a platform with no compatible version fails
@@ -1220,7 +1222,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 		require.Equal(t, stdoutSearchAll, stdoutSearch)
 		for _, stdout := range [][]byte{stdoutSearchAll, stdoutSearch} {
 			requirejson.Parse(t, stdout).
-				Query(`.[] | select(.id == "foo_vendor:avr")`).
+				Query(`.platforms | .[] | select(.id == "foo_vendor:avr")`).
 				MustContain(`{
 					"latest_version": "1.0.1",
 					"releases": {
@@ -1230,7 +1232,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 					}
 				}`)
 			requirejson.Parse(t, stdout).
-				Query(`.[] | select(.id == "incompatible_vendor:avr")`).
+				Query(`.platforms | .[] | select(.id == "incompatible_vendor:avr")`).
 				MustContain(`{"latest_version": "", "releases": { "1.0.0": {"compatible": false}}}`)
 		}
 		// In text mode, core search shows `n/a` for core that doesn't have any compatible version
