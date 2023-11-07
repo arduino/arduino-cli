@@ -114,27 +114,27 @@ func watchList(inst *rpc.Instance) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type listResult struct {
-	ports []*result.DetectedPort
+	Ports []*result.DetectedPort `json:"detected_ports"`
 }
 
 func (dr listResult) Data() interface{} {
-	return dr.ports
+	return dr
 }
 
 func (dr listResult) String() string {
-	if len(dr.ports) == 0 {
+	if len(dr.Ports) == 0 {
 		return tr("No boards found.")
 	}
 
-	sort.Slice(dr.ports, func(i, j int) bool {
-		x, y := dr.ports[i].Port, dr.ports[j].Port
+	sort.Slice(dr.Ports, func(i, j int) bool {
+		x, y := dr.Ports[i].Port, dr.Ports[j].Port
 		return x.Protocol < y.Protocol ||
 			(x.Protocol == y.Protocol && x.Address < y.Address)
 	})
 
 	t := table.New()
 	t.SetHeader(tr("Port"), tr("Protocol"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
-	for _, detectedPort := range dr.ports {
+	for _, detectedPort := range dr.Ports {
 		port := detectedPort.Port
 		protocol := port.Protocol
 		address := port.Address
