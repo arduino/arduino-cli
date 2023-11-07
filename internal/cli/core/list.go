@@ -89,24 +89,24 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 func newCoreListResult(in []*rpc.PlatformSummary, updatableOnly bool) *coreListResult {
 	res := &coreListResult{updatableOnly: updatableOnly}
 	for _, platformSummary := range in {
-		res.platforms = append(res.platforms, result.NewPlatformSummary(platformSummary))
+		res.Platforms = append(res.Platforms, result.NewPlatformSummary(platformSummary))
 	}
 	return res
 }
 
 type coreListResult struct {
-	platforms     []*result.PlatformSummary
+	Platforms     []*result.PlatformSummary `json:"platforms"`
 	updatableOnly bool
 }
 
 // Data implements Result interface
 func (ir coreListResult) Data() interface{} {
-	return ir.platforms
+	return ir
 }
 
 // String implements Result interface
 func (ir coreListResult) String() string {
-	if len(ir.platforms) == 0 {
+	if len(ir.Platforms) == 0 {
 		if ir.updatableOnly {
 			return tr("All platforms are up to date.")
 		}
@@ -114,7 +114,7 @@ func (ir coreListResult) String() string {
 	}
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
-	for _, platform := range ir.platforms {
+	for _, platform := range ir.Platforms {
 		latestVersion := platform.LatestVersion.String()
 		if latestVersion == "" {
 			latestVersion = "n/a"
