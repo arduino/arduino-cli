@@ -45,15 +45,15 @@ func runDumpCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type dumpResult struct {
-	data map[string]interface{}
+	Config map[string]interface{} `json:"config"`
 }
 
 func (dr dumpResult) Data() interface{} {
-	return dr.data
+	return dr
 }
 
 func (dr dumpResult) String() string {
-	bs, err := yaml.Marshal(dr.data)
+	bs, err := yaml.Marshal(dr.Config)
 	if err != nil {
 		// Should never happen
 		panic(tr("unable to marshal config to YAML: %v", err))
