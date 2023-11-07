@@ -4,6 +4,56 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### CLI changed JSON output for some `lib`, `core`, `config`, `board`, and `sketch` commands.
+
+- `arduino-cli lib list` results are wrapped under `installed_libraries` key
+
+  ```
+  { "installed_libraries": [ {...}, {...} ] }
+  ```
+
+- `arduino-cli lib list` results are wrapped under `examples` key
+
+  ```
+  { "examples": [ {...}, {...} ] }
+  ```
+
+- `arduino-cli core search` and `arduino-cli core list` results are wrapped under `platforms` key
+
+  ```
+  { "platforms": [ {...}, {...} ] }
+  ```
+
+- `arduino-cli config init` now correctly returns a json containg the config path
+
+  ```
+  { "config_path": "/home/user/.arduino15/arduino-cli.yaml" }
+  ```
+
+- `arduino-cli core dump` results are wrapped under `config` key
+
+  ```
+  { "config": { ... } }
+  ```
+
+- `arduino-cli board search` results are wrapped under `boards` key
+
+  ```
+  { "boards": [ {...}, {...} ] }
+  ```
+
+- `arduino-cli board list` results are wrapped under `detected_ports` key
+
+  ```
+  { "detected_ports": [ {...}, {...} ] }
+  ```
+
+- `arduino-cli sketch new` now correctly returns a json containing the sketch path
+
+  ```
+  { "sketch_path": "/tmp/my_sketch" }
+  ```
+
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformRelease` has been changed.
 
 We've added a new field called `compatible`. This field indicates if the current platform release is installable or not.
