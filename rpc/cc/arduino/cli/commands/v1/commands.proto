@@ -29,6 +29,7 @@ import "cc/arduino/cli/commands/v1/debug.proto";
 import "cc/arduino/cli/commands/v1/monitor.proto";
 import "cc/arduino/cli/commands/v1/upload.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
+import "cc/arduino/cli/commands/v1/settings.proto";
 
 // The main Arduino Platform service API
 service ArduinoCoreService {
@@ -182,6 +183,26 @@ service ArduinoCoreService {
   rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
 
   rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
+
+  // List all the settings.
+  rpc SettingsGetAll(SettingsGetAllRequest) returns (SettingsGetAllResponse);
+
+  // Set multiple settings values at once.
+  rpc SettingsMerge(SettingsMergeRequest) returns (SettingsMergeResponse);
+
+  // Get the value of a specific setting.
+  rpc SettingsGetValue(SettingsGetValueRequest)
+      returns (SettingsGetValueResponse);
+
+  // Set the value of a specific setting.
+  rpc SettingsSetValue(SettingsSetValueRequest)
+      returns (SettingsSetValueResponse);
+
+  // Writes to file settings currently stored in memory
+  rpc SettingsWrite(SettingsWriteRequest) returns (SettingsWriteResponse);
+
+  // Deletes an entry and rewrites the file settings
+  rpc SettingsDelete(SettingsDeleteRequest) returns (SettingsDeleteResponse);
 }
 
 message CreateRequest {}

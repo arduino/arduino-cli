@@ -15,77 +15,55 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.settings.v1;
+package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1;settings";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
-// The SettingsService provides an interface to Arduino CLI configuration
-// options
-service SettingsService {
-  // List all the settings.
-  rpc GetAll(GetAllRequest) returns (GetAllResponse);
-
-  // Set multiple settings values at once.
-  rpc Merge(MergeRequest) returns (MergeResponse);
-
-  // Get the value of a specific setting.
-  rpc GetValue(GetValueRequest) returns (GetValueResponse);
-
-  // Set the value of a specific setting.
-  rpc SetValue(SetValueRequest) returns (SetValueResponse);
-
-  // Writes to file settings currently stored in memory
-  rpc Write(WriteRequest) returns (WriteResponse);
-
-  // Deletes an entry and rewrites the file settings
-  rpc Delete(DeleteRequest) returns (DeleteResponse);
-}
-
-message GetAllResponse {
+message SettingsGetAllResponse {
   // The settings, in JSON format.
   string json_data = 1;
 }
 
-message MergeRequest {
+message SettingsMergeRequest {
   // The settings, in JSON format.
   string json_data = 1;
 }
 
-message GetValueResponse {
+message SettingsGetValueResponse {
   // The key of the setting.
   string key = 1;
   // The setting, in JSON format.
   string json_data = 2;
 }
 
-message SetValueRequest {
+message SettingsSetValueRequest {
   // The key of the setting.
   string key = 1;
   // The setting, in JSON format.
   string json_data = 2;
 }
 
-message GetAllRequest {}
+message SettingsGetAllRequest {}
 
-message GetValueRequest {
+message SettingsGetValueRequest {
   // The key of the setting.
   string key = 1;
 }
 
-message MergeResponse {}
+message SettingsMergeResponse {}
 
-message SetValueResponse {}
+message SettingsSetValueResponse {}
 
-message WriteRequest {
+message SettingsWriteRequest {
   // Path to settings file (e.g. /path/to/arduino-cli.yaml)
   string file_path = 1;
 }
 
-message WriteResponse {}
+message SettingsWriteResponse {}
 
-message DeleteRequest {
+message SettingsDeleteRequest {
   // The key of the setting to delete.
   string key = 1;
 }
 
-message DeleteResponse {}
+message SettingsDeleteResponse {}

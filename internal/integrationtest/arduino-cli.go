@@ -31,7 +31,6 @@ import (
 
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
@@ -70,20 +69,19 @@ func CreateArduinoCLIWithEnvironment(t *testing.T) (*Environment, *ArduinoCLI) {
 
 // ArduinoCLI is an Arduino CLI client.
 type ArduinoCLI struct {
-	path                 *paths.Path
-	t                    *require.Assertions
-	proc                 *executils.Process
-	stdIn                io.WriteCloser
-	cliEnvVars           map[string]string
-	cliConfigPath        *paths.Path
-	stagingDir           *paths.Path
-	dataDir              *paths.Path
-	sketchbookDir        *paths.Path
-	workingDir           *paths.Path
-	daemonAddr           string
-	daemonConn           *grpc.ClientConn
-	daemonClient         commands.ArduinoCoreServiceClient
-	daemonSettingsClient settings.SettingsServiceClient
+	path          *paths.Path
+	t             *require.Assertions
+	proc          *executils.Process
+	stdIn         io.WriteCloser
+	cliEnvVars    map[string]string
+	cliConfigPath *paths.Path
+	stagingDir    *paths.Path
+	dataDir       *paths.Path
+	sketchbookDir *paths.Path
+	workingDir    *paths.Path
+	daemonAddr    string
+	daemonConn    *grpc.ClientConn
+	daemonClient  commands.ArduinoCoreServiceClient
 }
 
 // ArduinoCLIConfig is the configuration of the ArduinoCLI client
@@ -386,7 +384,6 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	cli.t.NoError(err)
 	cli.daemonConn = conn
 	cli.daemonClient = commands.NewArduinoCoreServiceClient(conn)
-	cli.daemonSettingsClient = settings.NewSettingsServiceClient(conn)
 	return cli.daemonAddr
 }
 
@@ -418,12 +415,12 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 
 // SetValue calls the "SetValue" gRPC method.
 func (cli *ArduinoCLI) SetValue(key, jsonData string) error {
-	req := &settings.SetValueRequest{
+	req := &commands.SettingsSetValueRequest{
 		Key:      key,
 		JsonData: jsonData,
 	}
 	logCallf(">>> SetValue(%+v)\n", req)
-	_, err := cli.daemonSettingsClient.SetValue(context.Background(), req)
+	_, err := cli.daemonClient.SettingsSetValue(context.Background(), req)
 	return err
 }
 

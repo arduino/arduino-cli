@@ -29,7 +29,6 @@ import (
 	"time"
 
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -63,8 +62,6 @@ func main() {
 	// Create an instance of the gRPC clients.
 	client := rpc.NewArduinoCoreServiceClient(conn)
 
-	settingsClient := settings.NewSettingsServiceClient(conn)
-
 	// Now we can call various methods of the API...
 
 	// `Version` can be called without any setup or init procedure.
@@ -76,39 +73,39 @@ func main() {
 
 	// Use SetValue to configure the arduino-cli directories.
 	log.Println("calling SetValue")
-	callSetValue(settingsClient)
+	callSetValue(client)
 
-	// List all the settings.
-	log.Println("calling GetAll()")
-	callGetAll(settingsClient)
+	// List all settings
+	log.Println("calling SettingsGetAll()")
+	callGetAll(client)
 
 	// Merge applies multiple settings values at once.
-	log.Println("calling Merge()")
-	callMerge(settingsClient, `{"foo": {"value": "bar"}, "daemon":{"port":"422"}, "board_manager": {"additional_urls":["https://example.com"]}}`)
+	log.Println("calling SettingsMerge()")
+	callMerge(client, `{"foo": {"value": "bar"}, "daemon":{"port":"422"}, "board_manager": {"additional_urls":["https://example.com"]}}`)
 
-	log.Println("calling GetAll()")
-	callGetAll(settingsClient)
+	log.Println("calling SettingsGetAll()")
+	callGetAll(client)
 
-	log.Println("calling Merge()")
-	callMerge(settingsClient, `{"foo": {} }`)
+	log.Println("calling SettingsMerge()")
+	callMerge(client, `{"foo": {} }`)
 
-	log.Println("calling GetAll()")
-	callGetAll(settingsClient)
+	log.Println("calling SettingsGetAll()")
+	callGetAll(client)
 
-	log.Println("calling Merge()")
-	callMerge(settingsClient, `{"foo": "bar" }`)
+	log.Println("calling SettingsMerge()")
+	callMerge(client, `{"foo": "bar" }`)
 
 	// Get the value of the foo key.
-	log.Println("calling GetValue(foo)")
-	callGetValue(settingsClient)
+	log.Println("calling SettingsGetValue(foo)")
+	callGetValue(client)
 
-	// List all the settings.
-	log.Println("calling GetAll()")
-	callGetAll(settingsClient)
+	// List all settings
+	log.Println("calling SettingsGetAll()")
+	callGetAll(client)
 
 	// Write settings to file.
 	log.Println("calling Write()")
-	callWrite(settingsClient)
+	callWrite(client)
 
 	// Before we can do anything with the CLI, an "instance" must be created.
 	// We keep a reference to the created instance because we will need it to
@@ -121,7 +118,7 @@ func main() {
 
 	// We set up the proxy and then run the update to verify that the proxy settings are currently used
 	log.Println("calling setProxy")
-	callSetProxy(settingsClient)
+	callSetProxy(client)
 
 	// With a brand new instance, the first operation should always be updating
 	// the index.
@@ -247,22 +244,21 @@ func callVersion(client rpc.ArduinoCoreServiceClient) {
 	log.Printf("arduino-cli version: %v", versionResp.GetVersion())
 }
 
-func callSetValue(client settings.SettingsServiceClient) {
-	_, err := client.SetValue(context.Background(),
-		&settings.SetValueRequest{
+func callSetValue(client rpc.ArduinoCoreServiceClient) {
+	_, err := client.SettingsSetValue(context.Background(),
+		&rpc.SettingsSetValueRequest{
 			Key:      "directories",
 			JsonData: `{"data": "` + dataDir + `", "downloads": "` + path.Join(dataDir, "staging") + `", "user": "` + path.Join(dataDir, "sketchbook") + `"}`,
 		})
 
 	if err != nil {
 		log.Fatalf("Error setting settings value: %s", err)
-
 	}
 }
 
-func callSetProxy(client settings.SettingsServiceClient) {
-	_, err := client.SetValue(context.Background(),
-		&settings.SetValueRequest{
+func callSetProxy(client rpc.ArduinoCoreServiceClient) {
+	_, err := client.SettingsSetValue(context.Background(),
+		&rpc.SettingsSetValueRequest{
 			Key:      "network.proxy",
 			JsonData: `"http://localhost:3128"`,
 		})
@@ -272,9 +268,9 @@ func callSetProxy(client settings.SettingsServiceClient) {
 	}
 }
 
-func callUnsetProxy(client settings.SettingsServiceClient) {
-	_, err := client.SetValue(context.Background(),
-		&settings.SetValueRequest{
+func callUnsetProxy(client rpc.ArduinoCoreServiceClient) {
+	_, err := client.SettingsSetValue(context.Background(),
+		&rpc.SettingsSetValueRequest{
 			Key:      "network.proxy",
 			JsonData: `""`,
 		})
@@ -284,9 +280,9 @@ func callUnsetProxy(client settings.SettingsServiceClient) {
 	}
 }
 
-func callMerge(client settings.SettingsServiceClient, jsonData string) {
-	_, err := client.Merge(context.Background(),
-		&settings.MergeRequest{
+func callMerge(client rpc.ArduinoCoreServiceClient, jsonData string) {
+	_, err := client.SettingsMerge(context.Background(),
+		&rpc.SettingsMergeRequest{
 			JsonData: jsonData,
 		})
 
@@ -295,9 +291,9 @@ func callMerge(client settings.SettingsServiceClient, jsonData string) {
 	}
 }
 
-func callGetValue(client settings.SettingsServiceClient) {
-	getValueResp, err := client.GetValue(context.Background(),
-		&settings.GetValueRequest{
+func callGetValue(client rpc.ArduinoCoreServiceClient) {
+	getValueResp, err := client.SettingsGetValue(context.Background(),
+		&rpc.SettingsGetValueRequest{
 			Key: "foo",
 		})
 
@@ -308,8 +304,8 @@ func callGetValue(client settings.SettingsServiceClient) {
 	log.Printf("Value: %s: %s", getValueResp.GetKey(), getValueResp.GetJsonData())
 }
 
-func callGetAll(client settings.SettingsServiceClient) {
-	getAllResp, err := client.GetAll(context.Background(), &settings.GetAllRequest{})
+func callGetAll(client rpc.ArduinoCoreServiceClient) {
+	getAllResp, err := client.SettingsGetAll(context.Background(), &rpc.SettingsGetAllRequest{})
 
 	if err != nil {
 		log.Fatalf("Error getting settings: %s", err)
@@ -318,10 +314,10 @@ func callGetAll(client settings.SettingsServiceClient) {
 	log.Printf("Settings: %s", getAllResp.GetJsonData())
 }
 
-func callWrite(client settings.SettingsServiceClient) {
-	_, err := client.Write(context.Background(),
-		&settings.WriteRequest{
-			FilePath: path.Join(dataDir, "written-settings.yml"),
+func callWrite(client rpc.ArduinoCoreServiceClient) {
+	_, err := client.SettingsWrite(context.Background(),
+		&rpc.SettingsWriteRequest{
+			FilePath: path.Join(dataDir, "written-rpc.Settingsyml"),
 		})
 
 	if err != nil {

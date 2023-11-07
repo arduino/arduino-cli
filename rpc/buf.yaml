@@ -5,6 +5,3 @@ lint:
   ignore_only:
     ENUM_ZERO_VALUE_SUFFIX:
       - cc/arduino/cli/commands/v1/lib.proto
-      - cc/arduino/cli/monitor/v1/monitor.proto
-    RPC_REQUEST_STANDARD_NAME:
-      - cc/arduino/cli/debug/v1/debug.proto

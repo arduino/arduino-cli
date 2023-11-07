@@ -21,7 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -47,12 +47,12 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config delete`")
 	toDelete := args[0]
 
-	svc := daemon.SettingsService{}
-	_, err := svc.Delete(cmd.Context(), &settings.DeleteRequest{Key: toDelete})
+	svc := daemon.ArduinoCoreServerImpl{}
+	_, err := svc.SettingsDelete(cmd.Context(), &rpc.SettingsDeleteRequest{Key: toDelete})
 	if err != nil {
 		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", toDelete, err), feedback.ErrGeneric)
 	}
-	_, err = svc.Write(cmd.Context(), &settings.WriteRequest{FilePath: configuration.Settings.ConfigFileUsed()})
+	_, err = svc.SettingsWrite(cmd.Context(), &rpc.SettingsWriteRequest{FilePath: configuration.Settings.ConfigFileUsed()})
 	if err != nil {
 		feedback.Fatal(tr("Cannot write the file %[1]s: %[2]v", configuration.Settings.ConfigFileUsed(), err), feedback.ErrGeneric)
 	}
