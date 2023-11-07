@@ -18,6 +18,7 @@ package result
 import (
 	"cmp"
 
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/orderedmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
@@ -880,6 +881,7 @@ type CompileResponse struct {
 	BoardPlatform          *InstalledPlatformReference `json:"board_platform,omitempty"`
 	BuildPlatform          *InstalledPlatformReference `json:"build_platform,omitempty"`
 	BuildProperties        []string                    `json:"build_properties,omitempty"`
+	Diagnostics            []*CompileDiagnostic        `json:"diagnostics,omitempty"`
 }
 
 func NewCompileResponse(c *rpc.CompileResponse) *CompileResponse {
@@ -904,6 +906,7 @@ func NewCompileResponse(c *rpc.CompileResponse) *CompileResponse {
 		BoardPlatform:          NewInstalledPlatformReference(c.GetBoardPlatform()),
 		BuildPlatform:          NewInstalledPlatformReference(c.GetBuildPlatform()),
 		BuildProperties:        c.GetBuildProperties(),
+		Diagnostics:            NewCompileDiagnostics(c.GetDiagnostics()),
 	}
 }
 
@@ -957,5 +960,63 @@ func NewBoardListWatchResponse(r *rpc.BoardListWatchResponse) *BoardListWatchRes
 		EventType: r.EventType,
 		Port:      NewDetectedPort(r.Port),
 		Error:     r.Error,
+	}
+}
+
+type CompileDiagnostic struct {
+	Severity string                      `json:"severity,omitempty"`
+	Message  string                      `json:"message,omitempty"`
+	File     string                      `json:"file,omitempty"`
+	Line     int64                       `json:"line,omitempty"`
+	Column   int64                       `json:"column,omitempty"`
+	Context  []*CompileDiagnosticContext `json:"context,omitempty"`
+	Notes    []*CompileDiagnosticNote    `json:"notes,omitempty"`
+}
+
+func NewCompileDiagnostics(cd []*rpc.CompileDiagnostic) []*CompileDiagnostic {
+	return f.Map(cd, NewCompileDiagnostic)
+}
+
+func NewCompileDiagnostic(cd *rpc.CompileDiagnostic) *CompileDiagnostic {
+	return &CompileDiagnostic{
+		Severity: cd.GetSeverity(),
+		Message:  cd.GetMessage(),
+		File:     cd.GetFile(),
+		Line:     cd.GetLine(),
+		Column:   cd.GetColumn(),
+		Context:  f.Map(cd.GetContext(), NewCompileDiagnosticContext),
+		Notes:    f.Map(cd.GetNotes(), NewCompileDiagnosticNote),
+	}
+}
+
+type CompileDiagnosticContext struct {
+	Message string `json:"message,omitempty"`
+	File    string `json:"file,omitempty"`
+	Line    int64  `json:"line,omitempty"`
+	Column  int64  `json:"column,omitempty"`
+}
+
+func NewCompileDiagnosticContext(cdc *rpc.CompileDiagnosticContext) *CompileDiagnosticContext {
+	return &CompileDiagnosticContext{
+		Message: cdc.GetMessage(),
+		File:    cdc.GetFile(),
+		Line:    cdc.GetLine(),
+		Column:  cdc.GetColumn(),
+	}
+}
+
+type CompileDiagnosticNote struct {
+	Message string `json:"message,omitempty"`
+	File    string `json:"file,omitempty"`
+	Line    int64  `json:"line,omitempty"`
+	Column  int64  `json:"column,omitempty"`
+}
+
+func NewCompileDiagnosticNote(cdn *rpc.CompileDiagnosticNote) *CompileDiagnosticNote {
+	return &CompileDiagnosticNote{
+		Message: cdn.GetMessage(),
+		File:    cdn.GetFile(),
+		Line:    cdn.GetLine(),
+		Column:  cdn.GetColumn(),
 	}
 }

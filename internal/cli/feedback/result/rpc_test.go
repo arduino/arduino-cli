@@ -205,6 +205,18 @@ func TestAllFieldAreMapped(t *testing.T) {
 	boardListWatchResponseRpc := &rpc.BoardListWatchResponse{}
 	boardListWatchResponseResult := result.NewBoardListWatchResponse(boardListWatchResponseRpc)
 	mustContainsAllPropertyOfRpcStruct(t, boardListWatchResponseRpc, boardListWatchResponseResult)
+
+	compileDiagnosticRpc := &rpc.CompileDiagnostic{}
+	compileDiagnosticResult := result.NewCompileDiagnostic(compileDiagnosticRpc)
+	mustContainsAllPropertyOfRpcStruct(t, compileDiagnosticRpc, compileDiagnosticResult)
+
+	compileDiagnosticContextRpc := &rpc.CompileDiagnosticContext{}
+	compileDiagnosticContextResult := result.NewCompileDiagnosticContext(compileDiagnosticContextRpc)
+	mustContainsAllPropertyOfRpcStruct(t, compileDiagnosticContextRpc, compileDiagnosticContextResult)
+
+	compileDiagnosticNoteRpc := &rpc.CompileDiagnosticNote{}
+	compileDiagnosticNoteResult := result.NewCompileDiagnosticNote(compileDiagnosticNoteRpc)
+	mustContainsAllPropertyOfRpcStruct(t, compileDiagnosticNoteRpc, compileDiagnosticNoteResult)
 }
 
 func TestEnumsMapsEveryRpcCounterpart(t *testing.T) {
