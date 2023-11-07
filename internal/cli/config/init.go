@@ -108,8 +108,21 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
 		feedback.Fatal(tr("Cannot create config file: %v", err), feedback.ErrGeneric)
 	}
+	feedback.PrintResult(initResult{ConfigFileAbsPath: configFileAbsPath})
+}
 
-	msg := tr("Config file written to: %s", configFileAbsPath.String())
+// output from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type initResult struct {
+	ConfigFileAbsPath *paths.Path `json:"config_path"`
+}
+
+func (dr initResult) Data() interface{} {
+	return dr
+}
+
+func (dr initResult) String() string {
+	msg := tr("Config file written to: %s", dr.ConfigFileAbsPath.String())
 	logrus.Info(msg)
-	feedback.Print(msg)
+	return msg
 }
