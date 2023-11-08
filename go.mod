@@ -39,7 +39,7 @@ require (
 	go.bug.st/relaxed-semver v0.11.0
 	go.bug.st/serial v1.6.1
 	go.bug.st/testifyjson v1.1.1
-	golang.org/x/term v0.13.0
+	golang.org/x/term v0.14.0
 	golang.org/x/text v0.14.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231012201019-e917dd12ba7a
 	google.golang.org/grpc v1.59.0
