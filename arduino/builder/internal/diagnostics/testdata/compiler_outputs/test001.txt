@@ -1,0 +1,12 @@
+/home/megabug/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto -mmcu=atmega32u4 -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_LEONARDO -DARDUINO_ARCH_AVR -DUSB_VID=0x2341 -DUSB_PID=0x8036 "-DUSB_MANUFACTURER=\"Unknown\"" "-DUSB_PRODUCT=\"Arduino Leonardo\"" -I/home/megabug/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino -I/home/megabug/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/leonardo /tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/sketch/Blink.ino.cpp -o /tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/sketch/Blink.ino.cpp.o
+/home/megabug/Arduino/Blink/Blink.ino:1:14: error: expected initializer before 'asd'
+ void setup() asd {
+              ^~~
+/home/megabug/Arduino/Blink/Blink.ino: In function 'void loop()':
+/home/megabug/Arduino/Blink/Blink.ino:6:1: error: 'asd' was not declared in this scope
+ asd
+ ^~~
+/home/megabug/Arduino/Blink/Blink.ino:6:1: note: suggested alternative: 'rand'
+ asd
+ ^~~
+ rand

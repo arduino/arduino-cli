@@ -177,6 +177,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if pme.GetProfile() != nil {
 		libsManager = lm
 	}
+
 	sketchBuilder, err := builder.NewBuilder(
 		sk,
 		boardBuildProperties,
@@ -216,6 +217,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if p := sketchBuilder.GetBuildPath(); p != nil {
 			r.BuildPath = p.String()
 		}
+	}()
+
+	defer func() {
+		r.Diagnostics = sketchBuilder.CompilerDiagnostics().ToRPC()
 	}()
 
 	defer func() {

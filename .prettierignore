@@ -4,6 +4,7 @@
 .vs/
 .ionide/
 
+testdata
 /arduino/libraries/librariesindex/testdata/invalid.json
 /arduino/security/testdata/
 /.licenses/

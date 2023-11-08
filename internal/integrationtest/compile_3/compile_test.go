@@ -113,10 +113,19 @@ func TestCompilerErrOutput(t *testing.T) {
 		require.NoError(t, err)
 
 		// Run compile and catch err stream
-		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--format", "json", sketch.String())
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
 		require.Error(t, err)
-		compilerErr := requirejson.Parse(t, out).Query(".compiler_err")
-		compilerErr.MustContain(`"error"`)
+		outJson := requirejson.Parse(t, out)
+		outJson.Query(`.compiler_err`).MustContain(`"error"`)
+		outJson.Query(`.diagnostics`).MustContain(`
+		[
+			{
+			  "severity": "ERROR",
+			  "line": 1,
+			  "column": 14,
+			  "context": [ { "message": "In function 'void wrong()':" } ]
+			}
+		]`)
 	}
 
 	// Check that library discover do not generate false errors
@@ -132,6 +141,7 @@ func TestCompilerErrOutput(t *testing.T) {
 		jsonOut := requirejson.Parse(t, out)
 		jsonOut.Query(".compiler_out").MustNotContain(`"fatal error"`)
 		jsonOut.Query(".compiler_err").MustNotContain(`"fatal error"`)
+		jsonOut.MustNotContain(`{ "diagnostics" : [] }`)
 	}
 }
 

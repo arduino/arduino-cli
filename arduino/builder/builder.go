@@ -25,6 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
@@ -36,6 +37,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
 )
 
 // ErrSketchCannotBeLocatedInBuildPath fixdoc
@@ -90,6 +92,12 @@ type Builder struct {
 	buildOptions *buildOptions
 
 	libsDetector *detector.SketchLibrariesDetector
+
+	// This is a function used to parse the output of the compiler
+	// It is used to extract errors and warnings
+	compilerOutputParser diagnostics.CompilerOutputParserCB
+	// and here are the diagnostics parsed from the compiler
+	compilerDiagnostics diagnostics.Diagnostics
 }
 
 // buildArtifacts contains the result of various build
@@ -189,7 +197,7 @@ func NewBuilder(
 		logger.Warn(string(verboseOut))
 	}
 
-	return &Builder{
+	b := &Builder{
 		sketch:                        sk,
 		buildProperties:               buildProperties,
 		buildPath:                     buildPath,
@@ -226,7 +234,26 @@ func NewBuilder(
 			buildProperties.GetPath("runtime.platform.path"),
 			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
 		),
-	}, nil
+	}
+
+	b.compilerOutputParser = func(cmdline []string, out []byte) {
+		compiler := diagnostics.DetectCompilerFromCommandLine(
+			cmdline,
+			false, // at the moment compiler-probing is not required
+		)
+		if compiler == nil {
+			logrus.Warnf("Could not detect compiler from: %s", cmdline)
+			return
+		}
+		diags, err := diagnostics.ParseCompilerOutput(compiler, out)
+		if err != nil {
+			logrus.Warnf("Error parsing compiler output: %s", err)
+			return
+		}
+		b.compilerDiagnostics = append(b.compilerDiagnostics, diags...)
+	}
+
+	return b, nil
 }
 
 // GetBuildProperties returns the build properties for running this build
@@ -247,6 +274,11 @@ func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
 // ImportedLibraries fixdoc
 func (b *Builder) ImportedLibraries() libraries.List {
 	return b.libsDetector.ImportedLibraries()
+}
+
+// CompilerDiagnostics returns the parsed compiler diagnostics
+func (b *Builder) CompilerDiagnostics() diagnostics.Diagnostics {
+	return b.compilerDiagnostics
 }
 
 // Preprocess fixdoc
