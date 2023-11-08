@@ -121,14 +121,14 @@ jobs:
 
       - name: Install gon for code signing and app notarization
         run: |
-          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip
+          wget -q https://github.com/Bearer/gon/releases/download/v0.0.27/gon_macos.zip
           unzip gon_macos.zip -d /usr/local/bin
 
       - name: Write gon config to file
         # gon does not allow env variables in config file (https://github.com/mitchellh/gon/issues/20)
         run: |
           cat > "${{ env.GON_CONFIG_PATH }}" <<EOF
-          # See: https://github.com/mitchellh/gon#configuration-file
+          # See: https://github.com/Bearer/gon#configuration-file
           source = ["dist/arduino-cli_osx_${{ matrix.artifact.name }}/arduino-cli"]
           bundle_id = "cc.arduino.arduino-cli"
 
@@ -147,6 +147,7 @@ jobs:
         env:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+          AC_PROVIDER: ${{ secrets.AC_PROVIDER }}
         run: |
           gon "${{ env.GON_CONFIG_PATH }}"
 
