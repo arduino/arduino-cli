@@ -1,0 +1,5 @@
+C:\Users\runneradmin\AppData\Local\Temp\cli2123776893\A\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\runneradmin\AppData\Local\Temp\cli2123776893\A\packages\arduino\hardware\avr\1.8.5\cores\arduino -IC:\Users\runneradmin\AppData\Local\Temp\cli2123776893\A\packages\arduino\hardware\avr\1.8.5\variants\standard C:\Users\runneradmin\AppData\Local\Temp\arduino\sketches\BD9E9425D0ACEC4A9F5E44E2417C33A5\sketch\wrong.cpp -o C:\Users\runneradmin\AppData\Local\Temp\arduino\sketches\BD9E9425D0ACEC4A9F5E44E2417C33A5\sketch\wrong.cpp.o
+D:\a\arduino-cli\arduino-cli\internal\integrationtest\compile_3\testdata\blink_with_wrong_cpp\wrong.cpp: In function 'void wrong()':
+D:\a\arduino-cli\arduino-cli\internal\integrationtest\compile_3\testdata\blink_with_wrong_cpp\wrong.cpp:1:14: error: expected '}' at end of input
+ void wrong() {
+              ^

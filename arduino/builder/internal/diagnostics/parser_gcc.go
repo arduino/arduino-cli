@@ -173,6 +173,17 @@ func extractFileLineAndColumn(file string) (string, int, int) {
 	if len(split) == 1 {
 		return file, 0, 0
 	}
+
+	// Special case: handle Windows drive letter `C:\...`
+	if len(split) > 1 && len(file) == 1 && strings.HasPrefix(split[1], `\`) {
+		file += ":" + split[1]
+		split = split[1:]
+
+		if len(split) == 1 {
+			return file, 0, 0
+		}
+	}
+
 	line, err := strconv.Atoi(split[1])
 	if err != nil || len(split) == 2 {
 		return file, line, 0

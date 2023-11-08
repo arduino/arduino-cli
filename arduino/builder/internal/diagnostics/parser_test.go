@@ -29,6 +29,7 @@ func TestParser(t *testing.T) {
 	t.Run("Generic001", func(t *testing.T) { runParserTest(t, "test001.txt") })
 	t.Run("Generic002", func(t *testing.T) { runParserTest(t, "test002.txt") })
 	t.Run("Generic003", func(t *testing.T) { runParserTest(t, "test003.txt") })
+	t.Run("Generic004", func(t *testing.T) { runParserTest(t, "test004.txt") })
 }
 
 func runParserTest(t *testing.T, testFile string) {
