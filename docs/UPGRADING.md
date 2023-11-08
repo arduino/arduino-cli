@@ -7,24 +7,30 @@ Here you can find a list of migration guides to handle breaking changes between 
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformRelease` has been changed.
 
 We've added a new field called `compatible`. This field indicates if the current platform release is installable or not.
-It may happen that a platform doesn't have a dependency available for an OS, in such cases, if we try to install the
-platform it will fail. The new field can be used to know upfront if a specific release is installable.
+It may happen that a platform doesn't have a dependency available for an OS/ARCH, in such cases, if we try to install
+the platform it will fail. The new field can be used to know upfront if a specific release is installable.
 
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformSummary` has been changed.
 
-We've added a new field called `latest_compatible_version`. This field indicates the latest version that can be
-successfully installed for the current OS. The `latest_version` field cannot guarantee such property.
+We've modified the behavior of `latest_version`. Now this field indicates the latest version that can be installed in
+the current OS/ARCH.
 
 ### `core list` now returns only the latest version that can be installed.
 
-Previously, we showed the latest version without checking if all the dependencies were available in the current OS. Now,
-the latest version will always point to an installable one even if a newer incompatible one is present.
+Previously, we showed the latest version without checking if all the dependencies were available in the current OS/ARCH.
+Now, the latest version will always point to an installable one even if a newer incompatible one is present.
+
+### `core search` now returns the latest installable version of a core.
+
+We now show in the `version` column the latest installable version. If none are available then we show a `n/a` label.
+The corresponding command with `--format json` now returns the same output of
+`arduino-cli core search --all --format json`.
 
 ### `core upgrade` and `core install` will install the latest compatible version.
 
 Previously, we'd have tried the installation/upgrade of a core even if all the required tools weren't available in the
-current OS. Now we check this upfront, and allowing the installation of incompatible versions only if a user explicitly
-provides it like: `core install arduino:renesas_uno@1.0.2`
+current OS/ARCH. Now we check this upfront, and allowing the installation of incompatible versions only if a user
+explicitly provides it like: `core install arduino:renesas_uno@1.0.2`
 
 ### gRPC service `cc.arduino.cli.settings.v1` has been removed, and all RPC calls have been migrated to `cc.arduino.cli.commands.v1`
 
