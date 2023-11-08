@@ -4,6 +4,27 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### gRPC service `cc.arduino.cli.settings.v1` has been removed, and all RPC calls have been migrated to `cc.arduino.cli.commands.v1`
+
+The service `cc.arduino.cli.settings.v1` no longer exists and all existing RPC calls have been moved to the
+`cc.arduino.cli.commands.v1` service adding a `Settings` prefix to the names of all messages. The existing RPC calls:
+
+- `rpc GetAll(GetAllRequest) returns (GetAllResponse)`
+- `rpc Merge(MergeRequest) returns (MergeResponse)`
+- `rpc GetValue(GetValueRequest) returns (GetValueResponse)`
+- `rpc SetValue(SetValueRequest) returns (SetValueResponse)`
+- `rpc Write(WriteRequest) returns (WriteResponse)`
+- `rpc Delete(DeleteRequest) returns (DeleteResponse)`
+
+are now renamed to:
+
+- `rpc SettingsGetAll(SettingsGetAllRequest) returns (SettingsGetAllResponse)`
+- `rpc SettingsMerge(SettingsMergeRequest) returns (SettingsMergeResponse)`
+- `rpc SettingsGetValue(SettingsGetValueRequest) returns (SettingsGetValueResponse)`
+- `rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse)`
+- `rpc SettingsWrite(SettingsWriteRequest) returns (SettingsWriteResponse)`
+- `rpc SettingsDelete(SettingsDeleteRequest) returns (SettingsDeleteResponse)`
+
 ### gRPC `cc.arduino.cli.commands.v1.LibrarySearchRequest` message has been changed.
 
 The `query` field has been removed, use `search_args` instead.

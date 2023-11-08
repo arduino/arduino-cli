@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	srv_settings "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -106,9 +105,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	srv_commands.RegisterArduinoCoreServiceServer(s, &daemon.ArduinoCoreServerImpl{
 		VersionString: version.VersionInfo.VersionString,
 	})
-
-	// Register the settings service
-	srv_settings.RegisterSettingsServiceServer(s, &daemon.SettingsService{})
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon

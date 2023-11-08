@@ -22,12 +22,12 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/configuration"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
-var svc = SettingsService{}
+var svc = ArduinoCoreServerImpl{}
 
 func init() {
 	configuration.Settings = configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
@@ -38,7 +38,7 @@ func reset() {
 }
 
 func TestGetAll(t *testing.T) {
-	resp, err := svc.GetAll(context.Background(), &rpc.GetAllRequest{})
+	resp, err := svc.SettingsGetAll(context.Background(), &rpc.SettingsGetAllRequest{})
 	require.Nil(t, err)
 
 	content, err := json.Marshal(configuration.Settings.AllSettings())
@@ -54,7 +54,7 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	bulkSettings := `{"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}`
-	res, err := svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
+	res, err := svc.SettingsMerge(context.Background(), &rpc.SettingsMergeRequest{JsonData: bulkSettings})
 	require.NotNil(t, res)
 	require.NoError(t, err)
 
@@ -63,7 +63,7 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, true, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	bulkSettings = `{"foo":"", "daemon": {}, "sketch": {"always_export_binaries": "false"}}`
-	res, err = svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
+	res, err = svc.SettingsMerge(context.Background(), &rpc.SettingsMergeRequest{JsonData: bulkSettings})
 	require.NotNil(t, res)
 	require.NoError(t, err)
 
@@ -72,7 +72,7 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	bulkSettings = `{"daemon": {"port":""}}`
-	res, err = svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
+	res, err = svc.SettingsMerge(context.Background(), &rpc.SettingsMergeRequest{JsonData: bulkSettings})
 	require.NotNil(t, res)
 	require.NoError(t, err)
 
@@ -85,60 +85,60 @@ func TestMerge(t *testing.T) {
 }
 
 func TestGetValue(t *testing.T) {
-	key := &rpc.GetValueRequest{Key: "daemon"}
-	resp, err := svc.GetValue(context.Background(), key)
+	key := &rpc.SettingsGetValueRequest{Key: "daemon"}
+	resp, err := svc.SettingsGetValue(context.Background(), key)
 	require.NoError(t, err)
 	require.Equal(t, `{"port":"50051"}`, resp.GetJsonData())
 
-	key = &rpc.GetValueRequest{Key: "daemon.port"}
-	resp, err = svc.GetValue(context.Background(), key)
+	key = &rpc.SettingsGetValueRequest{Key: "daemon.port"}
+	resp, err = svc.SettingsGetValue(context.Background(), key)
 	require.NoError(t, err)
 	require.Equal(t, `"50051"`, resp.GetJsonData())
 }
 
 func TestGetMergedValue(t *testing.T) {
 	// Verifies value is not set
-	key := &rpc.GetValueRequest{Key: "foo"}
-	res, err := svc.GetValue(context.Background(), key)
+	key := &rpc.SettingsGetValueRequest{Key: "foo"}
+	res, err := svc.SettingsGetValue(context.Background(), key)
 	require.Nil(t, res)
 	require.Error(t, err, "Error getting settings value")
 
 	// Merge value
 	bulkSettings := `{"foo": "bar"}`
-	_, err = svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
+	_, err = svc.SettingsMerge(context.Background(), &rpc.SettingsMergeRequest{JsonData: bulkSettings})
 	require.NoError(t, err)
 
 	// Verifies value is correctly returned
-	key = &rpc.GetValueRequest{Key: "foo"}
-	res, err = svc.GetValue(context.Background(), key)
+	key = &rpc.SettingsGetValueRequest{Key: "foo"}
+	res, err = svc.SettingsGetValue(context.Background(), key)
 	require.NoError(t, err)
 	require.Equal(t, `"bar"`, res.GetJsonData())
 }
 
 func TestGetValueNotFound(t *testing.T) {
-	key := &rpc.GetValueRequest{Key: "DOESNTEXIST"}
-	_, err := svc.GetValue(context.Background(), key)
+	key := &rpc.SettingsGetValueRequest{Key: "DOESNTEXIST"}
+	_, err := svc.SettingsGetValue(context.Background(), key)
 	require.NotNil(t, err)
 	require.Equal(t, `key not found in settings`, err.Error())
 }
 
 func TestSetValue(t *testing.T) {
-	val := &rpc.SetValueRequest{
+	val := &rpc.SettingsSetValueRequest{
 		Key:      "foo",
 		JsonData: `"bar"`,
 	}
-	_, err := svc.SetValue(context.Background(), val)
+	_, err := svc.SettingsSetValue(context.Background(), val)
 	require.Nil(t, err)
 	require.Equal(t, "bar", configuration.Settings.GetString("foo"))
 }
 
 func TestWrite(t *testing.T) {
 	// Writes some settings
-	val := &rpc.SetValueRequest{
+	val := &rpc.SettingsSetValueRequest{
 		Key:      "foo",
 		JsonData: `"bar"`,
 	}
-	_, err := svc.SetValue(context.Background(), val)
+	_, err := svc.SettingsSetValue(context.Background(), val)
 	require.NoError(t, err)
 
 	tempDir := paths.TempDir()
@@ -150,7 +150,7 @@ func TestWrite(t *testing.T) {
 	configFile := testFolder.Join("arduino-cli.yml")
 	require.True(t, configFile.NotExist())
 
-	_, err = svc.Write(context.Background(), &rpc.WriteRequest{
+	_, err = svc.SettingsWrite(context.Background(), &rpc.SettingsWriteRequest{
 		FilePath: configFile.String(),
 	})
 	require.NoError(t, err)
@@ -161,16 +161,16 @@ func TestWrite(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	_, err := svc.Delete(context.Background(), &rpc.DeleteRequest{
+	_, err := svc.SettingsDelete(context.Background(), &rpc.SettingsDeleteRequest{
 		Key: "doesnotexist",
 	})
 	require.Error(t, err)
 
-	_, err = svc.Delete(context.Background(), &rpc.DeleteRequest{
+	_, err = svc.SettingsDelete(context.Background(), &rpc.SettingsDeleteRequest{
 		Key: "network",
 	})
 	require.NoError(t, err)
 
-	_, err = svc.GetValue(context.Background(), &rpc.GetValueRequest{Key: "network"})
+	_, err = svc.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
 	require.Error(t, err)
 }

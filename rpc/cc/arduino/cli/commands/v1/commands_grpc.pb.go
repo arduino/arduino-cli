@@ -74,6 +74,12 @@ const (
 	ArduinoCoreService_EnumerateMonitorPortSettings_FullMethodName      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/EnumerateMonitorPortSettings"
 	ArduinoCoreService_Debug_FullMethodName                             = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Debug"
 	ArduinoCoreService_GetDebugConfig_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/GetDebugConfig"
+	ArduinoCoreService_SettingsGetAll_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetAll"
+	ArduinoCoreService_SettingsMerge_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsMerge"
+	ArduinoCoreService_SettingsGetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetValue"
+	ArduinoCoreService_SettingsSetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsSetValue"
+	ArduinoCoreService_SettingsWrite_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsWrite"
+	ArduinoCoreService_SettingsDelete_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsDelete"
 )
 
 // ArduinoCoreServiceClient is the client API for ArduinoCoreService service.
@@ -167,6 +173,18 @@ type ArduinoCoreServiceClient interface {
 	// Start a debug session and communicate with the debugger tool.
 	Debug(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_DebugClient, error)
 	GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error)
+	// List all the settings.
+	SettingsGetAll(ctx context.Context, in *SettingsGetAllRequest, opts ...grpc.CallOption) (*SettingsGetAllResponse, error)
+	// Set multiple settings values at once.
+	SettingsMerge(ctx context.Context, in *SettingsMergeRequest, opts ...grpc.CallOption) (*SettingsMergeResponse, error)
+	// Get the value of a specific setting.
+	SettingsGetValue(ctx context.Context, in *SettingsGetValueRequest, opts ...grpc.CallOption) (*SettingsGetValueResponse, error)
+	// Set the value of a specific setting.
+	SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error)
+	// Writes to file settings currently stored in memory
+	SettingsWrite(ctx context.Context, in *SettingsWriteRequest, opts ...grpc.CallOption) (*SettingsWriteResponse, error)
+	// Deletes an entry and rewrites the file settings
+	SettingsDelete(ctx context.Context, in *SettingsDeleteRequest, opts ...grpc.CallOption) (*SettingsDeleteResponse, error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -1018,6 +1036,60 @@ func (c *arduinoCoreServiceClient) GetDebugConfig(ctx context.Context, in *GetDe
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) SettingsGetAll(ctx context.Context, in *SettingsGetAllRequest, opts ...grpc.CallOption) (*SettingsGetAllResponse, error) {
+	out := new(SettingsGetAllResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsGetAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SettingsMerge(ctx context.Context, in *SettingsMergeRequest, opts ...grpc.CallOption) (*SettingsMergeResponse, error) {
+	out := new(SettingsMergeResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsMerge_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SettingsGetValue(ctx context.Context, in *SettingsGetValueRequest, opts ...grpc.CallOption) (*SettingsGetValueResponse, error) {
+	out := new(SettingsGetValueResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsGetValue_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error) {
+	out := new(SettingsSetValueResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsSetValue_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SettingsWrite(ctx context.Context, in *SettingsWriteRequest, opts ...grpc.CallOption) (*SettingsWriteResponse, error) {
+	out := new(SettingsWriteResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsWrite_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SettingsDelete(ctx context.Context, in *SettingsDeleteRequest, opts ...grpc.CallOption) (*SettingsDeleteResponse, error) {
+	out := new(SettingsDeleteResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsDelete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArduinoCoreServiceServer is the server API for ArduinoCoreService service.
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility
@@ -1109,6 +1181,18 @@ type ArduinoCoreServiceServer interface {
 	// Start a debug session and communicate with the debugger tool.
 	Debug(ArduinoCoreService_DebugServer) error
 	GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error)
+	// List all the settings.
+	SettingsGetAll(context.Context, *SettingsGetAllRequest) (*SettingsGetAllResponse, error)
+	// Set multiple settings values at once.
+	SettingsMerge(context.Context, *SettingsMergeRequest) (*SettingsMergeResponse, error)
+	// Get the value of a specific setting.
+	SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error)
+	// Set the value of a specific setting.
+	SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error)
+	// Writes to file settings currently stored in memory
+	SettingsWrite(context.Context, *SettingsWriteRequest) (*SettingsWriteResponse, error)
+	// Deletes an entry and rewrites the file settings
+	SettingsDelete(context.Context, *SettingsDeleteRequest) (*SettingsDeleteResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1235,6 +1319,24 @@ func (UnimplementedArduinoCoreServiceServer) Debug(ArduinoCoreService_DebugServe
 }
 func (UnimplementedArduinoCoreServiceServer) GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDebugConfig not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsGetAll(context.Context, *SettingsGetAllRequest) (*SettingsGetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsGetAll not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsMerge(context.Context, *SettingsMergeRequest) (*SettingsMergeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsMerge not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsGetValue not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsSetValue not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsWrite(context.Context, *SettingsWriteRequest) (*SettingsWriteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsWrite not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsDelete(context.Context, *SettingsDeleteRequest) (*SettingsDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsDelete not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 
@@ -2042,6 +2144,114 @@ func _ArduinoCoreService_GetDebugConfig_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_SettingsGetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsGetAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsGetAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsGetAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsGetAll(ctx, req.(*SettingsGetAllRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SettingsMerge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsMergeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsMerge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsMerge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsMerge(ctx, req.(*SettingsMergeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SettingsGetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsGetValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsGetValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsGetValue_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsGetValue(ctx, req.(*SettingsGetValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SettingsSetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsSetValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsSetValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsSetValue_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsSetValue(ctx, req.(*SettingsSetValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SettingsWrite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsWriteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsWrite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsWrite_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsWrite(ctx, req.(*SettingsWriteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SettingsDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsDelete(ctx, req.(*SettingsDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArduinoCoreService_ServiceDesc is the grpc.ServiceDesc for ArduinoCoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2124,6 +2334,30 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDebugConfig",
 			Handler:    _ArduinoCoreService_GetDebugConfig_Handler,
+		},
+		{
+			MethodName: "SettingsGetAll",
+			Handler:    _ArduinoCoreService_SettingsGetAll_Handler,
+		},
+		{
+			MethodName: "SettingsMerge",
+			Handler:    _ArduinoCoreService_SettingsMerge_Handler,
+		},
+		{
+			MethodName: "SettingsGetValue",
+			Handler:    _ArduinoCoreService_SettingsGetValue_Handler,
+		},
+		{
+			MethodName: "SettingsSetValue",
+			Handler:    _ArduinoCoreService_SettingsSetValue_Handler,
+		},
+		{
+			MethodName: "SettingsWrite",
+			Handler:    _ArduinoCoreService_SettingsWrite_Handler,
+		},
+		{
+			MethodName: "SettingsDelete",
+			Handler:    _ArduinoCoreService_SettingsDelete_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
