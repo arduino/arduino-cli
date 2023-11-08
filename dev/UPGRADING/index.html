@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" class="md-nav__link">
+    gRPC service cc.arduino.cli.settings.v1 has been removed, and all RPC calls have been migrated to cc.arduino.cli.commands.v1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed" class="md-nav__link">
     gRPC cc.arduino.cli.commands.v1.LibrarySearchRequest message has been changed.
   </a>
@@ -2165,20 +2172,6 @@
 
             
           
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../rpc/settings/" class="md-nav__link">
-        settings
-      </a>
-    </li>
-  
-
-            
-          
         </ul>
       </nav>
     </li>
@@ -2417,6 +2410,13 @@
   
     <nav class="md-nav" aria-label="0.36.0">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" class="md-nav__link">
+    gRPC service cc.arduino.cli.settings.v1 has been removed, and all RPC calls have been migrated to cc.arduino.cli.commands.v1
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed" class="md-nav__link">
@@ -3503,6 +3503,26 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1">gRPC service <code>cc.arduino.cli.settings.v1</code> has been removed, and all RPC calls have been migrated to <code>cc.arduino.cli.commands.v1</code><a class="headerlink" href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" title="Permanent link">&para;</a></h3>
+<p>The service <code>cc.arduino.cli.settings.v1</code> no longer exists and all existing RPC calls have been moved to the
+<code>cc.arduino.cli.commands.v1</code> service adding a <code>Settings</code> prefix to the names of all messages. The existing RPC calls:</p>
+<ul>
+<li><code>rpc GetAll(GetAllRequest) returns (GetAllResponse)</code></li>
+<li><code>rpc Merge(MergeRequest) returns (MergeResponse)</code></li>
+<li><code>rpc GetValue(GetValueRequest) returns (GetValueResponse)</code></li>
+<li><code>rpc SetValue(SetValueRequest) returns (SetValueResponse)</code></li>
+<li><code>rpc Write(WriteRequest) returns (WriteResponse)</code></li>
+<li><code>rpc Delete(DeleteRequest) returns (DeleteResponse)</code></li>
+</ul>
+<p>are now renamed to:</p>
+<ul>
+<li><code>rpc SettingsGetAll(SettingsGetAllRequest) returns (SettingsGetAllResponse)</code></li>
+<li><code>rpc SettingsMerge(SettingsMergeRequest) returns (SettingsMergeResponse)</code></li>
+<li><code>rpc SettingsGetValue(SettingsGetValueRequest) returns (SettingsGetValueResponse)</code></li>
+<li><code>rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse)</code></li>
+<li><code>rpc SettingsWrite(SettingsWriteRequest) returns (SettingsWriteResponse)</code></li>
+<li><code>rpc SettingsDelete(SettingsDeleteRequest) returns (SettingsDeleteResponse)</code></li>
+</ul>
 <h3 id="grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed">gRPC <code>cc.arduino.cli.commands.v1.LibrarySearchRequest</code> message has been changed.<a class="headerlink" href="#grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed" title="Permanent link">&para;</a></h3>
 <p>The <code>query</code> field has been removed, use <code>search_args</code> instead.</p>
 <h3 id="cli-core-list-and-core-search-changed-json-output">CLI <code>core list</code> and <code>core search</code> changed JSON output.<a class="headerlink" href="#cli-core-list-and-core-search-changed-json-output" title="Permanent link">&para;</a></h3>
