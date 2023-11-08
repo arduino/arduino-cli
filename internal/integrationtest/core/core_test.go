@@ -182,7 +182,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	stdout, _, err = cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `[{"id": "test:x86", "releases": { "2.0.0": {"name":"test_core"}}}]`)
-	requirejson.Query(t, stdout, `[.[] | select(.latest_compatible_version != "")] | length`, fmt.Sprint(numPlatforms))
+	requirejson.Len(t, stdout, numPlatforms)
 
 	// list all with additional urls, check the test core is there
 	stdout, _, err = cli.Run("core", "search", "--additional-urls="+url.String())
@@ -191,15 +191,27 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
-	// Check the absence of test:x86@3.0.0 because it contains incompatible deps
+	// Check the absence of test:x86@3.0.0 because it contains incompatible deps. The latest available should be the 2.0.0
 	require.NotContains(t, lines, []string{"test:x86", "3.0.0", "test_core"})
+	require.Contains(t, lines, []string{"test:x86", "2.0.0", "test_core"})
 	numPlatforms = len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
 	stdout, _, err = cli.Run("core", "search", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `[{"id": "test:x86", "releases": { "3.0.0": {"name":"test_core"}}}]`)
-	requirejson.Query(t, stdout, `[.[] | select(.latest_compatible_version != "")] | length`, fmt.Sprint(numPlatforms))
+	requirejson.Contains(t, stdout, `[
+		{
+			"id": "test:x86",
+			"installed_version": "2.0.0",
+			"latest_version": "2.0.0",
+			"releases": {
+				"1.0.0": {"name":"test_core", "compatible": true},
+				"2.0.0": {"name":"test_core", "compatible": true},
+				"3.0.0": {"name":"test_core", "compatible": false}
+			}
+		}
+	]`)
+	requirejson.Len(t, stdout, numPlatforms)
 }
 
 func TestCoreUpdateIndexUrlNotFound(t *testing.T) {
@@ -710,10 +722,10 @@ func TestCoreSearchSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	require.True(t, sort.SliceIsSorted(deprecated, func(i, j int) bool {
-		return strings.ToLower(deprecated[i][2]) < strings.ToLower(deprecated[j][2])
+		return strings.ToLower(deprecated[i][0]) < strings.ToLower(deprecated[j][0])
 	}))
 	require.True(t, sort.SliceIsSorted(notDeprecated, func(i, j int) bool {
-		return strings.ToLower(notDeprecated[i][2]) < strings.ToLower(notDeprecated[j][2])
+		return strings.ToLower(notDeprecated[i][0]) < strings.ToLower(notDeprecated[j][0])
 	}))
 
 	// verify that deprecated platforms are the last ones
@@ -725,20 +737,20 @@ func TestCoreSearchSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	sortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
+		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedDeprecated, notSortedDeprecated)
 
 	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
+		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
 
 	// verify that deprecated platforms are the last ones
 	platform := requirejson.Parse(t, stdout).Query(
-		"[ .[] | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
+		"[ .[] | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
@@ -781,10 +793,10 @@ func TestCoreListSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	require.True(t, sort.SliceIsSorted(deprecated, func(i, j int) bool {
-		return strings.ToLower(deprecated[i][3]) < strings.ToLower(deprecated[j][3])
+		return strings.ToLower(deprecated[i][0]) < strings.ToLower(deprecated[j][0])
 	}))
 	require.True(t, sort.SliceIsSorted(notDeprecated, func(i, j int) bool {
-		return strings.ToLower(notDeprecated[i][3]) < strings.ToLower(notDeprecated[j][3])
+		return strings.ToLower(notDeprecated[i][0]) < strings.ToLower(notDeprecated[j][0])
 	}))
 
 	// verify that deprecated platforms are the last ones
@@ -797,20 +809,20 @@ func TestCoreListSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	sortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
+		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated == true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedDeprecated, notSortedDeprecated)
 
 	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
+		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id] | sort").String()
 	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated != true) | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
 
 	// verify that deprecated platforms are the last ones
 	platform := requirejson.Parse(t, stdout).Query(
-		"[ .[] | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
+		"[ .[] | .id |=ascii_downcase | .id]").String()
 	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
@@ -1120,51 +1132,70 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	_, _, err := cli.Run("core", "update-index", additionalURLs)
 	require.NoError(t, err)
 
-	// check that list shows only compatible versions
+	// the `latest_version` must point to an installable release. In the releases field the latest entry, points to an incompatible version.
 	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	t.Log(string(stdout))
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_version`, `"1.0.2"`)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible_version`, `"1.0.1"`)
+	requirejson.Parse(t, stdout).
+		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		MustContain(`{
+			"installed_version": "",
+			"latest_version": "1.0.1",
+			"releases": {
+				"1.0.0": {"compatible": true},
+				"1.0.1": {"compatible": true},
+				"1.0.2": {"compatible": false}
+			}
+		}`)
 
 	// install latest compatible version
 	_, _, err = cli.Run("core", "install", "foo_vendor:avr", additionalURLs)
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible_version`, `"1.0.1"`)
+	requirejson.Parse(t, stdout).
+		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		MustContain(`{
+			"latest_version": "1.0.1",
+			"installed_version": "1.0.1",
+			"releases": {"1.0.1": {"compatible": true}}
+		}`)
 
-	// install incompatible version
+	// install a specific incompatible version
 	_, stderr, err := cli.Run("core", "install", "foo_vendor:avr@1.0.2", additionalURLs)
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "no versions available for the current OS")
 
-	// install compatible version
+	// install a specific compatible version
 	_, _, err = cli.Run("core", "install", "foo_vendor:avr@1.0.0", additionalURLs)
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.0"`)
+	requirejson.Parse(t, stdout).
+		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		MustContain(`{"installed_version": "1.0.0", "releases": {"1.0.0": {"compatible": true}}}`)
 
 	// Lists all updatable cores
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible_version`, `"1.0.1"`)
+	requirejson.Parse(t, stdout).
+		Query(`.[] | select(.id == "foo_vendor:avr")`).
+		MustContain(`{"latest_version": "1.0.1", "releases": {"1.0.1": {"compatible": true}}}`)
 
 	// Show outdated cores, must show latest compatible
 	stdout, _, err = cli.Run("outdated", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout,
-		`.platforms | .[] | select(.id == "foo_vendor:avr") | {latest_compatible: .latest_compatible_version, latest: .latest_version}`,
-		`{"latest_compatible": "1.0.1", "latest": "1.0.2"}`,
-	)
+	requirejson.Parse(t, stdout).
+		Query(`.platforms | .[] | select(.id == "foo_vendor:avr")`).
+		MustContain(`{"latest_version": "1.0.1", "releases":{"1.0.1": {"compatible": true}}}`)
 
 	// upgrade to latest compatible (1.0.0 -> 1.0.1)
 	_, _, err = cli.Run("core", "upgrade", "foo_vendor:avr", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.1"`)
+	requirejson.Parse(t, stdout).
+		Query(`.[] | select(.id == "foo_vendor:avr") | .releases[.installed_version]`).
+		MustContain(`{"version": "1.0.1", "compatible": true}`)
 
 	// upgrade to latest incompatible not possible (1.0.1 -> 1.0.2)
 	_, _, err = cli.Run("core", "upgrade", "foo_vendor:avr", "--format", "json", additionalURLs)
@@ -1174,34 +1205,44 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.1"`)
 
 	// When no compatible version are found return error
+	// When trying to install a platform with no compatible version fails
 	_, stderr, err = cli.Run("core", "install", "incompatible_vendor:avr", additionalURLs)
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "has no available releases for your OS")
+	require.Contains(t, string(stderr), "is not available for your OS")
 
-	// Core search --all shows incompatible field when a version is incompatible
-	stdout, _, err = cli.Run("core", "search", "--all", "--format", "json", additionalURLs)
-	require.NoError(t, err)
-	requirejson.Query(t, stdout,
-		`[.[] | select(.id == "foo_vendor:avr") | .releases | map(.) | .[] | {version: .version, compatible: .compatible}] | sort_by(.version)`,
-		`[
-			{"compatible":true,"version":"1.0.0"},
-			{"compatible":true,"version":"1.0.1"},
-			{"compatible":false,"version":"1.0.2"}
-		]`,
-	)
-
-	// Core search shows latest compatible version even if incompatible
-	stdout, _, err = cli.Run("core", "search", "--format", "json", additionalURLs)
-	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_version`, `"1.0.2"`)
-	requirejson.Query(t, stdout, `.[] | select(.id == "incompatible_vendor:avr") | .releases[.latest_version].compatible`, `false`)
-
-	// In text mode, core search doesn't show any version if no compatible one are present
-	stdout, _, err = cli.Run("core", "search", additionalURLs)
-	require.NoError(t, err)
-	var lines [][]string
-	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
-		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
+	// Core search
+	{
+		// core search with and without --all produces the same results.
+		stdoutSearchAll, _, err := cli.Run("core", "search", "--all", "--format", "json", additionalURLs)
+		require.NoError(t, err)
+		stdoutSearch, _, err := cli.Run("core", "search", "--format", "json", additionalURLs)
+		require.NoError(t, err)
+		require.Equal(t, stdoutSearchAll, stdoutSearch)
+		for _, stdout := range [][]byte{stdoutSearchAll, stdoutSearch} {
+			requirejson.Parse(t, stdout).
+				Query(`.[] | select(.id == "foo_vendor:avr")`).
+				MustContain(`{
+					"latest_version": "1.0.1",
+					"releases": {
+						"1.0.0": {"compatible": true},
+						"1.0.1": {"compatible": true},
+						"1.0.2": {"compatible": false}
+					}
+				}`)
+			requirejson.Parse(t, stdout).
+				Query(`.[] | select(.id == "incompatible_vendor:avr")`).
+				MustContain(`{"latest_version": "", "releases": { "1.0.0": {"compatible": false}}}`)
+		}
+		// In text mode, core search shows `n/a` for core that doesn't have any compatible version
+		stdout, _, err := cli.Run("core", "search", additionalURLs)
+		require.NoError(t, err)
+		var lines [][]string
+		for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
+			lines = append(lines, strings.Fields(strings.TrimSpace(v)))
+			if strings.Contains(v, "incompatible_vendor:avr") {
+				t.Log(strings.Fields(strings.TrimSpace(v)))
+			}
+		}
+		require.Contains(t, lines, []string{"incompatible_vendor:avr", "n/a", "Incompatible", "Boards"})
 	}
-	require.NotContains(t, lines, []string{"incompatible_vendor:avr"})
 }

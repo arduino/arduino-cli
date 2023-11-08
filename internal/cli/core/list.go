@@ -16,7 +16,6 @@
 package core
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands/core"
@@ -63,7 +62,6 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
 	platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:          inst,
-		AllVersions:       true,
 		ManuallyInstalled: true,
 	})
 	if err != nil {
@@ -80,7 +78,7 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 		if platform.InstalledVersion == "" && !platform.GetMetadata().ManuallyInstalled {
 			continue
 		}
-		if updatableOnly && platform.InstalledVersion == platform.LatestCompatibleVersion {
+		if updatableOnly && platform.InstalledVersion == platform.LatestVersion {
 			continue
 		}
 		result = append(result, platform)
@@ -117,22 +115,11 @@ func (ir coreListResult) String() string {
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
 	for _, platform := range ir.platforms {
-		var name string
-		if installed := platform.GetInstalledRelease(); installed != nil {
-			name = installed.Name
+		latestVersion := platform.LatestVersion.String()
+		if latestVersion == "" {
+			latestVersion = "n/a"
 		}
-		if name == "" {
-			if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
-				name = latestCompatible.Name
-			} else if latest := platform.GetLatestRelease(); latest != nil && name == "" {
-				name = latest.Name
-			}
-		}
-		if platform.Deprecated {
-			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
-		}
-
-		t.AddRow(platform.Id, platform.InstalledVersion, platform.LatestCompatibleVersion, name)
+		t.AddRow(platform.Id, platform.InstalledVersion, latestVersion, platform.GetPlatformName())
 	}
 
 	return t.Render()

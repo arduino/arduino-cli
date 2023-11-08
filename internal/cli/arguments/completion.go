@@ -85,7 +85,6 @@ func GetUninstallableCores() []string {
 
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:          inst,
-		AllVersions:       false,
 		ManuallyInstalled: true,
 	})
 
@@ -106,14 +105,13 @@ func GetInstallableCores() []string {
 	inst := instance.CreateAndInit()
 
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "",
-		AllVersions: false,
+		Instance:   inst,
+		SearchArgs: "",
 	})
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range platforms.GetSearchOutput() {
-		if latest := i.GetLatestCompatibleRelease(); latest != nil {
+		if latest := i.GetLatestRelease(); latest != nil {
 			res = append(res, i.GetMetadata().GetId()+"\t"+latest.GetName())
 		}
 	}

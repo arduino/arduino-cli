@@ -89,11 +89,9 @@ message PlatformSummary {
   map<string, PlatformRelease> releases = 2;
   // The installed version of the platform, or empty string if none installed
   string installed_version = 3;
-  // The latest available version of the platform, or empty if none available
+  // The latest available version of the platform that can be installable, or
+  // empty if none available.
   string latest_version = 4;
-  // The latest available version of the platform containing all compatible
-  // dependencies, or empty if none available
-  string latest_compatible_version = 5;
 }
 
 // PlatformMetadata contains generic information about a platform (not
@@ -144,8 +142,8 @@ message PlatformRelease {
   bool missing_metadata = 7;
   // True this release is deprecated
   bool deprecated = 8;
-  // True if the platform dependencies are available for the current OS. This
-  // also means that the platform is installable.
+  // True if the platform dependencies are available for the current OS/ARCH.
+  // This also means that the platform is installable.
   bool compatible = 9;
 }
 

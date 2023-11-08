@@ -17,12 +17,16 @@ package result
 
 import (
 	"cmp"
+	"fmt"
 
+	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/orderedmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
+
+var tr = i18n.Tr
 
 // NewPlatformSummary creates a new result.PlatformSummary from rpc.PlatformSummary
 func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
@@ -37,17 +41,16 @@ func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 	releases.SortKeys((*semver.Version).CompareTo)
 
 	return &PlatformSummary{
-		Id:                      in.GetMetadata().GetId(),
-		Maintainer:              in.GetMetadata().GetMaintainer(),
-		Website:                 in.GetMetadata().GetWebsite(),
-		Email:                   in.GetMetadata().GetEmail(),
-		ManuallyInstalled:       in.GetMetadata().GetManuallyInstalled(),
-		Deprecated:              in.GetMetadata().GetDeprecated(),
-		Indexed:                 in.GetMetadata().GetIndexed(),
-		Releases:                releases,
-		InstalledVersion:        semver.MustParse(in.GetInstalledVersion()),
-		LatestVersion:           semver.MustParse(in.GetLatestVersion()),
-		LatestCompatibleVersion: semver.MustParse(in.LatestCompatibleVersion),
+		Id:                in.GetMetadata().GetId(),
+		Maintainer:        in.GetMetadata().GetMaintainer(),
+		Website:           in.GetMetadata().GetWebsite(),
+		Email:             in.GetMetadata().GetEmail(),
+		ManuallyInstalled: in.GetMetadata().GetManuallyInstalled(),
+		Deprecated:        in.GetMetadata().GetDeprecated(),
+		Indexed:           in.GetMetadata().GetIndexed(),
+		Releases:          releases,
+		InstalledVersion:  semver.MustParse(in.GetInstalledVersion()),
+		LatestVersion:     semver.MustParse(in.GetLatestVersion()),
 	}
 }
 
@@ -63,9 +66,8 @@ type PlatformSummary struct {
 
 	Releases orderedmap.Map[*semver.Version, *PlatformRelease] `json:"releases,omitempty"`
 
-	InstalledVersion        *semver.Version `json:"installed_version,omitempty"`
-	LatestVersion           *semver.Version `json:"latest_version,omitempty"`
-	LatestCompatibleVersion *semver.Version `json:"latest_compatible_version,omitempty"`
+	InstalledVersion *semver.Version `json:"installed_version,omitempty"`
+	LatestVersion    *semver.Version `json:"latest_version,omitempty"`
 }
 
 // GetLatestRelease returns the latest relase of this platform or nil if none available.
@@ -73,14 +75,26 @@ func (p *PlatformSummary) GetLatestRelease() *PlatformRelease {
 	return p.Releases.Get(p.LatestVersion)
 }
 
-// GetLatestCompatibleRelease returns the latest relase of this platform or nil if none available.
-func (p *PlatformSummary) GetLatestCompatibleRelease() *PlatformRelease {
-	return p.Releases.Get(p.LatestCompatibleVersion)
-}
-
 // GetInstalledRelease returns the installed relase of this platform or nil if none available.
 func (p *PlatformSummary) GetInstalledRelease() *PlatformRelease {
 	return p.Releases.Get(p.InstalledVersion)
+}
+
+// GetPlatformName compute the name of the platform based on the installed/available releases.
+func (p *PlatformSummary) GetPlatformName() string {
+	var name string
+	if installed := p.GetInstalledRelease(); installed != nil {
+		name = installed.FormatName()
+	}
+	if name == "" {
+		if latest := p.GetLatestRelease(); latest != nil {
+			name = latest.FormatName()
+		} else {
+			keys := p.Releases.Keys()
+			name = p.Releases.Get(keys[len(keys)-1]).FormatName()
+		}
+	}
+	return name
 }
 
 // NewPlatformRelease creates a new result.PlatformRelease from rpc.PlatformRelease
@@ -126,6 +140,13 @@ type PlatformRelease struct {
 	MissingMetadata bool          `json:"missing_metadata,omitempty"`
 	Deprecated      bool          `json:"deprecated,omitempty"`
 	Compatible      bool          `json:"compatible"`
+}
+
+func (p *PlatformRelease) FormatName() string {
+	if p.Deprecated {
+		return fmt.Sprintf("[%s] %s", tr("DEPRECATED"), p.Name)
+	}
+	return p.Name
 }
 
 // Board maps a rpc.Board

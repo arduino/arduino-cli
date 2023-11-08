@@ -72,9 +72,8 @@ func runSearchCommand(cmd *cobra.Command, args []string, allVersions bool) {
 	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)
 
 	resp, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  arguments,
-		AllVersions: allVersions,
+		Instance:   inst,
+		SearchArgs: arguments,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error searching for platforms: %v", err), feedback.ErrGeneric)
@@ -115,19 +114,17 @@ func (sr searchResults) String() string {
 	t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
 
 	addRow := func(platform *result.PlatformSummary, release *result.PlatformRelease) {
-		name := release.Name
-		if release.Deprecated {
-			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), release.Name)
+		if release == nil {
+			t.AddRow(platform.Id, "n/a", platform.GetPlatformName())
+			return
 		}
-		t.AddRow(platform.Id, release.Version, name)
+		t.AddRow(platform.Id, release.Version, release.FormatName())
 	}
 
 	for _, platform := range sr.platforms {
 		// When allVersions is not requested we only show the latest compatible version
 		if !sr.allVersions {
-			if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
-				addRow(platform, latestCompatible)
-			}
+			addRow(platform, platform.GetLatestRelease())
 			continue
 		}
 

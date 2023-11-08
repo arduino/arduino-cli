@@ -55,10 +55,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 
 				// Discard platforms with no releases
 				latestRelease := platform.GetLatestRelease()
-				if latestRelease == nil {
-					continue
-				}
-				if latestRelease.Name == "" {
+				if latestRelease == nil || latestRelease.Name == "" {
 					continue
 				}
 
@@ -91,29 +88,20 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 		}
 		if installed := pme.GetInstalledPlatformRelease(platform); installed != nil {
 			rpcPlatformSummary.InstalledVersion = installed.Version.String()
-			rpcPlatformSummary.Releases[installed.Version.String()] = commands.PlatformReleaseToRPC(installed)
-		}
-		if latest := platform.GetLatestRelease(); latest != nil {
-			rpcPlatformSummary.LatestVersion = latest.Version.String()
-			rpcPlatformSummary.Releases[latest.Version.String()] = commands.PlatformReleaseToRPC(latest)
 		}
 		if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
-			rpcPlatformSummary.LatestCompatibleVersion = latestCompatible.Version.String()
-			rpcPlatformSummary.Releases[latestCompatible.Version.String()] = commands.PlatformReleaseToRPC(latestCompatible)
+			rpcPlatformSummary.LatestVersion = latestCompatible.Version.String()
 		}
-		if req.AllVersions {
-			for _, platformRelease := range platform.GetAllReleases() {
-				rpcPlatformRelease := commands.PlatformReleaseToRPC(platformRelease)
-				rpcPlatformSummary.Releases[rpcPlatformRelease.Version] = rpcPlatformRelease
-			}
+		for _, platformRelease := range platform.GetAllReleases() {
+			rpcPlatformRelease := commands.PlatformReleaseToRPC(platformRelease)
+			rpcPlatformSummary.Releases[rpcPlatformRelease.Version] = rpcPlatformRelease
 		}
 		out = append(out, rpcPlatformSummary)
 	}
 
 	// Sort result alphabetically and put deprecated platforms at the bottom
 	sort.Slice(out, func(i, j int) bool {
-		return strings.ToLower(out[i].GetLatestRelease().GetName()) <
-			strings.ToLower(out[j].GetLatestRelease().GetName())
+		return strings.ToLower(out[i].GetMetadata().GetId()) < strings.ToLower(out[j].GetMetadata().GetId())
 	})
 	sort.SliceStable(out, func(i, j int) bool {
 		return !out[i].GetMetadata().Deprecated && out[j].GetMetadata().Deprecated

@@ -78,15 +78,6 @@ func (s *PlatformSummary) GetLatestRelease() *PlatformRelease {
 	return s.Releases[s.LatestVersion]
 }
 
-// GetLatestCompatibleRelease returns the latest compatible release in this PlatformSummary,
-// or nil if not available.
-func (s *PlatformSummary) GetLatestCompatibleRelease() *PlatformRelease {
-	if s.LatestCompatibleVersion == "" {
-		return nil
-	}
-	return s.Releases[s.LatestCompatibleVersion]
-}
-
 // GetInstalledRelease returns the latest release in this PlatformSummary,
 // or nil if not available.
 func (s *PlatformSummary) GetInstalledRelease() *PlatformRelease {

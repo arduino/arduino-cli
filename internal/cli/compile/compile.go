@@ -370,9 +370,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				res.Error += fmt.Sprintln()
 
 				if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
-					Instance:    inst,
-					SearchArgs:  platformErr.Platform,
-					AllVersions: false,
+					Instance:   inst,
+					SearchArgs: platformErr.Platform,
 				}); err != nil {
 					res.Error += err.Error()
 				} else if len(platform.GetSearchOutput()) > 0 {
