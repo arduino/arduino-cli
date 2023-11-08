@@ -400,7 +400,7 @@ type compileResult struct {
 	Success            bool                        `json:"success"`
 	ProfileOut         string                      `json:"profile_out,omitempty"`
 	Error              string                      `json:"error,omitempty"`
-	Diagnostics        []*result.CompileDiagnostic `json:"diagnostics"`
+	Diagnostics        []*result.CompileDiagnostic `json:"diagnostics,omitempty"`
 	showPropertiesMode arguments.ShowPropertiesMode
 	hideStats          bool
 }
