@@ -15,6 +15,7 @@ venv
 /.pytest-tmp-dir
 /node_modules/
 __debug_bin*
+.vscode
 
 # gRPC client example folder
 /client_example/client_example
