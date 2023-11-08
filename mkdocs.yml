@@ -100,7 +100,6 @@ nav:
       - version: commands/arduino-cli_version.md
   - gRPC reference:
       - commands: rpc/commands.md
-      - settings: rpc/settings.md
   - configuration.md
   - Integration options: integration-options.md
   - sketch-build-process.md
