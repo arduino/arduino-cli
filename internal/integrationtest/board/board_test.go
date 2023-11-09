@@ -17,6 +17,7 @@ package board_test
 
 import (
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -602,10 +603,14 @@ func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
 	_, _, err = cli.Run("board", "list")
 	require.NoError(t, err)
 
+	ext := ""
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
 	// remove files from serial-discovery directory to simulate a failed installation
 	serialDiscovery, err := cli.DataDir().Join("packages", "builtin", "tools", "serial-discovery").ReadDir()
 	require.NoError(t, err)
-	require.NoError(t, serialDiscovery[0].Join("serial-discovery.exe").Remove())
+	require.NoError(t, serialDiscovery[0].Join("serial-discovery"+ext).Remove())
 
 	// board list should install serial-discovery again
 	stdout, stderr, err := cli.Run("board", "list")
