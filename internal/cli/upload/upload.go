@@ -138,9 +138,8 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 
 			msg += "\n"
 			if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
-				Instance:    inst,
-				SearchArgs:  platformErr.Platform,
-				AllVersions: false,
+				Instance:   inst,
+				SearchArgs: platformErr.Platform,
 			}); err != nil {
 				msg += err.Error()
 			} else if len(platform.GetSearchOutput()) > 0 {

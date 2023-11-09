@@ -61,8 +61,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
 		platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			AllVersions: false,
+			Instance: inst,
 		})
 		if err != nil {
 			feedback.Fatal(tr("Error retrieving core list: %v", err), feedback.ErrGeneric)
@@ -73,14 +72,14 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 			if platform.InstalledVersion == "" {
 				continue
 			}
-			if platform.InstalledVersion == platform.LatestVersion {
-				// if it's not updatable, skip it
-				continue
+			// if it's not updatable, skip it
+			latestRelease := platform.GetLatestRelease()
+			if latestRelease != nil && platform.InstalledVersion != latestRelease.Version {
+				targets = append(targets, &rpc.Platform{
+					Metadata: platform.GetMetadata(),
+					Release:  latestRelease,
+				})
 			}
-			targets = append(targets, &rpc.Platform{
-				Metadata: platform.GetMetadata(),
-				Release:  platform.GetLatestRelease(),
-			})
 		}
 
 		if len(targets) == 0 {

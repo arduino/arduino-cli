@@ -53,7 +53,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	if installed == nil {
 		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
-	latest := platform.GetLatestRelease()
+	latest := platform.GetLatestCompatibleRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
 		return installed, &arduino.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
 	}

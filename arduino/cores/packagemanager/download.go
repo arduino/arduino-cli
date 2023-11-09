@@ -87,9 +87,9 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 			return nil, nil, fmt.Errorf(tr("required version %[1]s not found for platform %[2]s"), item.PlatformVersion, platform.String())
 		}
 	} else {
-		release = platform.GetLatestRelease()
+		release = platform.GetLatestCompatibleRelease()
 		if release == nil {
-			return nil, nil, fmt.Errorf(tr("platform %s has no available releases"), platform.String())
+			return nil, nil, fmt.Errorf(tr("platform is not available for your OS"))
 		}
 	}
 

@@ -576,9 +576,8 @@ func (inst *ArduinoCLIInstance) PlatformUpgrade(ctx context.Context, packager, a
 // PlatformSearch calls the "PlatformSearch" gRPC method.
 func (inst *ArduinoCLIInstance) PlatformSearch(ctx context.Context, args string, all bool) (*commands.PlatformSearchResponse, error) {
 	req := &commands.PlatformSearchRequest{
-		Instance:    inst.instance,
-		SearchArgs:  args,
-		AllVersions: all,
+		Instance:   inst.instance,
+		SearchArgs: args,
 	}
 	logCallf(">>> PlatformSearch(%+v)\n", req)
 	resp, err := inst.cli.daemonClient.PlatformSearch(ctx, req)

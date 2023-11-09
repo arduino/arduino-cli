@@ -744,6 +744,7 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 func TestFindPlatformReleaseDependencies(t *testing.T) {
 	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	pmb.LoadPackageIndexFromFile(paths.New("testdata", "package_tooltest_index.json"))
+	pmb.calculateCompatibleReleases()
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()

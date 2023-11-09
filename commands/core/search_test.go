@@ -43,9 +43,8 @@ func TestPlatformSearch(t *testing.T) {
 
 	t.Run("SearchAllVersions", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "retrokit",
-			AllVersions: true,
+			Instance:   inst,
+			SearchArgs: "retrokit",
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
@@ -61,64 +60,32 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.5",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.5",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 				"1.0.6": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.6",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.6",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 			},
 			InstalledVersion: "",
-			LatestVersion:    "1.0.6",
-		})
-	})
-
-	t.Run("SearchNoAllVersions", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "retrokit",
-			AllVersions: false,
-		})
-		require.Nil(t, stat)
-		require.NotNil(t, res)
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
-			Metadata: &rpc.PlatformMetadata{
-				Id:         "Retrokits-RK002:arm",
-				Maintainer: "Retrokits (www.retrokits.com)",
-				Website:    "https://www.retrokits.com",
-				Email:      "info@retrokits.com",
-				Indexed:    true,
-			},
-			Releases: map[string]*rpc.PlatformRelease{
-				"1.0.6": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.6",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-				},
-			},
-			InstalledVersion: "",
-			LatestVersion:    "1.0.6",
 		})
 	})
 
 	t.Run("SearchThePackageMaintainer", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "Retrokits (www.retrokits.com)",
-			AllVersions: true,
+			Instance:   inst,
+			SearchArgs: "Retrokits (www.retrokits.com)",
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
@@ -133,32 +100,32 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.5",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.5",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 				"1.0.6": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.6",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.6",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 			},
 			InstalledVersion: "",
-			LatestVersion:    "1.0.6",
 		})
 	})
 
 	t.Run("SearchPackageName", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "Retrokits-RK002",
-			AllVersions: true,
+			Instance:   inst,
+			SearchArgs: "Retrokits-RK002",
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
@@ -173,32 +140,32 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.5",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.5",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 				"1.0.6": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.6",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.6",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 			},
 			InstalledVersion: "",
-			LatestVersion:    "1.0.6",
 		})
 	})
 
 	t.Run("SearchPlatformName", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "rk002",
-			AllVersions: true,
+			Instance:   inst,
+			SearchArgs: "rk002",
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
@@ -213,32 +180,32 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.5",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.5",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 				"1.0.6": {
-					Name:      "RK002",
-					Type:      []string{"Contributed"},
-					Installed: false,
-					Version:   "1.0.6",
-					Boards:    []*rpc.Board{{Name: "RK002"}},
-					Help:      &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Name:       "RK002",
+					Type:       []string{"Contributed"},
+					Installed:  false,
+					Version:    "1.0.6",
+					Boards:     []*rpc.Board{{Name: "RK002"}},
+					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible: false,
 				},
 			},
 			InstalledVersion: "",
-			LatestVersion:    "1.0.6",
 		})
 	})
 
 	t.Run("SearchBoardName", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "Yún",
-			AllVersions: true,
+			Instance:   inst,
+			SearchArgs: "Yún",
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
@@ -285,19 +252,18 @@ func TestPlatformSearch(t *testing.T) {
 						{Name: "Arduino Industrial 101"},
 						{Name: "Linino One"},
 					},
-					Help: &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					Help:       &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					Compatible: false,
 				},
 			},
 			InstalledVersion: "",
-			LatestVersion:    "1.8.3",
 		})
 	})
 
 	t.Run("SearchBoardName2", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-			Instance:    inst,
-			SearchArgs:  "yun",
-			AllVersions: true,
+			Instance:   inst,
+			SearchArgs: "yun",
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
@@ -344,11 +310,11 @@ func TestPlatformSearch(t *testing.T) {
 						{Name: "Arduino Industrial 101"},
 						{Name: "Linino One"},
 					},
-					Help: &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					Help:       &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					Compatible: false,
 				},
 			},
 			InstalledVersion: "",
-			LatestVersion:    "1.8.3",
 		})
 	})
 }
@@ -370,17 +336,16 @@ func TestPlatformSearchSorting(t *testing.T) {
 	require.NotNil(t, inst)
 
 	res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "",
-		AllVersions: false,
+		Instance:   inst,
+		SearchArgs: "",
 	})
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 
 	require.Len(t, res.SearchOutput, 3)
-	require.Equal(t, res.SearchOutput[0].GetLatestRelease().Name, "Arduino AVR Boards")
+	require.Equal(t, res.SearchOutput[0].GetSortedReleases()[0].Name, "Arduino AVR Boards")
 	require.Equal(t, res.SearchOutput[0].Metadata.Deprecated, false)
-	require.Equal(t, res.SearchOutput[1].GetLatestRelease().Name, "RK002")
+	require.Equal(t, res.SearchOutput[1].GetSortedReleases()[0].Name, "RK002")
 	require.Equal(t, res.SearchOutput[1].Metadata.Deprecated, false)
 	require.Equal(t, res.SearchOutput[2].GetLatestRelease().Name, "Platform")
 	require.Equal(t, res.SearchOutput[2].Metadata.Deprecated, true)

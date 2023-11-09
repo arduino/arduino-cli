@@ -55,10 +55,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 
 				// Discard platforms with no releases
 				latestRelease := platform.GetLatestRelease()
-				if latestRelease == nil {
-					continue
-				}
-				if latestRelease.Name == "" {
+				if latestRelease == nil || latestRelease.Name == "" {
 					continue
 				}
 
@@ -86,41 +83,25 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	out := []*rpc.PlatformSummary{}
 	for _, platform := range res {
 		rpcPlatformSummary := &rpc.PlatformSummary{
+			Metadata: commands.PlatformToRPCPlatformMetadata(platform),
 			Releases: map[string]*rpc.PlatformRelease{},
 		}
-
-		rpcPlatformSummary.Metadata = commands.PlatformToRPCPlatformMetadata(platform)
-
-		installed := pme.GetInstalledPlatformRelease(platform)
-		latest := platform.GetLatestRelease()
-		if installed != nil {
+		if installed := pme.GetInstalledPlatformRelease(platform); installed != nil {
 			rpcPlatformSummary.InstalledVersion = installed.Version.String()
 		}
-		if latest != nil {
-			rpcPlatformSummary.LatestVersion = latest.Version.String()
+		if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
+			rpcPlatformSummary.LatestVersion = latestCompatible.Version.String()
 		}
-		if req.AllVersions {
-			for _, platformRelease := range platform.GetAllReleases() {
-				rpcPlatformRelease := commands.PlatformReleaseToRPC(platformRelease)
-				rpcPlatformSummary.Releases[rpcPlatformRelease.Version] = rpcPlatformRelease
-			}
-		} else {
-			if installed != nil {
-				rpcPlatformRelease := commands.PlatformReleaseToRPC(installed)
-				rpcPlatformSummary.Releases[installed.Version.String()] = rpcPlatformRelease
-			}
-			if latest != nil {
-				rpcPlatformRelease := commands.PlatformReleaseToRPC(latest)
-				rpcPlatformSummary.Releases[latest.Version.String()] = rpcPlatformRelease
-			}
+		for _, platformRelease := range platform.GetAllReleases() {
+			rpcPlatformRelease := commands.PlatformReleaseToRPC(platformRelease)
+			rpcPlatformSummary.Releases[rpcPlatformRelease.Version] = rpcPlatformRelease
 		}
 		out = append(out, rpcPlatformSummary)
 	}
 
 	// Sort result alphabetically and put deprecated platforms at the bottom
 	sort.Slice(out, func(i, j int) bool {
-		return strings.ToLower(out[i].GetReleases()[out[i].GetLatestVersion()].Name) <
-			strings.ToLower(out[j].GetReleases()[out[j].GetLatestVersion()].Name)
+		return strings.ToLower(out[i].GetMetadata().GetId()) < strings.ToLower(out[j].GetMetadata().GetId())
 	})
 	sort.SliceStable(out, func(i, j int) bool {
 		return !out[i].GetMetadata().Deprecated && out[j].GetMetadata().Deprecated

@@ -16,8 +16,8 @@
 package board_test
 
 import (
-	"encoding/json"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -25,7 +25,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/require"
-	semver "go.bug.st/relaxed-semver"
 	"go.bug.st/testifyjson/requirejson"
 )
 
@@ -182,26 +181,36 @@ func TestBoardListall(t *testing.T) {
 				"name": "Arduino Yún",
 				"fqbn": "arduino:avr:yun",
 				"platform": {
-					"id": "arduino:avr",
-					"installed": "1.8.3",
-					"name": "Arduino AVR Boards"
+					"metadata": {
+						"id": "arduino:avr"
+					},
+					"release": {
+						"name": "Arduino AVR Boards",
+						"version": "1.8.3",
+						"installed": true
+					}
 				}
 			},
 			{
 				"name": "Arduino Uno",
 				"fqbn": "arduino:avr:uno",
 				"platform": {
-					"id": "arduino:avr",
-					"installed": "1.8.3",
-					"name": "Arduino AVR Boards"
+					"metadata": {
+						"id": "arduino:avr"
+					},
+					"release": {
+						"name": "Arduino AVR Boards",
+						"version": "1.8.3",
+						"installed": true
+					}
 				}
 			}
 		]
 	}`)
 
-	// Check if the boards' "latest" value is not empty
+	// Check if the boards' "version" value is not empty
 	requirejson.Parse(t, stdout).
-		Query(`[ .boards | .[] | .platform | select(.latest == "") ]`).
+		Query(`[ .boards | .[] | .platform | select(.version == "") ]`).
 		MustBeEmpty()
 }
 
@@ -232,20 +241,28 @@ func TestBoardListallWithManuallyInstalledPlatform(t *testing.T) {
 				"name": "Arduino MKR1000",
 				"fqbn": "arduino-beta-development:samd:mkr1000",
 				"platform": {
-				  "id": "arduino-beta-development:samd",
-				  "installed": "1.8.11",
-				  "latest": "1.8.11",
-				  "name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards",
+					"metadata": {
+					  "id": "arduino-beta-development:samd",
+					},
+					"release": {
+						"installed": true,
+						"version": "1.8.11",
+						"name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards"
+					},
 				}
 			},
 			{
 				"name": "Arduino NANO 33 IoT",
       			"fqbn": "arduino-beta-development:samd:nano_33_iot",
       			"platform": {
-        			"id": "arduino-beta-development:samd",
-        			"installed": "1.8.11",
-        			"latest": "1.8.11",
-        			"name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards"
+					"metadata": {
+					  "id": "arduino-beta-development:samd",
+					},
+					"release": {
+						"installed": true,
+						"version": "1.8.11",
+						"name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards"
+					},
 				}
 			}
 		]
@@ -575,36 +592,6 @@ func TestBoardAttach(t *testing.T) {
 	}
 }
 
-func TestBoardSearchWithOutdatedCore(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_, _, err := cli.Run("update")
-	require.NoError(t, err)
-
-	// Install an old core version
-	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
-	require.NoError(t, err)
-
-	stdout, _, err := cli.Run("board", "search", "arduino:samd:mkrwifi1010", "--format", "json")
-	require.NoError(t, err)
-	requirejson.Len(t, stdout, 1)
-	var data []map[string]interface{}
-	err = json.Unmarshal(stdout, &data)
-	require.NoError(t, err)
-	board := data[0]
-	require.Equal(t, board["name"], "Arduino MKR WiFi 1010")
-	require.Equal(t, board["fqbn"], "arduino:samd:mkrwifi1010")
-	samdCore := board["platform"].(map[string]interface{})
-	require.Equal(t, samdCore["id"], "arduino:samd")
-	installedVersion, err := semver.Parse(samdCore["installed"].(string))
-	require.NoError(t, err)
-	latestVersion, err := semver.Parse(samdCore["latest"].(string))
-	require.NoError(t, err)
-	// Installed version must be older than latest
-	require.True(t, installedVersion.LessThan(latestVersion))
-}
-
 func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
@@ -616,10 +603,14 @@ func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
 	_, _, err = cli.Run("board", "list")
 	require.NoError(t, err)
 
+	ext := ""
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
 	// remove files from serial-discovery directory to simulate a failed installation
 	serialDiscovery, err := cli.DataDir().Join("packages", "builtin", "tools", "serial-discovery").ReadDir()
 	require.NoError(t, err)
-	require.NoError(t, serialDiscovery[0].Join("serial-discovery.exe").Remove())
+	require.NoError(t, serialDiscovery[0].Join("serial-discovery"+ext).Remove())
 
 	// board list should install serial-discovery again
 	stdout, stderr, err := cli.Run("board", "list")

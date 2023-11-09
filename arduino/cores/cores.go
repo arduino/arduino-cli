@@ -75,6 +75,7 @@ type PlatformRelease struct {
 	PluggableDiscoveryAware bool                          `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
 	Monitors                map[string]*MonitorDependency `json:"-"`
 	MonitorsDevRecipes      map[string]string             `json:"-"`
+	Compatible              bool                          `json:"-"` // true if at all ToolDependencies are available for the current OS/ARCH.
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -229,6 +230,21 @@ func (platform *Platform) GetLatestRelease() *PlatformRelease {
 	return platform.FindReleaseWithVersion(latestVersion)
 }
 
+// GetLatestCompatibleRelease returns the latest compatible release of this platform, or nil if no
+// compatible releases are available.
+func (platform *Platform) GetLatestCompatibleRelease() *PlatformRelease {
+	var maximum *PlatformRelease
+	for _, release := range platform.Releases {
+		if !release.IsCompatible() {
+			continue
+		}
+		if maximum == nil || release.Version.GreaterThan(maximum.Version) {
+			maximum = release
+		}
+	}
+	return maximum
+}
+
 // GetAllReleases returns all the releases of this platform, or an empty
 // slice if no releases are available
 func (platform *Platform) GetAllReleases() []*PlatformRelease {
@@ -249,6 +265,18 @@ func (platform *Platform) GetAllReleasesVersions() []*semver.Version {
 	return versions
 }
 
+// GetAllCompatibleReleasesVersions returns all the version numbers in this Platform Package that contains compatible tools.
+func (platform *Platform) GetAllCompatibleReleasesVersions() []*semver.Version {
+	versions := []*semver.Version{}
+	for _, release := range platform.Releases {
+		if !release.IsCompatible() {
+			continue
+		}
+		versions = append(versions, release.Version)
+	}
+	return versions
+}
+
 // latestReleaseVersion obtains latest version number, or nil if no release available
 func (platform *Platform) latestReleaseVersion() *semver.Version {
 	// TODO: Cache latest version using a field in Platform
@@ -264,6 +292,18 @@ func (platform *Platform) latestReleaseVersion() *semver.Version {
 		}
 	}
 	return max
+}
+
+// latestCompatibleReleaseVersion obtains latest version number, for platforms that contains compatible tools, or nil if no release available
+func (platform *Platform) latestCompatibleReleaseVersion() *semver.Version {
+	versions := platform.GetAllCompatibleReleasesVersions()
+	var maxVer *semver.Version
+	for _, v := range versions {
+		if maxVer == nil || v.GreaterThan(maxVer) {
+			maxVer = v
+		}
+	}
+	return maxVer
 }
 
 // GetAllInstalled returns all installed PlatformRelease
@@ -421,4 +461,10 @@ func (release *PlatformRelease) HasMetadata() bool {
 
 	installedJSONPath := release.InstallDir.Join("installed.json")
 	return installedJSONPath.Exist()
+}
+
+// IsCompatible returns true if all the tools dependencies of a PlatformRelease
+// are available in the current OS/ARCH.
+func (release *PlatformRelease) IsCompatible() bool {
+	return release.Compatible
 }

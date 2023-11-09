@@ -41,7 +41,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 	foundBoards := []*rpc.BoardListItem{}
 	for _, targetPackage := range pme.GetPackages() {
 		for _, platform := range targetPackage.Platforms {
-			latestPlatformRelease := platform.GetLatestRelease()
+			latestPlatformRelease := platform.GetLatestCompatibleRelease()
 			installedPlatformRelease := pme.GetInstalledPlatformRelease(platform)
 
 			if latestPlatformRelease == nil && installedPlatformRelease == nil {

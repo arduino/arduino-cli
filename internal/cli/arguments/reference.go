@@ -96,8 +96,7 @@ func ParseReference(arg string) (*Reference, error) {
 	// try to use core.PlatformList to optimize what the user typed
 	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    instance.CreateAndInit(),
-		AllVersions: false,
+		Instance: instance.CreateAndInit(),
 	})
 	foundPlatforms := []string{}
 	for _, platform := range platforms.GetSearchOutput() {
