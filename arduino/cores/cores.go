@@ -233,9 +233,6 @@ func (platform *Platform) GetLatestRelease() *PlatformRelease {
 // GetLatestCompatibleRelease returns the latest compatible release of this platform, or nil if no
 // compatible releases are available.
 func (platform *Platform) GetLatestCompatibleRelease() *PlatformRelease {
-	if len(platform.Releases) == 0 {
-		return nil
-	}
 	var maximum *PlatformRelease
 	for _, release := range platform.Releases {
 		if !release.IsCompatible() {
