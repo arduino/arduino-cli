@@ -6058,6 +6058,12 @@ correlated to a specific release).</p>
 <td></td>
 <td>True this release is deprecated</td>
 </tr>
+<tr>
+<td>compatible</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>True if the platform dependencies are available for the current OS/ARCH. This also means that the platform is installable.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.PlatformSummary"></a></p>
@@ -6096,7 +6102,7 @@ a platform and all its available releases.</p>
 <td>latest_version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td>The latest available version of the platform, or empty if none available</td>
+<td>The latest available version of the platform that can be installable, or empty if none available.</td>
 </tr>
 </tbody>
 </table>
@@ -6827,12 +6833,6 @@ because already at latest version.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Keywords for the search.</td>
-</tr>
-<tr>
-<td>all_versions</td>
-<td><a href="#bool">bool</a></td>
-<td></td>
-<td>Whether to show all available versions. <code>false</code> causes only the newest versions of the cores to be listed in the search results.</td>
 </tr>
 <tr>
 <td>manually_installed</td>

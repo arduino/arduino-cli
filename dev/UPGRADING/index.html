@@ -285,6 +285,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformRelease has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformSummary has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-list-now-returns-only-the-latest-version-that-can-be-installed" class="md-nav__link">
+    core list now returns only the latest version that can be installed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-search-now-returns-the-latest-installable-version-of-a-core" class="md-nav__link">
+    core search now returns the latest installable version of a core.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-upgrade-and-core-install-will-install-the-latest-compatible-version" class="md-nav__link">
+    core upgrade and core install will install the latest compatible version.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" class="md-nav__link">
     gRPC service cc.arduino.cli.settings.v1 has been removed, and all RPC calls have been migrated to cc.arduino.cli.commands.v1
   </a>
@@ -2412,6 +2447,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformRelease has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformSummary has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-list-now-returns-only-the-latest-version-that-can-be-installed" class="md-nav__link">
+    core list now returns only the latest version that can be installed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-search-now-returns-the-latest-installable-version-of-a-core" class="md-nav__link">
+    core search now returns the latest installable version of a core.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-upgrade-and-core-install-will-install-the-latest-compatible-version" class="md-nav__link">
+    core upgrade and core install will install the latest compatible version.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" class="md-nav__link">
     gRPC service cc.arduino.cli.settings.v1 has been removed, and all RPC calls have been migrated to cc.arduino.cli.commands.v1
   </a>
@@ -3503,6 +3573,24 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.PlatformRelease</code> has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>We've added a new field called <code>compatible</code>. This field indicates if the current platform release is installable or not.
+It may happen that a platform doesn't have a dependency available for an OS/ARCH, in such cases, if we try to install
+the platform it will fail. The new field can be used to know upfront if a specific release is installable.</p>
+<h3 id="the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.PlatformSummary</code> has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>We've modified the behavior of <code>latest_version</code>. Now this field indicates the latest version that can be installed in
+the current OS/ARCH.</p>
+<h3 id="core-list-now-returns-only-the-latest-version-that-can-be-installed"><code>core list</code> now returns only the latest version that can be installed.<a class="headerlink" href="#core-list-now-returns-only-the-latest-version-that-can-be-installed" title="Permanent link">&para;</a></h3>
+<p>Previously, we showed the latest version without checking if all the dependencies were available in the current OS/ARCH.
+Now, the latest version will always point to an installable one even if a newer incompatible one is present.</p>
+<h3 id="core-search-now-returns-the-latest-installable-version-of-a-core"><code>core search</code> now returns the latest installable version of a core.<a class="headerlink" href="#core-search-now-returns-the-latest-installable-version-of-a-core" title="Permanent link">&para;</a></h3>
+<p>We now show in the <code>version</code> column the latest installable version. If none are available then we show a <code>n/a</code> label.
+The corresponding command with <code>--format json</code> now returns the same output of
+<code>arduino-cli core search --all --format json</code>.</p>
+<h3 id="core-upgrade-and-core-install-will-install-the-latest-compatible-version"><code>core upgrade</code> and <code>core install</code> will install the latest compatible version.<a class="headerlink" href="#core-upgrade-and-core-install-will-install-the-latest-compatible-version" title="Permanent link">&para;</a></h3>
+<p>Previously, we'd have tried the installation/upgrade of a core even if all the required tools weren't available in the
+current OS/ARCH. Now we check this upfront, and allowing the installation of incompatible versions only if a user
+explicitly provides it like: <code>core install arduino:renesas_uno@1.0.2</code></p>
 <h3 id="grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1">gRPC service <code>cc.arduino.cli.settings.v1</code> has been removed, and all RPC calls have been migrated to <code>cc.arduino.cli.commands.v1</code><a class="headerlink" href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" title="Permanent link">&para;</a></h3>
 <p>The service <code>cc.arduino.cli.settings.v1</code> no longer exists and all existing RPC calls have been moved to the
 <code>cc.arduino.cli.commands.v1</code> service adding a <code>Settings</code> prefix to the names of all messages. The existing RPC calls:</p>
