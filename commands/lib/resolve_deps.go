@@ -76,7 +76,7 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		})
 	}
 	sort.Slice(res, func(i, j int) bool {
-		return res[i].Name < res[j].Name
+		return res[i].GetName() < res[j].GetName()
 	})
 	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
 }

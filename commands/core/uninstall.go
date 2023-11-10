@@ -30,7 +30,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if err := platformUninstall(ctx, req, taskCB); err != nil {
 		return nil, err
 	}
-	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformUninstallResponse{}, nil
@@ -45,8 +45,8 @@ func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	defer release()
 
 	ref := &packagemanager.PlatformReference{
-		Package:              req.PlatformPackage,
-		PlatformArchitecture: req.Architecture,
+		Package:              req.GetPlatformPackage(),
+		PlatformArchitecture: req.GetArchitecture(),
 	}
 	if ref.PlatformVersion == nil {
 		platform := pme.FindPlatform(ref)

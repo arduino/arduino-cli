@@ -409,7 +409,7 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 	logCallf(" -> %v\n", resp)
 	return &ArduinoCLIInstance{
 		cli:      cli,
-		instance: resp.Instance,
+		instance: resp.GetInstance(),
 	}
 }
 

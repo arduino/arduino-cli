@@ -122,7 +122,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
-		Protocol: port.Protocol,
+		Protocol: port.GetProtocol(),
 	})
 	if err != nil {
 		msg := tr("Error during Upload: %v", err)
@@ -152,20 +152,20 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	}
 
 	fields := map[string]string{}
-	if len(userFieldRes.UserFields) > 0 {
+	if len(userFieldRes.GetUserFields()) > 0 {
 		if len(uploadFieldsArgs) > 0 {
 			// If the user has specified some fields via cmd-line, we don't ask for them
-			for _, field := range userFieldRes.UserFields {
-				if value, ok := uploadFieldsArgs[field.Name]; ok {
-					fields[field.Name] = value
+			for _, field := range userFieldRes.GetUserFields() {
+				if value, ok := uploadFieldsArgs[field.GetName()]; ok {
+					fields[field.GetName()] = value
 				} else {
-					feedback.Fatal(tr("Missing required upload field: %s", field.Name), feedback.ErrBadArgument)
+					feedback.Fatal(tr("Missing required upload field: %s", field.GetName()), feedback.ErrBadArgument)
 				}
 			}
 		} else {
 			// Otherwise prompt the user for them
-			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
-			if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
+			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.GetProtocol()))
+			if f, err := arguments.AskForUserFields(userFieldRes.GetUserFields()); err != nil {
 				msg := fmt.Sprintf("%s: %s", tr("Error getting user input"), err)
 				feedback.Fatal(msg, feedback.ErrGeneric)
 			} else {

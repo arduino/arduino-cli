@@ -37,11 +37,11 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	defer release()
 
 	res := []*cores.Platform{}
-	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", req.SearchArgs); isUsb {
-		vid, pid := req.SearchArgs[:4], req.SearchArgs[5:]
+	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", req.GetSearchArgs()); isUsb {
+		vid, pid := req.GetSearchArgs()[:4], req.GetSearchArgs()[5:]
 		res = pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
-		searchArgs := utils.SearchTermsFromQueryString(req.SearchArgs)
+		searchArgs := utils.SearchTermsFromQueryString(req.GetSearchArgs())
 		for _, targetPackage := range pme.GetPackages() {
 			for _, platform := range targetPackage.Platforms {
 				if platform == nil {
@@ -49,7 +49,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 				}
 				// Users can install platforms manually in the Sketchbook hardware folder,
 				// if not explictily requested we skip them.
-				if !req.ManuallyInstalled && platform.ManuallyInstalled {
+				if !req.GetManuallyInstalled() && platform.ManuallyInstalled {
 					continue
 				}
 
@@ -94,7 +94,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 		}
 		for _, platformRelease := range platform.GetAllReleases() {
 			rpcPlatformRelease := commands.PlatformReleaseToRPC(platformRelease)
-			rpcPlatformSummary.Releases[rpcPlatformRelease.Version] = rpcPlatformRelease
+			rpcPlatformSummary.Releases[rpcPlatformRelease.GetVersion()] = rpcPlatformRelease
 		}
 		out = append(out, rpcPlatformSummary)
 	}
@@ -104,7 +104,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 		return strings.ToLower(out[i].GetMetadata().GetId()) < strings.ToLower(out[j].GetMetadata().GetId())
 	})
 	sort.SliceStable(out, func(i, j int) bool {
-		return !out[i].GetMetadata().Deprecated && out[j].GetMetadata().Deprecated
+		return !out[i].GetMetadata().GetDeprecated() && out[j].GetMetadata().GetDeprecated()
 	})
 	return &rpc.PlatformSearchResponse{SearchOutput: out}, nil
 }

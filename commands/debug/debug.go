@@ -130,11 +130,11 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 	var gdbPath *paths.Path
 	switch debugInfo.GetToolchain() {
 	case "gcc":
-		gdbexecutable := debugInfo.ToolchainPrefix + "gdb"
+		gdbexecutable := debugInfo.GetToolchainPrefix() + "gdb"
 		if runtime.GOOS == "windows" {
 			gdbexecutable += ".exe"
 		}
-		gdbPath = paths.New(debugInfo.ToolchainPath).Join(gdbexecutable)
+		gdbPath = paths.New(debugInfo.GetToolchainPath()).Join(gdbexecutable)
 	default:
 		return nil, &arduino.FailedDebugError{Message: tr("Toolchain '%s' is not supported", debugInfo.GetToolchain())}
 	}
@@ -159,11 +159,11 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 	switch debugInfo.GetServer() {
 	case "openocd":
 		var openocdConf rpc.DebugOpenOCDServerConfiguration
-		if err := debugInfo.ServerConfiguration.UnmarshalTo(&openocdConf); err != nil {
+		if err := debugInfo.GetServerConfiguration().UnmarshalTo(&openocdConf); err != nil {
 			return nil, err
 		}
 
-		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.ServerPath)
+		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.GetServerPath())
 
 		if cfg := openocdConf.GetScriptsDir(); cfg != "" {
 			serverCmd += fmt.Sprintf(` -s "%s"`, cfg)
@@ -184,7 +184,7 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 	}
 
 	// Add executable
-	add(debugInfo.Executable)
+	add(debugInfo.GetExecutable())
 
 	// Transform every path to forward slashes (on Windows some tools further
 	// escapes the command line so the backslash "\" gets in the way).

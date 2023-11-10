@@ -37,8 +37,8 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 
 		// Extract all PlatformReference to platforms that have updates
 		ref := &packagemanager.PlatformReference{
-			Package:              req.PlatformPackage,
-			PlatformArchitecture: req.Architecture,
+			Package:              req.GetPlatformPackage(),
+			PlatformArchitecture: req.GetArchitecture(),
 		}
 		platform, err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall())
 		if err != nil {
@@ -59,7 +59,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 	if err != nil {
 		return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, err
 	}
-	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return nil, err
 	}
 

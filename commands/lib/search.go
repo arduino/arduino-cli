@@ -51,14 +51,14 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 	// get a sorted slice of results
 	sort.Slice(res, func(i, j int) bool {
 		// Sort by name, but bubble up exact matches
-		equalsI := strings.EqualFold(res[i].Name, query)
-		equalsJ := strings.EqualFold(res[j].Name, query)
+		equalsI := strings.EqualFold(res[i].GetName(), query)
+		equalsJ := strings.EqualFold(res[j].GetName(), query)
 		if equalsI && !equalsJ {
 			return true
 		} else if !equalsI && equalsJ {
 			return false
 		}
-		return res[i].Name < res[j].Name
+		return res[i].GetName() < res[j].GetName()
 	})
 
 	return &rpc.LibrarySearchResponse{Libraries: res, Status: rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS}

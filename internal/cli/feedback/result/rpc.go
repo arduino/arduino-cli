@@ -103,28 +103,28 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 		return nil
 	}
 	var boards []*Board
-	for _, board := range in.Boards {
+	for _, board := range in.GetBoards() {
 		boards = append(boards, &Board{
-			Name: board.Name,
-			Fqbn: board.Fqbn,
+			Name: board.GetName(),
+			Fqbn: board.GetFqbn(),
 		})
 	}
 	var help *HelpResource
-	if in.Help != nil {
+	if in.GetHelp() != nil {
 		help = &HelpResource{
-			Online: in.Help.Online,
+			Online: in.GetHelp().GetOnline(),
 		}
 	}
 	res := &PlatformRelease{
-		Name:            in.Name,
-		Version:         in.Version,
-		Type:            in.Type,
-		Installed:       in.Installed,
+		Name:            in.GetName(),
+		Version:         in.GetVersion(),
+		Type:            in.GetType(),
+		Installed:       in.GetInstalled(),
 		Boards:          boards,
 		Help:            help,
-		MissingMetadata: in.MissingMetadata,
-		Deprecated:      in.Deprecated,
-		Compatible:      in.Compatible,
+		MissingMetadata: in.GetMissingMetadata(),
+		Deprecated:      in.GetDeprecated(),
+		Compatible:      in.GetCompatible(),
 	}
 	return res
 }
@@ -751,13 +751,13 @@ func NewPlatformMetadata(p *rpc.PlatformMetadata) *PlatformMetadata {
 		return nil
 	}
 	return &PlatformMetadata{
-		Id:                p.Id,
-		Maintainer:        p.Maintainer,
-		Website:           p.Website,
-		Email:             p.Email,
-		ManuallyInstalled: p.ManuallyInstalled,
-		Deprecated:        p.Deprecated,
-		Indexed:           p.Indexed,
+		Id:                p.GetId(),
+		Maintainer:        p.GetMaintainer(),
+		Website:           p.GetWebsite(),
+		Email:             p.GetEmail(),
+		ManuallyInstalled: p.GetManuallyInstalled(),
+		Deprecated:        p.GetDeprecated(),
+		Indexed:           p.GetIndexed(),
 	}
 }
 
@@ -987,9 +987,9 @@ func NewBoardListWatchResponse(r *rpc.BoardListWatchResponse) *BoardListWatchRes
 		return nil
 	}
 	return &BoardListWatchResponse{
-		EventType: r.EventType,
-		Port:      NewDetectedPort(r.Port),
-		Error:     r.Error,
+		EventType: r.GetEventType(),
+		Port:      NewDetectedPort(r.GetPort()),
+		Error:     r.GetError(),
 	}
 }
 

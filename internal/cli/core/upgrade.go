@@ -69,12 +69,12 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 
 		targets := []*rpc.Platform{}
 		for _, platform := range platforms.GetSearchOutput() {
-			if platform.InstalledVersion == "" {
+			if platform.GetInstalledVersion() == "" {
 				continue
 			}
 			// if it's not updatable, skip it
 			latestRelease := platform.GetLatestRelease()
-			if latestRelease != nil && platform.InstalledVersion != latestRelease.Version {
+			if latestRelease != nil && platform.GetInstalledVersion() != latestRelease.GetVersion() {
 				targets = append(targets, &rpc.Platform{
 					Metadata: platform.GetMetadata(),
 					Release:  latestRelease,
@@ -88,16 +88,16 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 		}
 
 		for _, t := range targets {
-			args = append(args, t.GetMetadata().Id)
+			args = append(args, t.GetMetadata().GetId())
 		}
 	}
 
 	warningMissingIndex := func(response *rpc.PlatformUpgradeResponse) {
-		if response == nil || response.Platform == nil {
+		if response == nil || response.GetPlatform() == nil {
 			return
 		}
-		if !response.Platform.GetMetadata().Indexed {
-			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.Platform.GetMetadata().Id))
+		if !response.GetPlatform().GetMetadata().GetIndexed() {
+			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.GetPlatform().GetMetadata().GetId()))
 		}
 	}
 

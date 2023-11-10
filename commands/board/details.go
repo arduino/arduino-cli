@@ -52,16 +52,16 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	details.Version = board.PlatformRelease.Version.String()
 	details.IdentificationProperties = []*rpc.BoardIdentificationProperties{}
 	for _, p := range board.GetIdentificationProperties() {
-		details.IdentificationProperties = append(details.IdentificationProperties, &rpc.BoardIdentificationProperties{
+		details.IdentificationProperties = append(details.GetIdentificationProperties(), &rpc.BoardIdentificationProperties{
 			Properties: p.AsMap(),
 		})
 	}
 	for _, k := range boardProperties.Keys() {
 		v := boardProperties.Get(k)
-		details.BuildProperties = append(details.BuildProperties, k+"="+v)
+		details.BuildProperties = append(details.GetBuildProperties(), k+"="+v)
 	}
 	if !req.GetDoNotExpandBuildProperties() {
-		details.BuildProperties, _ = utils.ExpandBuildProperties(details.BuildProperties)
+		details.BuildProperties, _ = utils.ExpandBuildProperties(details.GetBuildProperties())
 	}
 
 	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
@@ -111,10 +111,10 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 			}
 			configValue.Value = value
 			configValue.ValueLabel = values.Get(value)
-			configOption.Values = append(configOption.Values, configValue)
+			configOption.Values = append(configOption.GetValues(), configValue)
 		}
 
-		details.ConfigOptions = append(details.ConfigOptions, configOption)
+		details.ConfigOptions = append(details.GetConfigOptions(), configOption)
 	}
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
@@ -132,7 +132,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 				})
 			}
 		}
-		details.ToolsDependencies = append(details.ToolsDependencies, &rpc.ToolsDependencies{
+		details.ToolsDependencies = append(details.GetToolsDependencies(), &rpc.ToolsDependencies{
 			Name:     tool.ToolName,
 			Packager: tool.ToolPackager,
 			Version:  tool.ToolVersion.String(),
@@ -142,7 +142,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 
 	details.Programmers = []*rpc.Programmer{}
 	for id, p := range boardPlatformRelease.Programmers {
-		details.Programmers = append(details.Programmers, &rpc.Programmer{
+		details.Programmers = append(details.GetProgrammers(), &rpc.Programmer{
 			Platform: boardPlatformRelease.Name,
 			Id:       id,
 			Name:     p.Name,

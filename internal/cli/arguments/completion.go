@@ -39,8 +39,8 @@ func GetInstalledBoards() []string {
 	})
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range list.Boards {
-		res = append(res, i.Fqbn+"\t"+i.Name)
+	for _, i := range list.GetBoards() {
+		res = append(res, i.GetFqbn()+"\t"+i.GetName())
 	}
 	return res
 }
@@ -59,10 +59,10 @@ func GetInstalledProgrammers() []string {
 	list, _ := board.ListAll(context.Background(), listAllReq)
 
 	installedProgrammers := make(map[string]string)
-	for _, board := range list.Boards {
+	for _, board := range list.GetBoards() {
 		programmers, _ := upload.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadRequest{
 			Instance: inst,
-			Fqbn:     board.Fqbn,
+			Fqbn:     board.GetFqbn(),
 		})
 		for _, programmer := range programmers.GetProgrammers() {
 			installedProgrammers[programmer.GetId()] = programmer.GetName()
@@ -91,7 +91,7 @@ func GetUninstallableCores() []string {
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range platforms.GetSearchOutput() {
-		if i.InstalledVersion == "" {
+		if i.GetInstalledVersion() == "" {
 			continue
 		}
 		res = append(res, i.GetMetadata().GetId()+"\t"+i.GetInstalledRelease().GetName())
@@ -141,8 +141,8 @@ func getLibraries(all bool) []string {
 	})
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range libs.InstalledLibraries {
-		res = append(res, i.Library.Name+"\t"+i.Library.Sentence)
+	for _, i := range libs.GetInstalledLibraries() {
+		res = append(res, i.GetLibrary().GetName()+"\t"+i.GetLibrary().GetSentence())
 	}
 	return res
 }
@@ -158,8 +158,8 @@ func GetInstallableLibs() []string {
 	})
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range libs.Libraries {
-		res = append(res, i.Name+"\t"+i.Latest.Sentence)
+	for _, i := range libs.GetLibraries() {
+		res = append(res, i.GetName()+"\t"+i.GetLatest().GetSentence())
 	}
 	return res
 }
@@ -176,7 +176,7 @@ func GetAvailablePorts() []*rpc.Port {
 	var res []*rpc.Port
 	// transform the data structure for the completion
 	for _, i := range list {
-		res = append(res, i.Port)
+		res = append(res, i.GetPort())
 	}
 	return res
 }

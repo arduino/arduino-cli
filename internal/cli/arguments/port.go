@@ -65,7 +65,7 @@ func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, defaultAddress,
 	if err != nil {
 		return "", "", err
 	}
-	return port.Address, port.Protocol, nil
+	return port.GetAddress(), port.GetProtocol(), nil
 }
 
 // GetPort returns the Port obtained by parsing command line arguments.
@@ -145,13 +145,13 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 		if p.protocol != "" && p.protocol != port.GetProtocol() {
 			continue
 		}
-		if len(detectedPort.MatchingBoards) > 1 {
+		if len(detectedPort.GetMatchingBoards()) > 1 {
 			feedback.FatalError(&arduino.MultipleBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
 		}
-		if len(detectedPort.MatchingBoards) == 0 {
+		if len(detectedPort.GetMatchingBoards()) == 0 {
 			feedback.FatalError(&arduino.NoBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
 		}
-		return detectedPort.MatchingBoards[0].Fqbn, port
+		return detectedPort.GetMatchingBoards()[0].GetFqbn(), port
 	}
 	return "", nil
 }

@@ -125,14 +125,14 @@ func PortFromRPCPort(o *rpc.Port) (p *Port) {
 		return nil
 	}
 	res := &Port{
-		Address:       o.Address,
-		AddressLabel:  o.Label,
-		Protocol:      o.Protocol,
-		ProtocolLabel: o.ProtocolLabel,
-		HardwareID:    o.HardwareId,
+		Address:       o.GetAddress(),
+		AddressLabel:  o.GetLabel(),
+		Protocol:      o.GetProtocol(),
+		ProtocolLabel: o.GetProtocolLabel(),
+		HardwareID:    o.GetHardwareId(),
 	}
-	if o.Properties != nil {
-		res.Properties = properties.NewFromHashmap(o.Properties)
+	if o.GetProperties() != nil {
+		res.Properties = properties.NewFromHashmap(o.GetProperties())
 	}
 	return res
 }

@@ -25,11 +25,11 @@ import (
 func AskForUserFields(userFields []*rpc.UserField) (map[string]string, error) {
 	fields := map[string]string{}
 	for _, f := range userFields {
-		value, err := feedback.InputUserField(f.Label, f.Secret)
+		value, err := feedback.InputUserField(f.GetLabel(), f.GetSecret())
 		if err != nil {
 			return nil, err
 		}
-		fields[f.Name] = value
+		fields[f.GetName()] = value
 	}
 
 	return fields, nil

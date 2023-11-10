@@ -45,7 +45,7 @@ func (a *DownloadProgressAnalyzer) Process(progress *commands.DownloadProgress) 
 	}
 	if start := progress.GetStart(); start != nil {
 		require.Empty(a.t, a.ongoingDownload, "DownloadProgressStart: started a download without 'completing' the previous one")
-		a.ongoingDownload = start.Url
+		a.ongoingDownload = start.GetUrl()
 	} else if update := progress.GetUpdate(); update != nil {
 		require.NotEmpty(a.t, a.ongoingDownload, "DownloadProgressUpdate: received update, but the download is not yet started...")
 	} else if end := progress.GetEnd(); end != nil {

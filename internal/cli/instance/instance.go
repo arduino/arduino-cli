@@ -52,7 +52,7 @@ func create() (*rpc.Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	return res.Instance, nil
+	return res.GetInstance(), nil
 }
 
 // Init initializes instance by loading installed libraries and platforms.
@@ -79,15 +79,15 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 	var profile *rpc.Profile
 	err := commands.Init(initReq, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
-			feedback.Warning(tr("Error initializing instance: %v", st.Message))
+			feedback.Warning(tr("Error initializing instance: %v", st.GetMessage()))
 		}
 
 		if progress := res.GetInitProgress(); progress != nil {
-			if progress.DownloadProgress != nil {
-				downloadCallback(progress.DownloadProgress)
+			if progress.GetDownloadProgress() != nil {
+				downloadCallback(progress.GetDownloadProgress())
 			}
-			if progress.TaskProgress != nil {
-				taskCallback(progress.TaskProgress)
+			if progress.GetTaskProgress() != nil {
+				taskCallback(progress.GetTaskProgress())
 			}
 		}
 

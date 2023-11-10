@@ -94,10 +94,10 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 	}
 
 	sort.Slice(foundBoards, func(i, j int) bool {
-		if foundBoards[i].Name != foundBoards[j].Name {
-			return foundBoards[i].Name < foundBoards[j].Name
+		if foundBoards[i].GetName() != foundBoards[j].GetName() {
+			return foundBoards[i].GetName() < foundBoards[j].GetName()
 		}
-		return foundBoards[i].Platform.Metadata.Id < foundBoards[j].Platform.Metadata.Id
+		return foundBoards[i].GetPlatform().GetMetadata().GetId() < foundBoards[j].GetPlatform().GetMetadata().GetId()
 	})
 
 	return &rpc.BoardSearchResponse{Boards: foundBoards}, nil

@@ -49,8 +49,8 @@ func TestPlatformSearch(t *testing.T) {
 		require.Nil(t, stat)
 		require.NotNil(t, res)
 
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+		require.Len(t, res.GetSearchOutput(), 1)
+		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -89,8 +89,8 @@ func TestPlatformSearch(t *testing.T) {
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+		require.Len(t, res.GetSearchOutput(), 1)
+		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -129,8 +129,8 @@ func TestPlatformSearch(t *testing.T) {
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+		require.Len(t, res.GetSearchOutput(), 1)
+		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -169,8 +169,8 @@ func TestPlatformSearch(t *testing.T) {
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+		require.Len(t, res.GetSearchOutput(), 1)
+		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -209,8 +209,8 @@ func TestPlatformSearch(t *testing.T) {
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+		require.Len(t, res.GetSearchOutput(), 1)
+		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "arduino:avr",
 				Maintainer: "Arduino",
@@ -267,8 +267,8 @@ func TestPlatformSearch(t *testing.T) {
 		})
 		require.Nil(t, stat)
 		require.NotNil(t, res)
-		require.Len(t, res.SearchOutput, 1)
-		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+		require.Len(t, res.GetSearchOutput(), 1)
+		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "arduino:avr",
 				Indexed:    true,
@@ -342,11 +342,11 @@ func TestPlatformSearchSorting(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 
-	require.Len(t, res.SearchOutput, 3)
-	require.Equal(t, res.SearchOutput[0].GetSortedReleases()[0].Name, "Arduino AVR Boards")
-	require.Equal(t, res.SearchOutput[0].Metadata.Deprecated, false)
-	require.Equal(t, res.SearchOutput[1].GetSortedReleases()[0].Name, "RK002")
-	require.Equal(t, res.SearchOutput[1].Metadata.Deprecated, false)
-	require.Equal(t, res.SearchOutput[2].GetLatestRelease().Name, "Platform")
-	require.Equal(t, res.SearchOutput[2].Metadata.Deprecated, true)
+	require.Len(t, res.GetSearchOutput(), 3)
+	require.Equal(t, res.GetSearchOutput()[0].GetSortedReleases()[0].GetName(), "Arduino AVR Boards")
+	require.Equal(t, res.GetSearchOutput()[0].GetMetadata().GetDeprecated(), false)
+	require.Equal(t, res.GetSearchOutput()[1].GetSortedReleases()[0].GetName(), "RK002")
+	require.Equal(t, res.GetSearchOutput()[1].GetMetadata().GetDeprecated(), false)
+	require.Equal(t, res.GetSearchOutput()[2].GetLatestRelease().GetName(), "Platform")
+	require.Equal(t, res.GetSearchOutput()[2].GetMetadata().GetDeprecated(), true)
 }

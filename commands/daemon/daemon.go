@@ -88,7 +88,7 @@ func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 // BoardListWatch FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, stream rpc.ArduinoCoreService_BoardListWatchServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	if req.Instance == nil {
+	if req.GetInstance() == nil {
 		err := fmt.Errorf(tr("no instance specified"))
 		syncSend.Send(&rpc.BoardListWatchResponse{
 			EventType: "error",
@@ -460,7 +460,7 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 			}
 			if conf := msg.GetPortConfiguration(); conf != nil {
 				for _, c := range conf.GetSettings() {
-					if err := portProxy.Config(c.SettingId, c.Value); err != nil {
+					if err := portProxy.Config(c.GetSettingId(), c.GetValue()); err != nil {
 						syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
 					}
 				}

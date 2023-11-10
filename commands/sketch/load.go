@@ -27,7 +27,7 @@ import (
 // LoadSketch collects and returns all files composing a sketch
 func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	// TODO: This should be a ToRpc function for the Sketch struct
-	sk, err := sketch.New(paths.New(req.SketchPath))
+	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}

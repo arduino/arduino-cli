@@ -45,23 +45,23 @@ var invalidNames = []string{"CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", 
 // NewSketch creates a new sketch via gRPC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
 	var sketchesDir string
-	if len(req.SketchDir) > 0 {
-		sketchesDir = req.SketchDir
+	if len(req.GetSketchDir()) > 0 {
+		sketchesDir = req.GetSketchDir()
 	} else {
 		sketchesDir = configuration.Settings.GetString("directories.User")
 	}
 
-	if err := validateSketchName(req.SketchName); err != nil {
+	if err := validateSketchName(req.GetSketchName()); err != nil {
 		return nil, err
 	}
 
-	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
+	sketchDirPath := paths.New(sketchesDir).Join(req.GetSketchName())
 	if err := sketchDirPath.MkdirAll(); err != nil {
 		return nil, &arduino.CantCreateSketchError{Cause: err}
 	}
 	sketchName := sketchDirPath.Base()
 	sketchMainFilePath := sketchDirPath.Join(sketchName + globals.MainFileValidExtension)
-	if !req.Overwrite {
+	if !req.GetOverwrite() {
 		if sketchMainFilePath.Exist() {
 			return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr(".ino file already exists"))}
 		}
