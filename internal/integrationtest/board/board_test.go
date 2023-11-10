@@ -630,6 +630,7 @@ func TestCLIStartupWithCorruptedInventory(t *testing.T) {
 	require.NoError(t, err)
 	_, err = f.WriteString(`data: '[{"name":"WCH;32?'","fqbn":"esp32:esp32:esp32s3camlcd"}]'`)
 	require.NoError(t, err)
+	require.NoError(t, f.Close())
 
 	// the CLI should not be able to load inventory and report it to the logs
 	_, stderr, err := cli.Run("core", "update-index", "-v")
