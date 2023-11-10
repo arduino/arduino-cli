@@ -55,19 +55,33 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 		return nil, err
 	}
 
+	templateDir := configuration.Settings.GetString("sketch.template")
 	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
-	if err := sketchDirPath.MkdirAll(); err != nil {
-		return nil, &arduino.CantCreateSketchError{Cause: err}
-	}
 	sketchName := sketchDirPath.Base()
 	sketchMainFilePath := sketchDirPath.Join(sketchName + globals.MainFileValidExtension)
-	if !req.Overwrite {
-		if sketchMainFilePath.Exist() {
-			return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr(".ino file already exists"))}
+
+	if templateDir != "" {
+		templateDirPath := paths.New(templateDir)
+		if err := templateDirPath.CopyDirTo(sketchDirPath); err != nil {
+			return nil, &arduino.CantCreateSketchError{Cause: err}
 		}
-	}
-	if err := sketchMainFilePath.WriteFile(emptySketch); err != nil {
-		return nil, &arduino.CantCreateSketchError{Cause: err}
+
+		oldMainFilePath := sketchDirPath.Join(templateDirPath.Base() + globals.MainFileValidExtension)
+		if err := oldMainFilePath.Rename(sketchMainFilePath); err != nil {
+			return nil, &arduino.CantCreateSketchError{Cause: err}
+		}
+	} else {
+		if err := sketchDirPath.MkdirAll(); err != nil {
+			return nil, &arduino.CantCreateSketchError{Cause: err}
+		}
+		if !req.Overwrite {
+			if sketchMainFilePath.Exist() {
+				return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr(".ino file already exists"))}
+			}
+		}
+		if err := sketchMainFilePath.WriteFile(emptySketch); err != nil {
+			return nil, &arduino.CantCreateSketchError{Cause: err}
+		}
 	}
 
 	return &rpc.NewSketchResponse{MainFile: sketchMainFilePath.String()}, nil

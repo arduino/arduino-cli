@@ -36,6 +36,7 @@ var validMap = map[string]reflect.Kind{
 	"logging.format":                reflect.String,
 	"logging.level":                 reflect.String,
 	"sketch.always_export_binaries": reflect.Bool,
+	"sketch.template":               reflect.String,
 	"metrics.addr":                  reflect.String,
 	"metrics.enabled":               reflect.Bool,
 	"network.proxy":                 reflect.String,
