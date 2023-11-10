@@ -47,27 +47,28 @@ func TestHardwareLoading(t *testing.T) {
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.LengthMustEqualTo(1)
-			jsonOut.MustContain(`[
-				{
-					"id": "arduino:avr",
-					"installed_version": "1.8.6",
-					"releases": {
-						"1.8.6": {
-							"name": "Arduino AVR Boards",
-							"boards": [
-								{
-									"name": "Arduino Uno",
-									"fqbn": "arduino:avr:uno"
-								},
-								{
-									"name": "Arduino Yún",
-									"fqbn": "arduino:avr:yun"
-								}
-							]
+			jsonOut.MustContain(`{
+				"platforms": [
+					{
+						"id": "arduino:avr",
+						"installed_version": "1.8.6",
+						"releases": {
+							"1.8.6": {
+								"name": "Arduino AVR Boards",
+								"boards": [
+									{
+										"name": "Arduino Uno",
+										"fqbn": "arduino:avr:uno"
+									},
+									{
+										"name": "Arduino Yún",
+										"fqbn": "arduino:avr:yun"
+									}
+								]
+							}
 						}
 					}
-				}
-			]`)
+				]}`)
 		}
 
 		{
@@ -154,60 +155,63 @@ func TestHardwareLoading(t *testing.T) {
 			out, _, err := cli.Run("core", "list", "--format", "json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
-			jsonOut.LengthMustEqualTo(3)
-			jsonOut.MustContain(`[
-				{
-					"id": "arduino:avr",
-					"installed_version": "1.8.6",
-					"releases": {
-						"1.8.6": {
-							"name": "Arduino AVR Boards",
-							"boards": [
-								{
-									"name": "Arduino Uno",
-									"fqbn": "arduino:avr:uno"
-								},
-								{
-									"name": "Arduino Yún",
-									"fqbn": "arduino:avr:yun"
-								}
-							]
+			jsonOut.Query(`.platforms | length`).LengthMustEqualTo(3)
+			jsonOut.MustContain(`{
+				"platforms": [
+					{
+						"id": "arduino:avr",
+						"installed_version": "1.8.6",
+						"releases": {
+							"1.8.6": {
+								"name": "Arduino AVR Boards",
+								"boards": [
+									{
+										"name": "Arduino Uno",
+										"fqbn": "arduino:avr:uno"
+									},
+									{
+										"name": "Arduino Yún",
+										"fqbn": "arduino:avr:yun"
+									}
+								]
+							}
 						}
 					}
-				}
-			]`)
-			jsonOut.MustContain(`[
-				{
-					"id": "my_avr_platform:avr",
-					"installed_version": "9.9.9",
-					"releases": {
-						"9.9.9": {
-							"name": "My AVR Boards",
-							"boards": [
-								{
-									"name": "Arduino Yún",
-									"fqbn": "my_avr_platform:avr:custom_yun"
-								}
-							]
-						}
-					},
-					"manually_installed": true
-				}
-			]`)
+				]}`)
+			jsonOut.MustContain(`{
+				"platforms": [
+					{
+						"id": "my_avr_platform:avr",
+						"installed_version": "9.9.9",
+						"releases": {
+							"9.9.9": {
+								"name": "My AVR Boards",
+								"boards": [
+									{
+										"name": "Arduino Yún",
+										"fqbn": "my_avr_platform:avr:custom_yun"
+									}
+								]
+							}
+						},
+						"manually_installed": true
+					}
+				]}`)
 
 			//		require.False(t, myAVRPlatformAvrArch.Properties.ContainsKey("preproc.includes.flags"))
 
 			if runtime.GOOS != "windows" {
-				jsonOut.MustContain(`[
-					{
-						"id": "my_symlinked_avr_platform:avr",
-						"manually_installed": true,
-						"releases": {
-							"9.9.9": {
+				jsonOut.MustContain(`{
+					"platforms": [
+						{
+							"id": "my_symlinked_avr_platform:avr",
+							"manually_installed": true,
+							"releases": {
+								"9.9.9": {
+								}
 							}
 						}
-					}
-				]`)
+					]}`)
 			}
 		}
 
