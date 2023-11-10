@@ -138,16 +138,16 @@ type openOcdServerConfigResult struct {
 func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 	var toolchainConfig interface{}
 	var serverConfig interface{}
-	switch info.Server {
+	switch info.GetServer() {
 	case "openocd":
 		var openocdConf rpc.DebugOpenOCDServerConfiguration
 		if err := info.GetServerConfiguration().UnmarshalTo(&openocdConf); err != nil {
 			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
 		}
 		serverConfig = &openOcdServerConfigResult{
-			Path:       openocdConf.Path,
-			ScriptsDir: openocdConf.ScriptsDir,
-			Scripts:    openocdConf.Scripts,
+			Path:       openocdConf.GetPath(),
+			ScriptsDir: openocdConf.GetScriptsDir(),
+			Scripts:    openocdConf.GetScripts(),
 		}
 	}
 	customConfigs := map[string]any{}
@@ -158,17 +158,17 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 		}
 	}
 	return &debugInfoResult{
-		Executable:      info.Executable,
-		Toolchain:       info.Toolchain,
-		ToolchainPath:   info.ToolchainPath,
-		ToolchainPrefix: info.ToolchainPrefix,
+		Executable:      info.GetExecutable(),
+		Toolchain:       info.GetToolchain(),
+		ToolchainPath:   info.GetToolchainPath(),
+		ToolchainPrefix: info.GetToolchainPrefix(),
 		ToolchainConfig: toolchainConfig,
-		Server:          info.Server,
-		ServerPath:      info.ServerPath,
+		Server:          info.GetServer(),
+		ServerPath:      info.GetServerPath(),
 		ServerConfig:    serverConfig,
-		SvdFile:         info.SvdFile,
+		SvdFile:         info.GetSvdFile(),
 		CustomConfigs:   customConfigs,
-		Programmer:      info.Programmer,
+		Programmer:      info.GetProgrammer(),
 	}
 }
 

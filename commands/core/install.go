@@ -41,8 +41,8 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 		}
 
 		ref := &packagemanager.PlatformReference{
-			Package:              req.PlatformPackage,
-			PlatformArchitecture: req.Architecture,
+			Package:              req.GetPlatformPackage(),
+			PlatformArchitecture: req.GetArchitecture(),
 			PlatformVersion:      version,
 		}
 		platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
@@ -74,7 +74,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 	if err := install(); err != nil {
 		return nil, err
 	}
-	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformInstallResponse{}, nil

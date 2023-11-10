@@ -44,7 +44,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Create:", err)
 	}
-	instance := resp.Instance
+	instance := resp.GetInstance()
 
 	respStream, err := cli.Init(context.Background(), &commands.InitRequest{Instance: instance})
 	if err != nil {
@@ -70,8 +70,8 @@ func main() {
 	if len(ports) == 0 {
 		log.Fatal("No port to connect!")
 	}
-	port := ports[0].Port
-	fmt.Println("Detected port:", port.Label, port.ProtocolLabel)
+	port := ports[0].GetPort()
+	fmt.Println("Detected port:", port.GetLabel(), port.GetProtocolLabel())
 
 	connectToPort(cli, instance, port)
 	time.Sleep(5 * time.Second)

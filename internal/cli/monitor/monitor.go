@@ -155,8 +155,8 @@ func runMonitorCmd(
 		feedback.Fatal(tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
 	}
 	if describe {
-		settings := make([]*result.MonitorPortSettingDescriptor, len(enumerateResp.Settings))
-		for i, v := range enumerateResp.Settings {
+		settings := make([]*result.MonitorPortSettingDescriptor, len(enumerateResp.GetSettings()))
+		for i, v := range enumerateResp.GetSettings() {
 			settings[i] = result.NewMonitorPortSettingDescriptor(v)
 		}
 		feedback.PrintResult(&detailsResult{Settings: settings})
@@ -177,13 +177,13 @@ func runMonitorCmd(
 			var setting *rpc.MonitorPortSettingDescriptor
 			for _, s := range enumerateResp.GetSettings() {
 				if k == "" {
-					if contains(s.EnumValues, v) {
+					if contains(s.GetEnumValues(), v) {
 						setting = s
 						break
 					}
 				} else {
-					if strings.EqualFold(s.SettingId, k) {
-						if !contains(s.EnumValues, v) {
+					if strings.EqualFold(s.GetSettingId(), k) {
+						if !contains(s.GetEnumValues(), v) {
 							feedback.Fatal(tr("invalid port configuration value for %s: %s", k, v), feedback.ErrBadArgument)
 						}
 						setting = s
@@ -194,13 +194,13 @@ func runMonitorCmd(
 			if setting == nil {
 				feedback.Fatal(tr("invalid port configuration: %s", config), feedback.ErrBadArgument)
 			}
-			configuration.Settings = append(configuration.Settings, &rpc.MonitorPortSetting{
-				SettingId: setting.SettingId,
+			configuration.Settings = append(configuration.GetSettings(), &rpc.MonitorPortSetting{
+				SettingId: setting.GetSettingId(),
 				Value:     v,
 			})
 			if !quiet {
 				feedback.Print(tr("Monitor port settings:"))
-				feedback.Print(fmt.Sprintf("%s=%s", setting.SettingId, v))
+				feedback.Print(fmt.Sprintf("%s=%s", setting.GetSettingId(), v))
 			}
 		}
 	}

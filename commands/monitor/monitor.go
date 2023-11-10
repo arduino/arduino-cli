@@ -84,10 +84,10 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 
 	// Apply user-requested settings
 	if portConfig := req.GetPortConfiguration(); portConfig != nil {
-		for _, setting := range portConfig.Settings {
-			boardSettings.Remove(setting.SettingId) // Remove board settings overridden by the user
-			if err := m.Configure(setting.SettingId, setting.Value); err != nil {
-				logrus.Errorf("Could not set configuration %s=%s: %s", setting.SettingId, setting.Value, err)
+		for _, setting := range portConfig.GetSettings() {
+			boardSettings.Remove(setting.GetSettingId()) // Remove board settings overridden by the user
+			if err := m.Configure(setting.GetSettingId(), setting.GetValue()); err != nil {
+				logrus.Errorf("Could not set configuration %s=%s: %s", setting.GetSettingId(), setting.GetValue(), err)
 			}
 		}
 	}

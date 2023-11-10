@@ -36,7 +36,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 	// sketchName is the name of the sketch without extension, for example "MySketch"
 	var sketchName string
 
-	sketchPath := paths.New(req.SketchPath)
+	sketchPath := paths.New(req.GetSketchPath())
 	if sketchPath == nil {
 		sketchPath = paths.New(".")
 	}
@@ -49,7 +49,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 	sketchPath = s.FullPath
 	sketchName = s.Name
 
-	archivePath := paths.New(req.ArchivePath)
+	archivePath := paths.New(req.GetArchivePath())
 	if archivePath == nil {
 		archivePath = sketchPath.Parent()
 	}
@@ -66,7 +66,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		archivePath = paths.New(archivePath.String() + ".zip")
 	}
 
-	if !req.Overwrite {
+	if !req.GetOverwrite() {
 		if archivePath.Exist() {
 			return nil, &arduino.InvalidArgumentError{Message: tr("Archive already exists")}
 		}
@@ -89,7 +89,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 	for _, f := range filesToZip {
 
-		if !req.IncludeBuildDir {
+		if !req.GetIncludeBuildDir() {
 			filePath, err := sketchPath.Parent().RelTo(f)
 			if err != nil {
 				return nil, &arduino.PermissionDeniedError{Message: tr("Error calculating relative file path"), Cause: err}

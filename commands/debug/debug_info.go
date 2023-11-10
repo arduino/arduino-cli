@@ -138,8 +138,8 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	// Set debug port property
 	port := req.GetPort()
 	if port.GetAddress() != "" {
-		toolProperties.Set("debug.port", port.Address)
-		portFile := strings.TrimPrefix(port.Address, "/dev/")
+		toolProperties.Set("debug.port", port.GetAddress())
+		portFile := strings.TrimPrefix(port.GetAddress(), "/dev/")
 		toolProperties.Set("debug.port.file", portFile)
 	}
 

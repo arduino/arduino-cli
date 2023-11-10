@@ -134,7 +134,7 @@ func (s *ArduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.S
 // and that's picked up when the CLI is run as daemon, either using the default path or a custom one
 // set with the --config-file flag.
 func (s *ArduinoCoreServerImpl) SettingsWrite(ctx context.Context, req *rpc.SettingsWriteRequest) (*rpc.SettingsWriteResponse, error) {
-	if err := configuration.Settings.WriteConfigAs(req.FilePath); err != nil {
+	if err := configuration.Settings.WriteConfigAs(req.GetFilePath()); err != nil {
 		return nil, err
 	}
 	return &rpc.SettingsWriteResponse{}, nil

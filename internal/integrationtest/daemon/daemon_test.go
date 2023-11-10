@@ -75,7 +75,7 @@ func TestArduinoCliDaemon(t *testing.T) {
 					return
 				}
 				require.NoError(t, err, "BoardListWatch grpc call returned an error")
-				require.Empty(t, msg.Error, "Board list watcher returned an error")
+				require.Empty(t, msg.GetError(), "Board list watcher returned an error")
 				fmt.Printf("WATCH> %v %v\n", msg, err)
 			}
 		}()
@@ -173,7 +173,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 			fmt.Println("COMPILE ERROR>", err)
 			break
 		}
-		if msg.ErrStream != nil {
+		if msg.GetErrStream() != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}
 	}
@@ -188,7 +188,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 			break
 		}
 		require.NoError(t, err)
-		if msg.ErrStream != nil {
+		if msg.GetErrStream() != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}
 		analyzer.Process(msg.GetProgress())
@@ -196,7 +196,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	// https://github.com/arduino/arduino-cli/issues/2016
 	// assert that the task progress is increasing and doesn't contain multiple 100% values
 	results := analyzer.Results[""]
-	require.True(t, results[len(results)-1].Completed, fmt.Sprintf("latest percent value: %v", results[len(results)-1].Percent))
+	require.True(t, results[len(results)-1].GetCompleted(), fmt.Sprintf("latest percent value: %v", results[len(results)-1].GetPercent()))
 	require.IsNonDecreasing(t, f.Map(results, (*commands.TaskProgress).GetPercent))
 }
 
@@ -226,7 +226,7 @@ func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
 			require.Contains(t, err.Error(), "Missing FQBN")
 			break
 		}
-		if msg.ErrStream != nil {
+		if msg.GetErrStream() != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}
 	}
@@ -254,7 +254,7 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 		res, err := analyzeUpdateIndexClient(t, cl)
 		require.NoError(t, err)
 		require.Len(t, res, 1)
-		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Success)
+		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].GetSuccess())
 	}
 	{
 		cl, err := grpcInst.UpdateIndex(context.Background(), false)
@@ -262,9 +262,9 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 		res, err := analyzeUpdateIndexClient(t, cl)
 		require.Error(t, err)
 		require.Len(t, res, 3)
-		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Success)
-		require.True(t, res["http://arduino.esp8266.com/stable/package_esp8266com_index.json"].Success)
-		require.False(t, res["http://downloads.arduino.cc/package_inexistent_index.json"].Success)
+		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].GetSuccess())
+		require.True(t, res["http://arduino.esp8266.com/stable/package_esp8266com_index.json"].GetSuccess())
+		require.False(t, res["http://downloads.arduino.cc/package_inexistent_index.json"].GetSuccess())
 	}
 }
 
@@ -297,7 +297,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		libsAndLocation := map[string]commands.LibraryLocation{}
 		for _, lib := range resp.GetInstalledLibraries() {
-			libsAndLocation[lib.Library.Name] = lib.Library.Location
+			libsAndLocation[lib.GetLibrary().GetName()] = lib.GetLibrary().GetLocation()
 		}
 		require.Contains(t, libsAndLocation, "Ethernet")
 		require.Contains(t, libsAndLocation, "SD")
@@ -328,9 +328,9 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		libsAndLocation := map[string]commands.LibraryLocation{}
 		for _, lib := range resp.GetInstalledLibraries() {
-			libsAndLocation[lib.Library.Name] = lib.Library.Location
-			if lib.Library.Name == "Ethernet" {
-				installedEthernetVersion = lib.Library.Version
+			libsAndLocation[lib.GetLibrary().GetName()] = lib.GetLibrary().GetLocation()
+			if lib.GetLibrary().GetName() == "Ethernet" {
+				installedEthernetVersion = lib.GetLibrary().GetVersion()
 			}
 		}
 		require.Contains(t, libsAndLocation, "Ethernet")
@@ -361,7 +361,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		libsAndLocation := map[string]commands.LibraryLocation{}
 		for _, lib := range resp.GetInstalledLibraries() {
-			libsAndLocation[lib.Library.Name] = lib.Library.Location
+			libsAndLocation[lib.GetLibrary().GetName()] = lib.GetLibrary().GetLocation()
 		}
 		require.Contains(t, libsAndLocation, "Ethernet")
 		require.Contains(t, libsAndLocation, "SD")
@@ -447,7 +447,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 		res, err := analyzeUpdateIndexClient(t, cl)
 		require.NoError(t, err)
 		require.Len(t, res, 2)
-		require.True(t, res["https://arduino.esp8266.com/stable/package_esp8266com_index.json"].Success)
+		require.True(t, res["https://arduino.esp8266.com/stable/package_esp8266com_index.json"].GetSuccess())
 
 		refreshInstance(t, grpcInst)
 
@@ -477,8 +477,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.NoError(t, upgradeError)
 			require.NotNil(t, platform)
-			require.True(t, platform.Metadata.Indexed)         // the esp866 is present in the additional-urls
-			require.False(t, platform.Release.MissingMetadata) // install.json is present
+			require.True(t, platform.GetMetadata().GetIndexed())         // the esp866 is present in the additional-urls
+			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
 		})
 		t.Run("and install.json is missing", func(t *testing.T) {
 			env, cli := createEnvForDaemon(t)
@@ -497,8 +497,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.NoError(t, upgradeError)
 			require.NotNil(t, platform)
-			require.True(t, platform.Metadata.Indexed)         // the esp866 is not present in the additional-urls
-			require.False(t, platform.Release.MissingMetadata) // install.json is present because the old version got upgraded
+			require.True(t, platform.GetMetadata().GetIndexed())         // the esp866 is not present in the additional-urls
+			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present because the old version got upgraded
 		})
 	})
 
@@ -520,8 +520,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
 			require.NotNil(t, platform)
-			require.False(t, platform.Metadata.Indexed)        // the esp866 is not present in the additional-urls
-			require.False(t, platform.Release.MissingMetadata) // install.json is present
+			require.False(t, platform.GetMetadata().GetIndexed())        // the esp866 is not present in the additional-urls
+			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
 		})
 		t.Run("missing both additional URLs and install.json", func(t *testing.T) {
 			env, cli := createEnvForDaemon(t)
@@ -545,8 +545,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
 			require.NotNil(t, platform)
-			require.False(t, platform.Metadata.Indexed)       // the esp866 is not present in the additional-urls
-			require.True(t, platform.Release.MissingMetadata) // install.json is present
+			require.False(t, platform.GetMetadata().GetIndexed())       // the esp866 is not present in the additional-urls
+			require.True(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
 		})
 	})
 }

@@ -54,8 +54,8 @@ func TestGetByVidPid(t *testing.T) {
 	res, err := apiByVidPid("0xf420", "0XF069")
 	require.Nil(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, "Arduino/Genuino MKR1000", res[0].Name)
-	require.Equal(t, "arduino:samd:mkr1000", res[0].Fqbn)
+	require.Equal(t, "Arduino/Genuino MKR1000", res[0].GetName())
+	require.Equal(t, "arduino:samd:mkr1000", res[0].GetFqbn())
 
 	// wrong vid (too long), wrong pid (not an hex value)
 	_, err = apiByVidPid("0xfffff", "0xDEFG")
@@ -156,8 +156,8 @@ func TestBoardIdentifySorting(t *testing.T) {
 	require.Len(t, res, 4)
 
 	// Verify expected sorting
-	require.Equal(t, res[0].Fqbn, "arduino:avr:assurdo")
-	require.Equal(t, res[1].Fqbn, "arduino:avr:nessuno")
-	require.Equal(t, res[2].Fqbn, "packager:platform:boardA")
-	require.Equal(t, res[3].Fqbn, "packager:platform:boardB")
+	require.Equal(t, res[0].GetFqbn(), "arduino:avr:assurdo")
+	require.Equal(t, res[1].GetFqbn(), "arduino:avr:nessuno")
+	require.Equal(t, res[2].GetFqbn(), "packager:platform:boardA")
+	require.Equal(t, res[3].GetFqbn(), "packager:platform:boardB")
 }

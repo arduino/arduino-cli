@@ -288,14 +288,14 @@ tools.arduino_ota.upload.field.password.secret=true`))
 
 	userFields := getUserFields("avrdude", platformRelease)
 	require.Len(t, userFields, 2)
-	require.Equal(t, userFields[0].ToolId, "avrdude")
-	require.Equal(t, userFields[0].Name, "username")
-	require.Equal(t, userFields[0].Label, "Username")
-	require.False(t, userFields[0].Secret)
-	require.Equal(t, userFields[1].ToolId, "avrdude")
-	require.Equal(t, userFields[1].Name, "password")
-	require.Equal(t, userFields[1].Label, "Password")
-	require.True(t, userFields[1].Secret)
+	require.Equal(t, userFields[0].GetToolId(), "avrdude")
+	require.Equal(t, userFields[0].GetName(), "username")
+	require.Equal(t, userFields[0].GetLabel(), "Username")
+	require.False(t, userFields[0].GetSecret())
+	require.Equal(t, userFields[1].GetToolId(), "avrdude")
+	require.Equal(t, userFields[1].GetName(), "password")
+	require.Equal(t, userFields[1].GetLabel(), "Password")
+	require.True(t, userFields[1].GetSecret())
 
 	props, err = properties.LoadFromBytes([]byte(`
 tools.arduino_ota.upload.field.password=Password
@@ -310,10 +310,10 @@ tools.arduino_ota.upload.field.some_field=This is a really long label that ideal
 	platformRelease.Properties = props
 	userFields = getUserFields("arduino_ota", platformRelease)
 	require.Len(t, userFields, 1)
-	require.Equal(t, userFields[0].ToolId, "arduino_ota")
-	require.Equal(t, userFields[0].Name, "some_field")
-	require.Equal(t, userFields[0].Label, "This is a really long label that ideally must nev…")
-	require.False(t, userFields[0].Secret)
+	require.Equal(t, userFields[0].GetToolId(), "arduino_ota")
+	require.Equal(t, userFields[0].GetName(), "some_field")
+	require.Equal(t, userFields[0].GetLabel(), "This is a really long label that ideally must nev…")
+	require.False(t, userFields[0].GetSecret())
 }
 
 func TestOverrideProtocolProperties(t *testing.T) {

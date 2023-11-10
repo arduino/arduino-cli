@@ -42,8 +42,8 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 
 	ref := &packagemanager.PlatformReference{
-		Package:              req.PlatformPackage,
-		PlatformArchitecture: req.Architecture,
+		Package:              req.GetPlatformPackage(),
+		PlatformArchitecture: req.GetArchitecture(),
 		PlatformVersion:      version,
 	}
 	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)

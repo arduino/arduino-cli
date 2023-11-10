@@ -330,7 +330,7 @@ func createInstance(client rpc.ArduinoCoreServiceClient) *rpc.Instance {
 	if err != nil {
 		log.Fatalf("Error creating server instance: %s", err)
 	}
-	return res.Instance
+	return res.GetInstance()
 }
 
 func initInstance(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
@@ -521,8 +521,8 @@ func callBoardSearch(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance
 		log.Fatalf("Error getting board data: %s\n", err)
 	}
 
-	for _, board := range res.Boards {
-		log.Printf("Board Name: %s, Board Platform: %s\n", board.Name, board.Platform.Metadata.Id)
+	for _, board := range res.GetBoards() {
+		log.Printf("Board Name: %s, Board Platform: %s\n", board.GetName(), board.GetPlatform().GetMetadata().GetId())
 	}
 }
 
@@ -650,16 +650,16 @@ func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 			} else if err != nil {
 				log.Fatalf("Board list watch error: %s\n", err)
 			}
-			if res.EventType == "error" {
-				log.Printf("res: %s\n", res.Error)
+			if res.GetEventType() == "error" {
+				log.Printf("res: %s\n", res.GetError())
 				continue
 			}
 
-			log.Printf("event: %s, address: %s\n", res.EventType, res.Port.Port.Address)
-			if res.EventType == "add" {
-				log.Printf("protocol: %s, ", res.Port.Port.Protocol)
-				log.Printf("protocolLabel: %s, ", res.Port.Port.ProtocolLabel)
-				log.Printf("boards: %s\n\n", res.Port.MatchingBoards)
+			log.Printf("event: %s, address: %s\n", res.GetEventType(), res.GetPort().GetPort().GetAddress())
+			if res.GetEventType() == "add" {
+				log.Printf("protocol: %s, ", res.GetPort().GetPort().GetProtocol())
+				log.Printf("protocolLabel: %s, ", res.GetPort().GetPort().GetProtocolLabel())
+				log.Printf("boards: %s\n\n", res.GetPort().GetMatchingBoards())
 			}
 		}
 	}()

@@ -40,31 +40,31 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 
 	toInstall := map[string]*rpc.LibraryDependencyStatus{}
 	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
-	if req.NoDeps {
-		toInstall[req.Name] = &rpc.LibraryDependencyStatus{
-			Name:            req.Name,
-			VersionRequired: req.Version,
+	if req.GetNoDeps() {
+		toInstall[req.GetName()] = &rpc.LibraryDependencyStatus{
+			Name:            req.GetName(),
+			VersionRequired: req.GetVersion(),
 		}
 	} else {
 		res, err := LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesRequest{
-			Instance: req.Instance,
-			Name:     req.Name,
-			Version:  req.Version,
+			Instance: req.GetInstance(),
+			Name:     req.GetName(),
+			Version:  req.GetVersion(),
 		})
 		if err != nil {
 			return err
 		}
 
-		for _, dep := range res.Dependencies {
-			if existingDep, has := toInstall[dep.Name]; has {
-				if existingDep.VersionRequired != dep.VersionRequired {
+		for _, dep := range res.GetDependencies() {
+			if existingDep, has := toInstall[dep.GetName()]; has {
+				if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
 					err := errors.New(
 						tr("two different versions of the library %[1]s are required: %[2]s and %[3]s",
-							dep.Name, dep.VersionRequired, existingDep.VersionRequired))
+							dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired()))
 					return &arduino.LibraryDependenciesResolutionFailedError{Cause: err}
 				}
 			}
-			toInstall[dep.Name] = dep
+			toInstall[dep.GetName()] = dep
 		}
 	}
 
@@ -72,8 +72,8 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	for _, lib := range toInstall {
 		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallRequest{
-			Name:    lib.Name,
-			Version: lib.VersionRequired,
+			Name:    lib.GetName(),
+			Version: lib.GetVersionRequired(),
 		})
 		if err != nil {
 			return err
@@ -99,7 +99,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	for libRelease, installTask := range libReleasesToInstall {
 		// Checks if libRelease is the requested library and not a dependency
 		downloadReason := "depends"
-		if libRelease.GetName() == req.Name {
+		if libRelease.GetName() == req.GetName() {
 			downloadReason = "install"
 			if installTask.ReplacedLib != nil {
 				downloadReason = "upgrade"
@@ -116,7 +116,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 	}
 
-	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return err
 	}
 
@@ -145,7 +145,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 // ZipLibraryInstall FIXMEDOC
 func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
 	lm := instances.GetLibraryManager(req.GetInstance())
-	if err := lm.InstallZipLib(ctx, paths.New(req.Path), req.Overwrite); err != nil {
+	if err := lm.InstallZipLib(ctx, paths.New(req.GetPath()), req.GetOverwrite()); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
@@ -155,7 +155,7 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 // GitLibraryInstall FIXMEDOC
 func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
 	lm := instances.GetLibraryManager(req.GetInstance())
-	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
+	if err := lm.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})

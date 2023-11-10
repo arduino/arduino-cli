@@ -182,12 +182,12 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 
 	// Sort by FQBN alphabetically
 	sort.Slice(boards, func(i, j int) bool {
-		return strings.ToLower(boards[i].Fqbn) < strings.ToLower(boards[j].Fqbn)
+		return strings.ToLower(boards[i].GetFqbn()) < strings.ToLower(boards[j].GetFqbn())
 	})
 
 	// Put Arduino boards before others in case there are non Arduino boards with identical VID:PID combination
 	sort.SliceStable(boards, func(i, j int) bool {
-		if boards[i].Platform.Metadata.Maintainer == "Arduino" && boards[j].Platform.Metadata.Maintainer != "Arduino" {
+		if boards[i].GetPlatform().GetMetadata().GetMaintainer() == "Arduino" && boards[j].GetPlatform().GetMetadata().GetMaintainer() != "Arduino" {
 			return true
 		}
 		return false
@@ -246,8 +246,8 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 }
 
 func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
-	for _, detectedBoard := range b.MatchingBoards {
-		detectedFqbn, err := cores.ParseFQBN(detectedBoard.Fqbn)
+	for _, detectedBoard := range b.GetMatchingBoards() {
+		detectedFqbn, err := cores.ParseFQBN(detectedBoard.GetFqbn())
 		if err != nil {
 			continue
 		}

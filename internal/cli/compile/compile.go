@@ -252,16 +252,16 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
 			Fqbn:     fqbn,
-			Protocol: port.Protocol,
+			Protocol: port.GetProtocol(),
 		})
 		if err != nil {
 			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 		}
 
 		fields := map[string]string{}
-		if len(userFieldRes.UserFields) > 0 {
-			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
-			if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
+		if len(userFieldRes.GetUserFields()) > 0 {
+			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.GetProtocol()))
+			if f, err := arguments.AskForUserFields(userFieldRes.GetUserFields()); err != nil {
 				feedback.FatalError(err, feedback.ErrBadArgument)
 			} else {
 				fields = f
@@ -294,7 +294,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		libs := ""
 		hasVendoredLibs := false
 		for _, lib := range compileRes.GetUsedLibraries() {
-			if lib.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.Location != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
+			if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
 				continue
 			}
 			if lib.GetVersion() == "" {
@@ -325,8 +325,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 
 		if buildPlatform := compileRes.GetBuildPlatform(); buildPlatform != nil &&
-			buildPlatform.Id != boardPlatform.Id &&
-			buildPlatform.Version != boardPlatform.Version {
+			buildPlatform.GetId() != boardPlatform.GetId() &&
+			buildPlatform.GetVersion() != boardPlatform.GetVersion() {
 			profileOut += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
 			if url := buildPlatform.GetPackageUrl(); url != "" {
 				profileOut += fmt.Sprintln("        platform_index_url: " + url)

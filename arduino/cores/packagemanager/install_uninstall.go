@@ -448,7 +448,7 @@ func (pme *Explorer) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 
 func skipEmptyMessageTaskProgressCB(taskCB rpc.TaskProgressCB) rpc.TaskProgressCB {
 	return func(msg *rpc.TaskProgress) {
-		if msg != nil && len(msg.Message) == 0 {
+		if msg != nil && len(msg.GetMessage()) == 0 {
 			return
 		}
 		taskCB(msg)

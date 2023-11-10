@@ -61,7 +61,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error searching boards: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(searchResults{result.NewBoardListItems(res.Boards)})
+	feedback.PrintResult(searchResults{result.NewBoardListItems(res.GetBoards())})
 }
 
 // output from this command requires special formatting so we create a dedicated

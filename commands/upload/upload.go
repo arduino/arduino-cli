@@ -46,7 +46,7 @@ var tr = i18n.Tr
 // SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
 // by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
 func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
-	if req.Protocol == "" {
+	if req.GetProtocol() == "" {
 		return nil, &arduino.MissingPortProtocolError{}
 	}
 
@@ -72,7 +72,7 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 
-	toolID, err := getToolID(boardProperties, "upload", req.Protocol)
+	toolID, err := getToolID(boardProperties, "upload", req.GetProtocol())
 	if err != nil {
 		return nil, err
 	}

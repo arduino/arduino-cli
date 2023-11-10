@@ -100,7 +100,7 @@ func GetList(
 		libs = res.GetInstalledLibraries()
 	} else {
 		for _, lib := range res.GetInstalledLibraries() {
-			if lib.Library.CompatibleWith[fqbn.String()] {
+			if lib.GetLibrary().GetCompatibleWith()[fqbn.String()] {
 				libs = append(libs, lib)
 			}
 		}

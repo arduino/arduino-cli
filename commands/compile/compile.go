@@ -54,7 +54,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// the optionality of this property, otherwise we would have no way of knowing if the property
 	// was set in the request or it's just the default boolean value.
 	if reqExportBinaries := req.GetExportBinaries(); reqExportBinaries != nil {
-		exportBinaries = reqExportBinaries.Value
+		exportBinaries = reqExportBinaries.GetValue()
 	}
 
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
@@ -110,13 +110,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	r.BuildPlatform = buildPlatform.ToRPCPlatformReference()
 
 	// Setup sign keys if requested
-	if req.KeysKeychain != "" {
+	if req.GetKeysKeychain() != "" {
 		boardBuildProperties.Set("build.keys.keychain", req.GetKeysKeychain())
 	}
-	if req.SignKey != "" {
+	if req.GetSignKey() != "" {
 		boardBuildProperties.Set("build.keys.sign_key", req.GetSignKey())
 	}
-	if req.EncryptKey != "" {
+	if req.GetEncryptKey() != "" {
 		boardBuildProperties.Set("build.keys.encrypt_key", req.GetEncryptKey())
 	}
 	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
@@ -197,7 +197,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		targetPlatform, actualPlatform,
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
-		paths.NewPathList(req.Library...),
+		paths.NewPathList(req.GetLibrary()...),
 		outStream, errStream, req.GetVerbose(), req.GetWarnings(),
 		progressCB,
 	)
@@ -231,10 +231,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		keys := buildProperties.Keys()
 		sort.Strings(keys)
 		for _, key := range keys {
-			r.BuildProperties = append(r.BuildProperties, key+"="+buildProperties.Get(key))
+			r.BuildProperties = append(r.GetBuildProperties(), key+"="+buildProperties.Get(key))
 		}
 		if !req.GetDoNotExpandBuildProperties() {
-			r.BuildProperties, _ = utils.ExpandBuildProperties(r.BuildProperties)
+			r.BuildProperties, _ = utils.ExpandBuildProperties(r.GetBuildProperties())
 		}
 	}()
 

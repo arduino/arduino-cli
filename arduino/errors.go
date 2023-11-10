@@ -134,8 +134,8 @@ type NoBoardsDetectedError struct {
 func (e *NoBoardsDetectedError) Error() string {
 	return tr(
 		"Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be identified",
-		e.Port.Address,
-		e.Port.Protocol,
+		e.Port.GetAddress(),
+		e.Port.GetProtocol(),
 	)
 }
 
@@ -154,8 +154,8 @@ type MultipleBoardsDetectedError struct {
 func (e *MultipleBoardsDetectedError) Error() string {
 	return tr(
 		"Please specify an FQBN. Multiple possible boards detected on port %[1]s with protocol %[2]s",
-		e.Port.Address,
-		e.Port.Protocol,
+		e.Port.GetAddress(),
+		e.Port.GetProtocol(),
 	)
 }
 

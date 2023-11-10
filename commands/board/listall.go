@@ -71,7 +71,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 					continue
 				}
 
-				list.Boards = append(list.Boards, &rpc.BoardListItem{
+				list.Boards = append(list.GetBoards(), &rpc.BoardListItem{
 					Name:     board.Name(),
 					Fqbn:     board.FQBN(),
 					IsHidden: board.IsHidden(),

@@ -29,6 +29,7 @@ linters:
     - tenv
     - typecheck
     - unconvert
+    - protogetter
 
 linters-settings:
   forbidigo:
@@ -55,7 +56,7 @@ linters-settings:
       - name: errorf
       - name: exported
       - name: increment-decrement
-      - name: indent-error-flow
+      #- name: indent-error-flow
       - name: package-comments
       - name: range
       - name: receiver-naming
