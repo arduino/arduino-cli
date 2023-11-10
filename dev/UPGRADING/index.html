@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" class="md-nav__link">
+    CLI changed JSON output for some lib, core, config, board, and sketch commands.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.PlatformRelease has been changed.
   </a>
@@ -2447,6 +2454,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" class="md-nav__link">
+    CLI changed JSON output for some lib, core, config, board, and sketch commands.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.PlatformRelease has been changed.
   </a>
@@ -3573,6 +3587,64 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands">CLI changed JSON output for some <code>lib</code>, <code>core</code>, <code>config</code>, <code>board</code>, and <code>sketch</code> commands.<a class="headerlink" href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><code>arduino-cli lib list --format json</code> results are now wrapped under <code>installed_libraries</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;installed_libraries&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli lib examples --format json</code> results are now wrapped under <code>examples</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;examples&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli core search --format json</code> and <code>arduino-cli core list --format json</code> results are now wrapped under
+  <code>platforms</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;platforms&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli config init --format json</code> now correctly returns a json object containg the config path</p>
+<div class="highlight"><pre><span></span><code>{ &quot;config_path&quot;: &quot;/home/user/.arduino15/arduino-cli.yaml&quot; }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli config dump --format json</code> results are now wrapped under <code>config</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;config&quot;: { ... } }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli board search --format json</code> results are now wrapped under <code>boards</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;boards&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli board list --format json</code> results are now wrapped under <code>detected_ports</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;detected_ports&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli sketch new</code> now correctly returns a json object containing the sketch path</p>
+<div class="highlight"><pre><span></span><code>{ &quot;sketch_path&quot;: &quot;/tmp/my_sketch&quot; }
+</code></pre></div>
+</li>
+</ul>
 <h3 id="the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.PlatformRelease</code> has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" title="Permanent link">&para;</a></h3>
 <p>We've added a new field called <code>compatible</code>. This field indicates if the current platform release is installable or not.
 It may happen that a platform doesn't have a dependency available for an OS/ARCH, in such cases, if we try to install
