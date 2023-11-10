@@ -67,7 +67,7 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 	}
 	feedback.PrintResult(installedResult{
 		onlyUpdates:   updatable,
-		installedLibs: installedLibsResult,
+		InstalledLibs: installedLibsResult,
 	})
 	logrus.Info("Done")
 }
@@ -118,24 +118,24 @@ func GetList(
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type installedResult struct {
+	InstalledLibs []*result.InstalledLibrary `json:"installed_libraries"`
 	onlyUpdates   bool
-	installedLibs []*result.InstalledLibrary
 }
 
 func (ir installedResult) Data() interface{} {
-	return ir.installedLibs
+	return ir
 }
 
 func (ir installedResult) String() string {
-	if len(ir.installedLibs) == 0 {
+	if len(ir.InstalledLibs) == 0 {
 		if ir.onlyUpdates {
 			return tr("No libraries update is available.")
 		}
 		return tr("No libraries installed.")
 	}
-	sort.Slice(ir.installedLibs, func(i, j int) bool {
-		return strings.ToLower(ir.installedLibs[i].Library.Name) < strings.ToLower(ir.installedLibs[j].Library.Name) ||
-			strings.ToLower(ir.installedLibs[i].Library.ContainerPlatform) < strings.ToLower(ir.installedLibs[j].Library.ContainerPlatform)
+	sort.Slice(ir.InstalledLibs, func(i, j int) bool {
+		return strings.ToLower(ir.InstalledLibs[i].Library.Name) < strings.ToLower(ir.InstalledLibs[j].Library.Name) ||
+			strings.ToLower(ir.InstalledLibs[i].Library.ContainerPlatform) < strings.ToLower(ir.InstalledLibs[j].Library.ContainerPlatform)
 	})
 
 	t := table.New()
@@ -145,7 +145,7 @@ func (ir installedResult) String() string {
 	t.SetColumnWidthMode(4, table.Average)
 
 	lastName := ""
-	for _, libMeta := range ir.installedLibs {
+	for _, libMeta := range ir.InstalledLibs {
 		lib := libMeta.Library
 		name := lib.Name
 		if name == lastName {

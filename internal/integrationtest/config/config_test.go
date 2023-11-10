@@ -239,7 +239,7 @@ func TestDump(t *testing.T) {
 
 	stdout, _, err := cli.Run("config", "dump", "--config-file", configFile.String(), "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 
 	stdout, _, err = cli.Run("config", "init", "--additional-urls", "https://example.com")
 	require.NoError(t, err)
@@ -249,7 +249,7 @@ func TestDump(t *testing.T) {
 
 	stdout, _, err = cli.Run("config", "dump", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com\"]")
 }
 
 func TestDumpWithConfigFileFlag(t *testing.T) {
@@ -265,7 +265,7 @@ func TestDumpWithConfigFileFlag(t *testing.T) {
 
 	stdout, _, err := cli.Run("config", "dump", "--config-file", configFile.String(), "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com\"]")
 
 	stdout, _, err = cli.Run(
 		"config",
@@ -277,7 +277,7 @@ func TestDumpWithConfigFileFlag(t *testing.T) {
 		"json",
 	)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://another-url.com\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://another-url.com\"]")
 }
 
 func TestAddRemoveSetDeleteOnUnexistingKey(t *testing.T) {
@@ -316,7 +316,7 @@ func TestAddSingleArgument(t *testing.T) {
 	// Verifies no additional urls are present
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 
 	// Adds one URL
 	url := "https://example.com"
@@ -326,7 +326,7 @@ func TestAddSingleArgument(t *testing.T) {
 	// Verifies URL has been saved
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com\"]")
 
 	// Adds the same URL (should not error)
 	_, _, err = cli.Run("config", "add",
@@ -337,7 +337,7 @@ func TestAddSingleArgument(t *testing.T) {
 	// Verifies a second copy has NOT been added
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com\"]")
 }
 
 func TestAddMultipleArguments(t *testing.T) {
@@ -351,7 +351,7 @@ func TestAddMultipleArguments(t *testing.T) {
 	// Verifies no additional urls are present
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 
 	// Adds multiple URLs at the same time
 	urls := [3]string{
@@ -366,14 +366,16 @@ func TestAddMultipleArguments(t *testing.T) {
 	// Verifies URL has been saved
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "2")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/package_example_index.json",
-				"https://example.com/yet_another_package_example_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/package_example_index.json",
+					"https://example.com/yet_another_package_example_index.json"
+				]
+			}
 		}
 	}`)
 
@@ -384,14 +386,16 @@ func TestAddMultipleArguments(t *testing.T) {
 	// Verifies no change in result array
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "2")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/package_example_index.json",
-				"https://example.com/yet_another_package_example_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/package_example_index.json",
+					"https://example.com/yet_another_package_example_index.json"
+				]
+			}
 		}
 	}`)
 
@@ -407,15 +411,17 @@ func TestAddMultipleArguments(t *testing.T) {
 	// Verifies URL has been saved
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "3")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "3")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/package_example_index.json",
-				"https://example.com/a_third_package_example_index.json",
-				"https://example.com/yet_another_package_example_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/package_example_index.json",
+					"https://example.com/a_third_package_example_index.json",
+					"https://example.com/yet_another_package_example_index.json"
+				]
+			}
 		}
 	}`)
 }
@@ -431,7 +437,7 @@ func TestAddOnUnsupportedKey(t *testing.T) {
 	// Verifies default value
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+	requirejson.Query(t, stdout, ".config | .daemon | .port", "\"50051\"")
 
 	// Tries and fails to add a new item
 	_, stderr, err := cli.Run("config", "add", "daemon.port", "50000", "--config-file", "arduino-cli.yaml")
@@ -441,7 +447,7 @@ func TestAddOnUnsupportedKey(t *testing.T) {
 	// Verifies value is not changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+	requirejson.Query(t, stdout, ".config | .daemon | .port", "\"50051\"")
 }
 
 func TestRemoveSingleArgument(t *testing.T) {
@@ -463,14 +469,16 @@ func TestRemoveSingleArgument(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "2")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/package_example_index.json",
-				"https://example.com/yet_another_package_example_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/package_example_index.json",
+					"https://example.com/yet_another_package_example_index.json"
+				]
+			}
 		}
 	}`)
 
@@ -481,7 +489,7 @@ func TestRemoveSingleArgument(t *testing.T) {
 	// Verifies URLs has been removed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com/yet_another_package_example_index.json\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com/yet_another_package_example_index.json\"]")
 }
 
 func TestRemoveMultipleArguments(t *testing.T) {
@@ -503,14 +511,16 @@ func TestRemoveMultipleArguments(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "2")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/package_example_index.json",
-				"https://example.com/yet_another_package_example_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/package_example_index.json",
+					"https://example.com/yet_another_package_example_index.json"
+				]
+			}
 		}
 	}`)
 
@@ -521,7 +531,7 @@ func TestRemoveMultipleArguments(t *testing.T) {
 	// Verifies all URLs have been removed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 }
 
 func TestRemoveOnUnsupportedKey(t *testing.T) {
@@ -535,7 +545,7 @@ func TestRemoveOnUnsupportedKey(t *testing.T) {
 	// Verifies default value
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+	requirejson.Query(t, stdout, ".config | .daemon | .port", "\"50051\"")
 
 	// Tries and fails to remove an item
 	_, stderr, err := cli.Run("config", "remove", "daemon.port", "50051", "--config-file", "arduino-cli.yaml")
@@ -545,7 +555,7 @@ func TestRemoveOnUnsupportedKey(t *testing.T) {
 	// Verifies value is not changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+	requirejson.Query(t, stdout, ".config | .daemon | .port", "\"50051\"")
 }
 
 func TestSetSliceWithSingleArgument(t *testing.T) {
@@ -559,7 +569,7 @@ func TestSetSliceWithSingleArgument(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 
 	// Set an URL in the list
 	url := "https://example.com/package_example_index.json"
@@ -569,7 +579,7 @@ func TestSetSliceWithSingleArgument(t *testing.T) {
 	// Verifies value is changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com/package_example_index.json\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com/package_example_index.json\"]")
 
 	// Set an URL in the list
 	url = "https://example.com/yet_another_package_example_index.json"
@@ -579,7 +589,7 @@ func TestSetSliceWithSingleArgument(t *testing.T) {
 	// Verifies value is changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com/yet_another_package_example_index.json\"]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[\"https://example.com/yet_another_package_example_index.json\"]")
 }
 
 func TestSetSliceWithMultipleArguments(t *testing.T) {
@@ -593,7 +603,7 @@ func TestSetSliceWithMultipleArguments(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 
 	// Set some URLs in the list
 	urls := [7]string{
@@ -606,14 +616,16 @@ func TestSetSliceWithMultipleArguments(t *testing.T) {
 	// Verifies value is changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "2")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/first_package_index.json",
-        		"https://example.com/second_package_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/first_package_index.json",
+					"https://example.com/second_package_index.json"
+				]
+			}
 		}
 	}`)
 
@@ -628,14 +640,16 @@ func TestSetSliceWithMultipleArguments(t *testing.T) {
 	// Verifies previous value is overwritten
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "2")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/third_package_index.json",
-				"https://example.com/fourth_package_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/third_package_index.json",
+					"https://example.com/fourth_package_index.json"
+				]
+			}
 		}
 	}`)
 
@@ -658,16 +672,18 @@ func TestSetSliceWithMultipleArguments(t *testing.T) {
 	// Verifies all unique values exist in config
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "4")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls | length", "4")
 	requirejson.Contains(t, stdout, `
 	{
-		"board_manager": {
-			"additional_urls": [
-				"https://example.com/first_package_index.json",
-				"https://example.com/second_package_index.json",
-				"https://example.com/fifth_package_index.json",
-				"https://example.com/sixth_package_index.json"
-			]
+		"config": {
+			"board_manager": {
+				"additional_urls": [
+					"https://example.com/first_package_index.json",
+					"https://example.com/second_package_index.json",
+					"https://example.com/fifth_package_index.json",
+					"https://example.com/sixth_package_index.json"
+				]
+			}
 		}
 	}`)
 }
@@ -683,7 +699,7 @@ func TestSetStringWithSingleArgument(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".logging | .level", "\"info\"")
+	requirejson.Query(t, stdout, ".config | .logging | .level", "\"info\"")
 
 	// Changes value
 	_, _, err = cli.Run("config", "set", "logging.level", "trace", "--config-file", "arduino-cli.yaml")
@@ -692,7 +708,7 @@ func TestSetStringWithSingleArgument(t *testing.T) {
 	// Verifies value is changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".logging | .level", "\"trace\"")
+	requirejson.Query(t, stdout, ".config | .logging | .level", "\"trace\"")
 }
 
 func TestSetStringWithMultipleArguments(t *testing.T) {
@@ -706,7 +722,7 @@ func TestSetStringWithMultipleArguments(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".logging | .level", "\"info\"")
+	requirejson.Query(t, stdout, ".config | .logging | .level", "\"info\"")
 
 	// Tries to change value
 	_, stderr, err := cli.Run("config", "set", "logging.level", "trace", "debug")
@@ -725,7 +741,7 @@ func TestSetBoolWithSingleArgument(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "false")
+	requirejson.Query(t, stdout, ".config | .library | .enable_unsafe_install", "false")
 
 	// Changes value
 	_, _, err = cli.Run("config", "set", "library.enable_unsafe_install", "true", "--config-file", "arduino-cli.yaml")
@@ -734,7 +750,7 @@ func TestSetBoolWithSingleArgument(t *testing.T) {
 	// Verifies value is changed
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "true")
+	requirejson.Query(t, stdout, ".config | .library | .enable_unsafe_install", "true")
 }
 
 func TestSetBoolWithMultipleArguments(t *testing.T) {
@@ -748,7 +764,7 @@ func TestSetBoolWithMultipleArguments(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "false")
+	requirejson.Query(t, stdout, ".config | .library | .enable_unsafe_install", "false")
 
 	// Changes value
 	_, stderr, err := cli.Run("config", "set", "library.enable_unsafe_install", "true", "foo", "--config-file", "arduino-cli.yaml")
@@ -767,7 +783,7 @@ func TestDelete(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "false")
+	requirejson.Query(t, stdout, ".config | .library | .enable_unsafe_install", "false")
 
 	// Delete config key
 	_, _, err = cli.Run("config", "delete", "library.enable_unsafe_install", "--config-file", "arduino-cli.yaml")
@@ -784,7 +800,7 @@ func TestDelete(t *testing.T) {
 	// Verifies default state
 	stdout, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+	requirejson.Query(t, stdout, ".config | .board_manager | .additional_urls", "[]")
 
 	// Delete config key and sub keys
 	_, _, err = cli.Run("config", "delete", "board_manager", "--config-file", "arduino-cli.yaml")

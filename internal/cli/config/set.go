@@ -57,7 +57,7 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 	var value interface{}
 	switch kind {
 	case reflect.Slice:
-		value = uniquifyStringSlice(args[1:])
+		value = uniquify(args[1:])
 	case reflect.String:
 		value = args[1]
 	case reflect.Bool:

@@ -499,9 +499,11 @@ func compileWithExportBinariesConfig(t *testing.T, env *integrationtest.Environm
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `
 		{
-			"sketch": {
-			"always_export_binaries": "true"
-	  		}
+			"config": {
+				"sketch": {
+					"always_export_binaries": "true"
+				}
+			}
 		}`)
 
 	// Test compilation with export binaries env var set
@@ -824,10 +826,8 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 
 	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	var libOutput []map[string]interface{}
-	err = json.Unmarshal(stdout, &libOutput)
-	require.NoError(t, err)
-	sketchPath := paths.New(libOutput[0]["library"].(map[string]interface{})["install_dir"].(string))
+	libOutput := strings.Trim(requirejson.Parse(t, stdout).Query(`.examples.[0].library.install_dir`).String(), `"`)
+	sketchPath := paths.New(libOutput)
 	sketchPath = sketchPath.Join("examples", "ArduinoIoTCloud-Advanced")
 
 	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml")

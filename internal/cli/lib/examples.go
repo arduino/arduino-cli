@@ -94,11 +94,11 @@ type libraryExamples struct {
 }
 
 type libraryExamplesResult struct {
-	Examples []*libraryExamples
+	Examples []*libraryExamples `json:"examples"`
 }
 
 func (ir libraryExamplesResult) Data() interface{} {
-	return ir.Examples
+	return ir
 }
 
 func (ir libraryExamplesResult) String() string {

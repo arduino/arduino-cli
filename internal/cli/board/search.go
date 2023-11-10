@@ -24,7 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
-	fResult "github.com/arduino/arduino-cli/internal/cli/feedback/result"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -61,32 +61,32 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error searching boards: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(searchResults{fResult.NewBoardListItems(res.Boards)})
+	feedback.PrintResult(searchResults{result.NewBoardListItems(res.Boards)})
 }
 
 // output from this command requires special formatting so we create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	boards []*fResult.BoardListItem
+	Boards []*result.BoardListItem `json:"boards"`
 }
 
 func (r searchResults) Data() interface{} {
-	return r.boards
+	return r
 }
 
 func (r searchResults) String() string {
-	if len(r.boards) == 0 {
+	if len(r.Boards) == 0 {
 		return ""
 	}
 
 	t := table.New()
 	t.SetHeader(tr("Board Name"), tr("FQBN"), tr("Platform ID"), "")
 
-	sort.Slice(r.boards, func(i, j int) bool {
-		return r.boards[i].Name < r.boards[j].Name
+	sort.Slice(r.Boards, func(i, j int) bool {
+		return r.Boards[i].Name < r.Boards[j].Name
 	})
 
-	for _, item := range r.boards {
+	for _, item := range r.Boards {
 		hidden := ""
 		if item.IsHidden {
 			hidden = tr("(hidden)")

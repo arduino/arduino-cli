@@ -86,7 +86,7 @@ func TestBoardList(t *testing.T) {
 	require.NoError(t, err)
 	// check is a valid json and contains a list of ports
 	requirejson.Parse(t, stdout).
-		Query(`[ .[].port | select(.protocol == null or .protocol_label == null) ]`).
+		Query(`[ .detected_ports | .[].port | select(.protocol == null or .protocol_label == null) ]`).
 		MustBeEmpty()
 }
 
@@ -103,29 +103,30 @@ func TestBoardListMock(t *testing.T) {
 	require.NoError(t, err)
 
 	// check is a valid json and contains a list of ports
-	requirejson.Contains(t, stdout, `[
-		{
-		  "matching_boards": [
+	requirejson.Contains(t, stdout, `{
+		  "detected_ports": [
 			{
-			  "name": "Arduino Yún",
-			  "fqbn": "arduino:avr:yun"
+			  "matching_boards": [
+				{
+				  "name": "Arduino Yún",
+				  "fqbn": "arduino:avr:yun"
+				}
+			  ],
+			  "port": {
+				"address": "/dev/ttyCIAO",
+				"label": "Mocked Serial port",
+				"protocol": "serial",
+				"protocol_label": "Serial",
+				"properties": {
+				  "pid": "0x0041",
+				  "serial": "123456",
+				  "vid": "0x2341"
+				},
+				"hardware_id": "123456"
+			  }
 			}
-		  ],
-		  "port": {
-			"address": "/dev/ttyCIAO",
-			"label": "Mocked Serial port",
-			"protocol": "serial",
-			"protocol_label": "Serial",
-			"properties": {
-			  "pid": "0x0041",
-			  "serial": "123456",
-			  "vid": "0x2341"
-			},
-			"hardware_id": "123456"
-		  }
-		}
-	  ]
-	`)
+		  ]
+	}`)
 }
 
 func TestBoardListWithFqbnFilter(t *testing.T) {
@@ -144,8 +145,7 @@ func TestBoardListWithFqbnFilter(t *testing.T) {
 	// but it would succeed even if the filtering wasn't working properly
 	// TODO: find a way to simulate connected boards or create a unit test which
 	// mocks or initializes multiple components
-	requirejson.Parse(t, stdout).
-		MustBeEmpty()
+	requirejson.Query(t, stdout, `.boards | length`, `0`)
 }
 
 func TestBoardListWithFqbnFilterInvalid(t *testing.T) {
@@ -434,14 +434,15 @@ func TestBoardSearch(t *testing.T) {
 	// Verifies boards are returned
 	requirejson.NotEmpty(t, stdout)
 	// Verifies no board has FQBN set since no platform is installed
-	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "0")
-	requirejson.Contains(t, stdout, `[
-		{"name": "Arduino UNO"},
-		{"name": "Arduino Yún"},
-		{"name": "Arduino Zero"},
-		{"name": "Arduino Nano 33 BLE"},
-		{"name": "Arduino Portenta H7"}
-	]`)
+	requirejson.Query(t, stdout, "[ .boards[] | select(.fqbn) ] | length", "0")
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+				{"name": "Arduino UNO"},
+				{"name": "Arduino Yún"},
+				{"name": "Arduino Zero"},
+				{"name": "Arduino Nano 33 BLE"},
+				{"name": "Arduino Portenta H7"}
+		]}`)
 
 	// Search in non installed boards
 	stdout, _, err = cli.Run("board", "search", "--format", "json", "nano", "33")
@@ -449,11 +450,12 @@ func TestBoardSearch(t *testing.T) {
 	// Verifies boards are returned
 	requirejson.NotEmpty(t, stdout)
 	// Verifies no board has FQBN set since no platform is installed
-	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "0")
-	requirejson.Contains(t, stdout, `[
-		{"name": "Arduino Nano 33 BLE"},
-		{"name": "Arduino Nano 33 IoT"}
-	]`)
+	requirejson.Query(t, stdout, "[ .boards[] | select(.fqbn) ] | length", "0")
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+			{"name": "Arduino Nano 33 BLE"},
+			{"name": "Arduino Nano 33 IoT"}
+		]}`)
 
 	// Install a platform from index
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
@@ -463,27 +465,29 @@ func TestBoardSearch(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	// Verifies some FQBNs are now returned after installing a platform
-	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "26")
-	requirejson.Contains(t, stdout, `[
-		{
-			"name": "Arduino Yún",
-    		"fqbn": "arduino:avr:yun"
-		},
-		{
-			"name": "Arduino Uno",
-    		"fqbn": "arduino:avr:uno"
-		}
-	]`)
+	requirejson.Query(t, stdout, "[ .boards[] | select(.fqbn) ] | length", "26")
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+			{
+				"name": "Arduino Yún",
+				"fqbn": "arduino:avr:yun"
+			},
+			{
+				"name": "Arduino Uno",
+				"fqbn": "arduino:avr:uno"
+			}
+		]}`)
 
 	stdout, _, err = cli.Run("board", "search", "--format", "json", "arduino", "yun")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
-	requirejson.Contains(t, stdout, `[
-		{
-			"name": "Arduino Yún",
-			"fqbn": "arduino:avr:yun"
-		}
-	]`)
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+			{
+				"name": "Arduino Yún",
+				"fqbn": "arduino:avr:yun"
+			}
+		]}`)
 
 	// Manually installs a core in sketchbooks hardware folder
 	gitUrl := "https://github.com/arduino/ArduinoCore-samd.git"
@@ -498,47 +502,50 @@ func TestBoardSearch(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	// Verifies some FQBNs are now returned after installing a platform
-	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "43")
-	requirejson.Contains(t, stdout, `[
-		{
-			"name": "Arduino Uno",
-    		"fqbn": "arduino:avr:uno"
-		},
-		{
-			"name": "Arduino Yún",
-    		"fqbn": "arduino:avr:yun"
-		},
-		{
-			"name": "Arduino MKR WiFi 1010",
-    		"fqbn": "arduino-beta-development:samd:mkrwifi1010"
-		},
-		{
-			"name": "Arduino MKR1000",
-    		"fqbn": "arduino-beta-development:samd:mkr1000"
-		},
-		{
-			"name": "Arduino MKRZERO",
-    		"fqbn": "arduino-beta-development:samd:mkrzero"
-		},
-		{
-			"name": "Arduino NANO 33 IoT",
-    		"fqbn": "arduino-beta-development:samd:nano_33_iot"
-		},
-		{
-			"fqbn": "arduino-beta-development:samd:arduino_zero_native"
-		}
-	]`)
+	requirejson.Query(t, stdout, "[ .boards[] | select(.fqbn) ] | length", "43")
+	requirejson.Contains(t, stdout, `{
+		"boards":
+		[
+			{
+				"name": "Arduino Uno",
+				"fqbn": "arduino:avr:uno"
+			},
+			{
+				"name": "Arduino Yún",
+				"fqbn": "arduino:avr:yun"
+			},
+			{
+				"name": "Arduino MKR WiFi 1010",
+				"fqbn": "arduino-beta-development:samd:mkrwifi1010"
+			},
+			{
+				"name": "Arduino MKR1000",
+				"fqbn": "arduino-beta-development:samd:mkr1000"
+			},
+			{
+				"name": "Arduino MKRZERO",
+				"fqbn": "arduino-beta-development:samd:mkrzero"
+			},
+			{
+				"name": "Arduino NANO 33 IoT",
+				"fqbn": "arduino-beta-development:samd:nano_33_iot"
+			},
+			{
+				"fqbn": "arduino-beta-development:samd:arduino_zero_native"
+			}
+		]}`)
 
 	stdout, _, err = cli.Run("board", "search", "--format", "json", "mkr1000")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	// Verifies some FQBNs are now returned after installing a platform
-	requirejson.Contains(t, stdout, `[
-		{
-			"name": "Arduino MKR1000",
-    		"fqbn": "arduino-beta-development:samd:mkr1000"
-		}
-	]`)
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+			{
+				"name": "Arduino MKR1000",
+				"fqbn": "arduino-beta-development:samd:mkr1000"
+			}
+		]}`)
 }
 
 func TestBoardAttach(t *testing.T) {

@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
-	fResult "github.com/arduino/arduino-cli/internal/cli/feedback/result"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/fatih/color"
@@ -66,13 +66,13 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(&checkDepResult{deps: fResult.NewLibraryResolveDependenciesResponse(deps)})
+	feedback.PrintResult(&checkDepResult{deps: result.NewLibraryResolveDependenciesResponse(deps)})
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type checkDepResult struct {
-	deps *fResult.LibraryResolveDependenciesResponse
+	deps *result.LibraryResolveDependenciesResponse
 }
 
 func (dr checkDepResult) Data() interface{} {
@@ -103,7 +103,7 @@ func (dr checkDepResult) String() string {
 	return res
 }
 
-func outputDep(dep *fResult.LibraryDependencyStatus) string {
+func outputDep(dep *result.LibraryDependencyStatus) string {
 	res := ""
 	green := color.New(color.FgGreen)
 	red := color.New(color.FgRed)

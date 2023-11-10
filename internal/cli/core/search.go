@@ -86,27 +86,27 @@ func runSearchCommand(cmd *cobra.Command, args []string, allVersions bool) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	platforms   []*result.PlatformSummary
+	Platforms   []*result.PlatformSummary `json:"platforms"`
 	allVersions bool
 }
 
 func newSearchResult(in []*rpc.PlatformSummary, allVersions bool) *searchResults {
 	res := &searchResults{
-		platforms:   make([]*result.PlatformSummary, len(in)),
+		Platforms:   make([]*result.PlatformSummary, len(in)),
 		allVersions: allVersions,
 	}
 	for i, platformSummary := range in {
-		res.platforms[i] = result.NewPlatformSummary(platformSummary)
+		res.Platforms[i] = result.NewPlatformSummary(platformSummary)
 	}
 	return res
 }
 
 func (sr searchResults) Data() interface{} {
-	return sr.platforms
+	return sr
 }
 
 func (sr searchResults) String() string {
-	if len(sr.platforms) == 0 {
+	if len(sr.Platforms) == 0 {
 		return tr("No platforms matching your search.")
 	}
 
@@ -121,7 +121,7 @@ func (sr searchResults) String() string {
 		t.AddRow(platform.Id, release.Version, release.FormatName())
 	}
 
-	for _, platform := range sr.platforms {
+	for _, platform := range sr.Platforms {
 		// When allVersions is not requested we only show the latest compatible version
 		if !sr.allVersions {
 			addRow(platform, platform.GetLatestRelease())
