@@ -48,7 +48,7 @@ tasks:
     desc: Build the Go code
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      - go build -v {{default "" .EXTRA_FLAGS}} {{.LDFLAGS}}
+      - go build {{default "" .EXTRA_FLAGS}} {{.LDFLAGS}}
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
   go:cli-docs:
