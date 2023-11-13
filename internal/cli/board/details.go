@@ -197,11 +197,11 @@ func (dr detailsResult) String() string {
 		}
 	}
 
+	green := color.New(color.FgGreen)
 	tab.AddRow() // get some space from above
 	for _, option := range details.ConfigOptions {
 		tab.AddRow(tr("Option:"), option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
-			green := color.New(color.FgGreen)
 			if value.Selected {
 				tab.AddRow("",
 					table.NewCell(value.ValueLabel, green),
@@ -216,9 +216,13 @@ func (dr detailsResult) String() string {
 		}
 	}
 
-	tab.AddRow(tr("Programmers:"), tr("ID"), tr("Name"))
+	tab.AddRow(tr("Programmers:"), tr("ID"), tr("Name"), "")
 	for _, programmer := range details.Programmers {
-		tab.AddRow("", programmer.Id, programmer.Name)
+		if programmer.Id == details.DefaultProgrammerID {
+			tab.AddRow("", table.NewCell(programmer.Id, green), table.NewCell(programmer.Name, green), table.NewCell("✔ (default)", green))
+		} else {
+			tab.AddRow("", programmer.Id, programmer.Name)
+		}
 	}
 
 	return t.Render() + tab.Render()

@@ -418,6 +418,7 @@ type BoardDetailsResponse struct {
 	DebuggingSupported       bool                             `json:"debugging_supported,omitempty"`
 	IdentificationProperties []*BoardIdentificationProperties `json:"identification_properties,omitempty"`
 	BuildProperties          []string                         `json:"build_properties,omitempty"`
+	DefaultProgrammerID      string                           `json:"default_programmer_id,omitempty"`
 }
 
 func NewBoardDetailsResponse(b *rpc.BoardDetailsResponse) *BoardDetailsResponse {
@@ -440,6 +441,7 @@ func NewBoardDetailsResponse(b *rpc.BoardDetailsResponse) *BoardDetailsResponse 
 		DebuggingSupported:       b.GetDebuggingSupported(),
 		IdentificationProperties: NewBoardIdentificationProperties(b.GetIdentificationProperties()),
 		BuildProperties:          b.GetBuildProperties(),
+		DefaultProgrammerID:      b.GetDefaultProgrammerId(),
 	}
 }
 
