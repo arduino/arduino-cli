@@ -87,7 +87,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 		Port:        port,
 		Interpreter: interpreter,
 		ImportDir:   importDir,
-		Programmer:  programmer.String(),
+		Programmer:  programmer.String(instance, fqbn),
 	}
 
 	if printInfo {

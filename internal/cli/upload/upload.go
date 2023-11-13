@@ -188,7 +188,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		Verify:     verify,
 		ImportFile: importFile,
 		ImportDir:  importDir,
-		Programmer: programmer.String(),
+		Programmer: programmer.String(inst, fqbn),
 		DryRun:     dryRun,
 		UserFields: fields,
 	}

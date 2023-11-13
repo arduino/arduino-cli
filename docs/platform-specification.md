@@ -728,6 +728,24 @@ the [board and core platform](#platform-terminology) of the currently selected b
 platforms may now need to define copies of the programmers that were previously assumed to be provided by another
 platform.
 
+### Set a default programmer for a board (since Arduino CLI >=0.35.0, Arduino IDE >=2.3.0)
+
+A default programmer for each board may be specified through the `programmer.default` directive in the board definition:
+
+```
+BOARD_ID.programmer.default=PROGRAMMER_ID
+```
+
+The default programmer will be selected automatically if the user do not specifiy or select another programmer. This may
+be useful for boards with an on-board programmer/debugger.
+
+For example if we want to set Atmel ICE as the default programmer for the Arduino UNO we would add the following line to
+the `boards.txt` file:
+
+```
+uno.programmer.default=atmel-ice
+```
+
 ## Tools
 
 The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn

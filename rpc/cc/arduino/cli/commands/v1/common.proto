@@ -66,8 +66,11 @@ message TaskProgress {
 }
 
 message Programmer {
+  // Platform name
   string platform = 1;
+  // Programmer ID
   string id = 2;
+  // Programmer name
   string name = 3;
 }
 

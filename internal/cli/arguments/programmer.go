@@ -15,7 +15,13 @@
 
 package arguments
 
-import "github.com/spf13/cobra"
+import (
+	"context"
+
+	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/spf13/cobra"
+)
 
 // Programmer contains the programmer flag data.
 // This is useful so all flags used by commands that need
@@ -32,7 +38,21 @@ func (p *Programmer) AddToCommand(cmd *cobra.Command) {
 	})
 }
 
-// String returns the programmer
-func (p *Programmer) String() string {
-	return p.programmer
+// String returns the programmer specified by the user, or the default programmer
+// for the given board if defined.
+func (p *Programmer) String(inst *commands.Instance, fqbn string) string {
+	if p.programmer != "" {
+		return p.programmer
+	}
+	if inst == nil || fqbn == "" {
+		return ""
+	}
+	details, err := board.Details(context.Background(), &commands.BoardDetailsRequest{
+		Instance: inst,
+		Fqbn:     fqbn,
+	})
+	if err != nil {
+		return ""
+	}
+	return details.GetDefaultProgrammerId()
 }
