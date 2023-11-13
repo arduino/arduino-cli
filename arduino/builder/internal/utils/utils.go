@@ -160,17 +160,6 @@ func filterOutSCCS(file *paths.Path) bool {
 	return !sourceControlFolders[file.Base()]
 }
 
-// filterReadableFiles is a ReadDirFilter that accepts only readable files
-func filterReadableFiles(file *paths.Path) bool {
-	// See if the file is readable by opening it
-	f, err := file.Open()
-	if err != nil {
-		return false
-	}
-	f.Close()
-	return true
-}
-
 // filterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
 var filterOutHiddenFiles = paths.FilterOutPrefixes(".")
 
@@ -180,7 +169,6 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (pat
 		filterOutHiddenFiles,
 		filterOutSCCS,
 		paths.FilterOutDirectories(),
-		filterReadableFiles,
 	)
 	if len(extensions) > 0 {
 		fileFilter = paths.AndFilter(
