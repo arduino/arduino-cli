@@ -65,6 +65,8 @@ message BoardDetailsResponse {
   repeated BoardIdentificationProperties identification_properties = 15;
   // Board build properties used for compiling
   repeated string build_properties = 16;
+  // Default programmer for the board
+  string default_programmer_id = 17;
 }
 
 message BoardIdentificationProperties {

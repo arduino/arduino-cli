@@ -276,7 +276,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,
-			Programmer: programmer.String(),
+			Programmer: programmer.String(inst, fqbn),
 			UserFields: fields,
 		}
 

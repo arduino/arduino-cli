@@ -79,7 +79,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		Port:       discoveryPort,
 		Verbose:    verbose,
 		Verify:     verify,
-		Programmer: programmer.String(),
+		Programmer: programmer.String(instance, fqbn.String()),
 		DryRun:     dryRun,
 	}, stdOut, stdErr); err != nil {
 		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
