@@ -20,7 +20,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
@@ -29,8 +28,6 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-var tr = i18n.Tr
 
 // ObjFileIsUpToDate fixdoc
 func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
