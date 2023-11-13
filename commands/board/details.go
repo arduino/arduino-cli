@@ -140,6 +140,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 		})
 	}
 
+	details.DefaultProgrammerId = board.GetDefaultProgrammerID()
 	details.Programmers = []*rpc.Programmer{}
 	for id, p := range boardPlatformRelease.Programmers {
 		details.Programmers = append(details.GetProgrammers(), &rpc.Programmer{
