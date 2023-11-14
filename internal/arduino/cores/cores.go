@@ -70,7 +70,6 @@ type PlatformRelease struct {
 	Programmers             map[string]*Programmer        `json:"-"`
 	Menus                   *properties.Map               `json:"-"`
 	InstallDir              *paths.Path                   `json:"-"`
-	IsIDEBundled            bool                          `json:"-"`
 	IsTrusted               bool                          `json:"-"`
 	PluggableDiscoveryAware bool                          `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
 	Monitors                map[string]*MonitorDependency `json:"-"`

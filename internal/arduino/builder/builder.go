@@ -121,7 +121,7 @@ func NewBuilder(
 	coreBuildCachePath *paths.Path,
 	jobs int,
 	requestBuildProperties []string,
-	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	hardwareDirs, otherLibrariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
 	fqbn *cores.FQBN,
 	clean bool,
@@ -223,7 +223,7 @@ func NewBuilder(
 			logger,
 		),
 		buildOptions: newBuildOptions(
-			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+			hardwareDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
 			customBuildPropertiesArgs,

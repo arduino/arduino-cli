@@ -621,8 +621,7 @@ func (pme *Explorer) GetInstalledPlatformRelease(platform *cores.Platform) *core
 	}
 
 	debug := func(msg string, pl *cores.PlatformRelease) {
-		pme.log.WithField("bundle", pl.IsIDEBundled).
-			WithField("version", pl.Version).
+		pme.log.WithField("version", pl.Version).
 			WithField("managed", pme.IsManagedPlatformRelease(pl)).
 			Debugf("%s: %s", msg, pl)
 	}
@@ -634,20 +633,14 @@ func (pme *Explorer) GetInstalledPlatformRelease(platform *cores.Platform) *core
 	for _, candidate := range releases[1:] {
 		candidateIsManaged := pme.IsManagedPlatformRelease(candidate)
 		debug("candidate", candidate)
-		// TODO: Disentangle this algorithm and make it more straightforward
-		if bestIsManaged == candidateIsManaged {
-			if best.IsIDEBundled == candidate.IsIDEBundled {
-				if candidate.Version.GreaterThan(best.Version) {
-					best = candidate
-				}
-			}
-			if best.IsIDEBundled && !candidate.IsIDEBundled {
-				best = candidate
-			}
+		if !candidateIsManaged {
+			continue
 		}
-		if !bestIsManaged && candidateIsManaged {
+		if !bestIsManaged {
 			best = candidate
 			bestIsManaged = true
+		} else if candidate.Version.GreaterThan(best.Version) {
+			best = candidate
 		}
 		debug("current best", best)
 	}
