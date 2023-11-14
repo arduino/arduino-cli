@@ -16,8 +16,12 @@
 package arguments
 
 import (
+	"context"
+
+	"github.com/arduino/arduino-cli/commands/sketch"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
@@ -42,4 +46,25 @@ func InitSketchPath(path string, printWarnings bool) (sketchPath *paths.Path) {
 		}
 	}
 	return sketchPath
+}
+
+// GetSketchProfiles is an helper function useful to autocomplete.
+// It returns the profile names set in the sketch.yaml
+func GetSketchProfiles(sketchPath string) []string {
+	if sketchPath == "" {
+		if wd, _ := paths.Getwd(); wd != nil && wd.String() != "" {
+			sketchPath = wd.String()
+		} else {
+			return nil
+		}
+	}
+	list, _ := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{
+		SketchPath: sketchPath,
+	})
+	profiles := list.GetProfiles()
+	res := make([]string, len(profiles))
+	for i, p := range list.GetProfiles() {
+		res[i] = p.GetName()
+	}
+	return res
 }

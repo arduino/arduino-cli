@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -228,4 +229,31 @@ func TestCoreCompletion(t *testing.T) {
 	require.Contains(t, string(stdout), "atmel_ice")
 	stdout, _, _ = cli.Run("__complete", "upload", "-P", "")
 	require.Contains(t, string(stdout), "atmel_ice")
+}
+
+func TestProfileCompletion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create test sketches
+	sketchWithProfilesPath, err := paths.New("testdata", "SketchWithProfiles").Abs()
+	require.NoError(t, err)
+	require.True(t, sketchWithProfilesPath.IsDir())
+
+	stdout, _, _ := cli.Run("__complete", "compile", sketchWithProfilesPath.String(), "--profile", "")
+	require.Contains(t, string(stdout), "profile1")
+	stdout, _, _ = cli.Run("__complete", "monitor", sketchWithProfilesPath.String(), "--profile", "")
+	require.Contains(t, string(stdout), "profile1")
+	stdout, _, _ = cli.Run("__complete", "upload", sketchWithProfilesPath.String(), "--profile", "")
+	require.Contains(t, string(stdout), "profile1")
+
+	// The cli is running in the sketch folder, so need the explictly specify the path in the cli
+	cli.SetWorkingDir(sketchWithProfilesPath)
+	stdout, _, _ = cli.Run("__complete", "compile", "--profile", "")
+	require.Contains(t, string(stdout), "profile1")
+	stdout, _, _ = cli.Run("__complete", "monitor", "--profile", "")
+	require.Contains(t, string(stdout), "profile1")
+	stdout, _, _ = cli.Run("__complete", "upload", "--profile", "")
+	require.Contains(t, string(stdout), "profile1")
+
 }
