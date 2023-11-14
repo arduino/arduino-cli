@@ -66,10 +66,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 
 	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
 		boardPlatformRelease.Properties.ContainsKey("debug.executable") ||
-		(boardRefPlatform != nil && boardRefPlatform.Properties.ContainsKey("debug.executable")) ||
-		// HOTFIX: Remove me when the `arduino:samd` core is updated
-		boardPlatformRelease.String() == "arduino:samd@1.8.9" ||
-		boardPlatformRelease.String() == "arduino:samd@1.8.8"
+		(boardRefPlatform != nil && boardRefPlatform.Properties.ContainsKey("debug.executable"))
 
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,

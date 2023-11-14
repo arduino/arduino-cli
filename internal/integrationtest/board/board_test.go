@@ -355,8 +355,8 @@ func TestBoardDetails(t *testing.T) {
 		]
 	}`)
 
-	// Download samd core pinned to 1.8.8
-	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.8")
+	// Download samd core pinned to 1.8.10
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.10")
 	require.NoError(t, err)
 
 	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")

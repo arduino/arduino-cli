@@ -84,21 +84,6 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	toolProperties.Merge(platformRelease.RuntimeProperties())
 	toolProperties.Merge(boardProperties)
 
-	// HOTFIX: Remove me when the `arduino:samd` core is updated
-	//         (remember to remove it also in arduino/board/details.go)
-	if !toolProperties.ContainsKey("debug.executable") {
-		if platformRelease.String() == "arduino:samd@1.8.9" || platformRelease.String() == "arduino:samd@1.8.8" {
-			toolProperties.Set("debug.executable", "{build.path}/{build.project_name}.elf")
-			toolProperties.Set("debug.toolchain", "gcc")
-			toolProperties.Set("debug.toolchain.path", "{runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/")
-			toolProperties.Set("debug.toolchain.prefix", "arm-none-eabi-")
-			toolProperties.Set("debug.server", "openocd")
-			toolProperties.Set("debug.server.openocd.path", "{runtime.tools.openocd-0.10.0-arduino7.path}/bin/openocd")
-			toolProperties.Set("debug.server.openocd.scripts_dir", "{runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/")
-			toolProperties.Set("debug.server.openocd.script", "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}")
-		}
-	}
-
 	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		toolProperties.Merge(tool.RuntimeProperties())
 	}
