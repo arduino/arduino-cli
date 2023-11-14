@@ -20,7 +20,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
@@ -29,8 +28,6 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-var tr = i18n.Tr
 
 // ObjFileIsUpToDate fixdoc
 func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
@@ -160,17 +157,6 @@ func filterOutSCCS(file *paths.Path) bool {
 	return !sourceControlFolders[file.Base()]
 }
 
-// filterReadableFiles is a ReadDirFilter that accepts only readable files
-func filterReadableFiles(file *paths.Path) bool {
-	// See if the file is readable by opening it
-	f, err := file.Open()
-	if err != nil {
-		return false
-	}
-	f.Close()
-	return true
-}
-
 // filterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
 var filterOutHiddenFiles = paths.FilterOutPrefixes(".")
 
@@ -180,7 +166,6 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (pat
 		filterOutHiddenFiles,
 		filterOutSCCS,
 		paths.FilterOutDirectories(),
-		filterReadableFiles,
 	)
 	if len(extensions) > 0 {
 		fileFilter = paths.AndFilter(
