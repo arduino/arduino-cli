@@ -18,6 +18,7 @@ package result
 import (
 	"cmp"
 	"fmt"
+	"slices"
 
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
@@ -425,6 +426,8 @@ func NewBoardDetailsResponse(b *rpc.BoardDetailsResponse) *BoardDetailsResponse 
 	if b == nil {
 		return nil
 	}
+	buildProperties := b.GetBuildProperties()
+	slices.Sort(buildProperties)
 	return &BoardDetailsResponse{
 		Fqbn:                     b.GetFqbn(),
 		Name:                     b.GetName(),
@@ -440,7 +443,7 @@ func NewBoardDetailsResponse(b *rpc.BoardDetailsResponse) *BoardDetailsResponse 
 		Programmers:              NewProgrammers(b.GetProgrammers()),
 		DebuggingSupported:       b.GetDebuggingSupported(),
 		IdentificationProperties: NewBoardIdentificationProperties(b.GetIdentificationProperties()),
-		BuildProperties:          b.GetBuildProperties(),
+		BuildProperties:          buildProperties,
 		DefaultProgrammerID:      b.GetDefaultProgrammerId(),
 	}
 }
@@ -636,6 +639,10 @@ func NewProgrammers(c []*rpc.Programmer) []*Programmer {
 	for i, v := range c {
 		res[i] = NewProgrammer(v)
 	}
+
+	slices.SortFunc(res, func(a, b *Programmer) int {
+		return cmp.Compare(a.Id, b.Id)
+	})
 	return res
 }
 
