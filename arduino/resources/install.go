@@ -97,12 +97,6 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 		}
 	}
 
-	// TODO
-	// // Create a package file
-	// if err := createPackageFile(destDir); err != nil {
-	// 	return err
-	// }
-
 	return nil
 }
 
