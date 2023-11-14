@@ -275,8 +275,8 @@ func TestBoardDetails(t *testing.T) {
 
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
-	// Download samd core pinned to 1.8.6
-	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	// Download samd core pinned to 1.8.13
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.13")
 	require.NoError(t, err)
 
 	// Test board listall with and without showing hidden elements
@@ -298,70 +298,73 @@ func TestBoardDetails(t *testing.T) {
 	require.NoError(t, err)
 
 	requirejson.Contains(t, stdout, `{
-		"fqbn": "arduino:samd:nano_33_iot",
-		"name": "Arduino NANO 33 IoT",
-		"version": "1.8.6",
-		"properties_id": "nano_33_iot",
-		"official": true,
-		"package": {
-	  		"maintainer": "Arduino",
-	  		"url": "https://downloads.arduino.cc/packages/package_index.tar.bz2",
-	  		"website_url": "http://www.arduino.cc/",
-	 		 "email": "packages@arduino.cc",
-	  		"name": "arduino",
-	  		"help": {
-				"online": "http://www.arduino.cc/en/Reference/HomePage"
-	  		}
-		},
-		"platform": {
-	  		"architecture": "samd",
-	  		"category": "Arduino",
-	  		"url": "http://downloads.arduino.cc/cores/samd-1.8.6.tar.bz2",
-			"archive_filename": "samd-1.8.6.tar.bz2",
-			"checksum": "SHA-256:68a4fffa6fe6aa7886aab2e69dff7d3f94c02935bbbeb42de37f692d7daf823b",
-			"size": 2980953,
+		  "fqbn": "arduino:samd:nano_33_iot",
+		  "name": "Arduino NANO 33 IoT",
+		  "version": "1.8.13",
+		  "properties_id": "nano_33_iot",
+		  "official": true,
+		  "package": {
+			"maintainer": "Arduino",
+			"url": "https://downloads.arduino.cc/packages/package_index.tar.bz2",
+			"website_url": "http://www.arduino.cc/",
+			"email": "packages@arduino.cc",
+			"name": "arduino",
+			"help": {
+			  "online": "http://www.arduino.cc/en/Reference/HomePage"
+			}
+		  },
+		  "platform": {
+			"architecture": "samd",
+			"category": "Arduino",
+			"url": "http://downloads.arduino.cc/cores/core-ArduinoCore-samd-1.8.13.tar.bz2",
+			"archive_filename": "core-ArduinoCore-samd-1.8.13.tar.bz2",
+			"checksum": "SHA-256:47d44c80a5fd4ea224eb64fd676169e896caa6856f338d78feb4a12d42b4ea67",
+			"size": 3074191,
 			"name": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)"
-		},
-		"identification_properties": [
+		  },
+		  "programmers": [
 			{
-				"properties": {
-				"vid": "0x2341",
-				"pid": "0x8057"
-				}
+			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+			  "id": "jlink",
+			  "name": "Segger J-Link"
 			},
 			{
-				"properties": {
-				"vid": "0x2341",
-				"pid": "0x0057"
-				}
+			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+			  "id": "edbg",
+			  "name": "Atmel EDBG"
+			},
+			{
+			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+			  "id": "atmel_ice",
+			  "name": "Atmel-ICE"
+			},
+			{
+			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+			  "id": "sam_ice",
+			  "name": "Atmel SAM-ICE"
 			}
-		],
-		"programmers": [
-	  		{
-				"platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
-				"id": "edbg",
-				"name": "Atmel EDBG"
+		  ],
+		  "debugging_supported": true,
+		  "identification_properties": [
+			{
+			  "properties": {
+				"pid": "0x8057",
+				"vid": "0x2341"
+			  }
 			},
 			{
-				"platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
-				"id": "atmel_ice",
-				"name": "Atmel-ICE"
+			  "properties": {
+				"pid": "0x0057",
+				"vid": "0x2341"
+			  }
 			},
 			{
-				"platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
-				"id": "sam_ice",
-				"name": "Atmel SAM-ICE"
+			  "properties": {
+				"board": "nano_33_iot"
+			  }
 			}
-		]
-	}`)
-
-	// Download samd core pinned to 1.8.10
-	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.10")
-	require.NoError(t, err)
-
-	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")
-	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `{"debugging_supported": true}`)
+		  ]
+		}`)
 }
 
 func TestBoardDetailsNoFlags(t *testing.T) {
