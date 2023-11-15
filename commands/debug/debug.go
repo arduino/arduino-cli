@@ -130,7 +130,7 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 	var gdbPath *paths.Path
 	switch debugInfo.GetToolchain() {
 	case "gcc":
-		gdbexecutable := debugInfo.GetToolchainPrefix() + "gdb"
+		gdbexecutable := debugInfo.GetToolchainPrefix() + "-gdb"
 		if runtime.GOOS == "windows" {
 			gdbexecutable += ".exe"
 		}
