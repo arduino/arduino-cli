@@ -298,6 +298,13 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
+
+	// Github-actions workflow tags to fold log lines
+	if os.Getenv("GITHUB_ACTIONS") != "" {
+		fmt.Printf("::group::Running %s\n", strings.Join(args, " "))
+		defer fmt.Println("::endgroup::")
+	}
+
 	fmt.Println(color.HiBlackString(">>> Running: ") + color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
 	cliProc, err := executils.NewProcessFromPath(cli.convertEnvForExecutils(env), cli.path, args...)
 	cli.t.NoError(err)
