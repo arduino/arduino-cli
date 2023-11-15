@@ -282,7 +282,7 @@ The string field `server_configuration.script` is now an array and has been rena
   "executable": "/tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/Blink.ino.elf",
   "toolchain": "gcc",
   "toolchain_path": "/home/user/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/7-2017q4/bin/",
-  "toolchain_prefix": "arm-none-eabi-",
+  "toolchain_prefix": "arm-none-eabi",
   "server": "openocd",
   "server_path": "/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd",
   "server_configuration": {
@@ -2514,7 +2514,7 @@ Now:
 debug.executable={build.path}/{build.project_name}.elf
 debug.toolchain=gcc
 debug.toolchain.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
-debug.toolchain.prefix=arm-none-eabi-
+debug.toolchain.prefix=arm-none-eabi
 debug.server=openocd
 debug.server.openocd.path={runtime.tools.openocd-0.10.0-arduino7.path}/bin/
 debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/
