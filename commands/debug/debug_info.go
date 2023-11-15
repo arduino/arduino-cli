@@ -184,6 +184,13 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 	}
 
+	// HOTFIX: for samd (and maybe some other platforms). We should keep this for a reasonable
+	// amount of time to allow seamless platforms update.
+	toolchainPrefix := debugProperties.Get("toolchain.prefix")
+	if toolchainPrefix == "arm-none-eabi-" {
+		toolchainPrefix = "arm-none-eabi"
+	}
+
 	customConfigs := map[string]string{}
 	if cortexDebugProps := debugProperties.SubTree("cortex-debug.custom"); cortexDebugProps.Size() > 0 {
 		customConfigs["cortex-debug"] = convertToJsonMap(cortexDebugProps)
@@ -196,7 +203,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		SvdFile:                debugProperties.Get("svd_file"),
 		Toolchain:              toolchain,
 		ToolchainPath:          debugProperties.Get("toolchain.path"),
-		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),
+		ToolchainPrefix:        toolchainPrefix,
 		ToolchainConfiguration: &toolchainConfiguration,
 		CustomConfigs:          customConfigs,
 		Programmer:             req.GetProgrammer(),

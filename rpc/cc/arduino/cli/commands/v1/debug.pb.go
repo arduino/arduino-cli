@@ -284,7 +284,7 @@ type GetDebugConfigResponse struct {
 	Toolchain string `protobuf:"bytes,2,opt,name=toolchain,proto3" json:"toolchain,omitempty"`
 	// The toolchain directory
 	ToolchainPath string `protobuf:"bytes,3,opt,name=toolchain_path,json=toolchainPath,proto3" json:"toolchain_path,omitempty"`
-	// The toolchain architecture prefix (for example "arm-none-eabi-")
+	// The toolchain architecture prefix (for example "arm-none-eabi")
 	ToolchainPrefix string `protobuf:"bytes,4,opt,name=toolchain_prefix,json=toolchainPrefix,proto3" json:"toolchain_prefix,omitempty"`
 	// The GDB server type used to connect to the programmer/board (for example
 	// "openocd")
