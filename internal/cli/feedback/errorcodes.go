@@ -53,4 +53,7 @@ const (
 	// ErrInitializingInventory is returned when the inventory cannot be initialized,
 	// usually depends on a wrong configuration of the data dir (10)
 	ErrInitializingInventory
+
+	// ErrMissingProgrammer is returned when the programmer argument is missing (11)
+	ErrMissingProgrammer
 )
