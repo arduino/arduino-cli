@@ -80,7 +80,7 @@ message GetDebugConfigResponse {
   string toolchain = 2;
   // The toolchain directory
   string toolchain_path = 3;
-  // The toolchain architecture prefix (for example "arm-none-eabi-")
+  // The toolchain architecture prefix (for example "arm-none-eabi")
   string toolchain_prefix = 4;
   // The GDB server type used to connect to the programmer/board (for example
   // "openocd")
