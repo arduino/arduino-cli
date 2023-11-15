@@ -231,8 +231,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err != nil {
 			return err
 		}
-		includeFolders := l.includeFolders
-		if err := json.Unmarshal(d, &includeFolders); err != nil {
+		if err := json.Unmarshal(d, &l.includeFolders); err != nil {
 			return err
 		}
 		if l.logger.Verbose() {
