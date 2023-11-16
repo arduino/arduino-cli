@@ -17,8 +17,10 @@ package burnbootloader
 
 import (
 	"context"
+	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -82,7 +84,14 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		Programmer: programmer.String(instance, fqbn.String()),
 		DryRun:     dryRun,
 	}, stdOut, stdErr); err != nil {
-		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+		errcode := feedback.ErrGeneric
+		if errors.Is(err, &arduino.ProgrammerRequiredForUploadError{}) {
+			errcode = feedback.ErrMissingProgrammer
+		}
+		if errors.Is(err, &arduino.MissingProgrammerError{}) {
+			errcode = feedback.ErrMissingProgrammer
+		}
+		feedback.Fatal(tr("Error during Upload: %v", err), errcode)
 	}
 	feedback.PrintResult(res())
 }

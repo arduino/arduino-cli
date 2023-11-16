@@ -290,7 +290,8 @@ func (e *MissingProgrammerError) Error() string {
 
 // ToRPCStatus converts the error into a *status.Status
 func (e *MissingProgrammerError) ToRPCStatus() *status.Status {
-	return status.New(codes.InvalidArgument, e.Error())
+	s, _ := status.New(codes.InvalidArgument, e.Error()).WithDetails(&rpc.MissingProgrammerError{})
+	return s
 }
 
 // ProgrammerRequiredForUploadError is returned when the upload can be done only using a programmer

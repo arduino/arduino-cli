@@ -63,5 +63,6 @@ func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 
 // GetDebugConfig return metadata about a debug session
 func (s *ArduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
-	return cmd.GetDebugConfig(ctx, req)
+	res, err := cmd.GetDebugConfig(ctx, req)
+	return res, convertErrorToRPCStatus(err)
 }
