@@ -16,11 +16,9 @@
 package compile_test
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 )
@@ -36,13 +34,9 @@ func TestCompileCommandsJSONGeneration(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a test sketch
-	out, _, err := cli.Run("sketch", "new", "Test", "--format", "json")
+	_, _, err = cli.Run("sketch", "new", "Test")
 	require.NoError(t, err)
-	var s struct {
-		Path string `json:"sketch_path"`
-	}
-	require.NoError(t, json.Unmarshal(out, &s))
-	sketchPath := paths.New(s.Path)
+	sketchPath := cli.WorkingDir().Join("Test")
 	buildPath := sketchPath.Join("build")
 
 	{
