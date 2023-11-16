@@ -1,0 +1,5 @@
+default_port: /dev/ttyDEF
+default_fqbn: arduino:avr:yun
+profiles:
+  profile1:
+    fqbn: "arduino:avr:uno"
