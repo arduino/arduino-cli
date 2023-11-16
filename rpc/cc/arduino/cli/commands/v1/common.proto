@@ -74,6 +74,10 @@ message Programmer {
   string name = 3;
 }
 
+// MissingProgrammerError is a status error detail that is returned when
+// the operation can not be completed due to a missing programmer argument.
+message MissingProgrammerError {}
+
 message Platform {
   // Platform ID (e.g., `arduino:avr`).
   string id = 1;

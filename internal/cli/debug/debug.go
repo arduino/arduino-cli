@@ -18,9 +18,11 @@ package debug
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"os/signal"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/debug"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/i18n"
@@ -93,7 +95,11 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			feedback.Fatal(tr("Error getting Debug info: %v", err), feedback.ErrBadArgument)
+			errcode := feedback.ErrBadArgument
+			if errors.Is(err, &arduino.MissingProgrammerError{}) {
+				errcode = feedback.ErrMissingProgrammer
+			}
+			feedback.Fatal(tr("Error getting Debug info: %v", err), errcode)
 		} else {
 			feedback.PrintResult(newDebugInfoResult(res))
 		}
@@ -109,7 +115,11 @@ func runDebugCommand(command *cobra.Command, args []string) {
 			feedback.FatalError(err, feedback.ErrBadArgument)
 		}
 		if _, err := debug.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
-			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
+			errcode := feedback.ErrGeneric
+			if errors.Is(err, &arduino.MissingProgrammerError{}) {
+				errcode = feedback.ErrMissingProgrammer
+			}
+			feedback.Fatal(tr("Error during Debug: %v", err), errcode)
 		}
 
 	}

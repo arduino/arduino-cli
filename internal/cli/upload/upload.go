@@ -193,7 +193,14 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		UserFields: fields,
 	}
 	if res, err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
+		errcode := feedback.ErrGeneric
+		if errors.Is(err, &arduino.ProgrammerRequiredForUploadError{}) {
+			errcode = feedback.ErrMissingProgrammer
+		}
+		if errors.Is(err, &arduino.MissingProgrammerError{}) {
+			errcode = feedback.ErrMissingProgrammer
+		}
+		feedback.FatalError(err, errcode)
 	} else {
 		io := stdIOResult()
 		feedback.PrintResult(&uploadResult{

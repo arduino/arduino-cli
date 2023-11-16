@@ -280,7 +280,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 
 		if res, err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
-			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+			errcode := feedback.ErrGeneric
+			if errors.Is(err, &arduino.ProgrammerRequiredForUploadError{}) {
+				errcode = feedback.ErrMissingProgrammer
+			}
+			if errors.Is(err, &arduino.MissingProgrammerError{}) {
+				errcode = feedback.ErrMissingProgrammer
+			}
+			feedback.Fatal(tr("Error during Upload: %v", err), errcode)
 		} else {
 			uploadRes = res
 		}
