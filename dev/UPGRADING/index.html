@@ -285,6 +285,55 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" class="md-nav__link">
+    CLI changed JSON output for some lib, core, config, board, and sketch commands.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformRelease has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformSummary has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-list-now-returns-only-the-latest-version-that-can-be-installed" class="md-nav__link">
+    core list now returns only the latest version that can be installed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-search-now-returns-the-latest-installable-version-of-a-core" class="md-nav__link">
+    core search now returns the latest installable version of a core.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-upgrade-and-core-install-will-install-the-latest-compatible-version" class="md-nav__link">
+    core upgrade and core install will install the latest compatible version.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" class="md-nav__link">
+    gRPC service cc.arduino.cli.settings.v1 has been removed, and all RPC calls have been migrated to cc.arduino.cli.commands.v1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed" class="md-nav__link">
     gRPC cc.arduino.cli.commands.v1.LibrarySearchRequest message has been changed.
   </a>
@@ -2165,20 +2214,6 @@
 
             
           
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../rpc/settings/" class="md-nav__link">
-        settings
-      </a>
-    </li>
-  
-
-            
-          
         </ul>
       </nav>
     </li>
@@ -2417,6 +2452,55 @@
   
     <nav class="md-nav" aria-label="0.36.0">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" class="md-nav__link">
+    CLI changed JSON output for some lib, core, config, board, and sketch commands.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformRelease has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.PlatformSummary has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-list-now-returns-only-the-latest-version-that-can-be-installed" class="md-nav__link">
+    core list now returns only the latest version that can be installed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-search-now-returns-the-latest-installable-version-of-a-core" class="md-nav__link">
+    core search now returns the latest installable version of a core.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-upgrade-and-core-install-will-install-the-latest-compatible-version" class="md-nav__link">
+    core upgrade and core install will install the latest compatible version.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" class="md-nav__link">
+    gRPC service cc.arduino.cli.settings.v1 has been removed, and all RPC calls have been migrated to cc.arduino.cli.commands.v1
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed" class="md-nav__link">
@@ -3503,6 +3587,102 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands">CLI changed JSON output for some <code>lib</code>, <code>core</code>, <code>config</code>, <code>board</code>, and <code>sketch</code> commands.<a class="headerlink" href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><code>arduino-cli lib list --format json</code> results are now wrapped under <code>installed_libraries</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;installed_libraries&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli lib examples --format json</code> results are now wrapped under <code>examples</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;examples&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli core search --format json</code> and <code>arduino-cli core list --format json</code> results are now wrapped under
+  <code>platforms</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;platforms&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli config init --format json</code> now correctly returns a json object containg the config path</p>
+<div class="highlight"><pre><span></span><code>{ &quot;config_path&quot;: &quot;/home/user/.arduino15/arduino-cli.yaml&quot; }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli config dump --format json</code> results are now wrapped under <code>config</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;config&quot;: { ... } }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli board search --format json</code> results are now wrapped under <code>boards</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;boards&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli board list --format json</code> results are now wrapped under <code>detected_ports</code> key</p>
+<div class="highlight"><pre><span></span><code>{ &quot;detected_ports&quot;: [ {...}, {...} ] }
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>arduino-cli sketch new</code> now correctly returns a json object containing the sketch path</p>
+<div class="highlight"><pre><span></span><code>{ &quot;sketch_path&quot;: &quot;/tmp/my_sketch&quot; }
+</code></pre></div>
+</li>
+</ul>
+<h3 id="the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.PlatformRelease</code> has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1platformrelease-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>We've added a new field called <code>compatible</code>. This field indicates if the current platform release is installable or not.
+It may happen that a platform doesn't have a dependency available for an OS/ARCH, in such cases, if we try to install
+the platform it will fail. The new field can be used to know upfront if a specific release is installable.</p>
+<h3 id="the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.PlatformSummary</code> has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1platformsummary-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>We've modified the behavior of <code>latest_version</code>. Now this field indicates the latest version that can be installed in
+the current OS/ARCH.</p>
+<h3 id="core-list-now-returns-only-the-latest-version-that-can-be-installed"><code>core list</code> now returns only the latest version that can be installed.<a class="headerlink" href="#core-list-now-returns-only-the-latest-version-that-can-be-installed" title="Permanent link">&para;</a></h3>
+<p>Previously, we showed the latest version without checking if all the dependencies were available in the current OS/ARCH.
+Now, the latest version will always point to an installable one even if a newer incompatible one is present.</p>
+<h3 id="core-search-now-returns-the-latest-installable-version-of-a-core"><code>core search</code> now returns the latest installable version of a core.<a class="headerlink" href="#core-search-now-returns-the-latest-installable-version-of-a-core" title="Permanent link">&para;</a></h3>
+<p>We now show in the <code>version</code> column the latest installable version. If none are available then we show a <code>n/a</code> label.
+The corresponding command with <code>--format json</code> now returns the same output of
+<code>arduino-cli core search --all --format json</code>.</p>
+<h3 id="core-upgrade-and-core-install-will-install-the-latest-compatible-version"><code>core upgrade</code> and <code>core install</code> will install the latest compatible version.<a class="headerlink" href="#core-upgrade-and-core-install-will-install-the-latest-compatible-version" title="Permanent link">&para;</a></h3>
+<p>Previously, we'd have tried the installation/upgrade of a core even if all the required tools weren't available in the
+current OS/ARCH. Now we check this upfront, and allowing the installation of incompatible versions only if a user
+explicitly provides it like: <code>core install arduino:renesas_uno@1.0.2</code></p>
+<h3 id="grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1">gRPC service <code>cc.arduino.cli.settings.v1</code> has been removed, and all RPC calls have been migrated to <code>cc.arduino.cli.commands.v1</code><a class="headerlink" href="#grpc-service-ccarduinoclisettingsv1-has-been-removed-and-all-rpc-calls-have-been-migrated-to-ccarduinoclicommandsv1" title="Permanent link">&para;</a></h3>
+<p>The service <code>cc.arduino.cli.settings.v1</code> no longer exists and all existing RPC calls have been moved to the
+<code>cc.arduino.cli.commands.v1</code> service adding a <code>Settings</code> prefix to the names of all messages. The existing RPC calls:</p>
+<ul>
+<li><code>rpc GetAll(GetAllRequest) returns (GetAllResponse)</code></li>
+<li><code>rpc Merge(MergeRequest) returns (MergeResponse)</code></li>
+<li><code>rpc GetValue(GetValueRequest) returns (GetValueResponse)</code></li>
+<li><code>rpc SetValue(SetValueRequest) returns (SetValueResponse)</code></li>
+<li><code>rpc Write(WriteRequest) returns (WriteResponse)</code></li>
+<li><code>rpc Delete(DeleteRequest) returns (DeleteResponse)</code></li>
+</ul>
+<p>are now renamed to:</p>
+<ul>
+<li><code>rpc SettingsGetAll(SettingsGetAllRequest) returns (SettingsGetAllResponse)</code></li>
+<li><code>rpc SettingsMerge(SettingsMergeRequest) returns (SettingsMergeResponse)</code></li>
+<li><code>rpc SettingsGetValue(SettingsGetValueRequest) returns (SettingsGetValueResponse)</code></li>
+<li><code>rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse)</code></li>
+<li><code>rpc SettingsWrite(SettingsWriteRequest) returns (SettingsWriteResponse)</code></li>
+<li><code>rpc SettingsDelete(SettingsDeleteRequest) returns (SettingsDeleteResponse)</code></li>
+</ul>
 <h3 id="grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed">gRPC <code>cc.arduino.cli.commands.v1.LibrarySearchRequest</code> message has been changed.<a class="headerlink" href="#grpc-ccarduinoclicommandsv1librarysearchrequest-message-has-been-changed" title="Permanent link">&para;</a></h3>
 <p>The <code>query</code> field has been removed, use <code>search_args</code> instead.</p>
 <h3 id="cli-core-list-and-core-search-changed-json-output">CLI <code>core list</code> and <code>core search</code> changed JSON output.<a class="headerlink" href="#cli-core-list-and-core-search-changed-json-output" title="Permanent link">&para;</a></h3>
@@ -3662,7 +3842,7 @@ message isn't something to be considered future-proof proof, so we decided to mo
 <span class="w">  </span><span class="nt">&quot;executable&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/Blink.ino.elf&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;toolchain&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gcc&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;toolchain_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/7-2017q4/bin/&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;toolchain_prefix&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm-none-eabi-&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;toolchain_prefix&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm-none-eabi&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;openocd&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;server_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;server_configuration&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -5364,7 +5544,7 @@ No other action is necessary.</p>
 <div class="highlight"><pre><span></span><code>debug.executable={build.path}/{build.project_name}.elf
 debug.toolchain=gcc
 debug.toolchain.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
-debug.toolchain.prefix=arm-none-eabi-
+debug.toolchain.prefix=arm-none-eabi
 debug.server=openocd
 debug.server.openocd.path={runtime.tools.openocd-0.10.0-arduino7.path}/bin/
 debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/

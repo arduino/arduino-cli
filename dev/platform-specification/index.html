@@ -1057,20 +1057,6 @@
 
             
           
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../rpc/settings/" class="md-nav__link">
-        settings
-      </a>
-    </li>
-  
-
-            
-          
         </ul>
       </nav>
     </li>
@@ -1434,6 +1420,19 @@
   <a href="#programmerstxt" class="md-nav__link">
     programmers.txt
   </a>
+  
+    <nav class="md-nav" aria-label="programmers.txt">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-a-default-programmer-for-a-board-since-arduino-cli-0350-arduino-ide-230" class="md-nav__link">
+    Set a default programmer for a board (since Arduino CLI &gt;=0.35.0, Arduino IDE &gt;=2.3.0)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2060,6 +2059,19 @@
   <a href="#programmerstxt" class="md-nav__link">
     programmers.txt
   </a>
+  
+    <nav class="md-nav" aria-label="programmers.txt">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-a-default-programmer-for-a-board-since-arduino-cli-0350-arduino-ide-230" class="md-nav__link">
+    Set a default programmer for a board (since Arduino CLI &gt;=0.35.0, Arduino IDE &gt;=2.3.0)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2914,6 +2926,16 @@ Arduino IDE 1.8.13 (and in all relevant versions of other Arduino development to
 the <a href="#platform-terminology">board and core platform</a> of the currently selected board are available. For this reason,
 platforms may now need to define copies of the programmers that were previously assumed to be provided by another
 platform.</p>
+<h3 id="set-a-default-programmer-for-a-board-since-arduino-cli-0350-arduino-ide-230">Set a default programmer for a board (since Arduino CLI &gt;=0.35.0, Arduino IDE &gt;=2.3.0)<a class="headerlink" href="#set-a-default-programmer-for-a-board-since-arduino-cli-0350-arduino-ide-230" title="Permanent link">&para;</a></h3>
+<p>A default programmer for each board may be specified through the <code>programmer.default</code> directive in the board definition:</p>
+<div class="highlight"><pre><span></span><code>BOARD_ID.programmer.default=PROGRAMMER_ID
+</code></pre></div>
+<p>The default programmer will be selected automatically if the user do not specifiy or select another programmer. This may
+be useful for boards with an on-board programmer/debugger.</p>
+<p>For example if we want to set Atmel ICE as the default programmer for the Arduino UNO we would add the following line to
+the <code>boards.txt</code> file:</p>
+<div class="highlight"><pre><span></span><code>uno.programmer.default=atmel-ice
+</code></pre></div>
 <h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
 <p>The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn
 bootloaders using external programmers. For example, <em>avrdude</em> is used for AVR based boards and <em>bossac</em> for SAM based
