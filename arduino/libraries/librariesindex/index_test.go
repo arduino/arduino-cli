@@ -90,7 +90,7 @@ func TestIndexer(t *testing.T) {
 	rtcInexistent2 := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero-blah", Version: semver.MustParse("1.0.0")})
 	require.Nil(t, rtcInexistent2)
 
-	resolve1 := index.ResolveDependencies(alp.Releases["1.2.1"])
+	resolve1 := index.ResolveDependencies(alp.Releases["1.2.1"], nil)
 	require.Len(t, resolve1, 2)
 	require.Contains(t, resolve1, alp.Releases["1.2.1"])
 	require.Contains(t, resolve1, rtc.Releases["1.6.0"])
@@ -108,7 +108,7 @@ func TestIndexer(t *testing.T) {
 	require.NotNil(t, http040)
 	require.Equal(t, "ArduinoHttpClient@0.4.0", http040.String())
 
-	resolve2 := index.ResolveDependencies(oauth010)
+	resolve2 := index.ResolveDependencies(oauth010, nil)
 	require.Len(t, resolve2, 4)
 	require.Contains(t, resolve2, oauth010)
 	require.Contains(t, resolve2, eccx135)

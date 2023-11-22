@@ -144,11 +144,24 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 	return nil
 }
 
-// ResolveDependencies returns the dependencies of a library release.
-func (idx *Index) ResolveDependencies(lib *Release) []*Release {
-	// Create and populate the library resolver
+// ResolveDependencies resolve the dependencies of a library release and returns a
+// possible solution (the set of library releases to install together with the library).
+// An optional "override" releases may be passed if we want to exclude the same
+// libraries from the index (for example if we want to keep an installed library).
+func (idx *Index) ResolveDependencies(lib *Release, overrides []*Release) []*Release {
 	resolver := semver.NewResolver[*Release, *Dependency]()
-	for _, indexLib := range idx.Libraries {
+
+	overridden := map[string]bool{}
+	for _, override := range overrides {
+		resolver.AddRelease(override)
+		overridden[override.GetName()] = true
+	}
+
+	// Create and populate the library resolver
+	for libName, indexLib := range idx.Libraries {
+		if _, ok := overridden[libName]; ok {
+			continue
+		}
 		for _, indexLibRelease := range indexLib.Releases {
 			resolver.AddRelease(indexLibRelease)
 		}

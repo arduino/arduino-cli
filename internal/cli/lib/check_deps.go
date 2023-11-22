@@ -33,6 +33,7 @@ import (
 )
 
 func initDepsCommand() *cobra.Command {
+	var noOverwrite bool
 	depsCommand := &cobra.Command{
 		Use:   fmt.Sprintf("deps %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
 		Short: tr("Check dependencies status for the specified library."),
@@ -41,15 +42,18 @@ func initDepsCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib deps AudioZero       # " + tr("for the latest version.") + "\n" +
 			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
-		Run:  runDepsCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runDepsCommand(args, noOverwrite)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstalledLibraries(), cobra.ShellCompDirectiveDefault
 		},
 	}
+	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not try to update library dependencies if already installed."))
 	return depsCommand
 }
 
-func runDepsCommand(cmd *cobra.Command, args []string) {
+func runDepsCommand(args []string, noOverwrite bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
@@ -58,9 +62,10 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 	}
 
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
-		Instance: instance,
-		Name:     libRef.Name,
-		Version:  libRef.Version,
+		Instance:                      instance,
+		Name:                          libRef.Name,
+		Version:                       libRef.Version,
+		DoNotUpdateInstalledLibraries: noOverwrite,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), feedback.ErrGeneric)
