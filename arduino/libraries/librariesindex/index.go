@@ -44,7 +44,7 @@ type Library struct {
 type Release struct {
 	Author           string
 	Version          *semver.Version
-	Dependencies     []semver.Dependency
+	Dependencies     []*Dependency
 	Maintainer       string
 	Sentence         string
 	Paragraph        string
@@ -85,7 +85,7 @@ func (r *Release) GetVersion() *semver.Version {
 }
 
 // GetDependencies returns the dependencies of this library.
-func (r *Release) GetDependencies() []semver.Dependency {
+func (r *Release) GetDependencies() []*Dependency {
 	return r.Dependencies
 }
 
@@ -146,29 +146,16 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 
 // ResolveDependencies returns the dependencies of a library release.
 func (idx *Index) ResolveDependencies(lib *Release) []*Release {
-	// Box lib index *Release to be digested by dep-resolver
-	// (TODO: There is a better use of golang interfaces to avoid this?)
-	allReleases := map[string]semver.Releases{}
+	// Create and populate the library resolver
+	resolver := semver.NewResolver[*Release, *Dependency]()
 	for _, indexLib := range idx.Libraries {
-		releases := semver.Releases{}
 		for _, indexLibRelease := range indexLib.Releases {
-			releases = append(releases, indexLibRelease)
+			resolver.AddRelease(indexLibRelease)
 		}
-		allReleases[indexLib.Name] = releases
 	}
 
 	// Perform lib resolution
-	archive := &semver.Archive{
-		Releases: allReleases,
-	}
-	deps := archive.Resolve(lib)
-
-	// Unbox resolved deps back into *Release
-	res := []*Release{}
-	for _, dep := range deps {
-		res = append(res, dep.(*Release))
-	}
-	return res
+	return resolver.Resolve(lib)
 }
 
 // Versions returns an array of all versions available of the library
