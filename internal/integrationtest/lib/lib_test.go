@@ -589,8 +589,10 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "SD@1.2.3")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
-	require.Error(t, err)
+	// This time it should accept the installation with the currently installed SD 1.2.3
+	out, _, err := cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
+	require.NoError(t, err)
+	require.Contains(t, string(out), "Already installed SD@1.2.3")
 }
 
 func TestInstallNoDeps(t *testing.T) {
