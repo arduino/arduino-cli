@@ -42,6 +42,8 @@
   - `ttl` - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files
     lifetime is renewed. The value format must be a valid input for
     [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
+- `network` - configuration options related to the network connection.
+  - `proxy` - URL of the proxy server.
 
 ## Configuration methods
 
