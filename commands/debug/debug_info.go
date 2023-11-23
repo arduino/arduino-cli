@@ -133,6 +133,12 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	for k, v := range toolProperties.SubTree("debug").AsMap() {
 		debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 	}
+	if debugAdditionalConfig, ok := toolProperties.GetOk("debug.additional_config"); ok {
+		debugAdditionalConfig = toolProperties.ExpandPropsInString(debugAdditionalConfig)
+		for k, v := range toolProperties.SubTree(debugAdditionalConfig).AsMap() {
+			debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
+		}
+	}
 
 	if !debugProperties.ContainsKey("executable") {
 		return nil, &arduino.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
