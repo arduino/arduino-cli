@@ -169,12 +169,10 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 	}
 
+	toolchainPrefix := debugProperties.Get("toolchain.prefix")
 	// HOTFIX: for samd (and maybe some other platforms). We should keep this for a reasonable
 	// amount of time to allow seamless platforms update.
-	toolchainPrefix := debugProperties.Get("toolchain.prefix")
-	if toolchainPrefix == "arm-none-eabi-" {
-		toolchainPrefix = "arm-none-eabi"
-	}
+	toolchainPrefix = strings.TrimSuffix(toolchainPrefix, "-")
 
 	customConfigs := map[string]string{}
 	if cortexDebugProps := debugProperties.SubTree("cortex-debug.custom"); cortexDebugProps.Size() > 0 {
