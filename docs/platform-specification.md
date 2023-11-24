@@ -1452,6 +1452,74 @@ will result in the following JSON:
 }
 ```
 
+### Additional debugger config selection via `debug.additional_config` directive.
+
+It is possible to use any sub-tree of the platform configuration to override the debugger configuration using the
+directive `debug.additional_config=CONFIG_PREFIX`. This rule will use the configuration under `CONFIG_PREFIX.*` to
+override the current `debug.*` config.
+
+This change allows a more convenient rationalization and selection of the configs to apply to the debugger. For example,
+we could factor common parts of a configuration in the platform.txt file:
+
+```
+# CONFIG 1
+debug-overrides.esp32.cortex-debug.custom.name=Arduino on ESP32
+debug-overrides.esp32.cortex-debug.custom.request=attach
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.0=set remote hardware-watchpoint-limit 2
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.1=monitor reset halt
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.2=monitor gdb_sync
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.3=thb setup
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.4=c
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.0=monitor reset halt
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.2=thb setup
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.3=c
+
+# CONFIG 2
+debug-overrides.esp32s2.cortex-debug.custom.name=Arduino on ESP32-S2
+debug-overrides.esp32s2.cortex-debug.custom.request=attach
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.0=set remote hardware-watchpoint-limit 2
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.1=monitor reset halt
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.2=monitor gdb_sync
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.3=thb setup
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.4=c
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.0=monitor reset halt
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.2=thb setup
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.3=c
+```
+
+and choose which one to use depending on the board in the boards.txt file:
+
+```
+myboard.name=My Board with esp32
+myboard.debug.additional_config=debug-overrides.esp32
+
+anotherboard.name=My Board with esp32s2
+anotherboard.debug.additional_config=debug-overrides.esp32s2
+...
+```
+
+Another possibility is to compose the configuration using another variable present in the board configuration, for
+example if in the `platform.txt` we add:
+
+```
+debug.additional_config=debug-overrides.{build.mcu}
+```
+
+we may use the `build.mcu` value as a "selector" for the board-specific debug configuration that is overlapped to the
+global debug configuration:
+
+```
+myboard.name=My Board with esp32
+myboard.build.mcu=esp32
+...
+
+anotherboard.name=My Board with esp32s2
+anotherboard.build.mcu=esp32s2
+...
+```
+
 ### Optimization level for debugging
 
 The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
