@@ -277,12 +277,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#v0350" class="md-nav__link">
-    v0.35.0
+  <a href="#0350" class="md-nav__link">
+    0.35.0
   </a>
   
-    <nav class="md-nav" aria-label="v0.35.0">
+    <nav class="md-nav" aria-label="0.35.0">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#debugging_supported-field-has-been-removed-from-grpc-ccarduinoclicommandsv1boarddetails-and-board-details-command-in-cli" class="md-nav__link">
+    debugging_supported field has been removed from gRPC cc.arduino.cli.commands.v1.BoardDetails and board details command in CLI
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#cli-debug-info-changed-json-output" class="md-nav__link">
@@ -2363,12 +2370,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#v0350" class="md-nav__link">
-    v0.35.0
+  <a href="#0350" class="md-nav__link">
+    0.35.0
   </a>
   
-    <nav class="md-nav" aria-label="v0.35.0">
+    <nav class="md-nav" aria-label="0.35.0">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#debugging_supported-field-has-been-removed-from-grpc-ccarduinoclicommandsv1boarddetails-and-board-details-command-in-cli" class="md-nav__link">
+    debugging_supported field has been removed from gRPC cc.arduino.cli.commands.v1.BoardDetails and board details command in CLI
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#cli-debug-info-changed-json-output" class="md-nav__link">
@@ -3406,7 +3420,17 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
-<h2 id="v0350">v0.35.0<a class="headerlink" href="#v0350" title="Permanent link">&para;</a></h2>
+<h2 id="0350">0.35.0<a class="headerlink" href="#0350" title="Permanent link">&para;</a></h2>
+<h3 id="debugging_supported-field-has-been-removed-from-grpc-ccarduinoclicommandsv1boarddetails-and-board-details-command-in-cli"><code>debugging_supported</code> field has been removed from gRPC <code>cc.arduino.cli.commands.v1.BoardDetails</code> and <code>board details</code> command in CLI<a class="headerlink" href="#debugging_supported-field-has-been-removed-from-grpc-ccarduinoclicommandsv1boarddetails-and-board-details-command-in-cli" title="Permanent link">&para;</a></h3>
+<p>The <code>debugging_supported</code> field has been removed, since the possibility to debug is determined by:</p>
+<ul>
+<li>the board selected</li>
+<li>the board option selected</li>
+<li>the programmer selected</li>
+</ul>
+<p>the <code>board details</code> command has no sufficient information to determine it. If you need to determine if a specific
+selection of board + option + programmer supports debugging, use the gRPC call
+<code>cc.arduino.cli.commands.v1.GetDebugConfig</code>: if the call is successful, it means that the debugging is supported.</p>
 <h3 id="cli-debug-info-changed-json-output">CLI <code>debug --info</code> changed JSON output.<a class="headerlink" href="#cli-debug-info-changed-json-output" title="Permanent link">&para;</a></h3>
 <p>The string field <code>server_configuration.script</code> is now an array and has been renamed <code>scripts</code>, here an example:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
