@@ -1624,6 +1624,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#additional-debugger-config-selection-via-debugadditional_config-directive" class="md-nav__link">
+    Additional debugger config selection via debug.additional_config directive.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#optimization-level-for-debugging" class="md-nav__link">
     Optimization level for debugging
   </a>
@@ -2258,6 +2265,13 @@
           <li class="md-nav__item">
   <a href="#custom-config-for-cortext-debug-plugin-for-arduino-ide" class="md-nav__link">
     Custom config for Cortext-debug plugin for Arduino IDE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-debugger-config-selection-via-debugadditional_config-directive" class="md-nav__link">
+    Additional debugger config selection via debug.additional_config directive.
   </a>
   
 </li>
@@ -3453,6 +3467,60 @@ debug.cortex-debug.custom.anotherObject.boolean=[boolean]true
 <span class="w">    </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;value&quot;</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
+</code></pre></div>
+<h3 id="additional-debugger-config-selection-via-debugadditional_config-directive">Additional debugger config selection via <code>debug.additional_config</code> directive.<a class="headerlink" href="#additional-debugger-config-selection-via-debugadditional_config-directive" title="Permanent link">&para;</a></h3>
+<p>It is possible to use any sub-tree of the platform configuration to override the debugger configuration using the
+directive <code>debug.additional_config=CONFIG_PREFIX</code>. This rule will use the configuration under <code>CONFIG_PREFIX.*</code> to
+override the current <code>debug.*</code> config.</p>
+<p>This change allows a more convenient rationalization and selection of the configs to apply to the debugger. For example,
+we could factor common parts of a configuration in the platform.txt file:</p>
+<div class="highlight"><pre><span></span><code># CONFIG 1
+debug-overrides.esp32.cortex-debug.custom.name=Arduino on ESP32
+debug-overrides.esp32.cortex-debug.custom.request=attach
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.0=set remote hardware-watchpoint-limit 2
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.1=monitor reset halt
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.2=monitor gdb_sync
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.3=thb setup
+debug-overrides.esp32.cortex-debug.custom.postAttachCommands.4=c
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.0=monitor reset halt
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.2=thb setup
+debug-overrides.esp32.cortex-debug.custom.overrideRestartCommands.3=c
+
+# CONFIG 2
+debug-overrides.esp32s2.cortex-debug.custom.name=Arduino on ESP32-S2
+debug-overrides.esp32s2.cortex-debug.custom.request=attach
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.0=set remote hardware-watchpoint-limit 2
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.1=monitor reset halt
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.2=monitor gdb_sync
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.3=thb setup
+debug-overrides.esp32s2.cortex-debug.custom.postAttachCommands.4=c
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.0=monitor reset halt
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.2=thb setup
+debug-overrides.esp32s2.cortex-debug.custom.overrideRestartCommands.3=c
+</code></pre></div>
+<p>and choose which one to use depending on the board in the boards.txt file:</p>
+<div class="highlight"><pre><span></span><code>myboard.name=My Board with esp32
+myboard.debug.additional_config=debug-overrides.esp32
+
+anotherboard.name=My Board with esp32s2
+anotherboard.debug.additional_config=debug-overrides.esp32s2
+...
+</code></pre></div>
+<p>Another possibility is to compose the configuration using another variable present in the board configuration, for
+example if in the <code>platform.txt</code> we add:</p>
+<div class="highlight"><pre><span></span><code>debug.additional_config=debug-overrides.{build.mcu}
+</code></pre></div>
+<p>we may use the <code>build.mcu</code> value as a "selector" for the board-specific debug configuration that is overlapped to the
+global debug configuration:</p>
+<div class="highlight"><pre><span></span><code>myboard.name=My Board with esp32
+myboard.build.mcu=esp32
+...
+
+anotherboard.name=My Board with esp32s2
+anotherboard.build.mcu=esp32s2
+...
 </code></pre></div>
 <h3 id="optimization-level-for-debugging">Optimization level for debugging<a class="headerlink" href="#optimization-level-for-debugging" title="Permanent link">&para;</a></h3>
 <p>The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
