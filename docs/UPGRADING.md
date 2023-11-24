@@ -271,6 +271,18 @@ To address all the inconsistencies/inaccuracies we introduced two messages:
 - `PlatformMetadata` contains generic information about a platform (not correlated to a specific release).
 - `PlatformRelease` contains information about a specific release of a platform.
 
+### `debugging_supported` field has been removed from gRPC `cc.arduino.cli.commands.v1.BoardDetails` and `board details` command in CLI
+
+The `debugging_supported` field has been removed, since the possibility to debug is determined by:
+
+- the board selected
+- the board option selected
+- the programmer selected
+
+the `board details` command has no sufficient information to determine it. If you need to determine if a specific
+selection of board + option + programmer supports debugging, use the gRPC call
+`cc.arduino.cli.commands.v1.GetDebugConfig`: if the call is successful, it means that the debugging is supported.
+
 ## 0.35.0
 
 ### CLI `debug --info` changed JSON output.

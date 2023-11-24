@@ -338,7 +338,6 @@ func TestBoardDetails(t *testing.T) {
 			  "name": "Atmel SAM-ICE"
 			}
 		  ],
-		  "debugging_supported": true,
 		  "identification_properties": [
 			{
 			  "properties": {
