@@ -272,5 +272,62 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 			}`)
 		}
 
+		{
+			// Mixing programmer and additional_config
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my3", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"cold_ice_script"
+					]
+				},
+				"custom_configs": {
+					"cortex-debug": {
+						"test1": "true"
+					}
+				},
+				"svd_file": "test1.svd",
+				"programmer": "my_cold_ice"
+			}`)
+		}
+
+		{
+			// Mixing programmer and additional_config selected by another variable
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my4", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"cold_ice_script"
+					]
+				},
+				"custom_configs": {
+					"cortex-debug": {
+						"test2": "true"
+					}
+				},
+				"svd_file": "test2.svd",
+				"programmer": "my_cold_ice"
+			}`)
+		}
 	}
 }

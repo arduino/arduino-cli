@@ -87,3 +87,28 @@ my2.debug.server.openocd.path=openocd-path
 my2.debug.server.openocd.scripts_dir=openocd-scripts-dir
 my2.debug.server.openocd.script=single-script
 my2.debug.svd_file=svd-file
+
+my3.name=My third Cool Board
+my3.build.core=arduino:arduino
+my3.build.variant=arduino:mkr1000
+my3.debug.toolchain.path=gcc-path
+my3.debug.toolchain.prefix=gcc-prefix
+my3.debug.server.openocd.path=openocd-path
+my3.debug.server.openocd.scripts_dir=openocd-scripts-dir
+my3.debug.server.openocd.script=single-script
+# this one will be overwritten by additional_config
+my3.debug.svd_file=svd-file
+my3.debug.additional_config=build.debug.config.test1
+
+my4.name=My fourth Cool Board
+my4.build.core=arduino:arduino
+my4.build.variant=arduino:mkr1000
+my4.debug.toolchain.path=gcc-path
+my4.debug.toolchain.prefix=gcc-prefix
+my4.debug.server.openocd.path=openocd-path
+my4.debug.server.openocd.scripts_dir=openocd-scripts-dir
+my4.debug.server.openocd.script=single-script
+my4.build.mcu=test2
+# this one will be overwritten by additional_config
+my4.debug.svd_file=svd-file
+my4.debug.additional_config=build.debug.config.{build.mcu}

@@ -133,6 +133,12 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	for k, v := range toolProperties.SubTree("debug").AsMap() {
 		debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 	}
+	if debugAdditionalConfig, ok := toolProperties.GetOk("debug.additional_config"); ok {
+		debugAdditionalConfig = toolProperties.ExpandPropsInString(debugAdditionalConfig)
+		for k, v := range toolProperties.SubTree(debugAdditionalConfig).AsMap() {
+			debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
+		}
+	}
 
 	if !debugProperties.ContainsKey("executable") {
 		return nil, &arduino.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
@@ -169,12 +175,10 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 	}
 
+	toolchainPrefix := debugProperties.Get("toolchain.prefix")
 	// HOTFIX: for samd (and maybe some other platforms). We should keep this for a reasonable
 	// amount of time to allow seamless platforms update.
-	toolchainPrefix := debugProperties.Get("toolchain.prefix")
-	if toolchainPrefix == "arm-none-eabi-" {
-		toolchainPrefix = "arm-none-eabi"
-	}
+	toolchainPrefix = strings.TrimSuffix(toolchainPrefix, "-")
 
 	customConfigs := map[string]string{}
 	if cortexDebugProps := debugProperties.SubTree("cortex-debug.custom"); cortexDebugProps.Size() > 0 {
