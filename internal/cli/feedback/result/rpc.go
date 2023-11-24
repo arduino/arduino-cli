@@ -416,7 +416,6 @@ type BoardDetailsResponse struct {
 	ToolsDependencies        []*ToolsDependency               `json:"tools_dependencies,omitempty"`
 	ConfigOptions            []*ConfigOption                  `json:"config_options,omitempty"`
 	Programmers              []*Programmer                    `json:"programmers,omitempty"`
-	DebuggingSupported       bool                             `json:"debugging_supported,omitempty"`
 	IdentificationProperties []*BoardIdentificationProperties `json:"identification_properties,omitempty"`
 	BuildProperties          []string                         `json:"build_properties,omitempty"`
 	DefaultProgrammerID      string                           `json:"default_programmer_id,omitempty"`
@@ -441,7 +440,6 @@ func NewBoardDetailsResponse(b *rpc.BoardDetailsResponse) *BoardDetailsResponse 
 		ToolsDependencies:        NewToolsDependencies(b.GetToolsDependencies()),
 		ConfigOptions:            NewConfigOptions(b.GetConfigOptions()),
 		Programmers:              NewProgrammers(b.GetProgrammers()),
-		DebuggingSupported:       b.GetDebuggingSupported(),
 		IdentificationProperties: NewBoardIdentificationProperties(b.GetIdentificationProperties()),
 		BuildProperties:          buildProperties,
 		DefaultProgrammerID:      b.GetDefaultProgrammerId(),

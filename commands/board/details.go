@@ -39,7 +39,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	boardPackage, boardPlatformRelease, board, boardProperties, boardRefPlatform, err := pme.ResolveFQBN(fqbn)
+	boardPackage, boardPlatformRelease, board, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
@@ -63,10 +63,6 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	if !req.GetDoNotExpandBuildProperties() {
 		details.BuildProperties, _ = utils.ExpandBuildProperties(details.GetBuildProperties())
 	}
-
-	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
-		boardPlatformRelease.Properties.ContainsKey("debug.executable") ||
-		(boardRefPlatform != nil && boardRefPlatform.Properties.ContainsKey("debug.executable"))
 
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,
