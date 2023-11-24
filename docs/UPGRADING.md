@@ -273,7 +273,7 @@ To address all the inconsistencies/inaccuracies we introduced two messages:
 
 ### `debugging_supported` field has been removed from gRPC `cc.arduino.cli.commands.v1.BoardDetails` and `board details` command in CLI
 
-The `debuggin_supported` field has been removed, since the possibility to debug is determined by:
+The `debugging_supported` field has been removed, since the possibility to debug is determined by:
 
 - the board selected
 - the board option selected
