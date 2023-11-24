@@ -304,9 +304,8 @@ func TestBoardDetails(t *testing.T) {
 	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.8")
 	require.NoError(t, err)
 
-	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")
+	_, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `{"debugging_supported": true}`)
 }
 
 func TestBoardDetailsNoFlags(t *testing.T) {

@@ -39,7 +39,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pme.ResolveFQBN(fqbn)
+	boardPackage, boardPlatform, board, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
@@ -63,13 +63,6 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	if !req.GetDoNotExpandBuildProperties() {
 		details.BuildProperties, _ = utils.ExpandBuildProperties(details.BuildProperties)
 	}
-
-	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
-		boardPlatform.Properties.ContainsKey("debug.executable") ||
-		(boardRefPlatform != nil && boardRefPlatform.Properties.ContainsKey("debug.executable")) ||
-		// HOTFIX: Remove me when the `arduino:samd` core is updated
-		boardPlatform.String() == "arduino:samd@1.8.9" ||
-		boardPlatform.String() == "arduino:samd@1.8.8"
 
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,

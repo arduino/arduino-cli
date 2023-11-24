@@ -138,9 +138,6 @@ func (dr detailsResult) String() string {
 	t.AddRow(tr("Board name:"), details.Name)
 	t.AddRow(tr("FQBN:"), details.Fqbn)
 	addIfNotEmpty(tr("Board version:"), details.Version)
-	if details.GetDebuggingSupported() {
-		t.AddRow(tr("Debugging supported:"), table.NewCell("✔", color.New(color.FgGreen)))
-	}
 
 	if details.Official {
 		t.AddRow() // get some space from above
