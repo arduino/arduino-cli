@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 // Details returns all details for a board including tools and HW identifiers.
@@ -64,9 +65,14 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 		details.BuildProperties, _ = utils.ExpandBuildProperties(details.GetBuildProperties())
 	}
 
-	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
-		boardPlatformRelease.Properties.ContainsKey("debug.executable") ||
-		(boardRefPlatform != nil && boardRefPlatform.Properties.ContainsKey("debug.executable"))
+	toolProperties := properties.NewMap()
+	if boardRefPlatform != nil {
+		toolProperties.Merge(boardRefPlatform.Properties)
+	}
+	toolProperties.Merge(boardPlatformRelease.Properties)
+	toolProperties.Merge(boardPlatformRelease.RuntimeProperties())
+	toolProperties.Merge(boardProperties)
+	details.DebuggingSupported = toolProperties.ContainsKey("debug.executable") && toolProperties.Get("debug.executable") != ""
 
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,
