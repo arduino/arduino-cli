@@ -1655,9 +1655,6 @@ func TestDependencyResolver(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	_, _, err := cli.Run("lib", "update-index")
-	require.NoError(t, err)
-
 	done := make(chan bool)
 	go func() {
 		_, _, err := cli.Run("lib", "install", "NTPClient_Generic")
@@ -1670,4 +1667,50 @@ func TestDependencyResolver(t *testing.T) {
 	case <-time.After(time.Second * 2):
 		require.FailNow(t, "The install command didn't complete in the allocated time")
 	}
+}
+
+func TestDependencyResolverNoOverwrite(t *testing.T) {
+	// https://github.com/arduino/arduino-cli/issues/1799
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "install", "Bounce2@2.53.0")
+	require.NoError(t, err)
+
+	out, _, err := cli.Run("lib", "deps", "EncoderTool@2.2.0", "--format", "json")
+	require.NoError(t, err)
+	outjson := requirejson.Parse(t, out)
+	outjson.MustContain(`{
+		"dependencies": [
+			{
+				"name": "Bounce2",
+				"version_installed": "2.53"
+			},
+			{
+				"name": "EncoderTool",
+				"version_required": "2.2.0"
+			}
+		]
+	}`)
+	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53.0"`)
+
+	out, _, err = cli.Run("lib", "deps", "EncoderTool@2.2.0", "--no-overwrite", "--format", "json")
+	require.NoError(t, err)
+	outjson = requirejson.Parse(t, out)
+	outjson.MustContain(`{
+		"dependencies": [
+			{
+				"name": "Bounce2",
+				"version_required": "2.53.0",
+				"version_installed": "2.53"
+			},
+			{
+				"name": "EncoderTool",
+				"version_required": "2.2.0"
+			}
+		]
+	}`)
+
+	_, _, err = cli.Run("lib", "install", "EncoderTool@2.2.0", "--no-overwrite")
+	require.NoError(t, err)
 }
