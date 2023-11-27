@@ -3385,12 +3385,14 @@ to provide some debug configuration directives.</p>
 <p>All the debug directives are grouped under the <code>debug.*</code> directives. Here is the complete list of the supported
 directives:</p>
 <ul>
+<li><code>debug.executable</code>: is the absolute path to the compiled binary of the sketch</li>
 <li><code>debug.toolchain</code>: is a unique identifier of the required toolchain, currently we support <code>gcc</code> (and compatible) only</li>
 <li><code>debug.toolchain.path</code>: is the absolute path to the toolchain directory</li>
 <li><code>debug.toolchain.prefix</code>: is the prefix of the toolchain (for example <code>arm-none-eabi-</code>)</li>
 <li><code>debug.server</code>: is a unique identifier of the required debug server, currently we support only <code>openocd</code></li>
 <li><code>debug.svd_file</code>: is the absolute path to the SVD descriptor.</li>
 </ul>
+<p>If the <code>debug.executable</code> property is not present or is empty debugging will not be allowed.</p>
 <p>OpenOCD server specific configurations:</p>
 <ul>
 <li><code>debug.server.openocd.path</code>: is the absolute path to the OpenOCD directory</li>
