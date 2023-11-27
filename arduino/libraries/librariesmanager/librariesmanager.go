@@ -225,6 +225,20 @@ func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, in
 	return alternatives.FilterByVersionAndInstallLocation(libRef.Version, installLocation)
 }
 
+// FindAllInstalled returns all the installed libraries
+func (lm *LibrariesManager) FindAllInstalled() libraries.List {
+	var res libraries.List
+	for _, libAlternatives := range lm.Libraries {
+		for _, libRelease := range libAlternatives {
+			if libRelease.InstallDir == nil {
+				continue
+			}
+			res.Add(libRelease)
+		}
+	}
+	return res
+}
+
 func (lm *LibrariesManager) clearLibraries() {
 	for k := range lm.Libraries {
 		delete(lm.Libraries, k)

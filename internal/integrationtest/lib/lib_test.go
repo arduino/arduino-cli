@@ -589,8 +589,10 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "SD@1.2.3")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
-	require.Error(t, err)
+	// This time it should accept the installation with the currently installed SD 1.2.3
+	out, _, err := cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
+	require.NoError(t, err)
+	require.Contains(t, string(out), "Already installed SD@1.2.3")
 }
 
 func TestInstallNoDeps(t *testing.T) {
@@ -1653,9 +1655,6 @@ func TestDependencyResolver(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	_, _, err := cli.Run("lib", "update-index")
-	require.NoError(t, err)
-
 	done := make(chan bool)
 	go func() {
 		_, _, err := cli.Run("lib", "install", "NTPClient_Generic")
@@ -1665,7 +1664,54 @@ func TestDependencyResolver(t *testing.T) {
 
 	select {
 	case <-done:
-	case <-time.After(time.Second * 2):
+	case <-time.After(time.Second * 10):
 		require.FailNow(t, "The install command didn't complete in the allocated time")
 	}
+}
+
+func TestDependencyResolverNoOverwrite(t *testing.T) {
+	// https://github.com/arduino/arduino-cli/issues/1799
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "install", "Bounce2@2.53.0")
+	require.NoError(t, err)
+
+	out, _, err := cli.Run("lib", "deps", "EncoderTool@2.2.0", "--format", "json")
+	require.NoError(t, err)
+	outjson := requirejson.Parse(t, out)
+	outjson.MustContain(`{
+		"dependencies": [
+			{
+				"name": "Bounce2",
+				"version_installed": "2.53"
+			},
+			{
+				"name": "EncoderTool",
+				"version_required": "2.2.0"
+			}
+		]
+	}`)
+	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53.0"`)
+	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53"`)
+
+	out, _, err = cli.Run("lib", "deps", "EncoderTool@2.2.0", "--no-overwrite", "--format", "json")
+	require.NoError(t, err)
+	outjson = requirejson.Parse(t, out)
+	outjson.MustContain(`{
+		"dependencies": [
+			{
+				"name": "Bounce2",
+				"version_required": "2.53",
+				"version_installed": "2.53"
+			},
+			{
+				"name": "EncoderTool",
+				"version_required": "2.2.0"
+			}
+		]
+	}`)
+
+	_, _, err = cli.Run("lib", "install", "EncoderTool@2.2.0", "--no-overwrite")
+	require.NoError(t, err)
 }

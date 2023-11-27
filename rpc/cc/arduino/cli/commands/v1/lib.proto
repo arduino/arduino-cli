@@ -118,6 +118,9 @@ message LibraryResolveDependenciesRequest {
   // The version of the library to check dependencies of. If no version is
   // specified, dependencies of the newest version will be listed.
   string version = 3;
+  // If true the computed solution will try to keep exising libraries
+  // at their current version.
+  bool do_not_update_installed_libraries = 4;
 }
 
 message LibraryResolveDependenciesResponse {

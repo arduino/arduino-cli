@@ -118,7 +118,7 @@ func getLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 	}
 }
 
-func getLibraryDependenciesParameter(deps []semver.Dependency) []*rpc.LibraryDependency {
+func getLibraryDependenciesParameter(deps []*librariesindex.Dependency) []*rpc.LibraryDependency {
 	res := []*rpc.LibraryDependency{}
 	for _, dep := range deps {
 		res = append(res, &rpc.LibraryDependency{

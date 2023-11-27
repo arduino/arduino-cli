@@ -44,7 +44,7 @@ type Library struct {
 type Release struct {
 	Author           string
 	Version          *semver.Version
-	Dependencies     []semver.Dependency
+	Dependencies     []*Dependency
 	Maintainer       string
 	Sentence         string
 	Paragraph        string
@@ -85,7 +85,7 @@ func (r *Release) GetVersion() *semver.Version {
 }
 
 // GetDependencies returns the dependencies of this library.
-func (r *Release) GetDependencies() []semver.Dependency {
+func (r *Release) GetDependencies() []*Dependency {
 	return r.Dependencies
 }
 
@@ -144,31 +144,31 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 	return nil
 }
 
-// ResolveDependencies returns the dependencies of a library release.
-func (idx *Index) ResolveDependencies(lib *Release) []*Release {
-	// Box lib index *Release to be digested by dep-resolver
-	// (TODO: There is a better use of golang interfaces to avoid this?)
-	allReleases := map[string]semver.Releases{}
-	for _, indexLib := range idx.Libraries {
-		releases := semver.Releases{}
-		for _, indexLibRelease := range indexLib.Releases {
-			releases = append(releases, indexLibRelease)
+// ResolveDependencies resolve the dependencies of a library release and returns a
+// possible solution (the set of library releases to install together with the library).
+// An optional "override" releases may be passed if we want to exclude the same
+// libraries from the index (for example if we want to keep an installed library).
+func (idx *Index) ResolveDependencies(lib *Release, overrides []*Release) []*Release {
+	resolver := semver.NewResolver[*Release, *Dependency]()
+
+	overridden := map[string]bool{}
+	for _, override := range overrides {
+		resolver.AddRelease(override)
+		overridden[override.GetName()] = true
+	}
+
+	// Create and populate the library resolver
+	for libName, indexLib := range idx.Libraries {
+		if _, ok := overridden[libName]; ok {
+			continue
 		}
-		allReleases[indexLib.Name] = releases
+		for _, indexLibRelease := range indexLib.Releases {
+			resolver.AddRelease(indexLibRelease)
+		}
 	}
 
 	// Perform lib resolution
-	archive := &semver.Archive{
-		Releases: allReleases,
-	}
-	deps := archive.Resolve(lib)
-
-	// Unbox resolved deps back into *Release
-	res := []*Release{}
-	for _, dep := range deps {
-		res = append(res, dep.(*Release))
-	}
-	return res
+	return resolver.Resolve(lib)
 }
 
 // Versions returns an array of all versions available of the library
