@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // LibraryResolveDependencies FIXMEDOC
@@ -80,14 +81,19 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 	res := []*rpc.LibraryDependencyStatus{}
 	for _, dep := range deps {
 		// ...and add information on currently installed versions of the libraries
-		installed := ""
+		var installed *semver.Version
+		required := dep.GetVersion()
 		if installedLib, has := installedLibs[dep.GetName()]; has {
-			installed = installedLib.Version.String()
+			installed = installedLib.Version
+			if installed != nil && required != nil && installed.Equal(required) {
+				// avoid situations like installed=0.53 and required=0.53.0
+				required = installed
+			}
 		}
 		res = append(res, &rpc.LibraryDependencyStatus{
 			Name:             dep.GetName(),
-			VersionRequired:  dep.GetVersion().String(),
-			VersionInstalled: installed,
+			VersionRequired:  required.String(),
+			VersionInstalled: installed.String(),
 		})
 	}
 	sort.Slice(res, func(i, j int) bool {

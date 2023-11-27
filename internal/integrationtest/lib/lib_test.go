@@ -1693,6 +1693,7 @@ func TestDependencyResolverNoOverwrite(t *testing.T) {
 		]
 	}`)
 	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53.0"`)
+	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53"`)
 
 	out, _, err = cli.Run("lib", "deps", "EncoderTool@2.2.0", "--no-overwrite", "--format", "json")
 	require.NoError(t, err)
@@ -1701,7 +1702,7 @@ func TestDependencyResolverNoOverwrite(t *testing.T) {
 		"dependencies": [
 			{
 				"name": "Bounce2",
-				"version_required": "2.53.0",
+				"version_required": "2.53",
 				"version_installed": "2.53"
 			},
 			{
