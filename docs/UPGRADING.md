@@ -2264,6 +2264,8 @@ debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/sh
 debug.server.openocd.script={runtime.platform.path}/variants/{build.variant}/{build.openocdscript}
 ```
 
+The `debug.executable` key must be present and non-empty for debugging to be supported.
+
 The `debug.server.XXXX` subkeys are optional and also "free text", this means that the configuration may be extended as
 needed by the specific server. For now only `openocd` is supported. Anyway, if this change works, any other kind of
 server may be fairly easily added.
