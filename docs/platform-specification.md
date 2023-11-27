@@ -1369,11 +1369,14 @@ to provide some debug configuration directives.
 All the debug directives are grouped under the `debug.*` directives. Here is the complete list of the supported
 directives:
 
+- `debug.executable`: is the absolute path to the compiled binary of the sketch
 - `debug.toolchain`: is a unique identifier of the required toolchain, currently we support `gcc` (and compatible) only
 - `debug.toolchain.path`: is the absolute path to the toolchain directory
 - `debug.toolchain.prefix`: is the prefix of the toolchain (for example `arm-none-eabi-`)
 - `debug.server`: is a unique identifier of the required debug server, currently we support only `openocd`
 - `debug.svd_file`: is the absolute path to the SVD descriptor.
+
+If the `debug.executable` property is not present or is empty debugging will not be allowed.
 
 OpenOCD server specific configurations:
 
