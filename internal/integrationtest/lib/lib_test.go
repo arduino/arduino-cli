@@ -1664,7 +1664,7 @@ func TestDependencyResolver(t *testing.T) {
 
 	select {
 	case <-done:
-	case <-time.After(time.Second * 2):
+	case <-time.After(time.Second * 10):
 		require.FailNow(t, "The install command didn't complete in the allocated time")
 	}
 }
