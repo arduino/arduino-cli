@@ -140,7 +140,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 	}
 
-	if !debugProperties.ContainsKey("executable") {
+	if !debugProperties.ContainsKey("executable") || debugProperties.Get("executable") == "" {
 		return nil, &arduino.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
 	}
 
