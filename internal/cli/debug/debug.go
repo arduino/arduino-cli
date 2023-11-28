@@ -60,6 +60,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
+	debugCommand.AddCommand(newDebugCheckCommand())
 	fqbnArg.AddToCommand(debugCommand)
 	portArgs.AddToCommand(debugCommand)
 	programmer.AddToCommand(debugCommand)
