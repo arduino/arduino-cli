@@ -36,25 +36,28 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	fqbnArg     arguments.Fqbn
-	portArgs    arguments.Port
-	interpreter string
-	importDir   string
-	printInfo   bool
-	programmer  arguments.Programmer
-	tr          = i18n.Tr
-)
+var tr = i18n.Tr
 
 // NewCommand created a new `upload` command
 func NewCommand() *cobra.Command {
+	var (
+		fqbnArg     arguments.Fqbn
+		portArgs    arguments.Port
+		interpreter string
+		importDir   string
+		printInfo   bool
+		programmer  arguments.Programmer
+	)
+
 	debugCommand := &cobra.Command{
 		Use:     "debug",
 		Short:   tr("Debug Arduino sketches."),
 		Long:    tr("Debug Arduino sketches. (this command opens an interactive gdb session)"),
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
-		Run:     runDebugCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runDebugCommand(args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo)
+		},
 	}
 
 	fqbnArg.AddToCommand(debugCommand)
@@ -67,7 +70,8 @@ func NewCommand() *cobra.Command {
 	return debugCommand
 }
 
-func runDebugCommand(command *cobra.Command, args []string) {
+func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
+	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli debug`")
 
@@ -81,7 +85,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, instance, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 	debugConfigRequested := &rpc.GetDebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
