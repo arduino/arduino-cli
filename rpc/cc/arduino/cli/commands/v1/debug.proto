@@ -43,6 +43,14 @@ message DebugRequest {
   bool send_interrupt = 3;
 }
 
+// The streaming response may contain chunks of data from the debugger or an error.
+message DebugResponse {
+  // Incoming data from the debugger tool.
+  bytes data = 1;
+  // Incoming error output from the debugger tool.
+  string error = 2;
+}
+
 message GetDebugConfigRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
@@ -63,14 +71,6 @@ message GetDebugConfigRequest {
   string import_dir = 8;
   // The programmer to use for debugging.
   string programmer = 9;
-}
-
-//
-message DebugResponse {
-  // Incoming data from the debugger tool.
-  bytes data = 1;
-  // Incoming error output from the debugger tool.
-  string error = 2;
 }
 
 message GetDebugConfigResponse {
