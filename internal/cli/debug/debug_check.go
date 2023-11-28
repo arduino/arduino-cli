@@ -82,7 +82,7 @@ func (d *debugCheckResult) Data() interface{} {
 }
 
 func (d *debugCheckResult) String() string {
-	if d.Result.Supported {
+	if d.Result.DebuggingSupported {
 		return tr("The given board/programmer configuration supports debugging.")
 	}
 	return tr("The given board/programmer configuration does NOT support debugging.")

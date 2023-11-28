@@ -63,12 +63,12 @@ func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*r
 	}, pme, true)
 	var x *arduino.FailedDebugError
 	if errors.As(err, &x) {
-		return &rpc.IsDebugSupportedResponse{Supported: false}, nil
+		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.IsDebugSupportedResponse{Supported: true}, nil
+	return &rpc.IsDebugSupportedResponse{DebuggingSupported: true}, nil
 }
 
 func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer, skipSketchChecks bool) (*rpc.GetDebugConfigResponse, error) {

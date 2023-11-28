@@ -68,7 +68,7 @@ message IsDebugSupportedRequest {
 
 message IsDebugSupportedResponse {
   // True if debugging is supported
-  bool supported = 1;
+  bool debugging_supported = 1;
 }
 
 message GetDebugConfigRequest {

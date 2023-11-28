@@ -345,7 +345,7 @@ func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integra
 
 	out, _, err = cli.Run("debug", "check", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, out, `.supported`, `true`)
+	requirejson.Query(t, out, `.debugging_supported`, `true`)
 
 	out, _, err = cli.Run("debug", "check", "-b", "arduino:avr:uno", "-P", "atmel_ice")
 	require.NoError(t, err)
@@ -353,5 +353,5 @@ func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integra
 
 	out, _, err = cli.Run("debug", "check", "-b", "arduino:avr:uno", "-P", "atmel_ice", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, out, `.supported`, `false`)
+	requirejson.Query(t, out, `.debugging_supported`, `false`)
 }
