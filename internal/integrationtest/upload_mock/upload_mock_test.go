@@ -44,7 +44,7 @@ type parametersMap struct {
 
 func TestUploadSketch(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
+	t.Cleanup(env.CleanUp)
 
 	indexes := []string{
 		"https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json",
@@ -655,13 +655,14 @@ func TestUploadSketch(t *testing.T) {
 	sketchPath := cli.SketchbookDir().Join(sketchName)
 	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
+	buildDir := generateBuildDir(sketchPath, t)
+	t.Cleanup(func() { buildDir.RemoveAll() })
 
-	var stdout []byte
-
-	for i, test := range testParameters {
+	for i, _test := range testParameters {
+		test := _test
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			buildDir := generateBuildDir(sketchPath, t)
-			defer buildDir.RemoveAll()
+			t.Parallel()
+			var stdout []byte
 			if test.Programmer != "" {
 				if test.UploadPort != "" {
 					stdout, _, err = cli.Run("upload", "-p", test.UploadPort, "-P", test.Programmer, "-b", test.Fqbn, sketchPath.String(), "--dry-run", "-v")
@@ -686,10 +687,11 @@ func TestUploadSketch(t *testing.T) {
 		})
 	}
 
-	for i, test := range testParametersMap {
+	for i, _test := range testParametersMap {
+		test := _test
 		t.Run(fmt.Sprintf("WithMap%d", i), func(t *testing.T) {
-			buildDir := generateBuildDir(sketchPath, t)
-			defer buildDir.RemoveAll()
+			t.Parallel()
+			var stdout []byte
 			if test.Programmer != "" {
 				if test.UploadPort != "" {
 					stdout, _, err = cli.Run("upload", "-p", test.UploadPort, "-P", test.Programmer, "-b", test.Fqbn, sketchPath.String(), "--dry-run", "-v")

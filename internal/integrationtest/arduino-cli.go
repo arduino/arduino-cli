@@ -299,13 +299,20 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
 
+	// Accumulate all output to terminal and spit-out all at once at the end of the test
+	// This allows to correctly group test output when running t.Parallel() tests.
+	terminalOut := new(bytes.Buffer)
+	defer func() {
+		fmt.Print(terminalOut.String())
+	}()
+
 	// Github-actions workflow tags to fold log lines
 	if os.Getenv("GITHUB_ACTIONS") != "" {
-		fmt.Printf("::group::Running %s\n", strings.Join(args, " "))
-		defer fmt.Println("::endgroup::")
+		fmt.Fprintf(terminalOut, "::group::Running %s\n", strings.Join(args, " "))
+		defer fmt.Fprintln(terminalOut, "::endgroup::")
 	}
 
-	fmt.Println(color.HiBlackString(">>> Running: ") + color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
+	fmt.Fprintln(terminalOut, color.HiBlackString(">>> Running: ")+color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
 	cliProc, err := executils.NewProcessFromPath(cli.convertEnvForExecutils(env), cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
@@ -325,8 +332,8 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 		if stdoutBuff == nil {
 			stdoutBuff = io.Discard
 		}
-		if _, err := io.Copy(stdoutBuff, io.TeeReader(stdout, os.Stdout)); err != nil {
-			fmt.Println(color.HiBlackString("<<< stdout copy error:"), err)
+		if _, err := io.Copy(stdoutBuff, io.TeeReader(stdout, terminalOut)); err != nil {
+			fmt.Fprintln(terminalOut, color.HiBlackString("<<< stdout copy error:"), err)
 		}
 	}()
 	go func() {
@@ -334,20 +341,20 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 		if stderrBuff == nil {
 			stderrBuff = io.Discard
 		}
-		if _, err := io.Copy(stderrBuff, io.TeeReader(stderr, os.Stderr)); err != nil {
-			fmt.Println(color.HiBlackString("<<< stderr copy error:"), err)
+		if _, err := io.Copy(stderrBuff, io.TeeReader(stderr, terminalOut)); err != nil {
+			fmt.Fprintln(terminalOut, color.HiBlackString("<<< stderr copy error:"), err)
 		}
 	}()
 	if stdinBuff != nil {
 		go func() {
 			if _, err := io.Copy(stdin, stdinBuff); err != nil {
-				fmt.Println(color.HiBlackString("<<< stdin copy error:"), err)
+				fmt.Fprintln(terminalOut, color.HiBlackString("<<< stdin copy error:"), err)
 			}
 		}()
 	}
 	wg.Wait()
 	cliErr := cliProc.Wait()
-	fmt.Println(color.HiBlackString("<<< Run completed (err = %v)", cliErr))
+	fmt.Fprintln(terminalOut, color.HiBlackString("<<< Run completed (err = %v)", cliErr))
 
 	return cliErr
 }
