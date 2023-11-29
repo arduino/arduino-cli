@@ -30,6 +30,16 @@ type FQBN struct {
 	Configs      *properties.Map
 }
 
+// MustParseFQBN extract an FQBN object from the input string
+// or panics if the input is not a valid FQBN.
+func MustParseFQBN(fqbnIn string) *FQBN {
+	res, err := ParseFQBN(fqbnIn)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
 // ParseFQBN extract an FQBN object from the input string
 func ParseFQBN(fqbnIn string) (*FQBN, error) {
 	// Split fqbn

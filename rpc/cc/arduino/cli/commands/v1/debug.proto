@@ -69,6 +69,11 @@ message IsDebugSupportedRequest {
 message IsDebugSupportedResponse {
   // True if debugging is supported
   bool debugging_supported = 1;
+  // This is the same FQBN given in the IsDebugSupportedRequest but cleaned
+  // up of the board options that do not affect the debugger configuration.
+  // It may be used by clients/IDE to group slightly different boards option
+  // selections under the same debug configuration.
+  string debug_fqbn = 2;
 }
 
 message GetDebugConfigRequest {

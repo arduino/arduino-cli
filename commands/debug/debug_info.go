@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"reflect"
 	"slices"
 	"strconv"
 	"strings"
@@ -52,7 +53,7 @@ func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*r
 		return nil, &arduino.InvalidInstanceError{}
 	}
 	defer release()
-	_, err := getDebugProperties(&rpc.GetDebugConfigRequest{
+	configRequest := &rpc.GetDebugConfigRequest{
 		Instance:    req.GetInstance(),
 		Fqbn:        req.GetFqbn(),
 		SketchPath:  "",
@@ -60,7 +61,8 @@ func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*r
 		Interpreter: req.GetInterpreter(),
 		ImportDir:   "",
 		Programmer:  req.GetProgrammer(),
-	}, pme, true)
+	}
+	expectedOutput, err := getDebugProperties(configRequest, pme, true)
 	var x *arduino.FailedDebugError
 	if errors.As(err, &x) {
 		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
@@ -68,7 +70,23 @@ func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*r
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.IsDebugSupportedResponse{DebuggingSupported: true}, nil
+
+	// Compute the minimum FQBN required to get the same debug configuration.
+	// (i.e. the FQBN cleaned up of the options that do not affect the debugger configuration)
+	minimumFQBN := cores.MustParseFQBN(req.GetFqbn())
+	for _, config := range minimumFQBN.Configs.Keys() {
+		checkFQBN := minimumFQBN.Clone()
+		checkFQBN.Configs.Remove(config)
+		configRequest.Fqbn = checkFQBN.String()
+		checkOutput, err := getDebugProperties(configRequest, pme, true)
+		if err == nil && reflect.DeepEqual(expectedOutput, checkOutput) {
+			minimumFQBN.Configs.Remove(config)
+		}
+	}
+	return &rpc.IsDebugSupportedResponse{
+		DebuggingSupported: true,
+		DebugFqbn:          minimumFQBN.String(),
+	}, nil
 }
 
 func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer, skipSketchChecks bool) (*rpc.GetDebugConfigResponse, error) {
