@@ -118,7 +118,7 @@ func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Read
 
 // getCommandLine compose a debug command represented by a core recipe
 func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
-	debugInfo, err := getDebugProperties(req, pme)
+	debugInfo, err := getDebugProperties(req, pme, false)
 	if err != nil {
 		return nil, err
 	}

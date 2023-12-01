@@ -1057,3 +1057,15 @@ func NewCompileDiagnosticNote(cdn *rpc.CompileDiagnosticNote) *CompileDiagnostic
 		Column:  cdn.GetColumn(),
 	}
 }
+
+type IsDebugSupportedResponse struct {
+	DebuggingSupported bool   `json:"debugging_supported"`
+	DebugFQBN          string `json:"debug_fqbn,omitempty"`
+}
+
+func NewIsDebugSupportedResponse(resp *rpc.IsDebugSupportedResponse) *IsDebugSupportedResponse {
+	return &IsDebugSupportedResponse{
+		DebuggingSupported: resp.GetDebuggingSupported(),
+		DebugFQBN:          resp.GetDebugFqbn(),
+	}
+}

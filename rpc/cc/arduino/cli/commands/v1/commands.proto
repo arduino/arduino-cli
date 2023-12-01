@@ -182,6 +182,11 @@ service ArduinoCoreService {
   // Start a debug session and communicate with the debugger tool.
   rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
 
+  // Determine if debugging is suported given a specific configuration.
+  rpc IsDebugSupported(IsDebugSupportedRequest)
+      returns (IsDebugSupportedResponse) {}
+
+  // Query the debugger information given a specific configuration.
   rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
 
   // List all the settings.

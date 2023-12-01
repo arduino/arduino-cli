@@ -66,3 +66,9 @@ func (s *ArduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.Get
 	res, err := cmd.GetDebugConfig(ctx, req)
 	return res, convertErrorToRPCStatus(err)
 }
+
+// IsDebugSupported checks if debugging is supported for a given configuration
+func (s *ArduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
+	res, err := cmd.IsDebugSupported(ctx, req)
+	return res, convertErrorToRPCStatus(err)
+}

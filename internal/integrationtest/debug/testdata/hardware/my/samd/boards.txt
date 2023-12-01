@@ -112,3 +112,39 @@ my4.build.mcu=test2
 # this one will be overwritten by additional_config
 my4.debug.svd_file=svd-file
 my4.debug.additional_config=build.debug.config.{build.mcu}
+
+# menu options for the following boards
+menu.dbg=Debugger
+menu.cpu=CPU Speed
+
+# This does not support debug by default but only after selecting a menu option
+my5.name=5th Board
+my5.build.core=arduino:arduino
+my5.build.variant=arduino:mkr1000
+my5.debug.toolchain.path=gcc-path
+my5.debug.toolchain.prefix=gcc-prefix
+my5.debug.server.openocd.path=openocd-path
+my5.debug.server.openocd.scripts_dir=openocd-scripts-dir
+my5.debug.server.openocd.script=single-script
+my5.debug.executable=
+my5.menu.dbg.off=Debug Disabled
+my5.menu.dbg.on=Debug Enabled
+my5.menu.dbg.on.debug.executable=YES
+my5.menu.cpu.100m=100Mhz
+my5.menu.cpu.150m=150Mhz
+
+# this one has debugger enabled by default
+my6.name=5th Board
+my6.build.core=arduino:arduino
+my6.build.variant=arduino:mkr1000
+my6.debug.toolchain.path=gcc-path
+my6.debug.toolchain.prefix=gcc-prefix
+my6.debug.server.openocd.path=openocd-path
+my6.debug.server.openocd.scripts_dir=openocd-scripts-dir
+my6.debug.server.openocd.script=single-script
+my6.debug.executable=
+my6.menu.dbg.on=Debug Enabled
+my6.menu.dbg.on.debug.executable=YES
+my6.menu.dbg.off=Debug Disabled
+my6.menu.cpu.100m=100Mhz
+my6.menu.cpu.150m=150Mhz

@@ -33,13 +33,22 @@ func TestDebug(t *testing.T) {
 	require.NoError(t, err)
 
 	// Install cores
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
 	_, _, err = cli.Run("core", "install", "arduino:samd")
+	require.NoError(t, err)
+
+	// Install custom core
+	customHw, err := paths.New("testdata", "hardware").Abs()
+	require.NoError(t, err)
+	err = customHw.CopyDirTo(cli.SketchbookDir().Join("hardware"))
 	require.NoError(t, err)
 
 	integrationtest.CLISubtests{
 		{"Start", testDebuggerStarts},
 		{"WithPdeSketchStarts", testDebuggerWithPdeSketchStarts},
 		{"DebugInformation", testAllDebugInformation},
+		{"DebugCheck", testDebugCheck},
 	}.Run(t, env, cli)
 }
 
@@ -97,12 +106,6 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 	sketchPath := cli.DataDir().Join("DebuggerStartTest")
 	defer sketchPath.RemoveAll()
 	_, _, err := cli.Run("sketch", "new", sketchPath.String())
-	require.NoError(t, err)
-
-	// Install custom core
-	customHw, err := paths.New("testdata", "hardware").Abs()
-	require.NoError(t, err)
-	err = customHw.CopyDirTo(cli.SketchbookDir().Join("hardware"))
 	require.NoError(t, err)
 
 	// Build sketch
@@ -330,4 +333,46 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 			}`)
 		}
 	}
+}
+
+func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	_, _, err := cli.Run("debug", "check", "-b", "arduino:samd:mkr1000")
+	require.Error(t, err)
+
+	out, _, err := cli.Run("debug", "check", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice")
+	require.NoError(t, err)
+	require.Contains(t, string(out), "The given board/programmer configuration supports debugging.")
+
+	out, _, err = cli.Run("debug", "check", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, out, `.debugging_supported`, `true`)
+
+	out, _, err = cli.Run("debug", "check", "-b", "arduino:avr:uno", "-P", "atmel_ice")
+	require.NoError(t, err)
+	require.Contains(t, string(out), "The given board/programmer configuration does NOT support debugging.")
+
+	out, _, err = cli.Run("debug", "check", "-b", "arduino:avr:uno", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, out, `.debugging_supported`, `false`)
+
+	// Test minimum FQBN compute
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, out, `{ "debugging_supported" : false }`)
+
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5:dbg=on", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my5:dbg=on" }`)
+
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5:dbg=on,cpu=150m", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my5:dbg=on" }`)
+
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my6", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my6" }`)
+
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my6:dbg=on", "-P", "atmel_ice", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my6" }`)
 }

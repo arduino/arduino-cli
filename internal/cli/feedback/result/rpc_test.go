@@ -217,6 +217,10 @@ func TestAllFieldAreMapped(t *testing.T) {
 	compileDiagnosticNoteRpc := &rpc.CompileDiagnosticNote{}
 	compileDiagnosticNoteResult := result.NewCompileDiagnosticNote(compileDiagnosticNoteRpc)
 	mustContainsAllPropertyOfRpcStruct(t, compileDiagnosticNoteRpc, compileDiagnosticNoteResult)
+
+	isDebugSupportedResponseRpc := &rpc.IsDebugSupportedResponse{}
+	isDebugSupportedResponseResult := result.NewIsDebugSupportedResponse(isDebugSupportedResponseRpc)
+	mustContainsAllPropertyOfRpcStruct(t, isDebugSupportedResponseRpc, isDebugSupportedResponseResult)
 }
 
 func TestEnumsMapsEveryRpcCounterpart(t *testing.T) {
