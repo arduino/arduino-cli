@@ -1788,6 +1788,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#isdebugsupportedrequest" class="md-nav__link">
+    IsDebugSupportedRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isdebugsupportedresponse" class="md-nav__link">
+    IsDebugSupportedResponse
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3305,6 +3319,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#isdebugsupportedrequest" class="md-nav__link">
+    IsDebugSupportedRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isdebugsupportedresponse" class="md-nav__link">
+    IsDebugSupportedResponse
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4004,7 +4032,9 @@
     - <a href="#cc.arduino.cli.commands.v1.DebugResponse">DebugResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a>
-    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigsEntry">GetDebugConfigResponse.CustomConfigsEntry</a></li>
+    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.CustomConfigsEntry">GetDebugConfigResponse.CustomConfigsEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.IsDebugSupportedRequest">IsDebugSupportedRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.IsDebugSupportedResponse">IsDebugSupportedResponse</a></li>
 </ul>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/lib.proto">cc/arduino/cli/commands/v1/lib.proto</a>
@@ -5665,10 +5695,16 @@
 <td>Start a debug session and communicate with the debugger tool.</td>
 </tr>
 <tr>
+<td>IsDebugSupported</td>
+<td><a href="#cc.arduino.cli.commands.v1.IsDebugSupportedRequest">IsDebugSupportedRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.IsDebugSupportedResponse">IsDebugSupportedResponse</a></td>
+<td>Determine if debugging is suported given a specific configuration.</td>
+</tr>
+<tr>
 <td>GetDebugConfig</td>
 <td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a></td>
-<td></td>
+<td>Query the debugger information given a specific configuration.</td>
 </tr>
 <tr>
 <td>SettingsGetAll</td>
@@ -7095,6 +7131,8 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.DebugResponse"></a></p>
 <h3 id="debugresponse">DebugResponse<a class="headerlink" href="#debugresponse" title="Permanent link">&para;</a></h3>
+<p>The streaming response may contain chunks of data from the debugger or an
+error.</p>
 <table>
 <thead>
 <tr>
@@ -7278,6 +7316,76 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.IsDebugSupportedRequest"></a></p>
+<h3 id="isdebugsupportedrequest">IsDebugSupportedRequest<a class="headerlink" href="#isdebugsupportedrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Fully qualified board name of the board in use (e.g., <code>arduino:samd:mkr1000</code>).</td>
+</tr>
+<tr>
+<td>port</td>
+<td><a href="#cc.arduino.cli.commands.v1.Port">Port</a></td>
+<td></td>
+<td>Port of the debugger (optional).</td>
+</tr>
+<tr>
+<td>interpreter</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Which GDB command interpreter to use.</td>
+</tr>
+<tr>
+<td>programmer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The programmer to use for debugging.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.IsDebugSupportedResponse"></a></p>
+<h3 id="isdebugsupportedresponse">IsDebugSupportedResponse<a class="headerlink" href="#isdebugsupportedresponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>debugging_supported</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>True if debugging is supported</td>
+</tr>
+<tr>
+<td>debug_fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>This is the same FQBN given in the IsDebugSupportedRequest but cleaned up of the board options that do not affect the debugger configuration. It may be used by clients/IDE to group slightly different boards option selections under the same debug configuration.</td>
 </tr>
 </tbody>
 </table>
