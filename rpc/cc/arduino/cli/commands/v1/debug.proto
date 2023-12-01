@@ -43,6 +43,39 @@ message DebugRequest {
   bool send_interrupt = 3;
 }
 
+// The streaming response may contain chunks of data from the debugger or an
+// error.
+message DebugResponse {
+  // Incoming data from the debugger tool.
+  bytes data = 1;
+  // Incoming error output from the debugger tool.
+  string error = 2;
+}
+
+message IsDebugSupportedRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the board in use (e.g.,
+  // `arduino:samd:mkr1000`).
+  string fqbn = 2;
+  // Port of the debugger (optional).
+  Port port = 3;
+  // Which GDB command interpreter to use.
+  string interpreter = 4;
+  // The programmer to use for debugging.
+  string programmer = 5;
+}
+
+message IsDebugSupportedResponse {
+  // True if debugging is supported
+  bool debugging_supported = 1;
+  // This is the same FQBN given in the IsDebugSupportedRequest but cleaned
+  // up of the board options that do not affect the debugger configuration.
+  // It may be used by clients/IDE to group slightly different boards option
+  // selections under the same debug configuration.
+  string debug_fqbn = 2;
+}
+
 message GetDebugConfigRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
@@ -63,14 +96,6 @@ message GetDebugConfigRequest {
   string import_dir = 8;
   // The programmer to use for debugging.
   string programmer = 9;
-}
-
-//
-message DebugResponse {
-  // Incoming data from the debugger tool.
-  bytes data = 1;
-  // Incoming error output from the debugger tool.
-  string error = 2;
 }
 
 message GetDebugConfigResponse {

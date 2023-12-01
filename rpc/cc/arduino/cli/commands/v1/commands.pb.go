@@ -1664,7 +1664,7 @@ var file_cc_arduino_cli_commands_v1_commands_proto_rawDesc = []byte{
 	0x49, 0x4c, 0x45, 0x44, 0x5f, 0x49, 0x4e, 0x53, 0x54, 0x41, 0x4e, 0x43, 0x45, 0x5f, 0x49, 0x4e,
 	0x49, 0x54, 0x5f, 0x52, 0x45, 0x41, 0x53, 0x4f, 0x4e, 0x5f, 0x49, 0x4e, 0x44, 0x45, 0x58, 0x5f,
 	0x44, 0x4f, 0x57, 0x4e, 0x4c, 0x4f, 0x41, 0x44, 0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x10, 0x04,
-	0x32, 0xab, 0x27, 0x0a, 0x12, 0x41, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x43, 0x6f, 0x72, 0x65,
+	0x32, 0xac, 0x28, 0x0a, 0x12, 0x41, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x43, 0x6f, 0x72, 0x65,
 	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x61, 0x0a, 0x06, 0x43, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x12, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63,
 	0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43,
@@ -1971,19 +1971,28 @@ var file_cc_arduino_cli_commands_v1_commands_proto_rawDesc = []byte{
 	0x73, 0x74, 0x1a, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
 	0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e,
 	0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28,
-	0x01, 0x30, 0x01, 0x12, 0x79, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43,
-	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x31, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69,
-	0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e,
-	0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f, 0x6e, 0x66, 0x69,
-	0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x32, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72,
-	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e,
-	0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f,
-	0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x48,
-	0x5a, 0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64,
-	0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69,
-	0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f,
-	0x63, 0x6c, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x3b,
-	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x01, 0x30, 0x01, 0x12, 0x7f, 0x0a, 0x10, 0x49, 0x73, 0x44, 0x65, 0x62, 0x75, 0x67, 0x53, 0x75,
+	0x70, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x12, 0x33, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
+	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
+	0x73, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x73, 0x44, 0x65, 0x62, 0x75, 0x67, 0x53, 0x75, 0x70, 0x70,
+	0x6f, 0x72, 0x74, 0x65, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x34, 0x2e, 0x63,
+	0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x73, 0x44, 0x65, 0x62, 0x75,
+	0x67, 0x53, 0x75, 0x70, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x79, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x31, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75,
+	0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73,
+	0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x32, 0x2e, 0x63, 0x63, 0x2e, 0x61,
+	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61,
+	0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42,
+	0x48, 0x5a, 0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72,
+	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c,
+	0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f,
+	0x2f, 0x63, 0x6c, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31,
+	0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -2060,38 +2069,40 @@ var file_cc_arduino_cli_commands_v1_commands_proto_goTypes = []interface{}{
 	(*MonitorRequest)(nil),                            // 56: cc.arduino.cli.commands.v1.MonitorRequest
 	(*EnumerateMonitorPortSettingsRequest)(nil),       // 57: cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsRequest
 	(*DebugRequest)(nil),                              // 58: cc.arduino.cli.commands.v1.DebugRequest
-	(*GetDebugConfigRequest)(nil),                     // 59: cc.arduino.cli.commands.v1.GetDebugConfigRequest
-	(*BoardDetailsResponse)(nil),                      // 60: cc.arduino.cli.commands.v1.BoardDetailsResponse
-	(*BoardListResponse)(nil),                         // 61: cc.arduino.cli.commands.v1.BoardListResponse
-	(*BoardListAllResponse)(nil),                      // 62: cc.arduino.cli.commands.v1.BoardListAllResponse
-	(*BoardSearchResponse)(nil),                       // 63: cc.arduino.cli.commands.v1.BoardSearchResponse
-	(*BoardListWatchResponse)(nil),                    // 64: cc.arduino.cli.commands.v1.BoardListWatchResponse
-	(*CompileResponse)(nil),                           // 65: cc.arduino.cli.commands.v1.CompileResponse
-	(*PlatformInstallResponse)(nil),                   // 66: cc.arduino.cli.commands.v1.PlatformInstallResponse
-	(*PlatformDownloadResponse)(nil),                  // 67: cc.arduino.cli.commands.v1.PlatformDownloadResponse
-	(*PlatformUninstallResponse)(nil),                 // 68: cc.arduino.cli.commands.v1.PlatformUninstallResponse
-	(*PlatformUpgradeResponse)(nil),                   // 69: cc.arduino.cli.commands.v1.PlatformUpgradeResponse
-	(*UploadResponse)(nil),                            // 70: cc.arduino.cli.commands.v1.UploadResponse
-	(*UploadUsingProgrammerResponse)(nil),             // 71: cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse
-	(*SupportedUserFieldsResponse)(nil),               // 72: cc.arduino.cli.commands.v1.SupportedUserFieldsResponse
-	(*ListProgrammersAvailableForUploadResponse)(nil), // 73: cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse
-	(*BurnBootloaderResponse)(nil),                    // 74: cc.arduino.cli.commands.v1.BurnBootloaderResponse
-	(*PlatformSearchResponse)(nil),                    // 75: cc.arduino.cli.commands.v1.PlatformSearchResponse
-	(*PlatformListResponse)(nil),                      // 76: cc.arduino.cli.commands.v1.PlatformListResponse
-	(*LibraryDownloadResponse)(nil),                   // 77: cc.arduino.cli.commands.v1.LibraryDownloadResponse
-	(*LibraryInstallResponse)(nil),                    // 78: cc.arduino.cli.commands.v1.LibraryInstallResponse
-	(*LibraryUpgradeResponse)(nil),                    // 79: cc.arduino.cli.commands.v1.LibraryUpgradeResponse
-	(*ZipLibraryInstallResponse)(nil),                 // 80: cc.arduino.cli.commands.v1.ZipLibraryInstallResponse
-	(*GitLibraryInstallResponse)(nil),                 // 81: cc.arduino.cli.commands.v1.GitLibraryInstallResponse
-	(*LibraryUninstallResponse)(nil),                  // 82: cc.arduino.cli.commands.v1.LibraryUninstallResponse
-	(*LibraryUpgradeAllResponse)(nil),                 // 83: cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse
-	(*LibraryResolveDependenciesResponse)(nil),        // 84: cc.arduino.cli.commands.v1.LibraryResolveDependenciesResponse
-	(*LibrarySearchResponse)(nil),                     // 85: cc.arduino.cli.commands.v1.LibrarySearchResponse
-	(*LibraryListResponse)(nil),                       // 86: cc.arduino.cli.commands.v1.LibraryListResponse
-	(*MonitorResponse)(nil),                           // 87: cc.arduino.cli.commands.v1.MonitorResponse
-	(*EnumerateMonitorPortSettingsResponse)(nil),      // 88: cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse
-	(*DebugResponse)(nil),                             // 89: cc.arduino.cli.commands.v1.DebugResponse
-	(*GetDebugConfigResponse)(nil),                    // 90: cc.arduino.cli.commands.v1.GetDebugConfigResponse
+	(*IsDebugSupportedRequest)(nil),                   // 59: cc.arduino.cli.commands.v1.IsDebugSupportedRequest
+	(*GetDebugConfigRequest)(nil),                     // 60: cc.arduino.cli.commands.v1.GetDebugConfigRequest
+	(*BoardDetailsResponse)(nil),                      // 61: cc.arduino.cli.commands.v1.BoardDetailsResponse
+	(*BoardListResponse)(nil),                         // 62: cc.arduino.cli.commands.v1.BoardListResponse
+	(*BoardListAllResponse)(nil),                      // 63: cc.arduino.cli.commands.v1.BoardListAllResponse
+	(*BoardSearchResponse)(nil),                       // 64: cc.arduino.cli.commands.v1.BoardSearchResponse
+	(*BoardListWatchResponse)(nil),                    // 65: cc.arduino.cli.commands.v1.BoardListWatchResponse
+	(*CompileResponse)(nil),                           // 66: cc.arduino.cli.commands.v1.CompileResponse
+	(*PlatformInstallResponse)(nil),                   // 67: cc.arduino.cli.commands.v1.PlatformInstallResponse
+	(*PlatformDownloadResponse)(nil),                  // 68: cc.arduino.cli.commands.v1.PlatformDownloadResponse
+	(*PlatformUninstallResponse)(nil),                 // 69: cc.arduino.cli.commands.v1.PlatformUninstallResponse
+	(*PlatformUpgradeResponse)(nil),                   // 70: cc.arduino.cli.commands.v1.PlatformUpgradeResponse
+	(*UploadResponse)(nil),                            // 71: cc.arduino.cli.commands.v1.UploadResponse
+	(*UploadUsingProgrammerResponse)(nil),             // 72: cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse
+	(*SupportedUserFieldsResponse)(nil),               // 73: cc.arduino.cli.commands.v1.SupportedUserFieldsResponse
+	(*ListProgrammersAvailableForUploadResponse)(nil), // 74: cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse
+	(*BurnBootloaderResponse)(nil),                    // 75: cc.arduino.cli.commands.v1.BurnBootloaderResponse
+	(*PlatformSearchResponse)(nil),                    // 76: cc.arduino.cli.commands.v1.PlatformSearchResponse
+	(*PlatformListResponse)(nil),                      // 77: cc.arduino.cli.commands.v1.PlatformListResponse
+	(*LibraryDownloadResponse)(nil),                   // 78: cc.arduino.cli.commands.v1.LibraryDownloadResponse
+	(*LibraryInstallResponse)(nil),                    // 79: cc.arduino.cli.commands.v1.LibraryInstallResponse
+	(*LibraryUpgradeResponse)(nil),                    // 80: cc.arduino.cli.commands.v1.LibraryUpgradeResponse
+	(*ZipLibraryInstallResponse)(nil),                 // 81: cc.arduino.cli.commands.v1.ZipLibraryInstallResponse
+	(*GitLibraryInstallResponse)(nil),                 // 82: cc.arduino.cli.commands.v1.GitLibraryInstallResponse
+	(*LibraryUninstallResponse)(nil),                  // 83: cc.arduino.cli.commands.v1.LibraryUninstallResponse
+	(*LibraryUpgradeAllResponse)(nil),                 // 84: cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse
+	(*LibraryResolveDependenciesResponse)(nil),        // 85: cc.arduino.cli.commands.v1.LibraryResolveDependenciesResponse
+	(*LibrarySearchResponse)(nil),                     // 86: cc.arduino.cli.commands.v1.LibrarySearchResponse
+	(*LibraryListResponse)(nil),                       // 87: cc.arduino.cli.commands.v1.LibraryListResponse
+	(*MonitorResponse)(nil),                           // 88: cc.arduino.cli.commands.v1.MonitorResponse
+	(*EnumerateMonitorPortSettingsResponse)(nil),      // 89: cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse
+	(*DebugResponse)(nil),                             // 90: cc.arduino.cli.commands.v1.DebugResponse
+	(*IsDebugSupportedResponse)(nil),                  // 91: cc.arduino.cli.commands.v1.IsDebugSupportedResponse
+	(*GetDebugConfigResponse)(nil),                    // 92: cc.arduino.cli.commands.v1.GetDebugConfigResponse
 }
 var file_cc_arduino_cli_commands_v1_commands_proto_depIdxs = []int32{
 	24, // 0: cc.arduino.cli.commands.v1.CreateResponse.instance:type_name -> cc.arduino.cli.commands.v1.Instance
@@ -2149,50 +2160,52 @@ var file_cc_arduino_cli_commands_v1_commands_proto_depIdxs = []int32{
 	56, // 52: cc.arduino.cli.commands.v1.ArduinoCoreService.Monitor:input_type -> cc.arduino.cli.commands.v1.MonitorRequest
 	57, // 53: cc.arduino.cli.commands.v1.ArduinoCoreService.EnumerateMonitorPortSettings:input_type -> cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsRequest
 	58, // 54: cc.arduino.cli.commands.v1.ArduinoCoreService.Debug:input_type -> cc.arduino.cli.commands.v1.DebugRequest
-	59, // 55: cc.arduino.cli.commands.v1.ArduinoCoreService.GetDebugConfig:input_type -> cc.arduino.cli.commands.v1.GetDebugConfigRequest
-	2,  // 56: cc.arduino.cli.commands.v1.ArduinoCoreService.Create:output_type -> cc.arduino.cli.commands.v1.CreateResponse
-	4,  // 57: cc.arduino.cli.commands.v1.ArduinoCoreService.Init:output_type -> cc.arduino.cli.commands.v1.InitResponse
-	7,  // 58: cc.arduino.cli.commands.v1.ArduinoCoreService.Destroy:output_type -> cc.arduino.cli.commands.v1.DestroyResponse
-	9,  // 59: cc.arduino.cli.commands.v1.ArduinoCoreService.UpdateIndex:output_type -> cc.arduino.cli.commands.v1.UpdateIndexResponse
-	11, // 60: cc.arduino.cli.commands.v1.ArduinoCoreService.UpdateLibrariesIndex:output_type -> cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse
-	13, // 61: cc.arduino.cli.commands.v1.ArduinoCoreService.Version:output_type -> cc.arduino.cli.commands.v1.VersionResponse
-	15, // 62: cc.arduino.cli.commands.v1.ArduinoCoreService.NewSketch:output_type -> cc.arduino.cli.commands.v1.NewSketchResponse
-	18, // 63: cc.arduino.cli.commands.v1.ArduinoCoreService.LoadSketch:output_type -> cc.arduino.cli.commands.v1.LoadSketchResponse
-	20, // 64: cc.arduino.cli.commands.v1.ArduinoCoreService.ArchiveSketch:output_type -> cc.arduino.cli.commands.v1.ArchiveSketchResponse
-	22, // 65: cc.arduino.cli.commands.v1.ArduinoCoreService.SetSketchDefaults:output_type -> cc.arduino.cli.commands.v1.SetSketchDefaultsResponse
-	60, // 66: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardDetails:output_type -> cc.arduino.cli.commands.v1.BoardDetailsResponse
-	61, // 67: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardList:output_type -> cc.arduino.cli.commands.v1.BoardListResponse
-	62, // 68: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardListAll:output_type -> cc.arduino.cli.commands.v1.BoardListAllResponse
-	63, // 69: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardSearch:output_type -> cc.arduino.cli.commands.v1.BoardSearchResponse
-	64, // 70: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardListWatch:output_type -> cc.arduino.cli.commands.v1.BoardListWatchResponse
-	65, // 71: cc.arduino.cli.commands.v1.ArduinoCoreService.Compile:output_type -> cc.arduino.cli.commands.v1.CompileResponse
-	66, // 72: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformInstall:output_type -> cc.arduino.cli.commands.v1.PlatformInstallResponse
-	67, // 73: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformDownload:output_type -> cc.arduino.cli.commands.v1.PlatformDownloadResponse
-	68, // 74: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformUninstall:output_type -> cc.arduino.cli.commands.v1.PlatformUninstallResponse
-	69, // 75: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformUpgrade:output_type -> cc.arduino.cli.commands.v1.PlatformUpgradeResponse
-	70, // 76: cc.arduino.cli.commands.v1.ArduinoCoreService.Upload:output_type -> cc.arduino.cli.commands.v1.UploadResponse
-	71, // 77: cc.arduino.cli.commands.v1.ArduinoCoreService.UploadUsingProgrammer:output_type -> cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse
-	72, // 78: cc.arduino.cli.commands.v1.ArduinoCoreService.SupportedUserFields:output_type -> cc.arduino.cli.commands.v1.SupportedUserFieldsResponse
-	73, // 79: cc.arduino.cli.commands.v1.ArduinoCoreService.ListProgrammersAvailableForUpload:output_type -> cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse
-	74, // 80: cc.arduino.cli.commands.v1.ArduinoCoreService.BurnBootloader:output_type -> cc.arduino.cli.commands.v1.BurnBootloaderResponse
-	75, // 81: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformSearch:output_type -> cc.arduino.cli.commands.v1.PlatformSearchResponse
-	76, // 82: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformList:output_type -> cc.arduino.cli.commands.v1.PlatformListResponse
-	77, // 83: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryDownload:output_type -> cc.arduino.cli.commands.v1.LibraryDownloadResponse
-	78, // 84: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryInstall:output_type -> cc.arduino.cli.commands.v1.LibraryInstallResponse
-	79, // 85: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryUpgrade:output_type -> cc.arduino.cli.commands.v1.LibraryUpgradeResponse
-	80, // 86: cc.arduino.cli.commands.v1.ArduinoCoreService.ZipLibraryInstall:output_type -> cc.arduino.cli.commands.v1.ZipLibraryInstallResponse
-	81, // 87: cc.arduino.cli.commands.v1.ArduinoCoreService.GitLibraryInstall:output_type -> cc.arduino.cli.commands.v1.GitLibraryInstallResponse
-	82, // 88: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryUninstall:output_type -> cc.arduino.cli.commands.v1.LibraryUninstallResponse
-	83, // 89: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryUpgradeAll:output_type -> cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse
-	84, // 90: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryResolveDependencies:output_type -> cc.arduino.cli.commands.v1.LibraryResolveDependenciesResponse
-	85, // 91: cc.arduino.cli.commands.v1.ArduinoCoreService.LibrarySearch:output_type -> cc.arduino.cli.commands.v1.LibrarySearchResponse
-	86, // 92: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryList:output_type -> cc.arduino.cli.commands.v1.LibraryListResponse
-	87, // 93: cc.arduino.cli.commands.v1.ArduinoCoreService.Monitor:output_type -> cc.arduino.cli.commands.v1.MonitorResponse
-	88, // 94: cc.arduino.cli.commands.v1.ArduinoCoreService.EnumerateMonitorPortSettings:output_type -> cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse
-	89, // 95: cc.arduino.cli.commands.v1.ArduinoCoreService.Debug:output_type -> cc.arduino.cli.commands.v1.DebugResponse
-	90, // 96: cc.arduino.cli.commands.v1.ArduinoCoreService.GetDebugConfig:output_type -> cc.arduino.cli.commands.v1.GetDebugConfigResponse
-	56, // [56:97] is the sub-list for method output_type
-	15, // [15:56] is the sub-list for method input_type
+	59, // 55: cc.arduino.cli.commands.v1.ArduinoCoreService.IsDebugSupported:input_type -> cc.arduino.cli.commands.v1.IsDebugSupportedRequest
+	60, // 56: cc.arduino.cli.commands.v1.ArduinoCoreService.GetDebugConfig:input_type -> cc.arduino.cli.commands.v1.GetDebugConfigRequest
+	2,  // 57: cc.arduino.cli.commands.v1.ArduinoCoreService.Create:output_type -> cc.arduino.cli.commands.v1.CreateResponse
+	4,  // 58: cc.arduino.cli.commands.v1.ArduinoCoreService.Init:output_type -> cc.arduino.cli.commands.v1.InitResponse
+	7,  // 59: cc.arduino.cli.commands.v1.ArduinoCoreService.Destroy:output_type -> cc.arduino.cli.commands.v1.DestroyResponse
+	9,  // 60: cc.arduino.cli.commands.v1.ArduinoCoreService.UpdateIndex:output_type -> cc.arduino.cli.commands.v1.UpdateIndexResponse
+	11, // 61: cc.arduino.cli.commands.v1.ArduinoCoreService.UpdateLibrariesIndex:output_type -> cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse
+	13, // 62: cc.arduino.cli.commands.v1.ArduinoCoreService.Version:output_type -> cc.arduino.cli.commands.v1.VersionResponse
+	15, // 63: cc.arduino.cli.commands.v1.ArduinoCoreService.NewSketch:output_type -> cc.arduino.cli.commands.v1.NewSketchResponse
+	18, // 64: cc.arduino.cli.commands.v1.ArduinoCoreService.LoadSketch:output_type -> cc.arduino.cli.commands.v1.LoadSketchResponse
+	20, // 65: cc.arduino.cli.commands.v1.ArduinoCoreService.ArchiveSketch:output_type -> cc.arduino.cli.commands.v1.ArchiveSketchResponse
+	22, // 66: cc.arduino.cli.commands.v1.ArduinoCoreService.SetSketchDefaults:output_type -> cc.arduino.cli.commands.v1.SetSketchDefaultsResponse
+	61, // 67: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardDetails:output_type -> cc.arduino.cli.commands.v1.BoardDetailsResponse
+	62, // 68: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardList:output_type -> cc.arduino.cli.commands.v1.BoardListResponse
+	63, // 69: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardListAll:output_type -> cc.arduino.cli.commands.v1.BoardListAllResponse
+	64, // 70: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardSearch:output_type -> cc.arduino.cli.commands.v1.BoardSearchResponse
+	65, // 71: cc.arduino.cli.commands.v1.ArduinoCoreService.BoardListWatch:output_type -> cc.arduino.cli.commands.v1.BoardListWatchResponse
+	66, // 72: cc.arduino.cli.commands.v1.ArduinoCoreService.Compile:output_type -> cc.arduino.cli.commands.v1.CompileResponse
+	67, // 73: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformInstall:output_type -> cc.arduino.cli.commands.v1.PlatformInstallResponse
+	68, // 74: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformDownload:output_type -> cc.arduino.cli.commands.v1.PlatformDownloadResponse
+	69, // 75: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformUninstall:output_type -> cc.arduino.cli.commands.v1.PlatformUninstallResponse
+	70, // 76: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformUpgrade:output_type -> cc.arduino.cli.commands.v1.PlatformUpgradeResponse
+	71, // 77: cc.arduino.cli.commands.v1.ArduinoCoreService.Upload:output_type -> cc.arduino.cli.commands.v1.UploadResponse
+	72, // 78: cc.arduino.cli.commands.v1.ArduinoCoreService.UploadUsingProgrammer:output_type -> cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse
+	73, // 79: cc.arduino.cli.commands.v1.ArduinoCoreService.SupportedUserFields:output_type -> cc.arduino.cli.commands.v1.SupportedUserFieldsResponse
+	74, // 80: cc.arduino.cli.commands.v1.ArduinoCoreService.ListProgrammersAvailableForUpload:output_type -> cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse
+	75, // 81: cc.arduino.cli.commands.v1.ArduinoCoreService.BurnBootloader:output_type -> cc.arduino.cli.commands.v1.BurnBootloaderResponse
+	76, // 82: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformSearch:output_type -> cc.arduino.cli.commands.v1.PlatformSearchResponse
+	77, // 83: cc.arduino.cli.commands.v1.ArduinoCoreService.PlatformList:output_type -> cc.arduino.cli.commands.v1.PlatformListResponse
+	78, // 84: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryDownload:output_type -> cc.arduino.cli.commands.v1.LibraryDownloadResponse
+	79, // 85: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryInstall:output_type -> cc.arduino.cli.commands.v1.LibraryInstallResponse
+	80, // 86: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryUpgrade:output_type -> cc.arduino.cli.commands.v1.LibraryUpgradeResponse
+	81, // 87: cc.arduino.cli.commands.v1.ArduinoCoreService.ZipLibraryInstall:output_type -> cc.arduino.cli.commands.v1.ZipLibraryInstallResponse
+	82, // 88: cc.arduino.cli.commands.v1.ArduinoCoreService.GitLibraryInstall:output_type -> cc.arduino.cli.commands.v1.GitLibraryInstallResponse
+	83, // 89: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryUninstall:output_type -> cc.arduino.cli.commands.v1.LibraryUninstallResponse
+	84, // 90: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryUpgradeAll:output_type -> cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse
+	85, // 91: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryResolveDependencies:output_type -> cc.arduino.cli.commands.v1.LibraryResolveDependenciesResponse
+	86, // 92: cc.arduino.cli.commands.v1.ArduinoCoreService.LibrarySearch:output_type -> cc.arduino.cli.commands.v1.LibrarySearchResponse
+	87, // 93: cc.arduino.cli.commands.v1.ArduinoCoreService.LibraryList:output_type -> cc.arduino.cli.commands.v1.LibraryListResponse
+	88, // 94: cc.arduino.cli.commands.v1.ArduinoCoreService.Monitor:output_type -> cc.arduino.cli.commands.v1.MonitorResponse
+	89, // 95: cc.arduino.cli.commands.v1.ArduinoCoreService.EnumerateMonitorPortSettings:output_type -> cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse
+	90, // 96: cc.arduino.cli.commands.v1.ArduinoCoreService.Debug:output_type -> cc.arduino.cli.commands.v1.DebugResponse
+	91, // 97: cc.arduino.cli.commands.v1.ArduinoCoreService.IsDebugSupported:output_type -> cc.arduino.cli.commands.v1.IsDebugSupportedResponse
+	92, // 98: cc.arduino.cli.commands.v1.ArduinoCoreService.GetDebugConfig:output_type -> cc.arduino.cli.commands.v1.GetDebugConfigResponse
+	57, // [57:99] is the sub-list for method output_type
+	15, // [15:57] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
 	15, // [15:15] is the sub-list for extension extendee
 	0,  // [0:15] is the sub-list for field type_name

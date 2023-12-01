@@ -18,6 +18,8 @@ package debug
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"reflect"
 	"slices"
 	"strconv"
 	"strings"
@@ -41,25 +43,83 @@ func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.G
 		return nil, &arduino.InvalidInstanceError{}
 	}
 	defer release()
-	return getDebugProperties(req, pme)
+	return getDebugProperties(req, pme, false)
 }
 
-func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) (*rpc.GetDebugConfigResponse, error) {
-	// TODO: make a generic function to extract sketch from request
-	// and remove duplication in commands/compile.go
-	if req.GetSketchPath() == "" {
-		return nil, &arduino.MissingSketchPathError{}
+// IsDebugSupported checks if the given board/programmer configuration supports debugging.
+func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
 	}
-	sketchPath := paths.New(req.GetSketchPath())
-	sk, err := sketch.New(sketchPath)
+	defer release()
+	configRequest := &rpc.GetDebugConfigRequest{
+		Instance:    req.GetInstance(),
+		Fqbn:        req.GetFqbn(),
+		SketchPath:  "",
+		Port:        req.GetPort(),
+		Interpreter: req.GetInterpreter(),
+		ImportDir:   "",
+		Programmer:  req.GetProgrammer(),
+	}
+	expectedOutput, err := getDebugProperties(configRequest, pme, true)
+	var x *arduino.FailedDebugError
+	if errors.As(err, &x) {
+		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
+	}
 	if err != nil {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
+		return nil, err
+	}
+
+	// Compute the minimum FQBN required to get the same debug configuration.
+	// (i.e. the FQBN cleaned up of the options that do not affect the debugger configuration)
+	minimumFQBN := cores.MustParseFQBN(req.GetFqbn())
+	for _, config := range minimumFQBN.Configs.Keys() {
+		checkFQBN := minimumFQBN.Clone()
+		checkFQBN.Configs.Remove(config)
+		configRequest.Fqbn = checkFQBN.String()
+		checkOutput, err := getDebugProperties(configRequest, pme, true)
+		if err == nil && reflect.DeepEqual(expectedOutput, checkOutput) {
+			minimumFQBN.Configs.Remove(config)
+		}
+	}
+	return &rpc.IsDebugSupportedResponse{
+		DebuggingSupported: true,
+		DebugFqbn:          minimumFQBN.String(),
+	}, nil
+}
+
+func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer, skipSketchChecks bool) (*rpc.GetDebugConfigResponse, error) {
+	var (
+		sketchName             string
+		sketchDefaultFQBN      string
+		sketchDefaultBuildPath *paths.Path
+	)
+	if !skipSketchChecks {
+		// TODO: make a generic function to extract sketch from request
+		// and remove duplication in commands/compile.go
+		if req.GetSketchPath() == "" {
+			return nil, &arduino.MissingSketchPathError{}
+		}
+		sketchPath := paths.New(req.GetSketchPath())
+		sk, err := sketch.New(sketchPath)
+		if err != nil {
+			return nil, &arduino.CantOpenSketchError{Cause: err}
+		}
+		sketchName = sk.Name
+		sketchDefaultFQBN = sk.GetDefaultFQBN()
+		sketchDefaultBuildPath = sk.DefaultBuildPath()
+	} else {
+		// Use placeholder sketch data
+		sketchName = "Sketch"
+		sketchDefaultFQBN = ""
+		sketchDefaultBuildPath = paths.New("SketchBuildPath")
 	}
 
 	// XXX Remove this code duplication!!
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sk != nil {
-		fqbnIn = sk.GetDefaultFQBN()
+	if fqbnIn == "" {
+		fqbnIn = sketchDefaultFQBN
 	}
 	if fqbnIn == "" {
 		return nil, &arduino.MissingFQBNError{}
@@ -124,16 +184,18 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	if importDir := req.GetImportDir(); importDir != "" {
 		importPath = paths.New(importDir)
 	} else {
-		importPath = sk.DefaultBuildPath()
+		importPath = sketchDefaultBuildPath
 	}
-	if !importPath.Exist() {
-		return nil, &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
-	}
-	if !importPath.IsDir() {
-		return nil, &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+	if !skipSketchChecks {
+		if !importPath.Exist() {
+			return nil, &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
+		}
+		if !importPath.IsDir() {
+			return nil, &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+		}
 	}
 	toolProperties.SetPath("build.path", importPath)
-	toolProperties.Set("build.project_name", sk.Name+".ino")
+	toolProperties.Set("build.project_name", sketchName+".ino")
 
 	// Set debug port property
 	port := req.GetPort()

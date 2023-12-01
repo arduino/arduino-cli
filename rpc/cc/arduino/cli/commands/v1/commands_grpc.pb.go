@@ -74,6 +74,7 @@ const (
 	ArduinoCoreService_Monitor_FullMethodName                           = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor"
 	ArduinoCoreService_EnumerateMonitorPortSettings_FullMethodName      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/EnumerateMonitorPortSettings"
 	ArduinoCoreService_Debug_FullMethodName                             = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Debug"
+	ArduinoCoreService_IsDebugSupported_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/IsDebugSupported"
 	ArduinoCoreService_GetDebugConfig_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/GetDebugConfig"
 )
 
@@ -169,6 +170,9 @@ type ArduinoCoreServiceClient interface {
 	EnumerateMonitorPortSettings(ctx context.Context, in *EnumerateMonitorPortSettingsRequest, opts ...grpc.CallOption) (*EnumerateMonitorPortSettingsResponse, error)
 	// Start a debug session and communicate with the debugger tool.
 	Debug(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_DebugClient, error)
+	// Determine if debugging is suported given a specific configuration.
+	IsDebugSupported(ctx context.Context, in *IsDebugSupportedRequest, opts ...grpc.CallOption) (*IsDebugSupportedResponse, error)
+	// Query the debugger information given a specific configuration.
 	GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error)
 }
 
@@ -1021,6 +1025,15 @@ func (x *arduinoCoreServiceDebugClient) Recv() (*DebugResponse, error) {
 	return m, nil
 }
 
+func (c *arduinoCoreServiceClient) IsDebugSupported(ctx context.Context, in *IsDebugSupportedRequest, opts ...grpc.CallOption) (*IsDebugSupportedResponse, error) {
+	out := new(IsDebugSupportedResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_IsDebugSupported_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *arduinoCoreServiceClient) GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error) {
 	out := new(GetDebugConfigResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_GetDebugConfig_FullMethodName, in, out, opts...)
@@ -1122,6 +1135,9 @@ type ArduinoCoreServiceServer interface {
 	EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error)
 	// Start a debug session and communicate with the debugger tool.
 	Debug(ArduinoCoreService_DebugServer) error
+	// Determine if debugging is suported given a specific configuration.
+	IsDebugSupported(context.Context, *IsDebugSupportedRequest) (*IsDebugSupportedResponse, error)
+	// Query the debugger information given a specific configuration.
 	GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
@@ -1249,6 +1265,9 @@ func (UnimplementedArduinoCoreServiceServer) EnumerateMonitorPortSettings(contex
 }
 func (UnimplementedArduinoCoreServiceServer) Debug(ArduinoCoreService_DebugServer) error {
 	return status.Errorf(codes.Unimplemented, "method Debug not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) IsDebugSupported(context.Context, *IsDebugSupportedRequest) (*IsDebugSupportedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsDebugSupported not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDebugConfig not implemented")
@@ -2059,6 +2078,24 @@ func (x *arduinoCoreServiceDebugServer) Recv() (*DebugRequest, error) {
 	return m, nil
 }
 
+func _ArduinoCoreService_IsDebugSupported_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsDebugSupportedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).IsDebugSupported(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_IsDebugSupported_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).IsDebugSupported(ctx, req.(*IsDebugSupportedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ArduinoCoreService_GetDebugConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDebugConfigRequest)
 	if err := dec(in); err != nil {
@@ -2159,6 +2196,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnumerateMonitorPortSettings",
 			Handler:    _ArduinoCoreService_EnumerateMonitorPortSettings_Handler,
+		},
+		{
+			MethodName: "IsDebugSupported",
+			Handler:    _ArduinoCoreService_IsDebugSupported_Handler,
 		},
 		{
 			MethodName: "GetDebugConfig",
