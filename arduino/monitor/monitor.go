@@ -26,9 +26,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/version"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,7 +36,7 @@ import (
 type PluggableMonitor struct {
 	id                   string
 	processArgs          []string
-	process              *executils.Process
+	process              *paths.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *monitorMessage
 	supportedProtocol    string
@@ -172,7 +172,7 @@ func (mon *PluggableMonitor) sendCommand(command string) error {
 
 func (mon *PluggableMonitor) runProcess() error {
 	mon.log.Infof("Starting monitor process")
-	proc, err := executils.NewProcess(nil, mon.processArgs...)
+	proc, err := paths.NewProcess(nil, mon.processArgs...)
 	if err != nil {
 		return err
 	}

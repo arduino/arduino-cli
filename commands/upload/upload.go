@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -652,7 +651,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if dryRun {
 		return nil
 	}
-	cmd, err := executils.NewProcess(toolEnv, cmdArgs...)
+	cmd, err := paths.NewProcess(toolEnv, cmdArgs...)
 	if err != nil {
 		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
 	}

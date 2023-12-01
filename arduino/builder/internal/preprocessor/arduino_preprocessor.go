@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -66,7 +65,7 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 		return nil, nil, errors.WithStack(err)
 	}
 
-	command, err := executils.NewProcess(nil, parts...)
+	command, err := paths.NewProcess(nil, parts...)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -67,7 +66,7 @@ func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Read
 	}
 	entry.Debug("Executing debugger")
 
-	cmd, err := executils.NewProcess(pme.GetEnvVarsForSpawnedProcess(), commandLine...)
+	cmd, err := paths.NewProcess(pme.GetEnvVarsForSpawnedProcess(), commandLine...)
 	if err != nil {
 		return nil, &arduino.FailedDebugError{Message: tr("Cannot execute debug tool"), Cause: err}
 	}

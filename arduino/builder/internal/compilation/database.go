@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 )
@@ -71,7 +70,7 @@ func (db *Database) SaveToFile() {
 }
 
 // Add adds a new CompilationDatabase entry
-func (db *Database) Add(target *paths.Path, command *executils.Process) {
+func (db *Database) Add(target *paths.Path, command *paths.Process) {
 	commandDir := command.GetDir()
 	if commandDir == "" {
 		// This mimics what Cmd.Run also does: Use Dir if specified,

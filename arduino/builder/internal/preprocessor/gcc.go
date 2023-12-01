@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/executils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -69,7 +68,7 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 	// to create a /dev/null.d dependency file, which won't work.
 	args = f.Filter(args, f.NotEquals("-MMD"))
 
-	proc, err := executils.NewProcess(nil, args...)
+	proc, err := paths.NewProcess(nil, args...)
 	if err != nil {
 		return nil, nil, err
 	}

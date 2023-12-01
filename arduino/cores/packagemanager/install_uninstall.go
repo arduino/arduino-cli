@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
@@ -239,7 +238,7 @@ func (pme *Explorer) RunPreOrPostScript(installDir *paths.Path, prefix string) (
 	}
 	script := installDir.Join(scriptFilename)
 	if script.Exist() && script.IsNotDir() {
-		cmd, err := executils.NewProcessFromPath(pme.GetEnvVarsForSpawnedProcess(), script)
+		cmd, err := paths.NewProcessFromPath(pme.GetEnvVarsForSpawnedProcess(), script)
 		if err != nil {
 			return []byte{}, []byte{}, err
 		}

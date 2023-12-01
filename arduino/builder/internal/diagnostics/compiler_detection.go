@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -34,7 +34,7 @@ type DetectedCompiler struct {
 
 // This function is overridden for mocking unit tests
 var runProcess = func(args ...string) []string {
-	if cmd, err := executils.NewProcess(nil, args...); err == nil {
+	if cmd, err := paths.NewProcess(nil, args...); err == nil {
 		out := &bytes.Buffer{}
 		cmd.RedirectStdoutTo(out)
 		cmd.Run()
