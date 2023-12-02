@@ -245,7 +245,7 @@ func (b *Builder) removeUnusedCompiledLibraries(importedLibraries libraries.List
 	toLibraryNames := func(libraries []*libraries.Library) []string {
 		libraryNames := []string{}
 		for _, library := range libraries {
-			libraryNames = append(libraryNames, library.Name)
+			libraryNames = append(libraryNames, library.DirName)
 		}
 		return libraryNames
 	}
