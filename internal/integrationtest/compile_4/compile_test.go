@@ -20,6 +20,7 @@ import (
 	"cmp"
 	"encoding/json"
 	"os/exec"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -955,6 +956,23 @@ func TestBuildCaching(t *testing.T) {
 		coreStatAfterTouch, err := cachedCoreFile.Stat()
 		require.NoError(t, err)
 		require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
+	})
+
+	t.Run("LibraryCacheWithDifferentDirname", func(t *testing.T) {
+		_, _, err = cli.Run("lib", "install", "Robot IR Remote")
+		require.NoError(t, err)
+
+		// Run first compile
+		sketchPath, err := paths.New("testdata", "SketchUsingRobotIRRemote").Abs()
+		require.NoError(t, err)
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:robotControl", "-v", sketchPath.String())
+		require.NoError(t, err)
+
+		// Run second compile and check that previous build is re-used
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:robotControl", "-v", sketchPath.String())
+		require.NoError(t, err)
+		check := regexp.MustCompile(`(?m)^Using previously compiled file:.*IRremoteTools\.cpp\.o$`)
+		require.True(t, check.Match(out))
 	})
 }
 
