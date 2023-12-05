@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" class="md-nav__link">
+    Some golang modules from github.com/arduino/arduino-cli/* have been made private.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" class="md-nav__link">
     CLI changed JSON output for some lib, core, config, board, and sketch commands.
   </a>
@@ -2461,6 +2468,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" class="md-nav__link">
+    Some golang modules from github.com/arduino/arduino-cli/* have been made private.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" class="md-nav__link">
     CLI changed JSON output for some lib, core, config, board, and sketch commands.
   </a>
@@ -3601,6 +3615,14 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private">Some golang modules from <code>github.com/arduino/arduino-cli/*</code> have been made private.<a class="headerlink" href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" title="Permanent link">&para;</a></h3>
+<p>The following golang modules are no longer available as public API:</p>
+<ul>
+<li><code>github.com/arduino/arduino-cli/buildcache</code></li>
+<li><code>github.com/arduino/arduino-cli/executils</code></li>
+<li><code>github.com/arduino/arduino-cli/table</code></li>
+</ul>
+<p>Most of the <code>executils</code> library has been integrated inside the <code>go-paths</code> library <code>github.com/arduino/go-paths-helper</code>.</p>
 <h3 id="cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands">CLI changed JSON output for some <code>lib</code>, <code>core</code>, <code>config</code>, <code>board</code>, and <code>sketch</code> commands.<a class="headerlink" href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
