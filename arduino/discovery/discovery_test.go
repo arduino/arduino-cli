@@ -20,13 +20,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDiscoveryStdioHandling(t *testing.T) {
 	// Build `cat` helper inside testdata/cat
-	builder, err := executils.NewProcess(nil, "go", "build")
+	builder, err := paths.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	builder.SetDir("testdata/cat")
 	require.NoError(t, builder.Run())

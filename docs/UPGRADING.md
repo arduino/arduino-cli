@@ -4,6 +4,16 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### Some golang modules from `github.com/arduino/arduino-cli/*` have been made private.
+
+The following golang modules are no longer available as public API:
+
+- `github.com/arduino/arduino-cli/buildcache`
+- `github.com/arduino/arduino-cli/executils`
+- `github.com/arduino/arduino-cli/table`
+
+Most of the `executils` library has been integrated inside the `go-paths` library `github.com/arduino/go-paths-helper`.
+
 ### CLI changed JSON output for some `lib`, `core`, `config`, `board`, and `sketch` commands.
 
 - `arduino-cli lib list --format json` results are now wrapped under `installed_libraries` key

@@ -29,7 +29,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
@@ -71,7 +70,7 @@ func CreateArduinoCLIWithEnvironment(t *testing.T) (*Environment, *ArduinoCLI) {
 type ArduinoCLI struct {
 	path          *paths.Path
 	t             *require.Assertions
-	proc          *executils.Process
+	proc          *paths.Process
 	stdIn         io.WriteCloser
 	cliEnvVars    map[string]string
 	cliConfigPath *paths.Path
@@ -207,7 +206,7 @@ func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
 
 	// Build mocked serial-discovery
 	mockDir := FindRepositoryRootPath(t).Join("internal", "mock_serial_discovery")
-	gobuild, err := executils.NewProcess(nil, "go", "build")
+	gobuild, err := paths.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
 	require.NoError(t, gobuild.Run(), "Building mocked serial-discovery")
@@ -243,7 +242,7 @@ func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
 
 	// Build mocked serial-monitor
 	mockDir := FindRepositoryRootPath(t).Join("internal", "mock_serial_monitor")
-	gobuild, err := executils.NewProcess(nil, "go", "build")
+	gobuild, err := paths.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
 	require.NoError(t, gobuild.Run(), "Building mocked serial-monitor")
@@ -313,7 +312,7 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 	}
 
 	fmt.Fprintln(terminalOut, color.HiBlackString(">>> Running: ")+color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
-	cliProc, err := executils.NewProcessFromPath(cli.convertEnvForExecutils(env), cli.path, args...)
+	cliProc, err := paths.NewProcessFromPath(cli.convertEnvForExecutils(env), cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
 	cli.t.NoError(err)
@@ -368,7 +367,7 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	if verbose {
 		args = append(args, "-v", "--log-level", "debug")
 	}
-	cliProc, err := executils.NewProcessFromPath(cli.convertEnvForExecutils(cli.cliEnvVars), cli.path, args...)
+	cliProc, err := paths.NewProcessFromPath(cli.convertEnvForExecutils(cli.cliEnvVars), cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
 	cli.t.NoError(err)

@@ -23,10 +23,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -48,7 +48,7 @@ const (
 type PluggableDiscovery struct {
 	id                   string
 	processArgs          []string
-	process              *executils.Process
+	process              *paths.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *discoveryMessage
 
@@ -269,7 +269,7 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 
 func (disc *PluggableDiscovery) runProcess() error {
 	logrus.Infof("starting discovery %s process", disc.id)
-	proc, err := executils.NewProcess(nil, disc.processArgs...)
+	proc, err := paths.NewProcess(nil, disc.processArgs...)
 	if err != nil {
 		return err
 	}

@@ -25,10 +25,10 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/core"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	"github.com/arduino/arduino-cli/internal/cli/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

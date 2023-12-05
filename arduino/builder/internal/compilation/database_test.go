@@ -18,7 +18,6 @@ package compilation
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -28,7 +27,7 @@ func TestCompilationDatabase(t *testing.T) {
 	require.NoError(t, err)
 	defer tmpfile.Remove()
 
-	cmd, err := executils.NewProcess(nil, "gcc", "arg1", "arg2")
+	cmd, err := paths.NewProcess(nil, "gcc", "arg1", "arg2")
 	require.NoError(t, err)
 	db := NewDatabase(tmpfile)
 	db.Add(paths.New("test"), cmd)

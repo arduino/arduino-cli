@@ -33,7 +33,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -492,7 +491,7 @@ func (b *Builder) build() error {
 	return nil
 }
 
-func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*executils.Process, error) {
+func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*paths.Process, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
 		return nil, fmt.Errorf(tr("%[1]s pattern is missing"), recipe)
@@ -525,7 +524,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 		}
 	}
 
-	command, err := executils.NewProcess(nil, parts...)
+	command, err := paths.NewProcess(nil, parts...)
 	if err != nil {
 		return nil, err
 	}
@@ -536,7 +535,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 	return command, nil
 }
 
-func (b *Builder) execCommand(command *executils.Process) error {
+func (b *Builder) execCommand(command *paths.Process) error {
 	if b.logger.Verbose() {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 		command.RedirectStdoutTo(b.logger.Stdout())

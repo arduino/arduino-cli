@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/preprocessor/internal/ctags"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -195,7 +194,7 @@ func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	proc, err := executils.NewProcess(nil, parts...)
+	proc, err := paths.NewProcess(nil, parts...)
 	if err != nil {
 		return nil, nil, err
 	}
