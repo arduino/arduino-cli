@@ -9,6 +9,7 @@ Here you can find a list of migration guides to handle breaking changes between 
 The following golang modules are no longer available as public API:
 
 - `github.com/arduino/arduino-cli/buildcache`
+- `github.com/arduino/arduino-cli/configuration`
 - `github.com/arduino/arduino-cli/executils`
 - `github.com/arduino/arduino-cli/table`
 

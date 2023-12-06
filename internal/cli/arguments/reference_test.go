@@ -18,8 +18,8 @@ package arguments_test
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

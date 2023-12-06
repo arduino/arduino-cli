@@ -18,8 +18,8 @@ package main
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/spf13/cobra/doc"
 )
 
