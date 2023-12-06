@@ -23,9 +23,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/builder"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
@@ -59,23 +59,23 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
-		return nil, &arduino.MissingSketchPathError{}
+		return nil, &cmderrors.MissingSketchPathError{}
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
+		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -87,22 +87,22 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}
 	if fqbnIn == "" {
-		return nil, &arduino.MissingFQBNError{}
+		return nil, &cmderrors.MissingFQBNError{}
 	}
 
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, &arduino.InvalidFQBNError{Cause: err}
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
 	_, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		if targetPlatform == nil {
-			return nil, &arduino.PlatformNotFoundError{
+			return nil, &cmderrors.PlatformNotFoundError{
 				Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 				Cause:    fmt.Errorf(tr("platform not installed")),
 			}
 		}
-		return nil, &arduino.InvalidFQBNError{Cause: err}
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
 
 	r = &rpc.CompileResponse{}
@@ -145,7 +145,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		buildPath = sk.DefaultBuildPath()
 	}
 	if err = buildPath.MkdirAll(); err != nil {
-		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
+		return nil, &cmderrors.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
 	buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
 	// cache is purged after compilation to not remove entries that might be required
@@ -157,10 +157,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	} else {
 		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
 		if err := buildCachePath.MkdirAll(); err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
@@ -203,14 +203,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
-			return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
+			return nil, &cmderrors.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
 		}
 		if errors.Is(err, builder.ErrSketchCannotBeLocatedInBuildPath) {
-			return r, &arduino.CompileFailedError{
+			return r, &cmderrors.CompileFailedError{
 				Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
 			}
 		}
-		return r, &arduino.CompileFailedError{Message: err.Error()}
+		return r, &cmderrors.CompileFailedError{Message: err.Error()}
 	}
 
 	defer func() {
@@ -247,7 +247,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// Just output preprocessed source code and exit
 		preprocessedSketch, err := sketchBuilder.Preprocess()
 		if err != nil {
-			err = &arduino.CompileFailedError{Message: err.Error()}
+			err = &cmderrors.CompileFailedError{Message: err.Error()}
 			return r, err
 		}
 		_, err = outStream.Write(preprocessedSketch)
@@ -293,7 +293,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	if err := sketchBuilder.Build(); err != nil {
-		return r, &arduino.CompileFailedError{Message: err.Error()}
+		return r, &cmderrors.CompileFailedError{Message: err.Error()}
 	}
 
 	// If the export directory is set we assume you want to export the binaries
@@ -321,23 +321,23 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if !buildPath.EqualsTo(exportPath) {
 			logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 			if err := exportPath.MkdirAll(); err != nil {
-				return r, &arduino.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
+				return r, &cmderrors.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
 			}
 
 			baseName, ok := sketchBuilder.GetBuildProperties().GetOk("build.project_name") // == "sketch.ino"
 			if !ok {
-				return r, &arduino.MissingPlatformPropertyError{Property: "build.project_name"}
+				return r, &cmderrors.MissingPlatformPropertyError{Property: "build.project_name"}
 			}
 			buildFiles, err := sketchBuilder.GetBuildPath().ReadDir()
 			if err != nil {
-				return r, &arduino.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
+				return r, &cmderrors.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
 			}
 			buildFiles.FilterPrefix(baseName)
 			for _, buildFile := range buildFiles {
 				exportedFile := exportPath.Join(buildFile.Base())
 				logrus.WithField("src", buildFile).WithField("dest", exportedFile).Trace("Copying artifact.")
 				if err = buildFile.CopyTo(exportedFile); err != nil {
-					return r, &arduino.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
+					return r, &cmderrors.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
 				}
 			}
 		}

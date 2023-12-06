@@ -18,7 +18,7 @@ package sketch
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -29,7 +29,7 @@ import (
 func SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (*rpc.SetSketchDefaultsResponse, error) {
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
+		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
 	oldAddress, oldProtocol := sk.GetDefaultPortAddressAndProtocol()
@@ -41,13 +41,13 @@ func SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (
 
 	if fqbn := req.GetDefaultFqbn(); fqbn != "" {
 		if err := sk.SetDefaultFQBN(fqbn); err != nil {
-			return nil, &arduino.CantUpdateSketchError{Cause: err}
+			return nil, &cmderrors.CantUpdateSketchError{Cause: err}
 		}
 		res.DefaultFqbn = fqbn
 	}
 	if newAddress, newProtocol := req.GetDefaultPortAddress(), req.GetDefaultPortProtocol(); newAddress != "" {
 		if err := sk.SetDefaultPort(newAddress, newProtocol); err != nil {
-			return nil, &arduino.CantUpdateSketchError{Cause: err}
+			return nil, &cmderrors.CantUpdateSketchError{Cause: err}
 		}
 		res.DefaultPortAddress = newAddress
 		res.DefaultPortProtocol = newProtocol

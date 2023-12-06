@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
@@ -200,7 +200,7 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
 		version, err := semver.Parse(versionString)
 		if err != nil {
-			return &arduino.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
+			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
 		}
 
 		// Check if package_bundled_index.json exists.

@@ -18,8 +18,8 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -30,7 +30,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 	lm := instances.GetLibraryManager(req.GetInstance())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
-		return &arduino.InvalidLibraryError{Cause: err}
+		return &cmderrors.InvalidLibraryError{Cause: err}
 	}
 
 	libs := lm.FindByReference(ref, libraries.User)
@@ -51,7 +51,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 	for _, lib := range libs {
 		libsDir.Add(lib.InstallDir)
 	}
-	return &arduino.MultipleLibraryInstallDetected{
+	return &cmderrors.MultipleLibraryInstallDetected{
 		LibName: libs[0].Name,
 		LibsDir: libsDir,
 		Message: tr("Automatic library uninstall can't be performed in this case, please manually remove them."),

@@ -19,8 +19,8 @@ import (
 	"context"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
@@ -38,13 +38,13 @@ type installedLib struct {
 func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 
 	nameFilter := strings.ToLower(req.GetName())
@@ -54,11 +54,11 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		allLibs = listLibraries(lm, req.GetUpdatable(), true)
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
-			return nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 		_, boardPlatform, _, _, refBoardPlatform, err := pme.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, &arduino.UnknownFQBNError{Cause: err}
+			return nil, &cmderrors.UnknownFQBNError{Cause: err}
 		}
 
 		filteredRes := map[string]*installedLib{}
@@ -105,7 +105,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
 		}
 		installedLibs = append(installedLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,

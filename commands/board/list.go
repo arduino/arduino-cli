@@ -26,8 +26,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery"
@@ -151,7 +151,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	for _, board := range pme.IdentifyBoard(port.Properties) {
 		fqbn, err := cores.ParseFQBN(board.FQBN())
 		if err != nil {
-			return nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 		fqbn.Configs = board.IdentifyBoardConfiguration(port.Properties)
 
@@ -207,7 +207,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, nil, &arduino.InvalidInstanceError{}
+		return nil, nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -216,7 +216,7 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 		var err error
 		fqbnFilter, err = cores.ParseFQBN(f)
 		if err != nil {
-			return nil, nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 	}
 
@@ -262,7 +262,7 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 	dm := pme.DiscoveryManager()

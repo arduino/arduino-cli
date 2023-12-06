@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
@@ -104,16 +104,16 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 	for _, indexURL := range indexesToDownload {
 		if err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
-			return &arduino.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
+			return &cmderrors.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
 		}
 		indexResource := resources.IndexResource{URL: indexURL}
 		if err := indexResource.Download(tmpPmb.IndexDir, downloadCB); err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
-			return &arduino.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
+			return &cmderrors.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
 		}
 		if err := tmpPmb.LoadPackageIndex(indexURL); err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error loading index %s", indexURL)})
-			return &arduino.FailedInstallError{Message: tr("Error loading index %s", indexURL), Cause: err}
+			return &cmderrors.FailedInstallError{Message: tr("Error loading index %s", indexURL), Cause: err}
 		}
 	}
 
@@ -127,7 +127,7 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 
 	if err := tmpPme.DownloadPlatformRelease(tmpPlatformRelease, nil, downloadCB); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error downloading platform %s", tmpPlatformRelease)})
-		return &arduino.FailedInstallError{Message: tr("Error downloading platform %s", tmpPlatformRelease), Cause: err}
+		return &cmderrors.FailedInstallError{Message: tr("Error downloading platform %s", tmpPlatformRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
@@ -135,7 +135,7 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 	taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", tmpPlatformRelease)})
 	if err := tmpPme.InstallPlatformInDirectory(tmpPlatformRelease, destDir); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error installing platform %s", tmpPlatformRelease)})
-		return &arduino.FailedInstallError{Message: tr("Error installing platform %s", tmpPlatformRelease), Cause: err}
+		return &cmderrors.FailedInstallError{Message: tr("Error installing platform %s", tmpPlatformRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	return nil
@@ -152,7 +152,7 @@ func (pmb *Builder) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url
 		// Try installing the missing tool
 		toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
 		if toolRelease == nil {
-			return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not found", toolRef.ToolVersion))}
+			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not found", toolRef.ToolVersion))}
 		}
 		if err := pmb.installMissingProfileTool(toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
@@ -173,12 +173,12 @@ func (pmb *Builder) installMissingProfileTool(toolRelease *cores.ToolRelease, de
 	// Download the tool
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not available for this operating system", toolRelease))}
+		return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not available for this operating system", toolRelease))}
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading tool %s", toolRelease)})
 	if err := toolResource.Download(pmb.DownloadDir, nil, toolRelease.String(), downloadCB, ""); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error downloading tool %s", toolRelease)})
-		return &arduino.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
+		return &cmderrors.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
@@ -186,7 +186,7 @@ func (pmb *Builder) installMissingProfileTool(toolRelease *cores.ToolRelease, de
 	taskCB(&rpc.TaskProgress{Name: tr("Installing tool %s", toolRelease)})
 	if err := toolResource.Install(pmb.DownloadDir, tmp, destDir); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error installing tool %s", toolRelease)})
-		return &arduino.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
+		return &cmderrors.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	return nil

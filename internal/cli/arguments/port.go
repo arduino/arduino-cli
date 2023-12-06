@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -146,10 +146,10 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 			continue
 		}
 		if len(detectedPort.GetMatchingBoards()) > 1 {
-			feedback.FatalError(&arduino.MultipleBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
+			feedback.FatalError(&cmderrors.MultipleBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
 		}
 		if len(detectedPort.GetMatchingBoards()) == 0 {
-			feedback.FatalError(&arduino.NoBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
+			feedback.FatalError(&cmderrors.NoBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
 		}
 		return detectedPort.GetMatchingBoards()[0].GetFqbn(), port
 	}

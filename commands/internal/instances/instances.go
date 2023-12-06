@@ -3,11 +3,11 @@ package instances
 import (
 	"sync"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 )
@@ -83,7 +83,7 @@ func Create(extraUserAgent ...string) (*rpc.Instance, error) {
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
 		}
 	}
 
@@ -93,7 +93,7 @@ func Create(extraUserAgent ...string) (*rpc.Instance, error) {
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
 		}
 	}
 

@@ -24,8 +24,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
@@ -40,7 +40,7 @@ import (
 func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 	return getDebugProperties(req, pme, false)
@@ -50,7 +50,7 @@ func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.G
 func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 	configRequest := &rpc.GetDebugConfigRequest{
@@ -63,7 +63,7 @@ func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*r
 		Programmer:  req.GetProgrammer(),
 	}
 	expectedOutput, err := getDebugProperties(configRequest, pme, true)
-	var x *arduino.FailedDebugError
+	var x *cmderrors.FailedDebugError
 	if errors.As(err, &x) {
 		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
 	}
@@ -99,12 +99,12 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		// TODO: make a generic function to extract sketch from request
 		// and remove duplication in commands/compile.go
 		if req.GetSketchPath() == "" {
-			return nil, &arduino.MissingSketchPathError{}
+			return nil, &cmderrors.MissingSketchPathError{}
 		}
 		sketchPath := paths.New(req.GetSketchPath())
 		sk, err := sketch.New(sketchPath)
 		if err != nil {
-			return nil, &arduino.CantOpenSketchError{Cause: err}
+			return nil, &cmderrors.CantOpenSketchError{Cause: err}
 		}
 		sketchName = sk.Name
 		sketchDefaultFQBN = sk.GetDefaultFQBN()
@@ -122,17 +122,17 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		fqbnIn = sketchDefaultFQBN
 	}
 	if fqbnIn == "" {
-		return nil, &arduino.MissingFQBNError{}
+		return nil, &cmderrors.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, &arduino.InvalidFQBNError{Cause: err}
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
 
 	// Find target board and board properties
 	_, platformRelease, _, boardProperties, referencedPlatformRelease, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, &arduino.UnknownFQBNError{Cause: err}
+		return nil, &cmderrors.UnknownFQBNError{Cause: err}
 	}
 
 	// Build configuration for debug
@@ -155,14 +155,14 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	}
 
 	if req.GetProgrammer() == "" {
-		return nil, &arduino.MissingProgrammerError{}
+		return nil, &cmderrors.MissingProgrammerError{}
 	}
 	if p, ok := platformRelease.Programmers[req.GetProgrammer()]; ok {
 		toolProperties.Merge(p.Properties)
 	} else if refP, ok := referencedPlatformRelease.Programmers[req.GetProgrammer()]; ok {
 		toolProperties.Merge(refP.Properties)
 	} else {
-		return nil, &arduino.ProgrammerNotFoundError{Programmer: req.GetProgrammer()}
+		return nil, &cmderrors.ProgrammerNotFoundError{Programmer: req.GetProgrammer()}
 	}
 
 	var importPath *paths.Path
@@ -173,10 +173,10 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	}
 	if !skipSketchChecks {
 		if !importPath.Exist() {
-			return nil, &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
+			return nil, &cmderrors.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return nil, &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+			return nil, &cmderrors.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 	}
 	toolProperties.SetPath("build.path", importPath)
@@ -203,7 +203,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	}
 
 	if !debugProperties.ContainsKey("executable") || debugProperties.Get("executable") == "" {
-		return nil, &arduino.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
+		return nil, &cmderrors.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
 	}
 
 	server := debugProperties.Get("server")

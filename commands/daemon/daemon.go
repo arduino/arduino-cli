@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -30,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
@@ -50,7 +50,7 @@ func convertErrorToRPCStatus(err error) error {
 	if err == nil {
 		return nil
 	}
-	if cmdErr, ok := err.(arduino.CommandError); ok {
+	if cmdErr, ok := err.(cmderrors.CommandError); ok {
 		return cmdErr.ToRPCStatus().Err()
 	}
 	return err

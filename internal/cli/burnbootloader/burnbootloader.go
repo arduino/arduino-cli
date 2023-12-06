@@ -20,9 +20,9 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -85,10 +85,10 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		DryRun:     dryRun,
 	}, stdOut, stdErr); err != nil {
 		errcode := feedback.ErrGeneric
-		if errors.Is(err, &arduino.ProgrammerRequiredForUploadError{}) {
+		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer
 		}
-		if errors.Is(err, &arduino.MissingProgrammerError{}) {
+		if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 			errcode = feedback.ErrMissingProgrammer
 		}
 		feedback.Fatal(tr("Error during Upload: %v", err), errcode)

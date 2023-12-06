@@ -18,8 +18,8 @@ package board
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -30,18 +30,18 @@ import (
 func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, &arduino.InvalidFQBNError{Cause: err}
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
 
 	boardPackage, boardPlatformRelease, board, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, &arduino.UnknownFQBNError{Cause: err}
+		return nil, &cmderrors.UnknownFQBNError{Cause: err}
 	}
 
 	details := &rpc.BoardDetailsResponse{}

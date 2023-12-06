@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -40,27 +40,27 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	skipPreUninstall bool,
 ) (*cores.PlatformRelease, error) {
 	if platformRef.PlatformVersion != nil {
-		return nil, &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
+		return nil, &cmderrors.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
 	}
 
 	// Search the latest version for all specified platforms
 	platform := pme.FindPlatform(platformRef)
 	if platform == nil {
-		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	installed := pme.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	latest := platform.GetLatestCompatibleRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		return installed, &arduino.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
+		return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
 	}
 	platformRef.PlatformVersion = latest.Version
 
 	platformRelease, tools, err := pme.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, skipPostInstall, skipPreUninstall); err != nil {
 		return nil, err
@@ -130,14 +130,14 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 		var err error
 		_, installedTools, err = pme.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
-			return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
+			return &cmderrors.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
 		}
 	}
 
 	// Install
 	if err := pme.InstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Cannot install platform")
-		return &arduino.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
+		return &cmderrors.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
 	}
 
 	// If upgrading remove previous release
@@ -155,7 +155,7 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 				taskCB(&rpc.TaskProgress{Message: tr("Error rolling-back changes: %s", err)})
 			}
 
-			return &arduino.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
+			return &cmderrors.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
 		}
 
 		// Uninstall unused tools
@@ -279,14 +279,14 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 	if platformRelease.InstallDir == nil {
 		err := fmt.Errorf(tr("platform not installed"))
 		log.WithError(err).Error("Error uninstalling")
-		return &arduino.FailedUninstallError{Message: err.Error()}
+		return &cmderrors.FailedUninstallError{Message: err.Error()}
 	}
 
 	// Safety measure
 	if !pme.IsManagedPlatformRelease(platformRelease) {
 		err := fmt.Errorf(tr("%s is not managed by package manager"), platformRelease)
 		log.WithError(err).Error("Error uninstalling")
-		return &arduino.FailedUninstallError{Message: err.Error()}
+		return &cmderrors.FailedUninstallError{Message: err.Error()}
 	}
 
 	if !skipPreUninstall {
@@ -306,7 +306,7 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
 		err = fmt.Errorf(tr("removing platform files: %s"), err)
 		log.WithError(err).Error("Error uninstalling")
-		return &arduino.FailedUninstallError{Message: err.Error()}
+		return &cmderrors.FailedUninstallError{Message: err.Error()}
 	}
 
 	platformRelease.InstallDir = nil
@@ -342,7 +342,7 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		return &arduino.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
+		return &cmderrors.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
 	}
 	if d, err := destDir.Abs(); err == nil {
 		toolRelease.InstallDir = d
@@ -397,7 +397,7 @@ func (pme *Explorer) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Ta
 
 	// Safety measure
 	if !pme.IsManagedToolRelease(toolRelease) {
-		err := &arduino.FailedUninstallError{Message: tr("tool %s is not managed by package manager", toolRelease)}
+		err := &cmderrors.FailedUninstallError{Message: tr("tool %s is not managed by package manager", toolRelease)}
 		log.WithError(err).Error("Error uninstalling")
 		return err
 	}
@@ -417,7 +417,7 @@ func (pme *Explorer) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Ta
 	}
 
 	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
-		err = &arduino.FailedUninstallError{Message: err.Error()}
+		err = &cmderrors.FailedUninstallError{Message: err.Error()}
 		log.WithError(err).Error("Error uninstalling")
 		return err
 	}

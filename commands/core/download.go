@@ -19,9 +19,9 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -32,13 +32,13 @@ var tr = i18n.Tr
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, &arduino.InvalidVersionError{Cause: err}
+		return nil, &cmderrors.InvalidVersionError{Cause: err}
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -48,7 +48,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
+		return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
 	if err := pme.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {

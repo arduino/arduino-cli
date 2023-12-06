@@ -26,8 +26,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
@@ -478,7 +478,7 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 	indexFileName := path.Base(URL.Path)
 	if indexFileName == "." || indexFileName == "" {
-		return &arduino.InvalidURLError{Cause: errors.New(URL.String())}
+		return &cmderrors.InvalidURLError{Cause: errors.New(URL.String())}
 	}
 	if strings.HasSuffix(indexFileName, ".tar.bz2") {
 		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json"

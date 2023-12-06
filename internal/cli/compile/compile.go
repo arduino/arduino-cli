@@ -24,12 +24,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -282,10 +282,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		if res, err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
 			errcode := feedback.ErrGeneric
-			if errors.Is(err, &arduino.ProgrammerRequiredForUploadError{}) {
+			if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
-			if errors.Is(err, &arduino.MissingProgrammerError{}) {
+			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
 			feedback.Fatal(tr("Error during Upload: %v", err), errcode)
@@ -366,7 +366,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
-		var platformErr *arduino.PlatformNotFoundError
+		var platformErr *cmderrors.PlatformNotFoundError
 		if errors.As(compileError, &platformErr) {
 			split := strings.Split(platformErr.Platform, ":")
 			if len(split) < 2 {

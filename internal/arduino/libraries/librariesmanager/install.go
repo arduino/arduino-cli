@@ -22,7 +22,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
@@ -72,7 +72,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semve
 		for _, lib := range libs {
 			libsDir.Add(lib.InstallDir)
 		}
-		return nil, &arduino.MultipleLibraryInstallDetected{
+		return nil, &cmderrors.MultipleLibraryInstallDetected{
 			LibName: name,
 			LibsDir: libsDir,
 			Message: tr("Automatic library install can't be performed in this case, please manually remove all duplicates and retry."),

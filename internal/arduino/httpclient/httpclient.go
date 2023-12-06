@@ -20,8 +20,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -71,7 +71,7 @@ func DownloadFile(path *paths.Path, URL string, queryParameter string, label str
 	// The URL is not reachable for some reason
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
 		msg := tr("Server responded with: %s", d.Resp.Status)
-		return &arduino.FailedDownloadError{Message: msg}
+		return &cmderrors.FailedDownloadError{Message: msg}
 	}
 
 	return nil
@@ -109,7 +109,7 @@ func NewWithConfig(config *Config) *http.Client {
 func GetDownloaderConfig() (*downloader.Config, error) {
 	httpClient, err := New()
 	if err != nil {
-		return nil, &arduino.InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
+		return nil, &cmderrors.InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
 	}
 	return &downloader.Config{
 		HttpClient: *httpClient,

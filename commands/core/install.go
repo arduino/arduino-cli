@@ -20,8 +20,8 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -31,13 +31,13 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 	install := func() error {
 		pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 		if pme == nil {
-			return &arduino.InvalidInstanceError{}
+			return &cmderrors.InvalidInstanceError{}
 		}
 		defer release()
 
 		version, err := commands.ParseVersion(req)
 		if err != nil {
-			return &arduino.InvalidVersionError{Cause: err}
+			return &cmderrors.InvalidVersionError{Cause: err}
 		}
 
 		ref := &packagemanager.PlatformReference{
@@ -47,7 +47,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 		}
 		platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
 		if err != nil {
-			return &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
+			return &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 		}
 
 		// Prerequisite checks before install

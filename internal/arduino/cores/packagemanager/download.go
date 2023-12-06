@@ -18,7 +18,7 @@ package packagemanager
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
@@ -123,7 +123,7 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 func (pme *Explorer) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
-		return &arduino.FailedDownloadError{
+		return &cmderrors.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
 			Cause:   errors.New(tr("no versions available for the current OS, try contacting %s", tool.Tool.Package.Email))}
 	}
@@ -134,7 +134,7 @@ func (pme *Explorer) DownloadToolRelease(tool *cores.ToolRelease, config *downlo
 // nil Downloader is returned.
 func (pme *Explorer) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
 	if platform.Resource == nil {
-		return &arduino.PlatformNotFoundError{Platform: platform.String()}
+		return &cmderrors.PlatformNotFoundError{Platform: platform.String()}
 	}
 	return platform.Resource.Download(pme.DownloadDir, config, platform.String(), progressCB, "")
 }
