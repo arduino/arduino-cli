@@ -22,9 +22,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"

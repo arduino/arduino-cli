@@ -24,12 +24,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"

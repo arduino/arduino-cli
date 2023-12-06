@@ -3,11 +3,11 @@ package instances
 import (
 	"sync"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 )

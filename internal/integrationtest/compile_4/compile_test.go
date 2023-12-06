@@ -27,7 +27,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"

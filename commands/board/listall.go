@@ -20,11 +20,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 

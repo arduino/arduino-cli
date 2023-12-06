@@ -18,9 +18,9 @@ package monitor
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino"
+	pluggableMonitor "github.com/arduino/arduino-cli/internal/arduino/monitor"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 

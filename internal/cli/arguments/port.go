@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/board"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
+	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"

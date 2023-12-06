@@ -21,8 +21,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/inventory"

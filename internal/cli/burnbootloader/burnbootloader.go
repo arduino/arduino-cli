@@ -20,9 +20,9 @@ import (
 	"errors"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"

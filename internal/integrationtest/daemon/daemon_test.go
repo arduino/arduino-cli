@@ -23,8 +23,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
+	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"

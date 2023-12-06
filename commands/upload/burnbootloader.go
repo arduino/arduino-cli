@@ -19,7 +19,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"

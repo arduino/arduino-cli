@@ -22,10 +22,10 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/debug"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"

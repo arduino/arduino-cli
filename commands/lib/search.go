@@ -20,10 +20,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )

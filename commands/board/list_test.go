@@ -21,8 +21,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"

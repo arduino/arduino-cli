@@ -18,7 +18,7 @@ package sketch
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	paths "github.com/arduino/go-paths-helper"
 )
 

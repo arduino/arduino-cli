@@ -20,8 +20,8 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/arduino"
+	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"

@@ -23,10 +23,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
