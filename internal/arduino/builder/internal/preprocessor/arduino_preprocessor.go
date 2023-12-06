@@ -18,6 +18,7 @@ package preprocessor
 import (
 	"bytes"
 	"context"
+	"errors"
 	"path/filepath"
 	"runtime"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 // PreprocessSketchWithArduinoPreprocessor performs preprocessing of the arduino sketch
@@ -62,7 +62,7 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 	commandLine := arduiniPreprocessorProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, err
 	}
 
 	command, err := paths.NewProcess(nil, parts...)

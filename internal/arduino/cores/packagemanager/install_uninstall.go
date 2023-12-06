@@ -18,6 +18,7 @@ package packagemanager
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"runtime"
 
@@ -26,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 // DownloadAndInstallPlatformUpgrades runs a full installation process to upgrade the given platform.
@@ -205,7 +205,7 @@ func (pme *Explorer) InstallPlatform(platformRelease *cores.PlatformRelease) err
 // InstallPlatformInDirectory installs a specific release of a platform in a specific directory.
 func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path) error {
 	if err := platformRelease.Resource.Install(pme.DownloadDir, pme.tempDir, destDir); err != nil {
-		return errors.Errorf(tr("installing platform %[1]s: %[2]s"), platformRelease, err)
+		return errors.New(tr("installing platform %[1]s: %[2]s", platformRelease, err))
 	}
 	if d, err := destDir.Abs(); err == nil {
 		platformRelease.InstallDir = d
@@ -213,7 +213,7 @@ func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformR
 		return err
 	}
 	if err := pme.cacheInstalledJSON(platformRelease); err != nil {
-		return errors.Errorf(tr("creating installed.json in %[1]s: %[2]s"), platformRelease.InstallDir, err)
+		return errors.New(tr("creating installed.json in %[1]s: %[2]s", platformRelease.InstallDir, err))
 	}
 	return nil
 }

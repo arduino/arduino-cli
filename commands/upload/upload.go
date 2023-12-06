@@ -17,6 +17,7 @@ package upload
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -36,7 +37,6 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -711,14 +711,14 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 		buildPath := paths.New(importDir)
 		sketchName, err := detectSketchNameFromBuildPath(buildPath)
 		if err != nil {
-			return nil, "", errors.Errorf(tr("autodetect build artifact: %s"), err)
+			return nil, "", fmt.Errorf("%s: %w", tr("looking for build artifacts"), err)
 		}
 		return buildPath, sketchName, nil
 	}
 
 	// Case 3: nothing given...
 	if sk == nil {
-		return nil, "", fmt.Errorf(tr("no sketch or build directory/file specified"))
+		return nil, "", errors.New(tr("no sketch or build directory/file specified"))
 	}
 
 	// Case 4: only sketch specified. In this case we use the generated build path
@@ -763,7 +763,7 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 		}
 
 		if candidateName != name {
-			return "", errors.Errorf(tr("multiple build artifacts found: '%[1]s' and '%[2]s'"), candidateFile, file)
+			return "", errors.New(tr("multiple build artifacts found: '%[1]s' and '%[2]s'", candidateFile, file))
 		}
 	}
 

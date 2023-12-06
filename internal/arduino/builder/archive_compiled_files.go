@@ -17,7 +17,6 @@ package builder
 
 import (
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 // ArchiveCompiledFiles fixdoc
@@ -45,7 +44,7 @@ func (b *Builder) archiveCompiledFiles(buildPath *paths.Path, archiveFile *paths
 		// something changed, rebuild the core archive
 		if rebuildArchive {
 			if err := archiveFilePath.Remove(); err != nil {
-				return nil, errors.WithStack(err)
+				return nil, err
 			}
 		} else {
 			if b.logger.Verbose() {
@@ -63,11 +62,11 @@ func (b *Builder) archiveCompiledFiles(buildPath *paths.Path, archiveFile *paths
 
 		command, err := b.prepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 
 		if err := b.execCommand(command); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 	}
 

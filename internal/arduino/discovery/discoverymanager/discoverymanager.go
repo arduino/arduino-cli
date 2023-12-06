@@ -16,13 +16,13 @@
 package discoverymanager
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -123,7 +123,7 @@ func (dm *DiscoveryManager) Add(d *discovery.PluggableDiscovery) error {
 
 	id := d.GetID()
 	if _, has := dm.discoveries[id]; has {
-		return errors.Errorf(tr("pluggable discovery already added: %s"), id)
+		return errors.New(tr("pluggable discovery already added: %s", id))
 	}
 	dm.discoveries[id] = d
 

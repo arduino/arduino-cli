@@ -18,6 +18,7 @@ package detector
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os/exec"
 	"regexp"
@@ -37,7 +38,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 var tr = i18n.Tr
@@ -254,7 +254,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		sketch := sketch
 		mergedfile, err := makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		sourceFileQueue.push(mergedfile)
 
@@ -268,19 +268,19 @@ func (l *SketchLibrariesDetector) findIncludes(
 			err := l.findIncludesUntilDone(cache, sourceFileQueue, buildProperties, sketchBuildPath, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
-				return errors.WithStack(err)
+				return err
 			}
 		}
 
 		// Finalize the cache
 		cache.ExpectEnd()
 		if err := writeCache(cache, cachePath); err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 
 	if err := l.failIfImportedLibraryIsWrong(); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	if d, err := json.Marshal(l.includeFolders); err != nil {
@@ -320,7 +320,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 	// remove the object file if it is found to be stale?
 	unchanged, err := utils.ObjFileIsUpToDate(sourcePath, objPath, depPath)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	first := true
@@ -352,12 +352,13 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				l.logger.WriteStdout(preprocStdout)
 			}
 			// Unwrap error and see if it is an ExitError.
+			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if _, isExitErr := errors.Cause(preprocErr).(*exec.ExitError); !isExitErr || preprocStderr == nil {
+			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || preprocStderr == nil {
 				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
-				return errors.WithStack(preprocErr)
+				return preprocErr
 			} else {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
 				if missingIncludeH == "" && l.logger.Verbose() {
@@ -391,7 +392,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				}
 			}
 			l.logger.WriteStderr(preprocStderr)
-			return errors.WithStack(preprocErr)
+			return preprocErr
 		}
 
 		// Add this library to the list of libraries, the
@@ -429,13 +430,13 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions...)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	for _, filePath := range filePaths {
 		sourceFile, err := makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		sourceFileQueue.push(sourceFile)
 	}
@@ -605,7 +606,7 @@ func LibrariesLoader(
 		builtInLibrariesFolders := builtInLibrariesDirs
 		if builtInLibrariesFolders != nil {
 			if err := builtInLibrariesFolders.ToAbs(); err != nil {
-				return nil, nil, nil, errors.WithStack(err)
+				return nil, nil, nil, err
 			}
 			lm.AddLibrariesDir(builtInLibrariesFolders, libraries.IDEBuiltIn)
 		}
@@ -617,7 +618,7 @@ func LibrariesLoader(
 
 		librariesFolders := otherLibrariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
-			return nil, nil, nil, errors.WithStack(err)
+			return nil, nil, nil, err
 		}
 		for _, folder := range librariesFolders {
 			lm.AddLibrariesDir(folder, libraries.User)
@@ -636,24 +637,24 @@ func LibrariesLoader(
 		for _, dir := range libraryDirs {
 			// Libraries specified this way have top priority
 			if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
-				return nil, nil, nil, errors.WithStack(err)
+				return nil, nil, nil, err
 			}
 		}
 	}
 
 	resolver := librariesresolver.NewCppResolver()
 	if err := resolver.ScanIDEBuiltinLibraries(lm); err != nil {
-		return nil, nil, nil, errors.WithStack(err)
+		return nil, nil, nil, err
 	}
 	if err := resolver.ScanUserAndUnmanagedLibraries(lm); err != nil {
-		return nil, nil, nil, errors.WithStack(err)
+		return nil, nil, nil, err
 	}
 	if err := resolver.ScanPlatformLibraries(lm, targetPlatform); err != nil {
-		return nil, nil, nil, errors.WithStack(err)
+		return nil, nil, nil, err
 	}
 	if actualPlatform != targetPlatform {
 		if err := resolver.ScanPlatformLibraries(lm, actualPlatform); err != nil {
-			return nil, nil, nil, errors.WithStack(err)
+			return nil, nil, nil, err
 		}
 	}
 	return lm, resolver, verboseOut.Bytes(), nil
@@ -760,11 +761,11 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 	} else {
 		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		err = path.WriteFile(bytes)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 	return nil

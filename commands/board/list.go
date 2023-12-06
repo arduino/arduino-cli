@@ -18,6 +18,7 @@ package board
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -73,10 +73,10 @@ func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
 	if !validVidPid.MatchString(vid) {
-		return nil, errors.Errorf(tr("Invalid vid value: '%s'"), vid)
+		return nil, errors.New(tr("Invalid vid value: '%s'", vid))
 	}
 	if !validVidPid.MatchString(pid) {
-		return nil, errors.Errorf(tr("Invalid pid value: '%s'"), pid)
+		return nil, errors.New(tr("Invalid pid value: '%s'", pid))
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
@@ -88,19 +88,19 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	httpClient, err := httpclient.New()
 
 	if err != nil {
-		return nil, errors.Wrap(err, tr("failed to initialize http client"))
+		return nil, fmt.Errorf("%s: %w", tr("failed to initialize http client"), err)
 	}
 
 	res, err := httpClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
+		return nil, fmt.Errorf("%s: %w", tr("error querying Arduino Cloud Api"), err)
 	}
 	if res.StatusCode == 404 {
 		// This is not an error, it just means that the board is not recognized
 		return nil, nil
 	}
 	if res.StatusCode >= 400 {
-		return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
+		return nil, errors.New(tr("the server responded with status %s", res.Status))
 	}
 
 	resp, err := io.ReadAll(res.Body)
@@ -113,7 +113,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 
 	var dat map[string]interface{}
 	if err := json.Unmarshal(resp, &dat); err != nil {
-		return nil, errors.Wrap(err, tr("error processing response from server"))
+		return nil, fmt.Errorf("%s: %w", tr("error processing response from server"), err)
 	}
 	name, nameFound := dat["name"].(string)
 	fqbn, fbqnFound := dat["fqbn"].(string)

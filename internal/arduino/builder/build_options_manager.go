@@ -17,6 +17,7 @@ package builder
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 // buildOptions fixdoc
@@ -100,7 +100,7 @@ func newBuildOptions(
 func (b *Builder) createBuildOptionsJSON() error {
 	buildOptionsJSON, err := json.MarshalIndent(b.buildOptions.currentOptions, "", "  ")
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	return b.buildOptions.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
@@ -110,10 +110,10 @@ func (b *Builder) wipeBuildPath() error {
 	// control when this should be printed.
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
 	if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
-		return errors.WithMessage(err, tr("cleaning build path"))
+		return fmt.Errorf("%s: %w", tr("cleaning build path"), err)
 	}
 	if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
-		return errors.WithMessage(err, tr("cleaning build path"))
+		return fmt.Errorf("%s: %w", tr("cleaning build path"), err)
 	}
 	return nil
 }
@@ -125,11 +125,11 @@ func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
 
 	// Load previous build options map
 	var buildOptionsJSONPrevious []byte
-	var _err error
 	if buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
-		buildOptionsJSONPrevious, _err = buildOptionsFile.ReadFile()
-		if _err != nil {
-			return errors.WithStack(_err)
+		var err error
+		buildOptionsJSONPrevious, err = buildOptionsFile.ReadFile()
+		if err != nil {
+			return err
 		}
 	}
 

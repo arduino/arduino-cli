@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/pkg/errors"
 	"go.bug.st/serial"
 )
 
@@ -35,7 +34,7 @@ func TouchSerialPortAt1200bps(port string) error {
 	// Open port
 	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
 	if err != nil {
-		return errors.WithMessage(err, tr("opening port at 1200bps"))
+		return fmt.Errorf("%s: %w", tr("opening port at 1200bps"), err)
 	}
 
 	if runtime.GOOS != "windows" {
@@ -45,7 +44,7 @@ func TouchSerialPortAt1200bps(port string) error {
 		// Set DTR to false
 		if err = p.SetDTR(false); err != nil {
 			p.Close()
-			return errors.WithMessage(err, tr("setting DTR to OFF"))
+			return fmt.Errorf("%s: %w", tr("setting DTR to OFF"), err)
 		}
 	}
 
@@ -64,7 +63,7 @@ func TouchSerialPortAt1200bps(port string) error {
 func getPortMap() (map[string]bool, error) {
 	ports, err := serial.GetPortsList()
 	if err != nil {
-		return nil, errors.WithMessage(err, tr("listing serial ports"))
+		return nil, fmt.Errorf("%s: %w", tr("listing serial ports"), err)
 	}
 	res := map[string]bool{}
 	for _, port := range ports {
@@ -138,7 +137,7 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks, dryRun boo
 			// do nothing!
 		} else {
 			if err := TouchSerialPortAt1200bps(portToTouch); err != nil && !wait {
-				return "", errors.Errorf(tr("TOUCH: error during reset: %s", err))
+				return "", fmt.Errorf("%s: %w", tr("error during board reset"), err)
 			}
 		}
 	}

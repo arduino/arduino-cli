@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -108,6 +107,6 @@ func removeIfExpired(dir *paths.Path, ttl time.Duration) {
 	logrus.Tracef(`Purging cache directory "%s". Expired by %s`, dir, lifeExpectancy.Abs())
 	err = dir.RemoveAll()
 	if err != nil {
-		logrus.Tracef(`Error while pruning cache directory "%s": %s`, dir, errors.WithStack(err))
+		logrus.Tracef(`Error while pruning cache directory "%s": %s`, dir, err)
 	}
 }

@@ -17,6 +17,7 @@ package discovery
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -28,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -345,13 +345,13 @@ func (disc *PluggableDiscovery) Run() (err error) {
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
 	} else if msg.EventType != "hello" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "hello", msg.EventType)
+		return errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "hello", msg.EventType))
 	} else if msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+		return errors.New(tr("command failed: %s", msg.Message))
 	} else if strings.ToUpper(msg.Message) != "OK" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
+		return errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "OK", msg.Message))
 	} else if msg.ProtocolVersion > 1 {
-		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
+		return errors.New(tr("protocol version not supported: requested 1, got %d", msg.ProtocolVersion))
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
@@ -366,13 +366,13 @@ func (disc *PluggableDiscovery) Start() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "START", err)
+		return errors.New(tr("calling %[1]s: %[2]w", "START", err))
 	} else if msg.EventType != "start" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "start", msg.EventType)
+		return errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "start", msg.EventType))
 	} else if msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+		return errors.New(tr("command failed: %s", msg.Message))
 	} else if strings.ToUpper(msg.Message) != "OK" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
+		return errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "OK", msg.Message))
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
@@ -388,13 +388,13 @@ func (disc *PluggableDiscovery) Stop() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "STOP", err)
+		return errors.New(tr("calling %[1]s: %[2]w", "STOP", err))
 	} else if msg.EventType != "stop" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "stop", msg.EventType)
+		return errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "stop", msg.EventType))
 	} else if msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+		return errors.New(tr("command failed: %s", msg.Message))
 	} else if strings.ToUpper(msg.Message) != "OK" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
+		return errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "OK", msg.Message))
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
@@ -428,11 +428,11 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 		return nil, err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "LIST", err)
+		return nil, errors.New(tr("calling %[1]s: %[2]w", "LIST", err))
 	} else if msg.EventType != "list" {
-		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "list", msg.EventType)
+		return nil, errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "list", msg.EventType))
 	} else if msg.Error {
-		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+		return nil, errors.New(tr("command failed: %s", msg.Message))
 	} else {
 		return msg.Ports, nil
 	}
@@ -454,13 +454,13 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 	}
 
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "START_SYNC", err)
+		return nil, errors.New(tr("calling %[1]s: %[2]w", "START_SYNC", err))
 	} else if msg.EventType != "start_sync" {
-		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "start_sync", msg.EventType)
+		return nil, errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "start_sync", msg.EventType))
 	} else if msg.Error {
-		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+		return nil, errors.New(tr("command failed: %s", msg.Message))
 	} else if strings.ToUpper(msg.Message) != "OK" {
-		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
+		return nil, errors.New(tr("communication out of sync, expected '%[1]s', received '%[2]s'", "OK", msg.Message))
 	}
 
 	disc.state = Syncing

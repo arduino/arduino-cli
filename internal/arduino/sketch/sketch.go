@@ -18,6 +18,7 @@ package sketch
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -25,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 // Sketch holds all the files composing a sketch
@@ -65,10 +65,10 @@ func New(path *paths.Path) (*Sketch, error) {
 			if mainFile == nil {
 				mainFile = candidateSketchMainFile
 			} else {
-				return nil, errors.Errorf(tr("multiple main sketch files found (%[1]v, %[2]v)"),
+				return nil, errors.New(tr("multiple main sketch files found (%[1]v, %[2]v)",
 					mainFile,
 					candidateSketchMainFile,
-				)
+				))
 			}
 		}
 	}
@@ -144,7 +144,7 @@ func New(path *paths.Path) (*Sketch, error) {
 				sketch.RootFolderFiles.Add(p)
 			}
 		} else {
-			return nil, errors.Errorf(tr("unknown sketch file extension '%s'"), ext)
+			return nil, errors.New(tr("unknown sketch file extension '%s'", ext))
 		}
 	}
 
@@ -206,7 +206,7 @@ func (s *Sketch) GetProfile(profileName string) *Profile {
 func (s *Sketch) checkSketchCasing() error {
 	files, err := s.FullPath.ReadDir()
 	if err != nil {
-		return errors.Errorf(tr("reading files: %v"), err)
+		return fmt.Errorf("%s: %w", tr("reading files"), err)
 	}
 	files.FilterOutDirs()
 

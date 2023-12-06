@@ -18,6 +18,7 @@ package builder
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -27,13 +28,12 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 // buildCore fixdoc
 func (b *Builder) buildCore() error {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	if b.coreBuildCachePath != nil {
@@ -44,13 +44,13 @@ func (b *Builder) buildCore() error {
 			// compileCore function).
 			b.coreBuildCachePath = nil
 		} else if err := b.coreBuildCachePath.MkdirAll(); err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 
 	archiveFile, objectFiles, err := b.compileCore()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	b.buildArtifacts.coreObjectsFiles = objectFiles
 	b.buildArtifacts.coreArchiveFilePath = archiveFile
@@ -77,7 +77,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 			includes,
 		)
 		if err != nil {
-			return nil, nil, errors.WithStack(err)
+			return nil, nil, err
 		}
 	}
 
@@ -125,12 +125,12 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		includes,
 	)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, err
 	}
 
 	archiveFile, err := b.archiveCompiledFiles(b.coreBuildPath, paths.New("core.a"), coreObjectFiles)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, err
 	}
 
 	// archive core.a

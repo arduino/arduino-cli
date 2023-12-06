@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -29,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	semver "go.bug.st/relaxed-semver"
 )
 

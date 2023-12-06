@@ -17,6 +17,7 @@ package builder
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"math"
 	"regexp"
@@ -28,8 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -42,7 +41,7 @@ var (
 // .cpp file still needs to be Arduino-preprocessed to compile).
 func (b *Builder) prepareSketchBuildPath() error {
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
+		return fmt.Errorf("%s: %w", tr("unable to create a folder to save the sketch"), err)
 	}
 
 	offset, mergedSource, err := b.sketchMergeSources(b.sourceOverrides)
@@ -73,7 +72,7 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 	getSource := func(f *paths.Path) (string, error) {
 		path, err := b.sketch.FullPath.RelTo(f)
 		if err != nil {
-			return "", errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
+			return "", fmt.Errorf("%s: %w", tr("unable to compute relative path to the sketch for the item"), err)
 		}
 		if override, ok := overrides[path.String()]; ok {
 			return override, nil
@@ -117,13 +116,13 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 	for _, file := range b.sketch.AdditionalFiles {
 		relpath, err := b.sketch.FullPath.RelTo(file)
 		if err != nil {
-			return errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
+			return fmt.Errorf("%s: %w", tr("unable to compute relative path to the sketch for the item"), err)
 		}
 
 		targetPath := buildPath.JoinPath(relpath)
 		// create the directory containing the target
 		if err = targetPath.Parent().MkdirAll(); err != nil {
-			return errors.Wrap(err, tr("unable to create the folder containing the item"))
+			return fmt.Errorf("%s: %w", tr("unable to create the folder containing the item"), err)
 		}
 
 		var sourceBytes []byte
@@ -134,7 +133,7 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 			// read the source file
 			s, err := file.ReadFile()
 			if err != nil {
-				return errors.Wrap(err, tr("unable to read contents of the source item"))
+				return fmt.Errorf("%s: %w", tr("unable to read contents of the source item"), err)
 			}
 			sourceBytes = s
 		}
@@ -144,7 +143,7 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {
-			return errors.Wrap(err, tr("unable to write to destination file"))
+			return fmt.Errorf("%s: %w", tr("unable to write to destination file"), err)
 		}
 	}
 
@@ -161,7 +160,7 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	// Read the destination file if it exists
 	existingBytes, err := destPath.ReadFile()
 	if err != nil {
-		return errors.Wrap(err, tr("unable to read contents of the destination item"))
+		return fmt.Errorf("%s: %w", tr("unable to read contents of the destination item"), err)
 	}
 
 	// Overwrite if contents are different
@@ -178,7 +177,7 @@ func (b *Builder) buildSketch(includesFolders paths.PathList) error {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	sketchObjectFiles, err := b.compileFiles(
@@ -187,7 +186,7 @@ func (b *Builder) buildSketch(includesFolders paths.PathList) error {
 		includes,
 	)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
@@ -199,7 +198,7 @@ func (b *Builder) buildSketch(includesFolders paths.PathList) error {
 			includes,
 		)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		sketchObjectFiles.AddAll(srcObjectFiles)
 	}

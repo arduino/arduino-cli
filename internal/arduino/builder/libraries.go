@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 // nolint
@@ -40,12 +39,12 @@ func (b *Builder) buildLibraries(includesFolders paths.PathList, importedLibrari
 	libs := importedLibraries
 
 	if err := b.librariesBuildPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	librariesObjectFiles, err := b.compileLibraries(libs, includes)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	b.buildArtifacts.librariesObjectFiles = librariesObjectFiles
 	return nil
@@ -118,7 +117,7 @@ func (b *Builder) compileLibraries(libraries libraries.List, includes []string) 
 	for _, library := range libraries {
 		libraryObjectFiles, err := b.compileLibrary(library, includes)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 		objectFiles.AddAll(libraryObjectFiles)
 
@@ -135,7 +134,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 	libraryBuildPath := b.librariesBuildPath.Join(library.DirName)
 
 	if err := libraryBuildPath.MkdirAll(); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	objectFiles := paths.NewPathList()
@@ -153,7 +152,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 			// Find all libraries in precompiledPath
 			libs, err := precompiledPath.ReadDir()
 			if err != nil {
-				return nil, errors.WithStack(err)
+				return nil, err
 			}
 
 			// Add required LD flags
@@ -194,12 +193,12 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 			includes,
 		)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 		if library.DotALinkage {
 			archiveFile, err := b.archiveCompiledFiles(libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles)
 			if err != nil {
-				return nil, errors.WithStack(err)
+				return nil, err
 			}
 			objectFiles.Add(archiveFile)
 		} else {
@@ -215,7 +214,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 			includes,
 		)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 		objectFiles.AddAll(libObjectFiles)
 
@@ -227,7 +226,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 				includes,
 			)
 			if err != nil {
-				return nil, errors.WithStack(err)
+				return nil, err
 			}
 			objectFiles.AddAll(utilityObjectFiles)
 		}
@@ -252,7 +251,7 @@ func (b *Builder) removeUnusedCompiledLibraries(importedLibraries libraries.List
 
 	files, err := b.librariesBuildPath.ReadDir()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	libraryNames := toLibraryNames(importedLibraries)
@@ -260,7 +259,7 @@ func (b *Builder) removeUnusedCompiledLibraries(importedLibraries libraries.List
 		if file.IsDir() {
 			if !slices.Contains(libraryNames, file.Base()) {
 				if err := file.RemoveAll(); err != nil {
-					return errors.WithStack(err)
+					return err
 				}
 			}
 		}

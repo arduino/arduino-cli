@@ -22,7 +22,6 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -40,7 +39,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	sourceFile = sourceFile.Clean()
 	sourceFileStat, err := sourceFile.Stat()
 	if err != nil {
-		return false, errors.WithStack(err)
+		return false, err
 	}
 
 	objectFile = objectFile.Clean()
@@ -50,7 +49,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 			logrus.Debugf("Not found: %v", objectFile)
 			return false, nil
 		}
-		return false, errors.WithStack(err)
+		return false, err
 	}
 
 	dependencyFile = dependencyFile.Clean()
@@ -60,7 +59,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 			logrus.Debugf("Not found: %v", dependencyFile)
 			return false, nil
 		}
-		return false, errors.WithStack(err)
+		return false, err
 	}
 
 	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
@@ -74,7 +73,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 
 	rows, err := dependencyFile.ReadFileAsLines()
 	if err != nil {
-		return false, errors.WithStack(err)
+		return false, err
 	}
 
 	rows = f.Map(rows, removeEndingBackSlash)

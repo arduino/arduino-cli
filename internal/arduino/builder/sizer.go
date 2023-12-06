@@ -18,6 +18,7 @@ package builder
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -25,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 // ExecutableSectionSize represents a section of the executable output file

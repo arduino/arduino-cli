@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -35,7 +36,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/arduino/go-timeutils"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )

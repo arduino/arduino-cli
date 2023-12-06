@@ -20,7 +20,6 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 // link fixdoc
@@ -39,7 +38,7 @@ func (b *Builder) link() error {
 
 	coreDotARelPath, err := b.buildPath.RelTo(b.buildArtifacts.coreArchiveFilePath)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	wrapWithDoubleQuotes := func(value string) string { return "\"" + value + "\"" }
@@ -73,11 +72,11 @@ func (b *Builder) link() error {
 
 			command, err := b.prepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 
 			if err := b.execCommand(command); err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 

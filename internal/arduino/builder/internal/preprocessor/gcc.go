@@ -17,6 +17,7 @@ package preprocessor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -24,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 // GCC performs a run of the gcc preprocess (macro/includes expansion). The function outputs the result
@@ -54,7 +54,7 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 
 	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
 	if pattern == "" {
-		return nil, nil, errors.Errorf(tr("%s pattern is missing"), gccPreprocRecipeProperty)
+		return nil, nil, errors.New(tr("%s pattern is missing", gccPreprocRecipeProperty))
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)

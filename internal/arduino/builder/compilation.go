@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 func (b *Builder) compileFiles(
@@ -104,7 +103,7 @@ func (b *Builder) compileFiles(
 	wg.Wait()
 	if len(errorsList) > 0 {
 		// output the first error
-		return nil, errors.WithStack(errorsList[0])
+		return nil, errorsList[0]
 	}
 	objectFiles.Sort()
 	return objectFiles, nil
@@ -124,7 +123,7 @@ func (b *Builder) compileFileWithRecipe(
 	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
@@ -132,17 +131,17 @@ func (b *Builder) compileFileWithRecipe(
 	properties.SetPath("object_file", objectFile)
 	err = objectFile.Parent().MkdirAll()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	objIsUpToDate, err := utils.ObjFileIsUpToDate(source, objectFile, depsFile)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	command, err := b.prepareCommandForRecipe(properties, recipe, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	if b.compilationDatabase != nil {
 		b.compilationDatabase.Add(source, command)
@@ -174,7 +173,7 @@ func (b *Builder) compileFileWithRecipe(
 
 		// ...and then return the error
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 	} else if b.logger.Verbose() {
 		if objIsUpToDate {

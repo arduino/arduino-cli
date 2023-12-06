@@ -19,6 +19,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -30,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 var tr = i18n.Tr
@@ -60,7 +60,7 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 	normalOutput.Write(gccStderr)
 	if err != nil {
 		if !onlyUpdateCompilationDatabase {
-			return normalOutput.Bytes(), verboseOutput.Bytes(), errors.WithStack(err)
+			return normalOutput.Bytes(), verboseOutput.Bytes(), err
 		}
 
 		// Do not bail out if we are generating the compile commands database
@@ -68,7 +68,7 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 			tr("An error occurred adding prototypes"),
 			tr("the compilation database may be incomplete or inaccurate")))
 		if err := sourceFile.CopyTo(ctagsTarget); err != nil {
-			return normalOutput.Bytes(), verboseOutput.Bytes(), errors.WithStack(err)
+			return normalOutput.Bytes(), verboseOutput.Bytes(), err
 		}
 	}
 
@@ -186,7 +186,7 @@ func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, 
 
 	pattern := ctagsBuildProperties.Get("pattern")
 	if pattern == "" {
-		return nil, nil, errors.Errorf(tr("%s pattern is missing"), "ctags")
+		return nil, nil, errors.New(tr("%s pattern is missing", "ctags"))
 	}
 
 	commandLine := ctagsBuildProperties.ExpandPropsInString(pattern)

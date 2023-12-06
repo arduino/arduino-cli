@@ -16,13 +16,13 @@
 package libraries
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -113,7 +113,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	}
 
 	if err := addExamples(library); err != nil {
-		return nil, errors.Errorf(tr("scanning examples: %s"), err)
+		return nil, fmt.Errorf("%s: %w", tr("scanning sketch examples"), err)
 	}
 	library.DirName = libraryDir.Base()
 	library.Name = strings.TrimSpace(libProperties.Get("name"))
@@ -136,7 +136,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 	if foundHeader, err := containsHeaderFile(path); err != nil {
 		return nil, err
 	} else if !foundHeader {
-		return nil, errors.Errorf(tr("invalid library: no header files found"))
+		return nil, errors.New(tr("invalid library: no header files found"))
 	}
 	library := &Library{
 		InstallDir:    path.Canonical(),
@@ -151,7 +151,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		InDevelopment: path.Join(".development").Exist(),
 	}
 	if err := addExamples(library); err != nil {
-		return nil, errors.Errorf(tr("scanning examples: %s"), err)
+		return nil, fmt.Errorf("%s: %w", tr("scanning sketch examples"), err)
 	}
 	addUtilityDirectory(library)
 	return library, nil
