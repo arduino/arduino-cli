@@ -22,6 +22,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/mattn/go-isatty"
 	"golang.org/x/term"
 )
 
@@ -46,7 +47,7 @@ func SetRawModeStdin() error {
 	if oldStateStdin != nil {
 		panic("terminal already in RAW mode")
 	}
-	if !IsTerminal() {
+	if !IsInteractive() {
 		return errors.New(tr("not running in a terminal"))
 	}
 	old, err := term.MakeRaw(int(os.Stdin.Fd()))
@@ -68,9 +69,22 @@ func RestoreModeStdin() {
 	oldStateStdin = nil
 }
 
-// IsTerminal returns true if there is an interactive terminal
-func IsTerminal() bool {
-	return term.IsTerminal(int(os.Stdin.Fd()))
+// IsInteractive returns true if the CLI is interactive (it can receive inputs from terminal/console)
+func IsInteractive() bool {
+	return isatty.IsTerminal(os.Stdin.Fd()) || isatty.IsCygwinTerminal(os.Stdin.Fd())
+}
+
+// HasConsole returns true if the CLI outputs to a terminal/console
+func HasConsole() bool {
+	return isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
+}
+
+// IsCI returns true if running on CI environments.
+// (based on https://github.com/watson/ci-info/blob/HEAD/index.js)
+func IsCI() bool {
+	return os.Getenv("CI") != "" || // GitHub Actions, Travis CI, CircleCI, Cirrus CI, GitLab CI, AppVeyor, CodeShip, dsari
+		os.Getenv("BUILD_NUMBER") != "" || // Jenkins, TeamCity
+		os.Getenv("RUN_ID") != "" // TaskCluster, dsari
 }
 
 // InputUserField prompts the user to input the provided user field.
@@ -78,7 +92,7 @@ func InputUserField(prompt string, secret bool) (string, error) {
 	if format != Text {
 		return "", errors.New(tr("user input not supported for the '%s' output format", format))
 	}
-	if !IsTerminal() {
+	if !IsInteractive() {
 		return "", errors.New(tr("user input not supported in non interactive mode"))
 	}
 

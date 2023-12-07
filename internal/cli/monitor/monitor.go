@@ -30,7 +30,6 @@ import (
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -88,7 +87,7 @@ func runMonitorCmd(
 ) {
 	logrus.Info("Executing `arduino-cli monitor`")
 
-	if !configuration.HasConsole {
+	if !feedback.HasConsole() {
 		quiet = true
 	}
 
@@ -230,7 +229,7 @@ func runMonitorCmd(
 
 	ctx, cancel := cleanup.InterruptableContext(context.Background())
 	if raw {
-		if feedback.IsTerminal() {
+		if feedback.IsInteractive() {
 			if err := feedback.SetRawModeStdin(); err != nil {
 				feedback.Warning(tr("Error setting raw mode: %s", err.Error()))
 			}
