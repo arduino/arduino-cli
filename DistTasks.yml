@@ -258,4 +258,4 @@ tasks:
     desc: Copy the JSON schema to dist folder
     cmds:
       - mkdir --parents {{.DIST_DIR}}
-      - cp ./configuration/configuration.schema.json {{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_configuration.schema.json
+      - cp ./internal/cli/configuration/configuration.schema.json {{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_configuration.schema.json

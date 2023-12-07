@@ -246,7 +246,7 @@ tasks:
   docs:include-configuration-json-schema:
     desc: Copy configuration JSON schema to make it available in documentation
     cmds:
-      - cp ./configuration/configuration.schema.json ./docs/configuration.schema.json
+      - cp ./internal/cli/configuration/configuration.schema.json ./docs/configuration.schema.json
 
   protoc:check:
     desc: Perform linting of the protobuf definitions
