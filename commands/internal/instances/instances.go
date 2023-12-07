@@ -3,16 +3,12 @@ package instances
 import (
 	"sync"
 
-	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
+	"github.com/arduino/go-paths-helper"
 )
-
-var tr = i18n.Tr
 
 // coreInstance is an instance of the Arduino Core Services. The user can
 // instantiate as many as needed by providing a different configuration
@@ -74,45 +70,18 @@ func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager
 	return true
 }
 
-// Create a new *rpc.Instance ready to be initialized, supporting directories are also created.
-func Create(extraUserAgent ...string) (*rpc.Instance, error) {
+// Create a new *rpc.Instance ready to be initialized
+func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent ...string) (*rpc.Instance, error) {
 	instance := &coreInstance{}
-
-	// Setup downloads directory
-	downloadsDir := configuration.DownloadsDir(configuration.Settings)
-	if downloadsDir.NotExist() {
-		err := downloadsDir.MkdirAll()
-		if err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
-		}
-	}
-
-	// Setup data directory
-	dataDir := configuration.DataDir(configuration.Settings)
-	packagesDir := configuration.PackagesDir(configuration.Settings)
-	if packagesDir.NotExist() {
-		err := packagesDir.MkdirAll()
-		if err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
-		}
-	}
 
 	// Create package manager
 	userAgent := "arduino-cli/" + version.VersionInfo.VersionString
 	for _, ua := range extraUserAgent {
 		userAgent += " " + ua
 	}
-	instance.pm = packagemanager.NewBuilder(
-		dataDir,
-		configuration.PackagesDir(configuration.Settings),
-		downloadsDir,
-		dataDir.Join("tmp"),
-		userAgent,
-	).Build()
-	instance.lm = librariesmanager.NewLibraryManager(
-		dataDir,
-		downloadsDir,
-	)
+	tempDir := dataDir.Join("tmp")
+	instance.pm = packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build()
+	instance.lm = librariesmanager.NewLibraryManager(dataDir, downloadsDir)
 
 	// Save instance
 	instancesMux.Lock()

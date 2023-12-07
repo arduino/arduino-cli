@@ -61,7 +61,26 @@ func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, dow
 
 // Create a new CoreInstance ready to be initialized, supporting directories are also created.
 func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateResponse, error) {
-	inst, err := instances.Create(extraUserAgent...)
+	// Setup downloads directory
+	downloadsDir := configuration.DownloadsDir(configuration.Settings)
+	if downloadsDir.NotExist() {
+		err := downloadsDir.MkdirAll()
+		if err != nil {
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
+		}
+	}
+
+	// Setup data directory
+	dataDir := configuration.DataDir(configuration.Settings)
+	packagesDir := configuration.PackagesDir(configuration.Settings)
+	if packagesDir.NotExist() {
+		err := packagesDir.MkdirAll()
+		if err != nil {
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
+		}
+	}
+
+	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, extraUserAgent...)
 	if err != nil {
 		return nil, err
 	}
