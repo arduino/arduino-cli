@@ -19,7 +19,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex(in *jlexer.Lexer, out *indexRelease) {
+func easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex(in *jlexer.Lexer, out *indexRelease) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -323,7 +323,7 @@ func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 		in.Consumed()
 	}
 }
-func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex(out *jwriter.Writer, in indexRelease) {
+func easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex(out *jwriter.Writer, in indexRelease) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -468,27 +468,27 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 // MarshalJSON supports json.Marshaler interface
 func (v indexRelease) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex(&w, v)
+	easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexRelease) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex(w, v)
+	easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexRelease) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex(&r, v)
+	easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexRelease) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex(l, v)
+	easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex(l, v)
 }
-func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex1(in *jlexer.Lexer, out *indexJSON) {
+func easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex1(in *jlexer.Lexer, out *indexJSON) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -566,7 +566,7 @@ func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 		in.Consumed()
 	}
 }
-func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex1(out *jwriter.Writer, in indexJSON) {
+func easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex1(out *jwriter.Writer, in indexJSON) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -592,27 +592,27 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 // MarshalJSON supports json.Marshaler interface
 func (v indexJSON) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex1(&w, v)
+	easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexJSON) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex1(w, v)
+	easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexJSON) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex1(&r, v)
+	easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexJSON) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex1(l, v)
+	easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex1(l, v)
 }
-func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex2(in *jlexer.Lexer, out *indexDependency) {
+func easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex2(in *jlexer.Lexer, out *indexDependency) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -652,7 +652,7 @@ func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 		in.Consumed()
 	}
 }
-func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex2(out *jwriter.Writer, in indexDependency) {
+func easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex2(out *jwriter.Writer, in indexDependency) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -672,23 +672,23 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 // MarshalJSON supports json.Marshaler interface
 func (v indexDependency) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex2(&w, v)
+	easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexDependency) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex2(w, v)
+	easyjson42239ddeEncodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexDependency) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex2(&r, v)
+	easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexDependency) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesindex2(l, v)
+	easyjson42239ddeDecodeGithubComArduinoArduinoCliInternalArduinoLibrariesLibrariesindex2(l, v)
 }
