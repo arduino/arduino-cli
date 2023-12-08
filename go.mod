@@ -7,7 +7,7 @@ replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371
-	github.com/arduino/go-paths-helper v1.10.0
+	github.com/arduino/go-paths-helper v1.10.1
 	github.com/arduino/go-properties-orderedmap v1.8.0
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v1.0.0
