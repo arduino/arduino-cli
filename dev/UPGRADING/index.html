@@ -3618,11 +3618,15 @@
 <h3 id="some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private">Some golang modules from <code>github.com/arduino/arduino-cli/*</code> have been made private.<a class="headerlink" href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" title="Permanent link">&para;</a></h3>
 <p>The following golang modules are no longer available as public API:</p>
 <ul>
+<li><code>github.com/arduino/arduino-cli/arduino</code></li>
 <li><code>github.com/arduino/arduino-cli/buildcache</code></li>
+<li><code>github.com/arduino/arduino-cli/configuration</code></li>
 <li><code>github.com/arduino/arduino-cli/executils</code></li>
 <li><code>github.com/arduino/arduino-cli/table</code></li>
 </ul>
-<p>Most of the <code>executils</code> library has been integrated inside the <code>go-paths</code> library <code>github.com/arduino/go-paths-helper</code>.</p>
+<p>Most of the <code>executils</code> library has been integrated inside the <code>go-paths</code> library <code>github.com/arduino/go-paths-helper</code>.
+The other packages are not intended for usage outside the Arduino CLI, we will keep them internal to allow future
+breaking changes as needed.</p>
 <h3 id="cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands">CLI changed JSON output for some <code>lib</code>, <code>core</code>, <code>config</code>, <code>board</code>, and <code>sketch</code> commands.<a class="headerlink" href="#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
