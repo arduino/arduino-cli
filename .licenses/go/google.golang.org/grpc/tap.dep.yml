@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/tap
-version: v1.59.0
+version: v1.60.0
 type: go
 summary: Package tap defines the function handles which are executed on the transport
   layer of gRPC-Go and related information.
 homepage: https://pkg.go.dev/google.golang.org/grpc/tap
 license: apache-2.0
 licenses:
-- sources: grpc@v1.59.0/LICENSE
+- sources: grpc@v1.60.0/LICENSE
   text: |2
 
                                      Apache License
