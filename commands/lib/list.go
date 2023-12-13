@@ -47,16 +47,17 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		return nil, err
 	}
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
 	}
+	defer release()
 
 	nameFilter := strings.ToLower(req.GetName())
 
 	var allLibs []*installedLib
 	if fqbnString := req.GetFqbn(); fqbnString != "" {
-		allLibs = listLibraries(lm, li, req.GetUpdatable(), true)
+		allLibs = listLibraries(lme, li, req.GetUpdatable(), true)
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
 			return nil, &cmderrors.InvalidFQBNError{Cause: err}
@@ -96,7 +97,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 			allLibs = append(allLibs, lib)
 		}
 	} else {
-		allLibs = listLibraries(lm, li, req.GetUpdatable(), req.GetAll())
+		allLibs = listLibraries(lme, li, req.GetUpdatable(), req.GetAll())
 	}
 
 	installedLibs := []*rpc.InstalledLibrary{}
@@ -122,10 +123,12 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 }
 
 // listLibraries returns the list of installed libraries. If updatable is true it
-// returns only the libraries that may be updated.
-func listLibraries(lm *librariesmanager.LibrariesManager, li *librariesindex.Index, updatable bool, all bool) []*installedLib {
+// returns only the libraries that may be updated by looking at the index for updates.
+// If all is true, it returns all the libraries (including the libraries builtin in the
+// platforms), otherwise only the user installed libraries.
+func listLibraries(lme *librariesmanager.Explorer, li *librariesindex.Index, updatable bool, all bool) []*installedLib {
 	res := []*installedLib{}
-	for _, lib := range lm.FindAllInstalled() {
+	for _, lib := range lme.FindAllInstalled() {
 		if !all {
 			if lib.Location != libraries.User {
 				continue

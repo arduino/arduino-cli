@@ -22,9 +22,16 @@ import (
 )
 
 func Test_RescanLibrariesCallClear(t *testing.T) {
-	lm := NewLibraryManager()
-	lm.libraries["testLibA"] = libraries.List{}
-	lm.libraries["testLibB"] = libraries.List{}
-	lm.RescanLibraries()
+	lmb := NewBuilder()
+	lmb.libraries["testLibA"] = libraries.List{}
+	lmb.libraries["testLibB"] = libraries.List{}
+	lm := lmb.Build()
+
+	{
+		lmi, release := lm.NewInstaller()
+		lmi.RescanLibraries()
+		release()
+	}
+
 	require.Len(t, lm.libraries, 0)
 }

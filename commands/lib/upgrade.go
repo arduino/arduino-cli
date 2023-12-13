@@ -31,12 +31,14 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 		return err
 	}
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
 	if err != nil {
 		return err
 	}
+	libsToUpgrade := listLibraries(lme, li, true, false)
+	release()
 
-	if err := upgrade(req.GetInstance(), listLibraries(lm, li, true, false), downloadCB, taskCB); err != nil {
+	if err := upgrade(req.GetInstance(), libsToUpgrade, downloadCB, taskCB); err != nil {
 		return err
 	}
 
@@ -54,14 +56,16 @@ func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloa
 		return err
 	}
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
 	if err != nil {
 		return err
 	}
+	libs := listLibraries(lme, li, false, false)
+	release()
 
 	// Get the library to upgrade
 	name := req.GetName()
-	lib := filterByName(listLibraries(lm, li, false, false), name)
+	lib := filterByName(libs, name)
 	if lib == nil {
 		// library not installed...
 		return &cmderrors.LibraryNotFoundError{Library: name}

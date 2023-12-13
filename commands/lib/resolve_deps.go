@@ -25,43 +25,50 @@ import (
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // LibraryResolveDependencies FIXMEDOC
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
 	}
+	defer release()
 
-	// Search the requested lib
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return nil, err
 	}
 
-	version, err := commands.ParseVersion(req.GetVersion())
+	return libraryResolveDependencies(ctx, lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
+}
+
+func libraryResolveDependencies(ctx context.Context, lme *librariesmanager.Explorer, li *librariesindex.Index,
+	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
+	version, err := commands.ParseVersion(reqVersion)
 	if err != nil {
 		return nil, err
 	}
 
-	reqLibRelease, err := li.FindRelease(req.GetName(), version)
+	// Search the requested lib
+	reqLibRelease, err := li.FindRelease(reqName, version)
 	if err != nil {
 		return nil, err
 	}
 
 	// Extract all installed libraries
 	installedLibs := map[string]*libraries.Library{}
-	for _, lib := range listLibraries(lm, li, false, false) {
+	for _, lib := range listLibraries(lme, li, false, false) {
 		installedLibs[lib.Library.Name] = lib.Library
 	}
 
 	// Resolve all dependencies...
 	var overrides []*librariesindex.Release
-	if req.GetDoNotUpdateInstalledLibraries() {
-		libs := lm.FindAllInstalled()
+	if noOverwrite {
+		libs := lme.FindAllInstalled()
 		libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
 		for _, lib := range libs {
 			if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {

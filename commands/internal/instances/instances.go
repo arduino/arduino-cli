@@ -62,6 +62,26 @@ func GetLibraryManager(inst *rpc.Instance) (*librariesmanager.LibrariesManager, 
 	return i.lm, nil
 }
 
+// GetLibraryManagerExplorer returns the library manager Explorer for the given instance.
+func GetLibraryManagerExplorer(inst *rpc.Instance) (*librariesmanager.Explorer, func(), error) {
+	lm, err := GetLibraryManager(inst)
+	if err != nil {
+		return nil, nil, err
+	}
+	lmi, release := lm.NewExplorer()
+	return lmi, release, nil
+}
+
+// GetLibraryManagerInstaller returns the library manager Installer for the given instance.
+func GetLibraryManagerInstaller(inst *rpc.Instance) (*librariesmanager.Installer, func(), error) {
+	lm, err := GetLibraryManager(inst)
+	if err != nil {
+		return nil, nil, err
+	}
+	lmi, release := lm.NewInstaller()
+	return lmi, release, nil
+}
+
 // GetLibrariesIndex returns the library index for the given instance.
 func GetLibrariesIndex(inst *rpc.Instance) (*librariesindex.Index, error) {
 	instancesMux.Lock()
@@ -108,7 +128,7 @@ func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent ...st
 
 	instance := &coreInstance{
 		pm: packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build(),
-		lm: librariesmanager.NewLibraryManager(),
+		lm: librariesmanager.NewBuilder().Build(),
 		li: librariesindex.EmptyIndex,
 	}
 

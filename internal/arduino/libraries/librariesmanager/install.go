@@ -57,15 +57,15 @@ type LibraryInstallPlan struct {
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
-func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semver.Version, installLocation libraries.LibraryLocation) (*LibraryInstallPlan, error) {
-	installDir, err := lm.getLibrariesDir(installLocation)
+func (lmi *Installer) InstallPrerequisiteCheck(name string, version *semver.Version, installLocation libraries.LibraryLocation) (*LibraryInstallPlan, error) {
+	installDir, err := lmi.getLibrariesDir(installLocation)
 	if err != nil {
 		return nil, err
 	}
 
-	lm.RescanLibraries()
+	lmi.RescanLibraries()
 
-	libs := lm.FindByReference(name, nil, installLocation)
+	libs := lmi.FindByReference(name, nil, installLocation)
 	if len(libs) > 1 {
 		libsDir := paths.NewPathList()
 		for _, lib := range libs {
@@ -103,7 +103,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semve
 }
 
 // importLibraryFromDirectory installs a library by copying it from the given directory.
-func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, overwrite bool) error {
+func (lmi *Installer) importLibraryFromDirectory(libPath *paths.Path, overwrite bool) error {
 	// Check if the library is valid and load metatada
 	if err := validateLibrary(libPath); err != nil {
 		return err
@@ -114,7 +114,7 @@ func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, over
 	}
 
 	// Check if the library is already installed and determine install path
-	installPlan, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
+	installPlan, err := lmi.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, over
 		if !overwrite {
 			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", installPlan.Name, installPlan.ReplacedLib))
 		}
-		if err := lm.Uninstall(installPlan.ReplacedLib); err != nil {
+		if err := lmi.Uninstall(installPlan.ReplacedLib); err != nil {
 			return err
 		}
 	}
@@ -142,7 +142,7 @@ func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, over
 }
 
 // Uninstall removes a Library
-func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
+func (lmi *Installer) Uninstall(lib *libraries.Library) error {
 	if lib == nil || lib.InstallDir == nil {
 		return fmt.Errorf(tr("install directory not set"))
 	}
@@ -150,14 +150,14 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 		return fmt.Errorf(tr("removing library directory: %s"), err)
 	}
 
-	alternatives := lm.libraries[lib.Name]
+	alternatives := lmi.libraries[lib.Name]
 	alternatives.Remove(lib)
-	lm.libraries[lib.Name] = alternatives
+	lmi.libraries[lib.Name] = alternatives
 	return nil
 }
 
 // InstallZipLib installs a Zip library on the specified path.
-func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error {
+func (lmi *Installer) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error {
 	// Clone library in a temporary directory
 	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
@@ -191,7 +191,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *path
 	tmpInstallPath := libRootFiles[0]
 
 	// Install extracted library in the destination directory
-	if err := lm.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
+	if err := lmi.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
 		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
@@ -199,7 +199,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *path
 }
 
 // InstallGitLib installs a library hosted on a git repository on the specified path.
-func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
+func (lmi *Installer) InstallGitLib(gitURL string, overwrite bool) error {
 	gitLibraryName, ref, err := parseGitURL(gitURL)
 	if err != nil {
 		return err
@@ -240,7 +240,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	tmpInstallPath.Join(".git").RemoveAll()
 
 	// Install extracted library in the destination directory
-	if err := lm.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
+	if err := lmi.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
 		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 

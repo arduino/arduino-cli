@@ -33,6 +33,7 @@ import (
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	// Obtain the library index from the manager
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return err
@@ -45,12 +46,14 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 			VersionRequired: req.GetVersion(),
 		}
 	} else {
-		res, err := LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesRequest{
-			Instance:                      req.GetInstance(),
-			Name:                          req.GetName(),
-			Version:                       req.GetVersion(),
-			DoNotUpdateInstalledLibraries: req.GetNoOverwrite(),
-		})
+		// Obtain the library explorer from the instance
+		lme, releaseLme, err := instances.GetLibraryManagerExplorer(req.GetInstance())
+		if err != nil {
+			return err
+		}
+
+		res, err := libraryResolveDependencies(ctx, lme, li, req.GetName(), req.GetVersion(), req.GetNoOverwrite())
+		releaseLme()
 		if err != nil {
 			return err
 		}
@@ -77,10 +80,12 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		releasePme()
 	}
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	// Obtain the library installer from the manager
+	lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
 	if err != nil {
 		return err
 	}
+	defer releaseLmi()
 
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
@@ -95,7 +100,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 			return err
 		}
 
-		installTask, err := lm.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
+		installTask, err := lmi.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
 		if err != nil {
 			return err
 		}
@@ -127,7 +132,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		if err := downloadLibrary(downloadsDir, libRelease, downloadCB, taskCB, downloadReason); err != nil {
 			return err
 		}
-		if err := installLibrary(lm, downloadsDir, libRelease, installTask, taskCB); err != nil {
+		if err := installLibrary(lmi, downloadsDir, libRelease, installTask, taskCB); err != nil {
 			return err
 		}
 	}
@@ -139,13 +144,13 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	return nil
 }
 
-func installLibrary(lm *librariesmanager.LibrariesManager, downloadsDir *paths.Path, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB) error {
+func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB) error {
 	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
 
 	if libReplaced := installTask.ReplacedLib; libReplaced != nil {
 		taskCB(&rpc.TaskProgress{Message: tr("Replacing %[1]s with %[2]s", libReplaced, libRelease)})
-		if err := lm.Uninstall(libReplaced); err != nil {
+		if err := lmi.Uninstall(libReplaced); err != nil {
 			return &cmderrors.FailedLibraryInstallError{
 				Cause: fmt.Errorf("%s: %s", tr("could not remove old library"), err)}
 		}
@@ -167,7 +172,9 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 	if err != nil {
 		return err
 	}
-	if err := lm.InstallZipLib(ctx, paths.New(req.GetPath()), req.GetOverwrite()); err != nil {
+	lmi, release := lm.NewInstaller()
+	defer release()
+	if err := lmi.InstallZipLib(ctx, paths.New(req.GetPath()), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
@@ -180,7 +187,9 @@ func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, t
 	if err != nil {
 		return err
 	}
-	if err := lm.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
+	lmi, release := lm.NewInstaller()
+	defer release()
+	if err := lmi.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})

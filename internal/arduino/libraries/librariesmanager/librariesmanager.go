@@ -21,6 +21,7 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -32,11 +33,30 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Builder is used to create a new LibrariesManager. The builder has
+// methods to load and parse libraries and to actually build the
+// LibraryManager. Once the LibrariesManager is built, it cannot be
+// altered anymore.
+type Builder struct {
+	*LibrariesManager
+}
+
+// Explorer is used to query the library manager about the installed libraries.
+type Explorer struct {
+	*LibrariesManager
+}
+
+// Installer is used to rescan installed libraries after install/uninstall.
+type Installer struct {
+	*LibrariesManager
+}
+
 // LibrariesManager keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
 type LibrariesManager struct {
-	librariesDir []*LibrariesDir
-	libraries    map[string]libraries.List
+	librariesLock sync.RWMutex
+	librariesDir  []*LibrariesDir
+	libraries     map[string]libraries.List
 }
 
 // LibrariesDir is a directory containing libraries
@@ -50,7 +70,7 @@ type LibrariesDir struct {
 var tr = i18n.Tr
 
 // Names returns an array with all the names of the installed libraries.
-func (lm LibrariesManager) Names() []string {
+func (lm *Explorer) Names() []string {
 	res := make([]string, len(lm.libraries))
 	i := 0
 	for n := range lm.libraries {
@@ -66,21 +86,63 @@ func (lm LibrariesManager) Names() []string {
 	return res
 }
 
-// NewLibraryManager creates a new library manager
-func NewLibraryManager() *LibrariesManager {
-	return &LibrariesManager{
-		libraries: map[string]libraries.List{},
+// NewBuilder creates a new library manager builder.
+func NewBuilder() *Builder {
+	return &Builder{
+		&LibrariesManager{
+			libraries: map[string]libraries.List{},
+		},
 	}
+}
+
+// NewBuilder creates a Builder with the same configuration of this
+// LibrariesManager. A "commit" function callback is returned: calling
+// this function will write the new configuration into this LibrariesManager.
+func (lm *LibrariesManager) NewBuilder() (*Builder, func()) {
+	lmb := NewBuilder()
+	return lmb, func() {
+		lmb.BuildIntoExistingLibrariesManager(lm)
+	}
+}
+
+// NewExplorer returns a new Explorer. The returned function must be called
+// to release the lock on the LibrariesManager.
+func (lm *LibrariesManager) NewExplorer() (*Explorer, func()) {
+	lm.librariesLock.RLock()
+	return &Explorer{lm}, lm.librariesLock.RUnlock
+}
+
+// NewInstaller returns a new Installer. The returned function must be called
+// to release the lock on the LibrariesManager.
+func (lm *LibrariesManager) NewInstaller() (*Installer, func()) {
+	lm.librariesLock.Lock()
+	return &Installer{lm}, lm.librariesLock.Unlock
+}
+
+// Build builds a new LibrariesManager.
+func (lmb *Builder) Build() *LibrariesManager {
+	res := &LibrariesManager{}
+	lmb.BuildIntoExistingLibrariesManager(res)
+	return res
+}
+
+// BuildIntoExistingLibrariesManager will overwrite the given LibrariesManager instead
+// of building a new one.
+func (lmb *Builder) BuildIntoExistingLibrariesManager(old *LibrariesManager) {
+	old.librariesLock.Lock()
+	old.librariesDir = lmb.librariesDir
+	old.libraries = lmb.libraries
+	old.librariesLock.Unlock()
 }
 
 // AddLibrariesDir adds path to the list of directories
 // to scan when searching for libraries. If a path is already
 // in the list it is ignored.
-func (lm *LibrariesManager) AddLibrariesDir(libDir *LibrariesDir) {
+func (lmb *Builder) AddLibrariesDir(libDir *LibrariesDir) {
 	if libDir.Path == nil {
 		return
 	}
-	for _, dir := range lm.librariesDir {
+	for _, dir := range lmb.librariesDir {
 		if dir.Path.EquivalentTo(libDir.Path) {
 			return
 		}
@@ -89,15 +151,15 @@ func (lm *LibrariesManager) AddLibrariesDir(libDir *LibrariesDir) {
 		WithField("location", libDir.Location.String()).
 		WithField("isSingleLibrary", libDir.IsSingleLibrary).
 		Info("Adding libraries dir")
-	lm.librariesDir = append(lm.librariesDir, libDir)
+	lmb.librariesDir = append(lmb.librariesDir, libDir)
 }
 
 // RescanLibraries reload all installed libraries in the system.
-func (lm *LibrariesManager) RescanLibraries() []*status.Status {
-	lm.clearLibraries()
+func (lmi *Installer) RescanLibraries() []*status.Status {
+	lmi.libraries = map[string]libraries.List{}
 	statuses := []*status.Status{}
-	for _, dir := range lm.librariesDir {
-		if errs := lm.loadLibrariesFromDir(dir); len(errs) > 0 {
+	for _, dir := range lmi.librariesDir {
+		if errs := lmi.loadLibrariesFromDir(dir); len(errs) > 0 {
 			statuses = append(statuses, errs...)
 		}
 	}
@@ -122,7 +184,7 @@ func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLoc
 
 // loadLibrariesFromDir loads all libraries in the given directory. Returns
 // nil if the directory doesn't exists.
-func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*status.Status {
+func (lmi *Installer) loadLibrariesFromDir(librariesDir *LibrariesDir) []*status.Status {
 	statuses := []*status.Status{}
 
 	var libDirs paths.PathList
@@ -142,17 +204,17 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 		libDirs = d
 	}
 
-	for _, subDir := range libDirs {
-		library, err := libraries.Load(subDir, librariesDir.Location)
+	for _, libDir := range libDirs {
+		library, err := libraries.Load(libDir, librariesDir.Location)
 		if err != nil {
-			s := status.Newf(codes.Internal, tr("loading library from %[1]s: %[2]s"), subDir, err)
+			s := status.Newf(codes.Internal, tr("loading library from %[1]s: %[2]s"), libDir, err)
 			statuses = append(statuses, s)
 			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives := lm.libraries[library.Name]
+		alternatives := lmi.libraries[library.Name]
 		alternatives.Add(library)
-		lm.libraries[library.Name] = alternatives
+		lmi.libraries[library.Name] = alternatives
 	}
 
 	return statuses
@@ -161,8 +223,8 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 // FindByReference return the installed libraries matching the Reference
 // name and version or, if the version is nil, the libraries installed
 // in the installLocation.
-func (lm *LibrariesManager) FindByReference(name string, version *semver.Version, installLocation libraries.LibraryLocation) libraries.List {
-	alternatives := lm.libraries[name]
+func (lmi *Installer) FindByReference(name string, version *semver.Version, installLocation libraries.LibraryLocation) libraries.List {
+	alternatives := lmi.libraries[name]
 	if alternatives == nil {
 		return nil
 	}
@@ -174,6 +236,7 @@ func (lm *LibrariesManager) FindAllInstalled() libraries.List {
 	var res libraries.List
 	for _, libAlternatives := range lm.libraries {
 		for _, libRelease := range libAlternatives {
+			// TODO: is this check redundant?
 			if libRelease.InstallDir == nil {
 				continue
 			}
@@ -181,10 +244,4 @@ func (lm *LibrariesManager) FindAllInstalled() libraries.List {
 		}
 	}
 	return res
-}
-
-func (lm *LibrariesManager) clearLibraries() {
-	for k := range lm.libraries {
-		delete(lm.libraries, k)
-	}
 }

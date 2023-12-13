@@ -301,14 +301,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	// Create library manager and add libraries directories
-	lm := librariesmanager.NewLibraryManager()
-	_ = instances.SetLibraryManager(instance, lm) // should never fail
+	lmb := librariesmanager.NewBuilder()
 
 	// Load libraries
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
 			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 					PlatformRelease: platformRelease,
 					Path:            platformRelease.GetLibrariesDir(),
 					Location:        libraries.PlatformBuiltIn,
@@ -336,14 +335,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
 		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 				Path:     bundledLibsDir,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
 		// Add libraries directory from config file
-		lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+		lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 			Path:     configuration.LibrariesDir(configuration.Settings),
 			Location: libraries.User,
 		})
@@ -383,16 +382,23 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				taskCallback(&rpc.TaskProgress{Completed: true})
 			}
 
-			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 				Path:     libRoot,
 				Location: libraries.User,
 			})
 		}
 	}
 
-	for _, status := range lm.RescanLibraries() {
-		logrus.WithError(status.Err()).Warnf("Error loading library")
-		// TODO: report as warning: responseError(err)
+	lm := lmb.Build()
+	_ = instances.SetLibraryManager(instance, lm) // should never fail
+
+	{
+		lmi, release := lm.NewInstaller()
+		for _, status := range lmi.RescanLibraries() {
+			logrus.WithError(status.Err()).Warnf("Error loading library")
+			// TODO: report as warning: responseError(err)
+		}
+		release()
 	}
 
 	// Refreshes the locale used, this will change the
