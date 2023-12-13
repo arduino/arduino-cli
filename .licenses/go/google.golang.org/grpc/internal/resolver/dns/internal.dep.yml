@@ -1,10 +1,9 @@
 ---
-name: google.golang.org/grpc/internal/grpcsync
+name: google.golang.org/grpc/internal/resolver/dns/internal
 version: v1.60.0
 type: go
-summary: Package grpcsync implements additional synchronization primitives built upon
-  the sync package.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/grpcsync
+summary: Package internal contains functionality internal to the dns resolver package.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/resolver/dns/internal
 license: apache-2.0
 licenses:
 - sources: grpc@v1.60.0/LICENSE
