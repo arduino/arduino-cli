@@ -22,7 +22,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/core"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
@@ -129,7 +129,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
-		var platformErr *arduino.PlatformNotFoundError
+		var platformErr *cmderrors.PlatformNotFoundError
 		if errors.As(err, &platformErr) {
 			split := strings.Split(platformErr.Platform, ":")
 			if len(split) < 2 {
@@ -194,10 +194,10 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	}
 	if res, err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
 		errcode := feedback.ErrGeneric
-		if errors.Is(err, &arduino.ProgrammerRequiredForUploadError{}) {
+		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer
 		}
-		if errors.Is(err, &arduino.MissingProgrammerError{}) {
+		if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 			errcode = feedback.ErrMissingProgrammer
 		}
 		feedback.FatalError(err, errcode)

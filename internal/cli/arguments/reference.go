@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -115,10 +115,10 @@ func ParseReference(arg string) (*Reference, error) {
 	// replace the returned Reference only if only one occurrence is found,
 	// otherwise return an error to the user because we don't know on which platform operate
 	if len(foundPlatforms) == 0 {
-		return nil, &arduino.PlatformNotFoundError{Platform: arg}
+		return nil, &cmderrors.PlatformNotFoundError{Platform: arg}
 	}
 	if len(foundPlatforms) > 1 {
-		return nil, &arduino.MultiplePlatformsError{Platforms: foundPlatforms, UserPlatform: arg}
+		return nil, &cmderrors.MultiplePlatformsError{Platforms: foundPlatforms, UserPlatform: arg}
 	}
 	toks = strings.Split(foundPlatforms[0], ":")
 	ret.PackageName = toks[0]

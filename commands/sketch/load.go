@@ -18,8 +18,8 @@ package sketch
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -29,7 +29,7 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 	// TODO: This should be a ToRpc function for the Sketch struct
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
+		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
 	otherSketchFiles := make([]string, sk.OtherSketchFiles.Len())

@@ -18,8 +18,8 @@ package lib
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -28,7 +28,7 @@ import (
 func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 
 	if err := upgrade(req.GetInstance(), listLibraries(lm, true, false), downloadCB, taskCB); err != nil {
@@ -46,7 +46,7 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 
 	// Get the library to upgrade
@@ -54,7 +54,7 @@ func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloa
 	lib := filterByName(listLibraries(lm, false, false), name)
 	if lib == nil {
 		// library not installed...
-		return &arduino.LibraryNotFoundError{Library: name}
+		return &cmderrors.LibraryNotFoundError{Library: name}
 	}
 	if lib.Available == nil {
 		taskCB(&rpc.TaskProgress{Message: tr("Library %s is already at the latest version", name), Completed: true})

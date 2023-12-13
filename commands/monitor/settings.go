@@ -18,9 +18,9 @@ package monitor
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	pluggableMonitor "github.com/arduino/arduino-cli/internal/arduino/monitor"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -28,7 +28,7 @@ import (
 func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -38,13 +38,13 @@ func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitor
 	}
 
 	if err := m.Run(); err != nil {
-		return nil, &arduino.FailedMonitorError{Cause: err}
+		return nil, &cmderrors.FailedMonitorError{Cause: err}
 	}
 	defer m.Quit()
 
 	desc, err := m.Describe()
 	if err != nil {
-		return nil, &arduino.FailedMonitorError{Cause: err}
+		return nil, &cmderrors.FailedMonitorError{Cause: err}
 	}
 
 	// Apply default settings for this board and protocol

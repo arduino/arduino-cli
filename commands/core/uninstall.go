@@ -18,10 +18,10 @@ package core
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -40,7 +40,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -51,18 +51,18 @@ func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if ref.PlatformVersion == nil {
 		platform := pme.FindPlatform(ref)
 		if platform == nil {
-			return &arduino.PlatformNotFoundError{Platform: ref.String()}
+			return &cmderrors.PlatformNotFoundError{Platform: ref.String()}
 		}
 		platformRelease := pme.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			return &arduino.PlatformNotFoundError{Platform: ref.String()}
+			return &cmderrors.PlatformNotFoundError{Platform: ref.String()}
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}
 
 	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
+		return &cmderrors.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
 	if err := pme.UninstallPlatform(platform, taskCB, req.GetSkipPreUninstall()); err != nil {

@@ -18,11 +18,11 @@ package core
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -31,7 +31,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 	upgrade := func() (*cores.PlatformRelease, error) {
 		pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 		if pme == nil {
-			return nil, &arduino.InvalidInstanceError{}
+			return nil, &cmderrors.InvalidInstanceError{}
 		}
 		defer release()
 

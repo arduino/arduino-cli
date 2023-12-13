@@ -19,7 +19,6 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands/sketch"
-	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -41,7 +40,7 @@ func InitSketchPath(path string, printWarnings bool) (sketchPath *paths.Path) {
 		sketchPath = wd
 	}
 	if printWarnings {
-		if msg := sk.WarnDeprecatedFiles(sketchPath); msg != "" {
+		if msg := sketch.WarnDeprecatedFiles(sketchPath); msg != "" {
 			feedback.Warning(msg)
 		}
 	}

@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -50,7 +50,7 @@ func convertErrorToRPCStatus(err error) error {
 	if err == nil {
 		return nil
 	}
-	if cmdErr, ok := err.(arduino.CommandError); ok {
+	if cmdErr, ok := err.(cmderrors.CommandError); ok {
 		return cmdErr.ToRPCStatus().Err()
 	}
 	return err

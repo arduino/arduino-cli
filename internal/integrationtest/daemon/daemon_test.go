@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -518,7 +518,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
-			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
+			require.ErrorIs(t, upgradeError, (&cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
 			require.NotNil(t, platform)
 			require.False(t, platform.GetMetadata().GetIndexed())        // the esp866 is not present in the additional-urls
 			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
@@ -543,7 +543,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
-			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
+			require.ErrorIs(t, upgradeError, (&cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
 			require.NotNil(t, platform)
 			require.False(t, platform.GetMetadata().GetIndexed())       // the esp866 is not present in the additional-urls
 			require.True(t, platform.GetRelease().GetMissingMetadata()) // install.json is present

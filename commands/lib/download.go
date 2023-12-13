@@ -18,12 +18,12 @@ package lib
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/httpclient"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 )
@@ -37,7 +37,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 
 	logrus.Info("Preparing download")
@@ -60,10 +60,10 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
 	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
+		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	if err := libRelease.Resource.Download(lm.DownloadsDir, config, libRelease.String(), downloadCB, queryParameter); err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
+		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 

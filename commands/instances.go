@@ -22,20 +22,20 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -61,7 +61,26 @@ func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, dow
 
 // Create a new CoreInstance ready to be initialized, supporting directories are also created.
 func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateResponse, error) {
-	inst, err := instances.Create(extraUserAgent...)
+	// Setup downloads directory
+	downloadsDir := configuration.DownloadsDir(configuration.Settings)
+	if downloadsDir.NotExist() {
+		err := downloadsDir.MkdirAll()
+		if err != nil {
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
+		}
+	}
+
+	// Setup data directory
+	dataDir := configuration.DataDir(configuration.Settings)
+	packagesDir := configuration.PackagesDir(configuration.Settings)
+	if packagesDir.NotExist() {
+		err := packagesDir.MkdirAll()
+		if err != nil {
+			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
+		}
+	}
+
+	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, extraUserAgent...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,11 +98,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 	reqInst := req.GetInstance()
 	if reqInst == nil {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 	instance := req.GetInstance()
 	if !instances.IsValid(instance) {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 
 	// Setup callback functions
@@ -121,11 +140,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if req.GetProfile() != "" {
 		sk, err := sketch.New(paths.New(req.GetSketchPath()))
 		if err != nil {
-			return &arduino.InvalidArgumentError{Cause: err}
+			return &cmderrors.InvalidArgumentError{Cause: err}
 		}
 		profile = sk.GetProfile(req.GetProfile())
 		if profile == nil {
-			return &arduino.UnknownProfileError{Profile: req.GetProfile()}
+			return &cmderrors.UnknownProfileError{Profile: req.GetProfile()}
 		}
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Profile{
@@ -145,7 +164,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		for _, u := range configuration.Settings.GetStringSlice("board_manager.additional_urls") {
 			URL, err := utils.URLParse(u)
 			if err != nil {
-				e := &arduino.InitFailedError{
+				e := &cmderrors.InitFailedError{
 					Code:   codes.InvalidArgument,
 					Cause:  fmt.Errorf(tr("Invalid additional URL: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL,
@@ -157,7 +176,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 	if err := firstUpdate(context.Background(), req.GetInstance(), downloadCallback, allPackageIndexUrls); err != nil {
-		e := &arduino.InitFailedError{
+		e := &cmderrors.InitFailedError{
 			Code:   codes.InvalidArgument,
 			Cause:  err,
 			Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR,
@@ -178,7 +197,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			if URL.Scheme == "file" {
 				_, err := pmb.LoadPackageIndexFromFile(paths.New(URL.Path))
 				if err != nil {
-					e := &arduino.InitFailedError{
+					e := &cmderrors.InitFailedError{
 						Code:   codes.FailedPrecondition,
 						Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
 						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
@@ -189,7 +208,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			}
 
 			if err := pmb.LoadPackageIndex(URL); err != nil {
-				e := &arduino.InitFailedError{
+				e := &cmderrors.InitFailedError{
 					Code:   codes.FailedPrecondition,
 					Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
@@ -206,7 +225,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// Load Platforms
 		if profile == nil {
 			for _, err := range pmb.LoadHardware() {
-				s := &arduino.PlatformLoadingError{Cause: err}
+				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.ToRPCStatus())
 			}
 		} else {
@@ -215,7 +234,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				profile, true, downloadCallback, taskCallback,
 			)
 			for _, err := range errs {
-				s := &arduino.PlatformLoadingError{Cause: err}
+				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.ToRPCStatus())
 			}
 
@@ -231,7 +250,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		for name, tool := range pmb.GetOrCreatePackage("builtin").Tools {
 			latest := tool.LatestRelease()
 			if latest == nil {
-				e := &arduino.InitFailedError{
+				e := &cmderrors.InitFailedError{
 					Code:   codes.Internal,
 					Cause:  fmt.Errorf(tr("can't find latest release of tool %s", name)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
@@ -246,7 +265,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if len(builtinToolsToInstall) > 0 {
 			for _, toolRelease := range builtinToolsToInstall {
 				if err := installTool(pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
-					e := &arduino.InitFailedError{
+					e := &cmderrors.InitFailedError{
 						Code:   codes.Internal,
 						Cause:  err,
 						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
@@ -258,7 +277,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			// We installed at least one builtin tool after loading hardware
 			// so we must reload again otherwise we would never found them.
 			for _, err := range loadBuiltinTools() {
-				s := &arduino.PlatformLoadingError{Cause: err}
+				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.ToRPCStatus())
 			}
 		}
@@ -270,7 +289,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	defer release()
 
 	for _, err := range pme.LoadDiscoveries() {
-		s := &arduino.PlatformLoadingError{Cause: err}
+		s := &cmderrors.PlatformLoadingError{Cause: err}
 		responseError(s.ToRPCStatus())
 	}
 
@@ -319,13 +338,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				})
 				if libRelease == nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
-					err := &arduino.LibraryNotFoundError{Library: libraryRef.Library}
+					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
 					responseError(err.ToRPCStatus())
 					continue
 				}
 				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
-					e := &arduino.FailedLibraryInstallError{Cause: err}
+					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())
 					continue
 				}
@@ -335,7 +354,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				taskCallback(&rpc.TaskProgress{Name: tr("Installing library %s", libraryRef)})
 				if err := libRelease.Resource.Install(lm.DownloadsDir, libRoot, libDir); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
-					e := &arduino.FailedLibraryInstallError{Cause: err}
+					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())
 					continue
 				}
@@ -362,7 +381,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 // Destroy FIXMEDOC
 func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	if ok := instances.Delete(req.GetInstance()); !ok {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	return &rpc.DestroyResponse{}, nil
 }
@@ -372,17 +391,17 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	logrus.Info("Updating libraries index")
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 
 	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
+		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
 	// Create a temp dir to stage all downloads
 	tmp, err := paths.MkTempDir("", "library_index_download")
 	if err != nil {
-		return &arduino.TempDirCreationFailedError{Cause: err}
+		return &cmderrors.TempDirCreationFailedError{Cause: err}
 	}
 	defer tmp.RemoveAll()
 
@@ -400,7 +419,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 // UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	if !instances.IsValid(req.GetInstance()) {
-		return &arduino.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 
 	indexpath := configuration.DataDir(configuration.Settings)
@@ -448,7 +467,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 	}
 
 	if failed {
-		return &arduino.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
+		return &cmderrors.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
 	}
 	return nil
 }
@@ -475,9 +494,9 @@ func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(ms
 		}
 		packageIndexFileName, err := (&resources.IndexResource{URL: URL}).IndexFileName()
 		if err != nil {
-			return &arduino.FailedDownloadError{
+			return &cmderrors.FailedDownloadError{
 				Message: tr("Error downloading index '%s'", URL),
-				Cause:   &arduino.InvalidURLError{}}
+				Cause:   &cmderrors.InvalidURLError{}}
 		}
 		packageIndexFile := dataDir.Join(packageIndexFileName)
 		if packageIndexFile.NotExist() {

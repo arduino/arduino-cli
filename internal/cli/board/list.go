@@ -22,9 +22,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -72,7 +72,7 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 		Timeout:  timeout,
 		Fqbn:     fqbn,
 	})
-	var invalidFQBNErr *arduino.InvalidFQBNError
+	var invalidFQBNErr *cmderrors.InvalidFQBNError
 	if errors.As(err, &invalidFQBNErr) {
 		feedback.Fatal(tr(err.Error()), feedback.ErrBadArgument)
 	}

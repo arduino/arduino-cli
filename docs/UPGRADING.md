@@ -8,11 +8,15 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 The following golang modules are no longer available as public API:
 
+- `github.com/arduino/arduino-cli/arduino`
 - `github.com/arduino/arduino-cli/buildcache`
+- `github.com/arduino/arduino-cli/configuration`
 - `github.com/arduino/arduino-cli/executils`
 - `github.com/arduino/arduino-cli/table`
 
 Most of the `executils` library has been integrated inside the `go-paths` library `github.com/arduino/go-paths-helper`.
+The other packages are not intended for usage outside the Arduino CLI, we will keep them internal to allow future
+breaking changes as needed.
 
 ### CLI changed JSON output for some `lib`, `core`, `config`, `board`, and `sketch` commands.
 

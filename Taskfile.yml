@@ -130,8 +130,8 @@ tasks:
     desc: Run easyjson code generation
     cmds:
       - go install github.com/mailru/easyjson/...@v0.7.7
-      - easyjson arduino/cores/packageindex/index.go
-      - easyjson arduino/libraries/librariesindex/json.go
+      - easyjson internal/arduino/cores/packageindex/index.go
+      - easyjson internal/arduino/libraries/librariesindex/json.go
 
   go:add-license-headers:
     desc: Add missing go license headers
@@ -246,7 +246,7 @@ tasks:
   docs:include-configuration-json-schema:
     desc: Copy configuration JSON schema to make it available in documentation
     cmds:
-      - cp ./configuration/configuration.schema.json ./docs/configuration.schema.json
+      - cp ./internal/cli/configuration/configuration.schema.json ./docs/configuration.schema.json
 
   protoc:check:
     desc: Perform linting of the protobuf definitions

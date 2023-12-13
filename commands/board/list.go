@@ -18,6 +18,7 @@ package board
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,16 +27,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/arduino/httpclient"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/discovery"
+	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -73,10 +73,10 @@ func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
 	if !validVidPid.MatchString(vid) {
-		return nil, errors.Errorf(tr("Invalid vid value: '%s'"), vid)
+		return nil, errors.New(tr("Invalid vid value: '%s'", vid))
 	}
 	if !validVidPid.MatchString(pid) {
-		return nil, errors.Errorf(tr("Invalid pid value: '%s'"), pid)
+		return nil, errors.New(tr("Invalid pid value: '%s'", pid))
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
@@ -88,19 +88,19 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	httpClient, err := httpclient.New()
 
 	if err != nil {
-		return nil, errors.Wrap(err, tr("failed to initialize http client"))
+		return nil, fmt.Errorf("%s: %w", tr("failed to initialize http client"), err)
 	}
 
 	res, err := httpClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
+		return nil, fmt.Errorf("%s: %w", tr("error querying Arduino Cloud Api"), err)
 	}
 	if res.StatusCode == 404 {
 		// This is not an error, it just means that the board is not recognized
 		return nil, nil
 	}
 	if res.StatusCode >= 400 {
-		return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
+		return nil, errors.New(tr("the server responded with status %s", res.Status))
 	}
 
 	resp, err := io.ReadAll(res.Body)
@@ -113,7 +113,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 
 	var dat map[string]interface{}
 	if err := json.Unmarshal(resp, &dat); err != nil {
-		return nil, errors.Wrap(err, tr("error processing response from server"))
+		return nil, fmt.Errorf("%s: %w", tr("error processing response from server"), err)
 	}
 	name, nameFound := dat["name"].(string)
 	fqbn, fbqnFound := dat["fqbn"].(string)
@@ -151,7 +151,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	for _, board := range pme.IdentifyBoard(port.Properties) {
 		fqbn, err := cores.ParseFQBN(board.FQBN())
 		if err != nil {
-			return nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 		fqbn.Configs = board.IdentifyBoardConfiguration(port.Properties)
 
@@ -207,7 +207,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, nil, &arduino.InvalidInstanceError{}
+		return nil, nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -216,7 +216,7 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 		var err error
 		fqbnFilter, err = cores.ParseFQBN(f)
 		if err != nil {
-			return nil, nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 	}
 
@@ -262,7 +262,7 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 	dm := pme.DiscoveryManager()

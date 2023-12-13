@@ -19,7 +19,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/commands/daemon"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"

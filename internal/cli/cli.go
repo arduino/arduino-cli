@@ -21,7 +21,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/board"
 	"github.com/arduino/arduino-cli/internal/cli/burnbootloader"
@@ -29,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/compile"
 	"github.com/arduino/arduino-cli/internal/cli/completion"
 	"github.com/arduino/arduino-cli/internal/cli/config"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/core"
 	"github.com/arduino/arduino-cli/internal/cli/daemon"
 	"github.com/arduino/arduino-cli/internal/cli/debug"

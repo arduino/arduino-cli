@@ -16,7 +16,7 @@
 package arguments
 
 import (
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -71,7 +71,7 @@ func (p *PrePostScriptsFlags) DetectSkipPostInstallValue() bool {
 		return true
 	}
 
-	if !configuration.IsInteractive {
+	if !feedback.IsInteractive() {
 		logrus.Info("Not running from console, will skip post-install by default")
 		return true
 	}
@@ -90,7 +90,7 @@ func (p *PrePostScriptsFlags) DetectSkipPreUninstallValue() bool {
 		return true
 	}
 
-	if !configuration.IsInteractive {
+	if !feedback.IsInteractive() {
 		logrus.Info("Not running from console, will skip pre-uninstall by default")
 		return true
 	}

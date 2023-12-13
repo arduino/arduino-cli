@@ -20,9 +20,9 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -57,17 +57,17 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 
 	sketchDirPath := paths.New(sketchesDir).Join(req.GetSketchName())
 	if err := sketchDirPath.MkdirAll(); err != nil {
-		return nil, &arduino.CantCreateSketchError{Cause: err}
+		return nil, &cmderrors.CantCreateSketchError{Cause: err}
 	}
 	sketchName := sketchDirPath.Base()
 	sketchMainFilePath := sketchDirPath.Join(sketchName + globals.MainFileValidExtension)
 	if !req.GetOverwrite() {
 		if sketchMainFilePath.Exist() {
-			return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr(".ino file already exists"))}
+			return nil, &cmderrors.CantCreateSketchError{Cause: errors.New(tr(".ino file already exists"))}
 		}
 	}
 	if err := sketchMainFilePath.WriteFile(emptySketch); err != nil {
-		return nil, &arduino.CantCreateSketchError{Cause: err}
+		return nil, &cmderrors.CantCreateSketchError{Cause: err}
 	}
 
 	return &rpc.NewSketchResponse{MainFile: sketchMainFilePath.String()}, nil
@@ -75,20 +75,20 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 
 func validateSketchName(name string) error {
 	if name == "" {
-		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name cannot be empty"))}
+		return &cmderrors.CantCreateSketchError{Cause: errors.New(tr("sketch name cannot be empty"))}
 	}
 	if len(name) > sketchNameMaxLength {
-		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name too long (%[1]d characters). Maximum allowed length is %[2]d",
+		return &cmderrors.CantCreateSketchError{Cause: errors.New(tr("sketch name too long (%[1]d characters). Maximum allowed length is %[2]d",
 			len(name),
 			sketchNameMaxLength))}
 	}
 	if !sketchNameValidationRegex.MatchString(name) {
-		return &arduino.CantCreateSketchError{Cause: errors.New(tr(`invalid sketch name "%[1]s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".". The last one cannot be ".".`,
+		return &cmderrors.CantCreateSketchError{Cause: errors.New(tr(`invalid sketch name "%[1]s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".". The last one cannot be ".".`,
 			name))}
 	}
 	for _, invalid := range invalidNames {
 		if name == invalid {
-			return &arduino.CantCreateSketchError{Cause: errors.New(tr(`sketch name cannot be the reserved name "%[1]s"`, invalid))}
+			return &cmderrors.CantCreateSketchError{Cause: errors.New(tr(`sketch name cannot be the reserved name "%[1]s"`, invalid))}
 		}
 	}
 	return nil

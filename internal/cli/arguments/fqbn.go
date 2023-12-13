@@ -18,7 +18,7 @@ package arguments
 import (
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
@@ -76,11 +76,11 @@ func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance,
 	}
 	if fqbn == "" {
 		if portArgs == nil || portArgs.address == "" {
-			feedback.FatalError(&arduino.MissingFQBNError{}, feedback.ErrGeneric)
+			feedback.FatalError(&cmderrors.MissingFQBNError{}, feedback.ErrGeneric)
 		}
 		fqbn, port := portArgs.DetectFQBN(instance)
 		if fqbn == "" {
-			feedback.FatalError(&arduino.MissingFQBNError{}, feedback.ErrGeneric)
+			feedback.FatalError(&cmderrors.MissingFQBNError{}, feedback.ErrGeneric)
 		}
 		return fqbn, port
 	}

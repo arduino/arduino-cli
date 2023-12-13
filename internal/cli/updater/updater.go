@@ -17,13 +17,12 @@ package updater
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/httpclient"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	"github.com/arduino/arduino-cli/version"
@@ -94,14 +93,7 @@ func shouldCheckForUpdate(currentVersion *semver.Version) bool {
 	}
 
 	// Don't check when running on CI or on non interactive consoles
-	return !isCI() && configuration.IsInteractive && configuration.HasConsole
-}
-
-// based on https://github.com/watson/ci-info/blob/HEAD/index.js
-func isCI() bool {
-	return os.Getenv("CI") != "" || // GitHub Actions, Travis CI, CircleCI, Cirrus CI, GitLab CI, AppVeyor, CodeShip, dsari
-		os.Getenv("BUILD_NUMBER") != "" || // Jenkins, TeamCity
-		os.Getenv("RUN_ID") != "" // TaskCluster, dsari
+	return !feedback.IsCI() && feedback.IsInteractive() && feedback.HasConsole()
 }
 
 // getLatestRelease queries the official Arduino download server for the latest release,

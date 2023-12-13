@@ -18,9 +18,9 @@ package upload
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -28,23 +28,23 @@ import (
 func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" {
-		return nil, &arduino.MissingFQBNError{}
+		return nil, &cmderrors.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, &arduino.InvalidFQBNError{Cause: err}
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
 
 	// Find target platforms
 	_, platform, _, _, refPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, &arduino.UnknownFQBNError{Cause: err}
+		return nil, &cmderrors.UnknownFQBNError{Cause: err}
 	}
 
 	result := []*rpc.Programmer{}

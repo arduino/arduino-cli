@@ -20,12 +20,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	pluggableMonitor "github.com/arduino/arduino-cli/internal/arduino/monitor"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
@@ -63,7 +63,7 @@ func (p *PortProxy) Close() error {
 func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
 	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
-		return nil, nil, &arduino.InvalidInstanceError{}
+		return nil, nil, &cmderrors.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -73,13 +73,13 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}
 
 	if err := m.Run(); err != nil {
-		return nil, nil, &arduino.FailedMonitorError{Cause: err}
+		return nil, nil, &cmderrors.FailedMonitorError{Cause: err}
 	}
 
 	descriptor, err := m.Describe()
 	if err != nil {
 		m.Quit()
-		return nil, nil, &arduino.FailedMonitorError{Cause: err}
+		return nil, nil, &cmderrors.FailedMonitorError{Cause: err}
 	}
 
 	// Apply user-requested settings
@@ -99,7 +99,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	monIO, err := m.Open(req.GetPort().GetAddress(), req.GetPort().GetProtocol())
 	if err != nil {
 		m.Quit()
-		return nil, nil, &arduino.FailedMonitorError{Cause: err}
+		return nil, nil, &cmderrors.FailedMonitorError{Cause: err}
 	}
 
 	logrus.Infof("Port %s successfully opened", req.GetPort().GetAddress())
@@ -115,7 +115,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 
 func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, *properties.Map, error) {
 	if protocol == "" {
-		return nil, nil, &arduino.MissingPortProtocolError{}
+		return nil, nil, &cmderrors.MissingPortProtocolError{}
 	}
 
 	var monitorDepOrRecipe *cores.MonitorDependency
@@ -125,12 +125,12 @@ func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, pro
 	if fqbn != "" {
 		fqbn, err := cores.ParseFQBN(fqbn)
 		if err != nil {
-			return nil, nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 
 		_, boardPlatform, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, nil, &arduino.UnknownFQBNError{Cause: err}
+			return nil, nil, &cmderrors.UnknownFQBNError{Cause: err}
 		}
 
 		boardSettings = cores.GetMonitorSettings(protocol, boardProperties)
@@ -142,7 +142,7 @@ func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, pro
 			cmdLine := boardProperties.ExpandPropsInString(recipe)
 			cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 			if err != nil {
-				return nil, nil, &arduino.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
+				return nil, nil, &cmderrors.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
 			}
 			id := fmt.Sprintf("%s-%s", boardPlatform, protocol)
 			return pluggableMonitor.New(id, cmdArgs...), boardSettings, nil
@@ -160,13 +160,13 @@ func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, pro
 	}
 
 	if monitorDepOrRecipe == nil {
-		return nil, nil, &arduino.NoMonitorAvailableForProtocolError{Protocol: protocol}
+		return nil, nil, &cmderrors.NoMonitorAvailableForProtocolError{Protocol: protocol}
 	}
 
 	// If it is a monitor dependency, resolve tool and create a monitor client
 	tool := pme.FindMonitorDependency(monitorDepOrRecipe)
 	if tool == nil {
-		return nil, nil, &arduino.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
+		return nil, nil, &cmderrors.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
 	}
 
 	return pluggableMonitor.New(

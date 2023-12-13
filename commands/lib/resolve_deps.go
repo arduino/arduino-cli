@@ -20,10 +20,10 @@ import (
 	"errors"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -32,7 +32,7 @@ import (
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
 	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
 
 	// Search the requested lib
@@ -70,12 +70,12 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		for _, directDep := range reqLibRelease.GetDependencies() {
 			if _, ok := lm.Index.Libraries[directDep.GetName()]; !ok {
 				err := errors.New(tr("dependency '%s' is not available", directDep.GetName()))
-				return nil, &arduino.LibraryDependenciesResolutionFailedError{Cause: err}
+				return nil, &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
 			}
 		}
 
 		// Otherwise there is no possible solution, the depends field has an invalid formula
-		return nil, &arduino.LibraryDependenciesResolutionFailedError{}
+		return nil, &cmderrors.LibraryDependenciesResolutionFailedError{}
 	}
 
 	res := []*rpc.LibraryDependencyStatus{}

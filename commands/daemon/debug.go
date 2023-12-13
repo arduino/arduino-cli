@@ -17,11 +17,11 @@ package daemon
 
 import (
 	"context"
+	"errors"
 	"os"
 
 	cmd "github.com/arduino/arduino-cli/commands/debug"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
 )
 
 // Debug returns a stream response that can be used to fetch data from the
@@ -37,7 +37,7 @@ func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	// Ensure it's a config message and not data
 	req := msg.GetDebugRequest()
 	if req == nil {
-		return errors.Errorf(tr("First message must contain debug request, not data"))
+		return errors.New(tr("First message must contain debug request, not data"))
 	}
 
 	// Launch debug recipe attaching stdin and out to grpc streaming

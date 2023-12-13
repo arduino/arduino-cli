@@ -22,8 +22,8 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"

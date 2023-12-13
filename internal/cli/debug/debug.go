@@ -22,7 +22,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/debug"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/i18n"
@@ -101,7 +101,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
 			errcode := feedback.ErrBadArgument
-			if errors.Is(err, &arduino.MissingProgrammerError{}) {
+			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
 			feedback.Fatal(tr("Error getting Debug info: %v", err), errcode)
@@ -121,7 +121,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 		}
 		if _, err := debug.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
 			errcode := feedback.ErrGeneric
-			if errors.Is(err, &arduino.MissingProgrammerError{}) {
+			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
 			feedback.Fatal(tr("Error during Debug: %v", err), errcode)

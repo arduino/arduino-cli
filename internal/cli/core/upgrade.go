@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -125,7 +125,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
 		warningMissingIndex(response)
 		if err != nil {
-			var alreadyAtLatestVersionErr *arduino.PlatformAlreadyAtTheLatestVersionError
+			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError
 			if errors.As(err, &alreadyAtLatestVersionErr) {
 				feedback.Warning(err.Error())
 				continue

@@ -19,8 +19,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
