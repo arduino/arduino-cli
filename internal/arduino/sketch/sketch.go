@@ -23,8 +23,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 

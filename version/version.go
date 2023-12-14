@@ -19,7 +19,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/i18n"
 )
 
 // VersionInfo contains all info injected during build

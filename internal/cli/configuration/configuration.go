@@ -21,8 +21,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
 	"github.com/spf13/cobra"

@@ -13,18 +13,25 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+package commands
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/arduino/arduino-cli/i18n/cmd/commands"
+	"github.com/arduino/arduino-cli/internal/i18n/cmd/commands/catalog"
+	"github.com/arduino/arduino-cli/internal/i18n/cmd/commands/transifex"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	if err := commands.Execute(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+var i18nCommand = &cobra.Command{
+	Use:   "i18n",
+	Short: "i18n",
+}
+
+func init() {
+	i18nCommand.AddCommand(catalog.Command)
+	i18nCommand.AddCommand(transifex.Command)
+}
+
+// Execute executes the i18n command
+func Execute() error {
+	return i18nCommand.Execute()
 }

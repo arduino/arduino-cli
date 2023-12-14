@@ -21,7 +21,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/gofrs/uuid/v5"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

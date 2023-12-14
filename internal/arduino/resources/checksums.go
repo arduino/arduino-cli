@@ -28,7 +28,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 )
 

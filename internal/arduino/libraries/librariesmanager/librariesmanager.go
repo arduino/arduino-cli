@@ -22,10 +22,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"

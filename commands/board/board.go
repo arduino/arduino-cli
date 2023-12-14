@@ -15,6 +15,6 @@
 
 package board
 
-import "github.com/arduino/arduino-cli/i18n"
+import "github.com/arduino/arduino-cli/internal/i18n"
 
 var tr = i18n.Tr
