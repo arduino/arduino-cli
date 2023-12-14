@@ -22,6 +22,16 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
+func filter(p *paths.PathList, filter func(*paths.Path) bool) paths.PathList {
+	res := (*p)[:0]
+	for _, path := range *p {
+		if filter(path) {
+			res = append(res, path)
+		}
+	}
+	return res
+}
+
 // link fixdoc
 func (b *Builder) link() error {
 	if b.onlyUpdateCompilationDatabase {
@@ -53,31 +63,16 @@ func (b *Builder) link() error {
 		// it may happen that a subdir/spi.o inside the archive may be overwritten by a anotherdir/spi.o
 		// because thery are both named spi.o.
 
-		properties := b.buildProperties.Clone()
 		archives := paths.NewPathList()
+
 		for _, object := range objectFiles {
-			if object.HasSuffix(".a") {
-				archives.Add(object)
-				continue
-			}
 			archive := object.Parent().Join("objs.a")
-			if !archives.Contains(archive) {
-				archives.Add(archive)
-				// Cleanup old archives
-				_ = archive.Remove()
-			}
-			properties.Set("archive_file", archive.Base())
-			properties.SetPath("archive_file_path", archive)
-			properties.SetPath("object_file", object)
+			archives.AddIfMissing(archive)
+		}
 
-			command, err := b.prepareCommandForRecipe(properties, "recipe.ar.pattern", false)
-			if err != nil {
-				return err
-			}
-
-			if err := b.execCommand(command); err != nil {
-				return err
-			}
+		for _, archive := range archives {
+			relatedObjectFiles := filter(&objectFiles, func(object *paths.Path) bool { return object.Parent().EquivalentTo(archive.Parent()) })
+			b.archiveCompiledFiles(archive.Parent(), paths.New(archive.Base()), relatedObjectFiles)
 		}
 
 		objectFileList = strings.Join(f.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
