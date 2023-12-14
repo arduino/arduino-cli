@@ -53,12 +53,12 @@ tasks:
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
   go:cli-docs:
     desc: Generate command line interface reference documentation
-    dir: ./docsgen
+    dir: ./internal/docsgen
     cmds:
       # Command examples use os.Args[0] so the docs generation binary must have the same filename as the project
       - go build -o {{.PROJECT_NAME}}{{exeExt}}
       # The binary is invoked like this instead of `./{{.PROJECT_NAME}}` to remove the `./` chars from the examples
-      - PATH=. {{.PROJECT_NAME}} ../docs/commands
+      - PATH=. {{.PROJECT_NAME}} ../../docs/commands
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:fix:

@@ -28,8 +28,8 @@ __debug_bin*
 # Mkdocs
 /site/
 /public/
-/docsgen/arduino-cli
-/docsgen/arduino-cli.exe
+/internal/docsgen/arduino-cli
+/internal/docsgen/arduino-cli.exe
 /docs/rpc/*.md
 /docs/commands/*.md
 /docs/configuration.schema.json
