@@ -60,7 +60,7 @@ jobs:
         run: echo "version=$(task general:get-version)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}
@@ -162,7 +162,7 @@ jobs:
           echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}
@@ -216,7 +216,7 @@ jobs:
           "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_PFX}} -p ${{ env.CERT_PASSWORD }} -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         env:
           MSI_FILE: ${{ steps.buildmsi.outputs.msi }}
         with:
