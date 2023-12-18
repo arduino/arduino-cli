@@ -112,6 +112,7 @@ nav:
   - Package index specification: package_index_json-specification.md
   - Guides:
       - Secure boot: guides/secure-boot.md
+  - Backward compatibility policy: versioning.md
 
 extra:
   version:
