@@ -1716,7 +1716,7 @@ Installed<span class="w"> </span>FTDebouncer@1.3.0
 </code></pre></div>
 <h2 id="using-the-daemon-mode-and-the-grpc-interface">Using the <code>daemon</code> mode and the gRPC interface<a class="headerlink" href="#using-the-daemon-mode-and-the-grpc-interface" title="Permanent link">&para;</a></h2>
 <p>Arduino CLI can be launched as a gRPC server via the <code>daemon</code> command.</p>
-<p>The <a href="https://github.com/arduino/arduino-cli/blob/master/client_example">client_example</a> folder contains a sample client code that shows how to interact with the gRPC server. Available
+<p>The <a href="https://github.com/arduino/arduino-cli/blob/master/rpc/internal/client_example">client_example</a> folder contains a sample client code that shows how to interact with the gRPC server. Available
 services and messages are detailed in the <a href="../rpc/commands/">gRPC reference</a> pages.</p>
 <p>To provide observability for the gRPC server activities besides logs, the <code>daemon</code> mode activates and exposes by default
 a <a href="https://prometheus.io/">Prometheus</a> endpoint (<a href="http://localhost:9090/metrics">http://localhost:9090/metrics</a>) that can be fetched for metrics data
