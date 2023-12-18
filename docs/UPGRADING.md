@@ -10,8 +10,11 @@ The following golang modules are no longer available as public API:
 
 - `github.com/arduino/arduino-cli/arduino`
 - `github.com/arduino/arduino-cli/buildcache`
+- `github.com/arduino/arduino-cli/client_example`
 - `github.com/arduino/arduino-cli/configuration`
+- `github.com/arduino/arduino-cli/docsgen`
 - `github.com/arduino/arduino-cli/executils`
+- `github.com/arduino/arduino-cli/i18n`
 - `github.com/arduino/arduino-cli/table`
 
 Most of the `executils` library has been integrated inside the `go-paths` library `github.com/arduino/go-paths-helper`.

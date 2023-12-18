@@ -26,7 +26,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
@@ -36,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )

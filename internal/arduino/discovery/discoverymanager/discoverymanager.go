@@ -21,8 +21,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/sirupsen/logrus"
 )
 

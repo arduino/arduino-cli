@@ -20,9 +20,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/updater"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

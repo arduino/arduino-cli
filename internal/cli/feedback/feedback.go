@@ -24,7 +24,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
 )

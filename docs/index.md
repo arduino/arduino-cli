@@ -19,5 +19,5 @@ services and messages are detailed in the [gRPC reference] pages.
 
 [installation]: installation.md
 [getting started guide]: getting-started.md
-[client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
+[client_example]: https://github.com/arduino/arduino-cli/blob/master/rpc/internal/client_example
 [grpc reference]: rpc/commands.md

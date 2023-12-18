@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"go.bug.st/serial"
 )
 

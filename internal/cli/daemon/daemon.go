@@ -25,9 +25,9 @@ import (
 	"syscall"
 
 	"github.com/arduino/arduino-cli/commands/daemon"
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"

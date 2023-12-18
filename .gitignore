@@ -18,9 +18,9 @@ __debug_bin*
 .vscode
 
 # gRPC client example folder
-/client_example/client_example
-/client_example/**/*.bin
-/client_example/**/*.elf
+/rpc/internal/client_example/client_example
+/rpc/internal/client_example/**/*.bin
+/rpc/internal/client_example/**/*.elf
 
 # Misc.
 .DS_Store
@@ -28,8 +28,8 @@ __debug_bin*
 # Mkdocs
 /site/
 /public/
-/docsgen/arduino-cli
-/docsgen/arduino-cli.exe
+/internal/docsgen/arduino-cli
+/internal/docsgen/arduino-cli.exe
 /docs/rpc/*.md
 /docs/commands/*.md
 /docs/configuration.schema.json

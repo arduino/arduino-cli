@@ -21,7 +21,7 @@ on:
       - "go.sum"
       - "Taskfile.ya?ml"
       - "**.go"
-      - "docsgen/**"
+      - "internal/docsgen/**"
       - "rpc/**"
       - "mkdocs.ya?ml"
       - "poetry.lock"

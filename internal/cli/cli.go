@@ -21,7 +21,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/board"
 	"github.com/arduino/arduino-cli/internal/cli/burnbootloader"
 	"github.com/arduino/arduino-cli/internal/cli/cache"
@@ -43,6 +42,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/upgrade"
 	"github.com/arduino/arduino-cli/internal/cli/upload"
 	"github.com/arduino/arduino-cli/internal/cli/version"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	versioninfo "github.com/arduino/arduino-cli/version"
 	"github.com/fatih/color"

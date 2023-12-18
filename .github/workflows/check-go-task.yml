@@ -236,7 +236,7 @@ jobs:
       matrix:
         module:
           - path: internal/arduino/discovery/discovery_client
-          - path: client_example
+          - path: rpc/internal/client_example
           - path: commands/daemon/term_example
 
     steps:
