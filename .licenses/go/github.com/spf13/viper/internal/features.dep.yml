@@ -1,9 +1,9 @@
 ---
-name: github.com/spf13/viper/internal/encoding/javaproperties
+name: github.com/spf13/viper/internal/features
 version: v1.18.2
 type: go
 summary: 
-homepage: https://pkg.go.dev/github.com/spf13/viper/internal/encoding/javaproperties
+homepage: https://pkg.go.dev/github.com/spf13/viper/internal/features
 license: mit
 licenses:
 - sources: viper@v1.18.2/LICENSE
