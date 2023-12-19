@@ -86,6 +86,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://arduino.github.io/arduino-cli/dev/versioning/</loc>
+         <lastmod>2023-12-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli/</loc>
          <lastmod>2023-12-19</lastmod>
          <changefreq>daily</changefreq>
