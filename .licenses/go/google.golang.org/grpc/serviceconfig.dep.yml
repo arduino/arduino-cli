@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/serviceconfig
-version: v1.60.0
+version: v1.60.1
 type: go
 summary: Package serviceconfig defines types and methods for operating on gRPC service
   configs.
 homepage: https://pkg.go.dev/google.golang.org/grpc/serviceconfig
 license: apache-2.0
 licenses:
-- sources: grpc@v1.60.0/LICENSE
+- sources: grpc@v1.60.1/LICENSE
   text: |2
 
                                      Apache License
