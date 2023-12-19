@@ -196,7 +196,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 			return nil, err
 		}
 		if library.DotALinkage {
-			archiveFile, err := b.archiveCompiledFiles(libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles)
+			archiveFile, err := b.archiveCompiledFiles(libraryBuildPath.Join(library.DirName+".a"), libObjectFiles)
 			if err != nil {
 				return nil, err
 			}

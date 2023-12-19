@@ -71,7 +71,7 @@ func (b *Builder) link() error {
 				// extract all the object files that are in the same directory of the archive
 				return object.Parent().EquivalentTo(archiveDir)
 			})
-			b.archiveCompiledFiles(archive.Parent(), paths.New(archive.Base()), relatedObjectFiles)
+			b.archiveCompiledFiles(archive, relatedObjectFiles)
 		}
 
 		// Put everything together
