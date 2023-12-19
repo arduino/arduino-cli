@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/encoding/proto
-version: v1.60.0
+version: v1.60.1
 type: go
 summary: Package proto defines the protobuf codec.
 homepage: https://pkg.go.dev/google.golang.org/grpc/encoding/proto
 license: apache-2.0
 licenses:
-- sources: grpc@v1.60.0/LICENSE
+- sources: grpc@v1.60.1/LICENSE
   text: |2
 
                                      Apache License
