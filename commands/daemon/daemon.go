@@ -181,16 +181,31 @@ func (s *ArduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.
 // Compile FIXMEDOC
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	outStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.CompileResponse{OutStream: data}) })
-	errStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.CompileResponse{ErrStream: data}) })
-	compileResp, compileErr := compile.Compile(
-		stream.Context(), req, outStream, errStream,
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.CompileResponse{Progress: p}) })
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_OutStream{OutStream: data},
+		})
+	})
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_ErrStream{ErrStream: data},
+		})
+	})
+	progressStream := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_Progress{Progress: p},
+		})
+	}
+	compileRes, compileErr := compile.Compile(stream.Context(), req, outStream, errStream, progressStream)
 	outStream.Close()
 	errStream.Close()
 	var compileRespSendErr error
-	if compileResp != nil {
-		compileRespSendErr = syncSend.Send(compileResp)
+	if compileRes != nil {
+		compileRespSendErr = syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_Result{
+				Result: compileRes,
+			},
+		})
 	}
 	if compileErr != nil {
 		return convertErrorToRPCStatus(compileErr)

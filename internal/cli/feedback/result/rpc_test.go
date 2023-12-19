@@ -190,9 +190,9 @@ func TestAllFieldAreMapped(t *testing.T) {
 	monitorPortSettingDescriptorResult := result.NewMonitorPortSettingDescriptor(monitorPortSettingDescriptorRpc)
 	mustContainsAllPropertyOfRpcStruct(t, monitorPortSettingDescriptorRpc, monitorPortSettingDescriptorResult)
 
-	compileResponseRpc := &rpc.CompileResponse{}
-	compileResponseResult := result.NewCompileResponse(compileResponseRpc)
-	mustContainsAllPropertyOfRpcStruct(t, compileResponseRpc, compileResponseResult, "progress")
+	builderResultRpc := &rpc.BuilderResult{}
+	builderResultResult := result.NewBuilderResult(builderResultRpc)
+	mustContainsAllPropertyOfRpcStruct(t, builderResultRpc, builderResultResult)
 
 	executableSectionSizeRpc := &rpc.ExecutableSectionSize{}
 	executableSectionSizeResult := result.NewExecutableSectionSize(executableSectionSizeRpc)
