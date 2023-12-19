@@ -12,8 +12,6 @@
   - `builtin.libraries` - the libraries in this directory will be available to all platforms without the need for the
     user to install them, but with the lowest priority over other installed libraries with the same name, it's the
     equivalent of the Arduino IDE's bundled libraries directory.
-  - `builtin.tools` - it's a list of directories of tools that will be available to all platforms without the need for
-    the user to install them, it's the equivalent of the Arduino IDE 1.x bundled tools directory.
 - `library` - configuration options relating to Arduino libraries.
   - `enable_unsafe_install` - set to `true` to enable the use of the `--git-url` and `--zip-file` flags with
     [`arduino-cli lib install`][arduino cli lib install]. These are considered "unsafe" installation methods because
