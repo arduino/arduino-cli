@@ -140,6 +140,48 @@ message BuilderResult {
 
 with a clear distinction on which fields are streamed.
 
+### The gRPC response `cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse` and `cc.arduino.cli.commands.v1.BurnBootloaderResponse` has been changed.
+
+The old messages:
+
+```protoc
+message UploadUsingProgrammerResponse {
+  // The output of the upload process.
+  bytes out_stream = 1;
+  // The error output of the upload process.
+  bytes err_stream = 2;
+}
+
+message BurnBootloaderResponse {
+  // The output of the burn bootloader process.
+  bytes out_stream = 1;
+  // The error output of the burn bootloader process.
+  bytes err_stream = 2;
+}
+```
+
+now have the `oneof` clause that makes explicit the streaming nature of the response:
+
+```protoc
+message UploadUsingProgrammerResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+  }
+}
+
+message BurnBootloaderResponse {
+  oneof message {
+    // The output of the burn bootloader process.
+    bytes out_stream = 1;
+    // The error output of the burn bootloader process.
+    bytes err_stream = 2;
+  }
+}
+```
+
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformRelease` has been changed.
 
 We've added a new field called `compatible`. This field indicates if the current platform release is installable or not.
