@@ -22,16 +22,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-func filter(p *paths.PathList, filter func(*paths.Path) bool) paths.PathList {
-	res := (*p)[:0]
-	for _, path := range *p {
-		if filter(path) {
-			res = append(res, path)
-		}
-	}
-	return res
-}
-
 // link fixdoc
 func (b *Builder) link() error {
 	if b.onlyUpdateCompilationDatabase {
@@ -64,14 +54,19 @@ func (b *Builder) link() error {
 		// because thery are both named spi.o.
 
 		archives := paths.NewPathList()
-
 		for _, object := range objectFiles {
 			archive := object.Parent().Join("objs.a")
 			archives.AddIfMissing(archive)
 		}
 
+		// Generate archive for each directory
 		for _, archive := range archives {
-			relatedObjectFiles := filter(&objectFiles, func(object *paths.Path) bool { return object.Parent().EquivalentTo(archive.Parent()) })
+			archiveDir := archive.Parent()
+			relatedObjectFiles := objectFiles.Clone()
+			relatedObjectFiles.Filter(func(object *paths.Path) bool {
+				// extract all the object files that are in the same directory of the archive
+				return object.Parent().EquivalentTo(archiveDir)
+			})
 			b.archiveCompiledFiles(archive.Parent(), paths.New(archive.Base()), relatedObjectFiles)
 		}
 
