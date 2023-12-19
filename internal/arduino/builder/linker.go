@@ -53,14 +53,18 @@ func (b *Builder) link() error {
 		// it may happen that a subdir/spi.o inside the archive may be overwritten by a anotherdir/spi.o
 		// because thery are both named spi.o.
 
-		archives := paths.NewPathList()
+		// Put all the existing archives apart from the other object files
+		existingArchives := objectFiles.Clone()
+		existingArchives.FilterSuffix(".a")
+		objectFiles.FilterOutSuffix(".a")
+
+		// Generate an archive for each directory from the remaining object files
+		newArchives := paths.NewPathList()
 		for _, object := range objectFiles {
 			archive := object.Parent().Join("objs.a")
-			archives.AddIfMissing(archive)
+			newArchives.AddIfMissing(archive)
 		}
-
-		// Generate archive for each directory
-		for _, archive := range archives {
+		for _, archive := range newArchives {
 			archiveDir := archive.Parent()
 			relatedObjectFiles := objectFiles.Clone()
 			relatedObjectFiles.Filter(func(object *paths.Path) bool {
@@ -70,7 +74,10 @@ func (b *Builder) link() error {
 			b.archiveCompiledFiles(archive.Parent(), paths.New(archive.Base()), relatedObjectFiles)
 		}
 
-		objectFileList = strings.Join(f.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
+		// Put everything together
+		allArchives := existingArchives.Clone()
+		allArchives.AddAll(newArchives)
+		objectFileList = strings.Join(f.Map(allArchives.AsStrings(), wrapWithDoubleQuotes), " ")
 		objectFileList = "-Wl,--whole-archive " + objectFileList + " -Wl,--no-whole-archive"
 	}
 
