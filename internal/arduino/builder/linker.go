@@ -53,34 +53,31 @@ func (b *Builder) link() error {
 		// it may happen that a subdir/spi.o inside the archive may be overwritten by a anotherdir/spi.o
 		// because thery are both named spi.o.
 
-		properties := b.buildProperties.Clone()
-		archives := paths.NewPathList()
+		// Put all the existing archives apart from the other object files
+		existingArchives := objectFiles.Clone()
+		existingArchives.FilterSuffix(".a")
+		objectFiles.FilterOutSuffix(".a")
+
+		// Generate an archive for each directory from the remaining object files
+		newArchives := paths.NewPathList()
 		for _, object := range objectFiles {
-			if object.HasSuffix(".a") {
-				archives.Add(object)
-				continue
-			}
 			archive := object.Parent().Join("objs.a")
-			if !archives.Contains(archive) {
-				archives.Add(archive)
-				// Cleanup old archives
-				_ = archive.Remove()
-			}
-			properties.Set("archive_file", archive.Base())
-			properties.SetPath("archive_file_path", archive)
-			properties.SetPath("object_file", object)
-
-			command, err := b.prepareCommandForRecipe(properties, "recipe.ar.pattern", false)
-			if err != nil {
-				return err
-			}
-
-			if err := b.execCommand(command); err != nil {
-				return err
-			}
+			newArchives.AddIfMissing(archive)
+		}
+		for _, archive := range newArchives {
+			archiveDir := archive.Parent()
+			relatedObjectFiles := objectFiles.Clone()
+			relatedObjectFiles.Filter(func(object *paths.Path) bool {
+				// extract all the object files that are in the same directory of the archive
+				return object.Parent().EquivalentTo(archiveDir)
+			})
+			b.archiveCompiledFiles(archive, relatedObjectFiles)
 		}
 
-		objectFileList = strings.Join(f.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
+		// Put everything together
+		allArchives := existingArchives.Clone()
+		allArchives.AddAll(newArchives)
+		objectFileList = strings.Join(f.Map(allArchives.AsStrings(), wrapWithDoubleQuotes), " ")
 		objectFileList = "-Wl,--whole-archive " + objectFileList + " -Wl,--no-whole-archive"
 	}
 
