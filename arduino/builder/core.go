@@ -128,7 +128,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		return nil, nil, errors.WithStack(err)
 	}
 
-	archiveFile, err := b.archiveCompiledFiles(b.coreBuildPath, paths.New("core.a"), coreObjectFiles)
+	archiveFile, err := b.archiveCompiledFiles(b.coreBuildPath.Join("core.a"), coreObjectFiles)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}

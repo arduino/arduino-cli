@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"testing"
@@ -830,8 +831,17 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	sketchPath := paths.New(libOutput[0]["library"].(map[string]interface{})["install_dir"].(string))
 	sketchPath = sketchPath.Join("examples", "ArduinoIoTCloud-Advanced")
 
-	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
+	t.Run("Compile", func(t *testing.T) {
+		_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml")
+		require.NoError(t, err)
+	})
+
+	t.Run("CheckCachingOfFolderArchives", func(t *testing.T) {
+		// Run compile again and check if the archive is re-used (cached)
+		out, _, err := cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml", "-v")
+		require.NoError(t, err)
+		require.True(t, regexp.MustCompile(`(?m)^Using previously compiled file:.*libraries.ArduinoIoTCloud.objs\.a$`).Match(out))
+	})
 }
 
 func TestCompileWithPrecompileLibrary(t *testing.T) {

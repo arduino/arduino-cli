@@ -21,9 +21,7 @@ import (
 )
 
 // ArchiveCompiledFiles fixdoc
-func (b *Builder) archiveCompiledFiles(buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList) (*paths.Path, error) {
-	archiveFilePath := buildPath.JoinPath(archiveFile)
-
+func (b *Builder) archiveCompiledFiles(archiveFilePath *paths.Path, objectFilesToArchive paths.PathList) (*paths.Path, error) {
 	if b.onlyUpdateCompilationDatabase {
 		if b.logger.Verbose() {
 			b.logger.Info(tr("Skipping archive creation of: %[1]s", archiveFilePath))
