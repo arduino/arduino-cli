@@ -1581,6 +1581,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#builderresult" class="md-nav__link">
+    BuilderResult
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#compilediagnostic" class="md-nav__link">
     CompileDiagnostic
   </a>
@@ -3127,6 +3134,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#builderresult" class="md-nav__link">
+    BuilderResult
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#compilediagnostic" class="md-nav__link">
     CompileDiagnostic
   </a>
@@ -4016,6 +4030,7 @@
 </ul>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/compile.proto">cc/arduino/cli/commands/v1/compile.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.BuilderResult">BuilderResult</a>
     - <a href="#cc.arduino.cli.commands.v1.CompileDiagnostic">CompileDiagnostic</a>
     - <a href="#cc.arduino.cli.commands.v1.CompileDiagnosticContext">CompileDiagnosticContext</a>
     - <a href="#cc.arduino.cli.commands.v1.CompileDiagnosticNote">CompileDiagnosticNote</a>
@@ -6302,6 +6317,62 @@ a platform and all its available releases.</p>
 <p align="right"><a href="#top">Top</a></p>
 
 <h2 id="ccarduinoclicommandsv1compileproto">cc/arduino/cli/commands/v1/compile.proto<a class="headerlink" href="#ccarduinoclicommandsv1compileproto" title="Permanent link">&para;</a></h2>
+<p><a name="cc.arduino.cli.commands.v1.BuilderResult"></a></p>
+<h3 id="builderresult">BuilderResult<a class="headerlink" href="#builderresult" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>build_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The compiler build path</td>
+</tr>
+<tr>
+<td>used_libraries</td>
+<td><a href="#cc.arduino.cli.commands.v1.Library">Library</a></td>
+<td>repeated</td>
+<td>The libraries used in the build</td>
+</tr>
+<tr>
+<td>executable_sections_size</td>
+<td><a href="#cc.arduino.cli.commands.v1.ExecutableSectionSize">ExecutableSectionSize</a></td>
+<td>repeated</td>
+<td>The size of the executable split by sections</td>
+</tr>
+<tr>
+<td>board_platform</td>
+<td><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></td>
+<td></td>
+<td>The platform where the board is defined</td>
+</tr>
+<tr>
+<td>build_platform</td>
+<td><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></td>
+<td></td>
+<td>The platform used for the build (if referenced from the board platform)</td>
+</tr>
+<tr>
+<td>build_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>Build properties used for compiling</td>
+</tr>
+<tr>
+<td>diagnostics</td>
+<td><a href="#cc.arduino.cli.commands.v1.CompileDiagnostic">CompileDiagnostic</a></td>
+<td>repeated</td>
+<td>Compiler errors and warnings</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.CompileDiagnostic"></a></p>
 <h3 id="compilediagnostic">CompileDiagnostic<a class="headerlink" href="#compilediagnostic" title="Permanent link">&para;</a></h3>
 <table>
@@ -6649,52 +6720,16 @@ a platform and all its available releases.</p>
 <td>The error output of the compilation process (stream)</td>
 </tr>
 <tr>
-<td>build_path</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>The compiler build path</td>
-</tr>
-<tr>
-<td>used_libraries</td>
-<td><a href="#cc.arduino.cli.commands.v1.Library">Library</a></td>
-<td>repeated</td>
-<td>The libraries used in the build</td>
-</tr>
-<tr>
-<td>executable_sections_size</td>
-<td><a href="#cc.arduino.cli.commands.v1.ExecutableSectionSize">ExecutableSectionSize</a></td>
-<td>repeated</td>
-<td>The size of the executable split by sections</td>
-</tr>
-<tr>
-<td>board_platform</td>
-<td><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></td>
-<td></td>
-<td>The platform where the board is defined</td>
-</tr>
-<tr>
-<td>build_platform</td>
-<td><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></td>
-<td></td>
-<td>The platform used for the build (if referenced from the board platform)</td>
-</tr>
-<tr>
 <td>progress</td>
 <td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
 <td></td>
 <td>Completions reports of the compilation process (stream)</td>
 </tr>
 <tr>
-<td>build_properties</td>
-<td><a href="#string">string</a></td>
-<td>repeated</td>
-<td>Build properties used for compiling</td>
-</tr>
-<tr>
-<td>diagnostics</td>
-<td><a href="#cc.arduino.cli.commands.v1.CompileDiagnostic">CompileDiagnostic</a></td>
-<td>repeated</td>
-<td>Compiler errors and warnings</td>
+<td>result</td>
+<td><a href="#cc.arduino.cli.commands.v1.BuilderResult">BuilderResult</a></td>
+<td></td>
+<td>The compilation result</td>
 </tr>
 </tbody>
 </table>
