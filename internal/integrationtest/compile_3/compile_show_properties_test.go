@@ -20,13 +20,13 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
 type cliCompileResponse struct {
-	BuilderResult *commands.CompileResponse `json:"builder_result"`
+	BuilderResult *rpc.BuilderResult `json:"builder_result"`
 }
 
 func TestCompileShowProperties(t *testing.T) {

@@ -245,7 +245,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
 		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
 	}
-	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
+	builderRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
 
 	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {
@@ -300,7 +300,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		libs := ""
 		hasVendoredLibs := false
-		for _, lib := range compileRes.GetUsedLibraries() {
+		for _, lib := range builderRes.GetUsedLibraries() {
 			if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
 				continue
 			}
@@ -325,13 +325,13 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		profileOut += fmt.Sprintln("  " + newProfileName + ":")
 		profileOut += fmt.Sprintln("    fqbn: " + compileRequest.GetFqbn())
 		profileOut += fmt.Sprintln("    platforms:")
-		boardPlatform := compileRes.GetBoardPlatform()
+		boardPlatform := builderRes.GetBoardPlatform()
 		profileOut += fmt.Sprintln("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
 		if url := boardPlatform.GetPackageUrl(); url != "" {
 			profileOut += fmt.Sprintln("        platform_index_url: " + url)
 		}
 
-		if buildPlatform := compileRes.GetBuildPlatform(); buildPlatform != nil &&
+		if buildPlatform := builderRes.GetBuildPlatform(); buildPlatform != nil &&
 			buildPlatform.GetId() != boardPlatform.GetId() &&
 			buildPlatform.GetVersion() != boardPlatform.GetVersion() {
 			profileOut += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
@@ -350,12 +350,12 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	res := &compileResult{
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
-		BuilderResult: result.NewCompileResponse(compileRes),
+		BuilderResult: result.NewBuilderResult(builderRes),
 		UploadResult: updatedUploadPortResult{
 			UpdatedUploadPort: result.NewPort(uploadRes.GetUpdatedUploadPort()),
 		},
 		ProfileOut:         profileOut,
-		Diagnostics:        result.NewCompileDiagnostics(compileRes.GetDiagnostics()),
+		Diagnostics:        result.NewCompileDiagnostics(builderRes.GetDiagnostics()),
 		Success:            compileError == nil,
 		showPropertiesMode: showProperties,
 		hideStats:          preprocess,
@@ -401,7 +401,7 @@ type updatedUploadPortResult struct {
 type compileResult struct {
 	CompilerOut        string                      `json:"compiler_out"`
 	CompilerErr        string                      `json:"compiler_err"`
-	BuilderResult      *result.CompileResponse     `json:"builder_result"`
+	BuilderResult      *result.BuilderResult       `json:"builder_result"`
 	UploadResult       updatedUploadPortResult     `json:"upload_result"`
 	Success            bool                        `json:"success"`
 	ProfileOut         string                      `json:"profile_out,omitempty"`

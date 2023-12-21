@@ -181,16 +181,31 @@ func (s *ArduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.
 // Compile FIXMEDOC
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	outStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.CompileResponse{OutStream: data}) })
-	errStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.CompileResponse{ErrStream: data}) })
-	compileResp, compileErr := compile.Compile(
-		stream.Context(), req, outStream, errStream,
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.CompileResponse{Progress: p}) })
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_OutStream{OutStream: data},
+		})
+	})
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_ErrStream{ErrStream: data},
+		})
+	})
+	progressStream := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_Progress{Progress: p},
+		})
+	}
+	compileRes, compileErr := compile.Compile(stream.Context(), req, outStream, errStream, progressStream)
 	outStream.Close()
 	errStream.Close()
 	var compileRespSendErr error
-	if compileResp != nil {
-		compileRespSendErr = syncSend.Send(compileResp)
+	if compileRes != nil {
+		compileRespSendErr = syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_Result{
+				Result: compileRes,
+			},
+		})
 	}
 	if compileErr != nil {
 		return convertErrorToRPCStatus(compileErr)
@@ -287,8 +302,20 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 // UploadUsingProgrammer FIXMEDOC
 func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerRequest, stream rpc.ArduinoCoreService_UploadUsingProgrammerServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	outStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.UploadUsingProgrammerResponse{OutStream: data}) })
-	errStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.UploadUsingProgrammerResponse{ErrStream: data}) })
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.UploadUsingProgrammerResponse{
+			Message: &rpc.UploadUsingProgrammerResponse_OutStream{
+				OutStream: data,
+			},
+		})
+	})
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.UploadUsingProgrammerResponse{
+			Message: &rpc.UploadUsingProgrammerResponse_ErrStream{
+				ErrStream: data,
+			},
+		})
+	})
 	err := upload.UsingProgrammer(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
@@ -307,8 +334,20 @@ func (s *ArduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rp
 // BurnBootloader FIXMEDOC
 func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, stream rpc.ArduinoCoreService_BurnBootloaderServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	outStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.BurnBootloaderResponse{OutStream: data}) })
-	errStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.BurnBootloaderResponse{ErrStream: data}) })
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.BurnBootloaderResponse{
+			Message: &rpc.BurnBootloaderResponse_OutStream{
+				OutStream: data,
+			},
+		})
+	})
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.BurnBootloaderResponse{
+			Message: &rpc.BurnBootloaderResponse_ErrStream{
+				ErrStream: data,
+			},
+		})
+	})
 	resp, err := upload.BurnBootloader(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()

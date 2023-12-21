@@ -909,9 +909,7 @@ func NewMonitorPortSettingDescriptor(m *rpc.MonitorPortSettingDescriptor) *Monit
 	}
 }
 
-type CompileResponse struct {
-	OutStream              []byte                      `json:"out_stream,omitempty"`
-	ErrStream              []byte                      `json:"err_stream,omitempty"`
+type BuilderResult struct {
 	BuildPath              string                      `json:"build_path,omitempty"`
 	UsedLibraries          []*Library                  `json:"used_libraries,omitempty"`
 	ExecutableSectionsSize []*ExecutableSectionSize    `json:"executable_sections_size,omitempty"`
@@ -921,7 +919,7 @@ type CompileResponse struct {
 	Diagnostics            []*CompileDiagnostic        `json:"diagnostics,omitempty"`
 }
 
-func NewCompileResponse(c *rpc.CompileResponse) *CompileResponse {
+func NewBuilderResult(c *rpc.BuilderResult) *BuilderResult {
 	if c == nil {
 		return nil
 	}
@@ -934,9 +932,7 @@ func NewCompileResponse(c *rpc.CompileResponse) *CompileResponse {
 		executableSectionsSizes[i] = NewExecutableSectionSize(v)
 	}
 
-	return &CompileResponse{
-		OutStream:              c.GetOutStream(),
-		ErrStream:              c.GetErrStream(),
+	return &BuilderResult{
 		BuildPath:              c.GetBuildPath(),
 		UsedLibraries:          usedLibs,
 		ExecutableSectionsSize: executableSectionsSizes,

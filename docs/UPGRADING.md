@@ -72,6 +72,116 @@ breaking changes as needed.
   { "sketch_path": "/tmp/my_sketch" }
   ```
 
+### The gRPC response `cc.arduino.cli.commands.v1.CompileResponse` has been changed.
+
+The `CompilerResponse` message has been refactored to made explicit which fields are intended for streaming the build
+process and which fields are part of the build result.
+
+The old `CompilerResposne`:
+
+```protoc
+message CompileResponse {
+  // The output of the compilation process (stream)
+  bytes out_stream = 1;
+  // The error output of the compilation process (stream)
+  bytes err_stream = 2;
+  // The compiler build path
+  string build_path = 3;
+  // The libraries used in the build
+  repeated Library used_libraries = 4;
+  // The size of the executable split by sections
+  repeated ExecutableSectionSize executable_sections_size = 5;
+  // The platform where the board is defined
+  InstalledPlatformReference board_platform = 6;
+  // The platform used for the build (if referenced from the board platform)
+  InstalledPlatformReference build_platform = 7;
+  // Completions reports of the compilation process (stream)
+  TaskProgress progress = 8;
+  // Build properties used for compiling
+  repeated string build_properties = 9;
+  // Compiler errors and warnings
+  repeated CompileDiagnostic diagnostics = 10;
+}
+```
+
+has been split into a `CompilerResponse` and a `BuilderResult`:
+
+```protoc
+message CompileResponse {
+  oneof message {
+    // The output of the compilation process (stream)
+    bytes out_stream = 1;
+    // The error output of the compilation process (stream)
+    bytes err_stream = 2;
+    // Completions reports of the compilation process (stream)
+    TaskProgress progress = 3;
+    // The compilation result
+    BuilderResult result = 4;
+  }
+}
+
+message BuilderResult {
+  // The compiler build path
+  string build_path = 1;
+  // The libraries used in the build
+  repeated Library used_libraries = 2;
+  // The size of the executable split by sections
+  repeated ExecutableSectionSize executable_sections_size = 3;
+  // The platform where the board is defined
+  InstalledPlatformReference board_platform = 4;
+  // The platform used for the build (if referenced from the board platform)
+  InstalledPlatformReference build_platform = 5;
+  // Build properties used for compiling
+  repeated string build_properties = 7;
+  // Compiler errors and warnings
+  repeated CompileDiagnostic diagnostics = 8;
+}
+```
+
+with a clear distinction on which fields are streamed.
+
+### The gRPC response `cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse` and `cc.arduino.cli.commands.v1.BurnBootloaderResponse` has been changed.
+
+The old messages:
+
+```protoc
+message UploadUsingProgrammerResponse {
+  // The output of the upload process.
+  bytes out_stream = 1;
+  // The error output of the upload process.
+  bytes err_stream = 2;
+}
+
+message BurnBootloaderResponse {
+  // The output of the burn bootloader process.
+  bytes out_stream = 1;
+  // The error output of the burn bootloader process.
+  bytes err_stream = 2;
+}
+```
+
+now have the `oneof` clause that makes explicit the streaming nature of the response:
+
+```protoc
+message UploadUsingProgrammerResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+  }
+}
+
+message BurnBootloaderResponse {
+  oneof message {
+    // The output of the burn bootloader process.
+    bytes out_stream = 1;
+    // The error output of the burn bootloader process.
+    bytes err_stream = 2;
+  }
+}
+```
+
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformRelease` has been changed.
 
 We've added a new field called `compatible`. This field indicates if the current platform release is installable or not.

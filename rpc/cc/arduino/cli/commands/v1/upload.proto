@@ -118,10 +118,12 @@ message UploadUsingProgrammerRequest {
 }
 
 message UploadUsingProgrammerResponse {
-  // The output of the upload process.
-  bytes out_stream = 1;
-  // The error output of the upload process.
-  bytes err_stream = 2;
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+  }
 }
 
 message BurnBootloaderRequest {
@@ -150,10 +152,12 @@ message BurnBootloaderRequest {
 }
 
 message BurnBootloaderResponse {
-  // The output of the burn bootloader process.
-  bytes out_stream = 1;
-  // The error output of the burn bootloader process.
-  bytes err_stream = 2;
+  oneof message {
+    // The output of the burn bootloader process.
+    bytes out_stream = 1;
+    // The error output of the burn bootloader process.
+    bytes err_stream = 2;
+  }
 }
 
 message ListProgrammersAvailableForUploadRequest {
