@@ -102,38 +102,19 @@ func (lm *LibrariesManager) LoadIndex() error {
 // AddLibrariesDir adds path to the list of directories
 // to scan when searching for libraries. If a path is already
 // in the list it is ignored.
-func (lm *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries.LibraryLocation) {
-	for _, dir := range lm.LibrariesDir {
-		if dir.Path.EquivalentTo(path) {
-			return
-		}
-	}
-	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
-	lm.LibrariesDir = append(lm.LibrariesDir, &LibrariesDir{
-		Path:     path,
-		Location: location,
-	})
-}
-
-// AddPlatformReleaseLibrariesDir add the libraries directory in the
-// specified PlatformRelease to the list of directories to scan when
-// searching for libraries.
-func (lm *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location libraries.LibraryLocation) {
-	path := plaftormRelease.GetLibrariesDir()
-	if path == nil {
+func (lm *LibrariesManager) AddLibrariesDir(libDir *LibrariesDir) {
+	if libDir.Path == nil {
 		return
 	}
 	for _, dir := range lm.LibrariesDir {
-		if dir.Path.EquivalentTo(path) {
+		if dir.Path.EquivalentTo(libDir.Path) {
 			return
 		}
 	}
-	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
-	lm.LibrariesDir = append(lm.LibrariesDir, &LibrariesDir{
-		Path:            path,
-		Location:        location,
-		PlatformRelease: plaftormRelease,
-	})
+	logrus.WithField("dir", libDir.Path).
+		WithField("location", libDir.Location.String()).
+		Info("Adding libraries dir")
+	lm.LibrariesDir = append(lm.LibrariesDir, libDir)
 }
 
 // RescanLibraries reload all installed libraries in the system.
