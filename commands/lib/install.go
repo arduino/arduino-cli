@@ -72,7 +72,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	for _, lib := range toInstall {
-		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallRequest{
+		libRelease, err := findLibraryIndexRelease(lm.Index, &rpc.LibraryInstallRequest{
 			Name:    lib.GetName(),
 			Version: lib.GetVersionRequired(),
 		})
