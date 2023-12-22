@@ -633,6 +633,12 @@ func (pme *Explorer) GetInstalledPlatformRelease(platform *cores.Platform) *core
 	for _, candidate := range releases[1:] {
 		candidateIsManaged := pme.IsManagedPlatformRelease(candidate)
 		debug("candidate", candidate)
+		if !candidateIsManaged && !bestIsManaged {
+			if candidate.Version.GreaterThan(best.Version) {
+				best = candidate
+			}
+			continue
+		}
 		if !candidateIsManaged {
 			continue
 		}
