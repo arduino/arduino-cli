@@ -638,6 +638,14 @@ func LibrariesLoader(
 			})
 		}
 
+		for _, dir := range libraryDirs {
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				Path:            dir,
+				Location:        libraries.Unmanaged,
+				IsSingleLibrary: true,
+			})
+		}
+
 		for _, status := range lm.RescanLibraries() {
 			// With the refactoring of the initialization step of the CLI we changed how
 			// errors are returned when loading platforms and libraries, that meant returning a list of
@@ -646,13 +654,6 @@ func LibrariesLoader(
 			// here's this shitty solution for now.
 			// When we're gonna refactor the legacy package this will be gone.
 			verboseOut.Write([]byte(status.Message()))
-		}
-
-		for _, dir := range libraryDirs {
-			// Libraries specified this way have top priority
-			if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
-				return nil, nil, nil, err
-			}
 		}
 	}
 
