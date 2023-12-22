@@ -20,7 +20,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
@@ -30,9 +29,9 @@ import (
 
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 	return searchLibrary(req, lm), nil
 }

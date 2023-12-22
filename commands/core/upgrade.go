@@ -19,7 +19,6 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
@@ -29,9 +28,9 @@ import (
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 	upgrade := func() (*cores.PlatformRelease, error) {
-		pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-		if pme == nil {
-			return nil, &cmderrors.InvalidInstanceError{}
+		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+		if err != nil {
+			return nil, err
 		}
 		defer release()
 

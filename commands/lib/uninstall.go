@@ -27,7 +27,11 @@ import (
 
 // LibraryUninstall FIXMEDOC
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := instances.GetLibraryManager(req.GetInstance())
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
+	}
+
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
 		return &cmderrors.InvalidLibraryError{Cause: err}

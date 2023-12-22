@@ -33,9 +33,9 @@ import (
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
 	}
 
 	toInstall := map[string]*rpc.LibraryDependencyStatus{}
@@ -145,7 +145,10 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 
 // ZipLibraryInstall FIXMEDOC
 func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := instances.GetLibraryManager(req.GetInstance())
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
+	}
 	if err := lm.InstallZipLib(ctx, paths.New(req.GetPath()), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
@@ -155,7 +158,10 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 
 // GitLibraryInstall FIXMEDOC
 func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := instances.GetLibraryManager(req.GetInstance())
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
+	}
 	if err := lm.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}

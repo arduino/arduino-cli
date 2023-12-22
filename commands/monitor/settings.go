@@ -26,9 +26,9 @@ import (
 
 // EnumerateMonitorPortSettings returns a description of the configuration settings of a monitor port
 func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
-	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-	if pme == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 	defer release()
 

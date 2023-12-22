@@ -30,9 +30,9 @@ var tr = i18n.Tr
 
 // PlatformDownload FIXMEDOC
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
-	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-	if pme == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 	defer release()
 

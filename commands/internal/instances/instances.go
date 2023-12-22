@@ -3,6 +3,7 @@ package instances
 import (
 	"sync"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -26,36 +27,37 @@ var instancesMux sync.Mutex
 // GetPackageManager returns a PackageManager. If the package manager is not found
 // (because the instance is invalid or has been destroyed), nil is returned.
 // Deprecated: use GetPackageManagerExplorer instead.
-func GetPackageManager(inst *rpc.Instance) *packagemanager.PackageManager {
+func GetPackageManager(inst *rpc.Instance) (*packagemanager.PackageManager, error) {
 	instancesMux.Lock()
 	i := instances[inst.GetId()]
 	instancesMux.Unlock()
 	if i == nil {
-		return nil
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
-	return i.pm
+	return i.pm, nil
 }
 
 // GetPackageManagerExplorer returns a new package manager Explorer. The
 // explorer holds a read lock on the underlying PackageManager and it should
 // be released by calling the returned "release" function.
-func GetPackageManagerExplorer(req *rpc.Instance) (explorer *packagemanager.Explorer, release func()) {
-	pm := GetPackageManager(req)
-	if pm == nil {
-		return nil, nil
+func GetPackageManagerExplorer(req *rpc.Instance) (explorer *packagemanager.Explorer, release func(), _err error) {
+	pm, err := GetPackageManager(req)
+	if err != nil {
+		return nil, nil, err
 	}
-	return pm.NewExplorer()
+	pme, release := pm.NewExplorer()
+	return pme, release, nil
 }
 
 // GetLibraryManager returns the library manager for the given instance.
-func GetLibraryManager(inst *rpc.Instance) *librariesmanager.LibrariesManager {
+func GetLibraryManager(inst *rpc.Instance) (*librariesmanager.LibrariesManager, error) {
 	instancesMux.Lock()
 	i := instances[inst.GetId()]
 	instancesMux.Unlock()
 	if i == nil {
-		return nil
+		return nil, &cmderrors.InvalidInstanceError{}
 	}
-	return i.lm
+	return i.lm, nil
 }
 
 // SetLibraryManager sets the library manager for the given instance.

@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
@@ -30,9 +29,9 @@ import (
 
 // PlatformSearch FIXMEDOC
 func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
-	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-	if pme == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 	defer release()
 

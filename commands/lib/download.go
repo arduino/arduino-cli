@@ -35,9 +35,9 @@ var tr = i18n.Tr
 func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino-cli lib download`")
 
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 
 	logrus.Info("Preparing download")
