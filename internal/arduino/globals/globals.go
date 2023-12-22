@@ -15,6 +15,12 @@
 
 package globals
 
+import (
+	"net/url"
+
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
+)
+
 var (
 	// MainFileValidExtension is the extension that must be used for files in new sketches
 	MainFileValidExtension = ".ino"
@@ -63,4 +69,13 @@ var (
 
 	// DefaultIndexURL is the default index url
 	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.tar.bz2"
+
+	// LibrariesIndexURL is the URL where to get the libraries index.
+	LibrariesIndexURL, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.tar.bz2")
+
+	// LibrariesIndexResource is the IndexResource to get the libraries index.
+	LibrariesIndexResource = resources.IndexResource{
+		URL:                          LibrariesIndexURL,
+		EnforceSignatureVerification: true,
+	}
 )
