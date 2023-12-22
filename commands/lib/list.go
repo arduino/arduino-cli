@@ -36,15 +36,15 @@ type installedLib struct {
 
 // LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
-	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-	if pme == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 	defer release()
 
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 
 	nameFilter := strings.ToLower(req.GetName())

@@ -30,9 +30,9 @@ import (
 
 // LibraryResolveDependencies FIXMEDOC
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 
 	// Search the requested lib

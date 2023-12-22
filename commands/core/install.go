@@ -29,9 +29,9 @@ import (
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 	install := func() error {
-		pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-		if pme == nil {
-			return &cmderrors.InvalidInstanceError{}
+		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+		if err != nil {
+			return err
 		}
 		defer release()
 

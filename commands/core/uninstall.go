@@ -38,8 +38,8 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 
 // platformUninstall is the implementation of platform unistaller
 func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
-	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-	if pme == nil {
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
 		return &cmderrors.InvalidInstanceError{}
 	}
 	defer release()

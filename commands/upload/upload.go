@@ -49,12 +49,11 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &cmderrors.MissingPortProtocolError{}
 	}
 
-	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
-	defer release()
-
-	if pme == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
+	defer release()
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
@@ -136,9 +135,9 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
-	pme, pmeRelease := instances.GetPackageManagerExplorer(req.GetInstance())
-	if pme == nil {
-		return nil, &cmderrors.InvalidInstanceError{}
+	pme, pmeRelease, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
 	}
 	defer pmeRelease()
 

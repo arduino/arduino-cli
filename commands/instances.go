@@ -190,7 +190,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// after reinitializing an instance after installing or uninstalling a core.
 		// If this is not done the information of the uninstall core is kept in memory,
 		// even if it should not.
-		pmb, commitPackageManager := instances.GetPackageManager(instance).NewBuilder()
+		pm, err := instances.GetPackageManager(instance)
+		if err != nil {
+			return err
+		}
+		pmb, commitPackageManager := pm.NewBuilder()
 
 		// Load packages index
 		for _, URL := range allPackageIndexUrls {
@@ -285,7 +289,10 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		commitPackageManager()
 	}
 
-	pme, release := instances.GetPackageManagerExplorer(instance)
+	pme, release, err := instances.GetPackageManagerExplorer(instance)
+	if err != nil {
+		return err
+	}
 	defer release()
 
 	for _, err := range pme.LoadDiscoveries() {
@@ -389,9 +396,9 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
 	}
 
 	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {

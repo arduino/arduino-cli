@@ -26,9 +26,9 @@ import (
 
 // LibraryUpgradeAll upgrades all the available libraries
 func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
 	}
 
 	if err := upgrade(req.GetInstance(), listLibraries(lm, true, false), downloadCB, taskCB); err != nil {
@@ -44,9 +44,9 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 
 // LibraryUpgrade upgrades a library
 func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := instances.GetLibraryManager(req.GetInstance())
-	if lm == nil {
-		return &cmderrors.InvalidInstanceError{}
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
 	}
 
 	// Get the library to upgrade
