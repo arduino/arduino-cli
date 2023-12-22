@@ -27,7 +27,7 @@ type libraryReferencer interface {
 	GetName() string
 }
 
-func createLibIndexReference(lm *librariesmanager.LibrariesManager, req libraryReferencer) (*librariesindex.Reference, error) {
+func createLibIndexReference(req libraryReferencer) (*librariesindex.Reference, error) {
 	version, err := commands.ParseVersion(req)
 	if err != nil {
 		return nil, &cmderrors.InvalidVersionError{Cause: err}
@@ -37,7 +37,7 @@ func createLibIndexReference(lm *librariesmanager.LibrariesManager, req libraryR
 }
 
 func findLibraryIndexRelease(lm *librariesmanager.LibrariesManager, req libraryReferencer) (*librariesindex.Release, error) {
-	ref, err := createLibIndexReference(lm, req)
+	ref, err := createLibIndexReference(req)
 	if err != nil {
 		return nil, err
 	}
