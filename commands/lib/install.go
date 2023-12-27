@@ -38,13 +38,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		return err
 	}
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
-	if err != nil {
-		return err
-	}
-
 	toInstall := map[string]*rpc.LibraryDependencyStatus{}
-	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	if req.GetNoDeps() {
 		toInstall[req.GetName()] = &rpc.LibraryDependencyStatus{
 			Name:            req.GetName(),
@@ -83,8 +77,14 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		releasePme()
 	}
 
+	lm, err := instances.GetLibraryManager(req.GetInstance())
+	if err != nil {
+		return err
+	}
+
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
+	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	for _, lib := range toInstall {
 		libRelease, err := findLibraryIndexRelease(li, &rpc.LibraryInstallRequest{
 			Name:    lib.GetName(),
