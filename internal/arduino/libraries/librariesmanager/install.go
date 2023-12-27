@@ -103,11 +103,6 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semve
 	}, nil
 }
 
-// Install installs a library on the specified path.
-func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, installPath *paths.Path) error {
-	return indexLibrary.Resource.Install(lm.DownloadsDir, installPath.Parent(), installPath)
-}
-
 // importLibraryFromDirectory installs a library by copying it from the given directory.
 func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, overwrite bool) error {
 	// Check if the library is valid and load metatada

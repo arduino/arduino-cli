@@ -149,7 +149,10 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 				Cause: fmt.Errorf("%s: %s", tr("could not remove old library"), err)}
 		}
 	}
-	if err := lm.Install(libRelease, installTask.TargetPath); err != nil {
+
+	installPath := installTask.TargetPath
+	tmpDirPath := installPath.Parent()
+	if err := libRelease.Resource.Install(lm.DownloadsDir, tmpDirPath, installPath); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 
