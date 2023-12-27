@@ -151,9 +151,9 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 		return fmt.Errorf(tr("removing library directory: %s"), err)
 	}
 
-	alternatives := lm.Libraries[lib.Name]
+	alternatives := lm.libraries[lib.Name]
 	alternatives.Remove(lib)
-	lm.Libraries[lib.Name] = alternatives
+	lm.libraries[lib.Name] = alternatives
 	return nil
 }
 

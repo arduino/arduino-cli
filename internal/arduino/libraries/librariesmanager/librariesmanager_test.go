@@ -25,8 +25,8 @@ import (
 func Test_RescanLibrariesCallClear(t *testing.T) {
 	baseDir := paths.New(t.TempDir())
 	lm := NewLibraryManager(baseDir.Join("downloads_dir"))
-	lm.Libraries["testLibA"] = libraries.List{}
-	lm.Libraries["testLibB"] = libraries.List{}
+	lm.libraries["testLibA"] = libraries.List{}
+	lm.libraries["testLibB"] = libraries.List{}
 	lm.RescanLibraries()
-	require.Len(t, lm.Libraries, 0)
+	require.Len(t, lm.libraries, 0)
 }

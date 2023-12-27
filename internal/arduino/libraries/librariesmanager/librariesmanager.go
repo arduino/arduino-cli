@@ -36,7 +36,7 @@ import (
 // (the list of libraries, revisions, installed paths, etc.)
 type LibrariesManager struct {
 	LibrariesDir []*LibrariesDir
-	Libraries    map[string]libraries.List `json:"libraries"`
+	libraries    map[string]libraries.List
 	DownloadsDir *paths.Path
 }
 
@@ -52,9 +52,9 @@ var tr = i18n.Tr
 
 // Names returns an array with all the names of the installed libraries.
 func (lm LibrariesManager) Names() []string {
-	res := make([]string, len(lm.Libraries))
+	res := make([]string, len(lm.libraries))
 	i := 0
-	for n := range lm.Libraries {
+	for n := range lm.libraries {
 		res[i] = n
 		i++
 	}
@@ -70,7 +70,7 @@ func (lm LibrariesManager) Names() []string {
 // NewLibraryManager creates a new library manager
 func NewLibraryManager(downloadsDir *paths.Path) *LibrariesManager {
 	return &LibrariesManager{
-		Libraries:    map[string]libraries.List{},
+		libraries:    map[string]libraries.List{},
 		DownloadsDir: downloadsDir,
 	}
 }
@@ -152,9 +152,9 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives := lm.Libraries[library.Name]
+		alternatives := lm.libraries[library.Name]
 		alternatives.Add(library)
-		lm.Libraries[library.Name] = alternatives
+		lm.libraries[library.Name] = alternatives
 	}
 
 	return statuses
@@ -164,7 +164,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 // name and version or, if the version is nil, the libraries installed
 // in the installLocation.
 func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) libraries.List {
-	alternatives := lm.Libraries[libRef.Name]
+	alternatives := lm.libraries[libRef.Name]
 	if alternatives == nil {
 		return nil
 	}
@@ -174,7 +174,7 @@ func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, in
 // FindAllInstalled returns all the installed libraries
 func (lm *LibrariesManager) FindAllInstalled() libraries.List {
 	var res libraries.List
-	for _, libAlternatives := range lm.Libraries {
+	for _, libAlternatives := range lm.libraries {
 		for _, libRelease := range libAlternatives {
 			if libRelease.InstallDir == nil {
 				continue
@@ -186,7 +186,7 @@ func (lm *LibrariesManager) FindAllInstalled() libraries.List {
 }
 
 func (lm *LibrariesManager) clearLibraries() {
-	for k := range lm.Libraries {
-		delete(lm.Libraries, k)
+	for k := range lm.libraries {
+		delete(lm.libraries, k)
 	}
 }
