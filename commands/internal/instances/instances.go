@@ -108,7 +108,7 @@ func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent ...st
 
 	instance := &coreInstance{
 		pm: packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build(),
-		lm: librariesmanager.NewLibraryManager(downloadsDir),
+		lm: librariesmanager.NewLibraryManager(),
 		li: librariesindex.EmptyIndex,
 	}
 

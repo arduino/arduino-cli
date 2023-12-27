@@ -126,7 +126,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		if err := downloadLibrary(downloadsDir, libRelease, downloadCB, taskCB, downloadReason); err != nil {
 			return err
 		}
-		if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
+		if err := installLibrary(lm, downloadsDir, libRelease, installTask, taskCB); err != nil {
 			return err
 		}
 	}
@@ -138,7 +138,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	return nil
 }
 
-func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB) error {
+func installLibrary(lm *librariesmanager.LibrariesManager, downloadsDir *paths.Path, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB) error {
 	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
 
@@ -152,7 +152,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 
 	installPath := installTask.TargetPath
 	tmpDirPath := installPath.Parent()
-	if err := libRelease.Resource.Install(lm.DownloadsDir, tmpDirPath, installPath); err != nil {
+	if err := libRelease.Resource.Install(downloadsDir, tmpDirPath, installPath); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 

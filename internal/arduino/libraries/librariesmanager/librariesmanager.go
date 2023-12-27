@@ -37,7 +37,6 @@ import (
 type LibrariesManager struct {
 	librariesDir []*LibrariesDir
 	libraries    map[string]libraries.List
-	DownloadsDir *paths.Path
 }
 
 // LibrariesDir is a directory containing libraries
@@ -68,10 +67,9 @@ func (lm LibrariesManager) Names() []string {
 }
 
 // NewLibraryManager creates a new library manager
-func NewLibraryManager(downloadsDir *paths.Path) *LibrariesManager {
+func NewLibraryManager() *LibrariesManager {
 	return &LibrariesManager{
-		libraries:    map[string]libraries.List{},
-		DownloadsDir: downloadsDir,
+		libraries: map[string]libraries.List{},
 	}
 }
 

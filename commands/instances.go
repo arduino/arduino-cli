@@ -301,9 +301,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	// Create library manager and add libraries directories
-	lm := librariesmanager.NewLibraryManager(
-		pme.DownloadDir,
-	)
+	lm := librariesmanager.NewLibraryManager()
 	_ = instances.SetLibraryManager(instance, lm) // should never fail
 
 	// Load libraries
@@ -369,7 +367,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					responseError(err.ToRPCStatus())
 					continue
 				}
-				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
+				if err := libRelease.Resource.Download(pme.DownloadDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())
@@ -379,7 +377,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 				// Install library
 				taskCallback(&rpc.TaskProgress{Name: tr("Installing library %s", libraryRef)})
-				if err := libRelease.Resource.Install(lm.DownloadsDir, libRoot, libDir); err != nil {
+				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())
