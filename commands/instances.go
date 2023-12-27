@@ -430,13 +430,6 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
-	// Create a temp dir to stage all downloads
-	tmp, err := paths.MkTempDir("", "library_index_download")
-	if err != nil {
-		return &cmderrors.TempDirCreationFailedError{Cause: err}
-	}
-	defer tmp.RemoveAll()
-
 	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB); err != nil {
 		return err
 	}
