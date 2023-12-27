@@ -608,20 +608,42 @@ func LibrariesLoader(
 			if err := builtInLibrariesFolders.ToAbs(); err != nil {
 				return nil, nil, nil, err
 			}
-			lm.AddLibrariesDir(builtInLibrariesFolders, libraries.IDEBuiltIn)
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				Path:     builtInLibrariesFolders,
+				Location: libraries.IDEBuiltIn,
+			})
 		}
 
 		if actualPlatform != targetPlatform {
-			lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				PlatformRelease: actualPlatform,
+				Path:            actualPlatform.GetLibrariesDir(),
+				Location:        libraries.ReferencedPlatformBuiltIn,
+			})
 		}
-		lm.AddPlatformReleaseLibrariesDir(targetPlatform, libraries.PlatformBuiltIn)
+		lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			PlatformRelease: targetPlatform,
+			Path:            targetPlatform.GetLibrariesDir(),
+			Location:        libraries.PlatformBuiltIn,
+		})
 
 		librariesFolders := otherLibrariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
 			return nil, nil, nil, err
 		}
 		for _, folder := range librariesFolders {
-			lm.AddLibrariesDir(folder, libraries.User)
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				Path:     folder,
+				Location: libraries.User, // XXX: Should be libraries.Unmanaged?
+			})
+		}
+
+		for _, dir := range libraryDirs {
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				Path:            dir,
+				Location:        libraries.Unmanaged,
+				IsSingleLibrary: true,
+			})
 		}
 
 		for _, status := range lm.RescanLibraries() {
@@ -632,13 +654,6 @@ func LibrariesLoader(
 			// here's this shitty solution for now.
 			// When we're gonna refactor the legacy package this will be gone.
 			verboseOut.Write([]byte(status.Message()))
-		}
-
-		for _, dir := range libraryDirs {
-			// Libraries specified this way have top priority
-			if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
-				return nil, nil, nil, err
-			}
 		}
 	}
 

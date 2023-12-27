@@ -311,7 +311,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
 			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+				lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+					PlatformRelease: platformRelease,
+					Path:            platformRelease.GetLibrariesDir(),
+					Location:        libraries.PlatformBuiltIn,
+				})
 			}
 		}
 	}
@@ -324,11 +328,17 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
 		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-			lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				Path:     bundledLibsDir,
+				Location: libraries.IDEBuiltIn,
+			})
 		}
 
 		// Add libraries directory from config file
-		lm.AddLibrariesDir(configuration.LibrariesDir(configuration.Settings), libraries.User)
+		lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			Path:     configuration.LibrariesDir(configuration.Settings),
+			Location: libraries.User,
+		})
 	} else {
 		// Load libraries required for profile
 		for _, libraryRef := range profile.Libraries {
@@ -368,7 +378,10 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				taskCallback(&rpc.TaskProgress{Completed: true})
 			}
 
-			lm.AddLibrariesDir(libRoot, libraries.User)
+			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				Path:     libRoot,
+				Location: libraries.User,
+			})
 		}
 	}
 
@@ -412,11 +425,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	}
 	defer tmp.RemoveAll()
 
-	indexResource := resources.IndexResource{
-		URL:                          librariesmanager.LibraryIndexWithSignatureArchiveURL,
-		EnforceSignatureVerification: true,
-	}
-	if err := indexResource.Download(lm.IndexFile.Parent(), downloadCB); err != nil {
+	if err := globals.LibrariesIndexResource.Download(lm.IndexFile.Parent(), downloadCB); err != nil {
 		return err
 	}
 

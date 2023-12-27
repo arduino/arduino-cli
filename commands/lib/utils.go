@@ -19,7 +19,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 )
 
 type libraryReferencer interface {
@@ -27,7 +26,7 @@ type libraryReferencer interface {
 	GetName() string
 }
 
-func createLibIndexReference(lm *librariesmanager.LibrariesManager, req libraryReferencer) (*librariesindex.Reference, error) {
+func createLibIndexReference(req libraryReferencer) (*librariesindex.Reference, error) {
 	version, err := commands.ParseVersion(req)
 	if err != nil {
 		return nil, &cmderrors.InvalidVersionError{Cause: err}
@@ -36,12 +35,12 @@ func createLibIndexReference(lm *librariesmanager.LibrariesManager, req libraryR
 	return &librariesindex.Reference{Name: req.GetName(), Version: version}, nil
 }
 
-func findLibraryIndexRelease(lm *librariesmanager.LibrariesManager, req libraryReferencer) (*librariesindex.Release, error) {
-	ref, err := createLibIndexReference(lm, req)
+func findLibraryIndexRelease(li *librariesindex.Index, req libraryReferencer) (*librariesindex.Release, error) {
+	ref, err := createLibIndexReference(req)
 	if err != nil {
 		return nil, err
 	}
-	lib := lm.Index.FindRelease(ref)
+	lib := li.FindRelease(ref)
 	if lib == nil {
 		return nil, &cmderrors.LibraryNotFoundError{Library: ref.String()}
 	}

@@ -32,7 +32,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 		return err
 	}
 
-	ref, err := createLibIndexReference(lm, req)
+	ref, err := createLibIndexReference(req)
 	if err != nil {
 		return &cmderrors.InvalidLibraryError{Cause: err}
 	}

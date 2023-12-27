@@ -36,7 +36,7 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 	}
 
 	// Search the requested lib
-	reqLibRelease, err := findLibraryIndexRelease(lm, req)
+	reqLibRelease, err := findLibraryIndexRelease(lm.Index, req)
 	if err != nil {
 		return nil, err
 	}
