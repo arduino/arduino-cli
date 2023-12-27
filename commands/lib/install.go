@@ -74,6 +74,15 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 	}
 
+	// Obtain the download directory
+	var downloadsDir *paths.Path
+	if pme, releasePme, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
+		return err
+	} else {
+		downloadsDir = pme.DownloadDir
+		releasePme()
+	}
+
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	for _, lib := range toInstall {
@@ -114,7 +123,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 				downloadReason += "-builtin"
 			}
 		}
-		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, downloadReason); err != nil {
+		if err := downloadLibrary(downloadsDir, libRelease, downloadCB, taskCB, downloadReason); err != nil {
 			return err
 		}
 		if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
