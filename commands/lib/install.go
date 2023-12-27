@@ -33,6 +33,11 @@ import (
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
+	if err != nil {
+		return err
+	}
+
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
 		return err
@@ -72,7 +77,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	for _, lib := range toInstall {
-		libRelease, err := findLibraryIndexRelease(lm.Index, &rpc.LibraryInstallRequest{
+		libRelease, err := findLibraryIndexRelease(li, &rpc.LibraryInstallRequest{
 			Name:    lib.GetName(),
 			Version: lib.GetVersionRequired(),
 		})

@@ -36,14 +36,19 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 	}
 
 	// Search the requested lib
-	reqLibRelease, err := findLibraryIndexRelease(lm.Index, req)
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
+	if err != nil {
+		return nil, err
+	}
+
+	reqLibRelease, err := findLibraryIndexRelease(li, req)
 	if err != nil {
 		return nil, err
 	}
 
 	// Extract all installed libraries
 	installedLibs := map[string]*libraries.Library{}
-	for _, lib := range listLibraries(lm, false, false) {
+	for _, lib := range listLibraries(lm, li, false, false) {
 		installedLibs[lib.Library.Name] = lib.Library
 	}
 
@@ -53,7 +58,7 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		libs := lm.FindAllInstalled()
 		libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
 		for _, lib := range libs {
-			release := lm.Index.FindRelease(&librariesindex.Reference{
+			release := li.FindRelease(&librariesindex.Reference{
 				Name:    lib.Name,
 				Version: lib.Version,
 			})
@@ -62,13 +67,13 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 			}
 		}
 	}
-	deps := lm.Index.ResolveDependencies(reqLibRelease, overrides)
+	deps := li.ResolveDependencies(reqLibRelease, overrides)
 
 	// If no solution has been found
 	if len(deps) == 0 {
 		// Check if there is a problem with the first level deps
 		for _, directDep := range reqLibRelease.GetDependencies() {
-			if _, ok := lm.Index.Libraries[directDep.GetName()]; !ok {
+			if _, ok := li.Libraries[directDep.GetName()]; !ok {
 				err := errors.New(tr("dependency '%s' is not available", directDep.GetName()))
 				return nil, &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
 			}

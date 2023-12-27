@@ -40,9 +40,14 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 		return nil, err
 	}
 
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
+	if err != nil {
+		return nil, err
+	}
+
 	logrus.Info("Preparing download")
 
-	lib, err := findLibraryIndexRelease(lm.Index, req)
+	lib, err := findLibraryIndexRelease(li, req)
 	if err != nil {
 		return nil, err
 	}

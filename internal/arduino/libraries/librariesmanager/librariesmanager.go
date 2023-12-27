@@ -37,7 +37,6 @@ import (
 type LibrariesManager struct {
 	LibrariesDir []*LibrariesDir
 	Libraries    map[string]libraries.List `json:"libraries"`
-	// TODO: Fix all access to lm.Index left around
 	DownloadsDir *paths.Path
 }
 
@@ -73,7 +72,6 @@ func NewLibraryManager(downloadsDir *paths.Path) *LibrariesManager {
 	return &LibrariesManager{
 		Libraries:    map[string]libraries.List{},
 		DownloadsDir: downloadsDir,
-		Index:        librariesindex.EmptyIndex,
 	}
 }
 
