@@ -35,7 +35,7 @@ import (
 // LibrariesManager keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
 type LibrariesManager struct {
-	LibrariesDir []*LibrariesDir
+	librariesDir []*LibrariesDir
 	libraries    map[string]libraries.List
 	DownloadsDir *paths.Path
 }
@@ -82,7 +82,7 @@ func (lm *LibrariesManager) AddLibrariesDir(libDir *LibrariesDir) {
 	if libDir.Path == nil {
 		return
 	}
-	for _, dir := range lm.LibrariesDir {
+	for _, dir := range lm.librariesDir {
 		if dir.Path.EquivalentTo(libDir.Path) {
 			return
 		}
@@ -91,14 +91,14 @@ func (lm *LibrariesManager) AddLibrariesDir(libDir *LibrariesDir) {
 		WithField("location", libDir.Location.String()).
 		WithField("isSingleLibrary", libDir.IsSingleLibrary).
 		Info("Adding libraries dir")
-	lm.LibrariesDir = append(lm.LibrariesDir, libDir)
+	lm.librariesDir = append(lm.librariesDir, libDir)
 }
 
 // RescanLibraries reload all installed libraries in the system.
 func (lm *LibrariesManager) RescanLibraries() []*status.Status {
 	lm.clearLibraries()
 	statuses := []*status.Status{}
-	for _, dir := range lm.LibrariesDir {
+	for _, dir := range lm.librariesDir {
 		if errs := lm.loadLibrariesFromDir(dir); len(errs) > 0 {
 			statuses = append(statuses, errs...)
 		}
@@ -107,7 +107,7 @@ func (lm *LibrariesManager) RescanLibraries() []*status.Status {
 }
 
 func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLocation) (*paths.Path, error) {
-	for _, dir := range lm.LibrariesDir {
+	for _, dir := range lm.librariesDir {
 		if dir.Location == installLocation {
 			return dir.Path, nil
 		}
