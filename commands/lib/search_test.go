@@ -19,22 +19,24 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var customIndexPath = paths.New("testdata", "test1")
-var fullIndexPath = paths.New("testdata", "full")
-var qualifiedSearchIndexPath = paths.New("testdata", "qualified_search")
+var indexFilename, _ = globals.LibrariesIndexResource.IndexFileName()
+var customIndexPath = paths.New("testdata", "test1", indexFilename)
+var fullIndexPath = paths.New("testdata", "full", indexFilename)
+var qualifiedSearchIndexPath = paths.New("testdata", "qualified_search", indexFilename)
 
 func TestSearchLibrary(t *testing.T) {
-	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
-	lm.LoadIndex()
+	li, err := librariesindex.LoadIndex(customIndexPath)
+	require.NoError(t, err)
 
-	resp := searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: "test"}, lm)
+	resp := searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: "test"}, li)
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
@@ -43,10 +45,10 @@ func TestSearchLibrary(t *testing.T) {
 }
 
 func TestSearchLibrarySimilar(t *testing.T) {
-	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
-	lm.LoadIndex()
+	li, err := librariesindex.LoadIndex(customIndexPath)
+	require.NoError(t, err)
 
-	resp := searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: "arduino"}, lm)
+	resp := searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: "arduino"}, li)
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
@@ -59,12 +61,12 @@ func TestSearchLibrarySimilar(t *testing.T) {
 }
 
 func TestSearchLibraryFields(t *testing.T) {
-	lm := librariesmanager.NewLibraryManager(fullIndexPath, nil)
-	lm.LoadIndex()
+	li, err := librariesindex.LoadIndex(fullIndexPath)
+	require.NoError(t, err)
 
 	query := func(q string) []string {
 		libs := []string{}
-		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, lm).GetLibraries() {
+		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, li).GetLibraries() {
 			libs = append(libs, lib.GetName())
 		}
 		return libs
@@ -97,12 +99,12 @@ func TestSearchLibraryFields(t *testing.T) {
 }
 
 func TestSearchLibraryWithQualifiers(t *testing.T) {
-	lm := librariesmanager.NewLibraryManager(qualifiedSearchIndexPath, nil)
-	lm.LoadIndex()
+	li, err := librariesindex.LoadIndex(qualifiedSearchIndexPath)
+	require.NoError(t, err)
 
 	query := func(q string) []string {
 		libs := []string{}
-		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, lm).GetLibraries() {
+		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, li).GetLibraries() {
 			libs = append(libs, lib.GetName())
 		}
 		return libs

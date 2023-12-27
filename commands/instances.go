@@ -302,7 +302,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 	// Create library manager and add libraries directories
 	lm := librariesmanager.NewLibraryManager(
-		pme.IndexDir,
 		pme.DownloadDir,
 	)
 	_ = instances.SetLibraryManager(instance, lm) // should never fail
@@ -320,10 +319,21 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
-	if err := lm.LoadIndex(); err != nil {
+	indexFileName, err := globals.LibrariesIndexResource.IndexFileName()
+	if err != nil {
+		// should never happen
+		panic("failed getting libraries index file name: " + err.Error())
+	}
+	indexFile := pme.IndexDir.Join(indexFileName)
+
+	logrus.WithField("index", indexFile).Info("Loading libraries index file")
+	li, err := librariesindex.LoadIndex(indexFile)
+	if err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 		responseError(s)
+		li = librariesindex.EmptyIndex
 	}
+	instances.SetLibrariesIndex(instance, li)
 
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
@@ -409,12 +419,14 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return err
 	}
+	indexDir := pme.IndexDir
+	release()
 
-	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
+	if err := indexDir.MkdirAll(); err != nil {
 		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
@@ -425,7 +437,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	}
 	defer tmp.RemoveAll()
 
-	if err := globals.LibrariesIndexResource.Download(lm.IndexFile.Parent(), downloadCB); err != nil {
+	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB); err != nil {
 		return err
 	}
 

@@ -37,11 +37,8 @@ import (
 type LibrariesManager struct {
 	LibrariesDir []*LibrariesDir
 	Libraries    map[string]libraries.List `json:"libraries"`
-
-	Index              *librariesindex.Index
-	IndexFile          *paths.Path
-	IndexFileSignature *paths.Path
-	DownloadsDir       *paths.Path
+	// TODO: Fix all access to lm.Index left around
+	DownloadsDir *paths.Path
 }
 
 // LibrariesDir is a directory containing libraries
@@ -72,32 +69,12 @@ func (lm LibrariesManager) Names() []string {
 }
 
 // NewLibraryManager creates a new library manager
-func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *LibrariesManager {
-	var indexFile, indexFileSignature *paths.Path
-	if indexDir != nil {
-		indexFile = indexDir.Join("library_index.json")
-		indexFileSignature = indexDir.Join("library_index.json.sig")
-	}
+func NewLibraryManager(downloadsDir *paths.Path) *LibrariesManager {
 	return &LibrariesManager{
-		Libraries:          map[string]libraries.List{},
-		IndexFile:          indexFile,
-		IndexFileSignature: indexFileSignature,
-		DownloadsDir:       downloadsDir,
-		Index:              librariesindex.EmptyIndex,
+		Libraries:    map[string]libraries.List{},
+		DownloadsDir: downloadsDir,
+		Index:        librariesindex.EmptyIndex,
 	}
-}
-
-// LoadIndex reads a library_index.json from a file and returns
-// the corresponding Index structure.
-func (lm *LibrariesManager) LoadIndex() error {
-	logrus.WithField("index", lm.IndexFile).Info("Loading libraries index file")
-	index, err := librariesindex.LoadIndex(lm.IndexFile)
-	if err != nil {
-		lm.Index = librariesindex.EmptyIndex
-		return err
-	}
-	lm.Index = index
-	return nil
 }
 
 // AddLibrariesDir adds path to the list of directories

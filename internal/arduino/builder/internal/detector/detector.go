@@ -598,10 +598,10 @@ func LibrariesLoader(
 	if useCachedLibrariesResolution {
 		// Since we are using the cached libraries resolution
 		// the library manager is not needed.
-		lm = librariesmanager.NewLibraryManager(nil, nil)
+		lm = librariesmanager.NewLibraryManager(nil)
 	}
 	if librariesManager == nil {
-		lm = librariesmanager.NewLibraryManager(nil, nil)
+		lm = librariesmanager.NewLibraryManager(nil)
 
 		builtInLibrariesFolders := builtInLibrariesDirs
 		if builtInLibrariesFolders != nil {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
@@ -17,6 +18,7 @@ import (
 type coreInstance struct {
 	pm *packagemanager.PackageManager
 	lm *librariesmanager.LibrariesManager
+	li *librariesindex.Index
 }
 
 // instances contains all the running Arduino Core Services instances
@@ -60,6 +62,29 @@ func GetLibraryManager(inst *rpc.Instance) (*librariesmanager.LibrariesManager, 
 	return i.lm, nil
 }
 
+// GetLibrariesIndex returns the library index for the given instance.
+func GetLibrariesIndex(inst *rpc.Instance) (*librariesindex.Index, error) {
+	instancesMux.Lock()
+	defer instancesMux.Unlock()
+	i := instances[inst.GetId()]
+	if i == nil {
+		return nil, &cmderrors.InvalidInstanceError{}
+	}
+	return i.li, nil
+}
+
+// SetLibrariesIndex sets the library index for the given instance.
+func SetLibrariesIndex(inst *rpc.Instance, li *librariesindex.Index) error {
+	instancesMux.Lock()
+	defer instancesMux.Unlock()
+	i := instances[inst.GetId()]
+	if i == nil {
+		return &cmderrors.InvalidInstanceError{}
+	}
+	i.li = li
+	return nil
+}
+
 // SetLibraryManager sets the library manager for the given instance.
 func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager) bool {
 	instancesMux.Lock()
@@ -74,16 +99,18 @@ func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager
 
 // Create a new *rpc.Instance ready to be initialized
 func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent ...string) (*rpc.Instance, error) {
-	instance := &coreInstance{}
-
 	// Create package manager
 	userAgent := "arduino-cli/" + version.VersionInfo.VersionString
 	for _, ua := range extraUserAgent {
 		userAgent += " " + ua
 	}
 	tempDir := dataDir.Join("tmp")
-	instance.pm = packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build()
-	instance.lm = librariesmanager.NewLibraryManager(dataDir, downloadsDir)
+
+	instance := &coreInstance{
+		pm: packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build(),
+		lm: librariesmanager.NewLibraryManager(downloadsDir),
+		li: librariesindex.EmptyIndex,
+	}
 
 	// Save instance
 	instancesMux.Lock()
