@@ -46,10 +46,8 @@ func NewCppResolver() *Cpp {
 // ScanFromLibrariesManager reads all librariers loaded in the LibrariesManager to find
 // and cache all C++ headers for later retrieval
 func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesManager) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			resolver.ScanLibrary(lib)
-		}
+	for _, lib := range lm.FindAllInstalled() {
+		resolver.ScanLibrary(lib)
 	}
 	return nil
 }
@@ -57,11 +55,9 @@ func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesMana
 // ScanIDEBuiltinLibraries reads ide-builtin librariers loaded in the LibrariesManager to find
 // and cache all C++ headers for later retrieval.
 func (resolver *Cpp) ScanIDEBuiltinLibraries(lm *librariesmanager.LibrariesManager) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if lib.Location == libraries.IDEBuiltIn {
-				resolver.ScanLibrary(lib)
-			}
+	for _, lib := range lm.FindAllInstalled() {
+		if lib.Location == libraries.IDEBuiltIn {
+			resolver.ScanLibrary(lib)
 		}
 	}
 	return nil
@@ -70,11 +66,9 @@ func (resolver *Cpp) ScanIDEBuiltinLibraries(lm *librariesmanager.LibrariesManag
 // ScanUserAndUnmanagedLibraries reads user/unmanaged librariers loaded in the LibrariesManager to find
 // and cache all C++ headers for later retrieval.
 func (resolver *Cpp) ScanUserAndUnmanagedLibraries(lm *librariesmanager.LibrariesManager) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if lib.Location == libraries.User || lib.Location == libraries.Unmanaged {
-				resolver.ScanLibrary(lib)
-			}
+	for _, lib := range lm.FindAllInstalled() {
+		if lib.Location == libraries.User || lib.Location == libraries.Unmanaged {
+			resolver.ScanLibrary(lib)
 		}
 	}
 	return nil
@@ -83,16 +77,14 @@ func (resolver *Cpp) ScanUserAndUnmanagedLibraries(lm *librariesmanager.Librarie
 // ScanPlatformLibraries reads platform-bundled libraries for a specific platform loaded in the LibrariesManager
 // to find and cache all C++ headers for later retrieval.
 func (resolver *Cpp) ScanPlatformLibraries(lm *librariesmanager.LibrariesManager, platform *cores.PlatformRelease) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if lib.Location != libraries.PlatformBuiltIn && lib.Location != libraries.ReferencedPlatformBuiltIn {
-				continue
-			}
-			if lib.ContainerPlatform != platform {
-				continue
-			}
-			resolver.ScanLibrary(lib)
+	for _, lib := range lm.FindAllInstalled() {
+		if lib.Location != libraries.PlatformBuiltIn && lib.Location != libraries.ReferencedPlatformBuiltIn {
+			continue
 		}
+		if lib.ContainerPlatform != platform {
+			continue
+		}
+		resolver.ScanLibrary(lib)
 	}
 	return nil
 }

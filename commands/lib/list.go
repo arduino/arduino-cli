@@ -125,22 +125,20 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 // returns only the libraries that may be updated.
 func listLibraries(lm *librariesmanager.LibrariesManager, li *librariesindex.Index, updatable bool, all bool) []*installedLib {
 	res := []*installedLib{}
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if !all {
-				if lib.Location != libraries.User {
-					continue
-				}
-			}
-			available := li.FindLibraryUpdate(lib)
-			if updatable && available == nil {
+	for _, lib := range lm.FindAllInstalled() {
+		if !all {
+			if lib.Location != libraries.User {
 				continue
 			}
-			res = append(res, &installedLib{
-				Library:   lib,
-				Available: available,
-			})
 		}
+		available := li.FindLibraryUpdate(lib)
+		if updatable && available == nil {
+			continue
+		}
+		res = append(res, &installedLib{
+			Library:   lib,
+			Available: available,
+		})
 	}
 	return res
 }
