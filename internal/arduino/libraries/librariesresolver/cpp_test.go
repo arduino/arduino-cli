@@ -35,7 +35,7 @@ var bundleServo = &libraries.Library{Name: "Servo", Location: libraries.IDEBuilt
 func runResolver(include string, arch string, libs ...*libraries.Library) *libraries.Library {
 	libraryList := libraries.List{}
 	libraryList.Add(libs...)
-	resolver := NewCppResolver()
+	resolver := &Cpp{headers: make(map[string]libraries.List)}
 	resolver.headers[include] = libraryList
 	return resolver.ResolveFor(include, arch)
 }
@@ -95,7 +95,7 @@ func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
 	libraryList.Add(l6)
 	libraryList.Add(l7)
 	libraryList.Add(l8)
-	resolver := NewCppResolver()
+	resolver := &Cpp{headers: make(map[string]libraries.List)}
 	resolver.headers["XYZ.h"] = libraryList
 	res := resolver.ResolveFor("XYZ.h", "xyz")
 	require.NotNil(t, res)
@@ -121,7 +121,7 @@ func TestCppHeaderPriority(t *testing.T) {
 }
 
 func TestCppHeaderResolverWithNilResult(t *testing.T) {
-	resolver := NewCppResolver()
+	resolver := &Cpp{headers: make(map[string]libraries.List)}
 	libraryList := libraries.List{}
 	libraryList.Add(l1)
 	resolver.headers["aaa.h"] = libraryList
@@ -130,7 +130,7 @@ func TestCppHeaderResolverWithNilResult(t *testing.T) {
 
 func TestCppHeaderResolver(t *testing.T) {
 	resolve := func(header string, libs ...*libraries.Library) string {
-		resolver := NewCppResolver()
+		resolver := &Cpp{headers: make(map[string]libraries.List)}
 		librarylist := libraries.List{}
 		for _, lib := range libs {
 			librarylist.Add(lib)
@@ -149,7 +149,7 @@ func TestCppHeaderResolver(t *testing.T) {
 }
 
 func TestCppHeaderResolverWithLibrariesInStrangeDirectoryNames(t *testing.T) {
-	resolver := NewCppResolver()
+	resolver := &Cpp{headers: make(map[string]libraries.List)}
 	librarylist := libraries.List{}
 	librarylist.Add(&libraries.Library{DirName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"*"}})
 	librarylist.Add(&libraries.Library{DirName: "onewireng_2_3_4", Name: "OneWireNg", Architectures: []string{"avr"}})

@@ -657,21 +657,8 @@ func LibrariesLoader(
 		}
 	}
 
-	resolver := librariesresolver.NewCppResolver()
-	if err := resolver.ScanIDEBuiltinLibraries(lm); err != nil {
-		return nil, nil, nil, err
-	}
-	if err := resolver.ScanUserAndUnmanagedLibraries(lm); err != nil {
-		return nil, nil, nil, err
-	}
-	if err := resolver.ScanPlatformLibraries(lm, targetPlatform); err != nil {
-		return nil, nil, nil, err
-	}
-	if actualPlatform != targetPlatform {
-		if err := resolver.ScanPlatformLibraries(lm, actualPlatform); err != nil {
-			return nil, nil, nil, err
-		}
-	}
+	allLibs := lm.FindAllInstalled()
+	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
 
