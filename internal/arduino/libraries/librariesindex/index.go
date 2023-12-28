@@ -18,6 +18,7 @@ package librariesindex
 import (
 	"sort"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -112,14 +113,17 @@ func (r *Release) String() string {
 // FindRelease search a library Release in the index. Returns nil if the
 // release is not found. If the version is not specified returns the latest
 // version available.
-func (idx *Index) FindRelease(ref *Reference) *Release {
-	if library, exists := idx.Libraries[ref.Name]; exists {
-		if ref.Version == nil {
-			return library.Latest
+func (idx *Index) FindRelease(name string, version *semver.Version) (*Release, error) {
+	if library, exists := idx.Libraries[name]; exists {
+		if version == nil {
+			return library.Latest, nil
 		}
-		return library.Releases[ref.Version.NormalizedString()]
+		return library.Releases[version.NormalizedString()], nil
 	}
-	return nil
+	if version == nil {
+		return nil, &cmderrors.LibraryNotFoundError{Library: name + "@latest"}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: name + "@" + version.String()}
 }
 
 // FindIndexedLibrary search an indexed library that matches the provided

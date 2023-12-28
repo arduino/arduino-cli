@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
@@ -65,8 +64,8 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semve
 	}
 
 	lm.RescanLibraries()
-	libs := lm.FindByReference(&librariesindex.Reference{Name: name}, installLocation)
 
+	libs := lm.FindByReference(name, nil, installLocation)
 	if len(libs) > 1 {
 		libsDir := paths.NewPathList()
 		for _, lib := range libs {

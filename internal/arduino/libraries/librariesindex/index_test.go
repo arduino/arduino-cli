@@ -49,27 +49,22 @@ func TestIndexer(t *testing.T) {
 	require.Equal(t, "", alp.Latest.Dependencies[0].GetConstraint().String())
 	require.Equal(t, "[1.0.0 1.1.0 1.2.0 1.2.1 1.2.2]", fmt.Sprintf("%v", alp.Versions()))
 
-	rtc100ref := &Reference{Name: "RTCZero", Version: semver.MustParse("1.0.0")}
-	require.Equal(t, "RTCZero@1.0.0", rtc100ref.String())
-	rtc100 := index.FindRelease(rtc100ref)
+	rtc100, err := index.FindRelease("RTCZero", semver.MustParse("1.0.0"))
+	require.NoError(t, err)
 	require.NotNil(t, rtc100)
 	require.Equal(t, "RTCZero@1.0.0", rtc100.String())
 
-	rtcLatestRef := &Reference{Name: "RTCZero"}
-	require.Equal(t, "RTCZero", rtcLatestRef.String())
-	rtcLatest := index.FindRelease(rtcLatestRef)
+	rtcLatest, err := index.FindRelease("RTCZero", nil)
+	require.NoError(t, err)
 	require.NotNil(t, rtcLatest)
 	require.Equal(t, "RTCZero@1.6.0", rtcLatest.String())
 
-	rtcInexistent := index.FindRelease(&Reference{
-		Name:    "RTCZero",
-		Version: semver.MustParse("0.0.0-blah"),
-	})
+	rtcInexistent, err := index.FindRelease("RTCZero", semver.MustParse("0.0.0-blah"))
+	require.Error(t, err)
 	require.Nil(t, rtcInexistent)
 
-	rtcInexistent = index.FindRelease(&Reference{
-		Name: "RTCZero-blah",
-	})
+	rtcInexistent, err = index.FindRelease("RTCZero-blah", nil)
+	require.Error(t, err)
 	require.Nil(t, rtcInexistent)
 
 	rtc := index.FindIndexedLibrary(&libraries.Library{Name: "RTCZero"})
@@ -95,16 +90,20 @@ func TestIndexer(t *testing.T) {
 	require.Contains(t, resolve1, alp.Releases["1.2.1"])
 	require.Contains(t, resolve1, rtc.Releases["1.6.0"])
 
-	oauth010 := index.FindRelease(&Reference{Name: "Arduino_OAuth", Version: semver.MustParse("0.1.0")})
+	oauth010, err := index.FindRelease("Arduino_OAuth", semver.MustParse("0.1.0"))
+	require.NoError(t, err)
 	require.NotNil(t, oauth010)
 	require.Equal(t, "Arduino_OAuth@0.1.0", oauth010.String())
-	eccx135 := index.FindRelease(&Reference{Name: "ArduinoECCX08", Version: semver.MustParse("1.3.5")})
+	eccx135, err := index.FindRelease("ArduinoECCX08", semver.MustParse("1.3.5"))
+	require.NoError(t, err)
 	require.NotNil(t, eccx135)
 	require.Equal(t, "ArduinoECCX08@1.3.5", eccx135.String())
-	bear172 := index.FindRelease(&Reference{Name: "ArduinoBearSSL", Version: semver.MustParse("1.7.2")})
+	bear172, err := index.FindRelease("ArduinoBearSSL", semver.MustParse("1.7.2"))
+	require.NoError(t, err)
 	require.NotNil(t, bear172)
 	require.Equal(t, "ArduinoBearSSL@1.7.2", bear172.String())
-	http040 := index.FindRelease(&Reference{Name: "ArduinoHttpClient", Version: semver.MustParse("0.4.0")})
+	http040, err := index.FindRelease("ArduinoHttpClient", semver.MustParse("0.4.0"))
+	require.NoError(t, err)
 	require.NotNil(t, http040)
 	require.Equal(t, "ArduinoHttpClient@0.4.0", http040.String())
 

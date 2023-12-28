@@ -86,10 +86,11 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	for _, lib := range toInstall {
-		libRelease, err := findLibraryIndexRelease(li, &rpc.LibraryInstallRequest{
-			Name:    lib.GetName(),
-			Version: lib.GetVersionRequired(),
-		})
+		version, err := commands.ParseVersion(lib.GetVersionRequired())
+		if err != nil {
+			return err
+		}
+		libRelease, err := li.FindRelease(lib.GetName(), version)
 		if err != nil {
 			return err
 		}

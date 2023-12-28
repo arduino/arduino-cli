@@ -35,7 +35,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 		}
 		defer release()
 
-		version, err := commands.ParseVersion(req)
+		version, err := commands.ParseVersion(req.GetVersion())
 		if err != nil {
 			return &cmderrors.InvalidVersionError{Cause: err}
 		}

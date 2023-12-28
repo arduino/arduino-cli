@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
@@ -50,7 +51,12 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 
 	logrus.Info("Preparing download")
 
-	lib, err := findLibraryIndexRelease(li, req)
+	version, err := commands.ParseVersion(req.GetVersion())
+	if err != nil {
+		return nil, err
+	}
+
+	lib, err := li.FindRelease(req.GetName(), version)
 	if err != nil {
 		return nil, err
 	}

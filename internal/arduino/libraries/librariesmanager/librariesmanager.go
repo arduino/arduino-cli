@@ -24,10 +24,10 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	semver "go.bug.st/relaxed-semver"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -161,12 +161,12 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 // FindByReference return the installed libraries matching the Reference
 // name and version or, if the version is nil, the libraries installed
 // in the installLocation.
-func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) libraries.List {
-	alternatives := lm.libraries[libRef.Name]
+func (lm *LibrariesManager) FindByReference(name string, version *semver.Version, installLocation libraries.LibraryLocation) libraries.List {
+	alternatives := lm.libraries[name]
 	if alternatives == nil {
 		return nil
 	}
-	return alternatives.FilterByVersionAndInstallLocation(libRef.Version, installLocation)
+	return alternatives.FilterByVersionAndInstallLocation(version, installLocation)
 }
 
 // FindAllInstalled returns all the installed libraries

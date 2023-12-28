@@ -20,6 +20,7 @@ import (
 	"errors"
 	"sort"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -41,7 +42,12 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		return nil, err
 	}
 
-	reqLibRelease, err := findLibraryIndexRelease(li, req)
+	version, err := commands.ParseVersion(req.GetVersion())
+	if err != nil {
+		return nil, err
+	}
+
+	reqLibRelease, err := li.FindRelease(req.GetName(), version)
 	if err != nil {
 		return nil, err
 	}
@@ -58,11 +64,7 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		libs := lm.FindAllInstalled()
 		libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
 		for _, lib := range libs {
-			release := li.FindRelease(&librariesindex.Reference{
-				Name:    lib.Name,
-				Version: lib.Version,
-			})
-			if release != nil {
+			if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {
 				overrides = append(overrides, release)
 			}
 		}

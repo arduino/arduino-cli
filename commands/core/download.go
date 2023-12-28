@@ -36,7 +36,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 	defer release()
 
-	version, err := commands.ParseVersion(req)
+	version, err := commands.ParseVersion(req.GetVersion())
 	if err != nil {
 		return nil, &cmderrors.InvalidVersionError{Cause: err}
 	}

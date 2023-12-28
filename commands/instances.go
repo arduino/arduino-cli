@@ -357,11 +357,8 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			if !libDir.IsDir() {
 				// Download library
 				taskCallback(&rpc.TaskProgress{Name: tr("Downloading library %s", libraryRef)})
-				libRelease := li.FindRelease(&librariesindex.Reference{
-					Name:    libraryRef.Library,
-					Version: libraryRef.Version,
-				})
-				if libRelease == nil {
+				libRelease, err := li.FindRelease(libraryRef.Library, libraryRef.Version)
+				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
 					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
 					responseError(err.ToRPCStatus())

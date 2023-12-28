@@ -16,19 +16,20 @@
 package commands
 
 import (
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	semver "go.bug.st/relaxed-semver"
 )
 
-// Versioned is an object that provides a GetVersion() method
-type Versioned interface {
-	GetVersion() string
-}
-
-// ParseVersion returns the version parsed from an interface that provides
-// the GetVersion() method (interface Versioned)
-func ParseVersion(req Versioned) (*semver.Version, error) {
-	if req.GetVersion() != "" {
-		return semver.Parse(req.GetVersion())
+// ParseVersion returns the parsed version or nil if the version is
+// the empty string. An error is returned if the version is not valid
+// semver.
+func ParseVersion(version string) (*semver.Version, error) {
+	if version == "" {
+		return nil, nil
 	}
-	return nil, nil
+	res, err := semver.Parse(version)
+	if err != nil {
+		return nil, &cmderrors.InvalidVersionError{Cause: err}
+	}
+	return res, nil
 }
