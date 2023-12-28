@@ -118,7 +118,9 @@ func (idx *Index) FindRelease(name string, version *semver.Version) (*Release, e
 		if version == nil {
 			return library.Latest, nil
 		}
-		return library.Releases[version.NormalizedString()], nil
+		if release, exists := library.Releases[version.NormalizedString()]; exists {
+			return release, nil
+		}
 	}
 	if version == nil {
 		return nil, &cmderrors.LibraryNotFoundError{Library: name + "@latest"}
