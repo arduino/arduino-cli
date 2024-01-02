@@ -341,7 +341,7 @@ tasks:
   general:get-version:
     desc: Returns the version used in the project
     cmds:
-      - echo {{.VERSION}}
+      - echo v{{.VERSION}}
 
 vars:
   PROJECT_NAME: "arduino-cli"
