@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/schollz/closestmatch"
@@ -37,64 +36,52 @@ type Cpp struct {
 var tr = i18n.Tr
 
 // NewCppResolver creates a new Cpp resolver
-func NewCppResolver() *Cpp {
-	return &Cpp{
+func NewCppResolver(allLibs []*libraries.Library, targetPlatform, actualPlatform *cores.PlatformRelease) *Cpp {
+	resolver := &Cpp{
 		headers: map[string]libraries.List{},
 	}
-}
-
-// ScanFromLibrariesManager reads all librariers loaded in the LibrariesManager to find
-// and cache all C++ headers for later retrieval
-func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesManager) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			resolver.ScanLibrary(lib)
-		}
+	resolver.ScanIDEBuiltinLibraries(allLibs)
+	resolver.ScanUserAndUnmanagedLibraries(allLibs)
+	resolver.ScanPlatformLibraries(allLibs, targetPlatform)
+	if actualPlatform != targetPlatform {
+		resolver.ScanPlatformLibraries(allLibs, actualPlatform)
 	}
-	return nil
+
+	return resolver
 }
 
 // ScanIDEBuiltinLibraries reads ide-builtin librariers loaded in the LibrariesManager to find
 // and cache all C++ headers for later retrieval.
-func (resolver *Cpp) ScanIDEBuiltinLibraries(lm *librariesmanager.LibrariesManager) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if lib.Location == libraries.IDEBuiltIn {
-				resolver.ScanLibrary(lib)
-			}
+func (resolver *Cpp) ScanIDEBuiltinLibraries(allLibs []*libraries.Library) {
+	for _, lib := range allLibs {
+		if lib.Location == libraries.IDEBuiltIn {
+			_ = resolver.ScanLibrary(lib)
 		}
 	}
-	return nil
 }
 
 // ScanUserAndUnmanagedLibraries reads user/unmanaged librariers loaded in the LibrariesManager to find
 // and cache all C++ headers for later retrieval.
-func (resolver *Cpp) ScanUserAndUnmanagedLibraries(lm *librariesmanager.LibrariesManager) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if lib.Location == libraries.User || lib.Location == libraries.Unmanaged {
-				resolver.ScanLibrary(lib)
-			}
+func (resolver *Cpp) ScanUserAndUnmanagedLibraries(allLibs []*libraries.Library) {
+	for _, lib := range allLibs {
+		if lib.Location == libraries.User || lib.Location == libraries.Unmanaged {
+			_ = resolver.ScanLibrary(lib)
 		}
 	}
-	return nil
 }
 
 // ScanPlatformLibraries reads platform-bundled libraries for a specific platform loaded in the LibrariesManager
 // to find and cache all C++ headers for later retrieval.
-func (resolver *Cpp) ScanPlatformLibraries(lm *librariesmanager.LibrariesManager, platform *cores.PlatformRelease) error {
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives {
-			if lib.Location != libraries.PlatformBuiltIn && lib.Location != libraries.ReferencedPlatformBuiltIn {
-				continue
-			}
-			if lib.ContainerPlatform != platform {
-				continue
-			}
-			resolver.ScanLibrary(lib)
+func (resolver *Cpp) ScanPlatformLibraries(allLibs []*libraries.Library, platform *cores.PlatformRelease) {
+	for _, lib := range allLibs {
+		if lib.Location != libraries.PlatformBuiltIn && lib.Location != libraries.ReferencedPlatformBuiltIn {
+			continue
 		}
+		if lib.ContainerPlatform != platform {
+			continue
+		}
+		_ = resolver.ScanLibrary(lib)
 	}
-	return nil
 }
 
 // ScanLibrary reads a library to find and cache C++ headers for later retrieval

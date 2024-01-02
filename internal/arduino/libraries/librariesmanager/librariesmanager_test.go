@@ -18,15 +18,20 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_RescanLibrariesCallClear(t *testing.T) {
-	baseDir := paths.New(t.TempDir())
-	lm := NewLibraryManager(baseDir.Join("index_dir"), baseDir.Join("downloads_dir"))
-	lm.Libraries["testLibA"] = libraries.List{}
-	lm.Libraries["testLibB"] = libraries.List{}
-	lm.RescanLibraries()
-	require.Len(t, lm.Libraries, 0)
+	lmb := NewBuilder()
+	lmb.libraries["testLibA"] = libraries.List{}
+	lmb.libraries["testLibB"] = libraries.List{}
+	lm := lmb.Build()
+
+	{
+		lmi, release := lm.NewInstaller()
+		lmi.RescanLibraries()
+		release()
+	}
+
+	require.Len(t, lm.libraries, 0)
 }

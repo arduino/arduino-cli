@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -32,13 +33,14 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 		return err
 	}
 
-	ref, err := createLibIndexReference(req)
+	version, err := commands.ParseVersion(req.GetVersion())
 	if err != nil {
-		return &cmderrors.InvalidLibraryError{Cause: err}
+		return err
 	}
+	lmi, release := lm.NewInstaller()
+	defer release()
 
-	libs := lm.FindByReference(ref, libraries.User)
-
+	libs := lmi.FindByReference(req.GetName(), version, libraries.User)
 	if len(libs) == 0 {
 		taskCB(&rpc.TaskProgress{Message: tr("Library %s is not installed", req.GetName()), Completed: true})
 		return nil
@@ -46,7 +48,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 
 	if len(libs) == 1 {
 		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", libs)})
-		lm.Uninstall(libs[0])
+		lmi.Uninstall(libs[0])
 		taskCB(&rpc.TaskProgress{Completed: true})
 		return nil
 	}

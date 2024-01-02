@@ -247,7 +247,7 @@ func TestProfileCompletion(t *testing.T) {
 	stdout, _, _ = cli.Run("__complete", "upload", sketchWithProfilesPath.String(), "--profile", "")
 	require.Contains(t, string(stdout), "profile1")
 
-	// The cli is running in the sketch folder, so need the explictly specify the path in the cli
+	// The cli is running in the sketch folder, so need the explicitly specify the path in the cli
 	cli.SetWorkingDir(sketchWithProfilesPath)
 	stdout, _, _ = cli.Run("__complete", "compile", "--profile", "")
 	require.Contains(t, string(stdout), "profile1")

@@ -22,26 +22,25 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return nil, err
 	}
-	return searchLibrary(req, lm), nil
+	return searchLibrary(req, li), nil
 }
 
-func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
+func searchLibrary(req *rpc.LibrarySearchRequest, li *librariesindex.Index) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
 	query := req.GetSearchArgs()
 	matcher := MatcherFromQueryString(query)
 
-	for _, lib := range lm.Index.Libraries {
+	for _, lib := range li.Libraries {
 		if matcher(lib) {
 			res = append(res, indexLibraryToRPCSearchLibrary(lib, req.GetOmitReleasesDetails()))
 		}

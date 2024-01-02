@@ -20,55 +20,69 @@ import (
 	"errors"
 	"sort"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // LibraryResolveDependencies FIXMEDOC
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
+	if err != nil {
+		return nil, err
+	}
+
+	return libraryResolveDependencies(ctx, lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
+}
+
+func libraryResolveDependencies(ctx context.Context, lme *librariesmanager.Explorer, li *librariesindex.Index,
+	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
+	version, err := commands.ParseVersion(reqVersion)
 	if err != nil {
 		return nil, err
 	}
 
 	// Search the requested lib
-	reqLibRelease, err := findLibraryIndexRelease(lm.Index, req)
+	reqLibRelease, err := li.FindRelease(reqName, version)
 	if err != nil {
 		return nil, err
 	}
 
 	// Extract all installed libraries
 	installedLibs := map[string]*libraries.Library{}
-	for _, lib := range listLibraries(lm, false, false) {
+	for _, lib := range listLibraries(lme, li, false, false) {
 		installedLibs[lib.Library.Name] = lib.Library
 	}
 
 	// Resolve all dependencies...
 	var overrides []*librariesindex.Release
-	if req.GetDoNotUpdateInstalledLibraries() {
-		libs := lm.FindAllInstalled()
+	if noOverwrite {
+		libs := lme.FindAllInstalled()
 		libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
 		for _, lib := range libs {
-			release := lm.Index.FindRelease(&librariesindex.Reference{
-				Name:    lib.Name,
-				Version: lib.Version,
-			})
-			if release != nil {
+			if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {
 				overrides = append(overrides, release)
 			}
 		}
 	}
-	deps := lm.Index.ResolveDependencies(reqLibRelease, overrides)
+	deps := li.ResolveDependencies(reqLibRelease, overrides)
 
 	// If no solution has been found
 	if len(deps) == 0 {
 		// Check if there is a problem with the first level deps
 		for _, directDep := range reqLibRelease.GetDependencies() {
-			if _, ok := lm.Index.Libraries[directDep.GetName()]; !ok {
+			if _, ok := li.Libraries[directDep.GetName()]; !ok {
 				err := errors.New(tr("dependency '%s' is not available", directDep.GetName()))
 				return nil, &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
 			}

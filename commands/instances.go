@@ -301,17 +301,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	// Create library manager and add libraries directories
-	lm := librariesmanager.NewLibraryManager(
-		pme.IndexDir,
-		pme.DownloadDir,
-	)
-	_ = instances.SetLibraryManager(instance, lm) // should never fail
+	lmb := librariesmanager.NewBuilder()
 
 	// Load libraries
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
 			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 					PlatformRelease: platformRelease,
 					Path:            platformRelease.GetLibrariesDir(),
 					Location:        libraries.PlatformBuiltIn,
@@ -320,22 +316,33 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
-	if err := lm.LoadIndex(); err != nil {
+	indexFileName, err := globals.LibrariesIndexResource.IndexFileName()
+	if err != nil {
+		// should never happen
+		panic("failed getting libraries index file name: " + err.Error())
+	}
+	indexFile := pme.IndexDir.Join(indexFileName)
+
+	logrus.WithField("index", indexFile).Info("Loading libraries index file")
+	li, err := librariesindex.LoadIndex(indexFile)
+	if err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 		responseError(s)
+		li = librariesindex.EmptyIndex
 	}
+	instances.SetLibrariesIndex(instance, li)
 
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
 		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 				Path:     bundledLibsDir,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
 		// Add libraries directory from config file
-		lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+		lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 			Path:     configuration.LibrariesDir(configuration.Settings),
 			Location: libraries.User,
 		})
@@ -349,17 +356,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			if !libDir.IsDir() {
 				// Download library
 				taskCallback(&rpc.TaskProgress{Name: tr("Downloading library %s", libraryRef)})
-				libRelease := lm.Index.FindRelease(&librariesindex.Reference{
-					Name:    libraryRef.Library,
-					Version: libraryRef.Version,
-				})
-				if libRelease == nil {
+				libRelease, err := li.FindRelease(libraryRef.Library, libraryRef.Version)
+				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
 					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
 					responseError(err.ToRPCStatus())
 					continue
 				}
-				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
+				if err := libRelease.Resource.Download(pme.DownloadDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())
@@ -369,7 +373,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 				// Install library
 				taskCallback(&rpc.TaskProgress{Name: tr("Installing library %s", libraryRef)})
-				if err := libRelease.Resource.Install(lm.DownloadsDir, libRoot, libDir); err != nil {
+				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())
@@ -378,16 +382,23 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				taskCallback(&rpc.TaskProgress{Completed: true})
 			}
 
-			lm.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
 				Path:     libRoot,
 				Location: libraries.User,
 			})
 		}
 	}
 
-	for _, status := range lm.RescanLibraries() {
-		logrus.WithError(status.Err()).Warnf("Error loading library")
-		// TODO: report as warning: responseError(err)
+	lm := lmb.Build()
+	_ = instances.SetLibraryManager(instance, lm) // should never fail
+
+	{
+		lmi, release := lm.NewInstaller()
+		for _, status := range lmi.RescanLibraries() {
+			logrus.WithError(status.Err()).Warnf("Error loading library")
+			// TODO: report as warning: responseError(err)
+		}
+		release()
 	}
 
 	// Refreshes the locale used, this will change the
@@ -409,23 +420,18 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return err
 	}
+	indexDir := pme.IndexDir
+	release()
 
-	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
+	if err := indexDir.MkdirAll(); err != nil {
 		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
-	// Create a temp dir to stage all downloads
-	tmp, err := paths.MkTempDir("", "library_index_download")
-	if err != nil {
-		return &cmderrors.TempDirCreationFailedError{Cause: err}
-	}
-	defer tmp.RemoveAll()
-
-	if err := globals.LibrariesIndexResource.Download(lm.IndexFile.Parent(), downloadCB); err != nil {
+	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB); err != nil {
 		return err
 	}
 

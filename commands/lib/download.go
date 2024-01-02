@@ -18,13 +18,14 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,26 +36,39 @@ var tr = i18n.Tr
 func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino-cli lib download`")
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
+	var downloadsDir *paths.Path
+	if pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
+		return nil, err
+	} else {
+		downloadsDir = pme.DownloadDir
+		release()
+	}
+
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return nil, err
 	}
 
 	logrus.Info("Preparing download")
 
-	lib, err := findLibraryIndexRelease(lm.Index, req)
+	version, err := commands.ParseVersion(req.GetVersion())
 	if err != nil {
 		return nil, err
 	}
 
-	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}, "download"); err != nil {
+	lib, err := li.FindRelease(req.GetName(), version)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := downloadLibrary(downloadsDir, lib, downloadCB, func(*rpc.TaskProgress) {}, "download"); err != nil {
 		return nil, err
 	}
 
 	return &rpc.LibraryDownloadResponse{}, nil
 }
 
-func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release,
+func downloadLibrary(downloadsDir *paths.Path, libRelease *librariesindex.Release,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, queryParameter string) error {
 
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
@@ -62,7 +76,7 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	if err != nil {
 		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
-	if err := libRelease.Resource.Download(lm.DownloadsDir, config, libRelease.String(), downloadCB, queryParameter); err != nil {
+	if err := libRelease.Resource.Download(downloadsDir, config, libRelease.String(), downloadCB, queryParameter); err != nil {
 		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
