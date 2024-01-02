@@ -2095,6 +2095,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#monitorportopenrequest" class="md-nav__link">
+    MonitorPortOpenRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#monitorportsetting" class="md-nav__link">
     MonitorPortSetting
   </a>
@@ -3648,6 +3655,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#monitorportopenrequest" class="md-nav__link">
+    MonitorPortOpenRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#monitorportsetting" class="md-nav__link">
     MonitorPortSetting
   </a>
@@ -4108,6 +4122,7 @@
     - <a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsRequest">EnumerateMonitorPortSettingsRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse">EnumerateMonitorPortSettingsResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorPortOpenRequest">MonitorPortOpenRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortSettingDescriptor">MonitorPortSettingDescriptor</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorRequest">MonitorRequest</a>
@@ -8700,6 +8715,44 @@ error.</p>
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.MonitorPortOpenRequest"></a></p>
+<h3 id="monitorportopenrequest">MonitorPortOpenRequest<a class="headerlink" href="#monitorportopenrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>port</td>
+<td><a href="#cc.arduino.cli.commands.v1.Port">Port</a></td>
+<td></td>
+<td>Port to open, must be filled only on the first request</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The board FQBN we are trying to connect to. This is optional, and it&#39;s needed to disambiguate if more than one platform provides the pluggable monitor for a given port protocol.</td>
+</tr>
+<tr>
+<td>port_configuration</td>
+<td><a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a></td>
+<td></td>
+<td>Port configuration, optional, contains settings of the port to be applied</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.MonitorPortSetting"></a></p>
 <h3 id="monitorportsetting">MonitorPortSetting<a class="headerlink" href="#monitorportsetting" title="Permanent link">&para;</a></h3>
 <table>
@@ -8783,22 +8836,10 @@ error.</p>
 </thead>
 <tbody>
 <tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td>open_request</td>
+<td><a href="#cc.arduino.cli.commands.v1.MonitorPortOpenRequest">MonitorPortOpenRequest</a></td>
 <td></td>
-<td>Arduino Core Service instance from the <code>Init</code> response.</td>
-</tr>
-<tr>
-<td>port</td>
-<td><a href="#cc.arduino.cli.commands.v1.Port">Port</a></td>
-<td></td>
-<td>Port to open, must be filled only on the first request</td>
-</tr>
-<tr>
-<td>fqbn</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>The board FQBN we are trying to connect to. This is optional, and it&#39;s needed to disambiguate if more than one platform provides the pluggable monitor for a given port protocol.</td>
+<td>Open request, it must be the first incoming message</td>
 </tr>
 <tr>
 <td>tx_data</td>
@@ -8807,10 +8848,16 @@ error.</p>
 <td>Data to send to the port</td>
 </tr>
 <tr>
-<td>port_configuration</td>
+<td>updated_configuration</td>
 <td><a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a></td>
 <td></td>
-<td>Port configuration, optional, contains settings of the port to be applied</td>
+<td>Port configuration, contains settings of the port to be changed</td>
+</tr>
+<tr>
+<td>close</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Close message, set to true to gracefully close a port (this ensure that the gRPC streaming call is closed by the daemon AFTER the port has been successfully closed)</td>
 </tr>
 </tbody>
 </table>

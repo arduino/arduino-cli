@@ -292,6 +292,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1monitorrequest-message-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.MonitorRequest message has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" class="md-nav__link">
     Some golang modules from github.com/arduino/arduino-cli/* have been made private.
   </a>
@@ -2511,6 +2518,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1monitorrequest-message-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.MonitorRequest message has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" class="md-nav__link">
     Some golang modules from github.com/arduino/arduino-cli/* have been made private.
   </a>
@@ -3674,6 +3688,56 @@
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
 <h3 id="drop-support-for-builtintools">Drop support for <code>builtin.tools</code><a class="headerlink" href="#drop-support-for-builtintools" title="Permanent link">&para;</a></h3>
 <p>We're dropping the <code>builtin.tools</code> support. It was the equivalent of Arduino IDE 1.x bundled tools directory.</p>
+<h3 id="the-grpc-ccarduinoclicommandsv1monitorrequest-message-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.MonitorRequest</code> message has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1monitorrequest-message-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>Previously the <code>MonitorRequest</code> was a single message used to open the monitor, to stream data, and to change the port
+configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">MonitorRequest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Arduino Core Service instance from the `Init` response.</span>
+<span class="w">  </span><span class="n">Instance</span><span class="w"> </span><span class="na">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Port to open, must be filled only on the first request</span>
+<span class="w">  </span><span class="n">Port</span><span class="w"> </span><span class="na">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// The board FQBN we are trying to connect to. This is optional, and  it&#39;s</span>
+<span class="w">  </span><span class="c1">// needed to disambiguate if more than one platform provides the pluggable</span>
+<span class="w">  </span><span class="c1">// monitor for a given port protocol.</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">fqbn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Data to send to the port</span>
+<span class="w">  </span><span class="kt">bytes</span><span class="w"> </span><span class="na">tx_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Port configuration, optional, contains settings of the port to be applied</span>
+<span class="w">  </span><span class="n">MonitorPortConfiguration</span><span class="w"> </span><span class="na">port_configuration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now the meaning of the fields has been clarified with the <code>oneof</code> clause, making it more explicit:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">MonitorRequest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">oneof</span><span class="w"> </span><span class="kd">message</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Open request, it must be the first incoming message</span>
+<span class="w">    </span><span class="n">MonitorPortOpenRequest</span><span class="w"> </span><span class="na">open_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Data to send to the port</span>
+<span class="w">    </span><span class="kt">bytes</span><span class="w"> </span><span class="na">tx_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Port configuration, contains settings of the port to be changed</span>
+<span class="w">    </span><span class="n">MonitorPortConfiguration</span><span class="w"> </span><span class="na">updated_configuration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Close message, set to true to gracefully close a port (this ensure</span>
+<span class="w">    </span><span class="c1">// that the gRPC streaming call is closed by the daemon AFTER the port</span>
+<span class="w">    </span><span class="c1">// has been successfully closed)</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="na">close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">message</span><span class="w"> </span><span class="nc">MonitorPortOpenRequest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Arduino Core Service instance from the `Init` response.</span>
+<span class="w">  </span><span class="n">Instance</span><span class="w"> </span><span class="na">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Port to open, must be filled only on the first request</span>
+<span class="w">  </span><span class="n">Port</span><span class="w"> </span><span class="na">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// The board FQBN we are trying to connect to. This is optional, and  it&#39;s</span>
+<span class="w">  </span><span class="c1">// needed to disambiguate if more than one platform provides the pluggable</span>
+<span class="w">  </span><span class="c1">// monitor for a given port protocol.</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">fqbn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Port configuration, optional, contains settings of the port to be applied</span>
+<span class="w">  </span><span class="n">MonitorPortConfiguration</span><span class="w"> </span><span class="na">port_configuration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now the message field <code>MonitorPortOpenRequest.open_request</code> must be sent in the first message after opening the
+streaming gRPC call.</p>
+<p>The identification number of the fields has been changed, this change is not binary compatible with old clients.</p>
 <h3 id="some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private">Some golang modules from <code>github.com/arduino/arduino-cli/*</code> have been made private.<a class="headerlink" href="#some-golang-modules-from-githubcomarduinoarduino-cli-have-been-made-private" title="Permanent link">&para;</a></h3>
 <p>The following golang modules are no longer available as public API:</p>
 <ul>
