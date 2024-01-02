@@ -4,6 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### Drop support for `builtin.tools`
+
+We're dropping the `builtin.tools` support. It was the equivalent of Arduino IDE 1.x bundled tools directory.
+
 ### Some golang modules from `github.com/arduino/arduino-cli/*` have been made private.
 
 The following golang modules are no longer available as public API:
