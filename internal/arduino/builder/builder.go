@@ -376,9 +376,6 @@ func (b *Builder) Build() error {
 	if buildErr != nil {
 		return buildErr
 	}
-	if err := b.exportProjectCMake(b.libsDetector.ImportedLibraries(), b.libsDetector.IncludeFolders()); err != nil {
-		return err
-	}
 	b.Progress.CompleteStep()
 
 	if err := b.size(); err != nil {
