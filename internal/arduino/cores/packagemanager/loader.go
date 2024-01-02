@@ -18,8 +18,6 @@ package packagemanager
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -36,12 +34,7 @@ import (
 // LoadHardware read all plaforms from the configured paths
 func (pm *Builder) LoadHardware() []error {
 	hardwareDirs := configuration.HardwareDirectories(configuration.Settings)
-	merr := pm.LoadHardwareFromDirectories(hardwareDirs)
-
-	bundleToolDirs := configuration.BuiltinToolsDirectories(configuration.Settings)
-	merr = append(merr, pm.LoadToolsFromBundleDirectories(bundleToolDirs)...)
-
-	return merr
+	return pm.LoadHardwareFromDirectories(hardwareDirs)
 }
 
 // LoadHardwareFromDirectories load plaforms from a set of directories
@@ -203,49 +196,9 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
 		}
 
-		// Check if package_bundled_index.json exists.
-		// This is used indirectly by the Java IDE since it's necessary for the arduino-builder
-		// to find cores bundled with that version of the IDE.
-		// TODO: This piece of logic MUST be removed as soon as the Java IDE stops using the arduino-builder.
-		isIDEBundled := false
-		packageBundledIndexPath := platformPath.Parent().Parent().Join("package_index_bundled.json")
-		if packageBundledIndexPath.Exist() {
-			// particular case: ARCHITECTURE/boards.txt with package_bundled_index.json
-
-			// this is an unversioned Platform with a package_index_bundled.json that
-			// gives information about the version and tools needed
-
-			// Parse the bundled index and merge to the general index
-			index, err := pm.LoadPackageIndexFromFile(packageBundledIndexPath)
-			if err != nil {
-				return fmt.Errorf("%s: %w", tr("parsing IDE bundled index"), err)
-			}
-
-			// Now export the bundled index in a temporary core.Packages to retrieve the bundled package version
-			tmp := cores.NewPackages()
-			index.MergeIntoPackages(tmp)
-			if tmpPackage := tmp.GetOrCreatePackage(targetPackage.Name); tmpPackage == nil {
-				pm.log.Warnf("Can't determine bundle platform version for %s", targetPackage.Name)
-			} else if tmpPlatform := tmpPackage.GetOrCreatePlatform(architecture); tmpPlatform == nil {
-				pm.log.Warnf("Can't determine bundle platform version for %s:%s", targetPackage.Name, architecture)
-			} else if tmpPlatformRelease := tmpPlatform.GetLatestRelease(); tmpPlatformRelease == nil {
-				pm.log.Warnf("Can't determine bundle platform version for %s:%s, no valid release found", targetPackage.Name, architecture)
-			} else {
-				version = tmpPlatformRelease.Version
-			}
-
-			isIDEBundled = true
-		}
-
 		platform := targetPackage.GetOrCreatePlatform(architecture)
-		if !isIDEBundled {
-			platform.ManuallyInstalled = true
-		}
+		platform.ManuallyInstalled = true
 		release := platform.GetOrCreateRelease(version)
-		release.IsIDEBundled = isIDEBundled
-		if isIDEBundled {
-			pm.log.Infof("Package is built-in")
-		}
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 			return fmt.Errorf("%s: %w", tr("loading platform release %s", release), err)
 		}
@@ -656,83 +609,6 @@ func (pm *Builder) loadToolReleaseFromDirectory(tool *cores.Tool, version *semve
 		pm.log.WithField("tool", toolRelease).Infof("Loaded tool")
 		return nil
 	}
-}
-
-// LoadToolsFromBundleDirectories FIXMEDOC
-func (pm *Builder) LoadToolsFromBundleDirectories(dirs paths.PathList) []error {
-	var merr []error
-	for _, dir := range dirs {
-		if err := pm.LoadToolsFromBundleDirectory(dir); err != nil {
-			merr = append(merr, fmt.Errorf("%s: %w", tr("loading bundled tools from %s", dir), err))
-		}
-	}
-	return merr
-}
-
-// LoadToolsFromBundleDirectory FIXMEDOC
-func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
-	pm.log.Infof("Loading tools from bundle dir: %s", toolsPath)
-
-	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists
-	// then the all the tools are available in the same directory, mixed together, and their
-	// name and version are written in the "builtin_tools_versions.txt" file.
-	// If no "builtin_tools_versions.txt" is found, then the directory structure is the classic
-	// TOOLSPATH/TOOL-NAME/TOOL-VERSION and it will be parsed as such and associated to an
-	// "unnamed" packager.
-
-	// TODO: get rid of "builtin_tools_versions.txt"
-
-	// Search for builtin_tools_versions.txt
-	builtinToolsVersionsTxtPath := ""
-	findBuiltInToolsVersionsTxt := func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			// Ignore errors
-			return nil
-		}
-		if builtinToolsVersionsTxtPath != "" {
-			return filepath.SkipDir
-		}
-		if info.Name() == "builtin_tools_versions.txt" {
-			builtinToolsVersionsTxtPath = currentPath
-			return filepath.SkipDir
-		}
-		return nil
-	}
-	if err := filepath.Walk(toolsPath.String(), findBuiltInToolsVersionsTxt); err != nil {
-		return fmt.Errorf(tr("searching for builtin_tools_versions.txt in %[1]s: %[2]s"), toolsPath, err)
-	}
-
-	if builtinToolsVersionsTxtPath != "" {
-		// If builtin_tools_versions.txt is found create tools based on the info
-		// contained in that file
-		pm.log.Infof("Found builtin_tools_versions.txt")
-		toolPath, err := paths.New(builtinToolsVersionsTxtPath).Parent().Abs()
-		if err != nil {
-			return fmt.Errorf(tr("getting parent dir of %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
-		}
-
-		all, err := properties.Load(builtinToolsVersionsTxtPath)
-		if err != nil {
-			return fmt.Errorf(tr("reading %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
-		}
-
-		for packager, toolsData := range all.FirstLevelOf() {
-			targetPackage := pm.packages.GetOrCreatePackage(packager)
-
-			for toolName, toolVersion := range toolsData.AsMap() {
-				tool := targetPackage.GetOrCreateTool(toolName)
-				version := semver.ParseRelaxed(toolVersion)
-				release := tool.GetOrCreateRelease(version)
-				release.InstallDir = toolPath
-				pm.log.WithField("tool", release).Infof("Loaded tool")
-			}
-		}
-	} else {
-		// otherwise load the tools inside the unnamed package
-		unnamedPackage := pm.packages.GetOrCreatePackage("")
-		pm.LoadToolsFromPackageDir(unnamedPackage, toolsPath)
-	}
-	return nil
 }
 
 // LoadDiscoveries load all discoveries for all loaded platforms

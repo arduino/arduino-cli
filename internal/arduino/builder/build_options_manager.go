@@ -33,7 +33,6 @@ type buildOptions struct {
 	currentOptions *properties.Map
 
 	hardwareDirs              paths.PathList
-	builtInToolsDirs          paths.PathList
 	otherLibrariesDirs        paths.PathList
 	builtInLibrariesDirs      *paths.Path
 	buildPath                 *paths.Path
@@ -47,7 +46,7 @@ type buildOptions struct {
 
 // newBuildOptions fixdoc
 func newBuildOptions(
-	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	hardwareDirs, otherLibrariesDirs paths.PathList,
 	builtInLibrariesDirs, buildPath *paths.Path,
 	sketch *sketch.Sketch,
 	customBuildProperties []string,
@@ -59,7 +58,6 @@ func newBuildOptions(
 	opts := properties.NewMap()
 
 	opts.Set("hardwareFolders", strings.Join(hardwareDirs.AsStrings(), ","))
-	opts.Set("builtInToolsFolders", strings.Join(builtInToolsDirs.AsStrings(), ","))
 	opts.Set("otherLibrariesFolders", strings.Join(otherLibrariesDirs.AsStrings(), ","))
 	opts.SetPath("sketchLocation", sketch.FullPath)
 	opts.Set("fqbn", fqbn.String())
@@ -84,7 +82,6 @@ func newBuildOptions(
 	return &buildOptions{
 		currentOptions:            opts,
 		hardwareDirs:              hardwareDirs,
-		builtInToolsDirs:          builtInToolsDirs,
 		otherLibrariesDirs:        otherLibrariesDirs,
 		builtInLibrariesDirs:      builtInLibrariesDirs,
 		buildPath:                 buildPath,

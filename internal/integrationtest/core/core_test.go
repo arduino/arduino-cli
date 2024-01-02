@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -510,6 +511,60 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 			"id": "arduino-beta-development:avr",
 			"latest_version": "1.8.3",
 			"releases": {
+				"1.8.3": {
+					"name": "Arduino AVR Boards"
+				}
+			}
+		}
+	]}`)
+}
+
+func TestCoreListShowsLatestVersionWhenMultipleReleasesOfAManuallyInstalledCoreArePresent(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Verifies only cores in board manager are shown
+	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.platforms | length > 0`, `true`)
+	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".platforms | length").String())
+	require.NoError(t, err)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(filepath.Join(repoDir.String(), "1.8.3"), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	tmp := paths.New(t.TempDir(), "1.8.4")
+	_, err = git.PlainClone(tmp.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.4"),
+	})
+	require.NoError(t, err)
+
+	err = tmp.Rename(repoDir.Join("1.8.4"))
+	require.NoError(t, err)
+
+	// When manually installing 2 releases of the same core, the newest one takes precedence
+	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.platforms | length`, fmt.Sprint(length+1))
+	requirejson.Contains(t, stdout, `{"platforms":[
+		{
+			"id": "arduino-beta-development:avr",
+			"latest_version": "1.8.4",
+			"installed_version": "1.8.4",
+			"releases": {
+				"1.8.3": {
+					"name": "Arduino AVR Boards"
+				},
 				"1.8.3": {
 					"name": "Arduino AVR Boards"
 				}

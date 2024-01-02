@@ -187,7 +187,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
 		configuration.HardwareDirectories(configuration.Settings),
-		configuration.BuiltinToolsDirectories(configuration.Settings),
 		otherLibrariesDirs,
 		configuration.IDEBuiltinLibrariesDir(configuration.Settings),
 		fqbn,
