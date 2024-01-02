@@ -23,6 +23,21 @@ import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/port.proto";
 
 message MonitorRequest {
+  oneof message {
+    // Open request, it must be the first incoming message
+    MonitorPortOpenRequest open_request = 1;
+    // Data to send to the port
+    bytes tx_data = 2;
+    // Port configuration, contains settings of the port to be changed
+    MonitorPortConfiguration updated_configuration = 3;
+    // Close message, set to true to gracefully close a port (this ensure
+    // that the gRPC streaming call is closed by the daemon AFTER the port
+    // has been successfully closed)
+    bool close = 4;
+  }
+}
+
+message MonitorPortOpenRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
   // Port to open, must be filled only on the first request
@@ -31,10 +46,8 @@ message MonitorRequest {
   // needed to disambiguate if more than one platform provides the pluggable
   // monitor for a given port protocol.
   string fqbn = 3;
-  // Data to send to the port
-  bytes tx_data = 4;
   // Port configuration, optional, contains settings of the port to be applied
-  MonitorPortConfiguration port_configuration = 5;
+  MonitorPortConfiguration port_configuration = 4;
 }
 
 message MonitorPortConfiguration {

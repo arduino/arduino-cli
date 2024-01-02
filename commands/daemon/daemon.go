@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -477,7 +478,11 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		return err
 	}
 
-	portProxy, _, err := monitor.Monitor(stream.Context(), req)
+	openReq := req.GetOpenRequest()
+	if openReq == nil {
+		return &cmderrors.InvalidInstanceError{}
+	}
+	portProxy, _, err := monitor.Monitor(stream.Context(), openReq)
 	if err != nil {
 		return err
 	}
@@ -486,6 +491,10 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	_ = syncSend.Send(&rpc.MonitorResponse{Success: true})
 
 	cancelCtx, cancel := context.WithCancel(stream.Context())
+	gracefulCloseInitiated := &atomic.Bool{}
+	gracefuleCloseCtx, gracefulCloseCancel := context.WithCancel(context.Background())
+
+	// gRPC stream receiver (gRPC data -> monitor, config, close)
 	go func() {
 		defer cancel()
 		for {
@@ -497,12 +506,19 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 				syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
 				return
 			}
-			if conf := msg.GetPortConfiguration(); conf != nil {
+			if conf := msg.GetUpdatedConfiguration(); conf != nil {
 				for _, c := range conf.GetSettings() {
 					if err := portProxy.Config(c.GetSettingId(), c.GetValue()); err != nil {
 						syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
 					}
 				}
+			}
+			if closeMsg := msg.GetClose(); closeMsg {
+				gracefulCloseInitiated.Store(true)
+				if err := portProxy.Close(); err != nil {
+					logrus.WithError(err).Debug("Error closing monitor port")
+				}
+				gracefulCloseCancel()
 			}
 			tx := msg.GetTxData()
 			for len(tx) > 0 {
@@ -519,8 +535,9 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		}
 	}()
 
+	// gRPC stream sender (monitor -> gRPC)
 	go func() {
-		defer cancel()
+		defer cancel() // unlock the receiver
 		buff := make([]byte, 4096)
 		for {
 			n, err := portProxy.Read(buff)
@@ -538,6 +555,11 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	}()
 
 	<-cancelCtx.Done()
-	portProxy.Close()
+	if gracefulCloseInitiated.Load() {
+		// Port closing has been initiated in the receiver
+		<-gracefuleCloseCtx.Done()
+	} else {
+		portProxy.Close()
+	}
 	return nil
 }

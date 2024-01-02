@@ -119,6 +119,21 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 	return cli
 }
 
+// CreateEnvForDaemon performs the minimum required operations to start the arduino-cli daemon.
+// It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
+// The Environment must be disposed by calling the CleanUp method via defer.
+func CreateEnvForDaemon(t *testing.T) (*Environment, *ArduinoCLI) {
+	env := NewEnvironment(t)
+
+	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
+		ArduinoCLIPath:         FindRepositoryRootPath(t).Join("arduino-cli"),
+		UseSharedStagingFolder: true,
+	})
+
+	_ = cli.StartDaemon(false)
+	return env, cli
+}
+
 // CleanUp closes the Arduino CLI client.
 func (cli *ArduinoCLI) CleanUp() {
 	if cli.proc != nil {
@@ -595,4 +610,23 @@ func (inst *ArduinoCLIInstance) PlatformSearch(ctx context.Context, args string,
 	logCallf(">>> PlatformSearch(%+v)\n", req)
 	resp, err := inst.cli.daemonClient.PlatformSearch(ctx, req)
 	return resp, err
+}
+
+// Monitor calls the "Monitor" gRPC method and sends the OpenRequest message.
+func (inst *ArduinoCLIInstance) Monitor(ctx context.Context, port *commands.Port) (commands.ArduinoCoreService_MonitorClient, error) {
+	req := &commands.MonitorRequest{}
+	logCallf(">>> Monitor(%+v)\n", req)
+	monitorClient, err := inst.cli.daemonClient.Monitor(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = monitorClient.Send(&commands.MonitorRequest{
+		Message: &commands.MonitorRequest_OpenRequest{
+			OpenRequest: &commands.MonitorPortOpenRequest{
+				Instance: inst.instance,
+				Port:     port,
+			},
+		},
+	})
+	return monitorClient, err
 }
