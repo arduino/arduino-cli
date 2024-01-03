@@ -117,7 +117,7 @@ downloadFile() {
     TAG=$1
   fi
   #  arduino-lint_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
-  APPLICATION_DIST_PREFIX="${PROJECT_NAME}_${TAG}_"
+  APPLICATION_DIST_PREFIX="${PROJECT_NAME}_${TAG#"v"}_"
   if [ "$OS" = "Windows" ]; then
     APPLICATION_DIST_EXTENSION=".zip"
   else
