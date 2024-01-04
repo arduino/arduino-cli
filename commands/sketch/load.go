@@ -58,8 +58,8 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 	}
 
 	defaultProfileResp := &rpc.SketchProfile{}
-	defaultProfile := sk.GetProfile(sk.Project.DefaultProfile)
-	if defaultProfile != nil {
+	defaultProfile, err := sk.GetProfile(sk.Project.DefaultProfile)
+	if err == nil {
 		defaultProfileResp.Name = defaultProfile.Name
 		defaultProfileResp.Fqbn = defaultProfile.FQBN
 	}

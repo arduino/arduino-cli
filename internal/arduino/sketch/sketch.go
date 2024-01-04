@@ -23,6 +23,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -180,15 +181,14 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 	return &files, nil
 }
 
-// GetProfile returns the requested profile or nil if the profile
-// is not found.
-func (s *Sketch) GetProfile(profileName string) *Profile {
+// GetProfile returns the requested profile or an error if not found
+func (s *Sketch) GetProfile(profileName string) (*Profile, error) {
 	for _, p := range s.Project.Profiles {
 		if p.Name == profileName {
-			return p
+			return p, nil
 		}
 	}
-	return nil
+	return nil, &cmderrors.UnknownProfileError{Profile: profileName}
 }
 
 // checkSketchCasing returns an error if the casing of the sketch folder and the main file are different.
