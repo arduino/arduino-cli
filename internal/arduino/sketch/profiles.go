@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
 	"gopkg.in/yaml.v3"
@@ -97,6 +98,14 @@ type Profile struct {
 	FQBN      string                   `yaml:"fqbn"`
 	Platforms ProfileRequiredPlatforms `yaml:"platforms"`
 	Libraries ProfileRequiredLibraries `yaml:"libraries"`
+}
+
+// ToRpc converts this Profile to an rpc.SketchProfile
+func (p *Profile) ToRpc() *rpc.SketchProfile {
+	return &rpc.SketchProfile{
+		Name: p.Name,
+		Fqbn: p.FQBN,
+	}
 }
 
 // AsYaml outputs the profile as Yaml

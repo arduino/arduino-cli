@@ -26,12 +26,12 @@ import (
 
 // LoadSketch collects and returns all files composing a sketch
 func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
-	// TODO: This should be a ToRpc function for the Sketch struct
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
+	// TODO: This should be a ToRpc function for the Sketch struct
 	otherSketchFiles := make([]string, sk.OtherSketchFiles.Len())
 	for i, file := range sk.OtherSketchFiles {
 		otherSketchFiles[i] = file.String()
@@ -57,14 +57,7 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 		}
 	}
 
-	defaultProfileResp := &rpc.SketchProfile{}
-	defaultProfile, err := sk.GetProfile(sk.Project.DefaultProfile)
-	if err == nil {
-		defaultProfileResp.Name = defaultProfile.Name
-		defaultProfileResp.Fqbn = defaultProfile.FQBN
-	}
-
-	return &rpc.LoadSketchResponse{
+	res := &rpc.LoadSketchResponse{
 		MainFile:         sk.MainFile.String(),
 		LocationPath:     sk.FullPath.String(),
 		OtherSketchFiles: otherSketchFiles,
@@ -74,6 +67,9 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 		DefaultPort:      defaultPort,
 		DefaultProtocol:  defaultProtocol,
 		Profiles:         profiles,
-		DefaultProfile:   defaultProfileResp,
-	}, nil
+	}
+	if defaultProfile, err := sk.GetProfile(sk.Project.DefaultProfile); err == nil {
+		res.DefaultProfile = defaultProfile.ToRpc()
+	}
+	return res, nil
 }
