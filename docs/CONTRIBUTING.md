@@ -8,9 +8,9 @@ There are several ways you can get involved:
 | ------------------------------------------------- | ------------------------------------------------------- |
 | - Support request<br/>- Question<br/>- Discussion | Post on the [Arduino Forum][forum]                      |
 | - Bug report<br/>- Feature request                | Issue report (read the [issue guidelines][issues])      |
-| Beta testing                                      | Try out the [nightly build][nightly]                    |
+| Testing                                           | Try out the [nightly build][nightly]                    |
 | - Bug fix<br/>- Enhancement                       | Pull Request (read the [pull request guidelines][prs])  |
-| Translations for Arduino CLI                      | [transifex][translate]                                  |
+| Translations for Arduino CLI                      | Use the [transifex][translate] platform                 |
 | Monetary                                          | - [Donate][donate]<br/>- [Buy official products][store] |
 
 ## Issue Reports
