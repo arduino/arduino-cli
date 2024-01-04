@@ -133,9 +133,10 @@ func GetDefaultBuiltinLibrariesDir() string {
 	return filepath.Join(getDefaultArduinoDataDir(), "libraries")
 }
 
-// FindConfigFileInArgs returns the config file path using the
-// argument '--config-file' (if specified) or looking in the current working dir
-func FindConfigFileInArgs(args []string) string {
+// FindConfigFileInArgsFallbackOnEnv returns the config file path using the
+// argument '--config-file' (if specified), if empty looks for the ARDUINO_CONFIG_FILE env,
+// or looking in the current working dir
+func FindConfigFileInArgsFallbackOnEnv(args []string) string {
 	// Look for '--config-file' argument
 	for i, arg := range args {
 		if arg == "--config-file" {
@@ -144,5 +145,5 @@ func FindConfigFileInArgs(args []string) string {
 			}
 		}
 	}
-	return ""
+	return os.Getenv("ARDUINO_CONFIG_FILE")
 }

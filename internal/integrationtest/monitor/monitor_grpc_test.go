@@ -58,7 +58,7 @@ func TestMonitorGRPCClose(t *testing.T) {
 	tmpFileMatcher := regexp.MustCompile("Tmpfile: (.*)\n")
 	{
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-		mon, err := grpcInst.Monitor(ctx, ports[0].Port)
+		mon, err := grpcInst.Monitor(ctx, ports[0].GetPort())
 		var tmpFile *paths.Path
 		for {
 			monResp, err := mon.Recv()
@@ -85,7 +85,7 @@ func TestMonitorGRPCClose(t *testing.T) {
 	{
 		// Keep a timeout to allow the test to exit in any case
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-		mon, err := grpcInst.Monitor(ctx, ports[0].Port)
+		mon, err := grpcInst.Monitor(ctx, ports[0].GetPort())
 		var tmpFile *paths.Path
 		for {
 			monResp, err := mon.Recv()

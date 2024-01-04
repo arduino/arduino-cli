@@ -60,15 +60,23 @@ func TestInit(t *testing.T) {
 }
 
 func TestFindConfigFile(t *testing.T) {
-	configFile := FindConfigFileInArgs([]string{"--config-file"})
+	configFile := FindConfigFileInArgsFallbackOnEnv([]string{"--config-file"})
 	require.Equal(t, "", configFile)
 
-	configFile = FindConfigFileInArgs([]string{"--config-file", "some/path/to/config"})
+	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "some/path/to/config"})
 	require.Equal(t, "some/path/to/config", configFile)
 
-	configFile = FindConfigFileInArgs([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
+	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
 	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
 
-	configFile = FindConfigFileInArgs([]string{})
+	configFile = FindConfigFileInArgsFallbackOnEnv([]string{})
 	require.Equal(t, "", configFile)
+
+	t.Setenv("ARDUINO_CONFIG_FILE", "some/path/to/config")
+	configFile = FindConfigFileInArgsFallbackOnEnv([]string{})
+	require.Equal(t, "some/path/to/config", configFile)
+
+	// when both env and flag are specified flag takes precedence
+	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "flag/path"})
+	require.Equal(t, "flag/path", configFile)
 }
