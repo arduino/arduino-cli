@@ -24,8 +24,10 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -306,4 +308,24 @@ func (s *Sketch) Hash() string {
 	path := s.FullPath.String()
 	md5SumBytes := md5.Sum([]byte(path))
 	return strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
+}
+
+// ToRpc converts this Sketch into a rpc.LoadSketchResponse
+func (s *Sketch) ToRpc() *rpc.LoadSketchResponse {
+	defaultPort, defaultProtocol := s.GetDefaultPortAddressAndProtocol()
+	res := &rpc.LoadSketchResponse{
+		MainFile:         s.MainFile.String(),
+		LocationPath:     s.FullPath.String(),
+		OtherSketchFiles: s.OtherSketchFiles.AsStrings(),
+		AdditionalFiles:  s.AdditionalFiles.AsStrings(),
+		RootFolderFiles:  s.RootFolderFiles.AsStrings(),
+		DefaultFqbn:      s.GetDefaultFQBN(),
+		DefaultPort:      defaultPort,
+		DefaultProtocol:  defaultProtocol,
+		Profiles:         f.Map(s.Project.Profiles, (*Profile).ToRpc),
+	}
+	if defaultProfile, err := s.GetProfile(s.Project.DefaultProfile); err == nil {
+		res.DefaultProfile = defaultProfile.ToRpc()
+	}
+	return res
 }
