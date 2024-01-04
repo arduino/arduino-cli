@@ -1,5 +1,4 @@
-Despite the lack of feature parity at the moment, Arduino CLI provides many of the features you can find in the Arduino
-IDE. Let's see some examples.
+Arduino CLI provides all the features you can find in the Arduino IDE. Let's see some examples.
 
 ## Before you start
 
