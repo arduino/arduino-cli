@@ -16,9 +16,11 @@
 package config_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 	"gopkg.in/yaml.v3"
@@ -814,4 +816,41 @@ func TestDelete(t *testing.T) {
 	require.NoError(t, err)
 	require.NotContains(t, configLines, "additional_urls")
 	require.NotContains(t, configLines, "board_manager")
+}
+
+func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	createConfig := func(path *paths.Path, content string) {
+		f, err := path.Create()
+		require.NoError(t, err)
+		_, err = f.WriteString(content)
+		require.NoError(t, err)
+	}
+	tmp := t.TempDir()
+	cliConfig, envConfig := paths.New(filepath.Join(tmp, "cli.yaml")), paths.New(filepath.Join(tmp, "env.yaml"))
+	createConfig(cliConfig, `cli-test: "test"`)
+	createConfig(envConfig, `env-test: "test"`)
+
+	// No flag nor env specified.
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.NotEmpty(t, stdout)
+
+	// Flag specified
+	stdout, _, err = cli.Run("config", "dump", "--config-file", cliConfig.String(), "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{"config":{ "cli-test": "test" }}`)
+
+	// Env specified
+	customEnv := map[string]string{"ARDUINO_CONFIG_FILE": envConfig.String()}
+	stdout, _, err = cli.RunWithCustomEnv(customEnv, "config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{"config":{ "env-test": "test" }}`)
+
+	// Flag and env specified, flag takes precedence
+	stdout, _, err = cli.RunWithCustomEnv(customEnv, "config", "dump", "--config-file", cliConfig.String(), "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{"config":{ "cli-test": "test" }}`)
 }
