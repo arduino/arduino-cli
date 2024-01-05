@@ -18,14 +18,23 @@ package sketch
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	paths "github.com/arduino/go-paths-helper"
 )
 
 // WarnDeprecatedFiles warns the user that a type of sketch files are deprecated
 func WarnDeprecatedFiles(sketchPath *paths.Path) string {
+	if sketchPath.IsNotDir() {
+		sketchPath = sketchPath.Parent()
+	}
+
+	files, err := sketchPath.ReadDirRecursive()
+	if err != nil {
+		return ""
+	}
+	files.FilterSuffix(".pde")
+
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
+	if len(files) > 0 {
 		msg := tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 		for _, f := range files {
 			msg += fmt.Sprintf("\n - %s", f)

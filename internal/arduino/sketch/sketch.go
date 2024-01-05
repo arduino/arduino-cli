@@ -280,23 +280,6 @@ func (e *InvalidSketchFolderNameError) Error() string {
 	return tr("no valid sketch found in %[1]s: missing %[2]s", e.SketchFolder, e.SketchFile)
 }
 
-// CheckForPdeFiles returns all files ending with .pde extension
-// in sketch, this is mainly used to warn the user that these files
-// must be changed to .ino extension.
-// When .pde files won't be supported anymore this function must be removed.
-func CheckForPdeFiles(sketch *paths.Path) []*paths.Path {
-	if sketch.IsNotDir() {
-		sketch = sketch.Parent()
-	}
-
-	files, err := sketch.ReadDirRecursive()
-	if err != nil {
-		return []*paths.Path{}
-	}
-	files.FilterSuffix(".pde")
-	return files
-}
-
 // DefaultBuildPath generates the default build directory for a given sketch.
 // The build path is in a temporary directory and is unique for each sketch.
 func (s *Sketch) DefaultBuildPath() *paths.Path {
