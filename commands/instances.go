@@ -142,10 +142,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if err != nil {
 			return &cmderrors.InvalidArgumentError{Cause: err}
 		}
-		profile, err := sk.GetProfile(req.GetProfile())
+		p, err := sk.GetProfile(req.GetProfile())
 		if err != nil {
 			return err
 		}
+		profile = p
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Profile{
 				Profile: &rpc.Profile{
