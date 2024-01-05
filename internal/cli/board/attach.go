@@ -53,7 +53,7 @@ func initAttachCommand() *cobra.Command {
 }
 
 func runAttachCommand(path string, port *arguments.Port, fqbn string) {
-	sketchPath := arguments.InitSketchPath(path, true)
+	sketchPath := arguments.InitSketchPath(path)
 
 	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, "", "")
 	newDefaults, err := sketch.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{

@@ -28,8 +28,7 @@ import (
 
 // InitSketchPath returns an instance of paths.Path pointing to sketchPath.
 // If sketchPath is an empty string returns the current working directory.
-// In both cases it warns the user if he's using deprecated files
-func InitSketchPath(path string, printWarnings bool) (sketchPath *paths.Path) {
+func InitSketchPath(path string) (sketchPath *paths.Path) {
 	if path != "" {
 		sketchPath = paths.New(path)
 	} else {
@@ -39,11 +38,6 @@ func InitSketchPath(path string, printWarnings bool) (sketchPath *paths.Path) {
 		}
 		logrus.Infof("Reading sketch from dir: %s", wd)
 		sketchPath = wd
-	}
-	if printWarnings {
-		if msg := sketch.WarnDeprecatedFiles(sketchPath); msg != "" {
-			feedback.Warning(msg)
-		}
 	}
 	return sketchPath
 }

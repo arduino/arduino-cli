@@ -90,15 +90,13 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	if len(args) > 0 {
 		path = args[0]
 	}
-	sketchPath := arguments.InitSketchPath(path, true)
-
-	if msg := sk.WarnDeprecatedFiles(sketchPath); importDir == "" && importFile == "" && msg != "" {
-		feedback.Warning(msg)
-	}
-
+	sketchPath := arguments.InitSketchPath(path)
 	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
-	if err != nil && importDir == "" && importFile == "" {
-		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+	if importDir == "" && importFile == "" {
+		if err != nil {
+			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+		}
+		feedback.WarnAboutDeprecatedFiles(sketch)
 	}
 
 	var inst *rpc.Instance

@@ -60,10 +60,6 @@ func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 		sketchPath = paths.New(args[0])
 	}
 
-	if msg := sk.WarnDeprecatedFiles(sketchPath); msg != "" {
-		feedback.Warning(msg)
-	}
-
 	archivePath := ""
 	if len(args) == 2 {
 		archivePath = args[1]

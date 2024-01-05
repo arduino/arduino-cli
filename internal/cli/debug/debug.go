@@ -81,11 +81,13 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 		path = args[0]
 	}
 
-	sketchPath := arguments.InitSketchPath(path, true)
+	sketchPath := arguments.InitSketchPath(path)
 	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	feedback.WarnAboutDeprecatedFiles(sk)
+
 	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, instance, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 	debugConfigRequested := &rpc.GetDebugConfigRequest{
 		Instance:    instance,
