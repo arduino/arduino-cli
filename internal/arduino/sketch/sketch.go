@@ -311,9 +311,9 @@ func (s *Sketch) Hash() string {
 }
 
 // ToRpc converts this Sketch into a rpc.LoadSketchResponse
-func (s *Sketch) ToRpc() *rpc.LoadSketchResponse {
+func (s *Sketch) ToRpc() *rpc.Sketch {
 	defaultPort, defaultProtocol := s.GetDefaultPortAddressAndProtocol()
-	res := &rpc.LoadSketchResponse{
+	res := &rpc.Sketch{
 		MainFile:         s.MainFile.String(),
 		LocationPath:     s.FullPath.String(),
 		OtherSketchFiles: s.OtherSketchFiles.AsStrings(),

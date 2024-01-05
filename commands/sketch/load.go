@@ -25,7 +25,7 @@ import (
 )
 
 // LoadSketch collects and returns all information about a sketch
-func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
+func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.Sketch, error) {
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}

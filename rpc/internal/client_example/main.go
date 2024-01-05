@@ -995,13 +995,14 @@ func waitForPrompt(debugStreamingOpenClient rpc.ArduinoCoreService_DebugClient, 
 
 func callLoadSketch(client rpc.ArduinoCoreServiceClient) {
 	currDir, _ := os.Getwd()
-	sketch, err := client.LoadSketch(context.Background(), &rpc.LoadSketchRequest{
+	sketchResp, err := client.LoadSketch(context.Background(), &rpc.LoadSketchRequest{
 		SketchPath: filepath.Join(currDir, "hello"),
 	})
 	if err != nil {
 		log.Fatalf("Error getting version: %s", err)
 	}
 
+	sketch := sketchResp.GetSketch()
 	log.Printf("Sketch main file: %s", sketch.GetMainFile())
 	log.Printf("Sketch location: %s", sketch.GetLocationPath())
 	log.Printf("Other sketch files: %v", sketch.GetOtherSketchFiles())
