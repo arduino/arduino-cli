@@ -350,9 +350,9 @@ func TestSketchArchiveWithMultipleMainFiles(t *testing.T) {
 	cli.SetWorkingDir(sketchDir)
 	_, stderr, err := cli.Run("sketch", "archive")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
+	require.NotContains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
 	require.Contains(t, string(stderr), relPath.String())
-	require.Contains(t, string(stderr), "Error archiving: Can't open sketch: multiple main sketch files found")
+	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
 }
 
 func TestSketchArchiveCaseMismatchFails(t *testing.T) {
@@ -370,7 +370,7 @@ func TestSketchArchiveCaseMismatchFails(t *testing.T) {
 
 	_, stderr, err := cli.Run("sketch", "archive", sketchPath.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error archiving: Can't open sketch:")
+	require.Contains(t, string(stderr), "Can't open sketch:")
 }
 
 func TestSketchNewDotArgOverwrite(t *testing.T) {

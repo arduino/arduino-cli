@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"os"
 
-	sk "github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -55,25 +55,31 @@ func initArchiveCommand() *cobra.Command {
 func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch archive`")
 
-	sketchPath := paths.New(".")
-	if len(args) >= 1 {
-		sketchPath = paths.New(args[0])
+	sketchPathArg := ""
+	if len(args) > 0 {
+		sketchPathArg = args[0]
 	}
 
-	archivePath := ""
-	if len(args) == 2 {
-		archivePath = args[1]
+	archivePathArg := ""
+	if len(args) > 1 {
+		archivePathArg = args[1]
 	}
 
-	_, err := sk.ArchiveSketch(context.Background(),
+	sketchPath := arguments.InitSketchPath(sketchPathArg)
+	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
+	}
+	feedback.WarnAboutDeprecatedFiles(sk)
+
+	if _, err := sketch.ArchiveSketch(context.Background(),
 		&rpc.ArchiveSketchRequest{
 			SketchPath:      sketchPath.String(),
-			ArchivePath:     archivePath,
+			ArchivePath:     archivePathArg,
 			IncludeBuildDir: includeBuildDir,
 			Overwrite:       overwrite,
-		})
-
-	if err != nil {
+		},
+	); err != nil {
 		feedback.Fatal(tr("Error archiving: %v", err), feedback.ErrGeneric)
 	}
 }
