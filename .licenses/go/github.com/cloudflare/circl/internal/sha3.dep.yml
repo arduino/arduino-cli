@@ -1,13 +1,13 @@
 ---
 name: github.com/cloudflare/circl/internal/sha3
-version: v1.3.3
+version: v1.3.7
 type: go
 summary: Package sha3 implements the SHA-3 fixed-output-length hash functions and
   the SHAKE variable-output-length hash functions defined by FIPS-202.
 homepage: https://pkg.go.dev/github.com/cloudflare/circl/internal/sha3
 license: other
 licenses:
-- sources: circl@v1.3.3/LICENSE
+- sources: circl@v1.3.7/LICENSE
   text: |
     Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -66,6 +66,6 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: circl@v1.3.3/README.md
+- sources: circl@v1.3.7/README.md
   text: The project is licensed under the [BSD-3-Clause License](./LICENSE).
 notices: []
