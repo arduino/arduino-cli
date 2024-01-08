@@ -129,7 +129,7 @@ func (lm *LibrariesManager) NewInstaller() (*Installer, func()) {
 func (lmb *Builder) Build() (*LibrariesManager, []*status.Status) {
 	var statuses []*status.Status
 	res := &LibrariesManager{}
-	for _, dir := range res.librariesDir {
+	for _, dir := range lmb.librariesDir {
 		if !dir.scanned {
 			if errs := lmb.loadLibrariesFromDir(dir); len(errs) > 0 {
 				statuses = append(statuses, errs...)
