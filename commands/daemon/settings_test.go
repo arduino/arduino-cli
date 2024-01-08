@@ -120,6 +120,8 @@ func TestGetMergedValue(t *testing.T) {
 	res, err = svc.SettingsGetValue(context.Background(), key)
 	require.NoError(t, err)
 	require.Equal(t, `"bar"`, res.GetJsonData())
+
+	reset()
 }
 
 func TestGetValueNotFound(t *testing.T) {
