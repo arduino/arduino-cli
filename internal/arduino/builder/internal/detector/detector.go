@@ -608,20 +608,20 @@ func LibrariesLoader(
 			if err := builtInLibrariesFolders.ToAbs(); err != nil {
 				return nil, nil, nil, err
 			}
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     builtInLibrariesFolders,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
 		if actualPlatform != targetPlatform {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				PlatformRelease: actualPlatform,
 				Path:            actualPlatform.GetLibrariesDir(),
 				Location:        libraries.ReferencedPlatformBuiltIn,
 			})
 		}
-		lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+		lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 			PlatformRelease: targetPlatform,
 			Path:            targetPlatform.GetLibrariesDir(),
 			Location:        libraries.PlatformBuiltIn,
@@ -632,14 +632,14 @@ func LibrariesLoader(
 			return nil, nil, nil, err
 		}
 		for _, folder := range librariesFolders {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     folder,
 				Location: libraries.User, // XXX: Should be libraries.Unmanaged?
 			})
 		}
 
 		for _, dir := range libraryDirs {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:            dir,
 				Location:        libraries.Unmanaged,
 				IsSingleLibrary: true,

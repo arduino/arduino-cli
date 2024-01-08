@@ -98,7 +98,7 @@ func NewBuilder() *Builder {
 
 // Clone creates a Builder starting with a copy of the same configuration
 // of this LibrariesManager. At the moment of the Build() only the added
-// libraries directories will be scanned, keeping the exising directories
+// libraries directories will be scanned, keeping the existing directories
 // "cached" to optimize scan. If you need to do a full rescan you must use
 // the RescanLibraries method of the Installer.
 func (lm *LibrariesManager) Clone() *Builder {
@@ -152,7 +152,7 @@ func (lmb *Builder) BuildIntoExistingLibrariesManager(old *LibrariesManager) {
 // AddLibrariesDir adds path to the list of directories
 // to scan when searching for libraries. If a path is already
 // in the list it is ignored.
-func (lmb *Builder) AddLibrariesDir(libDir *LibrariesDir) {
+func (lmb *Builder) AddLibrariesDir(libDir LibrariesDir) {
 	if libDir.Path == nil {
 		return
 	}
@@ -165,7 +165,7 @@ func (lmb *Builder) AddLibrariesDir(libDir *LibrariesDir) {
 		WithField("location", libDir.Location.String()).
 		WithField("isSingleLibrary", libDir.IsSingleLibrary).
 		Info("Adding libraries dir")
-	lmb.librariesDir = append(lmb.librariesDir, libDir)
+	lmb.librariesDir = append(lmb.librariesDir, &libDir)
 }
 
 // RescanLibraries reload all installed libraries in the system.
