@@ -1373,13 +1373,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sketchprofile" class="md-nav__link">
-    SketchProfile
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -1556,6 +1549,20 @@
           <li class="md-nav__item">
   <a href="#programmer" class="md-nav__link">
     Programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch" class="md-nav__link">
+    Sketch
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketchprofile" class="md-nav__link">
+    SketchProfile
   </a>
   
 </li>
@@ -2933,13 +2940,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sketchprofile" class="md-nav__link">
-    SketchProfile
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -3116,6 +3116,20 @@
           <li class="md-nav__item">
   <a href="#programmer" class="md-nav__link">
     Programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch" class="md-nav__link">
+    Sketch
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketchprofile" class="md-nav__link">
+    SketchProfile
   </a>
   
 </li>
@@ -4012,7 +4026,6 @@
     - <a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsRequest">SetSketchDefaultsRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a>
-    - <a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a>
@@ -4040,6 +4053,8 @@
     - <a href="#cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry">PlatformSummary.ReleasesEntry</a>
     - <a href="#cc.arduino.cli.commands.v1.Profile">Profile</a>
     - <a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a>
+    - <a href="#cc.arduino.cli.commands.v1.Sketch">Sketch</a>
+    - <a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a>
     - <a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></li>
 </ul>
 <ul>
@@ -5137,64 +5152,10 @@
 </thead>
 <tbody>
 <tr>
-<td>main_file</td>
-<td><a href="#string">string</a></td>
+<td>sketch</td>
+<td><a href="#cc.arduino.cli.commands.v1.Sketch">Sketch</a></td>
 <td></td>
-<td>Absolute path to a main sketch files</td>
-</tr>
-<tr>
-<td>location_path</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Absolute path to folder that contains main_file</td>
-</tr>
-<tr>
-<td>other_sketch_files</td>
-<td><a href="#string">string</a></td>
-<td>repeated</td>
-<td>List of absolute paths to other sketch files</td>
-</tr>
-<tr>
-<td>additional_files</td>
-<td><a href="#string">string</a></td>
-<td>repeated</td>
-<td>List of absolute paths to additional sketch files</td>
-</tr>
-<tr>
-<td>root_folder_files</td>
-<td><a href="#string">string</a></td>
-<td>repeated</td>
-<td>List of absolute paths to supported files in the sketch root folder, main file excluded</td>
-</tr>
-<tr>
-<td>default_fqbn</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Default FQBN set in project file (sketch.yaml)</td>
-</tr>
-<tr>
-<td>default_port</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Default Port set in project file (sketch.yaml)</td>
-</tr>
-<tr>
-<td>default_protocol</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Default Protocol set in project file (sketch.yaml)</td>
-</tr>
-<tr>
-<td>profiles</td>
-<td><a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a></td>
-<td>repeated</td>
-<td>List of profiles present in the project file (sketch.yaml)</td>
-</tr>
-<tr>
-<td>default_profile</td>
-<td><a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a></td>
-<td></td>
-<td>Default profile set in the project file (sketch.yaml)</td>
+<td>The loaded sketch</td>
 </tr>
 </tbody>
 </table>
@@ -5317,32 +5278,6 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The value of default_protocol that has been written in project file (sketch.yaml)</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.SketchProfile"></a></p>
-<h3 id="sketchprofile">SketchProfile<a class="headerlink" href="#sketchprofile" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>name</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Name of the profile</td>
-</tr>
-<tr>
-<td>fqbn</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>FQBN used by the profile</td>
 </tr>
 </tbody>
 </table>
@@ -6287,6 +6222,106 @@ a platform and all its available releases.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Programmer name</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.Sketch"></a></p>
+<h3 id="sketch">Sketch<a class="headerlink" href="#sketch" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>main_file</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to a main sketch files</td>
+</tr>
+<tr>
+<td>location_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to folder that contains main_file</td>
+</tr>
+<tr>
+<td>other_sketch_files</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of absolute paths to other sketch files</td>
+</tr>
+<tr>
+<td>additional_files</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of absolute paths to additional sketch files</td>
+</tr>
+<tr>
+<td>root_folder_files</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of absolute paths to supported files in the sketch root folder, main file excluded</td>
+</tr>
+<tr>
+<td>default_fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default FQBN set in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_port</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default Port set in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_protocol</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default Protocol set in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>profiles</td>
+<td><a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a></td>
+<td>repeated</td>
+<td>List of profiles present in the project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_profile</td>
+<td><a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a></td>
+<td></td>
+<td>Default profile set in the project file (sketch.yaml)</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.SketchProfile"></a></p>
+<h3 id="sketchprofile">SketchProfile<a class="headerlink" href="#sketchprofile" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Name of the profile</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>FQBN used by the profile</td>
 </tr>
 </tbody>
 </table>
