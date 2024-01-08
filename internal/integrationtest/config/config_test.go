@@ -827,6 +827,7 @@ func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
 		require.NoError(t, err)
 		_, err = f.WriteString(content)
 		require.NoError(t, err)
+		require.NoError(t, f.Close())
 	}
 	tmp := t.TempDir()
 	cliConfig, envConfig := paths.New(filepath.Join(tmp, "cli.yaml")), paths.New(filepath.Join(tmp, "env.yaml"))
