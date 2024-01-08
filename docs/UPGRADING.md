@@ -4,6 +4,46 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### The gRPC `cc.arduino.cli.commands.v1.LoadSketchResponse` message has been changed.
+
+Previously the `LoadSketchResponse` containted all the information about the sketch:
+
+```proto
+message LoadSketchResponse {
+  string main_file = 1;
+  string location_path = 2;
+  repeated string other_sketch_files = 3;
+  repeated string additional_files = 4;
+  repeated string root_folder_files = 5;
+  string default_fqbn = 6;
+  string default_port = 7;
+  string default_protocol = 8;
+  repeated SketchProfile profiles = 9;
+  SketchProfile default_profile = 10;
+}
+```
+
+Now all the metadata have been moved into a specific `Sketch` message:
+
+```proto
+message LoadSketchResponse {
+  Sketch sketch = 1;
+}
+
+message Sketch {
+  string main_file = 1;
+  string location_path = 2;
+  repeated string other_sketch_files = 3;
+  repeated string additional_files = 4;
+  repeated string root_folder_files = 5;
+  string default_fqbn = 6;
+  string default_port = 7;
+  string default_protocol = 8;
+  repeated SketchProfile profiles = 9;
+  SketchProfile default_profile = 10;
+}
+```
+
 ### Drop support for `builtin.tools`
 
 We're dropping the `builtin.tools` support. It was the equivalent of Arduino IDE 1.x bundled tools directory.

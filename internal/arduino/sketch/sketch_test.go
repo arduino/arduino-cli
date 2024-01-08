@@ -291,41 +291,6 @@ func TestGenBuildPath(t *testing.T) {
 	assert.Equal(t, "ACBD18DB4CC2F85CEDEF654FCCC4A4D8", (&Sketch{FullPath: paths.New("foo")}).Hash())
 }
 
-func TestCheckForPdeFiles(t *testing.T) {
-	sketchPath := paths.New("testdata", "SketchSimple")
-	files := CheckForPdeFiles(sketchPath)
-	require.Empty(t, files)
-
-	sketchPath = paths.New("testdata", "SketchPde")
-	files = CheckForPdeFiles(sketchPath)
-	require.Len(t, files, 1)
-	require.Equal(t, sketchPath.Join("SketchPde.pde"), files[0])
-
-	sketchPath = paths.New("testdata", "SketchMultipleMainFiles")
-	files = CheckForPdeFiles(sketchPath)
-	require.Len(t, files, 1)
-	require.Equal(t, sketchPath.Join("SketchMultipleMainFiles.pde"), files[0])
-
-	sketchPath = paths.New("testdata", "SketchSimple", "SketchSimple.ino")
-	files = CheckForPdeFiles(sketchPath)
-	require.Empty(t, files)
-
-	sketchPath = paths.New("testdata", "SketchPde", "SketchPde.pde")
-	files = CheckForPdeFiles(sketchPath)
-	require.Len(t, files, 1)
-	require.Equal(t, sketchPath.Parent().Join("SketchPde.pde"), files[0])
-
-	sketchPath = paths.New("testdata", "SketchMultipleMainFiles", "SketchMultipleMainFiles.ino")
-	files = CheckForPdeFiles(sketchPath)
-	require.Len(t, files, 1)
-	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
-
-	sketchPath = paths.New("testdata", "SketchMultipleMainFiles", "SketchMultipleMainFiles.pde")
-	files = CheckForPdeFiles(sketchPath)
-	require.Len(t, files, 1)
-	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
-}
-
 func TestNewSketchWithSymlink(t *testing.T) {
 	sketchPath, _ := paths.New("testdata", "SketchWithSymlink").Abs()
 	mainFilePath := sketchPath.Join("SketchWithSymlink.ino")

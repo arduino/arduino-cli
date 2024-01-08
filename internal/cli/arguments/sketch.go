@@ -19,6 +19,7 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands/sketch"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -27,8 +28,7 @@ import (
 
 // InitSketchPath returns an instance of paths.Path pointing to sketchPath.
 // If sketchPath is an empty string returns the current working directory.
-// In both cases it warns the user if he's using deprecated files
-func InitSketchPath(path string, printWarnings bool) (sketchPath *paths.Path) {
+func InitSketchPath(path string) (sketchPath *paths.Path) {
 	if path != "" {
 		sketchPath = paths.New(path)
 	} else {
@@ -38,11 +38,6 @@ func InitSketchPath(path string, printWarnings bool) (sketchPath *paths.Path) {
 		}
 		logrus.Infof("Reading sketch from dir: %s", wd)
 		sketchPath = wd
-	}
-	if printWarnings {
-		if msg := sketch.WarnDeprecatedFiles(sketchPath); msg != "" {
-			feedback.Warning(msg)
-		}
 	}
 	return sketchPath
 }
@@ -57,13 +52,10 @@ func GetSketchProfiles(sketchPath string) []string {
 			return nil
 		}
 	}
-	list, _ := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{
-		SketchPath: sketchPath,
-	})
-	profiles := list.GetProfiles()
-	res := make([]string, len(profiles))
-	for i, p := range list.GetProfiles() {
-		res[i] = p.GetName()
+	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath})
+	if err != nil {
+		return nil
 	}
-	return res
+	profiles := sk.GetProfiles()
+	return f.Map(profiles, (*rpc.SketchProfile).GetName)
 }

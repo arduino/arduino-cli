@@ -13,24 +13,32 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package sketch
+package feedback
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/arduino/arduino-cli/internal/arduino/sketch"
-	paths "github.com/arduino/go-paths-helper"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// WarnDeprecatedFiles warns the user that a type of sketch files are deprecated
-func WarnDeprecatedFiles(sketchPath *paths.Path) string {
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
+// WarnAboutDeprecatedFiles warns the user that a type of sketch files are deprecated
+func WarnAboutDeprecatedFiles(s *rpc.Sketch) {
+	var files []string
+	for _, f := range s.OtherSketchFiles {
+		if strings.HasSuffix(f, ".pde") {
+			files = append(files, f)
+		}
+	}
+	if strings.HasSuffix(s.MainFile, ".pde") {
+		files = append(files, s.MainFile)
+	}
+	if len(files) > 0 {
+		// .pde files are still supported but deprecated, this warning urges the user to rename them
 		msg := tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 		for _, f := range files {
 			msg += fmt.Sprintf("\n - %s", f)
 		}
-		return msg
+		Warning(msg)
 	}
-	return ""
 }

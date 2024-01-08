@@ -23,8 +23,11 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -180,15 +183,14 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 	return &files, nil
 }
 
-// GetProfile returns the requested profile or nil if the profile
-// is not found.
-func (s *Sketch) GetProfile(profileName string) *Profile {
+// GetProfile returns the requested profile or an error if not found
+func (s *Sketch) GetProfile(profileName string) (*Profile, error) {
 	for _, p := range s.Project.Profiles {
 		if p.Name == profileName {
-			return p
+			return p, nil
 		}
 	}
-	return nil
+	return nil, &cmderrors.UnknownProfileError{Profile: profileName}
 }
 
 // checkSketchCasing returns an error if the casing of the sketch folder and the main file are different.
@@ -278,23 +280,6 @@ func (e *InvalidSketchFolderNameError) Error() string {
 	return tr("no valid sketch found in %[1]s: missing %[2]s", e.SketchFolder, e.SketchFile)
 }
 
-// CheckForPdeFiles returns all files ending with .pde extension
-// in sketch, this is mainly used to warn the user that these files
-// must be changed to .ino extension.
-// When .pde files won't be supported anymore this function must be removed.
-func CheckForPdeFiles(sketch *paths.Path) []*paths.Path {
-	if sketch.IsNotDir() {
-		sketch = sketch.Parent()
-	}
-
-	files, err := sketch.ReadDirRecursive()
-	if err != nil {
-		return []*paths.Path{}
-	}
-	files.FilterSuffix(".pde")
-	return files
-}
-
 // DefaultBuildPath generates the default build directory for a given sketch.
 // The build path is in a temporary directory and is unique for each sketch.
 func (s *Sketch) DefaultBuildPath() *paths.Path {
@@ -306,4 +291,24 @@ func (s *Sketch) Hash() string {
 	path := s.FullPath.String()
 	md5SumBytes := md5.Sum([]byte(path))
 	return strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
+}
+
+// ToRpc converts this Sketch into a rpc.LoadSketchResponse
+func (s *Sketch) ToRpc() *rpc.Sketch {
+	defaultPort, defaultProtocol := s.GetDefaultPortAddressAndProtocol()
+	res := &rpc.Sketch{
+		MainFile:         s.MainFile.String(),
+		LocationPath:     s.FullPath.String(),
+		OtherSketchFiles: s.OtherSketchFiles.AsStrings(),
+		AdditionalFiles:  s.AdditionalFiles.AsStrings(),
+		RootFolderFiles:  s.RootFolderFiles.AsStrings(),
+		DefaultFqbn:      s.GetDefaultFQBN(),
+		DefaultPort:      defaultPort,
+		DefaultProtocol:  defaultProtocol,
+		Profiles:         f.Map(s.Project.Profiles, (*Profile).ToRpc),
+	}
+	if defaultProfile, err := s.GetProfile(s.Project.DefaultProfile); err == nil {
+		res.DefaultProfile = defaultProfile.ToRpc()
+	}
+	return res
 }
