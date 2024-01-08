@@ -21,17 +21,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_RescanLibrariesCallClear(t *testing.T) {
+func TestLibrariesBuilderScanCloneRescan(t *testing.T) {
 	lmb := NewBuilder()
 	lmb.libraries["testLibA"] = libraries.List{}
 	lmb.libraries["testLibB"] = libraries.List{}
-	lm := lmb.Build()
+	lm, warns := lmb.Build()
+	require.Empty(t, warns)
+	require.Len(t, lm.libraries, 2)
 
+	// Cloning should keep existing libraries
+	lm2, warns2 := lm.Clone().Build()
+	require.Empty(t, warns2)
+	require.Len(t, lm2.libraries, 2)
+
+	// Full rescan should update libs
 	{
-		lmi, release := lm.NewInstaller()
-		lmi.RescanLibraries()
+		lmi2, release := lm2.NewInstaller()
+		lmi2.RescanLibraries()
 		release()
 	}
-
-	require.Len(t, lm.libraries, 0)
+	require.Len(t, lm.libraries, 2) // Ensure deep-coping worked as expected...
+	require.Len(t, lm2.libraries, 0)
 }

@@ -389,16 +389,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
-	lm := lmb.Build()
+	lm, libsLoadingWarnings := lmb.Build()
 	_ = instances.SetLibraryManager(instance, lm) // should never fail
-
-	{
-		lmi, release := lm.NewInstaller()
-		for _, status := range lmi.RescanLibraries() {
-			logrus.WithError(status.Err()).Warnf("Error loading library")
-			// TODO: report as warning: responseError(err)
-		}
-		release()
+	for _, status := range libsLoadingWarnings {
+		logrus.WithError(status.Err()).Warnf("Error loading library")
+		// TODO: report as warning: responseError(err)
 	}
 
 	// Refreshes the locale used, this will change the

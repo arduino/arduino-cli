@@ -65,6 +65,7 @@ type LibrariesDir struct {
 	Location        libraries.LibraryLocation
 	PlatformRelease *cores.PlatformRelease
 	IsSingleLibrary bool // true if Path points directly to a library instad of a dir of libraries
+	scanned         bool
 }
 
 var tr = i18n.Tr
@@ -95,14 +96,19 @@ func NewBuilder() *Builder {
 	}
 }
 
-// NewBuilder creates a Builder with the same configuration of this
-// LibrariesManager. A "commit" function callback is returned: calling
-// this function will write the new configuration into this LibrariesManager.
-func (lm *LibrariesManager) NewBuilder() (*Builder, func()) {
+// Clone creates a Builder starting with a copy of the same configuration
+// of this LibrariesManager. At the moment of the Build() only the added
+// libraries directories will be scanned, keeping the exising directories
+// "cached" to optimize scan. If you need to do a full rescan you must use
+// the RescanLibraries method of the Installer.
+func (lm *LibrariesManager) Clone() *Builder {
 	lmb := NewBuilder()
-	return lmb, func() {
-		lmb.BuildIntoExistingLibrariesManager(lm)
+	lmb.librariesDir = append(lmb.librariesDir, lm.librariesDir...)
+	for libName, libAlternatives := range lm.libraries {
+		// TODO: Maybe we should deep clone libAlternatives...
+		lmb.libraries[libName] = append(lmb.libraries[libName], libAlternatives...)
 	}
+	return lmb
 }
 
 // NewExplorer returns a new Explorer. The returned function must be called
@@ -120,10 +126,18 @@ func (lm *LibrariesManager) NewInstaller() (*Installer, func()) {
 }
 
 // Build builds a new LibrariesManager.
-func (lmb *Builder) Build() *LibrariesManager {
+func (lmb *Builder) Build() (*LibrariesManager, []*status.Status) {
+	var statuses []*status.Status
 	res := &LibrariesManager{}
+	for _, dir := range res.librariesDir {
+		if !dir.scanned {
+			if errs := lmb.loadLibrariesFromDir(dir); len(errs) > 0 {
+				statuses = append(statuses, errs...)
+			}
+		}
+	}
 	lmb.BuildIntoExistingLibrariesManager(res)
-	return res
+	return res, statuses
 }
 
 // BuildIntoExistingLibrariesManager will overwrite the given LibrariesManager instead
@@ -184,8 +198,10 @@ func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLoc
 
 // loadLibrariesFromDir loads all libraries in the given directory. Returns
 // nil if the directory doesn't exists.
-func (lmi *Installer) loadLibrariesFromDir(librariesDir *LibrariesDir) []*status.Status {
+func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*status.Status {
 	statuses := []*status.Status{}
+
+	librariesDir.scanned = true
 
 	var libDirs paths.PathList
 	if librariesDir.IsSingleLibrary {
@@ -212,9 +228,9 @@ func (lmi *Installer) loadLibrariesFromDir(librariesDir *LibrariesDir) []*status
 			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives := lmi.libraries[library.Name]
+		alternatives := lm.libraries[library.Name]
 		alternatives.Add(library)
-		lmi.libraries[library.Name] = alternatives
+		lm.libraries[library.Name] = alternatives
 	}
 
 	return statuses
