@@ -1,12 +1,12 @@
 ---
 name: github.com/cloudflare/circl/dh/x448
-version: v1.3.3
+version: v1.3.7
 type: go
 summary: Package x448 provides Diffie-Hellman functions as specified in RFC-7748.
 homepage: https://pkg.go.dev/github.com/cloudflare/circl/dh/x448
 license: other
 licenses:
-- sources: circl@v1.3.3/LICENSE
+- sources: circl@v1.3.7/LICENSE
   text: |
     Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -65,6 +65,6 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: circl@v1.3.3/README.md
+- sources: circl@v1.3.7/README.md
   text: The project is licensed under the [BSD-3-Clause License](./LICENSE).
 notices: []
