@@ -822,17 +822,10 @@ func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	createConfig := func(path *paths.Path, content string) {
-		f, err := path.Create()
-		require.NoError(t, err)
-		_, err = f.WriteString(content)
-		require.NoError(t, err)
-		require.NoError(t, f.Close())
-	}
 	tmp := t.TempDir()
 	cliConfig, envConfig := paths.New(filepath.Join(tmp, "cli.yaml")), paths.New(filepath.Join(tmp, "env.yaml"))
-	createConfig(cliConfig, `cli-test: "test"`)
-	createConfig(envConfig, `env-test: "test"`)
+	cliConfig.WriteFile([]byte(`cli-test: "test"`))
+	envConfig.WriteFile([]byte(`env-test: "test"`))
 
 	// No flag nor env specified.
 	stdout, _, err := cli.Run("config", "dump", "--format", "json")
