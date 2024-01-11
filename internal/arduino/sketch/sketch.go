@@ -111,7 +111,7 @@ func New(path *paths.Path) (*Sketch, error) {
 
 	sketchFolderFiles, err := sketch.supportedFiles()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", tr("reading sketch files"), err)
 	}
 
 	// Collect files
