@@ -115,7 +115,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	}
 
 	// Collect files
-	for _, p := range *sketchFolderFiles {
+	for _, p := range sketchFolderFiles {
 		// Skip files that can't be opened
 		f, err := p.Open()
 		if err != nil {
@@ -160,7 +160,7 @@ func New(path *paths.Path) (*Sketch, error) {
 
 // supportedFiles reads all files recursively contained in Sketch and
 // filter out unneded or unsupported ones and returns them
-func (s *Sketch) supportedFiles() (*paths.PathList, error) {
+func (s *Sketch) supportedFiles() (paths.PathList, error) {
 	filterValidExtensions := func(p *paths.Path) bool {
 		return globals.MainFileValidExtensions[p.Ext()] || globals.AdditionalFileValidExtensions[p.Ext()]
 	}
@@ -180,7 +180,7 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &files, nil
+	return files, nil
 }
 
 // GetProfile returns the requested profile or an error if not found
