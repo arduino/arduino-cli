@@ -341,7 +341,7 @@ func TestNewSketchWithSymlinkLoop(t *testing.T) {
 				return false
 			}
 		},
-		20*time.Second,
+		5*time.Second,
 		10*time.Millisecond,
 		"Infinite symlink loop while loading sketch",
 	)
@@ -380,7 +380,7 @@ func TestSketchWithMultipleSymlinkLoops(t *testing.T) {
 				return false
 			}
 		},
-		20*time.Second,
+		5*time.Second,
 		10*time.Millisecond,
 		"Infinite symlink loop while loading sketch",
 	)
