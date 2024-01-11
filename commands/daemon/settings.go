@@ -79,9 +79,13 @@ func (s *ArduinoCoreServerImpl) SettingsMerge(ctx context.Context, req *rpc.Sett
 	// Set each value individually.
 	// This is done because Viper ignores empty strings or maps when
 	// using the MergeConfigMap function.
+	updatedSettings := configuration.Init("")
 	for k, v := range mapped {
-		configuration.Settings.Set(k, v)
+		updatedSettings.Set(k, v)
 	}
+	configPath := configuration.Settings.ConfigFileUsed()
+	updatedSettings.SetConfigFile(configPath)
+	configuration.Settings = updatedSettings
 
 	return &rpc.SettingsMergeResponse{}, nil
 }
