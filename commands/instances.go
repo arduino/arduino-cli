@@ -308,7 +308,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
 			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+				lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 					PlatformRelease: platformRelease,
 					Path:            platformRelease.GetLibrariesDir(),
 					Location:        libraries.PlatformBuiltIn,
@@ -336,14 +336,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
 		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     bundledLibsDir,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
 		// Add libraries directory from config file
-		lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+		lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 			Path:     configuration.LibrariesDir(configuration.Settings),
 			Location: libraries.User,
 		})
@@ -383,23 +383,18 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				taskCallback(&rpc.TaskProgress{Completed: true})
 			}
 
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     libRoot,
 				Location: libraries.User,
 			})
 		}
 	}
 
-	lm := lmb.Build()
+	lm, libsLoadingWarnings := lmb.Build()
 	_ = instances.SetLibraryManager(instance, lm) // should never fail
-
-	{
-		lmi, release := lm.NewInstaller()
-		for _, status := range lmi.RescanLibraries() {
-			logrus.WithError(status.Err()).Warnf("Error loading library")
-			// TODO: report as warning: responseError(err)
-		}
-		release()
+	for _, status := range libsLoadingWarnings {
+		logrus.WithError(status.Err()).Warnf("Error loading library")
+		// TODO: report as warning: responseError(err)
 	}
 
 	// Refreshes the locale used, this will change the

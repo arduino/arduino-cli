@@ -126,9 +126,12 @@ func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent ...st
 	}
 	tempDir := dataDir.Join("tmp")
 
+	pm := packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build()
+	lm, _ := librariesmanager.NewBuilder().Build()
+
 	instance := &coreInstance{
-		pm: packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build(),
-		lm: librariesmanager.NewBuilder().Build(),
+		pm: pm,
+		lm: lm,
 		li: librariesindex.EmptyIndex,
 	}
 

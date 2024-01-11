@@ -598,7 +598,7 @@ func LibrariesLoader(
 	if useCachedLibrariesResolution {
 		// Since we are using the cached libraries resolution
 		// the library manager is not needed.
-		lm = librariesmanager.NewBuilder().Build()
+		lm, _ = librariesmanager.NewBuilder().Build()
 	}
 	if librariesManager == nil {
 		lmb := librariesmanager.NewBuilder()
@@ -608,20 +608,20 @@ func LibrariesLoader(
 			if err := builtInLibrariesFolders.ToAbs(); err != nil {
 				return nil, nil, nil, err
 			}
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     builtInLibrariesFolders,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
 		if actualPlatform != targetPlatform {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				PlatformRelease: actualPlatform,
 				Path:            actualPlatform.GetLibrariesDir(),
 				Location:        libraries.ReferencedPlatformBuiltIn,
 			})
 		}
-		lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+		lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 			PlatformRelease: targetPlatform,
 			Path:            targetPlatform.GetLibrariesDir(),
 			Location:        libraries.PlatformBuiltIn,
@@ -632,35 +632,31 @@ func LibrariesLoader(
 			return nil, nil, nil, err
 		}
 		for _, folder := range librariesFolders {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     folder,
 				Location: libraries.User, // XXX: Should be libraries.Unmanaged?
 			})
 		}
 
 		for _, dir := range libraryDirs {
-			lmb.AddLibrariesDir(&librariesmanager.LibrariesDir{
+			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:            dir,
 				Location:        libraries.Unmanaged,
 				IsSingleLibrary: true,
 			})
 		}
 
-		lm = lmb.Build()
-
-		{
-			lmi, release := lm.NewInstaller()
-			for _, status := range lmi.RescanLibraries() {
-				// With the refactoring of the initialization step of the CLI we changed how
-				// errors are returned when loading platforms and libraries, that meant returning a list of
-				// errors instead of a single one to enhance the experience for the user.
-				// I have no intention right now to start a refactoring of the legacy package too, so
-				// here's this shitty solution for now.
-				// When we're gonna refactor the legacy package this will be gone.
-				verboseOut.Write([]byte(status.Message()))
-			}
-			release()
+		newLm, libsLoadingWarnings := lmb.Build()
+		for _, status := range libsLoadingWarnings {
+			// With the refactoring of the initialization step of the CLI we changed how
+			// errors are returned when loading platforms and libraries, that meant returning a list of
+			// errors instead of a single one to enhance the experience for the user.
+			// I have no intention right now to start a refactoring of the legacy package too, so
+			// here's this shitty solution for now.
+			// When we're gonna refactor the legacy package this will be gone.
+			verboseOut.Write([]byte(status.Message()))
 		}
+		lm = newLm
 	}
 
 	allLibs := lm.FindAllInstalled()
