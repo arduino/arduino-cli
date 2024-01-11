@@ -79,10 +79,6 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 [macos64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
 [macosarm64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_ARM64.tar.gz
 
-> **Deprecation notice**: links in the form
-> `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2` won’t be further updated. That URL
-> will provide the version `0.3.7-alpha.preview`, regardless of further releases.
-
 ### Previous versions
 
 These are available from the "Assets" sections on the [releases page](https://github.com/arduino/arduino-cli/releases).

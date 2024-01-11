@@ -33,9 +33,9 @@ contribute your changes to the project.
 
 :sparkles: Thanks to all our [contributors]! :sparkles:
 
-### Beta testing
+### Testing builds
 
-[Nightly builds] are available for beta testing.
+[Nightly builds] are available for testing.
 
 ## Security
 
