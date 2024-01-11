@@ -10,6 +10,9 @@ and many other tools needed to use any Arduino compatible board and platform fro
 [![Deploy Website status](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml)
 [![Codecov](https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-cli)
 
+> **Note:** this software is currently under active development: anything can change at any time, API and UI must be
+> considered unstable until we release version 1.0.0.
+
 ## Docs
 
 For guidance on installation and development, see the [User documentation].

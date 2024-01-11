@@ -1,18 +1,17 @@
 # Backward compatibility policy for arduino-cli.
 
 The arduino-cli project follows a strict semantic versioning policy. We are committing not to make breaking changes in
-minor releases after the release of version 1.0.0. The project is currently in the production release-candidate phase,
-the API is stable and only bug fixes releases are expected before 1.0.0.
+minor releases after the release of version 1.0.0. The project is currently in the last period of the Beta phase.
 
 The release rules are the following:
 
 - Alpha phase `0.0.X`: In this phase, the software is going through a quick iteration of the API, each release (with
   increments of X) may contain massive and breaking changes.
-- Beta phase `0.Y.X`: The software is usable, but the API is still not settled and is under continuous testing and
+- **Beta phase `0.Y.X`**: The software is usable, but the API is still not settled and is under continuous testing and
   review. Breaking changes are expected. Bug fixes and new features are made as patch releases (with increments of X).
   Breaking changes due to API refinements are made as minor releases (with increments of Y).
-- **Production release-candidate `1.0.0-rc.X`**: in this phase, the software is considered ready for release and
-  distributed to the users for final testing. Release candidates (with increments of X) are possible for bug fixes only.
+- Production release-candidate `1.0.0-rc.X`: in this phase, the software is considered ready for release and distributed
+  to the users for final testing. Release candidates (with increments of X) are possible for bug fixes only.
 - Production release `1.Y.X`: For the production releases backward compatibility is guaranteed, and all the breaking
   changes are cumulated for the next major release (2.0.0). Bug fixes are made as patch releases (with increments of X);
   New features are released as minor releases (with increments of Y).
