@@ -2,7 +2,7 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## 1.0.0-rc.0
+## 1.0.0-rc.1
 
 ### The gRPC `cc.arduino.cli.commands.v1.LoadSketchResponse` message has been changed.
 
