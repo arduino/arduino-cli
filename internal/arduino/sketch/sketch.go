@@ -116,13 +116,6 @@ func New(path *paths.Path) (*Sketch, error) {
 
 	// Collect files
 	for _, p := range sketchFolderFiles {
-		// Skip files that can't be opened
-		f, err := p.Open()
-		if err != nil {
-			continue
-		}
-		f.Close()
-
 		ext := p.Ext()
 		if globals.MainFileValidExtensions[ext] {
 			if p.EqualsTo(mainFile) {
