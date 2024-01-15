@@ -92,6 +92,8 @@ type Builder struct {
 
 	libsDetector *detector.SketchLibrariesDetector
 
+	toolEnv []string
+
 	// This is a function used to parse the output of the compiler
 	// It is used to extract errors and warnings
 	compilerOutputParser diagnostics.CompilerOutputParserCB
@@ -133,6 +135,7 @@ func NewBuilder(
 	libraryDirs paths.PathList,
 	stdout, stderr io.Writer, verbose bool, warningsLevel string,
 	progresCB rpc.TaskProgressCB,
+	toolEnv []string,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -216,6 +219,7 @@ func NewBuilder(
 		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
+		toolEnv:                       toolEnv,
 		libsDetector: detector.NewSketchLibrariesDetector(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
@@ -521,7 +525,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 		}
 	}
 
-	command, err := paths.NewProcess(nil, parts...)
+	command, err := paths.NewProcess(b.toolEnv, parts...)
 	if err != nil {
 		return nil, err
 	}
