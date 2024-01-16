@@ -199,6 +199,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		paths.NewPathList(req.GetLibrary()...),
 		outStream, errStream, req.GetVerbose(), req.GetWarnings(),
 		progressCB,
+		pme.GetEnvVarsForSpawnedProcess(),
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
