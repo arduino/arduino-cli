@@ -90,6 +90,8 @@ type Builder struct {
 	buildOptions *buildOptions
 
 	libsDetector *detector.SketchLibrariesDetector
+
+	toolEnv []string
 }
 
 // buildArtifacts contains the result of various build
@@ -126,6 +128,7 @@ func NewBuilder(
 	libraryDirs paths.PathList,
 	stdout, stderr io.Writer, verbose bool, warningsLevel string,
 	progresCB rpc.TaskProgressCB,
+	toolEnv []string,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -209,6 +212,7 @@ func NewBuilder(
 		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
+		toolEnv:                       toolEnv,
 		libsDetector: detector.NewSketchLibrariesDetector(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
@@ -493,7 +497,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 		}
 	}
 
-	command, err := executils.NewProcess(nil, parts...)
+	command, err := executils.NewProcess(b.toolEnv, parts...)
 	if err != nil {
 		return nil, err
 	}
