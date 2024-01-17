@@ -93,18 +93,20 @@ func (p *projectRaw) getProfiles() ([]*Profile, error) {
 // Profile is a sketch profile, it contains a reference to all the resources
 // needed to build and upload a sketch
 type Profile struct {
-	Name      string
-	Notes     string                   `yaml:"notes"`
-	FQBN      string                   `yaml:"fqbn"`
-	Platforms ProfileRequiredPlatforms `yaml:"platforms"`
-	Libraries ProfileRequiredLibraries `yaml:"libraries"`
+	Name       string
+	Notes      string                   `yaml:"notes"`
+	FQBN       string                   `yaml:"fqbn"`
+	Programmer string                   `yaml:"programmer"`
+	Platforms  ProfileRequiredPlatforms `yaml:"platforms"`
+	Libraries  ProfileRequiredLibraries `yaml:"libraries"`
 }
 
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
 	return &rpc.SketchProfile{
-		Name: p.Name,
-		Fqbn: p.FQBN,
+		Name:       p.Name,
+		Fqbn:       p.FQBN,
+		Programmer: p.Programmer,
 	}
 }
 
@@ -115,6 +117,9 @@ func (p *Profile) AsYaml() string {
 		res += fmt.Sprintf("    notes: %s\n", p.Notes)
 	}
 	res += fmt.Sprintf("    fqbn: %s\n", p.FQBN)
+	if p.Programmer != "" {
+		res += fmt.Sprintf("    programmer: %s\n", p.Programmer)
+	}
 	res += p.Platforms.AsYaml()
 	res += p.Libraries.AsYaml()
 	return res
