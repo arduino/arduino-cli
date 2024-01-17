@@ -208,4 +208,6 @@ message SketchProfile {
   string name = 1;
   // FQBN used by the profile
   string fqbn = 2;
+  // Programmer used by the profile
+  string programmer = 3;
 }
