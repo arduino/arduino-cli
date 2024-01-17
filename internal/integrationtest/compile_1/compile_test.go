@@ -220,16 +220,36 @@ func compileWithSketchWithSymlinkSelfloop(t *testing.T, env *integrationtest.Env
 		require.NoError(t, err)
 		require.Contains(t, string(stdout), "Sketch created in: "+sketchPath.String())
 
-		// create a symlink that loops on himself
+		// Create a symlink that loops on himself
+		//
+		// /tmp/cli2843369229/Arduino/CompileIntegrationTestSymlinkSelfLoop
+		// ├── CompileIntegrationTestSymlinkSelfLoop.ino
+		// └── loop -> /tmp/cli2843369229/Arduino/CompileIntegrationTestSymlinkSelfLoop/loop
+		//
+		// in this case the link is "broken", and it will be ignored by the compiler
 		loopFilePath := sketchPath.Join("loop")
 		err = os.Symlink(loopFilePath.String(), loopFilePath.String())
 		require.NoError(t, err)
 
-		// Build sketch for arduino:avr:uno
+		_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
+		require.NoError(t, err)
+
+		// Add a symlink that loops on himself named as a .ino file
+		//
+		// /tmp/cli2843369229/Arduino/CompileIntegrationTestSymlinkSelfLoop
+		// ├── CompileIntegrationTestSymlinkSelfLoop.ino
+		// ├── loop -> /tmp/cli2843369229/Arduino/CompileIntegrationTestSymlinkSelfLoop/loop
+		// └── loop.ino -> /tmp/cli2843369229/Arduino/CompileIntegrationTestSymlinkSelfLoop/loop.ino
+		//
+		// in this case the new link is "broken" as before, but being part of the sketch will trigger an error.
+		loopInoFilePath := sketchPath.Join("loop.ino")
+		err = os.Symlink(loopFilePath.String(), loopInoFilePath.String())
+		require.NoError(t, err)
+
 		_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
 		// The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
 		// returning a different error detailed message
-		require.Contains(t, string(stderr), "Can't open sketch:")
+		require.Contains(t, string(stderr), "Error during build:")
 		require.Error(t, err)
 	}
 	{

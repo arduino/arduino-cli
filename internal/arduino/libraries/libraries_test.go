@@ -95,15 +95,16 @@ func TestLibrariesLoader(t *testing.T) {
 func TestSymlinkLoop(t *testing.T) {
 	// Set up directory structure of test library.
 	testLib := paths.New("testdata", "TestLib")
-	examplesPath := testLib.Join("examples")
+	examplesPath, err := testLib.Join("examples").Abs()
+	require.NoError(t, err)
 	require.NoError(t, examplesPath.Mkdir())
 	defer examplesPath.RemoveAll()
 
 	// It's probably most friendly for contributors using Windows to create the symlinks needed for the test on demand.
-	err := os.Symlink(examplesPath.Join("..").String(), examplesPath.Join("UpGoer1").String())
+	err = os.Symlink(examplesPath.String(), examplesPath.Join("UpGoer1").String())
 	require.NoError(t, err, "This test must be run as administrator on Windows to have symlink creation privilege.")
 	// It's necessary to have multiple symlinks to a parent directory to create the loop.
-	err = os.Symlink(examplesPath.Join("..").String(), examplesPath.Join("UpGoer2").String())
+	err = os.Symlink(examplesPath.String(), examplesPath.Join("UpGoer2").String())
 	require.NoError(t, err)
 
 	// The failure condition is Load() never returning, testing for which requires setting up a timeout.
@@ -123,15 +124,16 @@ func TestSymlinkLoop(t *testing.T) {
 func TestLegacySymlinkLoop(t *testing.T) {
 	// Set up directory structure of test library.
 	testLib := paths.New("testdata", "LegacyLib")
-	examplesPath := testLib.Join("examples")
+	examplesPath, err := testLib.Join("examples").Abs()
+	require.NoError(t, err)
 	require.NoError(t, examplesPath.Mkdir())
 	defer examplesPath.RemoveAll()
 
 	// It's probably most friendly for contributors using Windows to create the symlinks needed for the test on demand.
-	err := os.Symlink(examplesPath.Join("..").String(), examplesPath.Join("UpGoer1").String())
+	err = os.Symlink(examplesPath.String(), examplesPath.Join("UpGoer1").String())
 	require.NoError(t, err, "This test must be run as administrator on Windows to have symlink creation privilege.")
 	// It's necessary to have multiple symlinks to a parent directory to create the loop.
-	err = os.Symlink(examplesPath.Join("..").String(), examplesPath.Join("UpGoer2").String())
+	err = os.Symlink(examplesPath.String(), examplesPath.Join("UpGoer2").String())
 	require.NoError(t, err)
 
 	// The failure condition is Load() never returning, testing for which requires setting up a timeout.
