@@ -10,6 +10,7 @@ multiple profiles.
 Each profile will define:
 
 - The board FQBN
+- The programmer to use
 - The target core platform name and version (with the 3rd party platform index URL if needed)
 - A possible core platform name and version, that is a dependency of the target core platform (with the 3rd party
   platform index URL if needed)
@@ -22,6 +23,7 @@ profiles:
   <PROFILE_NAME>:
     notes: <USER_NOTES>
     fqbn: <FQBN>
+    programmer: <PROGRAMMER>
     platforms:
       - platform: <PLATFORM> (<PLATFORM_VERSION>)
         platform_index_url: <3RD_PARTY_PLATFORM_URL>
@@ -50,6 +52,7 @@ otherwise below). The available fields are:
 - `libraries:` is a section where the required libraries to build the project are defined. This section is optional.
 - `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
 - `<USER_NOTES>` is a free text string available to the developer to add comments. This field is optional.
+- `<PROGRAMMER>` is the programmer that will be used. This field is optional.
 
 A complete example of a sketch project file may be the following:
 
@@ -134,6 +137,7 @@ The sketch project file may be used to set the default value for some command li
 particular:
 
 - The `default_fqbn` key sets the default value for the `--fqbn` flag
+- The `default_programmer` key sets the default value for the `--programmer` flag
 - The `default_port` key sets the default value for the `--port` flag
 - The `default_protocol` key sets the default value for the `--protocol` flag
 - The `default_profile` key sets the default value for the `--profile` flag
@@ -141,12 +145,14 @@ particular:
 For example:
 
 ```
-default_fqbn: arduino:avr:uno
+default_fqbn: arduino:samd:mkr1000
+default_programmer: atmel_ice
 default_port: /dev/ttyACM0
 default_protocol: serial
 default_profile: myprofile
 ```
 
-With this configuration set, it is not necessary to specify the `--fqbn`, `--port`, `--protocol` or `--profile` flags to
-the [`arduino-cli compile`](commands/arduino-cli_compile.md) or [`arduino-cli upload`](commands/arduino-cli_upload.md)
-commands when compiling or uploading the sketch.
+With this configuration set, it is not necessary to specify the `--fqbn`, `--programmer`, `--port`, `--protocol` or
+`--profile` flags to the [`arduino-cli compile`](commands/arduino-cli_compile.md),
+[`arduino-cli upload`](commands/arduino-cli_upload.md) or [`arduino-cli debug`](commands/arduino-cli_debug.md) commands
+when compiling, uploading or debugging the sketch.
