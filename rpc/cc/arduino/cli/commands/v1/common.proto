@@ -173,13 +173,6 @@ message Board {
   string fqbn = 2;
 }
 
-message Profile {
-  // Name used to identify the profile within the sketch.
-  string name = 1;
-  // FQBN specified in the profile.
-  string fqbn = 2;
-}
-
 message HelpResources {
   // A URL provided by the author of the platform's package, intended to point
   // to their online help service.

@@ -93,7 +93,7 @@ func runMonitorCmd(
 
 	var (
 		inst                         *rpc.Instance
-		profile                      *rpc.Profile
+		profile                      *rpc.SketchProfile
 		fqbn                         string
 		defaultPort, defaultProtocol string
 	)

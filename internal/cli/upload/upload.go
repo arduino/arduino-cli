@@ -100,7 +100,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	}
 
 	var inst *rpc.Instance
-	var profile *rpc.Profile
+	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
 		inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
