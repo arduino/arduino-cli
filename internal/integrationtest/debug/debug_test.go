@@ -376,3 +376,22 @@ func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integra
 	require.NoError(t, err)
 	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my6" }`)
 }
+
+func TestDebugProfile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	sketchPath := cli.CopySketch("sketch_with_profile")
+
+	// Compile the sketch using the profile
+	_, _, err = cli.Run("compile", "--profile", "samd", sketchPath.String())
+	require.NoError(t, err)
+
+	// Debug using the profile
+	_, _, err = cli.Run("debug", "--profile", "samd", sketchPath.String(), "--info")
+	require.NoError(t, err)
+}
