@@ -268,6 +268,11 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			}
 		}
 
+		prog := profile.GetProgrammer()
+		if prog == "" || programmer.GetProgrammer() != "" {
+			prog = programmer.String(inst, fqbn)
+		}
+
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
 			Fqbn:       fqbn,
@@ -276,7 +281,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,
-			Programmer: programmer.String(inst, fqbn),
+			Programmer: prog,
 			UserFields: fields,
 		}
 

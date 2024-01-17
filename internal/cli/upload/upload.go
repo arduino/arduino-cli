@@ -176,6 +176,11 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		path = sketchPath.String()
 	}
 
+	prog := profile.GetProgrammer()
+	if prog == "" || programmer.GetProgrammer() != "" {
+		prog = programmer.String(inst, fqbn)
+	}
+
 	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{
 		Instance:   inst,
@@ -186,7 +191,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		Verify:     verify,
 		ImportFile: importFile,
 		ImportDir:  importDir,
-		Programmer: programmer.String(inst, fqbn),
+		Programmer: prog,
 		DryRun:     dryRun,
 		UserFields: fields,
 	}
