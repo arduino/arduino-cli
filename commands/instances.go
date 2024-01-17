@@ -96,10 +96,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if responseCallback == nil {
 		responseCallback = func(r *rpc.InitResponse) {}
 	}
-	reqInst := req.GetInstance()
-	if reqInst == nil {
-		return &cmderrors.InvalidInstanceError{}
-	}
 	instance := req.GetInstance()
 	if !instances.IsValid(instance) {
 		return &cmderrors.InvalidInstanceError{}
