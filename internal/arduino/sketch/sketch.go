@@ -246,6 +246,12 @@ func (s *Sketch) GetDefaultPortAddressAndProtocol() (string, string) {
 	return s.Project.DefaultPort, s.Project.DefaultProtocol
 }
 
+// GetDefaultProgrammer return the default Programmer for the sketch (from the sketch.yaml project file),
+// ore the empty string if not set.
+func (s *Sketch) GetDefaultProgrammer() string {
+	return s.Project.DefaultProgrammer
+}
+
 // SetDefaultFQBN sets the default FQBN for the sketch and saves it in the sketch.yaml project file.
 func (s *Sketch) SetDefaultFQBN(fqbn string) error {
 	s.Project.DefaultFqbn = fqbn
@@ -261,6 +267,12 @@ func (s *Sketch) SetDefaultPort(address, protocol string) error {
 		return err
 	}
 	return updateOrAddYamlRootEntry(s.GetProjectPath(), "default_protocol", protocol)
+}
+
+// SetDefaultFQBN sets the default programmer for the sketch and saves it in the sketch.yaml project file.
+func (s *Sketch) SetDefaultProgrammer(programmer string) error {
+	s.Project.DefaultProgrammer = programmer
+	return updateOrAddYamlRootEntry(s.GetProjectPath(), "default_programmer", programmer)
 }
 
 // InvalidSketchFolderNameError is returned when the sketch directory doesn't match the sketch name
@@ -290,15 +302,16 @@ func (s *Sketch) Hash() string {
 func (s *Sketch) ToRpc() *rpc.Sketch {
 	defaultPort, defaultProtocol := s.GetDefaultPortAddressAndProtocol()
 	res := &rpc.Sketch{
-		MainFile:         s.MainFile.String(),
-		LocationPath:     s.FullPath.String(),
-		OtherSketchFiles: s.OtherSketchFiles.AsStrings(),
-		AdditionalFiles:  s.AdditionalFiles.AsStrings(),
-		RootFolderFiles:  s.RootFolderFiles.AsStrings(),
-		DefaultFqbn:      s.GetDefaultFQBN(),
-		DefaultPort:      defaultPort,
-		DefaultProtocol:  defaultProtocol,
-		Profiles:         f.Map(s.Project.Profiles, (*Profile).ToRpc),
+		MainFile:          s.MainFile.String(),
+		LocationPath:      s.FullPath.String(),
+		OtherSketchFiles:  s.OtherSketchFiles.AsStrings(),
+		AdditionalFiles:   s.AdditionalFiles.AsStrings(),
+		RootFolderFiles:   s.RootFolderFiles.AsStrings(),
+		DefaultFqbn:       s.GetDefaultFQBN(),
+		DefaultPort:       defaultPort,
+		DefaultProtocol:   defaultProtocol,
+		DefaultProgrammer: s.GetDefaultProgrammer(),
+		Profiles:          f.Map(s.Project.Profiles, (*Profile).ToRpc),
 	}
 	if defaultProfile, err := s.GetProfile(s.Project.DefaultProfile); err == nil {
 		res.DefaultProfile = defaultProfile.ToRpc()
