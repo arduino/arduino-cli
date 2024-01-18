@@ -201,6 +201,8 @@ message Sketch {
   repeated SketchProfile profiles = 9;
   // Default profile set in the project file (sketch.yaml)
   SketchProfile default_profile = 10;
+  // Default Programmer set in project file (sketch.yaml)
+  string default_programmer = 11;
 }
 
 message SketchProfile {
