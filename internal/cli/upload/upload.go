@@ -180,6 +180,9 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	if prog == "" || programmer.GetProgrammer() != "" {
 		prog = programmer.String(inst, fqbn)
 	}
+	if prog == "" {
+		prog = sketch.GetDefaultProgrammer()
+	}
 
 	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{

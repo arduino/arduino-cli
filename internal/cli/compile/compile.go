@@ -272,6 +272,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		if prog == "" || programmer.GetProgrammer() != "" {
 			prog = programmer.String(inst, fqbn)
 		}
+		if prog == "" {
+			prog = sk.GetDefaultProgrammer()
+		}
 
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,

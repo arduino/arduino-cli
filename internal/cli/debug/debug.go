@@ -108,6 +108,9 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 	if prog == "" || programmer.GetProgrammer() != "" {
 		prog = programmer.String(inst, fqbn)
 	}
+	if prog == "" {
+		prog = sk.GetDefaultProgrammer()
+	}
 
 	debugConfigRequested := &rpc.GetDebugConfigRequest{
 		Instance:    inst,

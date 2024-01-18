@@ -150,6 +150,9 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	if programmer == "" && pme.GetProfile() != nil {
 		programmer = pme.GetProfile().Programmer
 	}
+	if programmer == "" {
+		programmer = sk.GetDefaultProgrammer()
+	}
 
 	updatedPort, err := runProgramAction(
 		pme,
