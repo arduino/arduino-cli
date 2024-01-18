@@ -32,20 +32,22 @@ import (
 
 // projectRaw is a support struct used only to unmarshal the yaml
 type projectRaw struct {
-	ProfilesRaw     yaml.Node `yaml:"profiles"`
-	DefaultProfile  string    `yaml:"default_profile"`
-	DefaultFqbn     string    `yaml:"default_fqbn"`
-	DefaultPort     string    `yaml:"default_port,omitempty"`
-	DefaultProtocol string    `yaml:"default_protocol,omitempty"`
+	ProfilesRaw       yaml.Node `yaml:"profiles"`
+	DefaultProfile    string    `yaml:"default_profile"`
+	DefaultFqbn       string    `yaml:"default_fqbn"`
+	DefaultPort       string    `yaml:"default_port,omitempty"`
+	DefaultProtocol   string    `yaml:"default_protocol,omitempty"`
+	DefaultProgrammer string    `yaml:"default_programmer,omitempty"`
 }
 
 // Project represents the sketch project file
 type Project struct {
-	Profiles        []*Profile
-	DefaultProfile  string
-	DefaultFqbn     string
-	DefaultPort     string
-	DefaultProtocol string
+	Profiles          []*Profile
+	DefaultProfile    string
+	DefaultFqbn       string
+	DefaultPort       string
+	DefaultProtocol   string
+	DefaultProgrammer string
 }
 
 // AsYaml outputs the sketch project file as YAML
@@ -68,6 +70,9 @@ func (p *Project) AsYaml() string {
 	}
 	if p.DefaultProtocol != "" {
 		res += fmt.Sprintf("default_protocol: %s\n", p.DefaultProtocol)
+	}
+	if p.DefaultProgrammer != "" {
+		res += fmt.Sprintf("default_programmer: %s\n", p.DefaultProgrammer)
 	}
 	return res
 }
@@ -280,10 +285,11 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 		return nil, err
 	}
 	return &Project{
-		Profiles:        profiles,
-		DefaultProfile:  raw.DefaultProfile,
-		DefaultFqbn:     raw.DefaultFqbn,
-		DefaultPort:     raw.DefaultPort,
-		DefaultProtocol: raw.DefaultProtocol,
+		Profiles:          profiles,
+		DefaultProfile:    raw.DefaultProfile,
+		DefaultFqbn:       raw.DefaultFqbn,
+		DefaultPort:       raw.DefaultPort,
+		DefaultProtocol:   raw.DefaultProtocol,
+		DefaultProgrammer: raw.DefaultProgrammer,
 	}, nil
 }
