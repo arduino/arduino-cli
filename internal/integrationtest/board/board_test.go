@@ -550,7 +550,7 @@ func TestBoardAttach(t *testing.T) {
 
 	sketchName := "BoardAttach"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
-	sketchProjectFlie := sketchPath.Join("sketch.yaml")
+	sketchProjectFile := sketchPath.Join("sketch.yaml")
 
 	// Create a test sketch
 	_, _, err := cli.Run("sketch", "new", sketchPath.String())
@@ -561,7 +561,7 @@ func TestBoardAttach(t *testing.T) {
 		require.NoError(t, err)
 		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
 
-		yamlData, err := sketchProjectFlie.ReadFile()
+		yamlData, err := sketchProjectFile.ReadFile()
 		require.NoError(t, err)
 		require.Contains(t, string(yamlData), "default_fqbn: arduino:avr:uno")
 		require.NotContains(t, string(yamlData), "default_port:")
@@ -574,7 +574,7 @@ func TestBoardAttach(t *testing.T) {
 		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
 		requirejson.Query(t, stdout, ".port.protocol", `"serial"`)
 
-		yamlData, err := sketchProjectFlie.ReadFile()
+		yamlData, err := sketchProjectFile.ReadFile()
 		require.NoError(t, err)
 		require.Contains(t, string(yamlData), "default_fqbn: arduino:avr:uno")
 		require.Contains(t, string(yamlData), "default_port: /dev/ttyACM0")
@@ -587,9 +587,24 @@ func TestBoardAttach(t *testing.T) {
 		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
 		requirejson.Query(t, stdout, ".port.protocol", `null`)
 
-		yamlData, err := sketchProjectFlie.ReadFile()
+		yamlData, err := sketchProjectFile.ReadFile()
 		require.NoError(t, err)
 		require.Contains(t, string(yamlData), "default_fqbn: arduino:avr:uno")
+		require.Contains(t, string(yamlData), "default_port: /dev/ttyACM0")
+		require.NotContains(t, string(yamlData), "default_protocol:")
+	}
+	{
+		stdout, _, err := cli.Run("board", "attach", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", sketchPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, stdout, ".fqbn", `"arduino:samd:mkr1000"`)
+		requirejson.Query(t, stdout, ".programmer", `"atmel_ice"`)
+		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
+		requirejson.Query(t, stdout, ".port.protocol", `null`)
+
+		yamlData, err := sketchProjectFile.ReadFile()
+		require.NoError(t, err)
+		require.Contains(t, string(yamlData), "default_fqbn: arduino:samd:mkr1000")
+		require.Contains(t, string(yamlData), "default_programmer: atmel_ice")
 		require.Contains(t, string(yamlData), "default_port: /dev/ttyACM0")
 		require.NotContains(t, string(yamlData), "default_protocol:")
 	}
