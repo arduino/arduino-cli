@@ -72,7 +72,7 @@ func (p *Project) AsYaml() string {
 	return res
 }
 
-func (p *projectRaw) getProfiles() []*Profile {
+func (p *projectRaw) getProfiles() ([]*Profile, error) {
 	profiles := []*Profile{}
 	for i, node := range p.ProfilesRaw.Content {
 		if node.Tag != "!!str" {
@@ -82,11 +82,11 @@ func (p *projectRaw) getProfiles() []*Profile {
 		var profile Profile
 		profile.Name = node.Value
 		if err := p.ProfilesRaw.Content[i+1].Decode(&profile); err != nil {
-			panic(fmt.Sprintf("profiles parsing err: %v", err.Error()))
+			return nil, err
 		}
 		profiles = append(profiles, &profile)
 	}
-	return profiles
+	return profiles, nil
 }
 
 // UnmarshalYAML decodes a Profiles section from YAML source.
@@ -270,8 +270,12 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 		return nil, err
 	}
 
+	profiles, err := raw.getProfiles()
+	if err != nil {
+		return nil, err
+	}
 	return &Project{
-		Profiles:        raw.getProfiles(),
+		Profiles:        profiles,
 		DefaultProfile:  raw.DefaultProfile,
 		DefaultFqbn:     raw.DefaultFqbn,
 		DefaultPort:     raw.DefaultPort,
