@@ -237,7 +237,7 @@ message InitResponse {
     Progress init_progress = 1;
     google.rpc.Status error = 2;
     // Selected profile information
-    Profile profile = 3;
+    SketchProfile profile = 3;
   }
 }
 

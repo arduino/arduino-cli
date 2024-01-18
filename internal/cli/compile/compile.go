@@ -166,7 +166,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	feedback.WarnAboutDeprecatedFiles(sk)
 
 	var inst *rpc.Instance
-	var profile *rpc.Profile
+	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
 		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)

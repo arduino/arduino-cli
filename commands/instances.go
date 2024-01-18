@@ -145,11 +145,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		profile = p
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Profile{
-				Profile: &rpc.Profile{
-					Name: req.GetProfile(),
-					Fqbn: profile.FQBN,
-					// TODO: Other profile infos may be provided here...
-				},
+				Profile: profile.ToRpc(),
 			},
 		})
 	}

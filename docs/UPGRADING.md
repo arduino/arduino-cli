@@ -4,6 +4,21 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### The gRPC `cc.arduino.cli.commands.v1.Profile` message has been removed in favor of `SketchProfile`
+
+The message `Profile` has been replaced with `SketchProfile` in the `InitResponse.profile` field:
+
+```proto
+message InitResponse {
+  oneof message {
+    Progress init_progress = 1;
+    google.rpc.Status error = 2;
+    // Selected profile information
+    SketchProfile profile = 3;
+  }
+}
+```
+
 ### The gRPC `cc.arduino.cli.commands.v1.LoadSketchResponse` message has been changed.
 
 Previously the `LoadSketchResponse` containted all the information about the sketch:
