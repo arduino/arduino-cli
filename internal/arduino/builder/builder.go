@@ -191,7 +191,7 @@ func NewBuilder(
 	logger := logger.New(stdout, stderr, verbose, warningsLevel)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, librariesManager,
-		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
+		sk, builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
 		actualPlatform, targetPlatform,
 	)
 	if err != nil {

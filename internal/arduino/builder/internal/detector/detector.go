@@ -597,6 +597,7 @@ func (f *sourceFile) DepfilePath() *paths.Path {
 func LibrariesLoader(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
+	sk *sketch.Sketch,
 	builtInLibrariesDirs *paths.Path, libraryDirs, otherLibrariesDirs paths.PathList,
 	actualPlatform, targetPlatform *cores.PlatformRelease,
 ) (*librariesmanager.LibrariesManager, *librariesresolver.Cpp, []byte, error) {
@@ -667,7 +668,7 @@ func LibrariesLoader(
 	}
 
 	allLibs := lm.FindAllInstalled()
-	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
+	resolver := librariesresolver.NewCppResolver(allLibs, sk, targetPlatform, actualPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
 
