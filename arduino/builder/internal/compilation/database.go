@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
@@ -29,8 +30,9 @@ var tr = i18n.Tr
 
 // Database keeps track of all the compile commands run by the builder
 type Database struct {
-	Contents []Command
-	File     *paths.Path
+	lock     sync.Mutex
+	contents []Command
+	file     *paths.Path
 }
 
 // Command keeps track of a single run of a compile command
@@ -44,8 +46,8 @@ type Command struct {
 // NewDatabase creates an empty CompilationDatabase
 func NewDatabase(filename *paths.Path) *Database {
 	return &Database{
-		File:     filename,
-		Contents: []Command{},
+		file:     filename,
+		contents: []Command{},
 	}
 }
 
@@ -56,16 +58,18 @@ func LoadDatabase(file *paths.Path) (*Database, error) {
 		return nil, err
 	}
 	res := NewDatabase(file)
-	return res, json.Unmarshal(f, &res.Contents)
+	return res, json.Unmarshal(f, &res.contents)
 }
 
 // SaveToFile save the CompilationDatabase to file as a clangd-compatible compile_commands.json,
 // see https://clang.llvm.org/docs/JSONCompilationDatabase.html
 func (db *Database) SaveToFile() {
-	if jsonContents, err := json.MarshalIndent(db.Contents, "", " "); err != nil {
+	db.lock.Lock()
+	defer db.lock.Unlock()
+	if jsonContents, err := json.MarshalIndent(db.contents, "", " "); err != nil {
 		fmt.Println(tr("Error serializing compilation database: %s", err))
 		return
-	} else if err := db.File.WriteFile(jsonContents); err != nil {
+	} else if err := db.file.WriteFile(jsonContents); err != nil {
 		fmt.Println(tr("Error writing compilation database: %s", err))
 	}
 }
@@ -89,5 +93,7 @@ func (db *Database) Add(target *paths.Path, command *executils.Process) {
 		File:      target.String(),
 	}
 
-	db.Contents = append(db.Contents, entry)
+	db.lock.Lock()
+	db.contents = append(db.contents, entry)
+	db.lock.Unlock()
 }
