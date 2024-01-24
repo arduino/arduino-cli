@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -33,13 +34,14 @@ import (
 
 // Sketch holds all the files composing a sketch
 type Sketch struct {
-	Name             string
-	MainFile         *paths.Path
-	FullPath         *paths.Path    // FullPath is the path to the Sketch folder
-	OtherSketchFiles paths.PathList // Sketch files that end in .ino other than main file
-	AdditionalFiles  paths.PathList
-	RootFolderFiles  paths.PathList // All files that are in the Sketch root
-	Project          *Project
+	Name              string
+	MainFile          *paths.Path
+	FullPath          *paths.Path    // FullPath is the path to the Sketch folder
+	OtherSketchFiles  paths.PathList // Sketch files that end in .ino other than main file
+	AdditionalFiles   paths.PathList
+	RootFolderFiles   paths.PathList       // All files that are in the Sketch root
+	vendoredLibraries []*libraries.Library // All libraries in the 'libraries' directory in the sketch
+	Project           *Project
 }
 
 // New creates an Sketch instance by reading all the files composing a sketch and grouping them
@@ -142,7 +144,39 @@ func New(path *paths.Path) (*Sketch, error) {
 	sort.Sort(&sketch.OtherSketchFiles)
 	sort.Sort(&sketch.RootFolderFiles)
 
+	// Collect vedndored libraries
+	if librariesPath, ok := sketch.GetVendoredLibrariesDir(); ok {
+		libDirs, err := librariesPath.ReadDir()
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", i18n.Tr("reading sketch libraries"), err)
+		}
+		libDirs.FilterDirs()
+		for _, libDir := range libDirs {
+			lib, err := libraries.Load(libDir, libraries.Unmanaged)
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", i18n.Tr("reading sketch libraries"), err)
+			}
+			sketch.vendoredLibraries = append(sketch.vendoredLibraries, lib)
+		}
+	}
+
 	return sketch, nil
+}
+
+// GetVendoredLibrariesDir returns the 'libraries' directory path.
+// The result is in the res,ok format ok is true if the 'libraries' directory
+// is present in the sketch, false otherwise.
+func (s *Sketch) GetVendoredLibrariesDir() (res *paths.Path, ok bool) {
+	libsDir := s.FullPath.Join("libraries")
+	if libsDir.IsDir() {
+		return libsDir, true
+	}
+	return nil, false
+}
+
+// VendoredLibraries returns the libraries bundled in the sketch' 'libraries' directory.
+func (s *Sketch) VendoredLibraries() []*libraries.Library {
+	return s.vendoredLibraries
 }
 
 // supportedFiles reads all files recursively contained in Sketch and

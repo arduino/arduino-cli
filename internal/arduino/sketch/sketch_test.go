@@ -381,3 +381,11 @@ func TestSketchWithMultipleSymlinkLoops(t *testing.T) {
 	require.Error(t, err)
 	require.Nil(t, sketch)
 }
+
+func TestSketchWithVendoredLibraries(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchWithLibraries")
+	sk, err := New(sketchPath)
+	require.NoError(t, err)
+	require.Len(t, sk.vendoredLibraries, 1)
+	require.Equal(t, "MyLib", sk.vendoredLibraries[0].Name)
+}
