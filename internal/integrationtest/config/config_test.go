@@ -834,31 +834,17 @@ func TestGet(t *testing.T) {
 	// Get simple key value
 	stdout, _, err = cli.Run("config", "get", "daemon.port", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	require.Equal(t, `"50051"`, stdout)
+	requirejson.Contains(t, stdout, `"50051"`)
 
 	// Get structured key value
 	stdout, _, err = cli.Run("config", "get", "daemon", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	require.Equal(t, `{"port":"50051"}`, stdout)
-
-	// Get multiple key values
-	stdout, _, err = cli.Run("config", "get", "logging.format", "logging.level", "--format", "json", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
-	require.Equal(t, `"text"`+"\n"+`"info"`, stdout)
+	requirejson.Contains(t, stdout, `{"port":"50051"}`)
 
 	// Get undefined key
-	stdout, _, err = cli.Run("config", "get", "foo", "--format", "json", "--config-file", "arduino-cli.yaml")
-	require.Empty(t, stdout)
-	require.Contains(t, err, "Cannot get key foo")
-
-	// Set undefined key
-	_, _, err = cli.Run("config", "set", "foo", "bar", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
-
-	// Get previously-undefined key
-	stdout, _, err = cli.Run("config", "get", "foo", "--format", "json", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
-	require.Equal(t, `"bar"`, stdout)
+	_, stderr, err := cli.Run("config", "get", "foo", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.Error(t, err)
+	requirejson.Contains(t, stderr, `{"error":"Cannot get the key foo: key not found in settings"}`)
 }
 
 func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {

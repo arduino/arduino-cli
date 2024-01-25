@@ -16,6 +16,8 @@
 package config
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands/daemon"
@@ -29,11 +31,11 @@ import (
 func initGetCommand() *cobra.Command {
 	getCommand := &cobra.Command{
 		Use:   "get",
-		Short: tr("Gets settings key values."),
-		Long:  tr("Gets settings key values."),
+		Short: tr("Gets a settings key value."),
+		Long:  tr("Gets a settings key value."),
 		Example: "" +
 			"  " + os.Args[0] + " config get logging\n" +
-			"  " + os.Args[0] + " config get logging.level logging.file\n" +
+			"  " + os.Args[0] + " config get daemon.port\n" +
 			"  " + os.Args[0] + " config get board_manager.additional_urls",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runGetCommand,
@@ -53,7 +55,12 @@ func runGetCommand(cmd *cobra.Command, args []string) {
 		if err != nil {
 			feedback.Fatal(tr("Cannot get the key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(getResult{key: toGet, data: resp.GetJsonData()})
+		var result getResult
+		err = json.Unmarshal([]byte(resp.GetJsonData()), &result.resp)
+		if err != nil {
+			feedback.Fatal(tr("Cannot parse JSON for key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
+		}
+		feedback.PrintResult(result)
 	}
 }
 
@@ -61,19 +68,13 @@ func runGetCommand(cmd *cobra.Command, args []string) {
 // create a dedicated feedback.Result implementation to safely handle
 // any changes to the configuration.Settings struct.
 type getResult struct {
-	key  string
-	data interface{}
+	resp interface{}
 }
 
 func (gr getResult) Data() interface{} {
-	return gr.data
+	return gr.resp
 }
 
 func (gr getResult) String() string {
-	gs, ok := gr.data.(string)
-	if !ok {
-		// Should never happen
-		panic(tr("Cannot get key %s value as string: %v", gr.key, gr.data))
-	}
-	return gs
+	return fmt.Sprintf("%v", gr.resp)
 }
