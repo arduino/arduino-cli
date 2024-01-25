@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/encoding
-version: v1.60.1
+version: v1.61.0
 type: go
 summary: Package encoding defines the interface for the compressor and codec, and
   functions to register and retrieve compressors and codecs.
 homepage: https://pkg.go.dev/google.golang.org/grpc/encoding
 license: apache-2.0
 licenses:
-- sources: grpc@v1.60.1/LICENSE
+- sources: grpc@v1.61.0/LICENSE
   text: |2
 
                                      Apache License

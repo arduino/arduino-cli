@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/balancer
-version: v1.60.1
+version: v1.61.0
 type: go
 summary: Package balancer defines APIs for load balancing in gRPC.
 homepage: https://pkg.go.dev/google.golang.org/grpc/balancer
 license: apache-2.0
 licenses:
-- sources: grpc@v1.60.1/LICENSE
+- sources: grpc@v1.61.0/LICENSE
   text: |2
 
                                      Apache License
