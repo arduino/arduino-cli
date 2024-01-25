@@ -47,7 +47,7 @@ func initGetCommand() *cobra.Command {
 func runGetCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
 
-        svc := daemon.ArduinoCoreServerImpl{}
+	svc := daemon.ArduinoCoreServerImpl{}
 	for _, toGet := range args {
 		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {
@@ -61,7 +61,7 @@ func runGetCommand(cmd *cobra.Command, args []string) {
 // create a dedicated feedback.Result implementation to safely handle
 // any changes to the configuration.Settings struct.
 type getResult struct {
-	key string
+	key  string
 	data interface{}
 }
 

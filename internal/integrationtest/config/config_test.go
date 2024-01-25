@@ -844,7 +844,7 @@ func TestGet(t *testing.T) {
 	// Get multiple key values
 	stdout, _, err = cli.Run("config", "get", "logging.format", "logging.level", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	require.Equal(t,`"text"` + "\n" + `"info"`, stdout)
+	require.Equal(t, `"text"`+"\n"+`"info"`, stdout)
 
 	// Get undefined key
 	stdout, _, err = cli.Run("config", "get", "foo", "--format", "json", "--config-file", "arduino-cli.yaml")
