@@ -19,11 +19,11 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func initGetCommand() *cobra.Command {
