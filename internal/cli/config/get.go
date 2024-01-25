@@ -17,13 +17,13 @@ package config
 
 import (
 	"os"
-	"reflect"
 
+	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 func initGetCommand() *cobra.Command {
@@ -53,7 +53,7 @@ func runGetCommand(cmd *cobra.Command, args []string) {
 		if err != nil {
 			feedback.Fatal(tr("Cannot get the key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(resp.GetJsonData())
+		feedback.PrintResult(getResult{key: toGet, data: resp.GetJsonData()})
 	}
 }
 
@@ -61,6 +61,7 @@ func runGetCommand(cmd *cobra.Command, args []string) {
 // create a dedicated feedback.Result implementation to safely handle
 // any changes to the configuration.Settings struct.
 type getResult struct {
+	key string
 	data interface{}
 }
 
@@ -69,10 +70,10 @@ func (gr getResult) Data() interface{} {
 }
 
 func (gr getResult) String() string {
-	gs, err := yaml.Marshal(gr.data)
-	if err != nil {
+	gs, ok := gr.data.(string)
+	if !ok {
 		// Should never happen
-		panic(tr("unable to marshal config to YAML: %v", err))
+		panic(tr("Cannot get key %s value as string: %v", gr.key, gr.data))
 	}
-	return string(gs)
+	return gs
 }
