@@ -23,13 +23,18 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
 
 // GCC performs a run of the gcc preprocess (macro/includes expansion). The function outputs the result
 // to targetFilePath. Returns the stdout/stderr of gcc if any.
-func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList, buildProperties *properties.Map) ([]byte, []byte, error) {
+func GCC(
+	sourceFilePath, targetFilePath *paths.Path,
+	includes paths.PathList, buildProperties *properties.Map,
+	diagnosticManager *diagnosticmanager.Manager,
+) ([]byte, []byte, error) {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	gccBuildProperties.Merge(buildProperties)
@@ -73,6 +78,10 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 		return nil, nil, err
 	}
 	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
+
+	if diagnosticManager != nil {
+		diagnosticManager.ParseOutput(proc.GetArgs(), stderr)
+	}
 
 	// Append gcc arguments to stdout
 	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)

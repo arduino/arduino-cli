@@ -166,9 +166,9 @@ func (b *Builder) compileFileWithRecipe(
 		b.logger.WriteStderr(commandStderr.Bytes())
 
 		// Parse the output of the compiler to gather errors and warnings...
-		if b.compilerOutputParser != nil {
-			b.compilerOutputParser(command.GetArgs(), commandStdout.Bytes())
-			b.compilerOutputParser(command.GetArgs(), commandStderr.Bytes())
+		if b.diagnosticsManager != nil {
+			b.diagnosticsManager.ParseOutput(command.GetArgs(), commandStdout.Bytes())
+			b.diagnosticsManager.ParseOutput(command.GetArgs(), commandStderr.Bytes())
 		}
 
 		// ...and then return the error

@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
@@ -30,7 +31,11 @@ import (
 
 // PreprocessSketchWithArduinoPreprocessor performs preprocessing of the arduino sketch
 // using arduino-preprocessor (https://github.com/arduino/arduino-preprocessor).
-func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList, lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool) ([]byte, []byte, error) {
+func PreprocessSketchWithArduinoPreprocessor(
+	sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList,
+	lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
+	diagnosticmanager *diagnosticmanager.Manager,
+) ([]byte, []byte, error) {
 	verboseOut := &bytes.Buffer{}
 	normalOut := &bytes.Buffer{}
 	if err := buildPath.Join("preproc").MkdirAll(); err != nil {
@@ -39,7 +44,7 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
-	gccStdout, gccStderr, err := GCC(sourceFile, targetFile, includeFolders, buildProperties)
+	gccStdout, gccStderr, err := GCC(sourceFile, targetFile, includeFolders, buildProperties, diagnosticmanager)
 	verboseOut.Write(gccStdout)
 	verboseOut.Write(gccStderr)
 	if err != nil {

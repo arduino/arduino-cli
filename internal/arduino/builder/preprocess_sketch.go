@@ -26,6 +26,7 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
 		b.sketch, b.buildPath, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
+		b.diagnosticsManager,
 	)
 	if b.logger.Verbose() {
 		b.logger.WriteStdout(verboseOutput)

@@ -25,6 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/detector"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/progress"
@@ -36,7 +37,6 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/sirupsen/logrus"
 )
 
 // ErrSketchCannotBeLocatedInBuildPath fixdoc
@@ -94,11 +94,7 @@ type Builder struct {
 
 	toolEnv []string
 
-	// This is a function used to parse the output of the compiler
-	// It is used to extract errors and warnings
-	compilerOutputParser diagnostics.CompilerOutputParserCB
-	// and here are the diagnostics parsed from the compiler
-	compilerDiagnostics diagnostics.Diagnostics
+	diagnosticsManager *diagnosticmanager.Manager
 }
 
 // buildArtifacts contains the result of various build
@@ -199,6 +195,7 @@ func NewBuilder(
 		logger.Warn(string(verboseOut))
 	}
 
+	diagnosticmanager := diagnosticmanager.New()
 	b := &Builder{
 		sketch:                        sk,
 		buildProperties:               buildProperties,
@@ -220,12 +217,6 @@ func NewBuilder(
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
 		toolEnv:                       toolEnv,
-		libsDetector: detector.NewSketchLibrariesDetector(
-			libsManager, libsResolver,
-			useCachedLibrariesResolution,
-			onlyUpdateCompilationDatabase,
-			logger,
-		),
 		buildOptions: newBuildOptions(
 			hardwareDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
@@ -237,25 +228,15 @@ func NewBuilder(
 			buildProperties.GetPath("runtime.platform.path"),
 			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
 		),
+		diagnosticsManager: diagnosticmanager,
+		libsDetector: detector.NewSketchLibrariesDetector(
+			libsManager, libsResolver,
+			useCachedLibrariesResolution,
+			onlyUpdateCompilationDatabase,
+			logger,
+			diagnosticmanager,
+		),
 	}
-
-	b.compilerOutputParser = func(cmdline []string, out []byte) {
-		compiler := diagnostics.DetectCompilerFromCommandLine(
-			cmdline,
-			false, // at the moment compiler-probing is not required
-		)
-		if compiler == nil {
-			logrus.Warnf("Could not detect compiler from: %s", cmdline)
-			return
-		}
-		diags, err := diagnostics.ParseCompilerOutput(compiler, out)
-		if err != nil {
-			logrus.Warnf("Error parsing compiler output: %s", err)
-			return
-		}
-		b.compilerDiagnostics = append(b.compilerDiagnostics, diags...)
-	}
-
 	return b, nil
 }
 
@@ -281,7 +262,7 @@ func (b *Builder) ImportedLibraries() libraries.List {
 
 // CompilerDiagnostics returns the parsed compiler diagnostics
 func (b *Builder) CompilerDiagnostics() diagnostics.Diagnostics {
-	return b.compilerDiagnostics
+	return b.diagnosticsManager.CompilerDiagnostics()
 }
 
 // Preprocess fixdoc

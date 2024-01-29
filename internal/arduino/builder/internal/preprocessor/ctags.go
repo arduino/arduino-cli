@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor/internal/ctags"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -40,7 +41,11 @@ var tr = i18n.Tr
 var DebugPreprocessor bool
 
 // PreprocessSketchWithCtags performs preprocessing of the arduino sketch using CTags.
-func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList, lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool) ([]byte, []byte, error) {
+func PreprocessSketchWithCtags(
+	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
+	lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
+	diagnosticManager *diagnosticmanager.Manager,
+) ([]byte, []byte, error) {
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
@@ -54,7 +59,7 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 
 	// Run GCC preprocessor
 	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	gccStdout, gccStderr, err := GCC(sourceFile, ctagsTarget, includes, buildProperties)
+	gccStdout, gccStderr, err := GCC(sourceFile, ctagsTarget, includes, buildProperties, diagnosticManager)
 	verboseOutput.Write(gccStdout)
 	verboseOutput.Write(gccStderr)
 	normalOutput.Write(gccStderr)

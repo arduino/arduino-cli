@@ -26,6 +26,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
@@ -57,6 +58,7 @@ type SketchLibrariesDetector struct {
 	librariesResolutionResults    map[string]libraryResolutionResult
 	includeFolders                paths.PathList
 	logger                        *logger.BuilderLogger
+	diagnosticManager             *diagnosticmanager.Manager
 }
 
 // NewSketchLibrariesDetector todo
@@ -66,6 +68,7 @@ func NewSketchLibrariesDetector(
 	useCachedLibrariesResolution bool,
 	onlyUpdateCompilationDatabase bool,
 	logger *logger.BuilderLogger,
+	diagnosticManager *diagnosticmanager.Manager,
 ) *SketchLibrariesDetector {
 	return &SketchLibrariesDetector{
 		librariesManager:              lm,
@@ -76,6 +79,7 @@ func NewSketchLibrariesDetector(
 		includeFolders:                paths.PathList{},
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		logger:                        logger,
+		diagnosticManager:             diagnosticManager,
 	}
 }
 
@@ -347,7 +351,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			}
 		} else {
 			var preprocStdout []byte
-			preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
+			preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties, l.diagnosticManager)
 			if l.logger.Verbose() {
 				l.logger.WriteStdout(preprocStdout)
 			}
@@ -379,7 +383,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			if preprocErr == nil || preprocStderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				var preprocStdout []byte
-				preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
+				preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties, l.diagnosticManager)
 				if l.logger.Verbose() {
 					l.logger.WriteStdout(preprocStdout)
 				}
