@@ -117,13 +117,62 @@ func TestCompilerErrOutput(t *testing.T) {
 		require.Error(t, err)
 		outJson := requirejson.Parse(t, out)
 		outJson.Query(`.compiler_err`).MustContain(`"error"`)
-		outJson.Query(`.diagnostics`).MustContain(`
+		outJson.Query(`.builder_result.diagnostics`).MustContain(`
 		[
 			{
 			  "severity": "ERROR",
 			  "line": 1,
 			  "column": 14,
 			  "context": [ { "message": "In function 'void wrong()':" } ]
+			}
+		]`)
+	}
+
+	// Test the preprocessor errors are present in the diagnostics
+	{
+		// prepare sketch
+		sketch, err := paths.New("testdata", "blink_with_wrong_include").Abs()
+		require.NoError(t, err)
+
+		// Run compile and catch err stream
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		require.Error(t, err)
+		outJson := requirejson.Parse(t, out)
+		outJson.Query(`.success`).MustContain(`false`)
+		outJson.Query(`.builder_result.diagnostics`).MustContain(`
+		[
+			{
+			  "severity": "ERROR",
+			  "line": 1,
+			  "column": 2,
+			  "message": "invalid preprocessing directive #wrong\n #wrong\n  ^~~~~",
+			}
+		]`)
+	}
+
+	// Test the preprocessor errors are present in the diagnostics.
+	// In case we have 2 libraries:
+	// 1. one is missing
+	// 2. the other one is missing only from the first GCC run
+	// The diagnostics should report only 1 missing library.
+	{
+		// prepare sketch
+		sketch, err := paths.New("testdata", "using_Wire_with_missing_lib").Abs()
+		require.NoError(t, err)
+
+		// Run compile and catch err stream
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		require.Error(t, err)
+		outJson := requirejson.Parse(t, out)
+		outJson.Query(`.success`).MustContain(`false`)
+		outJson.Query(`.builder_result.diagnostics | length`).MustEqual("1")
+		outJson.Query(`.builder_result.diagnostics`).MustContain(`
+		[
+			{
+			  "severity": "FATAL",
+			  "message": "MissingWire.h: No such file or directory\n #include \u003cMissingWire.h\u003e\n          ^~~~~~~~~~~~~~~",
+			  "line": 2,
+			  "column": 10,
 			}
 		]`)
 	}
