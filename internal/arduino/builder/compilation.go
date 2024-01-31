@@ -167,8 +167,8 @@ func (b *Builder) compileFileWithRecipe(
 
 		// Parse the output of the compiler to gather errors and warnings...
 		if b.diagnosticsManager != nil {
-			b.diagnosticsManager.ParseOutput(command.GetArgs(), commandStdout.Bytes())
-			b.diagnosticsManager.ParseOutput(command.GetArgs(), commandStderr.Bytes())
+			b.diagnosticsManager.Parse(command.GetArgs(), commandStdout.Bytes())
+			b.diagnosticsManager.Parse(command.GetArgs(), commandStderr.Bytes())
 		}
 
 		// ...and then return the error

@@ -341,7 +341,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		}
 
 		var preprocErr error
-		var preprocStderr []byte
+		var preprocFirstResult preprocessor.Result
 
 		var missingIncludeH string
 		if unchanged && cache.valid {
@@ -350,21 +350,20 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				l.logger.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			var preprocStdout []byte
-			preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties, l.diagnosticManager)
+			preprocFirstResult, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
 			if l.logger.Verbose() {
-				l.logger.WriteStdout(preprocStdout)
+				l.logger.WriteStdout(preprocFirstResult.Stdout())
 			}
 			// Unwrap error and see if it is an ExitError.
 			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || preprocStderr == nil {
+			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || preprocFirstResult.Stderr() == nil {
 				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return preprocErr
 			} else {
-				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
+				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr()))
 				if missingIncludeH == "" && l.logger.Verbose() {
 					l.logger.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
@@ -380,22 +379,25 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		library := l.resolveLibrary(missingIncludeH, platformArch)
 		if library == nil {
 			// Library could not be resolved, show error
-			if preprocErr == nil || preprocStderr == nil {
+			if preprocErr == nil || preprocFirstResult.Stderr() == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				var preprocStdout []byte
-				preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties, l.diagnosticManager)
+				result, err := preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
 				if l.logger.Verbose() {
-					l.logger.WriteStdout(preprocStdout)
+					l.logger.WriteStdout(result.Stdout())
 				}
-				if preprocErr == nil {
+				if err == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
 					// Returning an error here will cause the cache to be
 					// deleted, so hopefully the next compilation will succeed.
 					return errors.New(tr("Internal error in cache"))
 				}
+				l.diagnosticManager.Parse(result.Args(), result.Stderr())
+				l.logger.WriteStderr(result.Stderr())
+				return err
 			}
-			l.logger.WriteStderr(preprocStderr)
+			l.diagnosticManager.Parse(preprocFirstResult.Args(), preprocFirstResult.Stderr())
+			l.logger.WriteStderr(preprocFirstResult.Stderr())
 			return preprocErr
 		}
 

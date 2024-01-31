@@ -23,7 +23,6 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -33,8 +32,7 @@ import (
 func GCC(
 	sourceFilePath, targetFilePath *paths.Path,
 	includes paths.PathList, buildProperties *properties.Map,
-	diagnosticManager *diagnosticmanager.Manager,
-) ([]byte, []byte, error) {
+) (Result, error) {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	gccBuildProperties.Merge(buildProperties)
@@ -59,14 +57,14 @@ func GCC(
 
 	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
 	if pattern == "" {
-		return nil, nil, errors.New(tr("%s pattern is missing", gccPreprocRecipeProperty))
+		return Result{}, errors.New(tr("%s pattern is missing", gccPreprocRecipeProperty))
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
 	commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	args, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return nil, nil, err
+		return Result{}, err
 	}
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
@@ -75,16 +73,12 @@ func GCC(
 
 	proc, err := paths.NewProcess(nil, args...)
 	if err != nil {
-		return nil, nil, err
+		return Result{}, err
 	}
 	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
-
-	if diagnosticManager != nil {
-		diagnosticManager.ParseOutput(proc.GetArgs(), stderr)
-	}
 
 	// Append gcc arguments to stdout
 	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)
 
-	return stdout, stderr, err
+	return Result{args: proc.GetArgs(), stdout: stdout, stderr: stderr}, err
 }

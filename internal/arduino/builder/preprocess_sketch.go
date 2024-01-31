@@ -23,16 +23,16 @@ import (
 // preprocessSketch fixdoc
 func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	// In the future we might change the preprocessor
-	normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
+	result, err := preprocessor.PreprocessSketchWithCtags(
 		b.sketch, b.buildPath, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
-		b.diagnosticsManager,
 	)
 	if b.logger.Verbose() {
-		b.logger.WriteStdout(verboseOutput)
+		b.logger.WriteStdout(result.Stdout())
 	} else {
-		b.logger.WriteStdout(normalOutput)
+		b.logger.WriteStdout(result.Stderr())
 	}
+	b.diagnosticsManager.Parse(result.Args(), result.Stderr())
 
 	return err
 }
