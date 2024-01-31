@@ -25,7 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/detector"
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/progress"
@@ -94,7 +93,7 @@ type Builder struct {
 
 	toolEnv []string
 
-	diagnosticsManager *diagnosticmanager.Manager
+	diagnosticStore *diagnostics.Store
 }
 
 // buildArtifacts contains the result of various build
@@ -195,7 +194,7 @@ func NewBuilder(
 		logger.Warn(string(verboseOut))
 	}
 
-	diagnosticmanager := diagnosticmanager.New()
+	diagnosticStore := diagnostics.NewStore()
 	b := &Builder{
 		sketch:                        sk,
 		buildProperties:               buildProperties,
@@ -228,13 +227,13 @@ func NewBuilder(
 			buildProperties.GetPath("runtime.platform.path"),
 			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
 		),
-		diagnosticsManager: diagnosticmanager,
+		diagnosticStore: diagnosticStore,
 		libsDetector: detector.NewSketchLibrariesDetector(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
 			onlyUpdateCompilationDatabase,
 			logger,
-			diagnosticmanager,
+			diagnosticStore,
 		),
 	}
 	return b, nil
@@ -262,7 +261,7 @@ func (b *Builder) ImportedLibraries() libraries.List {
 
 // CompilerDiagnostics returns the parsed compiler diagnostics
 func (b *Builder) CompilerDiagnostics() diagnostics.Diagnostics {
-	return b.diagnosticsManager.CompilerDiagnostics()
+	return b.diagnosticStore.Diagnostics()
 }
 
 // Preprocess fixdoc

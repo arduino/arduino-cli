@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnosticmanager"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
@@ -58,7 +58,7 @@ type SketchLibrariesDetector struct {
 	librariesResolutionResults    map[string]libraryResolutionResult
 	includeFolders                paths.PathList
 	logger                        *logger.BuilderLogger
-	diagnosticManager             *diagnosticmanager.Manager
+	diagnosticStore               *diagnostics.Store
 }
 
 // NewSketchLibrariesDetector todo
@@ -68,7 +68,7 @@ func NewSketchLibrariesDetector(
 	useCachedLibrariesResolution bool,
 	onlyUpdateCompilationDatabase bool,
 	logger *logger.BuilderLogger,
-	diagnosticManager *diagnosticmanager.Manager,
+	diagnosticStore *diagnostics.Store,
 ) *SketchLibrariesDetector {
 	return &SketchLibrariesDetector{
 		librariesManager:              lm,
@@ -79,7 +79,7 @@ func NewSketchLibrariesDetector(
 		includeFolders:                paths.PathList{},
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		logger:                        logger,
-		diagnosticManager:             diagnosticManager,
+		diagnosticStore:               diagnosticStore,
 	}
 }
 
@@ -392,11 +392,11 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 					// deleted, so hopefully the next compilation will succeed.
 					return errors.New(tr("Internal error in cache"))
 				}
-				l.diagnosticManager.Parse(result.Args(), result.Stderr())
+				l.diagnosticStore.Parse(result.Args(), result.Stderr())
 				l.logger.WriteStderr(result.Stderr())
 				return err
 			}
-			l.diagnosticManager.Parse(preprocFirstResult.Args(), preprocFirstResult.Stderr())
+			l.diagnosticStore.Parse(preprocFirstResult.Args(), preprocFirstResult.Stderr())
 			l.logger.WriteStderr(preprocFirstResult.Stderr())
 			return preprocErr
 		}
