@@ -10,8 +10,6 @@ apps:
 
 reviewed:
   go:
-    - google.golang.org/protobuf/encoding/protojson
-    - google.golang.org/protobuf/internal/encoding/json
     - github.com/ProtonMail/go-crypto/bitcurves
     - github.com/ProtonMail/go-crypto/brainpool
     - github.com/ProtonMail/go-crypto/eax
@@ -22,6 +20,8 @@ reviewed:
     - github.com/ProtonMail/go-crypto/openpgp/armor
     - github.com/ProtonMail/go-crypto/openpgp/ecdh
     - github.com/ProtonMail/go-crypto/openpgp/ecdsa
+    - github.com/ProtonMail/go-crypto/openpgp/ed25519
+    - github.com/ProtonMail/go-crypto/openpgp/ed448
     - github.com/ProtonMail/go-crypto/openpgp/eddsa
     - github.com/ProtonMail/go-crypto/openpgp/elgamal
     - github.com/ProtonMail/go-crypto/openpgp/errors
@@ -30,6 +30,8 @@ reviewed:
     - github.com/ProtonMail/go-crypto/openpgp/internal/encoding
     - github.com/ProtonMail/go-crypto/openpgp/packet
     - github.com/ProtonMail/go-crypto/openpgp/s2k
+    - github.com/ProtonMail/go-crypto/openpgp/x25519
+    - github.com/ProtonMail/go-crypto/openpgp/x448
     - github.com/cloudflare/circl/dh/x25519
     - github.com/cloudflare/circl/dh/x448
     - github.com/cloudflare/circl/ecc/goldilocks
@@ -42,27 +44,29 @@ reviewed:
     - github.com/cloudflare/circl/sign
     - github.com/cloudflare/circl/sign/ed25519
     - github.com/cloudflare/circl/sign/ed448
-    - golang.org/x/crypto/argon2
-    - golang.org/x/crypto/blake2b
-    - golang.org/x/crypto/sha3
-    - github.com/russross/blackfriday/v2
     - github.com/go-git/gcfg
     - github.com/go-git/gcfg/scanner
     - github.com/go-git/gcfg/token
     - github.com/go-git/gcfg/types
+    - github.com/russross/blackfriday/v2
+    - github.com/sagikazarmark/slog-shim
+    - golang.org/x/crypto/argon2
+    - golang.org/x/crypto/blake2b
     - golang.org/x/crypto/openpgp
     - golang.org/x/crypto/openpgp/armor
     - golang.org/x/crypto/openpgp/elgamal
     - golang.org/x/crypto/openpgp/errors
     - golang.org/x/crypto/openpgp/packet
     - golang.org/x/crypto/openpgp/s2k
+    - golang.org/x/crypto/sha3
     - golang.org/x/sys/execabs
     - golang.org/x/text/encoding
     - golang.org/x/text/encoding/internal
     - golang.org/x/text/encoding/internal/identifier
     - golang.org/x/text/encoding/unicode
     - golang.org/x/text/internal/utf8internal
-    - github.com/sagikazarmark/slog-shim
+    - google.golang.org/protobuf/encoding/protojson
+    - google.golang.org/protobuf/internal/encoding/json
     - sigs.k8s.io/yaml
     - sigs.k8s.io/yaml/goyaml.v2
 
