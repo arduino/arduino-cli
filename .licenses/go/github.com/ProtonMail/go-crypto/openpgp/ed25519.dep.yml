@@ -1,9 +1,10 @@
 ---
-name: github.com/ProtonMail/go-crypto/openpgp
+name: github.com/ProtonMail/go-crypto/openpgp/ed25519
 version: v1.1.0-alpha.0
 type: go
-summary: Package openpgp implements high level operations on OpenPGP messages.
-homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp
+summary: Package ed25519 implements the ed25519 signature algorithm for OpenPGP as
+  defined in the Open PGP crypto refresh.
+homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/ed25519
 license: other
 licenses:
 - sources: go-crypto@v1.1.0-alpha.0/LICENSE
