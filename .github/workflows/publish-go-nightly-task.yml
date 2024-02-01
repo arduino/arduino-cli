@@ -194,7 +194,7 @@ jobs:
           path: ${{ env.DIST_DIR }}
 
       - name: Prepare PATH
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build MSI
         id: buildmsi
