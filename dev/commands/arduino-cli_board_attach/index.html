@@ -1452,13 +1452,13 @@
                 <h2 id="arduino-cli-board-attach">arduino-cli board attach<a class="headerlink" href="#arduino-cli-board-attach" title="Permanent link">&para;</a></h2>
 <p>Attaches a sketch to a board.</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Sets the default values for port and FQBN. If no port or FQBN are specified, the current default port and FQBN are displayed.</p>
-<div class="highlight"><pre><span></span><code>arduino-cli board attach [-p &lt;port&gt;] [-b &lt;FQBN&gt;] [sketchPath] [flags]
+<p>Sets the default values for port and FQBN. If no port, FQBN or programmer are specified, the current default port, FQBN and programmer are displayed.</p>
+<div class="highlight"><pre><span></span><code>arduino-cli board attach [-p &lt;port&gt;] [-b &lt;FQBN&gt;] [-P &lt;programmer&gt;] [sketchPath] [flags]
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>  arduino-cli board attach -p /dev/ttyACM0
   arduino-cli board attach -p /dev/ttyACM0 HelloWorld
-  arduino-cli board attach -b arduino:samd:mkr1000
+  arduino-cli board attach -b arduino:samd:mkr1000  arduino-cli board attach -P atmel_ice
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>      --board-options strings        List of board options separated by commas. Or can be used multiple times for multiple options.
@@ -1466,6 +1466,7 @@
   -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
   -h, --help                         help for attach
   -p, --port string                  Upload port address, e.g.: COM3 or /dev/ttyACM2
+  -P, --programmer string            Programmer to use, e.g: atmel_ice
   -l, --protocol string              Upload port protocol, e.g: serial
 </code></pre></div>
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>

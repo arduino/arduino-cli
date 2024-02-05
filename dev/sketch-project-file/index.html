@@ -1427,6 +1427,7 @@ multiple profiles.</p>
 <p>Each profile will define:</p>
 <ul>
 <li>The board FQBN</li>
+<li>The programmer to use</li>
 <li>The target core platform name and version (with the 3rd party platform index URL if needed)</li>
 <li>A possible core platform name and version, that is a dependency of the target core platform (with the 3rd party
   platform index URL if needed)</li>
@@ -1437,6 +1438,7 @@ multiple profiles.</p>
   &lt;PROFILE_NAME&gt;:
     notes: &lt;USER_NOTES&gt;
     fqbn: &lt;FQBN&gt;
+    programmer: &lt;PROGRAMMER&gt;
     platforms:
       - platform: &lt;PLATFORM&gt; (&lt;PLATFORM_VERSION&gt;)
         platform_index_url: &lt;3RD_PARTY_PLATFORM_URL&gt;
@@ -1464,6 +1466,7 @@ otherwise below). The available fields are:</p>
 <li><code>libraries:</code> is a section where the required libraries to build the project are defined. This section is optional.</li>
 <li><code>&lt;LIB_VERSION&gt;</code> is the version required for the library, for example, <code>1.0.0</code>.</li>
 <li><code>&lt;USER_NOTES&gt;</code> is a free text string available to the developer to add comments. This field is optional.</li>
+<li><code>&lt;PROGRAMMER&gt;</code> is the programmer that will be used. This field is optional.</li>
 </ul>
 <p>A complete example of a sketch project file may be the following:</p>
 <div class="highlight"><pre><span></span><code>profiles:
@@ -1533,19 +1536,22 @@ and libraries installed in the system.</p>
 particular:</p>
 <ul>
 <li>The <code>default_fqbn</code> key sets the default value for the <code>--fqbn</code> flag</li>
+<li>The <code>default_programmer</code> key sets the default value for the <code>--programmer</code> flag</li>
 <li>The <code>default_port</code> key sets the default value for the <code>--port</code> flag</li>
 <li>The <code>default_protocol</code> key sets the default value for the <code>--protocol</code> flag</li>
 <li>The <code>default_profile</code> key sets the default value for the <code>--profile</code> flag</li>
 </ul>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code>default_fqbn: arduino:avr:uno
+<div class="highlight"><pre><span></span><code>default_fqbn: arduino:samd:mkr1000
+default_programmer: atmel_ice
 default_port: /dev/ttyACM0
 default_protocol: serial
 default_profile: myprofile
 </code></pre></div>
-<p>With this configuration set, it is not necessary to specify the <code>--fqbn</code>, <code>--port</code>, <code>--protocol</code> or <code>--profile</code> flags to
-the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
-commands when compiling or uploading the sketch.</p>
+<p>With this configuration set, it is not necessary to specify the <code>--fqbn</code>, <code>--programmer</code>, <code>--port</code>, <code>--protocol</code> or
+<code>--profile</code> flags to the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a>,
+<a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a> or <a href="../commands/arduino-cli_debug/"><code>arduino-cli debug</code></a> commands
+when compiling, uploading or debugging the sketch.</p>
                 
               
               
