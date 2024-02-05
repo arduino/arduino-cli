@@ -32,20 +32,22 @@ import (
 
 // projectRaw is a support struct used only to unmarshal the yaml
 type projectRaw struct {
-	ProfilesRaw     yaml.Node `yaml:"profiles"`
-	DefaultProfile  string    `yaml:"default_profile"`
-	DefaultFqbn     string    `yaml:"default_fqbn"`
-	DefaultPort     string    `yaml:"default_port,omitempty"`
-	DefaultProtocol string    `yaml:"default_protocol,omitempty"`
+	ProfilesRaw       yaml.Node `yaml:"profiles"`
+	DefaultProfile    string    `yaml:"default_profile"`
+	DefaultFqbn       string    `yaml:"default_fqbn"`
+	DefaultPort       string    `yaml:"default_port,omitempty"`
+	DefaultProtocol   string    `yaml:"default_protocol,omitempty"`
+	DefaultProgrammer string    `yaml:"default_programmer,omitempty"`
 }
 
 // Project represents the sketch project file
 type Project struct {
-	Profiles        []*Profile
-	DefaultProfile  string
-	DefaultFqbn     string
-	DefaultPort     string
-	DefaultProtocol string
+	Profiles          []*Profile
+	DefaultProfile    string
+	DefaultFqbn       string
+	DefaultPort       string
+	DefaultProtocol   string
+	DefaultProgrammer string
 }
 
 // AsYaml outputs the sketch project file as YAML
@@ -68,6 +70,9 @@ func (p *Project) AsYaml() string {
 	}
 	if p.DefaultProtocol != "" {
 		res += fmt.Sprintf("default_protocol: %s\n", p.DefaultProtocol)
+	}
+	if p.DefaultProgrammer != "" {
+		res += fmt.Sprintf("default_programmer: %s\n", p.DefaultProgrammer)
 	}
 	return res
 }
@@ -93,18 +98,20 @@ func (p *projectRaw) getProfiles() ([]*Profile, error) {
 // Profile is a sketch profile, it contains a reference to all the resources
 // needed to build and upload a sketch
 type Profile struct {
-	Name      string
-	Notes     string                   `yaml:"notes"`
-	FQBN      string                   `yaml:"fqbn"`
-	Platforms ProfileRequiredPlatforms `yaml:"platforms"`
-	Libraries ProfileRequiredLibraries `yaml:"libraries"`
+	Name       string
+	Notes      string                   `yaml:"notes"`
+	FQBN       string                   `yaml:"fqbn"`
+	Programmer string                   `yaml:"programmer"`
+	Platforms  ProfileRequiredPlatforms `yaml:"platforms"`
+	Libraries  ProfileRequiredLibraries `yaml:"libraries"`
 }
 
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
 	return &rpc.SketchProfile{
-		Name: p.Name,
-		Fqbn: p.FQBN,
+		Name:       p.Name,
+		Fqbn:       p.FQBN,
+		Programmer: p.Programmer,
 	}
 }
 
@@ -115,6 +122,9 @@ func (p *Profile) AsYaml() string {
 		res += fmt.Sprintf("    notes: %s\n", p.Notes)
 	}
 	res += fmt.Sprintf("    fqbn: %s\n", p.FQBN)
+	if p.Programmer != "" {
+		res += fmt.Sprintf("    programmer: %s\n", p.Programmer)
+	}
 	res += p.Platforms.AsYaml()
 	res += p.Libraries.AsYaml()
 	return res
@@ -275,10 +285,11 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 		return nil, err
 	}
 	return &Project{
-		Profiles:        profiles,
-		DefaultProfile:  raw.DefaultProfile,
-		DefaultFqbn:     raw.DefaultFqbn,
-		DefaultPort:     raw.DefaultPort,
-		DefaultProtocol: raw.DefaultProtocol,
+		Profiles:          profiles,
+		DefaultProfile:    raw.DefaultProfile,
+		DefaultFqbn:       raw.DefaultFqbn,
+		DefaultPort:       raw.DefaultPort,
+		DefaultProtocol:   raw.DefaultProtocol,
+		DefaultProgrammer: raw.DefaultProgrammer,
 	}, nil
 }

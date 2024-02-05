@@ -201,6 +201,8 @@ message Sketch {
   repeated SketchProfile profiles = 9;
   // Default profile set in the project file (sketch.yaml)
   SketchProfile default_profile = 10;
+  // Default Programmer set in project file (sketch.yaml)
+  string default_programmer = 11;
 }
 
 message SketchProfile {
@@ -208,4 +210,6 @@ message SketchProfile {
   string name = 1;
   // FQBN used by the profile
   string fqbn = 2;
+  // Programmer used by the profile
+  string programmer = 3;
 }

@@ -354,6 +354,8 @@ message SetSketchDefaultsRequest {
   string default_port_address = 3;
   // The desired value for default_protocol in project file (sketch.yaml)
   string default_port_protocol = 4;
+  // The desired value for default_programmer in project file (sketch.yaml)
+  string default_programmer = 5;
 }
 
 message SetSketchDefaultsResponse {
@@ -366,4 +368,7 @@ message SetSketchDefaultsResponse {
   // The value of default_protocol that has been written in project file
   // (sketch.yaml)
   string default_port_protocol = 3;
+  // The value of default_programmer that has been written in project file
+  // (sketch.yaml)
+  string default_programmer = 4;
 }

@@ -146,6 +146,14 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		fqbn = pme.GetProfile().FQBN
 	}
 
+	programmer := req.GetProgrammer()
+	if programmer == "" && pme.GetProfile() != nil {
+		programmer = pme.GetProfile().Programmer
+	}
+	if programmer == "" {
+		programmer = sk.GetDefaultProgrammer()
+	}
+
 	updatedPort, err := runProgramAction(
 		pme,
 		sk,
@@ -153,7 +161,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		req.GetImportDir(),
 		fqbn,
 		req.GetPort(),
-		req.GetProgrammer(),
+		programmer,
 		req.GetVerbose(),
 		req.GetVerify(),
 		false, // burnBootloader

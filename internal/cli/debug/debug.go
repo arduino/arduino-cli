@@ -43,6 +43,7 @@ func NewCommand() *cobra.Command {
 	var (
 		fqbnArg     arguments.Fqbn
 		portArgs    arguments.Port
+		profileArg  arguments.Profile
 		interpreter string
 		importDir   string
 		printInfo   bool
@@ -56,7 +57,7 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCommand(args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo)
+			runDebugCommand(args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
 		},
 	}
 
@@ -64,6 +65,7 @@ func NewCommand() *cobra.Command {
 	fqbnArg.AddToCommand(debugCommand)
 	portArgs.AddToCommand(debugCommand)
 	programmer.AddToCommand(debugCommand)
+	profileArg.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
@@ -72,8 +74,7 @@ func NewCommand() *cobra.Command {
 }
 
 func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
-	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool) {
-	instance := instance.CreateAndInit()
+	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile) {
 	logrus.Info("Executing `arduino-cli debug`")
 
 	path := ""
@@ -88,15 +89,37 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 	}
 	feedback.WarnAboutDeprecatedFiles(sk)
 
-	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, instance, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	var inst *rpc.Instance
+	var profile *rpc.SketchProfile
+
+	if profileArg.Get() == "" {
+		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)
+	} else {
+		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	}
+
+	if fqbnArg.String() == "" {
+		fqbnArg.Set(profile.GetFqbn())
+	}
+
+	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+
+	prog := profile.GetProgrammer()
+	if prog == "" || programmer.GetProgrammer() != "" {
+		prog = programmer.String(inst, fqbn)
+	}
+	if prog == "" {
+		prog = sk.GetDefaultProgrammer()
+	}
+
 	debugConfigRequested := &rpc.GetDebugConfigRequest{
-		Instance:    instance,
+		Instance:    inst,
 		Fqbn:        fqbn,
 		SketchPath:  sketchPath.String(),
 		Port:        port,
 		Interpreter: interpreter,
 		ImportDir:   importDir,
-		Programmer:  programmer.String(instance, fqbn),
+		Programmer:  prog,
 	}
 
 	if printInfo {

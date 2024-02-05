@@ -35,6 +35,7 @@ func SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (
 	oldAddress, oldProtocol := sk.GetDefaultPortAddressAndProtocol()
 	res := &rpc.SetSketchDefaultsResponse{
 		DefaultFqbn:         sk.GetDefaultFQBN(),
+		DefaultProgrammer:   sk.GetDefaultProgrammer(),
 		DefaultPortAddress:  oldAddress,
 		DefaultPortProtocol: oldProtocol,
 	}
@@ -44,6 +45,12 @@ func SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (
 			return nil, &cmderrors.CantUpdateSketchError{Cause: err}
 		}
 		res.DefaultFqbn = fqbn
+	}
+	if programmer := req.GetDefaultProgrammer(); programmer != "" {
+		if err := sk.SetDefaultProgrammer(programmer); err != nil {
+			return nil, &cmderrors.CantUpdateSketchError{Cause: err}
+		}
+		res.DefaultProgrammer = programmer
 	}
 	if newAddress, newProtocol := req.GetDefaultPortAddress(), req.GetDefaultPortProtocol(); newAddress != "" {
 		if err := sk.SetDefaultPort(newAddress, newProtocol); err != nil {

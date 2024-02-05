@@ -1,6 +1,7 @@
 profiles:
   nanorp:
     fqbn: arduino:mbed_nano:nanorp2040connect
+    programmer: p1
     platforms:
       - platform: arduino:mbed_nano (2.1.0)
     libraries:

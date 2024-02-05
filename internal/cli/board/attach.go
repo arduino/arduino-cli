@@ -30,35 +30,39 @@ import (
 func initAttachCommand() *cobra.Command {
 	var port arguments.Port
 	var fqbn arguments.Fqbn
+	var programmer arguments.Programmer
 	attachCommand := &cobra.Command{
-		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
+		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [-P <%s>] [%s]", tr("port"), tr("FQBN"), tr("programmer"), tr("sketchPath")),
 		Short: tr("Attaches a sketch to a board."),
-		Long:  tr("Sets the default values for port and FQBN. If no port or FQBN are specified, the current default port and FQBN are displayed."),
+		Long:  tr("Sets the default values for port and FQBN. If no port, FQBN or programmer are specified, the current default port, FQBN and programmer are displayed."),
 		Example: "  " + os.Args[0] + " board attach -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " board attach -p /dev/ttyACM0 HelloWorld\n" +
-			"  " + os.Args[0] + " board attach -b arduino:samd:mkr1000",
+			"  " + os.Args[0] + " board attach -b arduino:samd:mkr1000" +
+			"  " + os.Args[0] + " board attach -P atmel_ice",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			sketchPath := ""
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runAttachCommand(sketchPath, &port, fqbn.String())
+			runAttachCommand(sketchPath, &port, fqbn.String(), &programmer)
 		},
 	}
 	fqbn.AddToCommand(attachCommand)
 	port.AddToCommand(attachCommand)
+	programmer.AddToCommand(attachCommand)
 
 	return attachCommand
 }
 
-func runAttachCommand(path string, port *arguments.Port, fqbn string) {
+func runAttachCommand(path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
 	sketchPath := arguments.InitSketchPath(path)
 
 	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, "", "")
 	newDefaults, err := sketch.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,
+		DefaultProgrammer:   programmer.GetProgrammer(),
 		DefaultPortAddress:  portAddress,
 		DefaultPortProtocol: portProtocol,
 	})
@@ -67,7 +71,8 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	}
 
 	res := &boardAttachResult{
-		Fqbn: newDefaults.GetDefaultFqbn(),
+		Fqbn:       newDefaults.GetDefaultFqbn(),
+		Programmer: newDefaults.GetDefaultProgrammer(),
 	}
 	if newDefaults.GetDefaultPortAddress() != "" {
 		res.Port = &boardAttachPortResult{
@@ -92,8 +97,9 @@ func (b *boardAttachPortResult) String() string {
 }
 
 type boardAttachResult struct {
-	Fqbn string                 `json:"fqbn,omitempty"`
-	Port *boardAttachPortResult `json:"port,omitempty"`
+	Fqbn       string                 `json:"fqbn,omitempty"`
+	Programmer string                 `json:"programmer,omitempty"`
+	Port       *boardAttachPortResult `json:"port,omitempty"`
 }
 
 func (b *boardAttachResult) Data() interface{} {
@@ -101,10 +107,11 @@ func (b *boardAttachResult) Data() interface{} {
 }
 
 func (b *boardAttachResult) String() string {
-	if b.Port == nil && b.Fqbn == "" {
-		return tr("No default port or FQBN set")
+	if b.Port == nil && b.Fqbn == "" && b.Programmer == "" {
+		return tr("No default port, FQBN or programmer set")
 	}
 	res := fmt.Sprintf("%s: %s\n", tr("Default port set to"), b.Port)
 	res += fmt.Sprintf("%s: %s\n", tr("Default FQBN set to"), b.Fqbn)
+	res += fmt.Sprintf("%s: %s\n", tr("Default programmer set to"), b.Programmer)
 	return res
 }

@@ -56,3 +56,8 @@ func (p *Programmer) String(inst *commands.Instance, fqbn string) string {
 	}
 	return details.GetDefaultProgrammerId()
 }
+
+// GetProgrammer returns the programmer specified by the user
+func (p *Programmer) GetProgrammer() string {
+	return p.programmer
+}

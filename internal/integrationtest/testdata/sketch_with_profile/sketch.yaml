@@ -6,7 +6,16 @@ profiles:
 
   avr2:
     fqbn: arduino:avr:uno
+    programmer: atmel_ice
     platforms:
       - platform: arduino:avr (1.8.5)
+    libraries:
+      - Arduino_JSON (0.1.0)
+  
+  samd:
+    fqbn: arduino:samd:mkr1000
+    programmer: atmel_ice
+    platforms:
+      - platform: arduino:samd (1.8.13)
     libraries:
       - Arduino_JSON (0.1.0)
