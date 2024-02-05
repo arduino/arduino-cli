@@ -1473,6 +1473,7 @@
   -e, --export-binaries                       If set built binaries will be exported to the sketch folder.
   -b, --fqbn string                           Fully Qualified Board Name, e.g.: arduino:avr:uno
   -h, --help                                  help for compile
+  -j, --jobs int32                            Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used.
       --keys-keychain string                  The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it.
       --libraries strings                     Path to a collection of libraries. Can be used multiple times or entries can be comma separated.
       --library strings                       Path to a single library’s root folder. Can be used multiple times or entries can be comma separated.
