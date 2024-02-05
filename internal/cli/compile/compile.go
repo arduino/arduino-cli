@@ -68,6 +68,7 @@ var (
 	compilationDatabaseOnly bool                     // Only create compilation database without actually compiling
 	sourceOverrides         string                   // Path to a .json file that contains a set of replacements of the sketch source code.
 	dumpProfile             bool                     // Create and print a profile configuration from the build
+	jobs                    int32                    // Max number of parallel jobs
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -134,6 +135,7 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flag("source-override").Hidden = true
 	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")
 	compileCommand.Flag("skip-libraries-discovery").Hidden = true
+	compileCommand.Flags().Int32VarP(&jobs, "jobs", "j", 0, tr("Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used."))
 	configuration.Settings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
 
 	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
@@ -244,6 +246,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		EncryptKey:                    encryptKey,
 		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
 		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
+		Jobs:                          jobs,
 	}
 	builderRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
 
