@@ -155,3 +155,18 @@ func TestMatch(t *testing.T) {
 		require.False(t, b.Match(a))
 	}
 }
+
+func TestValidCharacters(t *testing.T) {
+	// These FQBNs contain valid characters
+	validFqbns := []string{"ardui_no:av_r:un_o", "arduin.o:av.r:un.o", "arduin-o:av-r:un-o", "arduin-o:av-r:un-o:a=b=c=d"}
+	for _, fqbn := range validFqbns {
+		_, err := ParseFQBN(fqbn)
+		require.NoError(t, err)
+	}
+	// These FQBNs contain invalid characters
+	invalidFqbns := []string{"arduin-o:av-r:un=o", "arduin?o:av-r:uno", "arduino:av*r:uno"}
+	for _, fqbn := range invalidFqbns {
+		_, err := ParseFQBN(fqbn)
+		require.Error(t, err)
+	}
+}

@@ -17,6 +17,7 @@ package cores
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -57,6 +58,13 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 	if fqbn.BoardID == "" {
 		return nil, fmt.Errorf(tr("empty board identifier"))
 	}
+	// Check if the fqbn contains invalid characters
+	fqbnValidationRegex := regexp.MustCompile(`^[a-zA-Z0-9_.-]*$`)
+	for i := 0; i < 3; i++ {
+		if !fqbnValidationRegex.MatchString(fqbnParts[i]) {
+			return nil, fmt.Errorf(tr("fqbn's field %s contains an invalid character"), fqbnParts[i])
+		}
+	}
 	if len(fqbnParts) > 3 {
 		for _, pair := range strings.Split(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
@@ -67,6 +75,14 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 			v := strings.TrimSpace(parts[1])
 			if k == "" {
 				return nil, fmt.Errorf(tr("invalid config option: %s"), pair)
+			}
+			if !fqbnValidationRegex.MatchString(k) {
+				return nil, fmt.Errorf(tr("config key %s contains an invalid character"), k)
+			}
+			// The config value can also contain the = symbol
+			valueValidationRegex := regexp.MustCompile(`^[a-zA-Z0-9=_.-]*$`)
+			if !valueValidationRegex.MatchString(v) {
+				return nil, fmt.Errorf(tr("config value %s contains an invalid character"), v)
 			}
 			fqbn.Configs.Set(k, v)
 		}
