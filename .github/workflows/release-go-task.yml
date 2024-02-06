@@ -51,7 +51,7 @@ jobs:
           changelog-file-path: "${{ env.DIST_DIR }}/CHANGELOG.md"
 
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
@@ -246,7 +246,7 @@ jobs:
           path: ${{ env.DIST_DIR }}
 
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
