@@ -33,11 +33,11 @@ import (
 func PreprocessSketchWithArduinoPreprocessor(
 	sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList,
 	lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
-) (Result, error) {
+) (*Result, error) {
 	verboseOut := &bytes.Buffer{}
 	normalOut := &bytes.Buffer{}
 	if err := buildPath.Join("preproc").MkdirAll(); err != nil {
-		return Result{}, err
+		return nil, err
 	}
 
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
@@ -46,7 +46,7 @@ func PreprocessSketchWithArduinoPreprocessor(
 	verboseOut.Write(gccResult.Stdout())
 	verboseOut.Write(gccResult.Stderr())
 	if err != nil {
-		return Result{}, err
+		return nil, err
 	}
 
 	arduiniPreprocessorProperties := properties.NewMap()
@@ -59,18 +59,18 @@ func PreprocessSketchWithArduinoPreprocessor(
 	arduiniPreprocessorProperties.SetPath("source_file", targetFile)
 	pattern := arduiniPreprocessorProperties.Get("pattern")
 	if pattern == "" {
-		return Result{}, errors.New(tr("arduino-preprocessor pattern is missing"))
+		return nil, errors.New(tr("arduino-preprocessor pattern is missing"))
 	}
 
 	commandLine := arduiniPreprocessorProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return Result{}, err
+		return nil, err
 	}
 
 	command, err := paths.NewProcess(nil, parts...)
 	if err != nil {
-		return Result{}, err
+		return nil, err
 	}
 	if runtime.GOOS == "windows" {
 		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)
@@ -81,13 +81,13 @@ func PreprocessSketchWithArduinoPreprocessor(
 	commandStdOut, commandStdErr, err := command.RunAndCaptureOutput(context.Background())
 	verboseOut.Write(commandStdErr)
 	if err != nil {
-		return Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
+		return &Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
 	}
 	result := utils.NormalizeUTF8(commandStdOut)
 
 	destFile := buildPath.Join(sk.MainFile.Base() + ".cpp")
 	if err := destFile.WriteFile(result); err != nil {
-		return Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
+		return &Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
 	}
-	return Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
+	return &Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
 }
