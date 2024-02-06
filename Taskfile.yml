@@ -137,7 +137,7 @@ tasks:
     desc: Add missing go license headers
     cmds:
       - go install github.com/google/addlicense@v1.1.1
-      - addlicense -c "ARDUINO SA (http://www.arduino.cc/)" -f ./license_header.tpl **/*.go
+      - addlicense -c "ARDUINO SA (http://www.arduino.cc/)" -f ./license_header.tpl $(find . -name "*.go" -type f -print0 | xargs -0)
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
   markdown:check-links:
