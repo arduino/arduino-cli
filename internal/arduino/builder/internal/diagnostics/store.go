@@ -27,6 +27,8 @@ func NewStore() *Store {
 	return &Store{}
 }
 
+// Parse parses the output coming from a compiler. It then stores the parsed
+// diagnostics in a slice of Diagnostic.
 func (m *Store) Parse(cmdline []string, out []byte) {
 	compiler := DetectCompilerFromCommandLine(
 		cmdline,
