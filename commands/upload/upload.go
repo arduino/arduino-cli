@@ -31,12 +31,12 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
-	"github.com/arduino/arduino-cli/internal/arduino/serialutils"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	serialutils "github.com/arduino/go-serial-utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -470,7 +470,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 			},
 		}
 
-		if newPortAddress, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
+		if newPortAddress, err := serialutils.Reset(portToTouch, wait, dryRun, nil, cb); err != nil {
 			errStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
 		} else {
 			if newPortAddress != "" {
