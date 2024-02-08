@@ -9,6 +9,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.0-alpha.0
 	github.com/arduino/go-paths-helper v1.12.0
 	github.com/arduino/go-properties-orderedmap v1.8.0
+	github.com/arduino/go-serial-utils v0.1.2
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v1.0.0
 	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.1.2
@@ -36,7 +37,6 @@ require (
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.12.0
-	go.bug.st/serial v1.6.1
 	go.bug.st/testifyjson v1.1.1
 	golang.org/x/term v0.16.0
 	golang.org/x/text v0.14.0
@@ -93,6 +93,7 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
+	go.bug.st/serial v1.6.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
