@@ -53,12 +53,13 @@ func runGetCommand(cmd *cobra.Command, args []string) {
 	for _, toGet := range args {
 		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {
-			feedback.Fatal(tr("Cannot get the key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
+			feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}
 		var result getResult
 		err = json.Unmarshal([]byte(resp.GetJsonData()), &result.resp)
 		if err != nil {
-			feedback.Fatal(tr("Cannot parse JSON for key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
+			// Should never happen...
+			panic(fmt.Sprintf("Cannot parse JSON for key %[1]s: %[2]v", toGet, err))
 		}
 		feedback.PrintResult(result)
 	}
