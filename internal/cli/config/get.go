@@ -17,7 +17,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands/daemon"
@@ -26,6 +25,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 func initGetCommand() *cobra.Command {
@@ -77,5 +77,10 @@ func (gr getResult) Data() interface{} {
 }
 
 func (gr getResult) String() string {
-	return fmt.Sprintf("%v", gr.resp)
+	gs, err := yaml.Marshal(gr.resp)
+	if err != nil {
+		// Should never happen
+		panic(tr("unable to marshal config to YAML: %v", err))
+	}
+	return string(gs)
 }
