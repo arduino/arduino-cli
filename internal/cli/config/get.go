@@ -17,6 +17,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands/daemon"
