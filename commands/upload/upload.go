@@ -29,7 +29,6 @@ import (
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -37,6 +36,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	serialutils "github.com/arduino/go-serial-utils"
+	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -209,7 +209,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	outStream, errStream io.Writer,
 	dryRun bool, userFields map[string]string,
 ) (*rpc.Port, error) {
-	port := discovery.PortFromRPCPort(userPort)
+	port := rpc.DiscoveryPortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
 		port = &discovery.Port{Protocol: "default"}
@@ -528,7 +528,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		// If the algorithms can not detect the new port, fallback to the user-provided port.
 		return userPort, nil
 	}
-	return updatedPort.ToRPC(), nil
+	return rpc.DiscoveryPortToRPC(updatedPort), nil
 }
 
 func detectUploadPort(

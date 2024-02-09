@@ -21,8 +21,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/internal/arduino/discovery"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,9 +35,9 @@ import (
 // is called.
 type DiscoveryManager struct {
 	discoveriesMutex   sync.Mutex
-	discoveries        map[string]*discovery.PluggableDiscovery // all registered PluggableDiscovery
-	discoveriesRunning bool                                     // set to true once discoveries are started
-	feed               chan *discovery.Event                    // all events will pass through this channel
+	discoveries        map[string]*discovery.Client // all registered PluggableDiscovery
+	discoveriesRunning bool                         // set to true once discoveries are started
+	feed               chan *discovery.Event        // all events will pass through this channel
 	watchersMutex      sync.Mutex
 	watchers           map[*PortWatcher]bool                  // all registered Watcher
 	watchersCache      map[string]map[string]*discovery.Event // this is a cache of all active ports
@@ -47,7 +48,7 @@ var tr = i18n.Tr
 // New creates a new DiscoveryManager
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
-		discoveries:   map[string]*discovery.PluggableDiscovery{},
+		discoveries:   map[string]*discovery.Client{},
 		watchers:      map[*PortWatcher]bool{},
 		feed:          make(chan *discovery.Event, 50),
 		watchersCache: map[string]map[string]*discovery.Event{},
@@ -65,7 +66,7 @@ func (dm *DiscoveryManager) Clear() {
 			logrus.Infof("Closed and removed discovery %s", d.GetID())
 		}
 	}
-	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
+	dm.discoveries = map[string]*discovery.Client{}
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -101,7 +102,7 @@ func (dm *DiscoveryManager) Start() []error {
 	var wg sync.WaitGroup
 	for _, d := range dm.discoveries {
 		wg.Add(1)
-		go func(d *discovery.PluggableDiscovery) {
+		go func(d *discovery.Client) {
 			if err := dm.startDiscovery(d); err != nil {
 				errsLock.Lock()
 				errs = append(errs, err)
@@ -117,7 +118,14 @@ func (dm *DiscoveryManager) Start() []error {
 }
 
 // Add adds a discovery to the list of managed discoveries
-func (dm *DiscoveryManager) Add(d *discovery.PluggableDiscovery) error {
+func (dm *DiscoveryManager) Add(id string, args ...string) error {
+	d := discovery.NewClient(id, args...)
+	d.SetLogger(logrus.WithField("discovery", id))
+	d.SetUserAgent(configuration.UserAgent(configuration.Settings))
+	return dm.add(d)
+}
+
+func (dm *DiscoveryManager) add(d *discovery.Client) error {
 	dm.discoveriesMutex.Lock()
 	defer dm.discoveriesMutex.Unlock()
 
@@ -178,7 +186,7 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 	return watcher, nil
 }
 
-func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (discErr error) {
+func (dm *DiscoveryManager) startDiscovery(d *discovery.Client) (discErr error) {
 	defer func() {
 		// If this function returns an error log it
 		if discErr != nil {
@@ -194,7 +202,7 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 		return fmt.Errorf("%s: %s", tr("starting discovery %s", d.GetID()), err)
 	}
 
-	go func(d *discovery.PluggableDiscovery) {
+	go func(d *discovery.Client) {
 		// Transfer all incoming events from this discovery to the feed channel
 		for ev := range eventCh {
 			dm.feed <- ev
@@ -281,6 +289,6 @@ func (dm *DiscoveryManager) List() []*discovery.Port {
 // AddAllDiscoveriesFrom transfers discoveries from src to the receiver
 func (dm *DiscoveryManager) AddAllDiscoveriesFrom(src *DiscoveryManager) {
 	for _, d := range src.discoveries {
-		dm.Add(d)
+		dm.add(d)
 	}
 }
