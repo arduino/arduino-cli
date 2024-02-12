@@ -12,7 +12,7 @@ require (
 	github.com/arduino/go-serial-utils v0.1.2
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v1.0.0
-	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.1.3-0.20240212133656-6f3fc156bcb9
+	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.2.0
 	github.com/arduino/pluggable-monitor-protocol-handler v0.9.2
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/extract/v3 v3.1.1
