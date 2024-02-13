@@ -844,7 +844,7 @@ func TestGet(t *testing.T) {
 	// Get undefined key
 	_, stderr, err := cli.Run("config", "get", "foo", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
-	requirejson.Contains(t, stderr, `{"error":"Cannot get the key foo: key not found in settings"}`)
+	requirejson.Contains(t, stderr, `{"error":"Cannot get the configuration key foo: key not found in settings"}`)
 }
 
 func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
