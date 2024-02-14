@@ -818,6 +818,35 @@ func TestDelete(t *testing.T) {
 	require.NotContains(t, configLines, "board_manager")
 }
 
+func TestGet(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".config | .daemon | .port", `"50051"`)
+
+	// Get simple key value
+	stdout, _, err = cli.Run("config", "get", "daemon.port", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `"50051"`)
+
+	// Get structured key value
+	stdout, _, err = cli.Run("config", "get", "daemon", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{"port":"50051"}`)
+
+	// Get undefined key
+	_, stderr, err := cli.Run("config", "get", "foo", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.Error(t, err)
+	requirejson.Contains(t, stderr, `{"error":"Cannot get the configuration key foo: key not found in settings"}`)
+}
+
 func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
