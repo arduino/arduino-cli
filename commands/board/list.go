@@ -31,11 +31,11 @@ import (
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
+	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -234,7 +234,7 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 		// boards slice can be empty at this point if neither the cores nor the
 		// API managed to recognize the connected board
 		b := &rpc.DetectedPort{
-			Port:           port.ToRPC(),
+			Port:           rpc.DiscoveryPortToRPC(port),
 			MatchingBoards: boards,
 		}
 
@@ -283,7 +283,7 @@ func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.Boa
 		defer close(outChan)
 		for event := range watcher.Feed() {
 			port := &rpc.DetectedPort{
-				Port: event.Port.ToRPC(),
+				Port: rpc.DiscoveryPortToRPC(event.Port),
 			}
 
 			boardsError := ""

@@ -18,6 +18,8 @@ package commands
 import (
 	"sort"
 
+	"github.com/arduino/go-properties-orderedmap"
+	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -96,5 +98,39 @@ func (s *PlatformSummary) GetSortedReleases() []*PlatformRelease {
 	sort.SliceStable(res, func(i, j int) bool {
 		return semver.ParseRelaxed(res[i].GetVersion()).LessThan(semver.ParseRelaxed(res[j].GetVersion()))
 	})
+	return res
+}
+
+// DiscoveryPortToRPC converts a *discovery.Port into an *rpc.Port
+func DiscoveryPortToRPC(p *discovery.Port) *Port {
+	props := p.Properties
+	if props == nil {
+		props = properties.NewMap()
+	}
+	return &Port{
+		Address:       p.Address,
+		Label:         p.AddressLabel,
+		Protocol:      p.Protocol,
+		ProtocolLabel: p.ProtocolLabel,
+		HardwareId:    p.HardwareID,
+		Properties:    props.AsMap(),
+	}
+}
+
+// DiscoveryPortFromRPCPort converts an *rpc.Port into a *discovery.Port
+func DiscoveryPortFromRPCPort(o *Port) (p *discovery.Port) {
+	if o == nil {
+		return nil
+	}
+	res := &discovery.Port{
+		Address:       o.GetAddress(),
+		AddressLabel:  o.GetLabel(),
+		Protocol:      o.GetProtocol(),
+		ProtocolLabel: o.GetProtocolLabel(),
+		HardwareID:    o.GetHardwareId(),
+	}
+	if o.GetProperties() != nil {
+		res.Properties = properties.NewFromHashmap(o.GetProperties())
+	}
 	return res
 }

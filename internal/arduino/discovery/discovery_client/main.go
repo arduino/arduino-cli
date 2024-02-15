@@ -22,7 +22,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
 	"github.com/sirupsen/logrus"
 )
@@ -35,8 +34,7 @@ func main() {
 	logrus.SetLevel(logrus.ErrorLevel)
 	dm := discoverymanager.New()
 	for _, discCmd := range os.Args[1:] {
-		disc := discovery.New(discCmd, discCmd)
-		dm.Add(disc)
+		dm.Add(discCmd, discCmd)
 	}
 	dm.Start()
 

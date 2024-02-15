@@ -22,10 +22,10 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )

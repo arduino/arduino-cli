@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
-	"github.com/arduino/arduino-cli/internal/arduino/discovery"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -636,8 +635,7 @@ func (pme *Explorer) loadDiscovery(id string) error {
 		return errors.New(tr("discovery %s not installed", id))
 	}
 	discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
-	d := discovery.New(id, discoveryPath)
-	pme.discoveryManager.Add(d)
+	pme.discoveryManager.Add(id, discoveryPath)
 	return nil
 }
 
@@ -713,8 +711,7 @@ func (pme *Explorer) loadDiscoveries(release *cores.PlatformRelease) []error {
 		if cmdArgs, err := properties.SplitQuotedString(cmd, `"'`, true); err != nil {
 			merr = append(merr, err)
 		} else {
-			d := discovery.New(discoveryID, cmdArgs...)
-			pme.discoveryManager.Add(d)
+			pme.discoveryManager.Add(discoveryID, cmdArgs...)
 		}
 	}
 
