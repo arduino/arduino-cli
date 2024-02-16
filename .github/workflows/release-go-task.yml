@@ -235,6 +235,7 @@ jobs:
 
   create-release:
     runs-on: ubuntu-latest
+    environment: prod
     needs:
       - create-release-artifacts
       - notarize-macos
