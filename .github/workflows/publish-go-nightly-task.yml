@@ -231,7 +231,7 @@ jobs:
 
   publish-nightly:
     runs-on: ubuntu-latest
-    environment: prod
+    environment: production
     needs:
       - create-nightly-artifacts
       - notarize-macos
