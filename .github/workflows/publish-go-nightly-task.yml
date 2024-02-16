@@ -8,6 +8,7 @@ env:
   DIST_DIR: dist
   # The project's folder on Arduino's download server for uploading builds
   AWS_PLUGIN_TARGET: /arduino-cli/
+  AWS_REGION: "us-east-1"
   ARTIFACT_NAME: dist
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -17,6 +18,10 @@ on:
     - cron: "0 1 * * *"
   workflow_dispatch:
   repository_dispatch:
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 
 jobs:
   create-nightly-artifacts:
@@ -258,6 +263,13 @@ jobs:
           VERSION=${{ needs.create-nightly-artifacts.outputs.version }}
           sha256sum ${{ env.PROJECT_NAME }}_${VERSION}* > ${VERSION}-checksums.txt
 
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: "github_${{ env.PROJECT_NAME }}"
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3
         env:
@@ -265,8 +277,6 @@ jobs:
           PLUGIN_TARGET: "${{ env.AWS_PLUGIN_TARGET }}nightly"
           PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
           PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   report:
     runs-on: ubuntu-latest
