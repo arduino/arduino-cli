@@ -240,6 +240,8 @@ jobs:
       - create-release-artifacts
       - notarize-macos
       - create-windows-installer
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
