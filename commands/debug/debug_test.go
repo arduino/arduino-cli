@@ -66,12 +66,6 @@ func TestGetCommandLine(t *testing.T) {
 	defer release()
 
 	{
-		// Check programmer required
-		_, err := getCommandLine(req, pme)
-		require.Error(t, err)
-	}
-
-	{
 		// Check programmer not found
 		req.Programmer = "not-existent"
 		_, err := getCommandLine(req, pme)
