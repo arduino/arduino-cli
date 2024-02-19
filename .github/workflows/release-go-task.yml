@@ -296,12 +296,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload release files on Arduino downloads servers
-        uses: docker://plugins/s3
-        env:
-          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
-          PLUGIN_TARGET: ${{ env.AWS_PLUGIN_TARGET }}
-          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
-          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+        run: aws s3 sync ${{ env.DIST_DIR }} s3://${{ secrets.DOWNLOADS_BUCKET }}${{ env.AWS_PLUGIN_TARGET }}
 
       - name: Update Homebrew formula
         if: steps.prerelease.outputs.IS_PRE != 'true'
