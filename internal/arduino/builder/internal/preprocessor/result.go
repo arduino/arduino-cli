@@ -13,15 +13,22 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+package preprocessor
 
-import (
-	"fmt"
-	"os"
-)
+type Result struct {
+	args   []string
+	stdout []byte
+	stderr []byte
+}
 
-func main() {
-	for _, env := range os.Environ() {
-		fmt.Fprintln(os.Stderr, "ENV>", env)
-	}
+func (r Result) Args() []string {
+	return r.args
+}
+
+func (r Result) Stdout() []byte {
+	return r.stdout
+}
+
+func (r Result) Stderr() []byte {
+	return r.stderr
 }

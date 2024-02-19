@@ -29,7 +29,10 @@ import (
 
 // GCC performs a run of the gcc preprocess (macro/includes expansion). The function outputs the result
 // to targetFilePath. Returns the stdout/stderr of gcc if any.
-func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList, buildProperties *properties.Map) ([]byte, []byte, error) {
+func GCC(
+	sourceFilePath, targetFilePath *paths.Path,
+	includes paths.PathList, buildProperties *properties.Map,
+) (Result, error) {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	gccBuildProperties.Merge(buildProperties)
@@ -54,14 +57,14 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 
 	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
 	if pattern == "" {
-		return nil, nil, errors.New(tr("%s pattern is missing", gccPreprocRecipeProperty))
+		return Result{}, errors.New(tr("%s pattern is missing", gccPreprocRecipeProperty))
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
 	commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	args, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return nil, nil, err
+		return Result{}, err
 	}
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
@@ -70,12 +73,12 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 
 	proc, err := paths.NewProcess(nil, args...)
 	if err != nil {
-		return nil, nil, err
+		return Result{}, err
 	}
 	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
 
 	// Append gcc arguments to stdout
 	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)
 
-	return stdout, stderr, err
+	return Result{args: proc.GetArgs(), stdout: stdout, stderr: stderr}, err
 }

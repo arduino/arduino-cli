@@ -40,52 +40,56 @@ var tr = i18n.Tr
 var DebugPreprocessor bool
 
 // PreprocessSketchWithCtags performs preprocessing of the arduino sketch using CTags.
-func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList, lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool) ([]byte, []byte, error) {
+func PreprocessSketchWithCtags(
+	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
+	lineOffset int, buildProperties *properties.Map,
+	onlyUpdateCompilationDatabase, verbose bool,
+) (*Result, error) {
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer tmpDir.RemoveAll()
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
 
-	normalOutput := &bytes.Buffer{}
-	verboseOutput := &bytes.Buffer{}
+	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 
 	// Run GCC preprocessor
 	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	gccStdout, gccStderr, err := GCC(sourceFile, ctagsTarget, includes, buildProperties)
-	verboseOutput.Write(gccStdout)
-	verboseOutput.Write(gccStderr)
-	normalOutput.Write(gccStderr)
+	result, err := GCC(sourceFile, ctagsTarget, includes, buildProperties)
+	stdout.Write(result.Stdout())
+	stderr.Write(result.Stderr())
 	if err != nil {
 		if !onlyUpdateCompilationDatabase {
-			return normalOutput.Bytes(), verboseOutput.Bytes(), err
+			return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 		}
 
 		// Do not bail out if we are generating the compile commands database
-		normalOutput.WriteString(fmt.Sprintf("%s: %s",
+		stderr.WriteString(fmt.Sprintf("%s: %s",
 			tr("An error occurred adding prototypes"),
 			tr("the compilation database may be incomplete or inaccurate")))
 		if err := sourceFile.CopyTo(ctagsTarget); err != nil {
-			return normalOutput.Bytes(), verboseOutput.Bytes(), err
+			return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 		}
 	}
 
 	if src, err := ctagsTarget.ReadFile(); err == nil {
 		filteredSource := filterSketchSource(sketch, bytes.NewReader(src), false)
 		if err := ctagsTarget.WriteFile([]byte(filteredSource)); err != nil {
-			return normalOutput.Bytes(), verboseOutput.Bytes(), err
+			return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 		}
 	} else {
-		return normalOutput.Bytes(), verboseOutput.Bytes(), err
+		return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 	}
 
 	// Run CTags on gcc-preprocessed source
 	ctagsOutput, ctagsStdErr, err := RunCTags(ctagsTarget, buildProperties)
-	verboseOutput.Write(ctagsStdErr)
+	if verbose {
+		stderr.Write(ctagsStdErr)
+	}
 	if err != nil {
-		return normalOutput.Bytes(), verboseOutput.Bytes(), err
+		return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 	}
 
 	// Parse CTags output
@@ -100,13 +104,13 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 	if sourceData, err := sourceFile.ReadFile(); err == nil {
 		source = string(sourceData)
 	} else {
-		return normalOutput.Bytes(), verboseOutput.Bytes(), err
+		return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 	}
 	source = strings.ReplaceAll(source, "\r\n", "\n")
 	source = strings.ReplaceAll(source, "\r", "\n")
 	sourceRows := strings.Split(source, "\n")
 	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
-		return normalOutput.Bytes(), verboseOutput.Bytes(), nil
+		return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, nil
 	}
 
 	insertionLine := firstFunctionLine + lineOffset - 1
@@ -132,7 +136,7 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 
 	// Write back arduino-preprocess output to the sourceFile
 	err = sourceFile.WriteFile([]byte(preprocessedSource))
-	return normalOutput.Bytes(), verboseOutput.Bytes(), err
+	return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
