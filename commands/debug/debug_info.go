@@ -169,15 +169,14 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 	}
 
-	if req.GetProgrammer() == "" {
-		return nil, &arduino.MissingProgrammerError{}
-	}
-	if p, ok := platformRelease.Programmers[req.GetProgrammer()]; ok {
-		toolProperties.Merge(p.Properties)
-	} else if refP, ok := referencedPlatformRelease.Programmers[req.GetProgrammer()]; ok {
-		toolProperties.Merge(refP.Properties)
-	} else {
-		return nil, &arduino.ProgrammerNotFoundError{Programmer: req.GetProgrammer()}
+	if req.GetProgrammer() != "" {
+		if p, ok := platformRelease.Programmers[req.GetProgrammer()]; ok {
+			toolProperties.Merge(p.Properties)
+		} else if refP, ok := referencedPlatformRelease.Programmers[req.GetProgrammer()]; ok {
+			toolProperties.Merge(refP.Properties)
+		} else {
+			return nil, &arduino.ProgrammerNotFoundError{Programmer: req.GetProgrammer()}
+		}
 	}
 
 	var importPath *paths.Path
