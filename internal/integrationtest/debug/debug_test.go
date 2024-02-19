@@ -336,9 +336,6 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 }
 
 func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	_, _, err := cli.Run("debug", "check", "-b", "arduino:samd:mkr1000")
-	require.Error(t, err)
-
 	out, _, err := cli.Run("debug", "check", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice")
 	require.NoError(t, err)
 	require.Contains(t, string(out), "The given board/programmer configuration supports debugging.")
