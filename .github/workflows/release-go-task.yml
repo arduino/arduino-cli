@@ -16,10 +16,6 @@ on:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
-permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
-
 jobs:
   create-release-artifacts:
     outputs:
@@ -242,6 +238,7 @@ jobs:
       - create-windows-installer
     permissions:
       contents: write
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Checkout repository

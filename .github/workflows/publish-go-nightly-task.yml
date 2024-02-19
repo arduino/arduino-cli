@@ -236,6 +236,9 @@ jobs:
       - create-nightly-artifacts
       - notarize-macos
       - create-windows-installer
+    permissions:
+      contents: write
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Checkout repository
