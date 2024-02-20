@@ -16,10 +16,6 @@ on:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
-permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
-
 jobs:
   create-release-artifacts:
     outputs:
@@ -242,6 +238,7 @@ jobs:
       - create-windows-installer
     permissions:
       contents: write
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Checkout repository
@@ -299,12 +296,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload release files on Arduino downloads servers
-        uses: docker://plugins/s3
-        env:
-          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
-          PLUGIN_TARGET: ${{ env.AWS_PLUGIN_TARGET }}
-          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
-          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+        run: aws s3 sync ${{ env.DIST_DIR }} s3://${{ secrets.DOWNLOADS_BUCKET }}${{ env.AWS_PLUGIN_TARGET }}
 
       - name: Update Homebrew formula
         if: steps.prerelease.outputs.IS_PRE != 'true'
