@@ -726,3 +726,44 @@ func generateBuildDir(sketchPath *paths.Path, t *testing.T) *paths.Path {
 	require.NoError(t, buildDir.ToAbs())
 	return buildDir
 }
+
+func TestUploadWithInputDirFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "install", "arduino:mbed_opta")
+	require.NoError(t, err)
+
+	sketchPath := cli.SketchbookDir().Join("TestSketchForUpload")
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Create a fake build directory
+	buildDir := sketchPath.Join("build")
+	require.NoError(t, buildDir.MkdirAll())
+	require.NoError(t, buildDir.Join("TestSketchForUpload.ino.bin").WriteFile(nil))
+	require.NoError(t, buildDir.Join("TestSketchForUpload.ino.elf").WriteFile(nil))
+	require.NoError(t, buildDir.Join("TestSketchForUpload.ino.hex").WriteFile(nil))
+	require.NoError(t, buildDir.Join("TestSketchForUpload.ino.map").WriteFile(nil))
+
+	// Test with input-dir flag
+	_, _, err = cli.Run(
+		"upload",
+		"-b", "arduino:mbed_opta:opta",
+		"-i", buildDir.String(),
+		"-t",
+		"-p", "/dev/ttyACM0",
+		"--dry-run", "-v",
+		sketchPath.String())
+	require.NoError(t, err)
+
+	// Test with input-dir flag and no sketch
+	_, _, err = cli.Run(
+		"upload",
+		"-b", "arduino:mbed_opta:opta",
+		"-i", buildDir.String(),
+		"-t",
+		"-p", "/dev/ttyACM0",
+		"--dry-run", "-v")
+	require.NoError(t, err)
+}
