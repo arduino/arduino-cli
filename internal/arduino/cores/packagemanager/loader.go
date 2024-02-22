@@ -239,16 +239,10 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
 	platform.InstallDir = path
 
-	// Some useful paths
-	installedJSONPath := path.Join("installed.json")
-	platformTxtPath := path.Join("platform.txt")
-	platformTxtLocalPath := path.Join("platform.local.txt")
-	programmersTxtPath := path.Join("programmers.txt")
-
 	// If the installed.json file is found load it, this is done to handle the
 	// case in which the platform's index and its url have been deleted locally,
 	// if we don't load it some information about the platform is lost
-	if installedJSONPath.Exist() {
+	if installedJSONPath := path.Join("installed.json"); installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
 			return fmt.Errorf(tr("loading %[1]s: %[2]s"), installedJSONPath, err)
 		}
@@ -256,12 +250,15 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 
 	// Create platform properties
 	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
-	if p, err := properties.SafeLoad(platformTxtPath.String()); err == nil {
+	platformTxtPath := path.Join("platform.txt")
+	if p, err := properties.SafeLoadFromPath(platformTxtPath); err == nil {
 		platform.Properties.Merge(p)
 	} else {
 		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtPath, err)
 	}
-	if p, err := properties.SafeLoad(platformTxtLocalPath.String()); err == nil {
+
+	platformTxtLocalPath := path.Join("platform.local.txt")
+	if p, err := properties.SafeLoadFromPath(platformTxtLocalPath); err == nil {
 		platform.Properties.Merge(p)
 	} else {
 		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
@@ -287,7 +284,8 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	}
 
 	// Create programmers properties
-	if programmersProperties, err := properties.SafeLoad(programmersTxtPath.String()); err == nil {
+	programmersTxtPath := path.Join("programmers.txt")
+	if programmersProperties, err := properties.SafeLoadFromPath(programmersTxtPath); err == nil {
 		for programmerID, programmerProps := range programmersProperties.FirstLevelOf() {
 			if !platform.PluggableDiscoveryAware {
 				convertUploadToolsToPluggableDiscovery(programmerProps)
