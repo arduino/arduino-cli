@@ -30,7 +30,7 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t, a.BoardID, "uno")
 	require.Zero(t, a.Configs.Size())
 
-	// Allow empty plaforms or packages
+	// Allow empty platforms or packages (aka. vendors + architectures)
 	b1, err := ParseFQBN("arduino::uno")
 	require.Equal(t, "arduino::uno", b1.String())
 	require.NoError(t, err)
@@ -65,10 +65,24 @@ func TestFQBN(t *testing.T) {
 	_, err = ParseFQBN("arduino:avr")
 	require.Error(t, err)
 
-	// Sort keys in fbqn config
-	s, err := ParseFQBN("arduino:avr:uno:d=x,b=x,a=x,e=x,c=x")
+	// Keeps the config keys order
+	s1, err := ParseFQBN("arduino:avr:uno:d=x,b=x,a=x,e=x,c=x")
 	require.NoError(t, err)
-	require.Equal(t, "arduino:avr:uno:d=x,b=x,a=x,e=x,c=x", s.String())
+	require.Equal(t, "arduino:avr:uno:d=x,b=x,a=x,e=x,c=x", s1.String())
+	require.Equal(t,
+		"properties.Map{\n  \"d\": \"x\",\n  \"b\": \"x\",\n  \"a\": \"x\",\n  \"e\": \"x\",\n  \"c\": \"x\",\n}",
+		s1.Configs.Dump())
+
+	s2, err := ParseFQBN("arduino:avr:uno:a=x,b=x,c=x,d=x,e=x")
+	require.NoError(t, err)
+	require.Equal(t, "arduino:avr:uno:a=x,b=x,c=x,d=x,e=x", s2.String())
+	require.Equal(t,
+		"properties.Map{\n  \"a\": \"x\",\n  \"b\": \"x\",\n  \"c\": \"x\",\n  \"d\": \"x\",\n  \"e\": \"x\",\n}",
+		s2.Configs.Dump())
+
+	// The config keys order is insignificant when comparing two FQBNs
+	require.True(t, s1.Match(s2))
+	require.NotEqual(t, s1.String(), s2.String())
 
 	// Test configs
 	c, err := ParseFQBN("arduino:avr:uno:cpu=atmega")
@@ -89,6 +103,8 @@ func TestFQBN(t *testing.T) {
 
 	// Do not allow empty keys or missing values in config
 	_, err = ParseFQBN("arduino:avr:uno:")
+	require.Error(t, err)
+	_, err = ParseFQBN("arduino:avr:uno,")
 	require.Error(t, err)
 	_, err = ParseFQBN("arduino:avr:uno:cpu")
 	require.Error(t, err)
