@@ -55,7 +55,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	}
 	installCl.CloseSend()
 
-	// Run a compile
+	// Utility functions: tryCompile
 	sketchPath, err := paths.New("testdata", "bare_minimum").Abs()
 	require.NoError(t, err)
 	tryCompile := func() error {
@@ -72,28 +72,39 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 			}
 		}
 	}
-	require.NoError(t, tryCompile())
 
-	// Change a file in the AVR core and check if the change is detected
-	avrCorePath := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.6")
-	{
+	// Utility functions: tryTouch will touch a file and see if the compile detects the change
+	tryTouch := func(fileToTouch *paths.Path) {
 		time.Sleep(time.Second) // await at least one second so the timestamp of the file is different
 
-		f, err := avrCorePath.Join("boards.txt").Append()
+		// touch the file
+		f, err := fileToTouch.Append()
 		require.NoError(t, err)
 		_, err = f.WriteString("\n")
 		require.NoError(t, err)
 		require.NoError(t, f.Close())
-	}
-	err = tryCompile()
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
-	// Re-init instance and check again
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
-		fmt.Printf("INIT> %v\n", ir.GetMessage())
-	}))
-	require.NoError(t, tryCompile())
+		// try compile: should fail
+		err = tryCompile()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
+
+		// re-init instance
+		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+			fmt.Printf("INIT> %v\n", ir.GetMessage())
+		}))
+
+		// try compile: should succeed
+		require.NoError(t, tryCompile())
+	}
+
+	avrCorePath := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.6")
+	tryTouch(avrCorePath.Join("installed.json"))
+	tryTouch(avrCorePath.Join("platform.txt"))
+	tryTouch(avrCorePath.Join("platform.local.txt"))
+	tryTouch(avrCorePath.Join("programmers.txt"))
+	tryTouch(avrCorePath.Join("boards.txt"))
+	tryTouch(avrCorePath.Join("boards.local.txt"))
 
 	// Delete a file and check if the change is detected
 	require.NoError(t, avrCorePath.Join("programmers.txt").Remove())
