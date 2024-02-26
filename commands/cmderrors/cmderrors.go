@@ -875,7 +875,7 @@ type InstanceNeedsReinitialization struct {
 }
 
 func (e *InstanceNeedsReinitialization) Error() string {
-	return tr("The instance is no more valid and needs to be reinitialized")
+	return tr("The instance is no longer valid and needs to be reinitialized")
 }
 
 // ToRPCStatus converts the error into a *status.Status

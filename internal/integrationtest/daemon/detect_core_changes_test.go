@@ -87,7 +87,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	}
 	err = tryCompile()
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "The instance is no more valid and needs to be reinitialized")
+	require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
 	// Re-init instance and check again
 	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
@@ -99,7 +99,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	require.NoError(t, avrCorePath.Join("programmers.txt").Remove())
 	err = tryCompile()
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "The instance is no more valid and needs to be reinitialized")
+	require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
 	// Re-init instance and check again
 	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
@@ -115,7 +115,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	}
 	err = tryCompile()
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "The instance is no more valid and needs to be reinitialized")
+	require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
 	// Re-init instance and check again
 	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
