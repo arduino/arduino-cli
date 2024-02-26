@@ -46,12 +46,12 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	installCl, err := grpcInst.PlatformInstall(context.Background(), "arduino", "avr", "", true)
 	require.NoError(t, err)
 	for {
-		if installResp, err := installCl.Recv(); errors.Is(err, io.EOF) {
+		installResp, err := installCl.Recv()
+		if errors.Is(err, io.EOF) {
 			break
-		} else {
-			require.NoError(t, err)
-			fmt.Printf("INSTALL> %v\n", installResp)
 		}
+		require.NoError(t, err)
+		fmt.Printf("INSTALL> %v\n", installResp)
 	}
 	installCl.CloseSend()
 
