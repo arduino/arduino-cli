@@ -109,6 +109,8 @@ message CompileResponse {
   }
 }
 
+message InstanceNeedsReinitializationError {}
+
 message BuilderResult {
   // The compiler build path
   string build_path = 1;
