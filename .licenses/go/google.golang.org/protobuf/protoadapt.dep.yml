@@ -1,15 +1,14 @@
 ---
-name: golang.org/x/crypto/blake2b
-version: v0.18.0
+name: google.golang.org/protobuf/protoadapt
+version: v1.32.0
 type: go
-summary: Package blake2b implements the BLAKE2b hash algorithm defined by RFC 7693
-  and the extendable output function (XOF) BLAKE2Xb.
-homepage: https://pkg.go.dev/golang.org/x/crypto/blake2b
-license: other
+summary: Package protoadapt bridges the original and new proto APIs.
+homepage: https://pkg.go.dev/google.golang.org/protobuf/protoadapt
+license: bsd-3-clause
 licenses:
-- sources: crypto@v0.18.0/LICENSE
+- sources: protobuf@v1.32.0/LICENSE
   text: |
-    Copyright (c) 2009 The Go Authors. All rights reserved.
+    Copyright (c) 2018 The Go Authors. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
@@ -36,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: crypto@v0.18.0/PATENTS
+- sources: protobuf@v1.32.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
