@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/peer
-version: v1.61.1
+version: v1.62.0
 type: go
 summary: Package peer defines various peer information associated with RPCs and corresponding
   utils.
 homepage: https://pkg.go.dev/google.golang.org/grpc/peer
 license: apache-2.0
 licenses:
-- sources: grpc@v1.61.1/LICENSE
+- sources: grpc@v1.62.0/LICENSE
   text: |2
 
                                      Apache License
