@@ -22,6 +22,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -897,4 +898,12 @@ func (pme *Explorer) NormalizeFQBN(fqbn *cores.FQBN) (*cores.FQBN, error) {
 		}
 	}
 	return normalizedFqbn, nil
+}
+
+// Dirty returns true if one of the loaded platforms needs to be re-initialized
+// due to file changes in the platform releases.
+func (pme *Explorer) Dirty() bool {
+	return slices.ContainsFunc(
+		pme.InstalledPlatformReleases(),
+		(*cores.PlatformRelease).Dirty)
 }

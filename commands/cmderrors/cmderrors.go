@@ -869,3 +869,19 @@ func (e *MultipleLibraryInstallDetected) Error() string {
 func (e *MultipleLibraryInstallDetected) ToRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, e.Error())
 }
+
+// InstanceNeedsReinitialization
+type InstanceNeedsReinitialization struct {
+}
+
+func (e *InstanceNeedsReinitialization) Error() string {
+	return tr("The instance is no longer valid and needs to be reinitialized")
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *InstanceNeedsReinitialization) ToRPCStatus() *status.Status {
+	st, _ := status.
+		New(codes.InvalidArgument, e.Error()).
+		WithDetails(&rpc.InstanceNeedsReinitializationError{})
+	return st
+}

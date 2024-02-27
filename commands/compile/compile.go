@@ -63,6 +63,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 	defer release()
 
+	if pme.Dirty() {
+		return nil, &cmderrors.InstanceNeedsReinitialization{}
+	}
+
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
 		return nil, err

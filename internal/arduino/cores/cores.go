@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
@@ -70,11 +71,57 @@ type PlatformRelease struct {
 	Programmers             map[string]*Programmer        `json:"-"`
 	Menus                   *properties.Map               `json:"-"`
 	InstallDir              *paths.Path                   `json:"-"`
+	Timestamps              *TimestampsStore              // Contains the timestamps of the files used to build this PlatformRelease
 	IsTrusted               bool                          `json:"-"`
 	PluggableDiscoveryAware bool                          `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
 	Monitors                map[string]*MonitorDependency `json:"-"`
 	MonitorsDevRecipes      map[string]string             `json:"-"`
 	Compatible              bool                          `json:"-"` // true if at all ToolDependencies are available for the current OS/ARCH.
+}
+
+// TimestampsStore is a generic structure to store timestamps
+type TimestampsStore struct {
+	timestamps map[*paths.Path]*time.Time
+}
+
+// NewTimestampsStore creates a new TimestampsStore
+func NewTimestampsStore() *TimestampsStore {
+	return &TimestampsStore{
+		timestamps: map[*paths.Path]*time.Time{},
+	}
+}
+
+// AddFile adds a file to the TimestampsStore
+func (t *TimestampsStore) AddFile(path *paths.Path) {
+	if info, err := path.Stat(); err != nil {
+		t.timestamps[path] = nil // Save a missing file with a nil timestamp
+	} else {
+		modtime := info.ModTime()
+		t.timestamps[path] = &modtime
+	}
+}
+
+// Dirty returns true if one of the files stored in the TimestampsStore has been
+// changed after being added to the store.
+func (t *TimestampsStore) Dirty() bool {
+	for path, timestamp := range t.timestamps {
+		if info, err := path.Stat(); err != nil {
+			if timestamp != nil {
+				return true
+			}
+		} else {
+			if timestamp == nil || info.ModTime() != *timestamp {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// Dirty returns true if one of the files of this PlatformRelease has been changed
+// (it means that the PlatformRelease should be rebuilt to be used correctly).
+func (release *PlatformRelease) Dirty() bool {
+	return release.Timestamps.Dirty()
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -207,6 +254,7 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformR
 		Properties:  properties.NewMap(),
 		Programmers: map[string]*Programmer{},
 		Platform:    platform,
+		Timestamps:  NewTimestampsStore(),
 	}
 	platform.Releases[tag] = release
 	return release
