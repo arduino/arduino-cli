@@ -6,7 +6,7 @@ go 1.21
 replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
-	github.com/ProtonMail/go-crypto v1.1.0-alpha.0
+	github.com/ProtonMail/go-crypto v1.1.0-alpha.1
 	github.com/arduino/go-paths-helper v1.12.0
 	github.com/arduino/go-properties-orderedmap v1.8.0
 	github.com/arduino/go-serial-utils v0.1.2
