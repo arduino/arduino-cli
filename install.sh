@@ -220,7 +220,7 @@ testVersion() {
   else
     # $PATH is intentionally a literal in this message.
     # shellcheck disable=SC2016
-    echo "$PROJECT_NAME not found. You might want to add \"$EFFECTIVE_BINDIR\" to your "'$PATH'
+    echo "install.sh: $PROJECT_NAME not found. You might want to add \"$EFFECTIVE_BINDIR\" to your "'$PATH'
   fi
 
   set -e
