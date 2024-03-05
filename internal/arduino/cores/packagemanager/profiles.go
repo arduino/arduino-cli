@@ -102,10 +102,6 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 		indexesToDownload = append(indexesToDownload, platformRef.PlatformIndexURL)
 	}
 	for _, indexURL := range indexesToDownload {
-		if err != nil {
-			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
-			return &cmderrors.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
-		}
 		indexResource := resources.IndexResource{URL: indexURL}
 		if err := indexResource.Download(tmpPmb.IndexDir, downloadCB); err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
