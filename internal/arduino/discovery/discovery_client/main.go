@@ -32,7 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 	logrus.SetLevel(logrus.ErrorLevel)
-	dm := discoverymanager.New()
+	dm := discoverymanager.New("discovery_client/1.0.0")
 	for _, discCmd := range os.Args[1:] {
 		dm.Add(discCmd, discCmd)
 	}
