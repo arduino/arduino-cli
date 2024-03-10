@@ -41,6 +41,14 @@ when using a serial port, the monitor baud rate can be set to 4800 with the foll
 
 `$ arduino-cli monitor -p <port> --config baudrate=4800`
 
+## "Permission denied" error in sketch upload
+
+This can be solved by setting up serial port permission. This can be achieved through the following command:
+
+`$ sudo usermod -a -G dialout <username>`
+
+Replace `<username>` with your user name. Logging out and logging in again is necessary for the changes to take effect.
+
 ## Additional assistance
 
 If your question wasn't answered, feel free to ask on [Arduino CLI's forum board][1].
