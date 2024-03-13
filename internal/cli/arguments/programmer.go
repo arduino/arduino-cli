@@ -18,7 +18,6 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -40,14 +39,14 @@ func (p *Programmer) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreService
 
 // String returns the programmer specified by the user, or the default programmer
 // for the given board if defined.
-func (p *Programmer) String(inst *rpc.Instance, fqbn string) string {
+func (p *Programmer) String(inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer, fqbn string) string {
 	if p.programmer != "" {
 		return p.programmer
 	}
 	if inst == nil || fqbn == "" {
 		return ""
 	}
-	details, err := commands.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
+	details, err := srv.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 	})

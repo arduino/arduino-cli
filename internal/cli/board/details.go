@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -44,7 +43,7 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runDetailsCommand(fqbn.String(), showFullDetails, listProgrammers, showProperties)
+			runDetailsCommand(srv, fqbn.String(), showFullDetails, listProgrammers, showProperties)
 		},
 	}
 
@@ -56,7 +55,7 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return detailsCommand
 }
 
-func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
+func runDetailsCommand(srv rpc.ArduinoCoreServiceServer, fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board details`")
@@ -65,7 +64,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 	if err != nil {
 		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
-	res, err := commands.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
+	res, err := srv.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
 		Instance:                   inst,
 		Fqbn:                       fqbn,
 		DoNotExpandBuildProperties: showPropertiesMode == arguments.ShowPropertiesUnexpanded,

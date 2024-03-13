@@ -88,7 +88,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
 		Args: cobra.MaximumNArgs(1),
-		Run:  runCompileCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runCompileCommand(cmd, args, srv)
+		},
 	}
 
 	fqbnArg.AddToCommand(compileCommand, srv)
@@ -138,7 +140,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return compileCommand
 }
 
-func runCompileCommand(cmd *cobra.Command, args []string) {
+func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli compile`")
 
 	if profileArg.Get() != "" {
@@ -268,7 +270,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		prog := profile.GetProgrammer()
 		if prog == "" || programmer.GetProgrammer() != "" {
-			prog = programmer.String(inst, fqbn)
+			prog = programmer.String(inst, srv, fqbn)
 		}
 		if prog == "" {
 			prog = sk.GetDefaultProgrammer()

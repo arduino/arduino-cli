@@ -48,8 +48,10 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Short:   tr("Upload the bootloader."),
 		Long:    tr("Upload the bootloader on the board using an external programmer."),
 		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     runBootloaderCommand,
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			runBootloaderCommand(srv)
+		},
 	}
 
 	fqbn.AddToCommand(burnBootloaderCommand, srv)
@@ -63,7 +65,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return burnBootloaderCommand
 }
 
-func runBootloaderCommand(command *cobra.Command, args []string) {
+func runBootloaderCommand(srv rpc.ArduinoCoreServiceServer) {
 	instance := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli burn-bootloader`")
@@ -81,7 +83,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		Port:       discoveryPort,
 		Verbose:    verbose,
 		Verify:     verify,
-		Programmer: programmer.String(instance, fqbn.String()),
+		Programmer: programmer.String(instance, srv, fqbn.String()),
 		DryRun:     dryRun,
 	}, stdOut, stdErr); err != nil {
 		errcode := feedback.ErrGeneric

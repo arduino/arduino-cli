@@ -41,7 +41,7 @@ func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Short:   tr("Check if the given board/programmer combination supports debugging."),
 		Example: "  " + os.Args[0] + " debug check -b arduino:samd:mkr1000 -P atmel_ice",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCheckCommand(&portArgs, &fqbnArg, interpreter, &programmer)
+			runDebugCheckCommand(srv, &portArgs, &fqbnArg, interpreter, &programmer)
 		},
 	}
 	fqbnArg.AddToCommand(debugCheckCommand, srv)
@@ -51,7 +51,7 @@ func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return debugCheckCommand
 }
 
-func runDebugCheckCommand(portArgs *arguments.Port, fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer) {
+func runDebugCheckCommand(srv rpc.ArduinoCoreServiceServer, portArgs *arguments.Port, fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli debug`")
 
@@ -65,7 +65,7 @@ func runDebugCheckCommand(portArgs *arguments.Port, fqbnArg *arguments.Fqbn, int
 		Fqbn:        fqbn,
 		Port:        port,
 		Interpreter: interpreter,
-		Programmer:  programmerArg.String(instance, fqbn),
+		Programmer:  programmerArg.String(instance, srv, fqbn),
 	})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)

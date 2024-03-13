@@ -44,11 +44,6 @@ type arduinoCoreServerImpl struct {
 	versionString string
 }
 
-// BoardDetails FIXMEDOC
-func (s *arduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
-	return BoardDetails(ctx, req)
-}
-
 // BoardList FIXMEDOC
 func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
 	ports, _, err := BoardList(req)

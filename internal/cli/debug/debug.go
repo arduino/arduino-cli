@@ -56,7 +56,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCommand(args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
+			runDebugCommand(srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
 		},
 	}
 
@@ -72,7 +72,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return debugCommand
 }
 
-func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
+func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
 	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile) {
 	logrus.Info("Executing `arduino-cli debug`")
 
@@ -105,7 +105,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {
-		prog = programmer.String(inst, fqbn)
+		prog = programmer.String(inst, srv, fqbn)
 	}
 	if prog == "" {
 		prog = sk.GetDefaultProgrammer()

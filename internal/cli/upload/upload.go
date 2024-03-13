@@ -63,7 +63,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runUploadCommand(args, uploadFields)
+			runUploadCommand(srv, args, uploadFields)
 		},
 	}
 
@@ -81,7 +81,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return uploadCommand
 }
 
-func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
+func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFieldsArgs map[string]string) {
 	logrus.Info("Executing `arduino-cli upload`")
 
 	path := ""
@@ -176,7 +176,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {
-		prog = programmer.String(inst, fqbn)
+		prog = programmer.String(inst, srv, fqbn)
 	}
 	if prog == "" {
 		prog = sketch.GetDefaultProgrammer()
