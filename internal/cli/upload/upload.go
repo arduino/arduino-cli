@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -117,7 +116,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	defaultProtocol := sketch.GetDefaultProtocol()
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
 
-	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+	userFieldRes, err := commands.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 		Protocol: port.GetProtocol(),
@@ -198,7 +197,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		DryRun:     dryRun,
 		UserFields: fields,
 	}
-	if res, err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
+	if res, err := commands.Upload(context.Background(), req, stdOut, stdErr); err != nil {
 		errcode := feedback.ErrGeneric
 		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer

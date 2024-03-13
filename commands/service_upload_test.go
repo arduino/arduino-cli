@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package upload
+package commands
 
 import (
 	"bytes"
@@ -32,23 +32,23 @@ import (
 )
 
 func TestDetectSketchNameFromBuildPath(t *testing.T) {
-	sk1, err1 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_1"))
+	sk1, err1 := detectSketchNameFromBuildPath(paths.New("testdata/upload/build_path_1"))
 	require.NoError(t, err1)
 	require.Equal(t, "sketch.ino", sk1)
 
-	sk2, err2 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_2"))
+	sk2, err2 := detectSketchNameFromBuildPath(paths.New("testdata/upload/build_path_2"))
 	require.NoError(t, err2)
 	require.Equal(t, "Blink.ino", sk2)
 
-	sk3, err3 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_3"))
+	sk3, err3 := detectSketchNameFromBuildPath(paths.New("testdata/upload/build_path_3"))
 	require.Error(t, err3)
 	require.Equal(t, "", sk3)
 
-	sk4, err4 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_4"))
+	sk4, err4 := detectSketchNameFromBuildPath(paths.New("testdata/upload/build_path_4"))
 	require.Error(t, err4)
 	require.Equal(t, "", sk4)
 
-	sk5, err5 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_invalid"))
+	sk5, err5 := detectSketchNameFromBuildPath(paths.New("testdata/upload/build_path_invalid"))
 	require.Error(t, err5)
 	require.Equal(t, "", sk5)
 }
@@ -63,7 +63,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		resSketchName string
 	}
 
-	blonk, err := sketch.New(paths.New("testdata/Blonk"))
+	blonk, err := sketch.New(paths.New("testdata/upload/Blonk"))
 	require.NoError(t, err)
 
 	fqbn, err := cores.ParseFQBN("arduino:samd:mkr1000")
@@ -73,39 +73,39 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 00: error: no data passed in
 		{"", "", nil, nil, "<nil>", ""},
 		// 01: use importFile to detect build.path and project_name
-		{"testdata/build_path_2/Blink.ino.hex", "", nil, nil, "testdata/build_path_2", "Blink.ino"},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "", nil, nil, "testdata/upload/build_path_2", "Blink.ino"},
 		// 02: use importPath as build.path and project_name
-		{"", "testdata/build_path_2", nil, nil, "testdata/build_path_2", "Blink.ino"},
+		{"", "testdata/upload/build_path_2", nil, nil, "testdata/upload/build_path_2", "Blink.ino"},
 		// 03: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, nil, "<nil>", ""},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "testdata/upload/build_path_2", nil, nil, "<nil>", ""},
 		// 04: only sketch without FQBN
 		{"", "", blonk, nil, blonk.DefaultBuildPath().String(), "Blonk.ino"},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
-		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino"},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/upload/build_path_2", "Blink.ino"},
 		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
-		{"", "testdata/build_path_2", blonk, nil, "testdata/build_path_2", "Blink.ino"},
+		{"", "testdata/upload/build_path_2", blonk, nil, "testdata/upload/build_path_2", "Blink.ino"},
 		// 07: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, nil, "<nil>", ""},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "testdata/upload/build_path_2", blonk, nil, "<nil>", ""},
 		// 08: error: no data passed in
 		{"", "", nil, fqbn, "<nil>", ""},
 		// 09: use importFile to detect build.path and project_name, fqbn ignored
-		{"testdata/build_path_2/Blink.ino.hex", "", nil, fqbn, "testdata/build_path_2", "Blink.ino"},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "", nil, fqbn, "testdata/upload/build_path_2", "Blink.ino"},
 		// 10: use importPath as build.path and project_name, fqbn ignored
-		{"", "testdata/build_path_2", nil, fqbn, "testdata/build_path_2", "Blink.ino"},
+		{"", "testdata/upload/build_path_2", nil, fqbn, "testdata/upload/build_path_2", "Blink.ino"},
 		// 11: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, fqbn, "<nil>", ""},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "testdata/upload/build_path_2", nil, fqbn, "<nil>", ""},
 		// 12: use sketch to determine project name and sketch+fqbn to determine build path
 		{"", "", blonk, fqbn, blonk.DefaultBuildPath().String(), "Blonk.ino"},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
-		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/upload/build_path_2", "Blink.ino"},
 		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn
-		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
+		{"", "testdata/upload/build_path_2", blonk, fqbn, "testdata/upload/build_path_2", "Blink.ino"},
 		// 15: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, fqbn, "<nil>", ""},
+		{"testdata/upload/build_path_2/Blink.ino.hex", "testdata/upload/build_path_2", blonk, fqbn, "<nil>", ""},
 		// 16: importPath containing multiple firmwares, but one has the same name as the containing folder
-		{"", "testdata/firmware", nil, fqbn, "testdata/firmware", "firmware.ino"},
+		{"", "testdata/upload/firmware", nil, fqbn, "testdata/upload/firmware", "firmware.ino"},
 		// 17: importFile among multiple firmwares
-		{"testdata/firmware/another_firmware.ino.bin", "", nil, fqbn, "testdata/firmware", "another_firmware.ino"},
+		{"testdata/upload/firmware/another_firmware.ino.bin", "", nil, fqbn, "testdata/upload/firmware", "another_firmware.ino"},
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
@@ -128,9 +128,9 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 
 func TestUploadPropertiesComposition(t *testing.T) {
 	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
-	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
+	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "upload", "hardware"))
 	require.Len(t, errs, 0)
-	buildPath1 := paths.New("testdata", "build_path_1")
+	buildPath1 := paths.New("testdata", "upload", "build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
 	type test struct {
 		importDir       *paths.Path
@@ -149,32 +149,32 @@ func TestUploadPropertiesComposition(t *testing.T) {
 
 	tests := []test{
 		// 0: classic upload, requires port
-		{buildPath1, "alice:avr:board1", "port", "serial", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "", "", false, "FAIL", ""},
 		// 2: classic upload, no port
-		{buildPath1, "alice:avr:board2", "port", "serial", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board2", "", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board2", "port", "serial", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board2", "", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
 
 		// 4: upload with programmer, requires port
-		{buildPath1, "alice:avr:board1", "port", "serial", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "", "progr1", false, "FAIL", ""},
 		// 6: upload with programmer, no port
-		{buildPath1, "alice:avr:board1", "port", "serial", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board1", "", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
 		// 8: upload with programmer, require port through extra params
-		{buildPath1, "alice:avr:board1", "port", "serial", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "", "progr3", false, "FAIL", ""},
 
 		// 10: burn bootloader, require port
 		{buildPath1, "alice:avr:board1", "port", "serial", "", true, "FAIL", ""}, // requires programmer
 		{buildPath1, "alice:avr:board1", "port", "serial", "progr1", true,
 			"ERASE conf-board1 conf-general conf-erase $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed\n",
-			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
+			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/upload/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 
 		// 12: burn bootloader, preferences override from programmers.txt
 		{buildPath1, "alice:avr:board1", "port", "serial", "progr4", true,
 			"ERASE conf-board1 conf-two-general conf-two-erase $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed\n",
-			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
+			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/upload/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 	}
 
 	pm := pmb.Build()

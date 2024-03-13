@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/updatecheck"
-	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
@@ -299,7 +298,7 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 			Message: &rpc.UploadResponse_ErrStream{ErrStream: data},
 		})
 	})
-	res, err := upload.Upload(stream.Context(), req, outStream, errStream)
+	res, err := Upload(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if res != nil {
@@ -329,7 +328,7 @@ func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 			},
 		})
 	})
-	err := upload.UsingProgrammer(stream.Context(), req, outStream, errStream)
+	err := UploadUsingProgrammer(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
@@ -340,7 +339,7 @@ func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 
 // SupportedUserFields FIXMEDOC
 func (s *ArduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
-	res, err := upload.SupportedUserFields(ctx, req)
+	res, err := SupportedUserFields(ctx, req)
 	return res, convertErrorToRPCStatus(err)
 }
 
@@ -361,7 +360,7 @@ func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 			},
 		})
 	})
-	resp, err := upload.BurnBootloader(stream.Context(), req, outStream, errStream)
+	resp, err := BurnBootloader(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
@@ -372,7 +371,7 @@ func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 
 // ListProgrammersAvailableForUpload FIXMEDOC
 func (s *ArduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
-	resp, err := upload.ListProgrammersAvailableForUpload(ctx, req)
+	resp, err := ListProgrammersAvailableForUpload(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 

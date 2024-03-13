@@ -19,7 +19,6 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -58,7 +57,7 @@ func GetInstalledProgrammers() []string {
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.GetBoards() {
-		programmers, _ := upload.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadRequest{
+		programmers, _ := commands.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadRequest{
 			Instance: inst,
 			Fqbn:     board.GetFqbn(),
 		})

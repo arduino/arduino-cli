@@ -20,8 +20,8 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -75,7 +75,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 	}
 
 	stdOut, stdErr, res := feedback.OutputStreams()
-	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
+	if _, err := commands.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn.String(),
 		Port:       discoveryPort,

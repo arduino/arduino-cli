@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package upload
+package commands
 
 import (
 	"context"
@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -39,8 +38,6 @@ import (
 	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
 )
-
-var tr = i18n.Tr
 
 // SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
 // by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
@@ -179,8 +176,8 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	}, nil
 }
 
-// UsingProgrammer FIXMEDOC
-func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) error {
+// UploadUsingProgrammer FIXMEDOC
+func UploadUsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) error {
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {

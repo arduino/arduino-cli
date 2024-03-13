@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -249,7 +248,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {
-		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+		userFieldRes, err := commands.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
 			Fqbn:     fqbn,
 			Protocol: port.GetProtocol(),
@@ -288,7 +287,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			UserFields: fields,
 		}
 
-		if res, err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
+		if res, err := commands.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 				errcode = feedback.ErrMissingProgrammer
