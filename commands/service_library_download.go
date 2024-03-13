@@ -13,23 +13,19 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package lib
+package commands
 
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
-
-var tr = i18n.Tr
 
 // LibraryDownload executes the download of the library.
 // A DownloadProgressCB callback function must be passed to monitor download progress.
@@ -51,7 +47,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 
 	logrus.Info("Preparing download")
 
-	version, err := commands.ParseVersion(req.GetVersion())
+	version, err := ParseVersion(req.GetVersion())
 	if err != nil {
 		return nil, err
 	}

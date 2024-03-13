@@ -21,7 +21,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -55,7 +55,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino-cli board listall`")
 
-	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
+	list, err := commands.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          args,
 		IncludeHiddenBoards: showHiddenBoard,

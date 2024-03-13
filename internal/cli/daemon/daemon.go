@@ -24,7 +24,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/arduino/arduino-cli/commands/daemon"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -102,7 +102,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set("network.user_agent_ext", "daemon")
 
 	// register the commands service
-	srv_commands.RegisterArduinoCoreServiceServer(s, &daemon.ArduinoCoreServerImpl{
+	srv_commands.RegisterArduinoCoreServiceServer(s, &commands.ArduinoCoreServerImpl{
 		VersionString: version.VersionInfo.VersionString,
 	})
 

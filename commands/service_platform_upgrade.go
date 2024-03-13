@@ -13,12 +13,11 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package core
+package commands
 
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
@@ -51,14 +50,14 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 	platformRelease, err := upgrade()
 	if platformRelease != nil {
 		rpcPlatform = &rpc.Platform{
-			Metadata: commands.PlatformToRPCPlatformMetadata(platformRelease.Platform),
-			Release:  commands.PlatformReleaseToRPC(platformRelease),
+			Metadata: PlatformToRPCPlatformMetadata(platformRelease.Platform),
+			Release:  PlatformReleaseToRPC(platformRelease),
 		}
 	}
 	if err != nil {
 		return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, err
 	}
-	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return nil, err
 	}
 

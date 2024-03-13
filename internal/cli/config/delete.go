@@ -18,7 +18,7 @@ package config
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/daemon"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -47,7 +47,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config delete`")
 	toDelete := args[0]
 
-	svc := daemon.ArduinoCoreServerImpl{}
+	svc := commands.ArduinoCoreServerImpl{}
 	_, err := svc.SettingsDelete(cmd.Context(), &rpc.SettingsDeleteRequest{Key: toDelete})
 	if err != nil {
 		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", toDelete, err), feedback.ErrGeneric)

@@ -18,9 +18,8 @@ package arguments
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -32,7 +31,7 @@ import (
 func GetInstalledBoards() []string {
 	inst := instance.CreateAndInit()
 
-	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
+	list, _ := commands.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
@@ -56,7 +55,7 @@ func GetInstalledProgrammers() []string {
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
 	}
-	list, _ := board.ListAll(context.Background(), listAllReq)
+	list, _ := commands.BoardListAll(context.Background(), listAllReq)
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.GetBoards() {
@@ -83,7 +82,7 @@ func GetInstalledProgrammers() []string {
 func GetUninstallableCores() []string {
 	inst := instance.CreateAndInit()
 
-	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
+	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:          inst,
 		ManuallyInstalled: true,
 	})
@@ -104,7 +103,7 @@ func GetUninstallableCores() []string {
 func GetInstallableCores() []string {
 	inst := instance.CreateAndInit()
 
-	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
+	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:   inst,
 		SearchArgs: "",
 	})
@@ -132,7 +131,7 @@ func GetUninstallableLibraries() []string {
 
 func getLibraries(all bool) []string {
 	inst := instance.CreateAndInit()
-	libs, _ := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
+	libs, _ := commands.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  inst,
 		All:       all,
 		Updatable: false,
@@ -152,7 +151,7 @@ func getLibraries(all bool) []string {
 func GetInstallableLibs() []string {
 	inst := instance.CreateAndInit()
 
-	libs, _ := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+	libs, _ := commands.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:   inst,
 		SearchArgs: "", // if no query is specified all the libs are returned
 	})

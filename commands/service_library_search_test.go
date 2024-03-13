@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package lib
+package commands
 
 import (
 	"strings"
@@ -28,9 +28,9 @@ import (
 )
 
 var indexFilename, _ = globals.LibrariesIndexResource.IndexFileName()
-var customIndexPath = paths.New("testdata", "test1", indexFilename)
-var fullIndexPath = paths.New("testdata", "full", indexFilename)
-var qualifiedSearchIndexPath = paths.New("testdata", "qualified_search", indexFilename)
+var customIndexPath = paths.New("testdata", "libraries", "test1", indexFilename)
+var fullIndexPath = paths.New("testdata", "libraries", "full", indexFilename)
+var qualifiedSearchIndexPath = paths.New("testdata", "libraries", "qualified_search", indexFilename)
 
 func TestSearchLibrary(t *testing.T) {
 	li, err := librariesindex.LoadIndex(customIndexPath)

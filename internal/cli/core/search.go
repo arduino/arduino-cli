@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -74,7 +73,7 @@ func runSearchCommand(cmd *cobra.Command, args []string, allVersions bool) {
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)
 
-	resp, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+	resp, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:   inst,
 		SearchArgs: arguments,
 	})

@@ -22,7 +22,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -84,7 +84,7 @@ func GetList(
 		name = args[0]
 	}
 
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
+	res, err := commands.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  instance,
 		All:       all,
 		Updatable: updatable,

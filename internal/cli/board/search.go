@@ -22,7 +22,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -52,7 +52,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino-cli board search`")
 
-	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
+	res, err := commands.BoardSearch(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		IncludeHiddenBoards: showHiddenBoard,

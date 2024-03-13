@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -63,7 +63,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, feedback.ProgressBar())
+		_, err := commands.PlatformDownload(context.Background(), platformDownloadreq, feedback.ProgressBar())
 		if err != nil {
 			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", args[i], err), feedback.ErrNetwork)
 		}

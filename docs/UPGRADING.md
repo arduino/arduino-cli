@@ -1698,7 +1698,7 @@ https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse
 https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest
 https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse
 
-https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go
+https://github.com/arduino/arduino-cli/blob/752709af9bf1bf8f6c1e6f689b1e8b86cc4e884e/commands/daemon/term_example/main.go
 
 ## 0.23.0
 

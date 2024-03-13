@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -63,7 +63,7 @@ func runUninstallCommand(args []string, preUninstallFlags arguments.PrePostScrip
 		}
 	}
 	for _, platformRef := range platformsRefs {
-		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
+		_, err := commands.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
 			Instance:         inst,
 			PlatformPackage:  platformRef.PackageName,
 			Architecture:     platformRef.Architecture,

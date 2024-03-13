@@ -18,7 +18,7 @@ package core
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -60,7 +60,7 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 
 // GetList returns a list of installed platforms.
 func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
-	platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+	platforms, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:          inst,
 		ManuallyInstalled: true,
 	})

@@ -13,13 +13,12 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package core
+package commands
 
 import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
-	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -33,13 +32,19 @@ func TestPlatformSearch(t *testing.T) {
 	dataDir.MkdirAll()
 	downloadDir.MkdirAll()
 	defer paths.TempDir().Join("test").RemoveAll()
-	err := paths.New("testdata").Join("package_index.json").CopyTo(dataDir.Join("package_index.json"))
+	err := paths.New("testdata", "platform", "package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
 	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
 
-	inst := instance.CreateAndInit()
+	createResp, err := Create(&rpc.CreateRequest{})
+	require.NoError(t, err)
+
+	inst := createResp.GetInstance()
 	require.NotNil(t, inst)
+
+	err = Init(&rpc.InitRequest{Instance: inst}, nil)
+	require.NoError(t, err)
 
 	t.Run("SearchAllVersions", func(t *testing.T) {
 		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
@@ -327,13 +332,17 @@ func TestPlatformSearchSorting(t *testing.T) {
 	dataDir.MkdirAll()
 	downloadDir.MkdirAll()
 	defer paths.TempDir().Join("test").RemoveAll()
-	err := paths.New("testdata").Join("package_index.json").CopyTo(dataDir.Join("package_index.json"))
+	err := paths.New("testdata", "platform", "package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
 	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
 
-	inst := instance.CreateAndInit()
+	createResp, err := Create(&rpc.CreateRequest{})
+	require.NoError(t, err)
+	inst := createResp.GetInstance()
 	require.NotNil(t, inst)
+	err = Init(&rpc.InitRequest{Instance: inst}, nil)
+	require.NoError(t, err)
 
 	res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:   inst,

@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -60,7 +60,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
+		_, err := commands.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
 		if err != nil {
 			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", library, err), feedback.ErrNetwork)
 		}

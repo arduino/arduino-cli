@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/daemon"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -50,7 +50,7 @@ func initGetCommand() *cobra.Command {
 func runGetCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
 
-	svc := daemon.ArduinoCoreServerImpl{}
+	svc := commands.ArduinoCoreServerImpl{}
 	for _, toGet := range args {
 		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {

@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -119,7 +118,7 @@ func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 		instance.Init(inst)
 	}
 
-	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+	searchResp, err := commands.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		OmitReleasesDetails: omitReleasesDetails,

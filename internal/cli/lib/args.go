@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -76,7 +76,7 @@ func ParseLibraryReferenceArgs(args []string) ([]*LibraryReferenceArg, error) {
 // library and possibly adjust the case of the name to match a library in the index
 func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (*LibraryReferenceArg, error) {
 	libRef, _ := ParseLibraryReferenceArg(arg)
-	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+	res, err := commands.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:   instance,
 		SearchArgs: libRef.Name,
 	})

@@ -21,7 +21,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -61,7 +61,7 @@ func runDepsCommand(args []string, noOverwrite bool) {
 		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
 
-	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
+	deps, err := commands.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
 		Instance:                      instance,
 		Name:                          libRef.Name,
 		Version:                       libRef.Version,

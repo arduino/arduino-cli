@@ -24,9 +24,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/compile"
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -384,7 +384,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			if profileArg.String() == "" {
 				res.Error += fmt.Sprintln()
 
-				if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+				if platform, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 					Instance:   inst,
 					SearchArgs: platformErr.Platform,
 				}); err != nil {

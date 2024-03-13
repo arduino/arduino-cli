@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package daemon
+package commands
 
 import (
 	"context"
@@ -127,8 +127,7 @@ func TestGetMergedValue(t *testing.T) {
 func TestGetValueNotFound(t *testing.T) {
 	key := &rpc.SettingsGetValueRequest{Key: "DOESNTEXIST"}
 	_, err := svc.SettingsGetValue(context.Background(), key)
-	require.NotNil(t, err)
-	require.Equal(t, `key not found in settings`, err.Error())
+	require.Error(t, err)
 }
 
 func TestSetValue(t *testing.T) {

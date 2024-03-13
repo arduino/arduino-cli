@@ -13,14 +13,13 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package core
+package commands
 
 import (
 	"regexp"
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
@@ -82,7 +81,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	out := []*rpc.PlatformSummary{}
 	for _, platform := range res {
 		rpcPlatformSummary := &rpc.PlatformSummary{
-			Metadata: commands.PlatformToRPCPlatformMetadata(platform),
+			Metadata: PlatformToRPCPlatformMetadata(platform),
 			Releases: map[string]*rpc.PlatformRelease{},
 		}
 		if installed := pme.GetInstalledPlatformRelease(platform); installed != nil {
@@ -92,7 +91,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 			rpcPlatformSummary.LatestVersion = latestCompatible.Version.String()
 		}
 		for _, platformRelease := range platform.GetAllReleases() {
-			rpcPlatformRelease := commands.PlatformReleaseToRPC(platformRelease)
+			rpcPlatformRelease := PlatformReleaseToRPC(platformRelease)
 			rpcPlatformSummary.Releases[rpcPlatformRelease.GetVersion()] = rpcPlatformRelease
 		}
 		out = append(out, rpcPlatformSummary)

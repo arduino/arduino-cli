@@ -13,12 +13,11 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package lib
+package commands
 
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -42,7 +41,7 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 		return err
 	}
 
-	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return err
 	}
 

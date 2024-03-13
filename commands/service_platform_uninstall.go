@@ -13,12 +13,11 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package core
+package commands
 
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
@@ -30,7 +29,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if err := platformUninstall(ctx, req, taskCB); err != nil {
 		return nil, err
 	}
-	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformUninstallResponse{}, nil

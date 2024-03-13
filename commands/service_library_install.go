@@ -13,14 +13,13 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package lib
+package commands
 
 import (
 	"context"
 	"errors"
 	"fmt"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -91,7 +90,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	for _, lib := range toInstall {
-		version, err := commands.ParseVersion(lib.GetVersionRequired())
+		version, err := ParseVersion(lib.GetVersionRequired())
 		if err != nil {
 			return err
 		}
@@ -137,7 +136,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 	}
 
-	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return err
 	}
 

@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -89,7 +89,7 @@ func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool
 
 	if zipPath {
 		for _, path := range args {
-			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
+			err := commands.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
 				Instance:  instance,
 				Path:      path,
 				Overwrite: !noOverwrite,
@@ -110,7 +110,7 @@ func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool
 				}
 				url = wd.String()
 			}
-			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
+			err := commands.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
 				Instance:  instance,
 				Url:       url,
 				Overwrite: !noOverwrite,
@@ -140,7 +140,7 @@ func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool
 			NoOverwrite:     noOverwrite,
 			InstallLocation: installLocation,
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
+		err := commands.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
 		}

@@ -13,22 +13,21 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package commands
 
 import (
 	"context"
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// ListAll FIXMEDOC
-func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
+// BoardListAll FIXMEDOC
+func BoardListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
@@ -47,8 +46,8 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 			}
 
 			rpcPlatform := &rpc.Platform{
-				Metadata: commands.PlatformToRPCPlatformMetadata(platform),
-				Release:  commands.PlatformReleaseToRPC(installedPlatformRelease),
+				Metadata: PlatformToRPCPlatformMetadata(platform),
+				Release:  PlatformReleaseToRPC(installedPlatformRelease),
 			}
 
 			toTest := []string{

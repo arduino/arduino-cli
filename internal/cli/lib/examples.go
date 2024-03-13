@@ -22,7 +22,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -63,7 +63,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 		name = args[0]
 	}
 
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
+	res, err := commands.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance: instance,
 		All:      true,
 		Name:     name,

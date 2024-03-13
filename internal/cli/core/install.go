@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -75,7 +75,7 @@ func runInstallCommand(args []string, scriptFlags arguments.PrePostScriptsFlags,
 			NoOverwrite:      noOverwrite,
 			SkipPreUninstall: scriptFlags.DetectSkipPreUninstallValue(),
 		}
-		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
+		_, err := commands.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Fatal(tr("Error during install: %v", err), feedback.ErrGeneric)
 		}

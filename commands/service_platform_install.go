@@ -13,13 +13,12 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package core
+package commands
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
@@ -35,7 +34,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 		}
 		defer release()
 
-		version, err := commands.ParseVersion(req.GetVersion())
+		version, err := ParseVersion(req.GetVersion())
 		if err != nil {
 			return &cmderrors.InvalidVersionError{Cause: err}
 		}
@@ -74,7 +73,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 	if err := install(); err != nil {
 		return nil, err
 	}
-	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformInstallResponse{}, nil

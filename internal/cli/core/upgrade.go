@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -60,7 +60,7 @@ func runUpgradeCommand(args []string, skipPostInstall bool, skipPreUninstall boo
 func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		platforms, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 			Instance: inst,
 		})
 		if err != nil {
@@ -122,7 +122,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 			SkipPostInstall:  skipPostInstall,
 			SkipPreUninstall: skipPreUninstall,
 		}
-		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
+		response, err := commands.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
 		warningMissingIndex(response)
 		if err != nil {
 			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError

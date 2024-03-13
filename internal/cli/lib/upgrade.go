@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -53,14 +53,14 @@ func Upgrade(instance *rpc.Instance, libraries []string) {
 	var upgradeErr error
 	if len(libraries) == 0 {
 		req := &rpc.LibraryUpgradeAllRequest{Instance: instance}
-		upgradeErr = lib.LibraryUpgradeAll(req, feedback.ProgressBar(), feedback.TaskProgress())
+		upgradeErr = commands.LibraryUpgradeAll(req, feedback.ProgressBar(), feedback.TaskProgress())
 	} else {
 		for _, libName := range libraries {
 			req := &rpc.LibraryUpgradeRequest{
 				Instance: instance,
 				Name:     libName,
 			}
-			upgradeErr = lib.LibraryUpgrade(context.Background(), req, feedback.ProgressBar(), feedback.TaskProgress())
+			upgradeErr = commands.LibraryUpgrade(context.Background(), req, feedback.ProgressBar(), feedback.TaskProgress())
 			if upgradeErr != nil {
 				break
 			}

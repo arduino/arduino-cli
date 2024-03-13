@@ -22,8 +22,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/core"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -135,7 +135,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 			}
 
 			msg += "\n"
-			if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+			if platform, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 				Instance:   inst,
 				SearchArgs: platformErr.Platform,
 			}); err != nil {

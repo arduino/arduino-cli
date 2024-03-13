@@ -13,14 +13,13 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package lib
+package commands
 
 import (
 	"context"
 	"errors"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -48,7 +47,7 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 
 func libraryResolveDependencies(ctx context.Context, lme *librariesmanager.Explorer, li *librariesindex.Index,
 	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
-	version, err := commands.ParseVersion(reqVersion)
+	version, err := ParseVersion(reqVersion)
 	if err != nil {
 		return nil, err
 	}

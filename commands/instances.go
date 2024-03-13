@@ -45,8 +45,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var tr = i18n.Tr
-
 func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	pme, release := pm.NewExplorer()
 	defer release()

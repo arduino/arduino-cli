@@ -13,24 +13,23 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package commands
 
 import (
 	"context"
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// Search returns all boards that match the search arg.
+// BoardSearch returns all boards that match the search arg.
 // Boards are searched in all platforms, including those in the index that are not yet
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
-func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
+func BoardSearch(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
@@ -68,8 +67,8 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 						Fqbn:     board.FQBN(),
 						IsHidden: board.IsHidden(),
 						Platform: &rpc.Platform{
-							Metadata: commands.PlatformToRPCPlatformMetadata(platform),
-							Release:  commands.PlatformReleaseToRPC(installedPlatformRelease),
+							Metadata: PlatformToRPCPlatformMetadata(platform),
+							Release:  PlatformReleaseToRPC(installedPlatformRelease),
 						},
 					})
 				}
@@ -83,8 +82,8 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 					foundBoards = append(foundBoards, &rpc.BoardListItem{
 						Name: strings.Trim(board.Name, " \n"),
 						Platform: &rpc.Platform{
-							Metadata: commands.PlatformToRPCPlatformMetadata(platform),
-							Release:  commands.PlatformReleaseToRPC(latestPlatformRelease),
+							Metadata: PlatformToRPCPlatformMetadata(platform),
+							Release:  PlatformReleaseToRPC(latestPlatformRelease),
 						},
 					})
 				}

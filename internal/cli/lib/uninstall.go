@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -54,7 +54,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, library := range refs {
-		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallRequest{
+		err := commands.LibraryUninstall(context.Background(), &rpc.LibraryUninstallRequest{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,
