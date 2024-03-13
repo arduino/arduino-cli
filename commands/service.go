@@ -22,10 +22,8 @@ import (
 	"io"
 	"sync/atomic"
 
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/cache"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/updatecheck"
@@ -55,13 +53,13 @@ func convertErrorToRPCStatus(err error) error {
 
 // BoardDetails FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
-	resp, err := board.Details(ctx, req)
+	resp, err := BoardDetails(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
 // BoardList FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
-	ports, _, err := board.List(req)
+	ports, _, err := BoardList(req)
 	if err != nil {
 		return nil, convertErrorToRPCStatus(err)
 	}
@@ -94,7 +92,7 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 		return err
 	}
 
-	eventsChan, err := board.Watch(stream.Context(), req)
+	eventsChan, err := BoardListWatch(stream.Context(), req)
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
@@ -211,7 +209,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 			Message: &rpc.CompileResponse_Progress{Progress: p},
 		})
 	}
-	compileRes, compileErr := compile.Compile(stream.Context(), req, outStream, errStream, progressStream)
+	compileRes, compileErr := Compile(stream.Context(), req, outStream, errStream, progressStream)
 	outStream.Close()
 	errStream.Close()
 	var compileRespSendErr error

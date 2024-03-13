@@ -26,7 +26,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -246,7 +245,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
 		Jobs:                          jobs,
 	}
-	builderRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
+	builderRes, compileError := commands.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
 
 	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {

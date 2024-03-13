@@ -19,7 +19,6 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -169,7 +168,7 @@ func GetInstallableLibs() []string {
 func GetAvailablePorts() []*rpc.Port {
 	inst := instance.CreateAndInit()
 
-	list, _, _ := board.List(&rpc.BoardListRequest{
+	list, _, _ := commands.BoardList(&rpc.BoardListRequest{
 		Instance: inst,
 	})
 	var res []*rpc.Port

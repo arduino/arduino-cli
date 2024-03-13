@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -91,7 +91,7 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	watcher, err := board.Watch(ctx, &rpc.BoardListWatchRequest{Instance: instance})
+	watcher, err := commands.BoardListWatch(ctx, &rpc.BoardListWatchRequest{Instance: instance})
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (p *Port) GetSearchTimeout() time.Duration {
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
 func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
-	detectedPorts, _, err := board.List(&rpc.BoardListRequest{
+	detectedPorts, _, err := commands.BoardList(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})

@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -65,7 +65,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 	if err != nil {
 		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
-	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
+	res, err := commands.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
 		Instance:                   inst,
 		Fqbn:                       fqbn,
 		DoNotExpandBuildProperties: showPropertiesMode == arguments.ShowPropertiesUnexpanded,

@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package commands
 
 import (
 	"context"
@@ -201,10 +201,10 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	return boards, nil
 }
 
-// List returns a list of boards found by the loaded discoveries.
+// BoardList returns a list of boards found by the loaded discoveries.
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
-func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
+func BoardList(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, nil, err
@@ -258,8 +258,8 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 	return false
 }
 
-// Watch returns a channel that receives boards connection and disconnection events.
-func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
+// BoardListWatch returns a channel that receives boards connection and disconnection events.
+func BoardListWatch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err

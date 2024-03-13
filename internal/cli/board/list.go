@@ -22,7 +22,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -67,7 +67,7 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 		return
 	}
 
-	ports, discoveryErrors, err := board.List(&rpc.BoardListRequest{
+	ports, discoveryErrors, err := commands.BoardList(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeout,
 		Fqbn:     fqbn,
@@ -87,7 +87,7 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 }
 
 func watchList(inst *rpc.Instance) {
-	eventsChan, err := board.Watch(context.Background(), &rpc.BoardListWatchRequest{Instance: inst})
+	eventsChan, err := commands.BoardListWatch(context.Background(), &rpc.BoardListWatchRequest{Instance: inst})
 	if err != nil {
 		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
 	}

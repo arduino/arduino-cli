@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package commands
 
 import (
 	"fmt"
@@ -30,11 +30,9 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func init() {
-	configuration.Settings = configuration.Init("")
-}
-
 func TestGetByVidPid(t *testing.T) {
+	configuration.Settings = configuration.Init("")
+	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `
 {
@@ -63,6 +61,8 @@ func TestGetByVidPid(t *testing.T) {
 }
 
 func TestGetByVidPidNotFound(t *testing.T) {
+	configuration.Settings = configuration.Init("")
+	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}))
@@ -75,6 +75,8 @@ func TestGetByVidPidNotFound(t *testing.T) {
 }
 
 func TestGetByVidPid5xx(t *testing.T) {
+	configuration.Settings = configuration.Init("")
+	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 - Ooooops!"))
@@ -89,6 +91,8 @@ func TestGetByVidPid5xx(t *testing.T) {
 }
 
 func TestGetByVidPidMalformedResponse(t *testing.T) {
+	configuration.Settings = configuration.Init("")
+	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "{}")
 	}))
@@ -102,12 +106,17 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 }
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
+	configuration.Settings = configuration.Init("")
+	configuration.Settings.Set("locale", "en")
 	items, err := identifyViaCloudAPI(properties.NewMap())
 	require.NoError(t, err)
 	require.Empty(t, items)
 }
 
 func TestBoardIdentifySorting(t *testing.T) {
+	configuration.Settings = configuration.Init("")
+	configuration.Settings.Set("locale", "en")
+
 	dataDir := paths.TempDir().Join("test", "data_dir")
 	t.Setenv("ARDUINO_DATA_DIR", dataDir.String())
 	dataDir.MkdirAll()
