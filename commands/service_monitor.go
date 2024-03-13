@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package monitor
+package commands
 
 import (
 	"context"
@@ -25,42 +25,39 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	pluggableMonitor "github.com/arduino/arduino-cli/internal/arduino/monitor"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
-var tr = i18n.Tr
-
-// PortProxy is an io.ReadWriteCloser that maps into the monitor port of the board
-type PortProxy struct {
+// portProxy is an io.ReadWriteCloser that maps into the monitor port of the board
+type portProxy struct {
 	rw               io.ReadWriter
 	changeSettingsCB func(setting, value string) error
 	closeCB          func() error
 }
 
-func (p *PortProxy) Read(buff []byte) (int, error) {
+func (p *portProxy) Read(buff []byte) (int, error) {
 	return p.rw.Read(buff)
 }
 
-func (p *PortProxy) Write(buff []byte) (int, error) {
+func (p *portProxy) Write(buff []byte) (int, error) {
 	return p.rw.Write(buff)
 }
 
 // Config sets the port configuration setting to the specified value
-func (p *PortProxy) Config(setting, value string) error {
+func (p *portProxy) Config(setting, value string) error {
 	return p.changeSettingsCB(setting, value)
 }
 
 // Close the port
-func (p *PortProxy) Close() error {
+func (p *portProxy) Close() error {
 	return p.closeCB()
 }
 
 // Monitor opens a communication port. It returns a PortProxy to communicate with the port and a PortDescriptor
 // that describes the available configuration settings.
-func Monitor(ctx context.Context, req *rpc.MonitorPortOpenRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
+func Monitor(ctx context.Context, req *rpc.MonitorPortOpenRequest) (*portProxy, *pluggableMonitor.PortDescriptor, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, nil, err
@@ -103,7 +100,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorPortOpenRequest) (*PortProxy, 
 	}
 
 	logrus.Infof("Port %s successfully opened", req.GetPort().GetAddress())
-	return &PortProxy{
+	return &portProxy{
 		rw:               monIO,
 		changeSettingsCB: m.Configure,
 		closeCB: func() error {

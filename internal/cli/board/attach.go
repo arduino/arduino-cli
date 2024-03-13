@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -59,7 +59,7 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string, programmer
 	sketchPath := arguments.InitSketchPath(path)
 
 	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, "", "")
-	newDefaults, err := sketch.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
+	newDefaults, err := commands.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,
 		DefaultProgrammer:   programmer.GetProgrammer(),

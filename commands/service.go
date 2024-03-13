@@ -24,8 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cache"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/monitor"
-	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/updatecheck"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -174,19 +172,19 @@ func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq
 
 // NewSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
-	resp, err := sketch.NewSketch(ctx, req)
+	resp, err := NewSketch(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
 // LoadSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
-	resp, err := sketch.LoadSketch(ctx, req)
+	resp, err := LoadSketch(ctx, req)
 	return &rpc.LoadSketchResponse{Sketch: resp}, convertErrorToRPCStatus(err)
 }
 
 // SetSketchDefaults FIXMEDOC
 func (s *ArduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (*rpc.SetSketchDefaultsResponse, error) {
-	resp, err := sketch.SetSketchDefaults(ctx, req)
+	resp, err := SetSketchDefaults(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
@@ -449,7 +447,7 @@ func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 
 // ArchiveSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
-	resp, err := sketch.ArchiveSketch(ctx, req)
+	resp, err := ArchiveSketch(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
@@ -475,7 +473,7 @@ func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 
 // EnumerateMonitorPortSettings FIXMEDOC
 func (s *ArduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
-	resp, err := monitor.EnumerateMonitorPortSettings(ctx, req)
+	resp, err := EnumerateMonitorPortSettings(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
@@ -493,7 +491,7 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	if openReq == nil {
 		return &cmderrors.InvalidInstanceError{}
 	}
-	portProxy, _, err := monitor.Monitor(stream.Context(), openReq)
+	portProxy, _, err := Monitor(stream.Context(), openReq)
 	if err != nil {
 		return err
 	}

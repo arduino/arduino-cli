@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -66,13 +66,13 @@ func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 	}
 
 	sketchPath := arguments.InitSketchPath(sketchPathArg)
-	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	sk, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 	feedback.WarnAboutDeprecatedFiles(sk)
 
-	if _, err := sketch.ArchiveSketch(context.Background(),
+	if _, err := commands.ArchiveSketch(context.Background(),
 		&rpc.ArchiveSketchRequest{
 			SketchPath:      sketchPath.String(),
 			ArchivePath:     archivePathArg,

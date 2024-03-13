@@ -20,7 +20,7 @@ import (
 	"os"
 	"strings"
 
-	sk "github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -72,7 +72,7 @@ func runNewCommand(args []string, overwrite bool) {
 		sketchName = sketchDirPath.Base()
 	}
 
-	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
+	_, err = commands.NewSketch(context.Background(), &rpc.NewSketchRequest{
 		SketchName: sketchName,
 		SketchDir:  sketchDir,
 		Overwrite:  overwrite,

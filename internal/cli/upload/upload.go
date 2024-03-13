@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -90,7 +89,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		path = args[0]
 	}
 	sketchPath := arguments.InitSketchPath(path)
-	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	sketch, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if importDir == "" && importFile == "" {
 		if err != nil {
 			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)

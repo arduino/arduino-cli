@@ -18,7 +18,7 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -52,7 +52,7 @@ func GetSketchProfiles(sketchPath string) []string {
 			return nil
 		}
 	}
-	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath})
+	sk, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath})
 	if err != nil {
 		return nil
 	}

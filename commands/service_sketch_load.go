@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,21 +13,22 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package sketch
+package commands
 
 import (
 	"context"
-	"testing"
 
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/stretchr/testify/require"
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	paths "github.com/arduino/go-paths-helper"
 )
 
-func TestLoadSketchProfiles(t *testing.T) {
-	loadResp, err := LoadSketch(context.Background(), &commands.LoadSketchRequest{
-		SketchPath: "./testdata/sketch_with_profile",
-	})
-	require.NoError(t, err)
-	require.Len(t, loadResp.GetProfiles(), 2)
-	require.Equal(t, loadResp.GetDefaultProfile().GetName(), "nanorp")
+// LoadSketch collects and returns all information about a sketch
+func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.Sketch, error) {
+	sk, err := sketch.New(paths.New(req.GetSketchPath()))
+	if err != nil {
+		return nil, &cmderrors.CantOpenSketchError{Cause: err}
+	}
+	return sk.ToRpc(), nil
 }

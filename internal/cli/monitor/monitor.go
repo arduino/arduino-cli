@@ -26,8 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/commands/monitor"
-	sk "github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -104,7 +103,7 @@ func runMonitorCmd(
 	// If only --port is set we read the fqbn in the following order: default_fqbn -> discovery
 	// If only --fqbn is set we read the port in the following order: default_port
 	sketchPath := arguments.InitSketchPath(sketchPathArg)
-	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	sketch, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && !portArgs.IsPortFlagSet() {
 		feedback.Fatal(
 			tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
@@ -145,7 +144,7 @@ func runMonitorCmd(
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
-	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
+	enumerateResp, err := commands.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     inst,
 		PortProtocol: portProtocol,
 		Fqbn:         fqbn,
@@ -203,7 +202,7 @@ func runMonitorCmd(
 			}
 		}
 	}
-	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorPortOpenRequest{
+	portProxy, _, err := commands.Monitor(context.Background(), &rpc.MonitorPortOpenRequest{
 		Instance:          inst,
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
 		Fqbn:              fqbn,
