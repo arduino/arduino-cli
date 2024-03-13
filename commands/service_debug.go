@@ -62,12 +62,10 @@ func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 
 // GetDebugConfig return metadata about a debug session
 func (s *ArduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
-	res, err := GetDebugConfig(ctx, req)
-	return res, convertErrorToRPCStatus(err)
+	return GetDebugConfig(ctx, req)
 }
 
 // IsDebugSupported checks if debugging is supported for a given configuration
 func (s *ArduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
-	res, err := IsDebugSupported(ctx, req)
-	return res, convertErrorToRPCStatus(err)
+	return IsDebugSupported(ctx, req)
 }

@@ -162,7 +162,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					Cause:  fmt.Errorf(tr("Invalid additional URL: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL,
 				}
-				responseError(e.ToRPCStatus())
+				responseError(e.GRPCStatus())
 				continue
 			}
 			allPackageIndexUrls = append(allPackageIndexUrls, URL)
@@ -174,7 +174,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			Cause:  err,
 			Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR,
 		}
-		responseError(e.ToRPCStatus())
+		responseError(e.GRPCStatus())
 	}
 
 	{
@@ -199,7 +199,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 						Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
 						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 					}
-					responseError(e.ToRPCStatus())
+					responseError(e.GRPCStatus())
 				}
 				continue
 			}
@@ -210,7 +210,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 				}
-				responseError(e.ToRPCStatus())
+				responseError(e.GRPCStatus())
 			}
 		}
 
@@ -223,7 +223,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if profile == nil {
 			for _, err := range pmb.LoadHardware() {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
-				responseError(s.ToRPCStatus())
+				responseError(s.GRPCStatus())
 			}
 		} else {
 			// Load platforms from profile
@@ -232,7 +232,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			)
 			for _, err := range errs {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
-				responseError(s.ToRPCStatus())
+				responseError(s.GRPCStatus())
 			}
 
 			// Load "builtin" tools
@@ -252,7 +252,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					Cause:  fmt.Errorf(tr("can't find latest release of tool %s", name)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
 				}
-				responseError(e.ToRPCStatus())
+				responseError(e.GRPCStatus())
 			} else if !latest.IsInstalled() {
 				builtinToolsToInstall = append(builtinToolsToInstall, latest)
 			}
@@ -267,7 +267,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 						Cause:  err,
 						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
 					}
-					responseError(e.ToRPCStatus())
+					responseError(e.GRPCStatus())
 				}
 			}
 
@@ -275,7 +275,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			// so we must reload again otherwise we would never found them.
 			for _, err := range loadBuiltinTools() {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
-				responseError(s.ToRPCStatus())
+				responseError(s.GRPCStatus())
 			}
 		}
 
@@ -290,7 +290,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 	for _, err := range pme.LoadDiscoveries() {
 		s := &cmderrors.PlatformLoadingError{Cause: err}
-		responseError(s.ToRPCStatus())
+		responseError(s.GRPCStatus())
 	}
 
 	// Create library manager and add libraries directories
@@ -353,13 +353,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
 					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
-					responseError(err.ToRPCStatus())
+					responseError(err.GRPCStatus())
 					continue
 				}
 				if err := libRelease.Resource.Download(pme.DownloadDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
-					responseError(e.ToRPCStatus())
+					responseError(e.GRPCStatus())
 					continue
 				}
 				taskCallback(&rpc.TaskProgress{Completed: true})
@@ -369,7 +369,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
-					responseError(e.ToRPCStatus())
+					responseError(e.GRPCStatus())
 					continue
 				}
 				taskCallback(&rpc.TaskProgress{Completed: true})
