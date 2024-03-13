@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newDebugCheckCommand() *cobra.Command {
+func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
 		fqbnArg     arguments.Fqbn
 		portArgs    arguments.Port
@@ -44,9 +44,9 @@ func newDebugCheckCommand() *cobra.Command {
 			runDebugCheckCommand(&portArgs, &fqbnArg, interpreter, &programmer)
 		},
 	}
-	fqbnArg.AddToCommand(debugCheckCommand)
+	fqbnArg.AddToCommand(debugCheckCommand, srv)
 	portArgs.AddToCommand(debugCheckCommand)
-	programmer.AddToCommand(debugCheckCommand)
+	programmer.AddToCommand(debugCheckCommand, srv)
 	debugCheckCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	return debugCheckCommand
 }

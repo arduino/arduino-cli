@@ -47,7 +47,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config delete`")
 	toDelete := args[0]
 
-	svc := commands.ArduinoCoreServerImpl{}
+	svc := commands.NewArduinoCoreServer("")
 	_, err := svc.SettingsDelete(cmd.Context(), &rpc.SettingsDeleteRequest{Key: toDelete})
 	if err != nil {
 		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", toDelete, err), feedback.ErrGeneric)

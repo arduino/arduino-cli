@@ -18,16 +18,21 @@ package main
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/version"
 )
 
 func main() {
 	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsFallbackOnEnv(os.Args))
 	i18n.Init(configuration.Settings.GetString("locale"))
-	arduinoCmd := cli.NewCommand()
+
+	srv := commands.NewArduinoCoreServer(version.VersionInfo.VersionString)
+
+	arduinoCmd := cli.NewCommand(srv)
 	if err := arduinoCmd.Execute(); err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

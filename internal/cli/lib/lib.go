@@ -19,13 +19,14 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
 var tr = i18n.Tr
 
 // NewCommand created a new `lib` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
 		Short: tr("Arduino commands about libraries."),
@@ -37,8 +38,8 @@ func NewCommand() *cobra.Command {
 
 	libCommand.AddCommand(initDownloadCommand())
 	libCommand.AddCommand(initInstallCommand())
-	libCommand.AddCommand(initListCommand())
-	libCommand.AddCommand(initExamplesCommand())
+	libCommand.AddCommand(initListCommand(srv))
+	libCommand.AddCommand(initExamplesCommand(srv))
 	libCommand.AddCommand(initSearchCommand())
 	libCommand.AddCommand(initUninstallCommand())
 	libCommand.AddCommand(initUpgradeCommand())

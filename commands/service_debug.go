@@ -26,7 +26,7 @@ import (
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
 // contain DebugRequest configuration params, not data.
-func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer) error {
+func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer) error {
 	// Grab the first message
 	msg, err := stream.Recv()
 	if err != nil {
@@ -61,11 +61,11 @@ func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 }
 
 // GetDebugConfig return metadata about a debug session
-func (s *ArduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
+func (s *arduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
 	return GetDebugConfig(ctx, req)
 }
 
 // IsDebugSupported checks if debugging is supported for a given configuration
-func (s *ArduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
+func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
 	return IsDebugSupported(ctx, req)
 }

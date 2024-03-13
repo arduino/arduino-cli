@@ -43,7 +43,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand created a new `monitor` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
 		portArgs   arguments.Port
 		fqbnArg    arguments.Fqbn
@@ -76,7 +76,7 @@ func NewCommand() *cobra.Command {
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, tr("Timestamp each incoming line."))
-	fqbnArg.AddToCommand(monitorCommand)
+	fqbnArg.AddToCommand(monitorCommand, srv)
 	return monitorCommand
 }
 

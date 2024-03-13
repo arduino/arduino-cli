@@ -64,13 +64,13 @@ var (
 )
 
 // NewCommand creates a new ArduinoCli command root
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cobra.AddTemplateFunc("tr", i18n.Tr)
 
 	var updaterMessageChan chan *semver.Version
 
 	// ArduinoCli is the root command
-	arduinoCli := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "arduino-cli",
 		Short:   tr("Arduino CLI."),
 		Long:    tr("Arduino Command Line Interface (arduino-cli)."),
@@ -112,35 +112,27 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	arduinoCli.SetUsageTemplate(getUsageTemplate())
+	cmd.SetUsageTemplate(getUsageTemplate())
 
-	createCliCommandTree(arduinoCli)
-
-	return arduinoCli
-}
-
-// this is here only for testing
-func createCliCommandTree(cmd *cobra.Command) {
-	cmd.AddCommand(board.NewCommand())
+	cmd.AddCommand(board.NewCommand(srv))
 	cmd.AddCommand(cache.NewCommand())
-	cmd.AddCommand(compile.NewCommand())
+	cmd.AddCommand(compile.NewCommand(srv))
 	cmd.AddCommand(completion.NewCommand())
 	cmd.AddCommand(config.NewCommand())
 	cmd.AddCommand(core.NewCommand())
 	cmd.AddCommand(daemon.NewCommand())
 	cmd.AddCommand(generatedocs.NewCommand())
-	cmd.AddCommand(lib.NewCommand())
-	cmd.AddCommand(monitor.NewCommand())
+	cmd.AddCommand(lib.NewCommand(srv))
+	cmd.AddCommand(monitor.NewCommand(srv))
 	cmd.AddCommand(outdated.NewCommand())
 	cmd.AddCommand(sketch.NewCommand())
 	cmd.AddCommand(update.NewCommand())
 	cmd.AddCommand(upgrade.NewCommand())
-	cmd.AddCommand(upload.NewCommand())
-	cmd.AddCommand(debug.NewCommand())
-	cmd.AddCommand(burnbootloader.NewCommand())
+	cmd.AddCommand(upload.NewCommand(srv))
+	cmd.AddCommand(debug.NewCommand(srv))
+	cmd.AddCommand(burnbootloader.NewCommand(srv))
 	cmd.AddCommand(version.NewCommand())
 	cmd.AddCommand(feedback.NewCommand())
-
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	cmd.Flag("verbose").Hidden = true
 	cmd.PersistentFlags().BoolVar(&verbose, "log", false, tr("Print the logs on the standard output."))
@@ -166,6 +158,8 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
 	configuration.BindFlags(cmd, configuration.Settings)
+
+	return cmd
 }
 
 // convert the string passed to the `--log-level` option to the corresponding

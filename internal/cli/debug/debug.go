@@ -38,7 +38,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand created a new `upload` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
 		fqbnArg     arguments.Fqbn
 		portArgs    arguments.Port
@@ -60,10 +60,10 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	debugCommand.AddCommand(newDebugCheckCommand())
-	fqbnArg.AddToCommand(debugCommand)
+	debugCommand.AddCommand(newDebugCheckCommand(srv))
+	fqbnArg.AddToCommand(debugCommand, srv)
 	portArgs.AddToCommand(debugCommand)
-	programmer.AddToCommand(debugCommand)
+	programmer.AddToCommand(debugCommand, srv)
 	profileArg.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))

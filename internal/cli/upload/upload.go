@@ -49,7 +49,7 @@ var (
 )
 
 // NewCommand created a new `upload` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	uploadFields := map[string]string{}
 	uploadCommand := &cobra.Command{
 		Use:   "upload",
@@ -67,14 +67,14 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	fqbnArg.AddToCommand(uploadCommand)
+	fqbnArg.AddToCommand(uploadCommand, srv)
 	portArgs.AddToCommand(uploadCommand)
 	profileArg.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
-	programmer.AddToCommand(uploadCommand)
+	programmer.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
 	arguments.AddKeyValuePFlag(uploadCommand, &uploadFields, "upload-field", "F", nil, tr("Set a value for a field required to upload."))

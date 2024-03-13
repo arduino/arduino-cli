@@ -50,7 +50,7 @@ func initGetCommand() *cobra.Command {
 func runGetCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
 
-	svc := commands.ArduinoCoreServerImpl{}
+	svc := commands.NewArduinoCoreServer("")
 	for _, toGet := range args {
 		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {

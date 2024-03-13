@@ -27,7 +27,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initAttachCommand() *cobra.Command {
+func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var port arguments.Port
 	var fqbn arguments.Fqbn
 	var programmer arguments.Programmer
@@ -48,9 +48,9 @@ func initAttachCommand() *cobra.Command {
 			runAttachCommand(sketchPath, &port, fqbn.String(), &programmer)
 		},
 	}
-	fqbn.AddToCommand(attachCommand)
+	fqbn.AddToCommand(attachCommand, srv)
 	port.AddToCommand(attachCommand)
-	programmer.AddToCommand(attachCommand)
+	programmer.AddToCommand(attachCommand, srv)
 
 	return attachCommand
 }

@@ -26,10 +26,10 @@ import (
 // GetInstalledBoards is an helper function useful to autocomplete.
 // It returns a list of fqbn
 // it's taken from cli/board/listall.go
-func GetInstalledBoards() []string {
+func GetInstalledBoards(srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit()
 
-	list, _ := commands.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
+	list, _ := srv.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
@@ -44,7 +44,7 @@ func GetInstalledBoards() []string {
 
 // GetInstalledProgrammers is an helper function useful to autocomplete.
 // It returns a list of programmers available based on the installed boards
-func GetInstalledProgrammers() []string {
+func GetInstalledProgrammers(srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit()
 
 	// we need the list of the available fqbn in order to get the list of the programmers
@@ -53,7 +53,7 @@ func GetInstalledProgrammers() []string {
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
 	}
-	list, _ := commands.BoardListAll(context.Background(), listAllReq)
+	list, _ := srv.BoardListAll(context.Background(), listAllReq)
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.GetBoards() {

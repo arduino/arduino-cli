@@ -35,7 +35,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initListCommand() *cobra.Command {
+func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var timeoutArg arguments.DiscoveryTimeout
 	var watch bool
 	var fqbn arguments.Fqbn
@@ -51,7 +51,7 @@ func initListCommand() *cobra.Command {
 	}
 
 	timeoutArg.AddToCommand(listCommand)
-	fqbn.AddToCommand(listCommand)
+	fqbn.AddToCommand(listCommand, srv)
 	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
 	return listCommand
 }

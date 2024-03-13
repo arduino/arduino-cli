@@ -28,7 +28,7 @@ import (
 
 // SettingsGetAll returns a message with a string field containing all the settings
 // currently in use, marshalled in JSON format.
-func (s *ArduinoCoreServerImpl) SettingsGetAll(ctx context.Context, req *rpc.SettingsGetAllRequest) (*rpc.SettingsGetAllResponse, error) {
+func (s *arduinoCoreServerImpl) SettingsGetAll(ctx context.Context, req *rpc.SettingsGetAllRequest) (*rpc.SettingsGetAllResponse, error) {
 	b, err := json.Marshal(configuration.Settings.AllSettings())
 	if err == nil {
 		return &rpc.SettingsGetAllResponse{
@@ -68,7 +68,7 @@ func mapper(toMap map[string]interface{}) map[string]interface{} {
 }
 
 // SettingsMerge applies multiple settings values at once.
-func (s *ArduinoCoreServerImpl) SettingsMerge(ctx context.Context, req *rpc.SettingsMergeRequest) (*rpc.SettingsMergeResponse, error) {
+func (s *arduinoCoreServerImpl) SettingsMerge(ctx context.Context, req *rpc.SettingsMergeRequest) (*rpc.SettingsMergeResponse, error) {
 	var toMerge map[string]interface{}
 	if err := json.Unmarshal([]byte(req.GetJsonData()), &toMerge); err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func (s *ArduinoCoreServerImpl) SettingsMerge(ctx context.Context, req *rpc.Sett
 // SettingsGetValue returns a settings value given its key. If the key is not present
 // an error will be returned, so that we distinguish empty settings from missing
 // ones.
-func (s *ArduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.SettingsGetValueRequest) (*rpc.SettingsGetValueResponse, error) {
+func (s *arduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.SettingsGetValueRequest) (*rpc.SettingsGetValueResponse, error) {
 	key := req.GetKey()
 
 	// Check if settings key actually existing, we don't use Viper.InConfig()
@@ -121,7 +121,7 @@ func (s *ArduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.S
 }
 
 // SettingsSetValue updates or set a value for a certain key.
-func (s *ArduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.SettingsSetValueRequest) (*rpc.SettingsSetValueResponse, error) {
+func (s *arduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.SettingsSetValueRequest) (*rpc.SettingsSetValueResponse, error) {
 	key := val.GetKey()
 	var value interface{}
 
@@ -137,7 +137,7 @@ func (s *ArduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.S
 // We don't have a Read() function, that's not necessary since we only want one config file to be used
 // and that's picked up when the CLI is run as daemon, either using the default path or a custom one
 // set with the --config-file flag.
-func (s *ArduinoCoreServerImpl) SettingsWrite(ctx context.Context, req *rpc.SettingsWriteRequest) (*rpc.SettingsWriteResponse, error) {
+func (s *arduinoCoreServerImpl) SettingsWrite(ctx context.Context, req *rpc.SettingsWriteRequest) (*rpc.SettingsWriteResponse, error) {
 	if err := configuration.Settings.WriteConfigAs(req.GetFilePath()); err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (s *ArduinoCoreServerImpl) SettingsWrite(ctx context.Context, req *rpc.Sett
 }
 
 // SettingsDelete removes a key from the config file
-func (s *ArduinoCoreServerImpl) SettingsDelete(ctx context.Context, req *rpc.SettingsDeleteRequest) (*rpc.SettingsDeleteResponse, error) {
+func (s *arduinoCoreServerImpl) SettingsDelete(ctx context.Context, req *rpc.SettingsDeleteRequest) (*rpc.SettingsDeleteResponse, error) {
 	toDelete := req.GetKey()
 
 	// Check if settings key actually existing, we don't use Viper.InConfig()

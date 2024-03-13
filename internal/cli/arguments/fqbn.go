@@ -33,10 +33,10 @@ type Fqbn struct {
 }
 
 // AddToCommand adds the flags used to set fqbn to the specified Command
-func (f *Fqbn) AddToCommand(cmd *cobra.Command) {
+func (f *Fqbn) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&f.fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledBoards(), cobra.ShellCompDirectiveDefault
+		return GetInstalledBoards(srv), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringSliceVar(&f.boardOptions, "board-options", []string{},
 		tr("List of board options separated by commas. Or can be used multiple times for multiple options."))

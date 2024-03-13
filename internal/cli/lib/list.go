@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initListCommand() *cobra.Command {
+func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var all bool
 	var updatable bool
 	listCommand := &cobra.Command{
@@ -52,7 +52,7 @@ not listed, they can be listed by adding the --all flag.`),
 		},
 	}
 	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
-	fqbn.AddToCommand(listCommand)
+	fqbn.AddToCommand(listCommand, srv)
 	listCommand.Flags().BoolVar(&updatable, "updatable", false, tr("List updatable libraries."))
 	return listCommand
 }

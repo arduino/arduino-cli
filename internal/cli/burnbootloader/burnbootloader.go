@@ -42,7 +42,7 @@ var (
 )
 
 // NewCommand created a new `burn-bootloader` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	burnBootloaderCommand := &cobra.Command{
 		Use:     "burn-bootloader",
 		Short:   tr("Upload the bootloader."),
@@ -52,9 +52,9 @@ func NewCommand() *cobra.Command {
 		Run:     runBootloaderCommand,
 	}
 
-	fqbn.AddToCommand(burnBootloaderCommand)
+	fqbn.AddToCommand(burnBootloaderCommand, srv)
 	port.AddToCommand(burnBootloaderCommand)
-	programmer.AddToCommand(burnBootloaderCommand)
+	programmer.AddToCommand(burnBootloaderCommand, srv)
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
 	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))

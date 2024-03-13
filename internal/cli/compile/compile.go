@@ -77,7 +77,7 @@ var (
 )
 
 // NewCommand created a new `compile` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	compileCommand := &cobra.Command{
 		Use:   "compile",
 		Short: tr("Compiles Arduino sketches."),
@@ -91,7 +91,7 @@ func NewCommand() *cobra.Command {
 		Run:  runCompileCommand,
 	}
 
-	fqbnArg.AddToCommand(compileCommand)
+	fqbnArg.AddToCommand(compileCommand, srv)
 	profileArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
 	showPropertiesArg.AddToCommand(compileCommand)
@@ -122,7 +122,7 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		tr("Path to a collection of libraries. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
-	programmer.AddToCommand(compileCommand)
+	programmer.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
 	compileCommand.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
 	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))

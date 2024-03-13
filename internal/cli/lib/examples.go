@@ -38,7 +38,7 @@ var (
 	fqbn arguments.Fqbn
 )
 
-func initExamplesCommand() *cobra.Command {
+func initExamplesCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	examplesCommand := &cobra.Command{
 		Use:     fmt.Sprintf("examples [%s]", tr("LIBRARY_NAME")),
 		Short:   tr("Shows the list of the examples for libraries."),
@@ -50,7 +50,7 @@ func initExamplesCommand() *cobra.Command {
 			return arguments.GetInstalledLibraries(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	fqbn.AddToCommand(examplesCommand)
+	fqbn.AddToCommand(examplesCommand, srv)
 	return examplesCommand
 }
 

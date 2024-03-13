@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var svc = ArduinoCoreServerImpl{}
+var svc = NewArduinoCoreServer("")
 
 func init() {
 	configuration.Settings = configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))

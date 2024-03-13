@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initDetailsCommand() *cobra.Command {
+func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var showFullDetails bool
 	var listProgrammers bool
 	var fqbn arguments.Fqbn
@@ -48,7 +48,7 @@ func initDetailsCommand() *cobra.Command {
 		},
 	}
 
-	fqbn.AddToCommand(detailsCommand)
+	fqbn.AddToCommand(detailsCommand, srv)
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
 	detailsCommand.MarkFlagRequired("fqbn")
