@@ -19,7 +19,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/debug"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -60,7 +60,7 @@ func runDebugCheckCommand(portArgs *arguments.Port, fqbnArg *arguments.Fqbn, int
 		feedback.FatalError(err, feedback.ErrBadArgument)
 	}
 	fqbn := fqbnArg.String()
-	resp, err := debug.IsDebugSupported(context.Background(), &rpc.IsDebugSupportedRequest{
+	resp, err := commands.IsDebugSupported(context.Background(), &rpc.IsDebugSupportedRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		Port:        port,

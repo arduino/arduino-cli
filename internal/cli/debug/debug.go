@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/debug"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -124,7 +123,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 
 	if printInfo {
 
-		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
+		if res, err := commands.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
 			errcode := feedback.ErrBadArgument
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
@@ -144,7 +143,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 		if err != nil {
 			feedback.FatalError(err, feedback.ErrBadArgument)
 		}
-		if _, err := debug.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
+		if _, err := commands.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer

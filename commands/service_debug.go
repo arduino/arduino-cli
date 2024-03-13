@@ -20,7 +20,6 @@ import (
 	"errors"
 	"os"
 
-	cmd "github.com/arduino/arduino-cli/commands/debug"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -44,7 +43,7 @@ func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	signalChan := make(chan os.Signal)
 	defer close(signalChan)
 	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.DebugResponse{Data: data}) })
-	resp, debugErr := cmd.Debug(stream.Context(), req,
+	resp, debugErr := Debug(stream.Context(), req,
 		consumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
 			if command.GetSendInterrupt() {
@@ -63,12 +62,12 @@ func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 
 // GetDebugConfig return metadata about a debug session
 func (s *ArduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
-	res, err := cmd.GetDebugConfig(ctx, req)
+	res, err := GetDebugConfig(ctx, req)
 	return res, convertErrorToRPCStatus(err)
 }
 
 // IsDebugSupported checks if debugging is supported for a given configuration
 func (s *ArduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
-	res, err := cmd.IsDebugSupported(ctx, req)
+	res, err := IsDebugSupported(ctx, req)
 	return res, convertErrorToRPCStatus(err)
 }
