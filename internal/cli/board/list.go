@@ -46,7 +46,7 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " board list --discovery-timeout 10s",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(watch, timeoutArg.Get().Milliseconds(), fqbn.String())
+			runListCommand(srv, watch, timeoutArg.Get().Milliseconds(), fqbn.String())
 		},
 	}
 
@@ -57,7 +57,7 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 // runListCommand detects and lists the connected arduino boards
-func runListCommand(watch bool, timeout int64, fqbn string) {
+func runListCommand(srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64, fqbn string) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board list`")
@@ -67,11 +67,13 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 		return
 	}
 
-	ports, discoveryErrors, err := commands.BoardList(&rpc.BoardListRequest{
+	list, err := srv.BoardList(context.Background(), &rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeout,
 		Fqbn:     fqbn,
 	})
+	ports := list.GetPorts()
+	discoveryErrors := list.GetWarnings()
 	var invalidFQBNErr *cmderrors.InvalidFQBNError
 	if errors.As(err, &invalidFQBNErr) {
 		feedback.Fatal(tr(err.Error()), feedback.ErrBadArgument)

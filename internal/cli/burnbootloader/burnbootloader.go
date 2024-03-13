@@ -55,7 +55,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 
 	fqbn.AddToCommand(burnBootloaderCommand, srv)
-	port.AddToCommand(burnBootloaderCommand)
+	port.AddToCommand(burnBootloaderCommand, srv)
 	programmer.AddToCommand(burnBootloaderCommand, srv)
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))

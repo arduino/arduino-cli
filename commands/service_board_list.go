@@ -29,6 +29,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
@@ -204,10 +205,10 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 // BoardList returns a list of boards found by the loaded discoveries.
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
-func BoardList(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
+func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer release()
 
@@ -216,19 +217,19 @@ func BoardList(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStart
 		var err error
 		fqbnFilter, err = cores.ParseFQBN(f)
 		if err != nil {
-			return nil, nil, &cmderrors.InvalidFQBNError{Cause: err}
+			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 	}
 
 	dm := pme.DiscoveryManager()
-	discoveryStartErrors = dm.Start()
+	warnings := f.Map(dm.Start(), (error).Error)
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
-	retVal := []*rpc.DetectedPort{}
+	ports := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
 		boards, err := identify(pme, port)
 		if err != nil {
-			return nil, discoveryStartErrors, err
+			warnings = append(warnings, err.Error())
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -239,10 +240,13 @@ func BoardList(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStart
 		}
 
 		if fqbnFilter == nil || hasMatchingBoard(b, fqbnFilter) {
-			retVal = append(retVal, b)
+			ports = append(ports, b)
 		}
 	}
-	return retVal, discoveryStartErrors, nil
+	return &rpc.BoardListResponse{
+		Ports:    ports,
+		Warnings: warnings,
+	}, nil
 }
 
 func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {

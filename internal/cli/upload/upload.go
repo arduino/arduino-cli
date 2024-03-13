@@ -68,7 +68,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 
 	fqbnArg.AddToCommand(uploadCommand, srv)
-	portArgs.AddToCommand(uploadCommand)
+	portArgs.AddToCommand(uploadCommand, srv)
 	profileArg.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
@@ -113,7 +113,7 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 	defaultFQBN := sketch.GetDefaultFqbn()
 	defaultAddress := sketch.GetDefaultPort()
 	defaultProtocol := sketch.GetDefaultProtocol()
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, srv, defaultFQBN, defaultAddress, defaultProtocol)
 
 	userFieldRes, err := commands.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: inst,

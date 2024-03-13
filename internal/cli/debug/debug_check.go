@@ -45,7 +45,7 @@ func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 	fqbnArg.AddToCommand(debugCheckCommand, srv)
-	portArgs.AddToCommand(debugCheckCommand)
+	portArgs.AddToCommand(debugCheckCommand, srv)
 	programmer.AddToCommand(debugCheckCommand, srv)
 	debugCheckCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	return debugCheckCommand

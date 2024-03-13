@@ -49,7 +49,7 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 	fqbn.AddToCommand(attachCommand, srv)
-	port.AddToCommand(attachCommand)
+	port.AddToCommand(attachCommand, srv)
 	programmer.AddToCommand(attachCommand, srv)
 
 	return attachCommand

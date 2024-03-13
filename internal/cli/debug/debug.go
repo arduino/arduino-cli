@@ -62,7 +62,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	debugCommand.AddCommand(newDebugCheckCommand(srv))
 	fqbnArg.AddToCommand(debugCommand, srv)
-	portArgs.AddToCommand(debugCommand)
+	portArgs.AddToCommand(debugCommand, srv)
 	programmer.AddToCommand(debugCommand, srv)
 	profileArg.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
@@ -101,7 +101,7 @@ func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {

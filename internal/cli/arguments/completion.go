@@ -19,6 +19,7 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -164,16 +165,11 @@ func GetInstallableLibs() []string {
 // GetAvailablePorts is an helper function useful to autocomplete.
 // It returns a list of upload port of the boards which are currently connected.
 // It will not suggests network ports because the timeout is not set.
-func GetAvailablePorts() []*rpc.Port {
+func GetAvailablePorts(srv rpc.ArduinoCoreServiceServer) []*rpc.Port {
+	// Get the port list
 	inst := instance.CreateAndInit()
+	list, _ := srv.BoardList(context.Background(), &rpc.BoardListRequest{Instance: inst})
 
-	list, _, _ := commands.BoardList(&rpc.BoardListRequest{
-		Instance: inst,
-	})
-	var res []*rpc.Port
-	// transform the data structure for the completion
-	for _, i := range list {
-		res = append(res, i.GetPort())
-	}
-	return res
+	// Transform the data structure for the completion (DetectedPort -> Port)
+	return f.Map(list.GetPorts(), (*rpc.DetectedPort).GetPort)
 }

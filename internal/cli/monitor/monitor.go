@@ -66,10 +66,10 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runMonitorCmd(&portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
+			runMonitorCmd(srv, &portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
 		},
 	}
-	portArgs.AddToCommand(monitorCommand)
+	portArgs.AddToCommand(monitorCommand, srv)
 	profileArg.AddToCommand(monitorCommand)
 	monitorCommand.Flags().BoolVar(&raw, "raw", false, tr("Set terminal in raw mode (unbuffered)."))
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
@@ -81,6 +81,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 func runMonitorCmd(
+	srv rpc.ArduinoCoreServiceServer,
 	portArgs *arguments.Port, fqbnArg *arguments.Fqbn, profileArg *arguments.Profile, sketchPathArg string,
 	configs []string, describe, timestamp, quiet, raw bool,
 ) {
@@ -136,7 +137,7 @@ func runMonitorCmd(
 	case sketch.GetDefaultFqbn() != "":
 		fqbn = sketch.GetDefaultFqbn()
 	default:
-		fqbn, _ = portArgs.DetectFQBN(inst)
+		fqbn, _ = portArgs.DetectFQBN(inst, srv)
 	}
 
 	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, defaultPort, defaultProtocol)

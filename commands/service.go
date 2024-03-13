@@ -44,17 +44,6 @@ type arduinoCoreServerImpl struct {
 	versionString string
 }
 
-// BoardList FIXMEDOC
-func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
-	ports, _, err := BoardList(req)
-	if err != nil {
-		return nil, err
-	}
-	return &rpc.BoardListResponse{
-		Ports: ports,
-	}, nil
-}
-
 // BoardSearch exposes to the gRPC interface the board search command
 func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	return BoardSearch(ctx, req)

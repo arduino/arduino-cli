@@ -39,14 +39,14 @@ type Port struct {
 }
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
-func (p *Port) AddToCommand(cmd *cobra.Command) {
+func (p *Port) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return f.Map(GetAvailablePorts(), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(srv), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return f.Map(GetAvailablePorts(), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(srv), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
 	})
 	p.timeout.AddToCommand(cmd)
 }
@@ -129,15 +129,15 @@ func (p *Port) GetSearchTimeout() time.Duration {
 // DetectFQBN tries to identify the board connected to the port and returns the
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
-func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
-	detectedPorts, _, err := commands.BoardList(&rpc.BoardListRequest{
+func (p *Port) DetectFQBN(inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) (string, *rpc.Port) {
+	detectedPorts, err := srv.BoardList(context.Background(), &rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error during FQBN detection: %v", err), feedback.ErrGeneric)
 	}
-	for _, detectedPort := range detectedPorts {
+	for _, detectedPort := range detectedPorts.GetPorts() {
 		port := detectedPort.GetPort()
 		if p.address != port.GetAddress() {
 			continue

@@ -69,7 +69,7 @@ func (f *Fqbn) Set(fqbn string) {
 //   - the port is not found, in this case nil is returned
 //   - the FQBN autodetection fail, in this case the function prints an error and
 //     terminates the execution
-func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, defaultFQBN, defaultAddress, defaultProtocol string) (string, *rpc.Port) {
+func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultFQBN, defaultAddress, defaultProtocol string) (string, *rpc.Port) {
 	fqbn := fqbnArg.String()
 	if fqbn == "" {
 		fqbn = defaultFQBN
@@ -78,7 +78,7 @@ func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance,
 		if portArgs == nil || portArgs.address == "" {
 			feedback.FatalError(&cmderrors.MissingFQBNError{}, feedback.ErrGeneric)
 		}
-		fqbn, port := portArgs.DetectFQBN(instance)
+		fqbn, port := portArgs.DetectFQBN(instance, srv)
 		if fqbn == "" {
 			feedback.FatalError(&cmderrors.MissingFQBNError{}, feedback.ErrGeneric)
 		}
