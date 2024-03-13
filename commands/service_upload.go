@@ -371,7 +371,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 
 	if !burnBootloader {
-		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
+		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk)
 		if err != nil {
 			return nil, &cmderrors.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
 		}
@@ -674,7 +674,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	return nil
 }
 
-func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sketch, fqbn *cores.FQBN) (*paths.Path, string, error) {
+func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sketch) (*paths.Path, string, error) {
 	// In general, compiling a sketch will produce a set of files that are
 	// named as the sketch but have different extensions, for example Sketch.ino
 	// may produce: Sketch.ino.bin; Sketch.ino.hex; Sketch.ino.zip; etc...

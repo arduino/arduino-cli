@@ -42,10 +42,10 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		return nil, err
 	}
 
-	return libraryResolveDependencies(ctx, lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
+	return libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
 }
 
-func libraryResolveDependencies(ctx context.Context, lme *librariesmanager.Explorer, li *librariesindex.Index,
+func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesindex.Index,
 	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
 	version, err := ParseVersion(reqVersion)
 	if err != nil {

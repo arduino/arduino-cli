@@ -51,7 +51,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 			return err
 		}
 
-		res, err := libraryResolveDependencies(ctx, lme, li, req.GetName(), req.GetVersion(), req.GetNoOverwrite())
+		res, err := libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetNoOverwrite())
 		releaseLme()
 		if err != nil {
 			return err

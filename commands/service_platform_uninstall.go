@@ -26,7 +26,7 @@ import (
 
 // PlatformUninstall FIXMEDOC
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
-	if err := platformUninstall(ctx, req, taskCB); err != nil {
+	if err := platformUninstall(req, taskCB); err != nil {
 		return nil, err
 	}
 	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
@@ -36,7 +36,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 }
 
 // platformUninstall is the implementation of platform unistaller
-func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
+func platformUninstall(req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return &cmderrors.InvalidInstanceError{}

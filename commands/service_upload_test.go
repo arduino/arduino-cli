@@ -109,7 +109,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
-			buildPath, sketchName, err := determineBuildPathAndSketchName(test.importFile, test.importDir, test.sketch, test.fqbn)
+			buildPath, sketchName, err := determineBuildPathAndSketchName(test.importFile, test.importDir, test.sketch)
 			if test.resBuildPath == "<nil>" {
 				require.Error(t, err)
 				require.Nil(t, buildPath)
