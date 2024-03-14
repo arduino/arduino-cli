@@ -36,14 +36,14 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " lib update-index",
 	}
 
-	libCommand.AddCommand(initDownloadCommand())
-	libCommand.AddCommand(initInstallCommand())
+	libCommand.AddCommand(initDownloadCommand(srv))
+	libCommand.AddCommand(initInstallCommand(srv))
 	libCommand.AddCommand(initListCommand(srv))
 	libCommand.AddCommand(initExamplesCommand(srv))
-	libCommand.AddCommand(initSearchCommand())
-	libCommand.AddCommand(initUninstallCommand())
-	libCommand.AddCommand(initUpgradeCommand())
-	libCommand.AddCommand(initUpdateIndexCommand())
-	libCommand.AddCommand(initDepsCommand())
+	libCommand.AddCommand(initSearchCommand(srv))
+	libCommand.AddCommand(initUninstallCommand(srv))
+	libCommand.AddCommand(initUpgradeCommand(srv))
+	libCommand.AddCommand(initUpdateIndexCommand(srv))
+	libCommand.AddCommand(initDepsCommand(srv))
 	return libCommand
 }

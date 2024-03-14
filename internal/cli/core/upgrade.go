@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpgradeCommand() *cobra.Command {
+func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
 		Use:   fmt.Sprintf("upgrade [%s:%s] ...", tr("PACKAGER"), tr("ARCH")),
@@ -43,21 +43,22 @@ func initUpgradeCommand() *cobra.Command {
 			"  # " + tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
+			runUpgradeCommand(srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(args []string, skipPostInstall bool, skipPreUninstall bool) {
-	inst := instance.CreateAndInit()
+func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	logrus.Info("Executing `arduino-cli core upgrade`")
-	Upgrade(inst, args, skipPostInstall, skipPreUninstall)
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
+	Upgrade(srv, ctx, inst, args, skipPostInstall, skipPreUninstall)
 }
 
 // Upgrade upgrades one or all installed platforms to the latest version.
-func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
+func Upgrade(srv rpc.ArduinoCoreServiceServer, ctx context.Context, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
 		platforms, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
@@ -102,7 +103,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 	}
 
 	// proceed upgrading, if anything is upgradable
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

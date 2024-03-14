@@ -34,7 +34,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func initInstallCommand() *cobra.Command {
+func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noDeps bool
 	var noOverwrite bool
 	var gitURL bool
@@ -52,10 +52,10 @@ func initInstallCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir)
+			runInstallCommand(srv, args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(srv, context.Background()), cobra.ShellCompDirectiveDefault
 		},
 	}
 	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
@@ -66,8 +66,9 @@ func initInstallCommand() *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool) {
-	instance := instance.CreateAndInit()
+func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool) {
+	ctx := context.Background()
+	instance := instance.CreateAndInit(srv, ctx)
 	logrus.Info("Executing `arduino-cli lib install`")
 
 	if zipPath || gitURL {

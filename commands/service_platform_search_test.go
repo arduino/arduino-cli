@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"context"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
@@ -37,7 +38,9 @@ func TestPlatformSearch(t *testing.T) {
 
 	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
 
-	createResp, err := Create(&rpc.CreateRequest{})
+	srv := NewArduinoCoreServer("")
+	ctx := context.Background()
+	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
 	require.NoError(t, err)
 
 	inst := createResp.GetInstance()
@@ -337,7 +340,10 @@ func TestPlatformSearchSorting(t *testing.T) {
 
 	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
 
-	createResp, err := Create(&rpc.CreateRequest{})
+	srv := NewArduinoCoreServer("")
+	ctx := context.Background()
+
+	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
 	require.NoError(t, err)
 	inst := createResp.GetInstance()
 	require.NotNil(t, inst)

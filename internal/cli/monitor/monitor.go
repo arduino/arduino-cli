@@ -86,6 +86,7 @@ func runMonitorCmd(
 	configs []string, describe, timestamp, quiet, raw bool,
 ) {
 	logrus.Info("Executing `arduino-cli monitor`")
+	ctx := context.Background()
 
 	if !feedback.HasConsole() {
 		quiet = true
@@ -116,13 +117,13 @@ func runMonitorCmd(
 	}
 	if fqbnArg.String() == "" {
 		if profileArg.Get() == "" {
-			inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
+			inst, profile = instance.CreateAndInitWithProfile(srv, ctx, sketch.GetDefaultProfile().GetName(), sketchPath)
 		} else {
-			inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+			inst, profile = instance.CreateAndInitWithProfile(srv, ctx, profileArg.Get(), sketchPath)
 		}
 	}
 	if inst == nil {
-		inst = instance.CreateAndInit()
+		inst = instance.CreateAndInit(srv, ctx)
 	}
 	// Priority on how to retrieve the fqbn
 	// 1. from flag

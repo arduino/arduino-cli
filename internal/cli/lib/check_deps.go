@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initDepsCommand() *cobra.Command {
+func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noOverwrite bool
 	depsCommand := &cobra.Command{
 		Use:   fmt.Sprintf("deps %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
@@ -43,18 +43,20 @@ func initDepsCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDepsCommand(args, noOverwrite)
+			runDepsCommand(srv, args, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstalledLibraries(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstalledLibraries(srv, context.Background()), cobra.ShellCompDirectiveDefault
 		},
 	}
 	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not try to update library dependencies if already installed."))
 	return depsCommand
 }
 
-func runDepsCommand(args []string, noOverwrite bool) {
-	instance := instance.CreateAndInit()
+func runDepsCommand(srv rpc.ArduinoCoreServiceServer, args []string, noOverwrite bool) {
+	ctx := context.Background()
+	instance := instance.CreateAndInit(srv, ctx)
+
 	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {

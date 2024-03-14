@@ -16,6 +16,7 @@
 package core
 
 import (
+	"context"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -28,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initListCommand() *cobra.Command {
+func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var updatableOnly bool
 	var all bool
 	listCommand := &cobra.Command{
@@ -38,7 +39,7 @@ func initListCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " core list",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(args, all, updatableOnly)
+			runListCommand(srv, all, updatableOnly)
 		},
 	}
 	listCommand.Flags().BoolVar(&updatableOnly, "updatable", false, tr("List updatable platforms."))
@@ -46,8 +47,9 @@ func initListCommand() *cobra.Command {
 	return listCommand
 }
 
-func runListCommand(args []string, all bool, updatableOnly bool) {
-	inst := instance.CreateAndInit()
+func runListCommand(srv rpc.ArduinoCoreServiceServer, all bool, updatableOnly bool) {
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
 	logrus.Info("Executing `arduino-cli core list`")
 	List(inst, all, updatableOnly)
 }

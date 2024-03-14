@@ -75,6 +75,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
 	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile) {
 	logrus.Info("Executing `arduino-cli debug`")
+	ctx := context.Background()
 
 	path := ""
 	if len(args) > 0 {
@@ -92,9 +93,9 @@ func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, sk.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {

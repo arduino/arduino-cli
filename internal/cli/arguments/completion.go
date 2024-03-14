@@ -27,8 +27,8 @@ import (
 // GetInstalledBoards is an helper function useful to autocomplete.
 // It returns a list of fqbn
 // it's taken from cli/board/listall.go
-func GetInstalledBoards(srv rpc.ArduinoCoreServiceServer) []string {
-	inst := instance.CreateAndInit()
+func GetInstalledBoards(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	inst := instance.CreateAndInit(srv, ctx)
 
 	list, _ := srv.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
@@ -45,8 +45,8 @@ func GetInstalledBoards(srv rpc.ArduinoCoreServiceServer) []string {
 
 // GetInstalledProgrammers is an helper function useful to autocomplete.
 // It returns a list of programmers available based on the installed boards
-func GetInstalledProgrammers(srv rpc.ArduinoCoreServiceServer) []string {
-	inst := instance.CreateAndInit()
+func GetInstalledProgrammers(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	inst := instance.CreateAndInit(srv, ctx)
 
 	// we need the list of the available fqbn in order to get the list of the programmers
 	listAllReq := &rpc.BoardListAllRequest{
@@ -78,8 +78,8 @@ func GetInstalledProgrammers(srv rpc.ArduinoCoreServiceServer) []string {
 
 // GetUninstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be uninstalled
-func GetUninstallableCores() []string {
-	inst := instance.CreateAndInit()
+func GetUninstallableCores(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	inst := instance.CreateAndInit(srv, ctx)
 
 	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:          inst,
@@ -99,8 +99,8 @@ func GetUninstallableCores() []string {
 
 // GetInstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be installed/downloaded
-func GetInstallableCores() []string {
-	inst := instance.CreateAndInit()
+func GetInstallableCores(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	inst := instance.CreateAndInit(srv, ctx)
 
 	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:   inst,
@@ -118,18 +118,18 @@ func GetInstallableCores() []string {
 
 // GetInstalledLibraries is an helper function useful to autocomplete.
 // It returns a list of libs which are currently installed, including the builtin ones
-func GetInstalledLibraries() []string {
-	return getLibraries(true)
+func GetInstalledLibraries(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	return getLibraries(srv, ctx, true)
 }
 
 // GetUninstallableLibraries is an helper function useful to autocomplete.
 // It returns a list of libs which can be uninstalled
-func GetUninstallableLibraries() []string {
-	return getLibraries(false)
+func GetUninstallableLibraries(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	return getLibraries(srv, ctx, false)
 }
 
-func getLibraries(all bool) []string {
-	inst := instance.CreateAndInit()
+func getLibraries(srv rpc.ArduinoCoreServiceServer, ctx context.Context, all bool) []string {
+	inst := instance.CreateAndInit(srv, ctx)
 	libs, _ := commands.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  inst,
 		All:       all,
@@ -147,8 +147,8 @@ func getLibraries(all bool) []string {
 
 // GetInstallableLibs is an helper function useful to autocomplete.
 // It returns a list of libs which can be installed/downloaded
-func GetInstallableLibs() []string {
-	inst := instance.CreateAndInit()
+func GetInstallableLibs(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []string {
+	inst := instance.CreateAndInit(srv, ctx)
 
 	libs, _ := commands.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:   inst,
@@ -165,10 +165,10 @@ func GetInstallableLibs() []string {
 // GetAvailablePorts is an helper function useful to autocomplete.
 // It returns a list of upload port of the boards which are currently connected.
 // It will not suggests network ports because the timeout is not set.
-func GetAvailablePorts(srv rpc.ArduinoCoreServiceServer) []*rpc.Port {
+func GetAvailablePorts(srv rpc.ArduinoCoreServiceServer, ctx context.Context) []*rpc.Port {
 	// Get the port list
-	inst := instance.CreateAndInit()
-	list, _ := srv.BoardList(context.Background(), &rpc.BoardListRequest{Instance: inst})
+	inst := instance.CreateAndInit(srv, ctx)
+	list, _ := srv.BoardList(ctx, &rpc.BoardListRequest{Instance: inst})
 
 	// Transform the data structure for the completion (DetectedPort -> Port)
 	return f.Map(list.GetPorts(), (*rpc.DetectedPort).GetPort)

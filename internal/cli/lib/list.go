@@ -46,7 +46,8 @@ not listed, they can be listed by adding the --all flag.`),
 		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			instance := instance.CreateAndInit()
+			ctx := context.Background()
+			instance := instance.CreateAndInit(srv, ctx)
 			logrus.Info("Executing `arduino-cli lib list`")
 			List(instance, args, all, updatable)
 		},

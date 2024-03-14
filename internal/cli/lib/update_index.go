@@ -28,20 +28,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpdateIndexCommand() *cobra.Command {
+func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
 		Short:   tr("Updates the libraries index."),
 		Long:    tr("Updates the libraries index to the latest version."),
 		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
-		Run:     runUpdateIndexCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpdateIndexCommand(srv)
+		},
 	}
 	return updateIndexCommand
 }
 
-func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) {
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
+
 	logrus.Info("Executing `arduino-cli lib update-index`")
 	resp := UpdateIndex(inst)
 	feedback.PrintResult(&libUpdateIndexResult{result.NewUpdateLibrariesIndexResponse_ResultResult(resp)})

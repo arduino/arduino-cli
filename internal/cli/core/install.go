@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initInstallCommand() *cobra.Command {
+func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noOverwrite bool
 	var scriptFlags arguments.PrePostScriptsFlags
 	installCommand := &cobra.Command{
@@ -45,10 +45,10 @@ func initInstallCommand() *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "run-post-install", "skip-post-install")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(args, scriptFlags, noOverwrite)
+			runInstallCommand(srv, args, scriptFlags, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(srv, context.Background()), cobra.ShellCompDirectiveDefault
 		},
 	}
 	scriptFlags.AddToCommand(installCommand)
@@ -56,11 +56,12 @@ func initInstallCommand() *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
-	inst := instance.CreateAndInit()
+func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
 	logrus.Info("Executing `arduino-cli core install`")
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
 
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

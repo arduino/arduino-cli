@@ -16,6 +16,7 @@
 package outdated
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -36,7 +37,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand creates a new `outdated` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	outdatedCommand := &cobra.Command{
 		Use:   "outdated",
 		Short: tr("Lists cores and libraries that can be upgraded"),
@@ -44,14 +45,17 @@ func NewCommand() *cobra.Command {
 that can be upgraded. If nothing needs to be updated the output is empty.`),
 		Example: "  " + os.Args[0] + " outdated\n",
 		Args:    cobra.NoArgs,
-		Run:     runOutdatedCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runOutdatedCommand(srv)
+		},
 	}
 	return outdatedCommand
 }
 
-func runOutdatedCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runOutdatedCommand(srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli outdated`")
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
 	Outdated(inst)
 }
 

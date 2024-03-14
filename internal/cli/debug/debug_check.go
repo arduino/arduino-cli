@@ -52,7 +52,8 @@ func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 func runDebugCheckCommand(srv rpc.ArduinoCoreServiceServer, portArgs *arguments.Port, fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer) {
-	instance := instance.CreateAndInit()
+	ctx := context.Background()
+	instance := instance.CreateAndInit(srv, ctx)
 	logrus.Info("Executing `arduino-cli debug`")
 
 	port, err := portArgs.GetPort(instance, srv, "", "")

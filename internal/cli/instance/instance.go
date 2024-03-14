@@ -16,6 +16,8 @@
 package instance
 
 import (
+	"context"
+
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -29,16 +31,16 @@ var tr = i18n.Tr
 // If Create fails the CLI prints an error and exits since
 // to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
-func CreateAndInit() *rpc.Instance {
-	inst, _ := CreateAndInitWithProfile("", nil)
+func CreateAndInit(srv rpc.ArduinoCoreServiceServer, ctx context.Context) *rpc.Instance {
+	inst, _ := CreateAndInitWithProfile(srv, ctx, "", nil)
 	return inst
 }
 
 // CreateAndInitWithProfile returns a new initialized instance using the given profile of the given sketch.
 // If Create fails the CLI prints an error and exits since to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
-func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.SketchProfile) {
-	instance, err := create()
+func CreateAndInitWithProfile(srv rpc.ArduinoCoreServiceServer, ctx context.Context, profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.SketchProfile) {
+	instance, err := create(srv, ctx)
 	if err != nil {
 		feedback.Fatal(tr("Error creating instance: %v", err), feedback.ErrGeneric)
 	}
@@ -47,8 +49,8 @@ func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.
 }
 
 // create and return a new Instance.
-func create() (*rpc.Instance, error) {
-	res, err := commands.Create(&rpc.CreateRequest{})
+func create(srv rpc.ArduinoCoreServiceServer, ctx context.Context) (*rpc.Instance, error) {
+	res, err := srv.Create(ctx, &rpc.CreateRequest{})
 	if err != nil {
 		return nil, err
 	}

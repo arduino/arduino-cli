@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUninstallCommand() *cobra.Command {
+func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var preUninstallFlags arguments.PrePostScriptsFlags
 	uninstallCommand := &cobra.Command{
 		Use:     fmt.Sprintf("uninstall %s:%s ...", tr("PACKAGER"), tr("ARCH")),
@@ -38,21 +38,22 @@ func initUninstallCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runUninstallCommand(args, preUninstallFlags)
+			runUninstallCommand(srv, args, preUninstallFlags)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableCores(), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableCores(srv, context.Background()), cobra.ShellCompDirectiveDefault
 		},
 	}
 	preUninstallFlags.AddToCommand(uninstallCommand)
 	return uninstallCommand
 }
 
-func runUninstallCommand(args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
-	inst := instance.CreateAndInit()
+func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
 	logrus.Info("Executing `arduino-cli core uninstall`")
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
 
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

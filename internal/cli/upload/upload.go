@@ -84,6 +84,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFieldsArgs map[string]string) {
 	logrus.Info("Executing `arduino-cli upload`")
 
+	ctx := context.Background()
+
 	path := ""
 	if len(args) > 0 {
 		path = args[0]
@@ -101,9 +103,9 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, sketch.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {

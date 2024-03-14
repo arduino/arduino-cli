@@ -66,7 +66,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 func runBootloaderCommand(srv rpc.ArduinoCoreServiceServer) {
-	instance := instance.CreateAndInit()
+	ctx := context.Background()
+	instance := instance.CreateAndInit(srv, ctx)
 
 	logrus.Info("Executing `arduino-cli burn-bootloader`")
 

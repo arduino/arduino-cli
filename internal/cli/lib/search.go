@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initSearchCommand() *cobra.Command {
+func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var namesOnly bool
 	var omitReleasesDetails bool
 	searchCommand := &cobra.Command{
@@ -90,7 +90,7 @@ In addition to the fields listed above, QV terms can use these qualifiers:
 			"  " + os.Args[0] + " lib search dependencies=IRremote               # " + tr("libraries that depend only on \"IRremote\"") + "\n",
 		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runSearchCommand(args, namesOnly, omitReleasesDetails)
+			runSearchCommand(srv, args, namesOnly, omitReleasesDetails)
 		},
 	}
 	searchCommand.Flags().BoolVar(&namesOnly, "names", false, tr("Show library names only."))
@@ -101,8 +101,9 @@ In addition to the fields listed above, QV terms can use these qualifiers:
 // indexUpdateInterval specifies the time threshold over which indexes are updated
 const indexUpdateInterval = 60 * time.Minute
 
-func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
-	inst := instance.CreateAndInit()
+func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, namesOnly bool, omitReleasesDetails bool) {
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
 
 	logrus.Info("Executing `arduino-cli lib search`")
 

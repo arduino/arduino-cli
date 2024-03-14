@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initDownloadCommand() *cobra.Command {
+func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	downloadCommand := &cobra.Command{
 		Use:   fmt.Sprintf("download [%s:%s[@%s]]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
 		Short: tr("Downloads one or more cores and corresponding tool dependencies."),
@@ -38,20 +38,23 @@ func initDownloadCommand() *cobra.Command {
 			"  " + os.Args[0] + " core download arduino:samd       # " + tr("download the latest version of Arduino SAMD core.") + "\n" +
 			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("download a specific version (in this case 1.6.9)."),
 		Args: cobra.MinimumNArgs(1),
-		Run:  runDownloadCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runDownloadCommand(srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(srv, context.Background()), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand
 }
 
-func runDownloadCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
+	ctx := context.Background()
+	inst := instance.CreateAndInit(srv, ctx)
 
 	logrus.Info("Executing `arduino-cli core download`")
 
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

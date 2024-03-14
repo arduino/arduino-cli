@@ -142,6 +142,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli compile`")
+	ctx := context.Background()
 
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
@@ -168,9 +169,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, sk.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {

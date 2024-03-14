@@ -42,6 +42,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -59,8 +60,16 @@ func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, dow
 	return nil
 }
 
-// Create a new CoreInstance ready to be initialized, supporting directories are also created.
-func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateResponse, error) {
+// Create a new Instance ready to be initialized, supporting directories are also created.
+func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
+	var userAgent []string
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		userAgent = md.Get("user-agent")
+	}
+	if len(userAgent) == 0 {
+		userAgent = []string{"gRPCClientUnknown/0.0.0"}
+	}
+
 	// Setup downloads directory
 	downloadsDir := configuration.DownloadsDir(configuration.Settings)
 	if downloadsDir.NotExist() {
@@ -80,7 +89,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 		}
 	}
 
-	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, extraUserAgent...)
+	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, userAgent...)
 	if err != nil {
 		return nil, err
 	}
@@ -397,8 +406,8 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	return nil
 }
 
-// Destroy FIXMEDOC
-func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
+// Destroy deletes an instance.
+func (s *arduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	if ok := instances.Delete(req.GetInstance()); !ok {
 		return nil, &cmderrors.InvalidInstanceError{}
 	}

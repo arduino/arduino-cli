@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/updatecheck"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/metadata"
 )
 
 // NewArduinoCoreServer returns an implementation of the ArduinoCoreService gRPC service
@@ -41,11 +40,6 @@ type arduinoCoreServerImpl struct {
 	rpc.UnsafeArduinoCoreServiceServer // Force compile error for unimplemented methods
 
 	versionString string
-}
-
-// Destroy FIXMEDOC
-func (s *arduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
-	return Destroy(ctx, req)
 }
 
 // UpdateIndex FIXMEDOC
@@ -82,18 +76,6 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 		})
 	}
 	return err
-}
-
-// Create FIXMEDOC
-func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
-	var userAgent []string
-	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		userAgent = md.Get("user-agent")
-	}
-	if len(userAgent) == 0 {
-		userAgent = []string{"gRPCClientUnknown/0.0.0"}
-	}
-	return Create(req, userAgent...)
 }
 
 // Init FIXMEDOC

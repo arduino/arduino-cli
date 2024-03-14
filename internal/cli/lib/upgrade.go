@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpgradeCommand() *cobra.Command {
+func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	upgradeCommand := &cobra.Command{
 		Use:   "upgrade",
 		Short: tr("Upgrades installed libraries."),
@@ -37,14 +37,17 @@ func initUpgradeCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib upgrade Audio\n" +
 			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
 		Args: cobra.ArbitraryArgs,
-		Run:  runUpgradeCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpgradeCommand(srv, args)
+		},
 	}
 	return upgradeCommand
 }
 
-func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib upgrade`")
+	ctx := context.Background()
+	instance := instance.CreateAndInit(srv, ctx)
 	Upgrade(instance, args)
 }
 
