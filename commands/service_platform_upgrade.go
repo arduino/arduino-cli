@@ -25,7 +25,7 @@ import (
 )
 
 // PlatformUpgrade FIXMEDOC
-func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
+func PlatformUpgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 	upgrade := func() (*cores.PlatformRelease, error) {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 		if err != nil {
@@ -57,7 +57,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 	if err != nil {
 		return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, err
 	}
-	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
 		return nil, err
 	}
 

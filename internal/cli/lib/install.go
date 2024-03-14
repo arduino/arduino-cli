@@ -141,7 +141,7 @@ func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps b
 			NoOverwrite:     noOverwrite,
 			InstallLocation: installLocation,
 		}
-		err := commands.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
+		err := commands.LibraryInstall(ctx, srv, libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
 		}

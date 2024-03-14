@@ -26,7 +26,7 @@ import (
 )
 
 // PlatformInstall FIXMEDOC
-func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
+func PlatformInstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 	install := func() error {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 		if err != nil {
@@ -73,7 +73,9 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 	if err := install(); err != nil {
 		return nil, err
 	}
-	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+
+	stream := InitStreamResponseToCallbackFunction(ctx, nil)
+	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, stream); err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformInstallResponse{}, nil

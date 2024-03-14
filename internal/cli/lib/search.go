@@ -116,7 +116,7 @@ func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, namesOnly
 		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
 	if res.GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
-		instance.Init(inst)
+		instance.Init(ctx, srv, inst)
 	}
 
 	searchResp, err := commands.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{

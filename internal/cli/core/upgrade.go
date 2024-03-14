@@ -123,7 +123,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 			SkipPostInstall:  skipPostInstall,
 			SkipPreUninstall: skipPreUninstall,
 		}
-		response, err := commands.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
+		response, err := commands.PlatformUpgrade(ctx, srv, r, feedback.ProgressBar(), feedback.TaskProgress())
 		warningMissingIndex(response)
 		if err != nil {
 			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError

@@ -96,23 +96,30 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	return &rpc.CreateResponse{Instance: inst}, nil
 }
 
+// InitStreamResponseToCallbackFunction returns a gRPC stream to be used in Init that sends
+// all responses to the callback function.
+func InitStreamResponseToCallbackFunction(ctx context.Context, cb func(r *rpc.InitResponse) error) rpc.ArduinoCoreService_InitServer {
+	return streamResponseToCallback(ctx, cb)
+}
+
 // Init loads installed libraries and Platforms in CoreInstance with specified ID,
 // a gRPC status error is returned if the CoreInstance doesn't exist.
 // All responses are sent through responseCallback, can be nil to ignore all responses.
 // Failures don't stop the loading process, in case of loading failure the Platform or library
 // is simply skipped and an error gRPC status is sent to responseCallback.
-func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) error {
-	if responseCallback == nil {
-		responseCallback = func(r *rpc.InitResponse) {}
-	}
+func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error {
 	instance := req.GetInstance()
 	if !instances.IsValid(instance) {
 		return &cmderrors.InvalidInstanceError{}
 	}
 
 	// Setup callback functions
-	if responseCallback == nil {
-		responseCallback = func(r *rpc.InitResponse) {}
+	var responseCallback func(*rpc.InitResponse) error
+	if stream != nil {
+		syncSend := NewSynchronizedSend(stream.Send)
+		responseCallback = syncSend.Send
+	} else {
+		responseCallback = func(*rpc.InitResponse) error { return nil }
 	}
 	responseError := func(st *status.Status) {
 		responseCallback(&rpc.InitResponse{

@@ -48,22 +48,22 @@ func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib upgrade`")
 	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
-	Upgrade(instance, args)
+	Upgrade(ctx, srv, instance, args)
 }
 
 // Upgrade upgrades the specified libraries
-func Upgrade(instance *rpc.Instance, libraries []string) {
+func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, libraries []string) {
 	var upgradeErr error
 	if len(libraries) == 0 {
 		req := &rpc.LibraryUpgradeAllRequest{Instance: instance}
-		upgradeErr = commands.LibraryUpgradeAll(req, feedback.ProgressBar(), feedback.TaskProgress())
+		upgradeErr = commands.LibraryUpgradeAll(srv, req, feedback.ProgressBar(), feedback.TaskProgress())
 	} else {
 		for _, libName := range libraries {
 			req := &rpc.LibraryUpgradeRequest{
 				Instance: instance,
 				Name:     libName,
 			}
-			upgradeErr = commands.LibraryUpgrade(context.Background(), req, feedback.ProgressBar(), feedback.TaskProgress())
+			upgradeErr = commands.LibraryUpgrade(ctx, srv, req, feedback.ProgressBar(), feedback.TaskProgress())
 			if upgradeErr != nil {
 				break
 			}

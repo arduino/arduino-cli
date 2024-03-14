@@ -24,7 +24,9 @@ import (
 )
 
 // LibraryUpgradeAll upgrades all the available libraries
-func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func LibraryUpgradeAll(srv rpc.ArduinoCoreServiceServer, req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	ctx := context.Background()
+
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return err
@@ -37,11 +39,12 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 	libsToUpgrade := listLibraries(lme, li, true, false)
 	release()
 
-	if err := upgrade(req.GetInstance(), libsToUpgrade, downloadCB, taskCB); err != nil {
+	if err := upgrade(ctx, srv, req.GetInstance(), libsToUpgrade, downloadCB, taskCB); err != nil {
 		return err
 	}
 
-	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	stream := InitStreamResponseToCallbackFunction(ctx, nil)
+	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, stream); err != nil {
 		return err
 	}
 
@@ -49,7 +52,7 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 }
 
 // LibraryUpgrade upgrades a library
-func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func LibraryUpgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return err
@@ -75,10 +78,10 @@ func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloa
 	}
 
 	// Install update
-	return upgrade(req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB)
+	return upgrade(ctx, srv, req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB)
 }
 
-func upgrade(instance *rpc.Instance, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	for _, lib := range libs {
 		libInstallReq := &rpc.LibraryInstallRequest{
 			Instance:    instance,
@@ -87,7 +90,7 @@ func upgrade(instance *rpc.Instance, libs []*installedLib, downloadCB rpc.Downlo
 			NoDeps:      false,
 			NoOverwrite: false,
 		}
-		err := LibraryInstall(context.Background(), libInstallReq, downloadCB, taskCB)
+		err := LibraryInstall(ctx, srv, libInstallReq, downloadCB, taskCB)
 		if err != nil {
 			return err
 		}

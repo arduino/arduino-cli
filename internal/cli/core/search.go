@@ -66,7 +66,7 @@ func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, allVersio
 	for _, idxRes := range res.GetUpdatedIndexes() {
 		if idxRes.GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
 			// At least one index has been updated, reinitialize the instance
-			instance.Init(inst)
+			instance.Init(ctx, srv, inst)
 			break
 		}
 	}

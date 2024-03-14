@@ -44,7 +44,7 @@ func CreateAndInitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceSer
 	if err != nil {
 		feedback.Fatal(tr("Error creating instance: %v", err), feedback.ErrGeneric)
 	}
-	profile := InitWithProfile(instance, profileName, sketchPath)
+	profile := InitWithProfile(ctx, srv, instance, profileName, sketchPath)
 	return instance, profile
 }
 
@@ -62,14 +62,14 @@ func create(ctx context.Context, srv rpc.ArduinoCoreServiceServer) (*rpc.Instanc
 // platform or library that we failed to load.
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
-func Init(instance *rpc.Instance) {
-	InitWithProfile(instance, "", nil)
+func Init(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance) {
+	InitWithProfile(ctx, srv, instance, "", nil)
 }
 
 // InitWithProfile initializes instance by loading libraries and platforms specified in the given profile of the given sketch.
 // In case of loading failures return a list of errors for each platform or library that we failed to load.
 // Required Package and library indexes files are automatically downloaded.
-func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.SketchProfile {
+func InitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.SketchProfile {
 	downloadCallback := feedback.ProgressBar()
 	taskCallback := feedback.TaskProgress()
 
@@ -79,7 +79,7 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		initReq.Profile = profileName
 	}
 	var profile *rpc.SketchProfile
-	err := commands.Init(initReq, func(res *rpc.InitResponse) {
+	err := srv.Init(initReq, commands.InitStreamResponseToCallbackFunction(ctx, func(res *rpc.InitResponse) error {
 		if st := res.GetError(); st != nil {
 			feedback.Warning(tr("Error initializing instance: %v", st.GetMessage()))
 		}
@@ -96,7 +96,8 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		if p := res.GetProfile(); p != nil {
 			profile = p
 		}
-	})
+		return nil
+	}))
 	if err != nil {
 		feedback.Warning(tr("Error initializing instance: %v", err))
 	}

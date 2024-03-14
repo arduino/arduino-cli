@@ -76,3 +76,45 @@ func (w *streamingResponseProxyToChan[T]) SetHeader(metadata.MD) error {
 
 func (w *streamingResponseProxyToChan[T]) SetTrailer(tr metadata.MD) {
 }
+
+// streamingResponseProxyToCallback is a streaming response proxy that
+// forwards the responses to a callback function
+type streamingResponseProxyToCallback[T any] struct {
+	ctx context.Context
+	cb  func(*T) error
+}
+
+// creates a streaming response proxy that forwards the responses to a callback function
+func streamResponseToCallback[T any](ctx context.Context, cb func(*T) error) *streamingResponseProxyToCallback[T] {
+	if cb == nil {
+		cb = func(*T) error { return nil }
+	}
+	return &streamingResponseProxyToCallback[T]{ctx: ctx, cb: cb}
+}
+
+func (w *streamingResponseProxyToCallback[T]) Send(resp *T) error {
+	return w.cb(resp)
+}
+
+func (w *streamingResponseProxyToCallback[T]) Context() context.Context {
+	return w.ctx
+}
+
+func (w *streamingResponseProxyToCallback[T]) RecvMsg(m any) error {
+	return errors.New("RecvMsg not implemented")
+}
+
+func (w *streamingResponseProxyToCallback[T]) SendHeader(metadata.MD) error {
+	return errors.New("SendHeader not implemented")
+}
+
+func (w *streamingResponseProxyToCallback[T]) SendMsg(m any) error {
+	return errors.New("SendMsg not implemented")
+}
+
+func (w *streamingResponseProxyToCallback[T]) SetHeader(metadata.MD) error {
+	return errors.New("SetHeader not implemented")
+}
+
+func (w *streamingResponseProxyToCallback[T]) SetTrailer(tr metadata.MD) {
+}

@@ -31,7 +31,7 @@ import (
 )
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
-func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func LibraryInstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	// Obtain the library index from the manager
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
@@ -136,7 +136,8 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 	}
 
-	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	stream := InitStreamResponseToCallbackFunction(ctx, nil)
+	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, stream); err != nil {
 		return err
 	}
 

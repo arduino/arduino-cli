@@ -55,7 +55,7 @@ func runUpdateCommand(srv rpc.ArduinoCoreServiceServer, showOutdated bool) {
 
 	lib.UpdateIndex(inst)
 	core.UpdateIndex(inst)
-	instance.Init(inst)
+	instance.Init(ctx, srv, inst)
 	if showOutdated {
 		outdated.Outdated(inst)
 	}

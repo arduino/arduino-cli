@@ -76,7 +76,7 @@ func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, scriptFl
 			NoOverwrite:      noOverwrite,
 			SkipPreUninstall: scriptFlags.DetectSkipPreUninstallValue(),
 		}
-		_, err := commands.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
+		_, err := commands.PlatformInstall(ctx, srv, platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Fatal(tr("Error during install: %v", err), feedback.ErrGeneric)
 		}

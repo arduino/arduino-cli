@@ -25,11 +25,11 @@ import (
 )
 
 // PlatformUninstall FIXMEDOC
-func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
+func PlatformUninstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
 	if err := platformUninstall(req, taskCB); err != nil {
 		return nil, err
 	}
-	if err := Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
+	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformUninstallResponse{}, nil

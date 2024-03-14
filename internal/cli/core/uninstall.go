@@ -64,7 +64,7 @@ func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, preUni
 		}
 	}
 	for _, platformRef := range platformsRefs {
-		_, err := commands.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
+		_, err := commands.PlatformUninstall(ctx, srv, &rpc.PlatformUninstallRequest{
 			Instance:         inst,
 			PlatformPackage:  platformRef.PackageName,
 			Architecture:     platformRef.Architecture,
