@@ -44,7 +44,7 @@ func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli lib update-index`")
 	resp := UpdateIndex(inst)

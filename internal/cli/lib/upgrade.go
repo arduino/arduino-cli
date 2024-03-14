@@ -47,7 +47,7 @@ func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib upgrade`")
 	ctx := context.Background()
-	instance := instance.CreateAndInit(srv, ctx)
+	instance := instance.CreateAndInit(ctx, srv)
 	Upgrade(instance, args)
 }
 

@@ -50,8 +50,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, skipPostInstall bool, skipPreUninstall bool) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli upgrade`")
 	lib.Upgrade(inst, []string{})
-	core.Upgrade(srv, ctx, inst, []string{}, skipPostInstall, skipPreUninstall)
+	core.Upgrade(ctx, srv, inst, []string{}, skipPostInstall, skipPreUninstall)
 }

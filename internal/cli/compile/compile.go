@@ -169,9 +169,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, sk.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sk.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {

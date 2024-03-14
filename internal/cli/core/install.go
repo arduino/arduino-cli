@@ -48,7 +48,7 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runInstallCommand(srv, args, scriptFlags, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	scriptFlags.AddToCommand(installCommand)
@@ -59,9 +59,9 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
 	logrus.Info("Executing `arduino-cli core install`")
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
-	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

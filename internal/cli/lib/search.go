@@ -103,7 +103,7 @@ const indexUpdateInterval = 60 * time.Minute
 
 func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, namesOnly bool, omitReleasesDetails bool) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli lib search`")
 

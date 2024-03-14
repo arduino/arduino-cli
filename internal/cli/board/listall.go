@@ -53,7 +53,7 @@ for a specific board if you specify the board name`),
 // runListAllCommand list all installed boards
 func runListAllCommand(args []string, srv rpc.ArduinoCoreServiceServer) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board listall`")
 

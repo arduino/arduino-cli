@@ -49,7 +49,7 @@ func initExamplesCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runExamplesCommand(srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstalledLibraries(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstalledLibraries(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	fqbn.AddToCommand(examplesCommand, srv)
@@ -59,7 +59,7 @@ func initExamplesCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runExamplesCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib examples`")
 	ctx := context.Background()
-	instance := instance.CreateAndInit(srv, ctx)
+	instance := instance.CreateAndInit(ctx, srv)
 
 	name := ""
 	if len(args) > 0 {

@@ -62,13 +62,13 @@ func TestParseReferenceCores(t *testing.T) {
 	srv := commands.NewArduinoCoreServer("")
 	ctx := context.Background()
 	for _, tt := range goodCores {
-		actual, err := arguments.ParseReference(srv, ctx, tt.in)
+		actual, err := arguments.ParseReference(ctx, srv, tt.in)
 		assert.Nil(t, err)
 		assert.Equal(t, tt.expected, actual)
 	}
 
 	for _, tt := range badCores {
-		actual, err := arguments.ParseReference(srv, ctx, tt.in)
+		actual, err := arguments.ParseReference(ctx, srv, tt.in)
 		require.NotNil(t, err, "Testing bad core '%s'", tt.in)
 		require.Equal(t, tt.expected, actual, "Testing bad core '%s'", tt.in)
 	}
@@ -81,7 +81,7 @@ func TestParseArgs(t *testing.T) {
 	}
 
 	srv := commands.NewArduinoCoreServer("")
-	refs, err := arguments.ParseReferences(srv, context.Background(), input)
+	refs, err := arguments.ParseReferences(context.Background(), srv, input)
 	assert.Nil(t, err)
 	assert.Equal(t, len(goodCores), len(refs))
 

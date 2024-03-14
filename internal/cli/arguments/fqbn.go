@@ -37,7 +37,7 @@ type Fqbn struct {
 func (f *Fqbn) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&f.fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledBoards(srv, context.Background()), cobra.ShellCompDirectiveDefault
+		return GetInstalledBoards(context.Background(), srv), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringSliceVar(&f.boardOptions, "board-options", []string{},
 		tr("List of board options separated by commas. Or can be used multiple times for multiple options."))

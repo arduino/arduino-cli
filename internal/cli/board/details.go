@@ -57,7 +57,7 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runDetailsCommand(srv rpc.ArduinoCoreServiceServer, fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board details`")
 

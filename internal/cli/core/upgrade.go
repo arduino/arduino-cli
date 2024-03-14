@@ -53,12 +53,12 @@ func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	logrus.Info("Executing `arduino-cli core upgrade`")
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
-	Upgrade(srv, ctx, inst, args, skipPostInstall, skipPreUninstall)
+	inst := instance.CreateAndInit(ctx, srv)
+	Upgrade(ctx, srv, inst, args, skipPostInstall, skipPreUninstall)
 }
 
 // Upgrade upgrades one or all installed platforms to the latest version.
-func Upgrade(srv rpc.ArduinoCoreServiceServer, ctx context.Context, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
+func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
 		platforms, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
@@ -103,7 +103,7 @@ func Upgrade(srv rpc.ArduinoCoreServiceServer, ctx context.Context, inst *rpc.In
 	}
 
 	// proceed upgrading, if anything is upgradable
-	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

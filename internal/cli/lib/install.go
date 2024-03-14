@@ -55,7 +55,7 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runInstallCommand(srv, args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
@@ -68,7 +68,7 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool) {
 	ctx := context.Background()
-	instance := instance.CreateAndInit(srv, ctx)
+	instance := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli lib install`")
 
 	if zipPath || gitURL {

@@ -44,11 +44,11 @@ func (r *Reference) String() string {
 
 // ParseReferences is a convenient wrapper that operates on a slice of strings and
 // calls ParseReference for each of them. It returns at the first invalid argument.
-func ParseReferences(srv rpc.ArduinoCoreServiceServer, ctx context.Context, args []string) ([]*Reference, error) {
+func ParseReferences(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) ([]*Reference, error) {
 	ret := []*Reference{}
 	for _, arg := range args {
 		// TODO: This is quite resource consuming (since it creates a new instance for each call)
-		reference, err := ParseReference(srv, ctx, arg)
+		reference, err := ParseReference(ctx, srv, arg)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func ParseReferences(srv rpc.ArduinoCoreServiceServer, ctx context.Context, args
 // To achieve that, it tries to use github.com/arduino/arduino-cli/commands/core.GetPlatform
 // Note that the Reference is returned rightaway if the arg inserted by the user matches perfectly one in the response of core.GetPlatform
 // A MultiplePlatformsError is returned if the platform searched by the user matches multiple platforms
-func ParseReference(srv rpc.ArduinoCoreServiceServer, ctx context.Context, arg string) (*Reference, error) {
+func ParseReference(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg string) (*Reference, error) {
 	logrus.Infof("Parsing reference %s", arg)
 	ret := &Reference{}
 	if arg == "" {
@@ -98,7 +98,7 @@ func ParseReference(srv rpc.ArduinoCoreServiceServer, ctx context.Context, arg s
 	// try to use core.PlatformList to optimize what the user typed
 	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
 	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance: instance.CreateAndInit(srv, ctx),
+		Instance: instance.CreateAndInit(ctx, srv),
 	})
 	foundPlatforms := []string{}
 	for _, platform := range platforms.GetSearchOutput() {

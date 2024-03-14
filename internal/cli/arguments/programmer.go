@@ -33,7 +33,7 @@ type Programmer struct {
 func (p *Programmer) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&p.programmer, "programmer", "P", "", tr("Programmer to use, e.g: atmel_ice"))
 	cmd.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledProgrammers(srv, context.Background()), cobra.ShellCompDirectiveDefault
+		return GetInstalledProgrammers(context.Background(), srv), cobra.ShellCompDirectiveDefault
 	})
 }
 

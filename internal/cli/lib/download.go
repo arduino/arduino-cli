@@ -42,7 +42,7 @@ func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runDownloadCommand(srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand
@@ -51,7 +51,7 @@ func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib download`")
 	ctx := context.Background()
-	instance := instance.CreateAndInit(srv, ctx)
+	instance := instance.CreateAndInit(ctx, srv)
 
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {

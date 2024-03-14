@@ -46,7 +46,7 @@ func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runDepsCommand(srv, args, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstalledLibraries(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstalledLibraries(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not try to update library dependencies if already installed."))
@@ -55,7 +55,7 @@ func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runDepsCommand(srv rpc.ArduinoCoreServiceServer, args []string, noOverwrite bool) {
 	ctx := context.Background()
-	instance := instance.CreateAndInit(srv, ctx)
+	instance := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])

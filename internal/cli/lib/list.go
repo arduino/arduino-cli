@@ -47,7 +47,7 @@ not listed, they can be listed by adding the --all flag.`),
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			instance := instance.CreateAndInit(srv, ctx)
+			instance := instance.CreateAndInit(ctx, srv)
 			logrus.Info("Executing `arduino-cli lib list`")
 			List(instance, args, all, updatable)
 		},

@@ -55,7 +55,7 @@ that can be upgraded. If nothing needs to be updated the output is empty.`),
 func runOutdatedCommand(srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli outdated`")
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 	Outdated(inst)
 }
 

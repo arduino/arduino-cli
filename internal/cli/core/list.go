@@ -49,7 +49,7 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runListCommand(srv rpc.ArduinoCoreServiceServer, all bool, updatableOnly bool) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli core list`")
 	List(inst, all, updatableOnly)
 }

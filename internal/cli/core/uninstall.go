@@ -41,7 +41,7 @@ func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runUninstallCommand(srv, args, preUninstallFlags)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableCores(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableCores(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	preUninstallFlags.AddToCommand(uninstallCommand)
@@ -51,9 +51,9 @@ func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
 	logrus.Info("Executing `arduino-cli core uninstall`")
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
-	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

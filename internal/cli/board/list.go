@@ -59,7 +59,7 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64, fqbn string) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board list`")
 

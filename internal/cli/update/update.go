@@ -51,7 +51,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runUpdateCommand(srv rpc.ArduinoCoreServiceServer, showOutdated bool) {
 	logrus.Info("Executing `arduino-cli update`")
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	lib.UpdateIndex(inst)
 	core.UpdateIndex(inst)

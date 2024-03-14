@@ -103,9 +103,9 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, sketch.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sketch.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(srv, ctx, profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {

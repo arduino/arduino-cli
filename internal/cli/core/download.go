@@ -42,7 +42,7 @@ func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runDownloadCommand(srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(srv, context.Background()), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(context.Background(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand
@@ -50,11 +50,11 @@ func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli core download`")
 
-	platformsRefs, err := arguments.ParseReferences(srv, ctx, args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}

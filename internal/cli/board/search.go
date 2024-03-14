@@ -50,7 +50,7 @@ func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board search`")
 

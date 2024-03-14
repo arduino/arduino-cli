@@ -54,7 +54,7 @@ const indexUpdateInterval = 24 * time.Hour
 
 func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, allVersions bool) {
 	ctx := context.Background()
-	inst := instance.CreateAndInit(srv, ctx)
+	inst := instance.CreateAndInit(ctx, srv)
 
 	res, err := commands.UpdateIndex(
 		context.Background(),

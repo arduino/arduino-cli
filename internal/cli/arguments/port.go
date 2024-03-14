@@ -42,11 +42,11 @@ type Port struct {
 func (p *Port) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return f.Map(GetAvailablePorts(srv, context.Background()), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(context.Background(), srv), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return f.Map(GetAvailablePorts(srv, context.Background()), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(context.Background(), srv), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
 	})
 	p.timeout.AddToCommand(cmd)
 }
