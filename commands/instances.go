@@ -184,7 +184,8 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			allPackageIndexUrls = append(allPackageIndexUrls, URL)
 		}
 	}
-	if err := firstUpdate(context.Background(), req.GetInstance(), downloadCallback, allPackageIndexUrls); err != nil {
+
+	if err := firstUpdate(context.Background(), s, req.GetInstance(), downloadCallback, allPackageIndexUrls); err != nil {
 		e := &cmderrors.InitFailedError{
 			Code:   codes.InvalidArgument,
 			Cause:  err,
@@ -464,10 +465,27 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	return result(rpc.IndexUpdateReport_STATUS_UPDATED), nil
 }
 
+// UpdateIndexStreamResponseToCallbackFunction returns a gRPC stream to be used in UpdateIndex that sends
+// all responses to the callback function.
+func UpdateIndexStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB) (rpc.ArduinoCoreService_UpdateIndexServer, func() *rpc.UpdateIndexResponse_Result) {
+	var result *rpc.UpdateIndexResponse_Result
+	return streamResponseToCallback(ctx, func(r *rpc.UpdateIndexResponse) error {
+			if r.GetDownloadProgress() != nil {
+				downloadCB(r.GetDownloadProgress())
+			}
+			if r.GetResult() != nil {
+				result = r.GetResult()
+			}
+			return nil
+		}), func() *rpc.UpdateIndexResponse_Result {
+			return result
+		}
+}
+
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse_Result, error) {
+func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream rpc.ArduinoCoreService_UpdateIndexServer) error {
 	if !instances.IsValid(req.GetInstance()) {
-		return nil, &cmderrors.InvalidInstanceError{}
+		return &cmderrors.InvalidInstanceError{}
 	}
 
 	report := func(indexURL *url.URL, status rpc.IndexUpdateReport_Status) *rpc.IndexUpdateReport {
@@ -477,6 +495,12 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		}
 	}
 
+	syncSend := NewSynchronizedSend(stream.Send)
+	var downloadCB rpc.DownloadProgressCB = func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.UpdateIndexResponse{
+			Message: &rpc.UpdateIndexResponse_DownloadProgress{DownloadProgress: p},
+		})
+	}
 	indexpath := configuration.DataDir(configuration.Settings)
 
 	urls := []string{globals.DefaultIndexURL}
@@ -549,16 +573,18 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_UPDATED))
 		}
 	}
-
+	syncSend.Send(&rpc.UpdateIndexResponse{
+		Message: &rpc.UpdateIndexResponse_Result_{Result: result},
+	})
 	if failed {
-		return result, &cmderrors.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
+		return &cmderrors.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
 	}
-	return result, nil
+	return nil
 }
 
 // firstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
-func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(msg *rpc.DownloadProgress), externalPackageIndexes []*url.URL) error {
+func firstUpdate(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, downloadCb func(msg *rpc.DownloadProgress), externalPackageIndexes []*url.URL) error {
 	// Gets the data directory to verify if library_index.json and package_index.json exist
 	dataDir := configuration.DataDir(configuration.Settings)
 	libraryIndex := dataDir.Join("library_index.json")
@@ -589,7 +615,8 @@ func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(ms
 			// library update we download that file and all the other package indexes from
 			// additional_urls
 			req := &rpc.UpdateIndexRequest{Instance: instance}
-			if _, err := UpdateIndex(ctx, req, downloadCb); err != nil {
+			stream, _ := UpdateIndexStreamResponseToCallbackFunction(ctx, downloadCb)
+			if err := srv.UpdateIndex(req, stream); err != nil {
 				return err
 			}
 			break

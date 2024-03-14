@@ -46,18 +46,19 @@ func runUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli core update-index`")
 	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
-	resp := UpdateIndex(inst)
+	resp := UpdateIndex(ctx, srv, inst)
 
 	feedback.PrintResult(&updateIndexResult{result.NewUpdateIndexResponse_ResultResult(resp)})
 }
 
 // UpdateIndex updates the index of platforms.
-func UpdateIndex(inst *rpc.Instance) *rpc.UpdateIndexResponse_Result {
-	res, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
+func UpdateIndex(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance) *rpc.UpdateIndexResponse_Result {
+	stream, res := commands.UpdateIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+	err := srv.UpdateIndex(&rpc.UpdateIndexRequest{Instance: inst}, stream)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
-	return res
+	return res()
 }
 
 type updateIndexResult struct {

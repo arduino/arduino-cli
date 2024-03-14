@@ -56,14 +56,14 @@ func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, allVersio
 	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 
-	res, err := commands.UpdateIndex(
-		context.Background(),
+	stream, res := commands.UpdateIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+	err := srv.UpdateIndex(
 		&rpc.UpdateIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())},
-		feedback.ProgressBar())
+		stream)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
-	for _, idxRes := range res.GetUpdatedIndexes() {
+	for _, idxRes := range res().GetUpdatedIndexes() {
 		if idxRes.GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
 			// At least one index has been updated, reinitialize the instance
 			instance.Init(ctx, srv, inst)
