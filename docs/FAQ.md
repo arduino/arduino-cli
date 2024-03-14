@@ -43,12 +43,12 @@ when using a serial port, the monitor baud rate can be set to 4800 with the foll
 
 ## "Permission denied" error in sketch upload
 
-This problem might happen on some Linux systems, and can be solved by setting up serial port permissions. First, search 
+This problem might happen on some Linux systems, and can be solved by setting up serial port permissions. First, search
 for the port your board is connected to, with the command:
 
 `$ arduino-cli board list`
 
-Then add your user to the group with the following command, replacing `<username>` with your username and `<group>` with 
+Then add your user to the group with the following command, replacing `<username>` with your username and `<group>` with
 your group name. Logging out and in again is necessary for the changes to take effect.
 
 `$ sudo usermod -a -G <group> <username>`
