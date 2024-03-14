@@ -140,7 +140,7 @@ func runMonitorCmd(
 		fqbn, _ = portArgs.DetectFQBN(inst, srv)
 	}
 
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, defaultPort, defaultProtocol)
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, srv, defaultPort, defaultProtocol)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

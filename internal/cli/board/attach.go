@@ -45,7 +45,7 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runAttachCommand(sketchPath, &port, fqbn.String(), &programmer)
+			runAttachCommand(srv, sketchPath, &port, fqbn.String(), &programmer)
 		},
 	}
 	fqbn.AddToCommand(attachCommand, srv)
@@ -55,10 +55,10 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return attachCommand
 }
 
-func runAttachCommand(path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
+func runAttachCommand(srv rpc.ArduinoCoreServiceServer, path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
 	sketchPath := arguments.InitSketchPath(path)
 
-	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, "", "")
+	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, srv, "", "")
 	newDefaults, err := commands.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,

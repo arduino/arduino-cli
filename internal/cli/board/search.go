@@ -22,7 +22,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -32,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initSearchCommand() *cobra.Command {
+func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var searchCommand = &cobra.Command{
 		Use:   fmt.Sprintf("search [%s]", tr("boardname")),
 		Short: tr("Search for a board in the Boards Manager."),
@@ -41,18 +40,20 @@ func initSearchCommand() *cobra.Command {
 			"  " + os.Args[0] + " board search\n" +
 			"  " + os.Args[0] + " board search zero",
 		Args: cobra.ArbitraryArgs,
-		Run:  runSearchCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runSearchCommand(srv, args)
+		},
 	}
 	searchCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return searchCommand
 }
 
-func runSearchCommand(cmd *cobra.Command, args []string) {
+func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board search`")
 
-	res, err := commands.BoardSearch(context.Background(), &rpc.BoardSearchRequest{
+	res, err := srv.BoardSearch(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		IncludeHiddenBoards: showHiddenBoard,

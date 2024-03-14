@@ -18,7 +18,6 @@ package commands
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"sync/atomic"
 
@@ -42,37 +41,6 @@ type arduinoCoreServerImpl struct {
 	rpc.UnsafeArduinoCoreServiceServer // Force compile error for unimplemented methods
 
 	versionString string
-}
-
-// BoardSearch exposes to the gRPC interface the board search command
-func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
-	return BoardSearch(ctx, req)
-}
-
-// BoardListWatch FIXMEDOC
-func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, stream rpc.ArduinoCoreService_BoardListWatchServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	if req.GetInstance() == nil {
-		err := fmt.Errorf(tr("no instance specified"))
-		syncSend.Send(&rpc.BoardListWatchResponse{
-			EventType: "error",
-			Error:     err.Error(),
-		})
-		return err
-	}
-
-	eventsChan, err := BoardListWatch(stream.Context(), req)
-	if err != nil {
-		return err
-	}
-
-	for event := range eventsChan {
-		if err := syncSend.Send(event); err != nil {
-			logrus.Infof("sending board watch message: %v", err)
-		}
-	}
-
-	return nil
 }
 
 // Destroy FIXMEDOC

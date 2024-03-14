@@ -39,7 +39,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	boardCommand.AddCommand(initDetailsCommand(srv))
 	boardCommand.AddCommand(initListCommand(srv))
 	boardCommand.AddCommand(initListAllCommand(srv))
-	boardCommand.AddCommand(initSearchCommand())
+	boardCommand.AddCommand(initSearchCommand(srv))
 
 	return boardCommand
 }

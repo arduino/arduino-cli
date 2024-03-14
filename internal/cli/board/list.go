@@ -63,7 +63,7 @@ func runListCommand(srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64,
 	logrus.Info("Executing `arduino-cli board list`")
 
 	if watch {
-		watchList(inst)
+		watchList(inst, srv)
 		return
 	}
 
@@ -88,8 +88,9 @@ func runListCommand(srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64,
 	feedback.PrintResult(listResult{result.NewDetectedPorts(ports)})
 }
 
-func watchList(inst *rpc.Instance) {
-	eventsChan, err := commands.BoardListWatch(context.Background(), &rpc.BoardListWatchRequest{Instance: inst})
+func watchList(inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) {
+	stream, eventsChan := commands.BoardListWatchProxyToChan(context.Background())
+	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: inst}, stream)
 	if err != nil {
 		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
 	}

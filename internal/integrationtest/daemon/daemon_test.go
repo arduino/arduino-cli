@@ -63,15 +63,15 @@ func TestArduinoCliDaemon(t *testing.T) {
 		require.NoError(t, err)
 		watcherCanceldCh := make(chan struct{})
 		go func() {
+			defer close(watcherCanceldCh)
 			for {
 				msg, err := watcher.Recv()
 				if errors.Is(err, io.EOF) {
-					fmt.Println("Watcher EOF")
+					fmt.Println("Got EOF from watcher")
 					return
 				}
 				if s, ok := status.FromError(err); ok && s.Code() == codes.Canceled {
-					fmt.Println("Watcher canceled")
-					watcherCanceldCh <- struct{}{}
+					fmt.Println("Got Canceled error from watcher")
 					return
 				}
 				require.NoError(t, err, "BoardListWatch grpc call returned an error")

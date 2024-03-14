@@ -262,29 +262,43 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 	return false
 }
 
-// BoardListWatch returns a channel that receives boards connection and disconnection events.
-func BoardListWatch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
+// BoardListWatchProxyToChan return a stream, to be used in BoardListWatch method,
+// that proxies all the responses to a channel.
+func BoardListWatchProxyToChan(ctx context.Context) (rpc.ArduinoCoreService_BoardListWatchServer, <-chan *rpc.BoardListWatchResponse) {
+	return streamResponseToChan[rpc.BoardListWatchResponse](ctx)
+}
+
+// BoardListWatch FIXMEDOC
+func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, stream rpc.ArduinoCoreService_BoardListWatchServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	if req.GetInstance() == nil {
+		err := fmt.Errorf(tr("no instance specified"))
+		syncSend.Send(&rpc.BoardListWatchResponse{
+			EventType: "error",
+			Error:     err.Error(),
+		})
+		return err
+	}
+
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer release()
 	dm := pme.DiscoveryManager()
 
 	watcher, err := dm.Watch()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	go func() {
-		<-ctx.Done()
+		<-stream.Context().Done()
 		logrus.Trace("closed watch")
 		watcher.Close()
 	}()
 
-	outChan := make(chan *rpc.BoardListWatchResponse)
 	go func() {
-		defer close(outChan)
 		for event := range watcher.Feed() {
 			port := &rpc.DetectedPort{
 				Port: rpc.DiscoveryPortToRPC(event.Port),
@@ -298,13 +312,13 @@ func BoardListWatch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan
 				}
 				port.MatchingBoards = boards
 			}
-			outChan <- &rpc.BoardListWatchResponse{
+			stream.Send(&rpc.BoardListWatchResponse{
 				EventType: event.Type,
 				Port:      port,
 				Error:     boardsError,
-			}
+			})
 		}
 	}()
 
-	return outChan, nil
+	return nil
 }
