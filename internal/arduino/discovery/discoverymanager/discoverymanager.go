@@ -171,9 +171,17 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 		defer dm.watchersMutex.Unlock()
 		delete(dm.watchers, watcher)
 		close(watcher.feed)
+		watcher.feed = nil
 	}
 	go func() {
 		dm.watchersMutex.Lock()
+		defer dm.watchersMutex.Unlock()
+
+		// Check if the watcher is still alive (it could have been closed before the goroutine started...)
+		if watcher.feed == nil {
+			return
+		}
+
 		// When a watcher is started, send all the current active ports first...
 		for _, cache := range dm.watchersCache {
 			for _, ev := range cache {
@@ -182,7 +190,6 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 		}
 		// ...and after that add the watcher to the list of watchers receiving events
 		dm.watchers[watcher] = true
-		dm.watchersMutex.Unlock()
 	}()
 	return watcher, nil
 }
