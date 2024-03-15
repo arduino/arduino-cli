@@ -204,20 +204,6 @@ func runMonitorCmd(
 			}
 		}
 	}
-	portProxy, _, err := commands.Monitor(context.Background(), &rpc.MonitorPortOpenRequest{
-		Instance:          inst,
-		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
-		Fqbn:              fqbn,
-		PortConfiguration: configuration,
-	})
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
-	defer portProxy.Close()
-
-	if !quiet {
-		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", portAddress))
-	}
 
 	ttyIn, ttyOut, err := feedback.InteractiveStreams()
 	if err != nil {
@@ -228,7 +214,7 @@ func runMonitorCmd(
 		ttyOut = newTimeStampWriter(ttyOut)
 	}
 
-	ctx, cancel := cleanup.InterruptableContext(context.Background())
+	ctx, cancel := cleanup.InterruptableContext(ctx)
 	if raw {
 		if feedback.IsInteractive() {
 			if err := feedback.SetRawModeStdin(); err != nil {
@@ -246,6 +232,22 @@ func runMonitorCmd(
 		ttyIn = io.TeeReader(ttyIn, ctrlCDetector)
 	}
 
+	monitorServer, portProxy := commands.MonitorServerToReadWriteCloser(ctx, &rpc.MonitorPortOpenRequest{
+		Instance:          inst,
+		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
+		Fqbn:              fqbn,
+		PortConfiguration: configuration,
+	})
+	go func() {
+		if !quiet {
+			feedback.Print(tr("Connecting to %s. Press CTRL-C to exit.", portAddress))
+		}
+		if err := srv.Monitor(monitorServer); err != nil {
+			feedback.FatalError(err, feedback.ErrGeneric)
+		}
+		portProxy.Close()
+		cancel()
+	}()
 	go func() {
 		_, err := io.Copy(ttyOut, portProxy)
 		if err != nil && !errors.Is(err, io.EOF) {

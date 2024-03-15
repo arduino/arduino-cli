@@ -17,15 +17,10 @@ package commands
 
 import (
 	"context"
-	"errors"
-	"io"
-	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/commands/cache"
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/updatecheck"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/sirupsen/logrus"
 )
 
 // NewArduinoCoreServer returns an implementation of the ArduinoCoreService gRPC service
@@ -354,102 +349,6 @@ func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 // EnumerateMonitorPortSettings FIXMEDOC
 func (s *arduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
 	return EnumerateMonitorPortSettings(ctx, req)
-}
-
-// Monitor FIXMEDOC
-func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-
-	// The configuration must be sent on the first message
-	req, err := stream.Recv()
-	if err != nil {
-		return err
-	}
-
-	openReq := req.GetOpenRequest()
-	if openReq == nil {
-		return &cmderrors.InvalidInstanceError{}
-	}
-	portProxy, _, err := Monitor(stream.Context(), openReq)
-	if err != nil {
-		return err
-	}
-
-	// Send a message with Success set to true to notify the caller of the port being now active
-	_ = syncSend.Send(&rpc.MonitorResponse{Success: true})
-
-	cancelCtx, cancel := context.WithCancel(stream.Context())
-	gracefulCloseInitiated := &atomic.Bool{}
-	gracefuleCloseCtx, gracefulCloseCancel := context.WithCancel(context.Background())
-
-	// gRPC stream receiver (gRPC data -> monitor, config, close)
-	go func() {
-		defer cancel()
-		for {
-			msg, err := stream.Recv()
-			if errors.Is(err, io.EOF) {
-				return
-			}
-			if err != nil {
-				syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
-				return
-			}
-			if conf := msg.GetUpdatedConfiguration(); conf != nil {
-				for _, c := range conf.GetSettings() {
-					if err := portProxy.Config(c.GetSettingId(), c.GetValue()); err != nil {
-						syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
-					}
-				}
-			}
-			if closeMsg := msg.GetClose(); closeMsg {
-				gracefulCloseInitiated.Store(true)
-				if err := portProxy.Close(); err != nil {
-					logrus.WithError(err).Debug("Error closing monitor port")
-				}
-				gracefulCloseCancel()
-			}
-			tx := msg.GetTxData()
-			for len(tx) > 0 {
-				n, err := portProxy.Write(tx)
-				if errors.Is(err, io.EOF) {
-					return
-				}
-				if err != nil {
-					syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
-					return
-				}
-				tx = tx[n:]
-			}
-		}
-	}()
-
-	// gRPC stream sender (monitor -> gRPC)
-	go func() {
-		defer cancel() // unlock the receiver
-		buff := make([]byte, 4096)
-		for {
-			n, err := portProxy.Read(buff)
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			if err != nil {
-				syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
-				break
-			}
-			if err := syncSend.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
-				break
-			}
-		}
-	}()
-
-	<-cancelCtx.Done()
-	if gracefulCloseInitiated.Load() {
-		// Port closing has been initiated in the receiver
-		<-gracefuleCloseCtx.Done()
-	} else {
-		portProxy.Close()
-	}
-	return nil
 }
 
 // CheckForArduinoCLIUpdates FIXMEDOC
