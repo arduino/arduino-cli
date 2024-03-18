@@ -37,24 +37,9 @@ type arduinoCoreServerImpl struct {
 	versionString string
 }
 
-// Version FIXMEDOC
+// Version returns the version of the Arduino CLI
 func (s *arduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionRequest) (*rpc.VersionResponse, error) {
 	return &rpc.VersionResponse{Version: s.versionString}, nil
-}
-
-// SupportedUserFields FIXMEDOC
-func (s *arduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
-	return SupportedUserFields(ctx, req)
-}
-
-// ListProgrammersAvailableForUpload FIXMEDOC
-func (s *arduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
-	return ListProgrammersAvailableForUpload(ctx, req)
-}
-
-// EnumerateMonitorPortSettings FIXMEDOC
-func (s *arduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
-	return EnumerateMonitorPortSettings(ctx, req)
 }
 
 // CheckForArduinoCLIUpdates FIXMEDOC

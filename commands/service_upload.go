@@ -41,7 +41,7 @@ import (
 
 // SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
 // by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
-func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
+func (s *arduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
 	if req.GetProtocol() == "" {
 		return nil, &cmderrors.MissingPortProtocolError{}
 	}

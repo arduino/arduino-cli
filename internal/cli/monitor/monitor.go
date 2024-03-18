@@ -147,7 +147,7 @@ func runMonitorCmd(
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
-	enumerateResp, err := commands.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
+	enumerateResp, err := srv.EnumerateMonitorPortSettings(ctx, &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     inst,
 		PortProtocol: portProtocol,
 		Fqbn:         fqbn,

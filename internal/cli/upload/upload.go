@@ -118,7 +118,7 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 	defaultProtocol := sketch.GetDefaultProtocol()
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, srv, defaultFQBN, defaultAddress, defaultProtocol)
 
-	userFieldRes, err := commands.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+	userFieldRes, err := srv.SupportedUserFields(ctx, &rpc.SupportedUserFieldsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 		Protocol: port.GetProtocol(),

@@ -253,7 +253,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 
 	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {
-		userFieldRes, err := commands.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+		userFieldRes, err := srv.SupportedUserFields(ctx, &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
 			Fqbn:     fqbn,
 			Protocol: port.GetProtocol(),

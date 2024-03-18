@@ -18,7 +18,6 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -58,7 +57,7 @@ func GetInstalledProgrammers(ctx context.Context, srv rpc.ArduinoCoreServiceServ
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.GetBoards() {
-		programmers, _ := commands.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadRequest{
+		programmers, _ := srv.ListProgrammersAvailableForUpload(ctx, &rpc.ListProgrammersAvailableForUploadRequest{
 			Instance: inst,
 			Fqbn:     board.GetFqbn(),
 		})
