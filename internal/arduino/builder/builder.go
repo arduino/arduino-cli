@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -111,6 +112,7 @@ type buildArtifacts struct {
 
 // NewBuilder creates a sketch Builder.
 func NewBuilder(
+	ctx context.Context,
 	sk *sketch.Sketch,
 	boardBuildProperties *properties.Map,
 	buildPath *paths.Path,

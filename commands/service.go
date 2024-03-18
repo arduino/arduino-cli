@@ -76,41 +76,6 @@ func (s *arduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.
 	return SetSketchDefaults(ctx, req)
 }
 
-// Compile FIXMEDOC
-func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	outStream := feedStreamTo(func(data []byte) {
-		syncSend.Send(&rpc.CompileResponse{
-			Message: &rpc.CompileResponse_OutStream{OutStream: data},
-		})
-	})
-	errStream := feedStreamTo(func(data []byte) {
-		syncSend.Send(&rpc.CompileResponse{
-			Message: &rpc.CompileResponse_ErrStream{ErrStream: data},
-		})
-	})
-	progressStream := func(p *rpc.TaskProgress) {
-		syncSend.Send(&rpc.CompileResponse{
-			Message: &rpc.CompileResponse_Progress{Progress: p},
-		})
-	}
-	compileRes, compileErr := Compile(stream.Context(), req, outStream, errStream, progressStream)
-	outStream.Close()
-	errStream.Close()
-	var compileRespSendErr error
-	if compileRes != nil {
-		compileRespSendErr = syncSend.Send(&rpc.CompileResponse{
-			Message: &rpc.CompileResponse_Result{
-				Result: compileRes,
-			},
-		})
-	}
-	if compileErr != nil {
-		return compileErr
-	}
-	return compileRespSendErr
-}
-
 // PlatformInstall FIXMEDOC
 func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest, stream rpc.ArduinoCoreService_PlatformInstallServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)

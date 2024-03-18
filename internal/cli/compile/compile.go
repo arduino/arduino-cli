@@ -246,7 +246,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
 		Jobs:                          jobs,
 	}
-	builderRes, compileError := commands.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
+	server, builderResCB := commands.CompilerServerToStreams(ctx, stdOut, stdErr)
+	compileError := srv.Compile(compileRequest, server)
+	builderRes := builderResCB()
 
 	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {

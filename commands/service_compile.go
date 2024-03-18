@@ -38,8 +38,34 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB rpc.TaskProgressCB) (r *rpc.BuilderResult, e error) {
+// CompilerServerToStreams creates a gRPC CompileServer that sends the responses to the provided streams.
+// The returned callback function can be used to retrieve the builder result after the compilation is done.
+func CompilerServerToStreams(ctx context.Context, stdOut, stderr io.Writer) (server rpc.ArduinoCoreService_CompileServer, resultCB func() *rpc.BuilderResult) {
+	var builderResult *rpc.BuilderResult
+	stream := streamResponseToCallback(ctx, func(resp *rpc.CompileResponse) error {
+		if out := resp.GetOutStream(); len(out) > 0 {
+			if _, err := stdOut.Write(out); err != nil {
+				return err
+			}
+		}
+		if err := resp.GetErrStream(); len(err) > 0 {
+			if _, err := stderr.Write(err); err != nil {
+				return err
+			}
+		}
+		if result := resp.GetResult(); result != nil {
+			builderResult = result
+		}
+		return nil
+	})
+	return stream, func() *rpc.BuilderResult { return builderResult }
+}
+
+// Compile performs a compilation of a sketch.
+func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
+	ctx := stream.Context()
+	syncSend := NewSynchronizedSend(stream.Send)
+
 	exportBinaries := configuration.Settings.GetBool("sketch.always_export_binaries")
 	if e := req.ExportBinaries; e != nil {
 		exportBinaries = *e
@@ -47,27 +73,27 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer release()
 
 	if pme.Dirty() {
-		return nil, &cmderrors.InstanceNeedsReinitialization{}
+		return &cmderrors.InstanceNeedsReinitialization{}
 	}
 
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
-		return nil, &cmderrors.MissingSketchPathError{}
+		return &cmderrors.MissingSketchPathError{}
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &cmderrors.CantOpenSketchError{Cause: err}
+		return &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -79,25 +105,30 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}
 	if fqbnIn == "" {
-		return nil, &cmderrors.MissingFQBNError{}
+		return &cmderrors.MissingFQBNError{}
 	}
 
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, &cmderrors.InvalidFQBNError{Cause: err}
+		return &cmderrors.InvalidFQBNError{Cause: err}
 	}
 	_, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		if targetPlatform == nil {
-			return nil, &cmderrors.PlatformNotFoundError{
+			return &cmderrors.PlatformNotFoundError{
 				Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 				Cause:    fmt.Errorf(tr("platform not installed")),
 			}
 		}
-		return nil, &cmderrors.InvalidFQBNError{Cause: err}
+		return &cmderrors.InvalidFQBNError{Cause: err}
 	}
 
-	r = &rpc.BuilderResult{}
+	r := &rpc.BuilderResult{}
+	defer func() {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_Result{Result: r},
+		})
+	}()
 	r.BoardPlatform = targetPlatform.ToRPCPlatformReference()
 	r.BuildPlatform = buildPlatform.ToRPCPlatformReference()
 
@@ -120,7 +151,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	encryptProp := boardBuildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
 	if !(keychainProp == signProp && signProp == encryptProp) {
-		return nil, fmt.Errorf(tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
+		return fmt.Errorf(tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
 
 	// Generate or retrieve build path
@@ -129,7 +160,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		buildPath = paths.New(req.GetBuildPath()).Canonical()
 		if in, _ := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
 			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
@@ -137,7 +168,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		buildPath = sk.DefaultBuildPath()
 	}
 	if err = buildPath.MkdirAll(); err != nil {
-		return nil, &cmderrors.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
+		return &cmderrors.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
 	buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
 	// cache is purged after compilation to not remove entries that might be required
@@ -149,16 +180,16 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	} else {
 		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
 		if err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
 		if err := buildCachePath.MkdirAll(); err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
 	if _, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform); err != nil {
-		return nil, err
+		return err
 	}
 
 	actualPlatform := buildPlatform
@@ -170,7 +201,25 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		libsManager = lm
 	}
 
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_OutStream{OutStream: data},
+		})
+	})
+	defer outStream.Close()
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_ErrStream{ErrStream: data},
+		})
+	})
+	defer errStream.Close()
+	progressCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.CompileResponse{
+			Message: &rpc.CompileResponse_Progress{Progress: p},
+		})
+	}
 	sketchBuilder, err := builder.NewBuilder(
+		ctx,
 		sk,
 		boardBuildProperties,
 		buildPath,
@@ -195,14 +244,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
-			return nil, &cmderrors.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
+			return &cmderrors.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
 		}
 		if errors.Is(err, builder.ErrSketchCannotBeLocatedInBuildPath) {
-			return r, &cmderrors.CompileFailedError{
+			return &cmderrors.CompileFailedError{
 				Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
 			}
 		}
-		return r, &cmderrors.CompileFailedError{Message: err.Error()}
+		return &cmderrors.CompileFailedError{Message: err.Error()}
 	}
 
 	defer func() {
@@ -232,7 +281,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	// Just get build properties and exit
 	if req.GetShowProperties() {
-		return r, nil
+		return nil
 	}
 
 	if req.GetPreprocess() {
@@ -240,10 +289,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		preprocessedSketch, err := sketchBuilder.Preprocess()
 		if err != nil {
 			err = &cmderrors.CompileFailedError{Message: err.Error()}
-			return r, err
+			return err
 		}
 		_, err = outStream.Write(preprocessedSketch)
-		return r, err
+		return err
 	}
 
 	defer func() {
@@ -285,7 +334,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	if err := sketchBuilder.Build(); err != nil {
-		return r, &cmderrors.CompileFailedError{Message: err.Error()}
+		return &cmderrors.CompileFailedError{Message: err.Error()}
 	}
 
 	// If the export directory is set we assume you want to export the binaries
@@ -297,9 +346,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = false
 	}
 	if exportBinaries {
-		err := sketchBuilder.RunRecipe("recipe.hooks.savehex.presavehex", ".pattern", false)
-		if err != nil {
-			return r, err
+		if err := sketchBuilder.RunRecipe("recipe.hooks.savehex.presavehex", ".pattern", false); err != nil {
+			return err
 		}
 
 		exportPath := paths.New(req.GetExportDir())
@@ -313,38 +361,36 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if !buildPath.EqualsTo(exportPath) {
 			logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 			if err := exportPath.MkdirAll(); err != nil {
-				return r, &cmderrors.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
+				return &cmderrors.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
 			}
 
 			baseName, ok := sketchBuilder.GetBuildProperties().GetOk("build.project_name") // == "sketch.ino"
 			if !ok {
-				return r, &cmderrors.MissingPlatformPropertyError{Property: "build.project_name"}
+				return &cmderrors.MissingPlatformPropertyError{Property: "build.project_name"}
 			}
 			buildFiles, err := sketchBuilder.GetBuildPath().ReadDir()
 			if err != nil {
-				return r, &cmderrors.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
+				return &cmderrors.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
 			}
 			buildFiles.FilterPrefix(baseName)
 			for _, buildFile := range buildFiles {
 				exportedFile := exportPath.Join(buildFile.Base())
 				logrus.WithField("src", buildFile).WithField("dest", exportedFile).Trace("Copying artifact.")
 				if err = buildFile.CopyTo(exportedFile); err != nil {
-					return r, &cmderrors.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
+					return &cmderrors.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
 				}
 			}
 		}
 
-		err = sketchBuilder.RunRecipe("recipe.hooks.savehex.postsavehex", ".pattern", false)
-		if err != nil {
-			return r, err
+		if err = sketchBuilder.RunRecipe("recipe.hooks.savehex.postsavehex", ".pattern", false); err != nil {
+			return err
 		}
 	}
 
 	r.ExecutableSectionsSize = sketchBuilder.ExecutableSectionsSize().ToRPCExecutableSectionSizeArray()
 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
-
-	return r, nil
+	return nil
 }
 
 // maybePurgeBuildCache runs the build files cache purge if the policy conditions are met.
