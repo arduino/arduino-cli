@@ -422,30 +422,56 @@ func (s *arduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 	return &rpc.DestroyResponse{}, nil
 }
 
+// UpdateLibrariesIndexStreamResponseToCallbackFunction returns a gRPC stream to be used in UpdateLibrariesIndex that sends
+// all responses to the callback function.
+func UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB) (rpc.ArduinoCoreService_UpdateLibrariesIndexServer, func() *rpc.UpdateLibrariesIndexResponse_Result) {
+	var result *rpc.UpdateLibrariesIndexResponse_Result
+	return streamResponseToCallback(ctx, func(r *rpc.UpdateLibrariesIndexResponse) error {
+			if r.GetDownloadProgress() != nil {
+				downloadCB(r.GetDownloadProgress())
+			}
+			if r.GetResult() != nil {
+				result = r.GetResult()
+			}
+			return nil
+		}), func() *rpc.UpdateLibrariesIndexResponse_Result {
+			return result
+		}
+}
+
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateLibrariesIndexResponse_Result, error) {
-	logrus.Info("Updating libraries index")
+func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexRequest, stream rpc.ArduinoCoreService_UpdateLibrariesIndexServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.UpdateLibrariesIndexResponse{
+			Message: &rpc.UpdateLibrariesIndexResponse_DownloadProgress{DownloadProgress: p}})
+	}
 
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	indexDir := pme.IndexDir
 	release()
-
 	index := globals.LibrariesIndexResource
-	result := func(status rpc.IndexUpdateReport_Status) *rpc.UpdateLibrariesIndexResponse_Result {
-		return &rpc.UpdateLibrariesIndexResponse_Result{
-			LibrariesIndex: &rpc.IndexUpdateReport{
-				IndexUrl: globals.LibrariesIndexResource.URL.String(),
-				Status:   status,
+
+	resultCB := func(status rpc.IndexUpdateReport_Status) {
+		syncSend.Send(&rpc.UpdateLibrariesIndexResponse{
+			Message: &rpc.UpdateLibrariesIndexResponse_Result_{
+				Result: &rpc.UpdateLibrariesIndexResponse_Result{
+					LibrariesIndex: &rpc.IndexUpdateReport{
+						IndexUrl: index.URL.String(),
+						Status:   status,
+					},
+				},
 			},
-		}
+		})
 	}
 
 	// Create the index directory if it doesn't exist
 	if err := indexDir.MkdirAll(); err != nil {
-		return result(rpc.IndexUpdateReport_STATUS_FAILED), &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
+		resultCB(rpc.IndexUpdateReport_STATUS_FAILED)
+		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
 	// Check if the index file is already up-to-date
@@ -453,16 +479,21 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	if info, err := indexDir.Join(indexFileName).Stat(); err == nil {
 		ageSecs := int64(time.Since(info.ModTime()).Seconds())
 		if ageSecs < req.GetUpdateIfOlderThanSecs() {
-			return result(rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE), nil
+			resultCB(rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE)
+			return nil
 		}
 	}
 
 	// Perform index update
+	// TODO: pass context
+	// ctx := stream.Context()
 	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB); err != nil {
-		return nil, err
+		resultCB(rpc.IndexUpdateReport_STATUS_FAILED)
+		return err
 	}
 
-	return result(rpc.IndexUpdateReport_STATUS_UPDATED), nil
+	resultCB(rpc.IndexUpdateReport_STATUS_UPDATED)
+	return nil
 }
 
 // UpdateIndexStreamResponseToCallbackFunction returns a gRPC stream to be used in UpdateIndex that sends
@@ -593,7 +624,8 @@ func firstUpdate(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance
 		// The library_index.json file doesn't exists, that means the CLI is run for the first time
 		// so we proceed with the first update that downloads the file
 		req := &rpc.UpdateLibrariesIndexRequest{Instance: instance}
-		if _, err := UpdateLibrariesIndex(ctx, req, downloadCb); err != nil {
+		stream, _ := UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx, downloadCb)
+		if err := srv.UpdateLibrariesIndex(req, stream); err != nil {
 			return err
 		}
 	}

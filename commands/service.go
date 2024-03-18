@@ -37,24 +37,6 @@ type arduinoCoreServerImpl struct {
 	versionString string
 }
 
-// UpdateLibrariesIndex FIXMEDOC
-func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexRequest, stream rpc.ArduinoCoreService_UpdateLibrariesIndexServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	res, err := UpdateLibrariesIndex(stream.Context(), req,
-		func(p *rpc.DownloadProgress) {
-			syncSend.Send(&rpc.UpdateLibrariesIndexResponse{
-				Message: &rpc.UpdateLibrariesIndexResponse_DownloadProgress{DownloadProgress: p},
-			})
-		},
-	)
-	if res != nil {
-		syncSend.Send(&rpc.UpdateLibrariesIndexResponse{
-			Message: &rpc.UpdateLibrariesIndexResponse_Result_{Result: res},
-		})
-	}
-	return err
-}
-
 // Version FIXMEDOC
 func (s *arduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionRequest) (*rpc.VersionResponse, error) {
 	return &rpc.VersionResponse{Version: s.versionString}, nil

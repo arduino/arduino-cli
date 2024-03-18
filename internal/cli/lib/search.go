@@ -107,15 +107,12 @@ func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, namesOnly
 
 	logrus.Info("Executing `arduino-cli lib search`")
 
-	res, err := commands.UpdateLibrariesIndex(
-		context.Background(),
-		&rpc.UpdateLibrariesIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())},
-		feedback.ProgressBar(),
-	)
-	if err != nil {
+	stream, res := commands.UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+	req := &rpc.UpdateLibrariesIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())}
+	if err := srv.UpdateLibrariesIndex(req, stream); err != nil {
 		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
-	if res.GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
+	if res().GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
 		instance.Init(ctx, srv, inst)
 	}
 
