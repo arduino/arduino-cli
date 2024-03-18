@@ -64,13 +64,14 @@ func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, preUni
 		}
 	}
 	for _, platformRef := range platformsRefs {
-		_, err := commands.PlatformUninstall(ctx, srv, &rpc.PlatformUninstallRequest{
+		req := &rpc.PlatformUninstallRequest{
 			Instance:         inst,
 			PlatformPackage:  platformRef.PackageName,
 			Architecture:     platformRef.Architecture,
 			SkipPreUninstall: preUninstallFlags.DetectSkipPreUninstallValue(),
-		}, feedback.NewTaskProgressCB())
-		if err != nil {
+		}
+		stream := commands.PlatformUninstallStreamResponseToCallbackFunction(ctx, feedback.NewTaskProgressCB())
+		if err := srv.PlatformUninstall(req, stream); err != nil {
 			feedback.Fatal(tr("Error during uninstall: %v", err), feedback.ErrGeneric)
 		}
 	}

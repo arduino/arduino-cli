@@ -24,8 +24,34 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// PlatformUpgrade FIXMEDOC
-func PlatformUpgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
+// PlatformUpgradeStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformUpgrade that sends
+// all responses to the callback function.
+func PlatformUpgradeStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (rpc.ArduinoCoreService_PlatformUpgradeServer, func() *rpc.Platform) {
+	var resp *rpc.Platform
+	return streamResponseToCallback(ctx, func(r *rpc.PlatformUpgradeResponse) error {
+			// TODO: use oneof in protoc files?
+			if r.GetProgress() != nil {
+				downloadCB(r.GetProgress())
+			}
+			if r.GetTaskProgress() != nil {
+				taskCB(r.GetTaskProgress())
+			}
+			if r.GetPlatform() != nil {
+				resp = r.GetPlatform()
+			}
+			return nil
+		}), func() *rpc.Platform {
+			return resp
+		}
+}
+
+// PlatformUpgrade upgrades a platform package
+func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest, stream rpc.ArduinoCoreService_PlatformUpgradeServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	ctx := stream.Context()
+	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{Progress: p}) }
+	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{TaskProgress: p}) }
+
 	upgrade := func() (*cores.PlatformRelease, error) {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 		if err != nil {
@@ -46,20 +72,22 @@ func PlatformUpgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req 
 		return platform, nil
 	}
 
-	var rpcPlatform *rpc.Platform
 	platformRelease, err := upgrade()
 	if platformRelease != nil {
-		rpcPlatform = &rpc.Platform{
-			Metadata: PlatformToRPCPlatformMetadata(platformRelease.Platform),
-			Release:  PlatformReleaseToRPC(platformRelease),
-		}
+		syncSend.Send(&rpc.PlatformUpgradeResponse{
+			Platform: &rpc.Platform{
+				Metadata: PlatformToRPCPlatformMetadata(platformRelease.Platform),
+				Release:  PlatformReleaseToRPC(platformRelease),
+			},
+		})
 	}
 	if err != nil {
-		return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, err
-	}
-	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, nil
+	if err := s.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -135,7 +135,7 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 			}
 
 			msg += "\n"
-			if platform, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+			if platform, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 				Instance:   inst,
 				SearchArgs: platformErr.Platform,
 			}); err != nil {

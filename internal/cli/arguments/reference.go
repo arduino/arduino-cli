@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -97,7 +96,7 @@ func ParseReference(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg s
 	// Now that we have the required informations in `ret` we can
 	// try to use core.PlatformList to optimize what the user typed
 	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
-	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+	platforms, _ := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance: instance.CreateAndInit(ctx, srv),
 	})
 	foundPlatforms := []string{}

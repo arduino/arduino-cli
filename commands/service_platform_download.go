@@ -27,17 +27,30 @@ import (
 
 var tr = i18n.Tr
 
-// PlatformDownload FIXMEDOC
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
+// PlatformDownloadStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformDownload that sends
+// all responses to the callback function.
+func PlatformDownloadStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB) rpc.ArduinoCoreService_PlatformDownloadServer {
+	return streamResponseToCallback(ctx, func(r *rpc.PlatformDownloadResponse) error {
+		if r.GetProgress() != nil {
+			downloadCB(r.GetProgress())
+		}
+		return nil
+	})
+}
+
+// PlatformDownload downloads a platform package
+func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadRequest, stream rpc.ArduinoCoreService_PlatformDownloadServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer release()
 
 	version, err := ParseVersion(req.GetVersion())
 	if err != nil {
-		return nil, &cmderrors.InvalidVersionError{Cause: err}
+		return &cmderrors.InvalidVersionError{Cause: err}
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -47,18 +60,23 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
+		return &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
+	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformDownloadResponse{Progress: p}) }
+
+	// TODO: pass context
+	// ctx := stream.Context()
 	if err := pme.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {
-		return nil, err
+		return err
 	}
 
 	for _, tool := range tools {
+		// TODO: pass context
 		if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return &rpc.PlatformDownloadResponse{}, nil
+	return syncSend.Send(&rpc.PlatformDownloadResponse{})
 }

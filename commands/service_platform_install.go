@@ -25,8 +25,27 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// PlatformInstall FIXMEDOC
-func PlatformInstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
+// UpdateIndexStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformInstall that sends
+// all responses to the callback function.
+func PlatformInstallStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) rpc.ArduinoCoreService_PlatformInstallServer {
+	return streamResponseToCallback(ctx, func(r *rpc.PlatformInstallResponse) error {
+		if r.GetProgress() != nil {
+			downloadCB(r.GetProgress())
+		}
+		if r.GetTaskProgress() != nil {
+			taskCB(r.GetTaskProgress())
+		}
+		return nil
+	})
+}
+
+// PlatformInstall installs a platform package
+func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest, stream rpc.ArduinoCoreService_PlatformInstallServer) error {
+	ctx := stream.Context()
+	syncSend := NewSynchronizedSend(stream.Send)
+	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformInstallResponse{TaskProgress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformInstallResponse{Progress: p}) }
+
 	install := func() error {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 		if err != nil {
@@ -63,6 +82,7 @@ func PlatformInstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req 
 			}
 		}
 
+		// TODO: Pass context
 		if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall()); err != nil {
 			return err
 		}
@@ -71,12 +91,16 @@ func PlatformInstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req 
 	}
 
 	if err := install(); err != nil {
-		return nil, err
+		return err
 	}
 
-	stream := InitStreamResponseToCallbackFunction(ctx, nil)
-	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, stream); err != nil {
-		return nil, err
+	err := s.Init(
+		&rpc.InitRequest{Instance: req.GetInstance()},
+		InitStreamResponseToCallbackFunction(ctx, nil),
+	)
+	if err != nil {
+		return err
 	}
-	return &rpc.PlatformInstallResponse{}, nil
+
+	return syncSend.Send(&rpc.PlatformInstallResponse{})
 }

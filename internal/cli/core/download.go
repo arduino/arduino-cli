@@ -66,8 +66,8 @@ func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := commands.PlatformDownload(context.Background(), platformDownloadreq, feedback.ProgressBar())
-		if err != nil {
+		stream := commands.PlatformDownloadStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+		if err := srv.PlatformDownload(platformDownloadreq, stream); err != nil {
 			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", args[i], err), feedback.ErrNetwork)
 		}
 	}

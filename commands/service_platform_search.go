@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"context"
 	"regexp"
 	"sort"
 	"strings"
@@ -27,7 +28,7 @@ import (
 )
 
 // PlatformSearch FIXMEDOC
-func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
+func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err

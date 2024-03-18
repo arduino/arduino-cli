@@ -56,13 +56,13 @@ func runOutdatedCommand(srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli outdated`")
 	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
-	Outdated(inst)
+	Outdated(ctx, srv, inst)
 }
 
 // Outdated prints a list of outdated platforms and libraries
-func Outdated(inst *rpc.Instance) {
+func Outdated(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance) {
 	feedback.PrintResult(
-		newOutdatedResult(core.GetList(inst, false, true), lib.GetList(inst, []string{}, false, true)),
+		newOutdatedResult(core.GetList(ctx, srv, inst, false, true), lib.GetList(inst, []string{}, false, true)),
 	)
 }
 

@@ -24,19 +24,33 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// PlatformUninstall FIXMEDOC
-func PlatformUninstall(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
-	if err := platformUninstall(req, taskCB); err != nil {
-		return nil, err
+// PlatformUninstallStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformUninstall that sends
+// all responses to the callback function.
+func PlatformUninstallStreamResponseToCallbackFunction(ctx context.Context, taskCB rpc.TaskProgressCB) rpc.ArduinoCoreService_PlatformUninstallServer {
+	return streamResponseToCallback(ctx, func(r *rpc.PlatformUninstallResponse) error {
+		if r.GetTaskProgress() != nil {
+			taskCB(r.GetTaskProgress())
+		}
+		return nil
+	})
+}
+
+// PlatformUninstall uninstalls a platform package
+func (s *arduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallRequest, stream rpc.ArduinoCoreService_PlatformUninstallServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	ctx := stream.Context()
+	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUninstallResponse{TaskProgress: p}) }
+	if err := platformUninstall(ctx, req, taskCB); err != nil {
+		return err
 	}
-	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
-		return nil, err
+	if err := s.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
+		return err
 	}
-	return &rpc.PlatformUninstallResponse{}, nil
+	return syncSend.Send(&rpc.PlatformUninstallResponse{})
 }
 
 // platformUninstall is the implementation of platform unistaller
-func platformUninstall(req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
+func platformUninstall(_ context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return &cmderrors.InvalidInstanceError{}
@@ -64,6 +78,7 @@ func platformUninstall(req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgres
 		return &cmderrors.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
+	// TODO: pass context
 	if err := pme.UninstallPlatform(platform, taskCB, req.GetSkipPreUninstall()); err != nil {
 		return err
 	}

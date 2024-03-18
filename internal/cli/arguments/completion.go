@@ -81,7 +81,7 @@ func GetInstalledProgrammers(ctx context.Context, srv rpc.ArduinoCoreServiceServ
 func GetUninstallableCores(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit(ctx, srv)
 
-	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+	platforms, _ := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:          inst,
 		ManuallyInstalled: true,
 	})
@@ -102,7 +102,7 @@ func GetUninstallableCores(ctx context.Context, srv rpc.ArduinoCoreServiceServer
 func GetInstallableCores(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit(ctx, srv)
 
-	platforms, _ := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+	platforms, _ := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:   inst,
 		SearchArgs: "",
 	})

@@ -386,7 +386,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			if profileArg.String() == "" {
 				res.Error += fmt.Sprintln()
 
-				if platform, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+				if platform, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 					Instance:   inst,
 					SearchArgs: platformErr.Platform,
 				}); err != nil {

@@ -76,65 +76,6 @@ func (s *arduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.
 	return SetSketchDefaults(ctx, req)
 }
 
-// PlatformInstall FIXMEDOC
-func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest, stream rpc.ArduinoCoreService_PlatformInstallServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	resp, err := PlatformInstall(
-		stream.Context(), s, req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformInstallResponse{Progress: p}) },
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformInstallResponse{TaskProgress: p}) },
-	)
-	if err != nil {
-		return err
-	}
-	return syncSend.Send(resp)
-}
-
-// PlatformDownload FIXMEDOC
-func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadRequest, stream rpc.ArduinoCoreService_PlatformDownloadServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	resp, err := PlatformDownload(
-		stream.Context(), req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformDownloadResponse{Progress: p}) },
-	)
-	if err != nil {
-		return err
-	}
-	return syncSend.Send(resp)
-}
-
-// PlatformUninstall FIXMEDOC
-func (s *arduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallRequest, stream rpc.ArduinoCoreService_PlatformUninstallServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	resp, err := PlatformUninstall(
-		stream.Context(), s, req,
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUninstallResponse{TaskProgress: p}) },
-	)
-	if err != nil {
-		return err
-	}
-	return syncSend.Send(resp)
-}
-
-// PlatformUpgrade FIXMEDOC
-func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest, stream rpc.ArduinoCoreService_PlatformUpgradeServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	resp, err := PlatformUpgrade(
-		stream.Context(), s, req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{Progress: p}) },
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{TaskProgress: p}) },
-	)
-	if err2 := syncSend.Send(resp); err2 != nil {
-		return err2
-	}
-	return err
-}
-
-// PlatformSearch FIXMEDOC
-func (s *arduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
-	return PlatformSearch(req)
-}
-
 // Upload FIXMEDOC
 func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)

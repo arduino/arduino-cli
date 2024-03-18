@@ -19,7 +19,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -51,18 +50,18 @@ func runListCommand(srv rpc.ArduinoCoreServiceServer, all bool, updatableOnly bo
 	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli core list`")
-	List(inst, all, updatableOnly)
+	List(ctx, srv, inst, all, updatableOnly)
 }
 
 // List gets and prints a list of installed platforms.
-func List(inst *rpc.Instance, all bool, updatableOnly bool) {
-	platforms := GetList(inst, all, updatableOnly)
+func List(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, all bool, updatableOnly bool) {
+	platforms := GetList(ctx, srv, inst, all, updatableOnly)
 	feedback.PrintResult(newCoreListResult(platforms, updatableOnly))
 }
 
 // GetList returns a list of installed platforms.
-func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
-	platforms, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
+	platforms, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:          inst,
 		ManuallyInstalled: true,
 	})

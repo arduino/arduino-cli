@@ -61,7 +61,7 @@ func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string, skipPost
 func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		platforms, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+		platforms, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance: inst,
 		})
 		if err != nil {
@@ -93,12 +93,12 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 		}
 	}
 
-	warningMissingIndex := func(response *rpc.PlatformUpgradeResponse) {
-		if response == nil || response.GetPlatform() == nil {
+	warningMissingIndex := func(platform *rpc.Platform) {
+		if platform == nil {
 			return
 		}
-		if !response.GetPlatform().GetMetadata().GetIndexed() {
-			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.GetPlatform().GetMetadata().GetId()))
+		if !platform.GetMetadata().GetIndexed() {
+			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", platform.GetMetadata().GetId()))
 		}
 	}
 
@@ -123,8 +123,9 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 			SkipPostInstall:  skipPostInstall,
 			SkipPreUninstall: skipPreUninstall,
 		}
-		response, err := commands.PlatformUpgrade(ctx, srv, r, feedback.ProgressBar(), feedback.TaskProgress())
-		warningMissingIndex(response)
+		stream, respCB := commands.PlatformUpgradeStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		err := srv.PlatformUpgrade(r, stream)
+		warningMissingIndex(respCB())
 		if err != nil {
 			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError
 			if errors.As(err, &alreadyAtLatestVersionErr) {

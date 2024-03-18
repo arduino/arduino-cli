@@ -74,7 +74,7 @@ func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, allVersio
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)
 
-	resp, err := commands.PlatformSearch(&rpc.PlatformSearchRequest{
+	resp, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:   inst,
 		SearchArgs: arguments,
 	})

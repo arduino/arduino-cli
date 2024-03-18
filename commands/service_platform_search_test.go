@@ -50,7 +50,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("SearchAllVersions", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+		res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance:   inst,
 			SearchArgs: "retrokit",
 		})
@@ -91,7 +91,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	t.Run("SearchThePackageMaintainer", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+		res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance:   inst,
 			SearchArgs: "Retrokits (www.retrokits.com)",
 		})
@@ -131,7 +131,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	t.Run("SearchPackageName", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+		res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance:   inst,
 			SearchArgs: "Retrokits-RK002",
 		})
@@ -171,7 +171,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	t.Run("SearchPlatformName", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+		res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance:   inst,
 			SearchArgs: "rk002",
 		})
@@ -211,7 +211,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	t.Run("SearchBoardName", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+		res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance:   inst,
 			SearchArgs: "Yún",
 		})
@@ -269,7 +269,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	t.Run("SearchBoardName2", func(t *testing.T) {
-		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+		res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance:   inst,
 			SearchArgs: "yun",
 		})
@@ -350,7 +350,7 @@ func TestPlatformSearchSorting(t *testing.T) {
 	err = srv.Init(&rpc.InitRequest{Instance: inst}, InitStreamResponseToCallbackFunction(ctx, nil))
 	require.NoError(t, err)
 
-	res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+	res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:   inst,
 		SearchArgs: "",
 	})
