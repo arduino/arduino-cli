@@ -15,7 +15,12 @@
 
 package arguments
 
-import "github.com/spf13/cobra"
+import (
+	"context"
+
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/spf13/cobra"
+)
 
 // Profile contains the profile flag data.
 // This is useful so all flags used by commands that need
@@ -25,14 +30,14 @@ type Profile struct {
 }
 
 // AddToCommand adds the flags used to set fqbn to the specified Command
-func (f *Profile) AddToCommand(cmd *cobra.Command) {
+func (f *Profile) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&f.profile, "profile", "m", "", tr("Sketch profile to use"))
 	cmd.RegisterFlagCompletionFunc("profile", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var sketchProfile string
 		if len(args) > 0 {
 			sketchProfile = args[0]
 		}
-		return GetSketchProfiles(sketchProfile), cobra.ShellCompDirectiveDefault
+		return GetSketchProfiles(context.Background(), srv, sketchProfile), cobra.ShellCompDirectiveDefault
 	})
 }
 

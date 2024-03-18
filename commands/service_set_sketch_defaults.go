@@ -26,7 +26,7 @@ import (
 
 // SetSketchDefaults updates the sketch project file (sketch.yaml) with the given defaults
 // for the values `default_fqbn`, `default_port`, and `default_protocol`.
-func SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (*rpc.SetSketchDefaultsResponse, error) {
+func (s *arduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (*rpc.SetSketchDefaultsResponse, error) {
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}

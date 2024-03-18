@@ -24,10 +24,11 @@ import (
 )
 
 func TestLoadSketchProfiles(t *testing.T) {
-	loadResp, err := LoadSketch(context.Background(), &commands.LoadSketchRequest{
+	srv := NewArduinoCoreServer("")
+	loadResp, err := srv.LoadSketch(context.Background(), &commands.LoadSketchRequest{
 		SketchPath: "./testdata/sketch_with_profile",
 	})
 	require.NoError(t, err)
-	require.Len(t, loadResp.GetProfiles(), 2)
-	require.Equal(t, loadResp.GetDefaultProfile().GetName(), "nanorp")
+	require.Len(t, loadResp.GetSketch().GetProfiles(), 2)
+	require.Equal(t, loadResp.GetSketch().GetDefaultProfile().GetName(), "nanorp")
 }

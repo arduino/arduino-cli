@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -56,10 +55,11 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 func runAttachCommand(srv rpc.ArduinoCoreServiceServer, path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
+	ctx := context.Background()
 	sketchPath := arguments.InitSketchPath(path)
 
 	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, srv, "", "")
-	newDefaults, err := commands.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
+	newDefaults, err := srv.SetSketchDefaults(ctx, &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,
 		DefaultProgrammer:   programmer.GetProgrammer(),

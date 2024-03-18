@@ -20,7 +20,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -29,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initNewCommand() *cobra.Command {
+func initNewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var overwrite bool
 
 	newCommand := &cobra.Command{
@@ -38,7 +37,9 @@ func initNewCommand() *cobra.Command {
 		Long:    tr("Create a new Sketch"),
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
-		Run:     func(cmd *cobra.Command, args []string) { runNewCommand(args, overwrite) },
+		Run: func(cmd *cobra.Command, args []string) {
+			runNewCommand(srv, args, overwrite)
+		},
 	}
 
 	newCommand.Flags().BoolVarP(&overwrite, "overwrite", "f", false, tr("Overwrites an existing .ino sketch."))
@@ -46,7 +47,8 @@ func initNewCommand() *cobra.Command {
 	return newCommand
 }
 
-func runNewCommand(args []string, overwrite bool) {
+func runNewCommand(srv rpc.ArduinoCoreServiceServer, args []string, overwrite bool) {
+	ctx := context.Background()
 	logrus.Info("Executing `arduino-cli sketch new`")
 	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
 	inputSketchName := args[0]
@@ -72,7 +74,7 @@ func runNewCommand(args []string, overwrite bool) {
 		sketchName = sketchDirPath.Base()
 	}
 
-	_, err = commands.NewSketch(context.Background(), &rpc.NewSketchRequest{
+	_, err = srv.NewSketch(ctx, &rpc.NewSketchRequest{
 		SketchName: sketchName,
 		SketchDir:  sketchDir,
 		Overwrite:  overwrite,

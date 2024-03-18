@@ -69,7 +69,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	fqbnArg.AddToCommand(uploadCommand, srv)
 	portArgs.AddToCommand(uploadCommand, srv)
-	profileArg.AddToCommand(uploadCommand)
+	profileArg.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
@@ -91,7 +91,8 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 		path = args[0]
 	}
 	sketchPath := arguments.InitSketchPath(path)
-	sketch, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	sketch := resp.GetSketch()
 	if importDir == "" && importFile == "" {
 		if err != nil {
 			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)

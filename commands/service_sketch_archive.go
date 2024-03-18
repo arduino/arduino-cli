@@ -29,7 +29,7 @@ import (
 )
 
 // ArchiveSketch FIXMEDOC
-func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
+func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
 	// sketchName is the name of the sketch without extension, for example "MySketch"
 	var sketchName string
 
@@ -38,13 +38,13 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		sketchPath = paths.New(".")
 	}
 
-	s, err := sketch.New(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil {
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
-	sketchPath = s.FullPath
-	sketchName = s.Name
+	sketchPath = sk.FullPath
+	sketchName = sk.Name
 
 	archivePath := paths.New(req.GetArchivePath())
 	if archivePath == nil {

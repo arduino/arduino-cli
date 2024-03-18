@@ -70,7 +70,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 	portArgs.AddToCommand(monitorCommand, srv)
-	profileArg.AddToCommand(monitorCommand)
+	profileArg.AddToCommand(monitorCommand, srv)
 	monitorCommand.Flags().BoolVar(&raw, "raw", false, tr("Set terminal in raw mode (unbuffered)."))
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
@@ -105,13 +105,14 @@ func runMonitorCmd(
 	// If only --port is set we read the fqbn in the following order: default_fqbn -> discovery
 	// If only --fqbn is set we read the port in the following order: default_port
 	sketchPath := arguments.InitSketchPath(sketchPathArg)
-	sketch, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && !portArgs.IsPortFlagSet() {
 		feedback.Fatal(
 			tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
 			feedback.ErrGeneric,
 		)
 	}
+	sketch := resp.GetSketch()
 	if sketch != nil {
 		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
 	}

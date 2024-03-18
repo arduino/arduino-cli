@@ -64,7 +64,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	fqbnArg.AddToCommand(debugCommand, srv)
 	portArgs.AddToCommand(debugCommand, srv)
 	programmer.AddToCommand(debugCommand, srv)
-	profileArg.AddToCommand(debugCommand)
+	profileArg.AddToCommand(debugCommand, srv)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
@@ -83,10 +83,11 @@ func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	sk := resp.GetSketch()
 	feedback.WarnAboutDeprecatedFiles(sk)
 
 	var inst *rpc.Instance

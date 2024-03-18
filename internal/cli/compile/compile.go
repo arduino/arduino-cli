@@ -94,7 +94,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 
 	fqbnArg.AddToCommand(compileCommand, srv)
-	profileArg.AddToCommand(compileCommand)
+	profileArg.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
 	showPropertiesArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
@@ -159,10 +159,11 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk, err := commands.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	sk := resp.GetSketch()
 	feedback.WarnAboutDeprecatedFiles(sk)
 
 	var inst *rpc.Instance

@@ -125,7 +125,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.AddCommand(lib.NewCommand(srv))
 	cmd.AddCommand(monitor.NewCommand(srv))
 	cmd.AddCommand(outdated.NewCommand(srv))
-	cmd.AddCommand(sketch.NewCommand())
+	cmd.AddCommand(sketch.NewCommand(srv))
 	cmd.AddCommand(update.NewCommand(srv))
 	cmd.AddCommand(upgrade.NewCommand(srv))
 	cmd.AddCommand(upload.NewCommand(srv))

@@ -25,10 +25,10 @@ import (
 )
 
 // LoadSketch collects and returns all information about a sketch
-func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.Sketch, error) {
+func (s *arduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
-	return sk.ToRpc(), nil
+	return &rpc.LoadSketchResponse{Sketch: sk.ToRpc()}, nil
 }

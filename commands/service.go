@@ -42,22 +42,6 @@ func (s *arduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq
 	return &rpc.VersionResponse{Version: s.versionString}, nil
 }
 
-// NewSketch FIXMEDOC
-func (s *arduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
-	return NewSketch(ctx, req)
-}
-
-// LoadSketch FIXMEDOC
-func (s *arduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
-	resp, err := LoadSketch(ctx, req)
-	return &rpc.LoadSketchResponse{Sketch: resp}, err
-}
-
-// SetSketchDefaults FIXMEDOC
-func (s *arduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (*rpc.SetSketchDefaultsResponse, error) {
-	return SetSketchDefaults(ctx, req)
-}
-
 // Upload FIXMEDOC
 func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
@@ -144,11 +128,6 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 // ListProgrammersAvailableForUpload FIXMEDOC
 func (s *arduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
 	return ListProgrammersAvailableForUpload(ctx, req)
-}
-
-// ArchiveSketch FIXMEDOC
-func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
-	return ArchiveSketch(ctx, req)
 }
 
 // EnumerateMonitorPortSettings FIXMEDOC
