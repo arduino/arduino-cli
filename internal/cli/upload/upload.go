@@ -199,7 +199,8 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 		DryRun:     dryRun,
 		UserFields: fields,
 	}
-	if res, err := commands.Upload(context.Background(), req, stdOut, stdErr); err != nil {
+	stream, streamResp := commands.UploadToServerStreams(ctx, stdOut, stdErr)
+	if err := srv.Upload(req, stream); err != nil {
 		errcode := feedback.ErrGeneric
 		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer
@@ -213,7 +214,7 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 		feedback.PrintResult(&uploadResult{
 			Stdout:            io.Stdout,
 			Stderr:            io.Stderr,
-			UpdatedUploadPort: result.NewPort(res.GetUpdatedUploadPort()),
+			UpdatedUploadPort: result.NewPort(streamResp().GetUpdatedUploadPort()),
 		})
 	}
 }

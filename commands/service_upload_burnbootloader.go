@@ -24,8 +24,42 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// BurnBootloader FIXMEDOC
-func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResponse, error) {
+// BurnBootloaderToServerStreams return a server stream that forwards the output and error streams to the provided io.Writers
+func BurnBootloaderToServerStreams(ctx context.Context, outStrem, errStream io.Writer) rpc.ArduinoCoreService_BurnBootloaderServer {
+	stream := streamResponseToCallback(ctx, func(resp *rpc.BurnBootloaderResponse) error {
+		if outData := resp.GetOutStream(); len(outData) > 0 {
+			_, err := outStrem.Write(outData)
+			return err
+		}
+		if errData := resp.GetErrStream(); len(errData) > 0 {
+			_, err := errStream.Write(errData)
+			return err
+		}
+		return nil
+	})
+	return stream
+}
+
+// BurnBootloader performs the burn bootloader action
+func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, stream rpc.ArduinoCoreService_BurnBootloaderServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.BurnBootloaderResponse{
+			Message: &rpc.BurnBootloaderResponse_OutStream{
+				OutStream: data,
+			},
+		})
+	})
+	defer outStream.Close()
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.BurnBootloaderResponse{
+			Message: &rpc.BurnBootloaderResponse_ErrStream{
+				ErrStream: data,
+			},
+		})
+	})
+	defer errStream.Close()
+
 	logrus.
 		WithField("fqbn", req.GetFqbn()).
 		WithField("port", req.GetPort()).
@@ -34,7 +68,7 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer release()
 
@@ -54,7 +88,7 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 		req.GetDryRun(),
 		map[string]string{}, // User fields
 	); err != nil {
-		return nil, err
+		return err
 	}
-	return &rpc.BurnBootloaderResponse{}, nil
+	return syncSend.Send(&rpc.BurnBootloaderResponse{})
 }

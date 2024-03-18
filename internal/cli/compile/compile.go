@@ -292,7 +292,8 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			UserFields: fields,
 		}
 
-		if res, err := commands.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
+		stream, streamRes := commands.UploadToServerStreams(ctx, stdOut, stdErr)
+		if err := srv.Upload(uploadRequest, stream); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 				errcode = feedback.ErrMissingProgrammer
@@ -302,7 +303,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			}
 			feedback.Fatal(tr("Error during Upload: %v", err), errcode)
 		} else {
-			uploadRes = res
+			uploadRes = streamRes()
 		}
 	}
 

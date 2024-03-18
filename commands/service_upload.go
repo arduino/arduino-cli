@@ -120,8 +120,33 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) []*rpc
 	return userFields
 }
 
-// Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResult, error) {
+// UploadToServerStreams return a server stream that forwards the output and error streams to the provided writers.
+// It also returns a function that can be used to retrieve the result of the upload.
+func UploadToServerStreams(ctx context.Context, outStream io.Writer, errStream io.Writer) (rpc.ArduinoCoreService_UploadServer, func() *rpc.UploadResult) {
+	var result *rpc.UploadResult
+	stream := streamResponseToCallback(ctx, func(resp *rpc.UploadResponse) error {
+		if errData := resp.GetErrStream(); len(errData) > 0 {
+			_, err := errStream.Write(errData)
+			return err
+		}
+		if outData := resp.GetOutStream(); len(outData) > 0 {
+			_, err := outStream.Write(outData)
+			return err
+		}
+		if res := resp.GetResult(); res != nil {
+			result = res
+		}
+		return nil
+	})
+	return stream, func() *rpc.UploadResult {
+		return result
+	}
+}
+
+// Upload performs the upload of a sketch to a board.
+func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -129,12 +154,12 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return nil, &cmderrors.CantOpenSketchError{Cause: err}
+		return &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
 	pme, pmeRelease, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer pmeRelease()
 
@@ -151,6 +176,20 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		programmer = sk.GetDefaultProgrammer()
 	}
 
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_OutStream{OutStream: data},
+		})
+	})
+	defer outStream.Close()
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_ErrStream{ErrStream: data},
+		})
+	})
+	defer errStream.Close()
+	// TODO: inject context
+	// ctx := stream.Context()
 	updatedPort, err := runProgramAction(
 		pme,
 		sk,
@@ -168,22 +207,45 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		req.GetUserFields(),
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	return &rpc.UploadResult{
-		UpdatedUploadPort: updatedPort,
-	}, nil
+	return syncSend.Send(&rpc.UploadResponse{
+		Message: &rpc.UploadResponse_Result{
+			Result: &rpc.UploadResult{
+				UpdatedUploadPort: updatedPort,
+			},
+		},
+	})
 }
 
 // UploadUsingProgrammer FIXMEDOC
-func UploadUsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) error {
+func (s *arduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerRequest, stream rpc.ArduinoCoreService_UploadUsingProgrammerServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	streamAdapter := streamResponseToCallback(stream.Context(), func(resp *rpc.UploadResponse) error {
+		if errData := resp.GetErrStream(); len(errData) > 0 {
+			syncSend.Send(&rpc.UploadUsingProgrammerResponse{
+				Message: &rpc.UploadUsingProgrammerResponse_ErrStream{
+					ErrStream: errData,
+				},
+			})
+		}
+		if outData := resp.GetOutStream(); len(outData) > 0 {
+			syncSend.Send(&rpc.UploadUsingProgrammerResponse{
+				Message: &rpc.UploadUsingProgrammerResponse_OutStream{
+					OutStream: outData,
+				},
+			})
+		}
+		// resp.GetResult() is ignored
+		return nil
+	})
+
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {
 		return &cmderrors.MissingProgrammerError{}
 	}
-	_, err := Upload(ctx, &rpc.UploadRequest{
+	return s.Upload(&rpc.UploadRequest{
 		Instance:   req.GetInstance(),
 		SketchPath: req.GetSketchPath(),
 		ImportFile: req.GetImportFile(),
@@ -194,8 +256,7 @@ func UploadUsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRe
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
 		UserFields: req.GetUserFields(),
-	}, outStream, errStream)
-	return err
+	}, streamAdapter)
 }
 
 func runProgramAction(pme *packagemanager.Explorer,

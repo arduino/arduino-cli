@@ -78,7 +78,8 @@ func runBootloaderCommand(srv rpc.ArduinoCoreServiceServer) {
 	}
 
 	stdOut, stdErr, res := feedback.OutputStreams()
-	if _, err := commands.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
+	stream := commands.BurnBootloaderToServerStreams(ctx, stdOut, stdErr)
+	if err := srv.BurnBootloader(&rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn.String(),
 		Port:       discoveryPort,
@@ -86,7 +87,7 @@ func runBootloaderCommand(srv rpc.ArduinoCoreServiceServer) {
 		Verify:     verify,
 		Programmer: programmer.String(instance, srv, fqbn.String()),
 		DryRun:     dryRun,
-	}, stdOut, stdErr); err != nil {
+	}, stream); err != nil {
 		errcode := feedback.ErrGeneric
 		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer
