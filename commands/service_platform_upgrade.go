@@ -76,8 +76,8 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 	if platformRelease != nil {
 		syncSend.Send(&rpc.PlatformUpgradeResponse{
 			Platform: &rpc.Platform{
-				Metadata: PlatformToRPCPlatformMetadata(platformRelease.Platform),
-				Release:  PlatformReleaseToRPC(platformRelease),
+				Metadata: platformToRPCPlatformMetadata(platformRelease.Platform),
+				Release:  platformReleaseToRPC(platformRelease),
 			},
 		})
 	}

@@ -47,7 +47,7 @@ func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 		return err
 	}
 
-	version, err := ParseVersion(req.GetVersion())
+	version, err := parseVersion(req.GetVersion())
 	if err != nil {
 		return err
 	}

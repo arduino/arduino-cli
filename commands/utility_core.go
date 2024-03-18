@@ -20,8 +20,8 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// PlatformToRPCPlatformMetadata converts our internal structure to the RPC structure.
-func PlatformToRPCPlatformMetadata(platform *cores.Platform) *rpc.PlatformMetadata {
+// platformToRPCPlatformMetadata converts our internal structure to the RPC structure.
+func platformToRPCPlatformMetadata(platform *cores.Platform) *rpc.PlatformMetadata {
 	return &rpc.PlatformMetadata{
 		Id:                platform.String(),
 		Maintainer:        platform.Package.Maintainer,
@@ -33,10 +33,10 @@ func PlatformToRPCPlatformMetadata(platform *cores.Platform) *rpc.PlatformMetada
 	}
 }
 
-// PlatformReleaseToRPC converts our internal structure to the RPC structure.
+// platformReleaseToRPC converts our internal structure to the RPC structure.
 // Note: this function does not touch the "Installed" field of rpc.Platform as it's not always clear that the
 // platformRelease we're currently converting is actually installed.
-func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.PlatformRelease {
+func platformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.PlatformRelease {
 	// If the boards are not installed yet, the `platformRelease.Boards` will be a zero length slice.
 	// In such case, we have to use the `platformRelease.BoardsManifest` instead.
 	// So that we can retrieve the name of the boards at least.

@@ -48,7 +48,7 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 	}
 	defer release()
 
-	version, err := ParseVersion(req.GetVersion())
+	version, err := parseVersion(req.GetVersion())
 	if err != nil {
 		return &cmderrors.InvalidVersionError{Cause: err}
 	}

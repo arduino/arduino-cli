@@ -82,7 +82,7 @@ func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.Platf
 	out := []*rpc.PlatformSummary{}
 	for _, platform := range res {
 		rpcPlatformSummary := &rpc.PlatformSummary{
-			Metadata: PlatformToRPCPlatformMetadata(platform),
+			Metadata: platformToRPCPlatformMetadata(platform),
 			Releases: map[string]*rpc.PlatformRelease{},
 		}
 		if installed := pme.GetInstalledPlatformRelease(platform); installed != nil {
@@ -92,7 +92,7 @@ func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.Platf
 			rpcPlatformSummary.LatestVersion = latestCompatible.Version.String()
 		}
 		for _, platformRelease := range platform.GetAllReleases() {
-			rpcPlatformRelease := PlatformReleaseToRPC(platformRelease)
+			rpcPlatformRelease := platformReleaseToRPC(platformRelease)
 			rpcPlatformSummary.Releases[rpcPlatformRelease.GetVersion()] = rpcPlatformRelease
 		}
 		out = append(out, rpcPlatformSummary)

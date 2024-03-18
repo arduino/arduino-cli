@@ -56,7 +56,7 @@ func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 		return err
 	}
 
-	version, err := ParseVersion(req.GetVersion())
+	version, err := parseVersion(req.GetVersion())
 	if err != nil {
 		return err
 	}

@@ -46,8 +46,8 @@ func (s *arduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.Board
 			}
 
 			rpcPlatform := &rpc.Platform{
-				Metadata: PlatformToRPCPlatformMetadata(platform),
-				Release:  PlatformReleaseToRPC(installedPlatformRelease),
+				Metadata: platformToRPCPlatformMetadata(platform),
+				Release:  platformReleaseToRPC(installedPlatformRelease),
 			}
 
 			toTest := []string{

@@ -47,7 +47,7 @@ func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, 
 
 func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesindex.Index,
 	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
-	version, err := ParseVersion(reqVersion)
+	version, err := parseVersion(reqVersion)
 	if err != nil {
 		return nil, err
 	}

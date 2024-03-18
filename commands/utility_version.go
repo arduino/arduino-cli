@@ -20,10 +20,10 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// ParseVersion returns the parsed version or nil if the version is
+// parseVersion returns the parsed version or nil if the version is
 // the empty string. An error is returned if the version is not valid
 // semver.
-func ParseVersion(version string) (*semver.Version, error) {
+func parseVersion(version string) (*semver.Version, error) {
 	if version == "" {
 		return nil, nil
 	}

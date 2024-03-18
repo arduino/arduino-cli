@@ -109,7 +109,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	for _, lib := range toInstall {
-		version, err := ParseVersion(lib.GetVersionRequired())
+		version, err := parseVersion(lib.GetVersionRequired())
 		if err != nil {
 			return err
 		}

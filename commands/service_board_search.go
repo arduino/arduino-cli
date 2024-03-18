@@ -67,8 +67,8 @@ func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 						Fqbn:     board.FQBN(),
 						IsHidden: board.IsHidden(),
 						Platform: &rpc.Platform{
-							Metadata: PlatformToRPCPlatformMetadata(platform),
-							Release:  PlatformReleaseToRPC(installedPlatformRelease),
+							Metadata: platformToRPCPlatformMetadata(platform),
+							Release:  platformReleaseToRPC(installedPlatformRelease),
 						},
 					})
 				}
@@ -82,8 +82,8 @@ func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 					foundBoards = append(foundBoards, &rpc.BoardListItem{
 						Name: strings.Trim(board.Name, " \n"),
 						Platform: &rpc.Platform{
-							Metadata: PlatformToRPCPlatformMetadata(platform),
-							Release:  PlatformReleaseToRPC(latestPlatformRelease),
+							Metadata: platformToRPCPlatformMetadata(platform),
+							Release:  platformReleaseToRPC(latestPlatformRelease),
 						},
 					})
 				}
