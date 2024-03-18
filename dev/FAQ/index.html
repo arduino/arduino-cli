@@ -368,6 +368,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#permission-denied-error-in-sketch-upload" class="md-nav__link">
+    "Permission denied" error in sketch upload
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-assistance" class="md-nav__link">
     Additional assistance
   </a>
@@ -1410,6 +1417,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#permission-denied-error-in-sketch-upload" class="md-nav__link">
+    "Permission denied" error in sketch upload
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-assistance" class="md-nav__link">
     Additional assistance
   </a>
@@ -1464,6 +1478,13 @@ installed. On Windows, a good choice for command line usage is Plink, included w
 <p>These parameters can be modified by passing a list of <code>&lt;key&gt;=&lt;desiredValue&gt;</code> pairs to the <code>--config</code> flag. For example,
 when using a serial port, the monitor baud rate can be set to 4800 with the following command:</p>
 <p><code>$ arduino-cli monitor -p &lt;port&gt; --config baudrate=4800</code></p>
+<h2 id="permission-denied-error-in-sketch-upload">"Permission denied" error in sketch upload<a class="headerlink" href="#permission-denied-error-in-sketch-upload" title="Permanent link">&para;</a></h2>
+<p>This problem might happen on some Linux systems, and can be solved by setting up serial port permissions. First, search
+for the port your board is connected to, with the command:</p>
+<p><code>$ arduino-cli board list</code></p>
+<p>Then add your user to the group with the following command, replacing <code>&lt;username&gt;</code> with your username and <code>&lt;group&gt;</code> with
+your group name. Logging out and in again is necessary for the changes to take effect.</p>
+<p><code>$ sudo usermod -a -G &lt;group&gt; &lt;username&gt;</code></p>
 <h2 id="additional-assistance">Additional assistance<a class="headerlink" href="#additional-assistance" title="Permanent link">&para;</a></h2>
 <p>If your question wasn't answered, feel free to ask on <a href="https://forum.arduino.cc/c/software/arduino-cli/89">Arduino CLI's forum board</a>.</p>
                 
