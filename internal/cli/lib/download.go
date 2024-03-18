@@ -53,7 +53,7 @@ func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
 
-	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	refs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
@@ -64,8 +64,8 @@ func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := commands.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
-		if err != nil {
+		stream := commands.LibraryDownloadStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+		if err := srv.LibraryDownload(libraryDownloadRequest, stream); err != nil {
 			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", library, err), feedback.ErrNetwork)
 		}
 	}

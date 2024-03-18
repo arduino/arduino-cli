@@ -56,15 +56,16 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rp
 	var upgradeErr error
 	if len(libraries) == 0 {
 		req := &rpc.LibraryUpgradeAllRequest{Instance: instance}
-		upgradeErr = commands.LibraryUpgradeAll(srv, req, feedback.ProgressBar(), feedback.TaskProgress())
+		stream := commands.LibraryUpgradeAllStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		upgradeErr = srv.LibraryUpgradeAll(req, stream)
 	} else {
 		for _, libName := range libraries {
 			req := &rpc.LibraryUpgradeRequest{
 				Instance: instance,
 				Name:     libName,
 			}
-			upgradeErr = commands.LibraryUpgrade(ctx, srv, req, feedback.ProgressBar(), feedback.TaskProgress())
-			if upgradeErr != nil {
+			stream := commands.LibraryUpgradeStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+			if upgradeErr = srv.LibraryUpgrade(req, stream); upgradeErr != nil {
 				break
 			}
 		}

@@ -62,7 +62,9 @@ func runOutdatedCommand(srv rpc.ArduinoCoreServiceServer) {
 // Outdated prints a list of outdated platforms and libraries
 func Outdated(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance) {
 	feedback.PrintResult(
-		newOutdatedResult(core.GetList(ctx, srv, inst, false, true), lib.GetList(inst, []string{}, false, true)),
+		newOutdatedResult(
+			core.GetList(ctx, srv, inst, false, true),
+			lib.GetList(ctx, srv, inst, []string{}, false, true)),
 	)
 }
 

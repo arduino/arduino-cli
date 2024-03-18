@@ -27,7 +27,7 @@ import (
 )
 
 // LibrarySearch FIXMEDOC
-func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
+func (s *arduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return nil, err

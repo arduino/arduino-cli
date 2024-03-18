@@ -51,18 +51,19 @@ func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
 
-	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	refs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, library := range refs {
-		err := commands.LibraryUninstall(context.Background(), &rpc.LibraryUninstallRequest{
+		req := &rpc.LibraryUninstallRequest{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,
-		}, feedback.TaskProgress())
-		if err != nil {
+		}
+		stream := commands.LibraryUninstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
+		if err := srv.LibraryUninstall(req, stream); err != nil {
 			feedback.Fatal(tr("Error uninstalling %[1]s: %[2]v", library, err), feedback.ErrGeneric)
 		}
 	}

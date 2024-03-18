@@ -23,9 +23,26 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
+// LibraryUpgradeAllStreamResponseToCallbackFunction returns a gRPC stream to be used in LibraryUpgradeAll that sends
+// all responses to the callback function.
+func LibraryUpgradeAllStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) rpc.ArduinoCoreService_LibraryUpgradeAllServer {
+	return streamResponseToCallback(ctx, func(r *rpc.LibraryUpgradeAllResponse) error {
+		if r.GetProgress() != nil {
+			downloadCB(r.GetProgress())
+		}
+		if r.GetTaskProgress() != nil {
+			taskCB(r.GetTaskProgress())
+		}
+		return nil
+	})
+}
+
 // LibraryUpgradeAll upgrades all the available libraries
-func LibraryUpgradeAll(srv rpc.ArduinoCoreServiceServer, req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	ctx := context.Background()
+func (s *arduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, stream rpc.ArduinoCoreService_LibraryUpgradeAllServer) error {
+	ctx := stream.Context()
+	syncSend := NewSynchronizedSend(stream.Send)
+	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryUpgradeAllResponse{Progress: p}) }
+	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUpgradeAllResponse{TaskProgress: p}) }
 
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
@@ -39,20 +56,41 @@ func LibraryUpgradeAll(srv rpc.ArduinoCoreServiceServer, req *rpc.LibraryUpgrade
 	libsToUpgrade := listLibraries(lme, li, true, false)
 	release()
 
-	if err := upgrade(ctx, srv, req.GetInstance(), libsToUpgrade, downloadCB, taskCB); err != nil {
+	if err := s.libraryUpgrade(ctx, req.GetInstance(), libsToUpgrade, downloadCB, taskCB); err != nil {
 		return err
 	}
 
-	stream := InitStreamResponseToCallbackFunction(ctx, nil)
-	if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, stream); err != nil {
+	err = s.Init(
+		&rpc.InitRequest{Instance: req.GetInstance()},
+		InitStreamResponseToCallbackFunction(ctx, nil))
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// LibraryUpgradeStreamResponseToCallbackFunction returns a gRPC stream to be used in LibraryUpgrade that sends
+// all responses to the callback function.
+func LibraryUpgradeStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) rpc.ArduinoCoreService_LibraryUpgradeServer {
+	return streamResponseToCallback(ctx, func(r *rpc.LibraryUpgradeResponse) error {
+		if r.GetProgress() != nil {
+			downloadCB(r.GetProgress())
+		}
+		if r.GetTaskProgress() != nil {
+			taskCB(r.GetTaskProgress())
+		}
+		return nil
+	})
+}
+
 // LibraryUpgrade upgrades a library
-func LibraryUpgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func (s *arduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, stream rpc.ArduinoCoreService_LibraryUpgradeServer) error {
+	ctx := stream.Context()
+	syncSend := NewSynchronizedSend(stream.Send)
+	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryUpgradeResponse{Progress: p}) }
+	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUpgradeResponse{TaskProgress: p}) }
+
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
 		return err
@@ -78,10 +116,10 @@ func LibraryUpgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, req *
 	}
 
 	// Install update
-	return upgrade(ctx, srv, req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB)
+	return s.libraryUpgrade(ctx, req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB)
 }
 
-func upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func (s *arduinoCoreServerImpl) libraryUpgrade(ctx context.Context, instance *rpc.Instance, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	for _, lib := range libs {
 		libInstallReq := &rpc.LibraryInstallRequest{
 			Instance:    instance,
@@ -90,8 +128,8 @@ func upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rp
 			NoDeps:      false,
 			NoOverwrite: false,
 		}
-		err := LibraryInstall(ctx, srv, libInstallReq, downloadCB, taskCB)
-		if err != nil {
+		stream := LibraryInstallStreamResponseToCallbackFunction(ctx, downloadCB, taskCB)
+		if err := s.LibraryInstall(libInstallReq, stream); err != nil {
 			return err
 		}
 	}

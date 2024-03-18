@@ -130,7 +130,7 @@ func GetUninstallableLibraries(ctx context.Context, srv rpc.ArduinoCoreServiceSe
 
 func getLibraries(ctx context.Context, srv rpc.ArduinoCoreServiceServer, all bool) []string {
 	inst := instance.CreateAndInit(ctx, srv)
-	libs, _ := commands.LibraryList(context.Background(), &rpc.LibraryListRequest{
+	libs, _ := srv.LibraryList(ctx, &rpc.LibraryListRequest{
 		Instance:  inst,
 		All:       all,
 		Updatable: false,
@@ -150,7 +150,7 @@ func getLibraries(ctx context.Context, srv rpc.ArduinoCoreServiceServer, all boo
 func GetInstallableLibs(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit(ctx, srv)
 
-	libs, _ := commands.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+	libs, _ := srv.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:   inst,
 		SearchArgs: "", // if no query is specified all the libs are returned
 	})

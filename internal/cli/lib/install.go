@@ -90,12 +90,13 @@ func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps b
 
 	if zipPath {
 		for _, path := range args {
-			err := commands.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
+			req := &rpc.ZipLibraryInstallRequest{
 				Instance:  instance,
 				Path:      path,
 				Overwrite: !noOverwrite,
-			}, feedback.TaskProgress())
-			if err != nil {
+			}
+			stream := commands.ZipLibraryInstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
+			if err := srv.ZipLibraryInstall(req, stream); err != nil {
 				feedback.Fatal(tr("Error installing Zip Library: %v", err), feedback.ErrGeneric)
 			}
 		}
@@ -111,19 +112,20 @@ func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps b
 				}
 				url = wd.String()
 			}
-			err := commands.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
+			req := &rpc.GitLibraryInstallRequest{
 				Instance:  instance,
 				Url:       url,
 				Overwrite: !noOverwrite,
-			}, feedback.TaskProgress())
-			if err != nil {
+			}
+			stream := commands.GitLibraryInstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
+			if err := srv.GitLibraryInstall(req, stream); err != nil {
 				feedback.Fatal(tr("Error installing Git Library: %v", err), feedback.ErrGeneric)
 			}
 		}
 		return
 	}
 
-	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
 		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
@@ -141,8 +143,8 @@ func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps b
 			NoOverwrite:     noOverwrite,
 			InstallLocation: installLocation,
 		}
-		err := commands.LibraryInstall(ctx, srv, libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
-		if err != nil {
+		stream := commands.LibraryInstallStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		if err := srv.LibraryInstall(libraryInstallRequest, stream); err != nil {
 			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
 		}
 	}

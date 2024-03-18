@@ -25,8 +25,23 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-// LibraryUninstall FIXMEDOC
-func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB rpc.TaskProgressCB) error {
+// LibraryUninstallStreamResponseToCallbackFunction returns a gRPC stream to be used in LibraryUninstall that sends
+// all responses to the callback function.
+func LibraryUninstallStreamResponseToCallbackFunction(ctx context.Context, taskCB rpc.TaskProgressCB) rpc.ArduinoCoreService_LibraryUninstallServer {
+	return streamResponseToCallback(ctx, func(r *rpc.LibraryUninstallResponse) error {
+		if r.GetTaskProgress() != nil {
+			taskCB(r.GetTaskProgress())
+		}
+		return nil
+	})
+}
+
+// LibraryUninstall uninstalls a library
+func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallRequest, stream rpc.ArduinoCoreService_LibraryUninstallServer) error {
+	// ctx := stream.Context()
+	syncSend := NewSynchronizedSend(stream.Send)
+	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUninstallResponse{TaskProgress: p}) }
+
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
 		return err
@@ -47,6 +62,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 
 	if len(libs) == 1 {
 		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", libs)})
+		// TODO: pass context
 		lmi.Uninstall(libs[0])
 		taskCB(&rpc.TaskProgress{Completed: true})
 		return nil

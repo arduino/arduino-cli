@@ -21,7 +21,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -58,12 +57,12 @@ func runDepsCommand(srv rpc.ArduinoCoreServiceServer, args []string, noOverwrite
 	instance := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli lib deps`")
-	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
+	libRef, err := ParseLibraryReferenceArgAndAdjustCase(ctx, srv, instance, args[0])
 	if err != nil {
 		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
 
-	deps, err := commands.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
+	deps, err := srv.LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesRequest{
 		Instance:                      instance,
 		Name:                          libRef.Name,
 		Version:                       libRef.Version,

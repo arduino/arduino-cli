@@ -22,7 +22,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -49,7 +48,7 @@ not listed, they can be listed by adding the --all flag.`),
 			ctx := context.Background()
 			instance := instance.CreateAndInit(ctx, srv)
 			logrus.Info("Executing `arduino-cli lib list`")
-			List(instance, args, all, updatable)
+			List(ctx, srv, instance, args, all, updatable)
 		},
 	}
 	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
@@ -59,8 +58,8 @@ not listed, they can be listed by adding the --all flag.`),
 }
 
 // List gets and prints a list of installed libraries.
-func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
-	installedLibs := GetList(instance, args, all, updatable)
+func List(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, args []string, all bool, updatable bool) {
+	installedLibs := GetList(ctx, srv, instance, args, all, updatable)
 
 	installedLibsResult := make([]*result.InstalledLibrary, len(installedLibs))
 	for i, v := range installedLibs {
@@ -74,18 +73,13 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 }
 
 // GetList returns a list of installed libraries.
-func GetList(
-	instance *rpc.Instance,
-	args []string,
-	all bool,
-	updatable bool,
-) []*rpc.InstalledLibrary {
+func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, args []string, all bool, updatable bool) []*rpc.InstalledLibrary {
 	name := ""
 	if len(args) > 0 {
 		name = args[0]
 	}
 
-	res, err := commands.LibraryList(context.Background(), &rpc.LibraryListRequest{
+	res, err := srv.LibraryList(ctx, &rpc.LibraryListRequest{
 		Instance:  instance,
 		All:       all,
 		Updatable: updatable,

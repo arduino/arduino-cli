@@ -164,92 +164,9 @@ func (s *arduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Co
 	return ListProgrammersAvailableForUpload(ctx, req)
 }
 
-// LibraryDownload FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest, stream rpc.ArduinoCoreService_LibraryDownloadServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	resp, err := LibraryDownload(
-		stream.Context(), req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryDownloadResponse{Progress: p}) },
-	)
-	if err != nil {
-		return err
-	}
-	return syncSend.Send(resp)
-}
-
-// LibraryInstall FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, stream rpc.ArduinoCoreService_LibraryInstallServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	return LibraryInstall(
-		stream.Context(), s, req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryInstallResponse{Progress: p}) },
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryInstallResponse{TaskProgress: p}) },
-	)
-}
-
-// LibraryUpgrade FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, stream rpc.ArduinoCoreService_LibraryUpgradeServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	return LibraryUpgrade(
-		stream.Context(), s, req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryUpgradeResponse{Progress: p}) },
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUpgradeResponse{TaskProgress: p}) },
-	)
-}
-
-// LibraryUninstall FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallRequest, stream rpc.ArduinoCoreService_LibraryUninstallServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	return LibraryUninstall(stream.Context(), req,
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUninstallResponse{TaskProgress: p}) },
-	)
-}
-
-// LibraryUpgradeAll FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, stream rpc.ArduinoCoreService_LibraryUpgradeAllServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	return LibraryUpgradeAll(s, req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryUpgradeAllResponse{Progress: p}) },
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUpgradeAllResponse{TaskProgress: p}) },
-	)
-}
-
-// LibraryResolveDependencies FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
-	return LibraryResolveDependencies(ctx, req)
-}
-
-// LibrarySearch FIXMEDOC
-func (s *arduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
-	return LibrarySearch(ctx, req)
-}
-
-// LibraryList FIXMEDOC
-func (s *arduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
-	return LibraryList(ctx, req)
-}
-
 // ArchiveSketch FIXMEDOC
 func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
 	return ArchiveSketch(ctx, req)
-}
-
-// ZipLibraryInstall FIXMEDOC
-func (s *arduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequest, stream rpc.ArduinoCoreService_ZipLibraryInstallServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	return ZipLibraryInstall(
-		stream.Context(), req,
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.ZipLibraryInstallResponse{TaskProgress: p}) },
-	)
-}
-
-// GitLibraryInstall FIXMEDOC
-func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequest, stream rpc.ArduinoCoreService_GitLibraryInstallServer) error {
-	syncSend := NewSynchronizedSend(stream.Send)
-	return GitLibraryInstall(
-		stream.Context(), req,
-		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.GitLibraryInstallResponse{TaskProgress: p}) },
-	)
 }
 
 // EnumerateMonitorPortSettings FIXMEDOC

@@ -30,7 +30,7 @@ import (
 )
 
 // LibraryResolveDependencies FIXMEDOC
-func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
+func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
 	lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err

@@ -35,7 +35,7 @@ type installedLib struct {
 }
 
 // LibraryList FIXMEDOC
-func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
+func (s *arduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
