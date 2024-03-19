@@ -21,7 +21,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
@@ -41,17 +40,19 @@ type DiscoveryManager struct {
 	watchersMutex      sync.Mutex
 	watchers           map[*PortWatcher]bool                  // all registered Watcher
 	watchersCache      map[string]map[string]*discovery.Event // this is a cache of all active ports
+	userAgent          string
 }
 
 var tr = i18n.Tr
 
 // New creates a new DiscoveryManager
-func New() *DiscoveryManager {
+func New(userAgent string) *DiscoveryManager {
 	return &DiscoveryManager{
 		discoveries:   map[string]*discovery.Client{},
 		watchers:      map[*PortWatcher]bool{},
 		feed:          make(chan *discovery.Event, 50),
 		watchersCache: map[string]map[string]*discovery.Event{},
+		userAgent:     userAgent,
 	}
 }
 
@@ -121,7 +122,7 @@ func (dm *DiscoveryManager) Start() []error {
 func (dm *DiscoveryManager) Add(id string, args ...string) error {
 	d := discovery.NewClient(id, args...)
 	d.SetLogger(logrus.WithField("discovery", id))
-	d.SetUserAgent(configuration.UserAgent(configuration.Settings))
+	d.SetUserAgent(dm.userAgent)
 	return dm.add(d)
 }
 

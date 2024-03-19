@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -83,7 +84,7 @@ func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAge
 		DownloadDir:                    downloadDir,
 		tempDir:                        tempDir,
 		packagesCustomGlobalProperties: properties.NewMap(),
-		discoveryManager:               discoverymanager.New(),
+		discoveryManager:               discoverymanager.New(configuration.UserAgent(configuration.Settings)),
 		userAgent:                      userAgent,
 	}
 }
