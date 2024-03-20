@@ -67,13 +67,13 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 
 	// TODO: pass context
 	// ctx := stream.Context()
-	if err := pme.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {
+	if err := pme.DownloadPlatformRelease(platform, downloadCB); err != nil {
 		return err
 	}
 
 	for _, tool := range tools {
 		// TODO: pass context
-		if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+		if err := pme.DownloadToolRelease(tool, downloadCB); err != nil {
 			return err
 		}
 	}

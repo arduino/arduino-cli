@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initRemoveCommand() *cobra.Command {
+func initRemoveCommand(defaultSettings *configuration.Settings) *cobra.Command {
 	removeCommand := &cobra.Command{
 		Use:   "remove",
 		Short: tr("Removes one or more values from a setting."),
@@ -34,15 +34,17 @@ func initRemoveCommand() *cobra.Command {
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
 		Args: cobra.MinimumNArgs(2),
-		Run:  runRemoveCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runRemoveCommand(args, defaultSettings)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
+			return GetSlicesConfigurationKeys(defaultSettings), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return removeCommand
 }
 
-func runRemoveCommand(cmd *cobra.Command, args []string) {
+func runRemoveCommand(args []string, defaultSettings *configuration.Settings) {
 	logrus.Info("Executing `arduino-cli config remove`")
 	key := args[0]
 	kind := validateKey(key)
@@ -53,7 +55,7 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	}
 
 	mappedValues := map[string]bool{}
-	for _, v := range configuration.Settings.GetStringSlice(key) {
+	for _, v := range defaultSettings.GetStringSlice(key) {
 		mappedValues[v] = true
 	}
 	for _, arg := range args[1:] {
@@ -63,9 +65,9 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	for k := range mappedValues {
 		values = append(values, k)
 	}
-	configuration.Settings.Set(key, values)
+	defaultSettings.Set(key, values)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
+	if err := defaultSettings.WriteConfig(); err != nil {
 		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
 	}
 }

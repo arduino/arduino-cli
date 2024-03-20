@@ -147,7 +147,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 				downloadReason += "-builtin"
 			}
 		}
-		if err := downloadLibrary(ctx, downloadsDir, libRelease, downloadCB, taskCB, downloadReason); err != nil {
+		if err := downloadLibrary(ctx, downloadsDir, libRelease, downloadCB, taskCB, downloadReason, s.settings); err != nil {
 			return err
 		}
 		if err := installLibrary(lmi, downloadsDir, libRelease, installTask, taskCB); err != nil {

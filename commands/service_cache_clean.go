@@ -24,7 +24,7 @@ import (
 
 // CleanDownloadCacheDirectory clean the download cache directory (where archives are downloaded).
 func (s *arduinoCoreServerImpl) CleanDownloadCacheDirectory(ctx context.Context, req *rpc.CleanDownloadCacheDirectoryRequest) (*rpc.CleanDownloadCacheDirectoryResponse, error) {
-	cachePath := configuration.DownloadsDir(configuration.Settings)
+	cachePath := configuration.DownloadsDir(s.settings)
 	err := cachePath.RemoveAll()
 	if err != nil {
 		return nil, err

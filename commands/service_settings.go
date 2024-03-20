@@ -29,7 +29,7 @@ import (
 // SettingsGetAll returns a message with a string field containing all the settings
 // currently in use, marshalled in JSON format.
 func (s *arduinoCoreServerImpl) SettingsGetAll(ctx context.Context, req *rpc.SettingsGetAllRequest) (*rpc.SettingsGetAllResponse, error) {
-	b, err := json.Marshal(configuration.Settings.AllSettings())
+	b, err := json.Marshal(s.settings.AllSettings())
 	if err == nil {
 		return &rpc.SettingsGetAllResponse{
 			JsonData: string(b),
@@ -83,9 +83,9 @@ func (s *arduinoCoreServerImpl) SettingsMerge(ctx context.Context, req *rpc.Sett
 	for k, v := range mapped {
 		updatedSettings.Set(k, v)
 	}
-	configPath := configuration.Settings.ConfigFileUsed()
+	configPath := s.settings.ConfigFileUsed()
 	updatedSettings.SetConfigFile(configPath)
-	configuration.Settings = updatedSettings
+	s.settings = updatedSettings
 
 	return &rpc.SettingsMergeResponse{}, nil
 }
@@ -100,7 +100,7 @@ func (s *arduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.S
 	// since that doesn't check for keys formatted like daemon.port or those set
 	// with Viper.Set(). This way we check for all existing settings for sure.
 	keyExists := false
-	for _, k := range configuration.Settings.AllKeys() {
+	for _, k := range s.settings.AllKeys() {
 		if k == key || strings.HasPrefix(k, key) {
 			keyExists = true
 			break
@@ -110,7 +110,7 @@ func (s *arduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.S
 		return nil, errors.New(tr("key not found in settings"))
 	}
 
-	b, err := json.Marshal(configuration.Settings.Get(key))
+	b, err := json.Marshal(s.settings.Get(key))
 	value := &rpc.SettingsGetValueResponse{}
 	if err == nil {
 		value.Key = key
@@ -127,7 +127,7 @@ func (s *arduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.S
 
 	err := json.Unmarshal([]byte(val.GetJsonData()), &value)
 	if err == nil {
-		configuration.Settings.Set(key, value)
+		s.settings.Set(key, value)
 	}
 
 	return &rpc.SettingsSetValueResponse{}, err
@@ -138,7 +138,7 @@ func (s *arduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.S
 // and that's picked up when the CLI is run as daemon, either using the default path or a custom one
 // set with the --config-file flag.
 func (s *arduinoCoreServerImpl) SettingsWrite(ctx context.Context, req *rpc.SettingsWriteRequest) (*rpc.SettingsWriteResponse, error) {
-	if err := configuration.Settings.WriteConfigAs(req.GetFilePath()); err != nil {
+	if err := s.settings.WriteConfigAs(req.GetFilePath()); err != nil {
 		return nil, err
 	}
 	return &rpc.SettingsWriteResponse{}, nil
@@ -153,7 +153,7 @@ func (s *arduinoCoreServerImpl) SettingsDelete(ctx context.Context, req *rpc.Set
 	// with Viper.Set(). This way we check for all existing settings for sure.
 	keyExists := false
 	keys := []string{}
-	for _, k := range configuration.Settings.AllKeys() {
+	for _, k := range s.settings.AllKeys() {
 		if !strings.HasPrefix(k, toDelete) {
 			keys = append(keys, k)
 			continue
@@ -168,11 +168,11 @@ func (s *arduinoCoreServerImpl) SettingsDelete(ctx context.Context, req *rpc.Set
 	// Override current settings to delete the key
 	updatedSettings := configuration.Init("")
 	for _, k := range keys {
-		updatedSettings.Set(k, configuration.Settings.Get(k))
+		updatedSettings.Set(k, s.settings.Get(k))
 	}
-	configPath := configuration.Settings.ConfigFileUsed()
+	configPath := s.settings.ConfigFileUsed()
 	updatedSettings.SetConfigFile(configPath)
-	configuration.Settings = updatedSettings
+	s.settings = updatedSettings
 
 	return &rpc.SettingsDeleteResponse{}, nil
 }

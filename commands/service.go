@@ -18,14 +18,16 @@ package commands
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // NewArduinoCoreServer returns an implementation of the ArduinoCoreService gRPC service
 // that uses the provided version string.
-func NewArduinoCoreServer(version string) rpc.ArduinoCoreServiceServer {
+func NewArduinoCoreServer(version string, settings *configuration.Settings) rpc.ArduinoCoreServiceServer {
 	return &arduinoCoreServerImpl{
 		versionString: version,
+		settings:      settings,
 	}
 }
 
@@ -33,6 +35,9 @@ type arduinoCoreServerImpl struct {
 	rpc.UnsafeArduinoCoreServiceServer // Force compile error for unimplemented methods
 
 	versionString string
+
+	// Settings holds configurations of the CLI and the gRPC consumers
+	settings *configuration.Settings
 }
 
 // Version returns the version of the Arduino CLI

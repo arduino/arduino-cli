@@ -16,12 +16,9 @@
 package httpclient
 
 import (
-	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -34,7 +31,7 @@ var tr = i18n.Tr
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
 // If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
-func DownloadFile(path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+func DownloadFile(path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
 	if queryParameter != "" {
 		URL = URL + "?query=" + queryParameter
 	}
@@ -48,15 +45,7 @@ func DownloadFile(path *paths.Path, URL string, queryParameter string, label str
 		}
 	}()
 
-	if config == nil {
-		c, err := GetDownloaderConfig()
-		if err != nil {
-			return err
-		}
-		config = c
-	}
-
-	d, err := downloader.DownloadWithConfig(path.String(), URL, *config, options...)
+	d, err := downloader.DownloadWithConfig(path.String(), URL, config, options...)
 	if err != nil {
 		return err
 	}
@@ -75,53 +64,4 @@ func DownloadFile(path *paths.Path, URL string, queryParameter string, label str
 	}
 
 	return nil
-}
-
-// Config is the configuration of the http client
-type Config struct {
-	UserAgent string
-	Proxy     *url.URL
-}
-
-// New returns a default http client for use in the arduino-cli
-func New() (*http.Client, error) {
-	userAgent := configuration.UserAgent(configuration.Settings)
-	proxy, err := configuration.NetworkProxy(configuration.Settings)
-	if err != nil {
-		return nil, err
-	}
-	return NewWithConfig(&Config{UserAgent: userAgent, Proxy: proxy}), nil
-}
-
-// NewWithConfig creates a http client for use in the arduino-cli, with a given configuration
-func NewWithConfig(config *Config) *http.Client {
-	return &http.Client{
-		Transport: &httpClientRoundTripper{
-			transport: &http.Transport{
-				Proxy: http.ProxyURL(config.Proxy),
-			},
-			userAgent: config.UserAgent,
-		},
-	}
-}
-
-// GetDownloaderConfig returns the downloader configuration based on current settings.
-func GetDownloaderConfig() (*downloader.Config, error) {
-	httpClient, err := New()
-	if err != nil {
-		return nil, &cmderrors.InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
-	}
-	return &downloader.Config{
-		HttpClient: *httpClient,
-	}, nil
-}
-
-type httpClientRoundTripper struct {
-	transport http.RoundTripper
-	userAgent string
-}
-
-func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Add("User-Agent", h.userAgent)
-	return h.transport.RoundTrip(req)
 }

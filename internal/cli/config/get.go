@@ -16,11 +16,11 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -29,7 +29,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func initGetCommand() *cobra.Command {
+func initGetCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
 	getCommand := &cobra.Command{
 		Use:   "get",
 		Short: tr("Gets a settings key value."),
@@ -39,20 +39,22 @@ func initGetCommand() *cobra.Command {
 			"  " + os.Args[0] + " config get daemon.port\n" +
 			"  " + os.Args[0] + " config get board_manager.additional_urls",
 		Args: cobra.MinimumNArgs(1),
-		Run:  runGetCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runGetCommand(srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			return defaultSettings.AllKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return getCommand
 }
 
-func runGetCommand(cmd *cobra.Command, args []string) {
+func runGetCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
+	ctx := context.Background()
 
-	svc := commands.NewArduinoCoreServer("")
 	for _, toGet := range args {
-		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
+		resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {
 			feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}

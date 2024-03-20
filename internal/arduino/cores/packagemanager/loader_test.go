@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -174,7 +175,7 @@ func TestLoadDiscoveries(t *testing.T) {
 	defer fakePath.RemoveAll()
 
 	createTestPackageManager := func() *PackageManager {
-		pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
+		pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test", downloader.GetDefaultConfig())
 		pack := pmb.packages.GetOrCreatePackage("arduino")
 		// ble-discovery tool
 		tool := pack.GetOrCreateTool("ble-discovery")

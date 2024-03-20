@@ -48,10 +48,6 @@ var badCores = []struct {
 	{"", nil},
 }
 
-func init() {
-	configuration.Settings = configuration.Init("")
-}
-
 func TestArgsStringify(t *testing.T) {
 	for _, core := range goodCores {
 		require.Equal(t, core.in, core.expected.String())
@@ -59,7 +55,7 @@ func TestArgsStringify(t *testing.T) {
 }
 
 func TestParseReferenceCores(t *testing.T) {
-	srv := commands.NewArduinoCoreServer("")
+	srv := commands.NewArduinoCoreServer("", configuration.Init(""))
 	ctx := context.Background()
 	for _, tt := range goodCores {
 		actual, err := arguments.ParseReference(ctx, srv, tt.in)
@@ -80,7 +76,7 @@ func TestParseArgs(t *testing.T) {
 		input = append(input, tt.in)
 	}
 
-	srv := commands.NewArduinoCoreServer("")
+	srv := commands.NewArduinoCoreServer("", configuration.Init(""))
 	refs, err := arguments.ParseReferences(context.Background(), srv, input)
 	assert.Nil(t, err)
 	assert.Equal(t, len(goodCores), len(refs))

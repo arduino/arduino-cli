@@ -63,7 +63,7 @@ var (
 )
 
 // NewCommand creates a new ArduinoCli command root
-func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
 	cobra.AddTemplateFunc("tr", i18n.Tr)
 
 	var updaterMessageChan chan *semver.Version
@@ -79,7 +79,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 				outputFormat = "json"
 			}
 
-			preRun(cmd, args)
+			preRun(cmd, defaultSettings)
 
 			if cmd.Name() != "version" {
 				updaterMessageChan = make(chan *semver.Version)
@@ -115,13 +115,13 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	cmd.AddCommand(board.NewCommand(srv))
 	cmd.AddCommand(cache.NewCommand(srv))
-	cmd.AddCommand(compile.NewCommand(srv))
+	cmd.AddCommand(compile.NewCommand(srv, defaultSettings))
 	cmd.AddCommand(completion.NewCommand())
-	cmd.AddCommand(config.NewCommand())
+	cmd.AddCommand(config.NewCommand(srv, defaultSettings))
 	cmd.AddCommand(core.NewCommand(srv))
-	cmd.AddCommand(daemon.NewCommand())
+	cmd.AddCommand(daemon.NewCommand(srv, defaultSettings))
 	cmd.AddCommand(generatedocs.NewCommand())
-	cmd.AddCommand(lib.NewCommand(srv))
+	cmd.AddCommand(lib.NewCommand(srv, defaultSettings))
 	cmd.AddCommand(monitor.NewCommand(srv))
 	cmd.AddCommand(outdated.NewCommand(srv))
 	cmd.AddCommand(sketch.NewCommand(srv))
@@ -156,7 +156,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
-	configuration.BindFlags(cmd, configuration.Settings)
+	configuration.BindFlags(cmd, defaultSettings)
 
 	return cmd
 }
@@ -177,17 +177,17 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 	return
 }
 
-func preRun(cmd *cobra.Command, args []string) {
-	configFile := configuration.Settings.ConfigFileUsed()
+func preRun(cmd *cobra.Command, defaultSettings *configuration.Settings) {
+	configFile := defaultSettings.ConfigFileUsed()
 
 	// initialize inventory
-	err := inventory.Init(configuration.DataDir(configuration.Settings).String())
+	err := inventory.Init(configuration.DataDir(defaultSettings).String())
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrInitializingInventory)
 	}
 
 	// https://no-color.org/
-	color.NoColor = configuration.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
+	color.NoColor = defaultSettings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
 
 	// Set default feedback output to colorable
 	feedback.SetOut(colorable.NewColorableStdout())
@@ -210,13 +210,13 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	// set the Logger format
-	logFormat := strings.ToLower(configuration.Settings.GetString("logging.format"))
+	logFormat := strings.ToLower(defaultSettings.GetString("logging.format"))
 	if logFormat == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
 	// should we log to file?
-	logFile := configuration.Settings.GetString("logging.file")
+	logFile := defaultSettings.GetString("logging.file")
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -232,8 +232,8 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	// configure logging filter
-	if lvl, found := toLogLevel(configuration.Settings.GetString("logging.level")); !found {
-		feedback.Fatal(tr("Invalid option for --log-level: %s", configuration.Settings.GetString("logging.level")), feedback.ErrBadArgument)
+	if lvl, found := toLogLevel(defaultSettings.GetString("logging.level")); !found {
+		feedback.Fatal(tr("Invalid option for --log-level: %s", defaultSettings.GetString("logging.level")), feedback.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
 	}

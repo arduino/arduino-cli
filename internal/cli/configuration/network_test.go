@@ -13,16 +13,16 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package httpclient
+package configuration_test
 
 import (
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,9 +32,10 @@ func TestUserAgentHeader(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewWithConfig(&Config{
-		UserAgent: "test-user-agent",
-	})
+	settings := configuration.Init("")
+	settings.Set("network.user_agent_ext", "test-user-agent")
+	client, err := settings.NewHttpClient()
+	require.NoError(t, err)
 
 	request, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
@@ -45,7 +46,7 @@ func TestUserAgentHeader(t *testing.T) {
 	b, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
 
-	require.Equal(t, "test-user-agent", string(b))
+	require.Contains(t, string(b), "test-user-agent")
 }
 
 func TestProxy(t *testing.T) {
@@ -54,12 +55,10 @@ func TestProxy(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	proxyURL, err := url.Parse(ts.URL)
+	settings := configuration.Init("")
+	settings.Set("network.proxy", ts.URL)
+	client, err := settings.NewHttpClient()
 	require.NoError(t, err)
-
-	client := NewWithConfig(&Config{
-		Proxy: proxyURL,
-	})
 
 	request, err := http.NewRequest("GET", "http://arduino.cc", nil)
 	require.NoError(t, err)

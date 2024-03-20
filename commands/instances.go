@@ -49,8 +49,9 @@ import (
 func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	pme, release := pm.NewExplorer()
 	defer release()
+
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
-	if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+	if err := pme.DownloadToolRelease(tool, downloadCB); err != nil {
 		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
@@ -62,16 +63,16 @@ func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, dow
 
 // Create a new Instance ready to be initialized, supporting directories are also created.
 func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
-	var userAgent []string
+	var userAgent string
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		userAgent = md.Get("user-agent")
+		userAgent = strings.Join(md.Get("user-agent"), " ")
 	}
-	if len(userAgent) == 0 {
-		userAgent = []string{"gRPCClientUnknown/0.0.0"}
+	if userAgent == "" {
+		userAgent = "gRPCClientUnknown/0.0.0"
 	}
 
 	// Setup downloads directory
-	downloadsDir := configuration.DownloadsDir(configuration.Settings)
+	downloadsDir := configuration.DownloadsDir(s.settings)
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
@@ -80,8 +81,8 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	}
 
 	// Setup data directory
-	dataDir := configuration.DataDir(configuration.Settings)
-	packagesDir := configuration.PackagesDir(configuration.Settings)
+	dataDir := configuration.DataDir(s.settings)
+	packagesDir := configuration.PackagesDir(s.settings)
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
@@ -89,7 +90,11 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 		}
 	}
 
-	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, userAgent...)
+	config, err := s.settings.DownloaderConfig()
+	if err != nil {
+		return nil, err
+	}
+	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, userAgent, config)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +113,8 @@ func InitStreamResponseToCallbackFunction(ctx context.Context, cb func(r *rpc.In
 // Failures don't stop the loading process, in case of loading failure the Platform or library
 // is simply skipped and an error gRPC status is sent to responseCallback.
 func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error {
+	ctx := stream.Context()
+
 	instance := req.GetInstance()
 	if !instances.IsValid(instance) {
 		return &cmderrors.InvalidInstanceError{}
@@ -170,7 +177,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	defaultIndexURL, _ := utils.URLParse(globals.DefaultIndexURL)
 	allPackageIndexUrls := []*url.URL{defaultIndexURL}
 	if profile == nil {
-		for _, u := range configuration.Settings.GetStringSlice("board_manager.additional_urls") {
+		for _, u := range s.settings.GetStringSlice("board_manager.additional_urls") {
 			URL, err := utils.URLParse(u)
 			if err != nil {
 				e := &cmderrors.InitFailedError{
@@ -185,7 +192,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		}
 	}
 
-	if err := firstUpdate(context.Background(), s, req.GetInstance(), downloadCallback, allPackageIndexUrls); err != nil {
+	if err := firstUpdate(ctx, s, req.GetInstance(), configuration.DataDir(s.settings), downloadCallback, allPackageIndexUrls); err != nil {
 		e := &cmderrors.InitFailedError{
 			Code:   codes.InvalidArgument,
 			Cause:  err,
@@ -238,15 +245,13 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 		// Load Platforms
 		if profile == nil {
-			for _, err := range pmb.LoadHardware() {
+			for _, err := range pmb.LoadHardware(s.settings) {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
 			}
 		} else {
 			// Load platforms from profile
-			errs := pmb.LoadHardwareForProfile(
-				profile, true, downloadCallback, taskCallback,
-			)
+			errs := pmb.LoadHardwareForProfile(profile, true, downloadCallback, taskCallback, s.settings)
 			for _, err := range errs {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
@@ -344,7 +349,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
-		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings); bundledLibsDir != nil {
+		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(s.settings); bundledLibsDir != nil {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     bundledLibsDir,
 				Location: libraries.IDEBuiltIn,
@@ -353,14 +358,14 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 		// Add libraries directory from config file
 		lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
-			Path:     configuration.LibrariesDir(configuration.Settings),
+			Path:     configuration.LibrariesDir(s.settings),
 			Location: libraries.User,
 		})
 	} else {
 		// Load libraries required for profile
 		for _, libraryRef := range profile.Libraries {
 			uid := libraryRef.InternalUniqueIdentifier()
-			libRoot := configuration.ProfilesCacheDir(configuration.Settings).Join(uid)
+			libRoot := configuration.ProfilesCacheDir(s.settings).Join(uid)
 			libDir := libRoot.Join(libraryRef.Library)
 
 			if !libDir.IsDir() {
@@ -373,7 +378,14 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					responseError(err.GRPCStatus())
 					continue
 				}
-				if err := libRelease.Resource.Download(pme.DownloadDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
+				config, err := s.settings.DownloaderConfig()
+				if err != nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
+					e := &cmderrors.FailedLibraryInstallError{Cause: err}
+					responseError(e.GRPCStatus())
+					continue
+				}
+				if err := libRelease.Resource.Download(pme.DownloadDir, config, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
@@ -409,7 +421,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	// Refreshes the locale used, this will change the
 	// language of the CLI if the locale is different
 	// after started.
-	i18n.Init(configuration.Settings.GetString("locale"))
+	i18n.Init(s.settings.GetString("locale"))
 
 	return nil
 }
@@ -487,7 +499,11 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	// Perform index update
 	// TODO: pass context
 	// ctx := stream.Context()
-	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB); err != nil {
+	config, err := s.settings.DownloaderConfig()
+	if err != nil {
+		return err
+	}
+	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB, config); err != nil {
 		resultCB(rpc.IndexUpdateReport_STATUS_FAILED)
 		return err
 	}
@@ -532,11 +548,11 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			Message: &rpc.UpdateIndexResponse_DownloadProgress{DownloadProgress: p},
 		})
 	}
-	indexpath := configuration.DataDir(configuration.Settings)
+	indexpath := configuration.DataDir(s.settings)
 
 	urls := []string{globals.DefaultIndexURL}
 	if !req.GetIgnoreCustomPackageIndexes() {
-		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+		urls = append(urls, s.settings.GetStringSlice("board_manager.additional_urls")...)
 	}
 
 	failed := false
@@ -593,11 +609,18 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			}
 		}
 
+		config, err := s.settings.DownloaderConfig()
+		if err != nil {
+			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
+			downloadCB.End(false, tr("Invalid network configuration: %s", err))
+			failed = true
+		}
+
 		if strings.HasSuffix(URL.Host, "arduino.cc") && strings.HasSuffix(URL.Path, ".json") {
 			indexResource.SignatureURL, _ = url.Parse(u) // should not fail because we already parsed it
 			indexResource.SignatureURL.Path += ".sig"
 		}
-		if err := indexResource.Download(indexpath, downloadCB); err != nil {
+		if err := indexResource.Download(indexpath, downloadCB, config); err != nil {
 			failed = true
 			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 		} else {
@@ -615,10 +638,8 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 
 // firstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
-func firstUpdate(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, downloadCb func(msg *rpc.DownloadProgress), externalPackageIndexes []*url.URL) error {
-	// Gets the data directory to verify if library_index.json and package_index.json exist
-	dataDir := configuration.DataDir(configuration.Settings)
-	libraryIndex := dataDir.Join("library_index.json")
+func firstUpdate(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, indexDir *paths.Path, downloadCb func(msg *rpc.DownloadProgress), externalPackageIndexes []*url.URL) error {
+	libraryIndex := indexDir.Join("library_index.json")
 
 	if libraryIndex.NotExist() {
 		// The library_index.json file doesn't exists, that means the CLI is run for the first time
@@ -640,7 +661,7 @@ func firstUpdate(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance
 				Message: tr("Error downloading index '%s'", URL),
 				Cause:   &cmderrors.InvalidURLError{}}
 		}
-		packageIndexFile := dataDir.Join(packageIndexFileName)
+		packageIndexFile := indexDir.Join(packageIndexFileName)
 		if packageIndexFile.NotExist() {
 			// The index file doesn't exists, that means the CLI is run for the first time,
 			// or the 3rd party package index URL has just been added. Similarly to the

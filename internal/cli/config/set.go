@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initSetCommand() *cobra.Command {
+func initSetCommand(defaultSettings *configuration.Settings) *cobra.Command {
 	setCommand := &cobra.Command{
 		Use:   "set",
 		Short: tr("Sets a setting value."),
@@ -37,15 +37,17 @@ func initSetCommand() *cobra.Command {
 			"  " + os.Args[0] + " config set sketch.always_export_binaries true\n" +
 			"  " + os.Args[0] + " config set board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json",
 		Args: cobra.MinimumNArgs(2),
-		Run:  runSetCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runSetCommand(defaultSettings, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			return defaultSettings.AllKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return setCommand
 }
 
-func runSetCommand(cmd *cobra.Command, args []string) {
+func runSetCommand(defaultSettings *configuration.Settings, args []string) {
 	logrus.Info("Executing `arduino-cli config set`")
 	key := args[0]
 	kind := validateKey(key)
@@ -68,9 +70,9 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	configuration.Settings.Set(key, value)
+	defaultSettings.Set(key, value)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
+	if err := defaultSettings.WriteConfig(); err != nil {
 		feedback.Fatal(tr("Writing config file: %v", err), feedback.ErrGeneric)
 	}
 }

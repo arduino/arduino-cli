@@ -44,7 +44,7 @@ func uniquify[T comparable](s []T) []T {
 	return result
 }
 
-func initAddCommand() *cobra.Command {
+func initAddCommand(defaultSettings *configuration.Settings) *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "add",
 		Short: tr("Adds one or more values to a setting."),
@@ -53,15 +53,17 @@ func initAddCommand() *cobra.Command {
 			"  " + os.Args[0] + " config add board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config add board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
 		Args: cobra.MinimumNArgs(2),
-		Run:  runAddCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runAddCommand(args, defaultSettings)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
+			return GetSlicesConfigurationKeys(defaultSettings), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return addCommand
 }
 
-func runAddCommand(cmd *cobra.Command, args []string) {
+func runAddCommand(args []string, defaultSettings *configuration.Settings) {
 	logrus.Info("Executing `arduino-cli config add`")
 	key := args[0]
 	kind := validateKey(key)
@@ -71,12 +73,12 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
-	v := configuration.Settings.GetStringSlice(key)
+	v := defaultSettings.GetStringSlice(key)
 	v = append(v, args[1:]...)
 	v = uniquify(v)
-	configuration.Settings.Set(key, v)
+	defaultSettings.Set(key, v)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
+	if err := defaultSettings.WriteConfig(); err != nil {
 		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
 	}
 }

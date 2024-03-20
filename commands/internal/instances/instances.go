@@ -25,6 +25,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
+	"go.bug.st/downloader/v2"
 )
 
 // coreInstance is an instance of the Arduino Core Services. The user can
@@ -133,15 +134,15 @@ func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager
 }
 
 // Create a new *rpc.Instance ready to be initialized
-func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent ...string) (*rpc.Instance, error) {
+func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent string, downloaderConfig downloader.Config) (*rpc.Instance, error) {
 	// Create package manager
 	userAgent := "arduino-cli/" + version.VersionInfo.VersionString
-	for _, ua := range extraUserAgent {
-		userAgent += " " + ua
+	if extraUserAgent != "" {
+		userAgent += " " + extraUserAgent
 	}
 	tempDir := dataDir.Join("tmp")
 
-	pm := packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent).Build()
+	pm := packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent, downloaderConfig).Build()
 	lm, _ := librariesmanager.NewBuilder().Build()
 
 	instance := &coreInstance{

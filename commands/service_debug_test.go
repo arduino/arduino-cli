@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/downloader/v2"
 )
 
 func TestGetCommandLine(t *testing.T) {
@@ -36,7 +37,7 @@ func TestGetCommandLine(t *testing.T) {
 	sketchPath := paths.New("testdata", "debug", sketch)
 	require.NoError(t, sketchPath.ToAbs())
 
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pmb.LoadHardwareFromDirectory(dataDir)
 

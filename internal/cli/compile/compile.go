@@ -77,7 +77,7 @@ var (
 )
 
 // NewCommand created a new `compile` command
-func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
 	compileCommand := &cobra.Command{
 		Use:   "compile",
 		Short: tr("Compiles Arduino sketches."),
@@ -133,7 +133,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")
 	compileCommand.Flag("skip-libraries-discovery").Hidden = true
 	compileCommand.Flags().Int32VarP(&jobs, "jobs", "j", 0, tr("Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used."))
-	configuration.Settings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
+	defaultSettings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
 
 	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
 

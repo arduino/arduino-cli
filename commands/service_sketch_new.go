@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -48,7 +47,7 @@ func (s *arduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketc
 	if len(req.GetSketchDir()) > 0 {
 		sketchesDir = req.GetSketchDir()
 	} else {
-		sketchesDir = configuration.Settings.GetString("directories.User")
+		sketchesDir = s.settings.GetString("directories.User")
 	}
 
 	if err := validateSketchName(req.GetSketchName()); err != nil {

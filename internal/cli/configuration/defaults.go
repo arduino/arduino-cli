@@ -19,12 +19,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
 // SetDefaults sets the default values for certain keys
-func SetDefaults(settings *viper.Viper) {
+func SetDefaults(settings *Settings) {
 	// logging
 	settings.SetDefault("logging.level", "info")
 	settings.SetDefault("logging.format", "text")

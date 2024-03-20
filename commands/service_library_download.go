@@ -20,8 +20,8 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 )
@@ -66,7 +66,7 @@ func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 		return err
 	}
 
-	if err := downloadLibrary(ctx, downloadsDir, lib, downloadCB, func(*rpc.TaskProgress) {}, "download"); err != nil {
+	if err := downloadLibrary(ctx, downloadsDir, lib, downloadCB, func(*rpc.TaskProgress) {}, "download", s.settings); err != nil {
 		return err
 	}
 
@@ -74,10 +74,10 @@ func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 }
 
 func downloadLibrary(_ context.Context, downloadsDir *paths.Path, libRelease *librariesindex.Release,
-	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, queryParameter string) error {
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, queryParameter string, settings *configuration.Settings) error {
 
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
-	config, err := httpclient.GetDownloaderConfig()
+	config, err := settings.DownloaderConfig()
 	if err != nil {
 		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}

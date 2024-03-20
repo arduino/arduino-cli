@@ -27,12 +27,12 @@ import (
 )
 
 func main() {
-	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsFallbackOnEnv(os.Args))
-	i18n.Init(configuration.Settings.GetString("locale"))
+	defaultSettings := configuration.Init(configuration.FindConfigFileInArgsFallbackOnEnv(os.Args))
+	i18n.Init(defaultSettings.GetString("locale"))
 
-	srv := commands.NewArduinoCoreServer(version.VersionInfo.VersionString)
+	srv := commands.NewArduinoCoreServer(version.VersionInfo.VersionString, defaultSettings)
 
-	arduinoCmd := cli.NewCommand(srv)
+	arduinoCmd := cli.NewCommand(srv, defaultSettings)
 	if err := arduinoCmd.Execute(); err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

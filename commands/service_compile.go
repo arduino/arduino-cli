@@ -22,6 +22,7 @@ import (
 	"io"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
@@ -66,7 +67,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
 
-	exportBinaries := configuration.Settings.GetBool("sketch.always_export_binaries")
+	exportBinaries := s.settings.GetBool("sketch.always_export_binaries")
 	if e := req.ExportBinaries; e != nil {
 		exportBinaries = *e
 	}
@@ -172,7 +173,10 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	}
 	buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
 	// cache is purged after compilation to not remove entries that might be required
-	defer maybePurgeBuildCache()
+
+	defer maybePurgeBuildCache(
+		s.settings.GetUint("build_cache.compilations_before_purge"),
+		s.settings.GetDuration("build_cache.ttl").Abs())
 
 	var coreBuildCachePath *paths.Path
 	if req.GetBuildCachePath() == "" {
@@ -194,7 +198,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 
 	actualPlatform := buildPlatform
 	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
-	otherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
+	otherLibrariesDirs.Add(configuration.LibrariesDir(s.settings))
 
 	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {
@@ -227,9 +231,9 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		coreBuildCachePath,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
-		configuration.HardwareDirectories(configuration.Settings),
+		configuration.HardwareDirectories(s.settings),
 		otherLibrariesDirs,
-		configuration.IDEBuiltinLibrariesDir(configuration.Settings),
+		configuration.IDEBuiltinLibrariesDir(s.settings),
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
@@ -394,9 +398,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 }
 
 // maybePurgeBuildCache runs the build files cache purge if the policy conditions are met.
-func maybePurgeBuildCache() {
-
-	compilationsBeforePurge := configuration.Settings.GetUint("build_cache.compilations_before_purge")
+func maybePurgeBuildCache(compilationsBeforePurge uint, cacheTTL time.Duration) {
 	// 0 means never purge
 	if compilationsBeforePurge == 0 {
 		return
@@ -409,7 +411,6 @@ func maybePurgeBuildCache() {
 		return
 	}
 	inventory.Store.Set("build_cache.compilation_count_since_last_purge", 0)
-	cacheTTL := configuration.Settings.GetDuration("build_cache.ttl").Abs()
 	buildcache.New(paths.TempDir().Join("arduino", "cores")).Purge(cacheTTL)
 	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
 }

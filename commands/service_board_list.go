@@ -32,7 +32,7 @@ import (
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
@@ -45,7 +45,7 @@ var (
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
 
-func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+func cachedAPIByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	var resp []*rpc.BoardListItem
 
 	cacheKey := fmt.Sprintf("cache.builder-api.v3/boards/byvid/pid/%s/%s", vid, pid)
@@ -59,7 +59,7 @@ func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		}
 	}
 
-	resp, err := apiByVidPid(vid, pid) // Perform API requrest
+	resp, err := apiByVidPid(vid, pid, settings) // Perform API requrest
 
 	if err == nil {
 		if cachedResp, err := json.Marshal(resp); err == nil {
@@ -71,7 +71,7 @@ func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	return resp, err
 }
 
-func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+func apiByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
 	if !validVidPid.MatchString(vid) {
 		return nil, errors.New(tr("Invalid vid value: '%s'", vid))
@@ -84,10 +84,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	// TODO: use proxy if set
-
-	httpClient, err := httpclient.New()
-
+	httpClient, err := settings.NewHttpClient()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", tr("failed to initialize http client"), err)
 	}
@@ -130,18 +127,18 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	}, nil
 }
 
-func identifyViaCloudAPI(props *properties.Map) ([]*rpc.BoardListItem, error) {
+func identifyViaCloudAPI(props *properties.Map, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
 	if !props.ContainsKey("vid") || !props.ContainsKey("pid") {
 		return nil, nil
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
-	return cachedAPIByVidPid(props.Get("vid"), props.Get("pid"))
+	return cachedAPIByVidPid(props.Get("vid"), props.Get("pid"), settings)
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
-func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardListItem, error) {
+func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	boards := []*rpc.BoardListItem{}
 	if port.Properties == nil {
 		return boards, nil
@@ -173,7 +170,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	// if installed cores didn't recognize the board, try querying
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
-		items, err := identifyViaCloudAPI(port.Properties)
+		items, err := identifyViaCloudAPI(port.Properties, settings)
 		if err != nil {
 			// this is bad, but keep going
 			logrus.WithError(err).Debug("Error querying builder API")
@@ -227,7 +224,7 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 
 	ports := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
-		boards, err := identify(pme, port)
+		boards, err := identify(pme, port, s.settings)
 		if err != nil {
 			warnings = append(warnings, err.Error())
 		}
@@ -306,7 +303,7 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 
 			boardsError := ""
 			if event.Type == "add" {
-				boards, err := identify(pme, event.Port)
+				boards, err := identify(pme, event.Port, s.settings)
 				if err != nil {
 					boardsError = err.Error()
 				}

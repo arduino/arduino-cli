@@ -29,18 +29,26 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Settings is a global instance of viper holding configurations for the CLI and the gRPC consumers
-var Settings *viper.Viper
-
 var tr = i18n.Tr
+
+// Settings contains the configuration of the Arduino CLI core service
+type Settings struct {
+	*viper.Viper
+}
+
+// NewSettings creates a new instance of Settings with the default values set
+func NewSettings() *Settings {
+	res := &Settings{viper.New()}
+	SetDefaults(res)
+	return res
+}
 
 // Init initialize defaults and read the configuration file.
 // Please note the logging system hasn't been configured yet,
 // so logging shouldn't be used here.
-func Init(configFile string) *viper.Viper {
+func Init(configFile string) *Settings {
 	// Create a new viper instance with default values for all the settings
-	settings := viper.New()
-	SetDefaults(settings)
+	settings := NewSettings()
 
 	// Set config name and config path
 	if configFilePath := paths.New(configFile); configFilePath != nil {
@@ -70,7 +78,7 @@ func Init(configFile string) *viper.Viper {
 }
 
 // BindFlags creates all the flags binding between the cobra Command and the instance of viper
-func BindFlags(cmd *cobra.Command, settings *viper.Viper) {
+func BindFlags(cmd *cobra.Command, settings *Settings) {
 	settings.BindPFlag("logging.level", cmd.Flag("log-level"))
 	settings.BindPFlag("logging.file", cmd.Flag("log-file"))
 	settings.BindPFlag("logging.format", cmd.Flag("log-format"))

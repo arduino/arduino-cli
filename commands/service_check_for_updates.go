@@ -20,8 +20,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -35,7 +33,7 @@ func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, r
 		return nil, err
 	}
 
-	if !shouldCheckForUpdate(currentVersion) && !req.GetForceCheck() {
+	if !s.shouldCheckForUpdate(currentVersion) && !req.GetForceCheck() {
 		return &rpc.CheckForArduinoCLIUpdatesResponse{}, nil
 	}
 
@@ -45,7 +43,7 @@ func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, r
 		inventory.WriteStore()
 	}()
 
-	latestVersion, err := semver.Parse(getLatestRelease())
+	latestVersion, err := semver.Parse(s.getLatestRelease())
 	if err != nil {
 		return nil, err
 	}
@@ -62,13 +60,13 @@ func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, r
 
 // shouldCheckForUpdate return true if it actually makes sense to check for new updates,
 // false in all other cases.
-func shouldCheckForUpdate(currentVersion *semver.Version) bool {
+func (s *arduinoCoreServerImpl) shouldCheckForUpdate(currentVersion *semver.Version) bool {
 	if strings.Contains(currentVersion.String(), "git-snapshot") || strings.Contains(currentVersion.String(), "nightly") {
 		// This is a dev build, no need to check for updates
 		return false
 	}
 
-	if !configuration.Settings.GetBool("updater.enable_notification") {
+	if !s.settings.GetBool("updater.enable_notification") {
 		// Don't check if the user disabled the notification
 		return false
 	}
@@ -84,8 +82,8 @@ func shouldCheckForUpdate(currentVersion *semver.Version) bool {
 
 // getLatestRelease queries the official Arduino download server for the latest release,
 // if there are no errors or issues a version string is returned, in all other case an empty string.
-func getLatestRelease() string {
-	client, err := httpclient.New()
+func (s *arduinoCoreServerImpl) getLatestRelease() string {
+	client, err := s.settings.NewHttpClient()
 	if err != nil {
 		return ""
 	}

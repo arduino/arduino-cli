@@ -17,16 +17,18 @@ package configuration
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"runtime"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/version"
-	"github.com/spf13/viper"
+	"go.bug.st/downloader/v2"
 )
 
 // UserAgent returns the user agent (mainly used by HTTP clients)
-func UserAgent(settings *viper.Viper) string {
+func UserAgent(settings *Settings) string {
 	subComponent := ""
 	if settings != nil {
 		subComponent = settings.GetString("network.user_agent_ext")
@@ -50,7 +52,7 @@ func UserAgent(settings *viper.Viper) string {
 }
 
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
-func NetworkProxy(settings *viper.Viper) (*url.URL, error) {
+func NetworkProxy(settings *Settings) (*url.URL, error) {
 	if settings == nil || !settings.IsSet("network.proxy") {
 		return nil, nil
 	}
@@ -64,4 +66,43 @@ func NetworkProxy(settings *viper.Viper) (*url.URL, error) {
 	} else {
 		return proxy, nil
 	}
+}
+
+// NewHttpClient returns a new http client for use in the arduino-cli
+func (settings *Settings) NewHttpClient() (*http.Client, error) {
+	proxy, err := NetworkProxy(settings)
+	if err != nil {
+		return nil, err
+	}
+	return &http.Client{
+		Transport: &httpClientRoundTripper{
+			transport: &http.Transport{
+				Proxy: http.ProxyURL(proxy),
+			},
+			userAgent: UserAgent(settings),
+		},
+	}, nil
+}
+
+type httpClientRoundTripper struct {
+	transport http.RoundTripper
+	userAgent string
+}
+
+func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Add("User-Agent", h.userAgent)
+	return h.transport.RoundTrip(req)
+}
+
+// DownloaderConfig returns the downloader configuration based on current settings.
+func (settings *Settings) DownloaderConfig() (downloader.Config, error) {
+	httpClient, err := settings.NewHttpClient()
+	if err != nil {
+		return downloader.Config{}, &cmderrors.InvalidArgumentError{
+			Message: tr("Could not connect via HTTP"),
+			Cause:   err}
+	}
+	return downloader.Config{
+		HttpClient: *httpClient,
+	}, nil
 }

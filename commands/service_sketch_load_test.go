@@ -19,12 +19,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoadSketchProfiles(t *testing.T) {
-	srv := NewArduinoCoreServer("")
+	srv := NewArduinoCoreServer("", configuration.Init(""))
 	loadResp, err := srv.LoadSketch(context.Background(), &commands.LoadSketchRequest{
 		SketchPath: "./testdata/sketch_with_profile",
 	})

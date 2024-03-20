@@ -31,8 +31,8 @@ import (
 )
 
 // LoadHardware read all plaforms from the configured paths
-func (pm *Builder) LoadHardware() []error {
-	hardwareDirs := configuration.HardwareDirectories(configuration.Settings)
+func (pm *Builder) LoadHardware(settings *configuration.Settings) []error {
+	hardwareDirs := configuration.HardwareDirectories(settings)
 	return pm.LoadHardwareFromDirectories(hardwareDirs)
 }
 

@@ -29,6 +29,7 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/downloader/v2"
 )
 
 func TestDetectSketchNameFromBuildPath(t *testing.T) {
@@ -127,7 +128,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
 	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "upload", "hardware"))
 	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "upload", "build_path_1")

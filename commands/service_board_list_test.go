@@ -27,12 +27,11 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
 )
 
 func TestGetByVidPid(t *testing.T) {
-	configuration.Settings = configuration.Init("")
-	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `
 {
@@ -49,34 +48,31 @@ func TestGetByVidPid(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0xf420", "0XF069")
+	res, err := apiByVidPid("0xf420", "0XF069", configuration.Init(""))
 	require.Nil(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].GetName())
 	require.Equal(t, "arduino:samd:mkr1000", res[0].GetFqbn())
 
 	// wrong vid (too long), wrong pid (not an hex value)
-	_, err = apiByVidPid("0xfffff", "0xDEFG")
+
+	_, err = apiByVidPid("0xfffff", "0xDEFG", configuration.Init(""))
 	require.NotNil(t, err)
 }
 
 func TestGetByVidPidNotFound(t *testing.T) {
-	configuration.Settings = configuration.Init("")
-	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069")
+	res, err := apiByVidPid("0x0420", "0x0069", configuration.Init(""))
 	require.NoError(t, err)
 	require.Empty(t, res)
 }
 
 func TestGetByVidPid5xx(t *testing.T) {
-	configuration.Settings = configuration.Init("")
-	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 - Ooooops!"))
@@ -84,46 +80,39 @@ func TestGetByVidPid5xx(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069")
+	res, err := apiByVidPid("0x0420", "0x0069", configuration.Init(""))
 	require.NotNil(t, err)
 	require.Equal(t, "the server responded with status 500 Internal Server Error", err.Error())
 	require.Len(t, res, 0)
 }
 
 func TestGetByVidPidMalformedResponse(t *testing.T) {
-	configuration.Settings = configuration.Init("")
-	configuration.Settings.Set("locale", "en")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "{}")
 	}))
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069")
+	res, err := apiByVidPid("0x0420", "0x0069", configuration.Init(""))
 	require.NotNil(t, err)
 	require.Equal(t, "wrong format in server response", err.Error())
 	require.Len(t, res, 0)
 }
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
-	configuration.Settings = configuration.Init("")
-	configuration.Settings.Set("locale", "en")
-	items, err := identifyViaCloudAPI(properties.NewMap())
+	items, err := identifyViaCloudAPI(properties.NewMap(), configuration.Init(""))
 	require.NoError(t, err)
 	require.Empty(t, items)
 }
 
 func TestBoardIdentifySorting(t *testing.T) {
-	configuration.Settings = configuration.Init("")
-	configuration.Settings.Set("locale", "en")
-
 	dataDir := paths.TempDir().Join("test", "data_dir")
 	t.Setenv("ARDUINO_DATA_DIR", dataDir.String())
 	dataDir.MkdirAll()
 	defer paths.TempDir().Join("test").RemoveAll()
 
 	// We don't really care about the paths in this case
-	pmb := packagemanager.NewBuilder(dataDir, dataDir, dataDir, dataDir, "test")
+	pmb := packagemanager.NewBuilder(dataDir, dataDir, dataDir, dataDir, "test", downloader.GetDefaultConfig())
 
 	// Create some boards with identical VID:PID combination
 	pack := pmb.GetOrCreatePackage("packager")
@@ -159,7 +148,8 @@ func TestBoardIdentifySorting(t *testing.T) {
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	res, err := identify(pme, &discovery.Port{Properties: idPrefs})
+	settings := configuration.Init("")
+	res, err := identify(pme, &discovery.Port{Properties: idPrefs}, settings)
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)

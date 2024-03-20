@@ -21,35 +21,36 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
 var tr = i18n.Tr
 
 // NewCommand created a new `config` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
 		Short:   tr("Arduino configuration commands."),
 		Example: "  " + os.Args[0] + " config init",
 	}
 
-	configCommand.AddCommand(initAddCommand())
-	configCommand.AddCommand(initDeleteCommand())
-	configCommand.AddCommand(initDumpCommand())
-	configCommand.AddCommand(initGetCommand())
-	configCommand.AddCommand(initInitCommand())
-	configCommand.AddCommand(initRemoveCommand())
-	configCommand.AddCommand(initSetCommand())
+	configCommand.AddCommand(initAddCommand(defaultSettings))
+	configCommand.AddCommand(initDeleteCommand(srv, defaultSettings))
+	configCommand.AddCommand(initDumpCommand(defaultSettings))
+	configCommand.AddCommand(initGetCommand(srv, defaultSettings))
+	configCommand.AddCommand(initInitCommand(defaultSettings))
+	configCommand.AddCommand(initRemoveCommand(defaultSettings))
+	configCommand.AddCommand(initSetCommand(defaultSettings))
 
 	return configCommand
 }
 
-// GetConfigurationKeys is an helper function useful to autocomplete.
+// GetSlicesConfigurationKeys is an helper function useful to autocomplete.
 // It returns a list of configuration keys which can be changed
-func GetConfigurationKeys() []string {
+func GetSlicesConfigurationKeys(settings *configuration.Settings) []string {
 	var res []string
-	keys := configuration.Settings.AllKeys()
+	keys := settings.AllKeys()
 	for _, key := range keys {
 		kind, _ := typeOf(key)
 		if kind == reflect.Slice {

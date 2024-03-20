@@ -17,15 +17,14 @@ package configuration
 
 import (
 	"github.com/arduino/go-paths-helper"
-	"github.com/spf13/viper"
 )
 
 // HardwareDirectories returns all paths that may contains hardware packages.
-func HardwareDirectories(settings *viper.Viper) paths.PathList {
+func HardwareDirectories(settings *Settings) paths.PathList {
 	res := paths.PathList{}
 
 	if settings.IsSet("directories.Data") {
-		packagesDir := PackagesDir(Settings)
+		packagesDir := PackagesDir(settings)
 		if packagesDir.IsDir() {
 			res.Add(packagesDir)
 		}
@@ -44,34 +43,34 @@ func HardwareDirectories(settings *viper.Viper) paths.PathList {
 
 // IDEBuiltinLibrariesDir returns the IDE-bundled libraries path. Usually
 // this directory is present in the Arduino IDE.
-func IDEBuiltinLibrariesDir(settings *viper.Viper) *paths.Path {
-	return paths.New(Settings.GetString("directories.builtin.Libraries"))
+func IDEBuiltinLibrariesDir(settings *Settings) *paths.Path {
+	return paths.New(settings.GetString("directories.builtin.Libraries"))
 }
 
 // LibrariesDir returns the full path to the user directory containing
 // custom libraries
-func LibrariesDir(settings *viper.Viper) *paths.Path {
+func LibrariesDir(settings *Settings) *paths.Path {
 	return paths.New(settings.GetString("directories.User")).Join("libraries")
 }
 
 // PackagesDir returns the full path to the packages folder
-func PackagesDir(settings *viper.Viper) *paths.Path {
+func PackagesDir(settings *Settings) *paths.Path {
 	return DataDir(settings).Join("packages")
 }
 
 // ProfilesCacheDir returns the full path to the profiles cache directory
 // (it contains all the platforms and libraries used to compile a sketch
 // using profiles)
-func ProfilesCacheDir(settings *viper.Viper) *paths.Path {
+func ProfilesCacheDir(settings *Settings) *paths.Path {
 	return DataDir(settings).Join("internal")
 }
 
 // DataDir returns the full path to the data directory
-func DataDir(settings *viper.Viper) *paths.Path {
+func DataDir(settings *Settings) *paths.Path {
 	return paths.New(settings.GetString("directories.Data"))
 }
 
 // DownloadsDir returns the full path to the download cache directory
-func DownloadsDir(settings *viper.Viper) *paths.Path {
+func DownloadsDir(settings *Settings) *paths.Path {
 	return paths.New(settings.GetString("directories.Downloads"))
 }

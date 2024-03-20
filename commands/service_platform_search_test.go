@@ -36,9 +36,8 @@ func TestPlatformSearch(t *testing.T) {
 	err := paths.New("testdata", "platform", "package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
-
-	srv := NewArduinoCoreServer("")
+	settings := configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
+	srv := NewArduinoCoreServer("", settings)
 	ctx := context.Background()
 	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
 	require.NoError(t, err)
@@ -338,9 +337,8 @@ func TestPlatformSearchSorting(t *testing.T) {
 	err := paths.New("testdata", "platform", "package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
-
-	srv := NewArduinoCoreServer("")
+	settings := configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
+	srv := NewArduinoCoreServer("", settings)
 	ctx := context.Background()
 
 	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})

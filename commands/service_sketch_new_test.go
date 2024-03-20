@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +36,7 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 		",`hack[}attempt{];",
 	}
 
-	srv := NewArduinoCoreServer("")
+	srv := NewArduinoCoreServer("", configuration.Init(""))
 	for _, name := range invalidNames {
 		_, err := srv.NewSketch(context.Background(), &rpc.NewSketchRequest{
 			SketchName: name,
@@ -48,7 +49,7 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 }
 
 func Test_SketchNameEmpty(t *testing.T) {
-	srv := NewArduinoCoreServer("")
+	srv := NewArduinoCoreServer("", configuration.Init(""))
 	_, err := srv.NewSketch(context.Background(), &rpc.NewSketchRequest{
 		SketchName: "",
 		SketchDir:  t.TempDir(),
@@ -62,7 +63,7 @@ func Test_SketchNameTooLong(t *testing.T) {
 	for i := range tooLongName {
 		tooLongName[i] = 'a'
 	}
-	srv := NewArduinoCoreServer("")
+	srv := NewArduinoCoreServer("", configuration.Init(""))
 	_, err := srv.NewSketch(context.Background(), &rpc.NewSketchRequest{
 		SketchName: string(tooLongName),
 		SketchDir:  t.TempDir(),
@@ -86,7 +87,7 @@ func Test_SketchNameOk(t *testing.T) {
 		"_hello_world",
 		string(lengthLimitName),
 	}
-	srv := NewArduinoCoreServer("")
+	srv := NewArduinoCoreServer("", configuration.Init(""))
 	for _, name := range validNames {
 		_, err := srv.NewSketch(context.Background(), &rpc.NewSketchRequest{
 			SketchName: name,
@@ -99,7 +100,7 @@ func Test_SketchNameOk(t *testing.T) {
 func Test_SketchNameReserved(t *testing.T) {
 	invalidNames := []string{"CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5",
 		"COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}
-	srv := NewArduinoCoreServer("")
+	srv := NewArduinoCoreServer("", configuration.Init(""))
 	for _, name := range invalidNames {
 		_, err := srv.NewSketch(context.Background(), &rpc.NewSketchRequest{
 			SketchName: name,
