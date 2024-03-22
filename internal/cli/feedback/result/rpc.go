@@ -1076,6 +1076,16 @@ func NewUpdateIndexResponse_ResultResult(resp *rpc.UpdateIndexResponse_Result) *
 	}
 }
 
+type UpdateLibrariesIndexResponse_ResultResult struct {
+	LibrariesIndex *IndexUpdateReportResult `json:"libraries_index"`
+}
+
+func NewUpdateLibrariesIndexResponse_ResultResult(resp *rpc.UpdateLibrariesIndexResponse_Result) *UpdateLibrariesIndexResponse_ResultResult {
+	return &UpdateLibrariesIndexResponse_ResultResult{
+		LibrariesIndex: NewIndexUpdateReportResult(resp.GetLibrariesIndex()),
+	}
+}
+
 type IndexUpdateReportResult struct {
 	IndexURL string                   `json:"index_url"`
 	Status   IndexUpdateReport_Status `json:"status"`

@@ -226,6 +226,10 @@ func TestAllFieldAreMapped(t *testing.T) {
 	updateIndexResponse_ResultResult := result.NewUpdateIndexResponse_ResultResult(updateIndexResponse_ResultRpc)
 	mustContainsAllPropertyOfRpcStruct(t, updateIndexResponse_ResultRpc, updateIndexResponse_ResultResult)
 
+	updateLibrariesIndexResponse_ResultRpc := &rpc.UpdateLibrariesIndexResponse_Result{}
+	updateLibrariesIndexResponse_ResultResult := result.NewUpdateLibrariesIndexResponse_ResultResult(updateLibrariesIndexResponse_ResultRpc)
+	mustContainsAllPropertyOfRpcStruct(t, updateLibrariesIndexResponse_ResultRpc, updateLibrariesIndexResponse_ResultResult)
+
 	indexUpdateReportRpc := &rpc.IndexUpdateReport{}
 	indexUpdateReportResult := result.NewIndexUpdateReportResult(indexUpdateReportRpc)
 	mustContainsAllPropertyOfRpcStruct(t, indexUpdateReportRpc, indexUpdateReportResult)
