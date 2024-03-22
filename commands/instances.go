@@ -486,15 +486,14 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		logrus.WithField("url", URL).Print("Updating index")
 
 		if URL.Scheme == "file" {
-			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
 			path := paths.New(URL.Path)
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
 				msg := fmt.Sprintf("%s: %v", tr("Invalid package index in %s", path), err)
+				downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
 				downloadCB.End(false, msg)
 				failed = true
 				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			} else {
-				downloadCB.End(true, "")
 				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_SKIPPED))
 			}
 			continue
@@ -514,8 +513,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		if info, err := indexFile.Stat(); err == nil {
 			ageSecs := int64(time.Since(info.ModTime()).Seconds())
 			if ageSecs < req.GetUpdateIfOlderThanSecs() {
-				downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
-				downloadCB.End(true, tr("Index is already up-to-date"))
 				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
 				continue
 			}
