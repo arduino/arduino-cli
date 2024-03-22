@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -472,7 +473,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 	failed := false
 	result := &rpc.UpdateIndexResponse_Result{}
 	for _, u := range urls {
-		URL, err := utils.URLParse(u)
+		URL, err := url.Parse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
 			msg := fmt.Sprintf("%s: %v", tr("Unable to parse URL"), err)
@@ -487,6 +488,11 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 
 		if URL.Scheme == "file" {
 			path := paths.New(URL.Path)
+			if URL.Scheme == "file" && runtime.GOOS == "windows" && len(URL.Path) > 1 {
+				// https://github.com/golang/go/issues/32456
+				// Parsed local file URLs on Windows are returned with a leading / so we remove it
+				path = paths.New(URL.Path[1:])
+			}
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
 				msg := fmt.Sprintf("%s: %v", tr("Invalid package index in %s", path), err)
 				downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
