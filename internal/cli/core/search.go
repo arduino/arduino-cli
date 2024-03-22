@@ -19,15 +19,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
 	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/internal/arduino/globals"
-	"github.com/arduino/arduino-cli/internal/arduino/utils"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -55,17 +51,24 @@ func initSearchCommand() *cobra.Command {
 }
 
 // indexUpdateInterval specifies the time threshold over which indexes are updated
-const indexUpdateInterval = "24h"
+const indexUpdateInterval = 24 * time.Hour
 
 func runSearchCommand(cmd *cobra.Command, args []string, allVersions bool) {
 	inst := instance.CreateAndInit()
 
-	if indexesNeedUpdating(indexUpdateInterval) {
-		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
-		if err != nil {
-			feedback.FatalError(err, feedback.ErrGeneric)
+	res, err := commands.UpdateIndex(
+		context.Background(),
+		&rpc.UpdateIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())},
+		feedback.ProgressBar())
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
+	}
+	for _, idxRes := range res.GetUpdatedIndexes() {
+		if idxRes.GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
+			// At least one index has been updated, reinitialize the instance
+			instance.Init(inst)
+			break
 		}
-		instance.Init(inst)
 	}
 
 	arguments := strings.ToLower(strings.Join(args, " "))
@@ -133,59 +136,4 @@ func (sr searchResults) String() string {
 		}
 	}
 	return t.Render()
-}
-
-// indexesNeedUpdating returns whether one or more index files need updating.
-// A duration string must be provided to calculate the time threshold
-// used to update the indexes, if the duration is not valid a default
-// of 24 hours is used.
-// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-func indexesNeedUpdating(duration string) bool {
-	indexpath := configuration.DataDir(configuration.Settings)
-
-	now := time.Now()
-	modTimeThreshold, err := time.ParseDuration(duration)
-	if err != nil {
-		feedback.Fatal(tr("Invalid timeout: %s", err), feedback.ErrBadArgument)
-	}
-
-	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
-	for _, u := range urls {
-		URL, err := utils.URLParse(u)
-		if err != nil {
-			continue
-		}
-
-		if URL.Scheme == "file" {
-			// No need to update local files
-			continue
-		}
-
-		// should handle:
-		// - package_index.json
-		// - package_index.json.sig
-		// - package_index.json.gz
-		// - package_index.tar.bz2
-		indexFileName := path.Base(URL.Path)
-		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2")
-		indexFileName = strings.TrimSuffix(indexFileName, ".gz")
-		indexFileName = strings.TrimSuffix(indexFileName, ".sig")
-		indexFileName = strings.TrimSuffix(indexFileName, ".json")
-		// and obtain package_index.json as result
-		coreIndexPath := indexpath.Join(indexFileName + ".json")
-		if coreIndexPath.NotExist() {
-			return true
-		}
-
-		info, err := coreIndexPath.Stat()
-		if err != nil {
-			return true
-		}
-
-		if now.After(info.ModTime().Add(modTimeThreshold)) {
-			return true
-		}
-	}
-	return false
 }

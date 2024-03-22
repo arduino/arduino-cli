@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -42,13 +43,28 @@ func initUpdateIndexCommand() *cobra.Command {
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core update-index`")
-	UpdateIndex(inst)
+	resp := UpdateIndex(inst)
+
+	feedback.PrintResult(&updateIndexResult{result.NewUpdateIndexResponse_ResultResult(resp)})
 }
 
 // UpdateIndex updates the index of platforms.
-func UpdateIndex(inst *rpc.Instance) {
-	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
+func UpdateIndex(inst *rpc.Instance) *rpc.UpdateIndexResponse_Result {
+	res, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	return res
+}
+
+type updateIndexResult struct {
+	*result.UpdateIndexResponse_ResultResult
+}
+
+func (r *updateIndexResult) Data() interface{} {
+	return r
+}
+
+func (r *updateIndexResult) String() string {
+	return ""
 }

@@ -24,12 +24,10 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -109,14 +107,15 @@ func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 
 	logrus.Info("Executing `arduino-cli lib search`")
 
-	if indexNeedsUpdating(indexUpdateInterval) {
-		if err := commands.UpdateLibrariesIndex(
-			context.Background(),
-			&rpc.UpdateLibrariesIndexRequest{Instance: inst},
-			feedback.ProgressBar(),
-		); err != nil {
-			feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
-		}
+	res, err := commands.UpdateLibrariesIndex(
+		context.Background(),
+		&rpc.UpdateLibrariesIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())},
+		feedback.ProgressBar(),
+	)
+	if err != nil {
+		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
+	}
+	if res.GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
 		instance.Init(inst)
 	}
 
@@ -220,21 +219,4 @@ func (res librarySearchResult) String() string {
 	}
 
 	return out.String()
-}
-
-// indexNeedsUpdating returns whether library_index.json needs updating
-func indexNeedsUpdating(timeout time.Duration) bool {
-	// Library index path is constant (relative to the data directory).
-	// It does not depend on board manager URLs or any other configuration.
-	dataDir := configuration.Settings.GetString("directories.Data")
-	indexPath := paths.New(dataDir).Join("library_index.json")
-	// Verify the index file exists and we can read its fstat attrs.
-	if indexPath.NotExist() {
-		return true
-	}
-	info, err := indexPath.Stat()
-	if err != nil {
-		return true
-	}
-	return time.Since(info.ModTime()) > timeout
 }

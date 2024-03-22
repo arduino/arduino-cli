@@ -221,6 +221,18 @@ func TestAllFieldAreMapped(t *testing.T) {
 	isDebugSupportedResponseRpc := &rpc.IsDebugSupportedResponse{}
 	isDebugSupportedResponseResult := result.NewIsDebugSupportedResponse(isDebugSupportedResponseRpc)
 	mustContainsAllPropertyOfRpcStruct(t, isDebugSupportedResponseRpc, isDebugSupportedResponseResult)
+
+	updateIndexResponse_ResultRpc := &rpc.UpdateIndexResponse_Result{}
+	updateIndexResponse_ResultResult := result.NewUpdateIndexResponse_ResultResult(updateIndexResponse_ResultRpc)
+	mustContainsAllPropertyOfRpcStruct(t, updateIndexResponse_ResultRpc, updateIndexResponse_ResultResult)
+
+	updateLibrariesIndexResponse_ResultRpc := &rpc.UpdateLibrariesIndexResponse_Result{}
+	updateLibrariesIndexResponse_ResultResult := result.NewUpdateLibrariesIndexResponse_ResultResult(updateLibrariesIndexResponse_ResultRpc)
+	mustContainsAllPropertyOfRpcStruct(t, updateLibrariesIndexResponse_ResultRpc, updateLibrariesIndexResponse_ResultResult)
+
+	indexUpdateReportRpc := &rpc.IndexUpdateReport{}
+	indexUpdateReportResult := result.NewIndexUpdateReportResult(indexUpdateReportRpc)
+	mustContainsAllPropertyOfRpcStruct(t, indexUpdateReportRpc, indexUpdateReportResult)
 }
 
 func TestEnumsMapsEveryRpcCounterpart(t *testing.T) {
@@ -249,6 +261,15 @@ func TestEnumsMapsEveryRpcCounterpart(t *testing.T) {
 		}
 		require.NotEmpty(t, results)
 		require.Len(t, results, len(rpc.LibrarySearchStatus_name))
+		require.True(t, isUnique(results))
+	})
+	t.Run("IndexUpdateReport_Status enums maps every element", func(t *testing.T) {
+		results := make([]result.IndexUpdateReport_Status, 0, len(rpc.IndexUpdateReport_Status_name))
+		for key := range rpc.IndexUpdateReport_Status_name {
+			results = append(results, result.NewIndexUpdateReport_Status(rpc.IndexUpdateReport_Status(key)))
+		}
+		require.NotEmpty(t, results)
+		require.Len(t, results, len(rpc.IndexUpdateReport_Status_name))
 		require.True(t, isUnique(results))
 	})
 }

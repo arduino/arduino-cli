@@ -1065,3 +1065,62 @@ func NewIsDebugSupportedResponse(resp *rpc.IsDebugSupportedResponse) *IsDebugSup
 		DebugFQBN:          resp.GetDebugFqbn(),
 	}
 }
+
+type UpdateIndexResponse_ResultResult struct {
+	UpdatedIndexes []*IndexUpdateReportResult `json:"updated_indexes,omitempty"`
+}
+
+func NewUpdateIndexResponse_ResultResult(resp *rpc.UpdateIndexResponse_Result) *UpdateIndexResponse_ResultResult {
+	return &UpdateIndexResponse_ResultResult{
+		UpdatedIndexes: f.Map(resp.GetUpdatedIndexes(), NewIndexUpdateReportResult),
+	}
+}
+
+type UpdateLibrariesIndexResponse_ResultResult struct {
+	LibrariesIndex *IndexUpdateReportResult `json:"libraries_index"`
+}
+
+func NewUpdateLibrariesIndexResponse_ResultResult(resp *rpc.UpdateLibrariesIndexResponse_Result) *UpdateLibrariesIndexResponse_ResultResult {
+	return &UpdateLibrariesIndexResponse_ResultResult{
+		LibrariesIndex: NewIndexUpdateReportResult(resp.GetLibrariesIndex()),
+	}
+}
+
+type IndexUpdateReportResult struct {
+	IndexURL string                   `json:"index_url"`
+	Status   IndexUpdateReport_Status `json:"status"`
+}
+
+func NewIndexUpdateReportResult(resp *rpc.IndexUpdateReport) *IndexUpdateReportResult {
+	return &IndexUpdateReportResult{
+		IndexURL: resp.GetIndexUrl(),
+		Status:   NewIndexUpdateReport_Status(resp.GetStatus()),
+	}
+}
+
+type IndexUpdateReport_Status string
+
+const (
+	IndexUpdateReport_StatusUnspecified     IndexUpdateReport_Status = "unspecified"
+	IndexUpdateReport_StatusAlreadyUpToDate IndexUpdateReport_Status = "already-up-to-date"
+	IndexUpdateReport_StatusFailed          IndexUpdateReport_Status = "failed"
+	IndexUpdateReport_StatusSkipped         IndexUpdateReport_Status = "skipped"
+	IndexUpdateReport_StatusUpdated         IndexUpdateReport_Status = "updated"
+)
+
+func NewIndexUpdateReport_Status(r rpc.IndexUpdateReport_Status) IndexUpdateReport_Status {
+	switch r {
+	case rpc.IndexUpdateReport_STATUS_UNSPECIFIED:
+		return IndexUpdateReport_StatusUnspecified
+	case rpc.IndexUpdateReport_STATUS_UPDATED:
+		return IndexUpdateReport_StatusUpdated
+	case rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE:
+		return IndexUpdateReport_StatusAlreadyUpToDate
+	case rpc.IndexUpdateReport_STATUS_FAILED:
+		return IndexUpdateReport_StatusFailed
+	case rpc.IndexUpdateReport_STATUS_SKIPPED:
+		return IndexUpdateReport_StatusSkipped
+	default:
+		return IndexUpdateReport_StatusUnspecified
+	}
+}

@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -42,15 +43,29 @@ func initUpdateIndexCommand() *cobra.Command {
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib update-index`")
-	UpdateIndex(inst)
+	resp := UpdateIndex(inst)
+	feedback.PrintResult(&libUpdateIndexResult{result.NewUpdateLibrariesIndexResponse_ResultResult(resp)})
 }
 
 // UpdateIndex updates the index of libraries.
-func UpdateIndex(inst *rpc.Instance) {
-	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
+func UpdateIndex(inst *rpc.Instance) *rpc.UpdateLibrariesIndexResponse_Result {
+	resp, err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 		Instance: inst,
 	}, feedback.ProgressBar())
 	if err != nil {
 		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
+	return resp
+}
+
+type libUpdateIndexResult struct {
+	*result.UpdateLibrariesIndexResponse_ResultResult
+}
+
+func (l *libUpdateIndexResult) String() string {
+	return ""
+}
+
+func (l *libUpdateIndexResult) Data() interface{} {
+	return l
 }
