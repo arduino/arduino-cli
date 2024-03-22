@@ -445,9 +445,9 @@ func TestCoreUpdateWithLocalUrl(t *testing.T) {
 		testIndex = "/" + strings.ReplaceAll(testIndex, "\\", "/")
 	}
 
-	stdout, _, err := cli.Run("core", "update-index", "--additional-urls=file://"+testIndex)
+	stdout, _, err := cli.Run("core", "update-index", "--additional-urls=file://"+testIndex, "--format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout), "Downloading index: test_index.json downloaded")
+	requirejson.Parse(t, stdout).MustContain(`{"updated_indexes":[{"index_url":"file://` + testIndex + `","status":"skipped"}]}`)
 }
 
 func TestCoreSearchManuallyInstalledCoresNotPrinted(t *testing.T) {
