@@ -276,21 +276,63 @@ message UpdateIndexRequest {
   Instance instance = 1;
   // If set to true user defined package indexes will not be updated.
   bool ignore_custom_package_indexes = 2;
+  // Only perform index update if the index file is older than this value in
+  // seconds.
+  int64 update_if_older_than_secs = 3;
 }
 
 message UpdateIndexResponse {
-  // Progress of the package index download.
-  DownloadProgress download_progress = 1;
+  message Result {
+    // The result of the packages index update.
+    repeated IndexUpdateReport updated_indexes = 1;
+  }
+  oneof message {
+    // Progress of the package index download.
+    DownloadProgress download_progress = 1;
+    // The result of the index update.
+    Result result = 2;
+  }
 }
 
 message UpdateLibrariesIndexRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
+  // Only perform index update if the index file is older than this value in
+  // seconds.
+  int64 update_if_older_than_secs = 2;
 }
 
 message UpdateLibrariesIndexResponse {
-  // Progress of the libraries index download.
-  DownloadProgress download_progress = 1;
+  message Result {
+    // The result of the libraries index update.
+    IndexUpdateReport libraries_index = 1;
+  }
+  oneof message {
+    // Progress of the libraries index download.
+    DownloadProgress download_progress = 1;
+    // The result of the index update.
+    Result result = 2;
+  }
+}
+
+message IndexUpdateReport {
+  enum Status {
+    // The status of the index update is unspecified.
+    STATUS_UNSPECIFIED = 0;
+    // The index has been successfully updated.
+    STATUS_UPDATED = 1;
+    // The index was already up to date.
+    STATUS_ALREADY_UP_TO_DATE = 2;
+    // The index update failed.
+    STATUS_FAILED = 3;
+    // The index update was skipped.
+    STATUS_SKIPPED = 4;
+  }
+
+  // The URL of the index that was updated.
+  string index_url = 1;
+  // The result of the index update.
+  Status status = 2;
 }
 
 message VersionRequest {}

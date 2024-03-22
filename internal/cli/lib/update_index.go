@@ -47,7 +47,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 
 // UpdateIndex updates the index of libraries.
 func UpdateIndex(inst *rpc.Instance) {
-	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
+	_, err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 		Instance: inst,
 	}, feedback.ProgressBar())
 	if err != nil {

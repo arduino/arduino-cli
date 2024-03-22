@@ -47,7 +47,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 
 // UpdateIndex updates the index of platforms.
 func UpdateIndex(inst *rpc.Instance) {
-	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
+	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

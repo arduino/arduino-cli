@@ -4,6 +4,76 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### The gRPC `cc.arduino.cli.commands.v1.UpdateIndexResponse` and `UpdateLibrariesIndexResponse` have changed.
+
+The responses coming from the update index commands:
+
+```proto
+message UpdateIndexResponse {
+  // Progress of the package index download.
+  DownloadProgress download_progress = 1;
+}
+
+message UpdateLibrariesIndexResponse {
+  // Progress of the libraries index download.
+  DownloadProgress download_progress = 1;
+}
+```
+
+are now more explicit and contains details about the result of the operation:
+
+```proto
+message UpdateIndexResponse {
+  message Result {
+    // The result of the packages index update.
+    repeated IndexUpdateReport updated_indexes = 1;
+  }
+  oneof message {
+    // Progress of the package index download.
+    DownloadProgress download_progress = 1;
+    // The result of the index update.
+    Result result = 2;
+  }
+}
+
+message UpdateLibrariesIndexResponse {
+  message Result {
+    // The result of the libraries index update.
+    IndexUpdateReport libraries_index = 1;
+  }
+  oneof message {
+    // Progress of the libraries index download.
+    DownloadProgress download_progress = 1;
+    // The result of the index update.
+    Result result = 2;
+  }
+}
+```
+
+The `IndexUpdateReport` message contains details for each index update operation performed:
+
+```proto
+message IndexUpdateReport {
+  enum Status {
+    // The status of the index update is unspecified.
+    STATUS_UNSPECIFIED = 0;
+    // The index has been successfully updated.
+    STATUS_UPDATED = 1;
+    // The index was already up to date.
+    STATUS_ALREADY_UP_TO_DATE = 2;
+    // The index update failed.
+    STATUS_FAILED = 3;
+    // The index update was skipped.
+    STATUS_SKIPPED = 4;
+  }
+
+  // The URL of the index that was updated.
+  string index_url = 1;
+  // The result of the index update.
+  Status status = 2;
+}
+```
+
 ### The gRPC `cc.arduino.cli.commands.v1.Profile` message has been removed in favor of `SketchProfile`
 
 The message `Profile` has been replaced with `SketchProfile` in the `InitResponse.profile` field:

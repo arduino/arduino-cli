@@ -121,18 +121,36 @@ func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 // UpdateIndex FIXMEDOC
 func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream rpc.ArduinoCoreService_UpdateIndexServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	err := commands.UpdateIndex(stream.Context(), req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.UpdateIndexResponse{DownloadProgress: p}) },
+	res, err := commands.UpdateIndex(stream.Context(), req,
+		func(p *rpc.DownloadProgress) {
+			syncSend.Send(&rpc.UpdateIndexResponse{
+				Message: &rpc.UpdateIndexResponse_DownloadProgress{DownloadProgress: p},
+			})
+		},
 	)
+	if res != nil {
+		syncSend.Send(&rpc.UpdateIndexResponse{
+			Message: &rpc.UpdateIndexResponse_Result_{Result: res},
+		})
+	}
 	return convertErrorToRPCStatus(err)
 }
 
 // UpdateLibrariesIndex FIXMEDOC
 func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexRequest, stream rpc.ArduinoCoreService_UpdateLibrariesIndexServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	err := commands.UpdateLibrariesIndex(stream.Context(), req,
-		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.UpdateLibrariesIndexResponse{DownloadProgress: p}) },
+	res, err := commands.UpdateLibrariesIndex(stream.Context(), req,
+		func(p *rpc.DownloadProgress) {
+			syncSend.Send(&rpc.UpdateLibrariesIndexResponse{
+				Message: &rpc.UpdateLibrariesIndexResponse_DownloadProgress{DownloadProgress: p},
+			})
+		},
 	)
+	if res != nil {
+		syncSend.Send(&rpc.UpdateLibrariesIndexResponse{
+			Message: &rpc.UpdateLibrariesIndexResponse_Result_{Result: res},
+		})
+	}
 	return convertErrorToRPCStatus(err)
 }
 

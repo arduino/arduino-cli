@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
@@ -406,30 +407,59 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
+func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateLibrariesIndexResponse_Result, error) {
 	logrus.Info("Updating libraries index")
+
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	indexDir := pme.IndexDir
 	release()
 
+	index := globals.LibrariesIndexResource
+	result := func(status rpc.IndexUpdateReport_Status) *rpc.UpdateLibrariesIndexResponse_Result {
+		return &rpc.UpdateLibrariesIndexResponse_Result{
+			LibrariesIndex: &rpc.IndexUpdateReport{
+				IndexUrl: globals.LibrariesIndexResource.URL.String(),
+				Status:   status,
+			},
+		}
+	}
+
+	// Create the index directory if it doesn't exist
 	if err := indexDir.MkdirAll(); err != nil {
-		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
+		return result(rpc.IndexUpdateReport_STATUS_FAILED), &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
+	// Check if the index file is already up-to-date
+	indexFileName, _ := index.IndexFileName()
+	if info, err := indexDir.Join(indexFileName).Stat(); err == nil {
+		ageSecs := int64(time.Since(info.ModTime()).Seconds())
+		if ageSecs < req.GetUpdateIfOlderThanSecs() {
+			return result(rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE), nil
+		}
+	}
+
+	// Perform index update
 	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return result(rpc.IndexUpdateReport_STATUS_UPDATED), nil
 }
 
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) error {
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse_Result, error) {
 	if !instances.IsValid(req.GetInstance()) {
-		return &cmderrors.InvalidInstanceError{}
+		return nil, &cmderrors.InvalidInstanceError{}
+	}
+
+	report := func(indexURL *url.URL, status rpc.IndexUpdateReport_Status) *rpc.IndexUpdateReport {
+		return &rpc.IndexUpdateReport{
+			IndexUrl: indexURL.String(),
+			Status:   status,
+		}
 	}
 
 	indexpath := configuration.DataDir(configuration.Settings)
@@ -440,6 +470,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 	}
 
 	failed := false
+	result := &rpc.UpdateIndexResponse_Result{}
 	for _, u := range urls {
 		URL, err := utils.URLParse(u)
 		if err != nil {
@@ -448,6 +479,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 			downloadCB.Start(u, tr("Downloading index: %s", u))
 			downloadCB.End(false, msg)
 			failed = true
+			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 
@@ -460,26 +492,51 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 				msg := fmt.Sprintf("%s: %v", tr("Invalid package index in %s", path), err)
 				downloadCB.End(false, msg)
 				failed = true
+				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			} else {
 				downloadCB.End(true, "")
+				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_SKIPPED))
 			}
 			continue
 		}
 
+		// Check if the index is up-to-date
 		indexResource := resources.IndexResource{URL: URL}
+		indexFileName, err := indexResource.IndexFileName()
+		if err != nil {
+			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
+			downloadCB.End(false, tr("Invalid index URL: %s", err))
+			failed = true
+			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			continue
+		}
+		indexFile := indexpath.Join(indexFileName)
+		if info, err := indexFile.Stat(); err == nil {
+			ageSecs := int64(time.Since(info.ModTime()).Seconds())
+			if ageSecs < req.GetUpdateIfOlderThanSecs() {
+				downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
+				downloadCB.End(true, tr("Index is already up-to-date"))
+				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
+				continue
+			}
+		}
+
 		if strings.HasSuffix(URL.Host, "arduino.cc") && strings.HasSuffix(URL.Path, ".json") {
 			indexResource.SignatureURL, _ = url.Parse(u) // should not fail because we already parsed it
 			indexResource.SignatureURL.Path += ".sig"
 		}
 		if err := indexResource.Download(indexpath, downloadCB); err != nil {
 			failed = true
+			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+		} else {
+			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_UPDATED))
 		}
 	}
 
 	if failed {
-		return &cmderrors.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
+		return result, &cmderrors.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
 	}
-	return nil
+	return result, nil
 }
 
 // firstUpdate downloads libraries and packages indexes if they don't exist.
@@ -493,7 +550,7 @@ func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(ms
 		// The library_index.json file doesn't exists, that means the CLI is run for the first time
 		// so we proceed with the first update that downloads the file
 		req := &rpc.UpdateLibrariesIndexRequest{Instance: instance}
-		if err := UpdateLibrariesIndex(ctx, req, downloadCb); err != nil {
+		if _, err := UpdateLibrariesIndex(ctx, req, downloadCb); err != nil {
 			return err
 		}
 	}
@@ -515,7 +572,7 @@ func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(ms
 			// library update we download that file and all the other package indexes from
 			// additional_urls
 			req := &rpc.UpdateIndexRequest{Instance: instance}
-			if err := UpdateIndex(ctx, req, downloadCb); err != nil {
+			if _, err := UpdateIndex(ctx, req, downloadCb); err != nil {
 				return err
 			}
 			break
