@@ -1310,6 +1310,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#indexupdatereport" class="md-nav__link">
+    IndexUpdateReport
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#initrequest" class="md-nav__link">
     InitRequest
   </a>
@@ -1387,6 +1394,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#updateindexresponseresult" class="md-nav__link">
+    UpdateIndexResponse.Result
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updatelibrariesindexrequest" class="md-nav__link">
     UpdateLibrariesIndexRequest
   </a>
@@ -1396,6 +1410,13 @@
           <li class="md-nav__item">
   <a href="#updatelibrariesindexresponse" class="md-nav__link">
     UpdateLibrariesIndexResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updatelibrariesindexresponseresult" class="md-nav__link">
+    UpdateLibrariesIndexResponse.Result
   </a>
   
 </li>
@@ -1417,6 +1438,13 @@
           <li class="md-nav__item">
   <a href="#failedinstanceinitreason" class="md-nav__link">
     FailedInstanceInitReason
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#indexupdatereportstatus" class="md-nav__link">
+    IndexUpdateReport.Status
   </a>
   
 </li>
@@ -2877,6 +2905,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#indexupdatereport" class="md-nav__link">
+    IndexUpdateReport
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#initrequest" class="md-nav__link">
     InitRequest
   </a>
@@ -2954,6 +2989,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#updateindexresponseresult" class="md-nav__link">
+    UpdateIndexResponse.Result
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updatelibrariesindexrequest" class="md-nav__link">
     UpdateLibrariesIndexRequest
   </a>
@@ -2963,6 +3005,13 @@
           <li class="md-nav__item">
   <a href="#updatelibrariesindexresponse" class="md-nav__link">
     UpdateLibrariesIndexResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updatelibrariesindexresponseresult" class="md-nav__link">
+    UpdateLibrariesIndexResponse.Result
   </a>
   
 </li>
@@ -2984,6 +3033,13 @@
           <li class="md-nav__item">
   <a href="#failedinstanceinitreason" class="md-nav__link">
     FailedInstanceInitReason
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#indexupdatereportstatus" class="md-nav__link">
+    IndexUpdateReport.Status
   </a>
   
 </li>
@@ -4017,6 +4073,7 @@
     - <a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.FailedInstanceInitError">FailedInstanceInitError</a>
+    - <a href="#cc.arduino.cli.commands.v1.IndexUpdateReport">IndexUpdateReport</a>
     - <a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a>
@@ -4028,10 +4085,13 @@
     - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse.Result">UpdateIndexResponse.Result</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse">UpdateLibrariesIndexResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse.Result">UpdateLibrariesIndexResponse.Result</a>
     - <a href="#cc.arduino.cli.commands.v1.VersionRequest">VersionRequest</a>
-    - <a href="#cc.arduino.cli.commands.v1.VersionResponse">VersionResponse</a><p>- <a href="#cc.arduino.cli.commands.v1.FailedInstanceInitReason">FailedInstanceInitReason</a></p>
+    - <a href="#cc.arduino.cli.commands.v1.VersionResponse">VersionResponse</a><p>- <a href="#cc.arduino.cli.commands.v1.FailedInstanceInitReason">FailedInstanceInitReason</a>
+  - <a href="#cc.arduino.cli.commands.v1.IndexUpdateReport.Status">IndexUpdateReport.Status</a></p>
 <p>- <a href="#cc.arduino.cli.commands.v1.ArduinoCoreService">ArduinoCoreService</a></p>
 </li>
 </ul>
@@ -5029,6 +5089,32 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.IndexUpdateReport"></a></p>
+<h3 id="indexupdatereport">IndexUpdateReport<a class="headerlink" href="#indexupdatereport" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>index_url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The URL of the index that was updated.</td>
+</tr>
+<tr>
+<td>status</td>
+<td><a href="#cc.arduino.cli.commands.v1.IndexUpdateReport.Status">IndexUpdateReport.Status</a></td>
+<td></td>
+<td>The result of the index update.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.InitRequest"></a></p>
 <h3 id="initrequest">InitRequest<a class="headerlink" href="#initrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -5317,6 +5403,12 @@
 <td></td>
 <td>If set to true user defined package indexes will not be updated.</td>
 </tr>
+<tr>
+<td>update_if_older_than_secs</td>
+<td><a href="#int64">int64</a></td>
+<td></td>
+<td>Only perform index update if the index file is older than this value in seconds.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.UpdateIndexResponse"></a></p>
@@ -5336,6 +5428,32 @@
 <td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
 <td></td>
 <td>Progress of the package index download.</td>
+</tr>
+<tr>
+<td>result</td>
+<td><a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse.Result">UpdateIndexResponse.Result</a></td>
+<td></td>
+<td>The result of the index update.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.UpdateIndexResponse.Result"></a></p>
+<h3 id="updateindexresponseresult">UpdateIndexResponse.Result<a class="headerlink" href="#updateindexresponseresult" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>updated_indexes</td>
+<td><a href="#cc.arduino.cli.commands.v1.IndexUpdateReport">IndexUpdateReport</a></td>
+<td>repeated</td>
+<td>The result of the packages index update.</td>
 </tr>
 </tbody>
 </table>
@@ -5357,6 +5475,12 @@
 <td></td>
 <td>Arduino Core Service instance from the Init response.</td>
 </tr>
+<tr>
+<td>update_if_older_than_secs</td>
+<td><a href="#int64">int64</a></td>
+<td></td>
+<td>Only perform index update if the index file is older than this value in seconds.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse"></a></p>
@@ -5376,6 +5500,32 @@
 <td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
 <td></td>
 <td>Progress of the libraries index download.</td>
+</tr>
+<tr>
+<td>result</td>
+<td><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse.Result">UpdateLibrariesIndexResponse.Result</a></td>
+<td></td>
+<td>The result of the index update.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse.Result"></a></p>
+<h3 id="updatelibrariesindexresponseresult">UpdateLibrariesIndexResponse.Result<a class="headerlink" href="#updatelibrariesindexresponseresult" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>libraries_index</td>
+<td><a href="#cc.arduino.cli.commands.v1.IndexUpdateReport">IndexUpdateReport</a></td>
+<td></td>
+<td>The result of the libraries index update.</td>
 </tr>
 </tbody>
 </table>
@@ -5436,6 +5586,44 @@
 <td>FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR</td>
 <td>4</td>
 <td>FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR failure encountered while downloading an index</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.IndexUpdateReport.Status"></a></p>
+<h3 id="indexupdatereportstatus">IndexUpdateReport.Status<a class="headerlink" href="#indexupdatereportstatus" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Number</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STATUS_UNSPECIFIED</td>
+<td>0</td>
+<td>The status of the index update is unspecified.</td>
+</tr>
+<tr>
+<td>STATUS_UPDATED</td>
+<td>1</td>
+<td>The index has been successfully updated.</td>
+</tr>
+<tr>
+<td>STATUS_ALREADY_UP_TO_DATE</td>
+<td>2</td>
+<td>The index was already up to date.</td>
+</tr>
+<tr>
+<td>STATUS_FAILED</td>
+<td>3</td>
+<td>The index update failed.</td>
+</tr>
+<tr>
+<td>STATUS_SKIPPED</td>
+<td>4</td>
+<td>The index update was skipped.</td>
 </tr>
 </tbody>
 </table>

@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.UpdateIndexResponse and UpdateLibrariesIndexResponse have changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1profile-message-has-been-removed-in-favor-of-sketchprofile" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.Profile message has been removed in favor of SketchProfile
   </a>
@@ -2525,6 +2532,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.UpdateIndexResponse and UpdateLibrariesIndexResponse have changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1profile-message-has-been-removed-in-favor-of-sketchprofile" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.Profile message has been removed in favor of SketchProfile
   </a>
@@ -3714,6 +3728,66 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed">The gRPC <code>cc.arduino.cli.commands.v1.UpdateIndexResponse</code> and <code>UpdateLibrariesIndexResponse</code> have changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed" title="Permanent link">&para;</a></h3>
+<p>The responses coming from the update index commands:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">UpdateIndexResponse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Progress of the package index download.</span>
+<span class="w">  </span><span class="n">DownloadProgress</span><span class="w"> </span><span class="na">download_progress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span><span class="w"> </span><span class="nc">UpdateLibrariesIndexResponse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Progress of the libraries index download.</span>
+<span class="w">  </span><span class="n">DownloadProgress</span><span class="w"> </span><span class="na">download_progress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>are now more explicit and contains details about the result of the operation:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">UpdateIndexResponse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">message</span><span class="w"> </span><span class="nc">Result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// The result of the packages index update.</span>
+<span class="w">    </span><span class="k">repeated</span><span class="w"> </span><span class="n">IndexUpdateReport</span><span class="w"> </span><span class="na">updated_indexes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">oneof</span><span class="w"> </span><span class="kd">message</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Progress of the package index download.</span>
+<span class="w">    </span><span class="n">DownloadProgress</span><span class="w"> </span><span class="na">download_progress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The result of the index update.</span>
+<span class="w">    </span><span class="n">Result</span><span class="w"> </span><span class="na">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">message</span><span class="w"> </span><span class="nc">UpdateLibrariesIndexResponse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">message</span><span class="w"> </span><span class="nc">Result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// The result of the libraries index update.</span>
+<span class="w">    </span><span class="n">IndexUpdateReport</span><span class="w"> </span><span class="na">libraries_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">oneof</span><span class="w"> </span><span class="kd">message</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Progress of the libraries index download.</span>
+<span class="w">    </span><span class="n">DownloadProgress</span><span class="w"> </span><span class="na">download_progress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The result of the index update.</span>
+<span class="w">    </span><span class="n">Result</span><span class="w"> </span><span class="na">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>IndexUpdateReport</code> message contains details for each index update operation performed:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">IndexUpdateReport</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">enum</span><span class="w"> </span><span class="n">Status</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// The status of the index update is unspecified.</span>
+<span class="w">    </span><span class="na">STATUS_UNSPECIFIED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The index has been successfully updated.</span>
+<span class="w">    </span><span class="na">STATUS_UPDATED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The index was already up to date.</span>
+<span class="w">    </span><span class="na">STATUS_ALREADY_UP_TO_DATE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The index update failed.</span>
+<span class="w">    </span><span class="na">STATUS_FAILED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The index update was skipped.</span>
+<span class="w">    </span><span class="na">STATUS_SKIPPED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="c1">// The URL of the index that was updated.</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">index_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// The result of the index update.</span>
+<span class="w">  </span><span class="n">Status</span><span class="w"> </span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
 <h3 id="the-grpc-ccarduinoclicommandsv1profile-message-has-been-removed-in-favor-of-sketchprofile">The gRPC <code>cc.arduino.cli.commands.v1.Profile</code> message has been removed in favor of <code>SketchProfile</code><a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1profile-message-has-been-removed-in-favor-of-sketchprofile" title="Permanent link">&para;</a></h3>
 <p>The message <code>Profile</code> has been replaced with <code>SketchProfile</code> in the <code>InitResponse.profile</code> field:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">InitResponse</span><span class="w"> </span><span class="p">{</span>
