@@ -480,7 +480,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 			downloadCB.Start(u, tr("Downloading index: %s", u))
 			downloadCB.End(false, msg)
 			failed = true
-			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 
@@ -498,9 +498,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 				downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
 				downloadCB.End(false, msg)
 				failed = true
-				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			} else {
-				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_SKIPPED))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_SKIPPED))
 			}
 			continue
 		}
@@ -512,14 +512,14 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, tr("Invalid index URL: %s", err))
 			failed = true
-			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 		indexFile := indexpath.Join(indexFileName)
 		if info, err := indexFile.Stat(); err == nil {
 			ageSecs := int64(time.Since(info.ModTime()).Seconds())
 			if ageSecs < req.GetUpdateIfOlderThanSecs() {
-				result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
 				continue
 			}
 		}
@@ -530,9 +530,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		}
 		if err := indexResource.Download(indexpath, downloadCB); err != nil {
 			failed = true
-			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 		} else {
-			result.UpdatedIndexes = append(result.UpdatedIndexes, report(URL, rpc.IndexUpdateReport_STATUS_UPDATED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_UPDATED))
 		}
 	}
 

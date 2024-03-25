@@ -25,13 +25,13 @@ import (
 // WarnAboutDeprecatedFiles warns the user that a type of sketch files are deprecated
 func WarnAboutDeprecatedFiles(s *rpc.Sketch) {
 	var files []string
-	for _, f := range s.OtherSketchFiles {
+	for _, f := range s.GetOtherSketchFiles() {
 		if strings.HasSuffix(f, ".pde") {
 			files = append(files, f)
 		}
 	}
-	if strings.HasSuffix(s.MainFile, ".pde") {
-		files = append(files, s.MainFile)
+	if strings.HasSuffix(s.GetMainFile(), ".pde") {
+		files = append(files, s.GetMainFile())
 	}
 	if len(files) > 0 {
 		// .pde files are still supported but deprecated, this warning urges the user to rename them
