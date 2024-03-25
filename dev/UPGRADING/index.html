@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.CompileRequest.export_binaries changed type.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.UpdateIndexResponse and UpdateLibrariesIndexResponse have changed.
   </a>
@@ -2532,6 +2539,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.CompileRequest.export_binaries changed type.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.UpdateIndexResponse and UpdateLibrariesIndexResponse have changed.
   </a>
@@ -3728,6 +3742,10 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type">The gRPC <code>cc.arduino.cli.commands.v1.CompileRequest.export_binaries</code> changed type.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" title="Permanent link">&para;</a></h3>
+<p>Previously the field <code>export_binaries</code> was a <code>google.protobuf.BoolValue</code>. We used this type because it expresses this
+field's optional nature (that is, it could be <code>true</code>, <code>false</code>, and <code>null</code> if not set).</p>
+<p>Now the field is an <code>optional bool</code>, since the latest protobuf protocol changes now allows optional fields.</p>
 <h3 id="the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed">The gRPC <code>cc.arduino.cli.commands.v1.UpdateIndexResponse</code> and <code>UpdateLibrariesIndexResponse</code> have changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1updateindexresponse-and-updatelibrariesindexresponse-have-changed" title="Permanent link">&para;</a></h3>
 <p>The responses coming from the update index commands:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">UpdateIndexResponse</span><span class="w"> </span><span class="p">{</span>
