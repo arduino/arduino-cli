@@ -4,6 +4,13 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### The gRPC `cc.arduino.cli.commands.v1.CompileRequest.export_binaries` changed type.
+
+Previously the field `export_binaries` was a `google.protobuf.BoolValue`. We used this type because it expresses this
+field's optional nature (that is, it could be `true`, `false`, and `null` if not set).
+
+Now the field is an `optional bool`, since the latest protobuf protocol changes now allows optional fields.
+
 ### The gRPC `cc.arduino.cli.commands.v1.UpdateIndexResponse` and `UpdateLibrariesIndexResponse` have changed.
 
 The responses coming from the update index commands:

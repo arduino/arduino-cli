@@ -61,6 +61,7 @@ var (
 	uploadAfterCompile      bool                     // Upload the binary after the compilation.
 	portArgs                arguments.Port           // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify                  bool                     // Upload, verify uploaded binary after the upload.
+	exportBinaries          bool                     //
 	exportDir               string                   // The compiled binary is written to this file
 	optimizeForDebug        bool                     // Optimize compile output for debug, not for release
 	programmer              arguments.Programmer     // Use the specified programmer to upload
@@ -127,10 +128,7 @@ func NewCommand() *cobra.Command {
 	programmer.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
 	compileCommand.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
-	// We must use the following syntax for this flag since it's also bound to settings.
-	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only
-	// read the value if the flag is set explicitly by the user.
-	compileCommand.Flags().BoolP("export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
+	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
 	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	compileCommand.Flag("source-override").Hidden = true
 	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")

@@ -29,7 +29,8 @@ linters:
     - tenv
     - typecheck
     - unconvert
-    - protogetter
+    # We must disable this one because there is no support 'optional' protobuf fields yet: https://github.com/arduino/arduino-cli/pull/2570
+    #- protogetter
 
 linters-settings:
   forbidigo:
