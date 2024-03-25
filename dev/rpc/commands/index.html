@@ -1275,6 +1275,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#cleandownloadcachedirectoryrequest" class="md-nav__link">
+    CleanDownloadCacheDirectoryRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cleandownloadcachedirectoryresponse" class="md-nav__link">
+    CleanDownloadCacheDirectoryResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#createrequest" class="md-nav__link">
     CreateRequest
   </a>
@@ -2870,6 +2884,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#cleandownloadcachedirectoryrequest" class="md-nav__link">
+    CleanDownloadCacheDirectoryRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cleandownloadcachedirectoryresponse" class="md-nav__link">
+    CleanDownloadCacheDirectoryResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#createrequest" class="md-nav__link">
     CreateRequest
   </a>
@@ -4068,6 +4096,8 @@
 <li><a href="#cc/arduino/cli/commands/v1/commands.proto">cc/arduino/cli/commands/v1/commands.proto</a>
     - <a href="#cc.arduino.cli.commands.v1.ArchiveSketchRequest">ArchiveSketchRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.ArchiveSketchResponse">ArchiveSketchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryRequest">CleanDownloadCacheDirectoryRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryResponse">CleanDownloadCacheDirectoryResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.CreateRequest">CreateRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a>
@@ -5019,6 +5049,28 @@
 </table>
 <p><a name="cc.arduino.cli.commands.v1.ArchiveSketchResponse"></a></p>
 <h3 id="archivesketchresponse">ArchiveSketchResponse<a class="headerlink" href="#archivesketchresponse" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryRequest"></a></p>
+<h3 id="cleandownloadcachedirectoryrequest">CleanDownloadCacheDirectoryRequest<a class="headerlink" href="#cleandownloadcachedirectoryrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>The Arduino Core Service instance.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryResponse"></a></p>
+<h3 id="cleandownloadcachedirectoryresponse">CleanDownloadCacheDirectoryResponse<a class="headerlink" href="#cleandownloadcachedirectoryresponse" title="Permanent link">&para;</a></h3>
 <p><a name="cc.arduino.cli.commands.v1.CreateRequest"></a></p>
 <h3 id="createrequest">CreateRequest<a class="headerlink" href="#createrequest" title="Permanent link">&para;</a></h3>
 <p><a name="cc.arduino.cli.commands.v1.CreateResponse"></a></p>
@@ -5885,6 +5937,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a></td>
 <td>Query the debugger information given a specific configuration.</td>
+</tr>
+<tr>
+<td>CleanDownloadCacheDirectory</td>
+<td><a href="#cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryRequest">CleanDownloadCacheDirectoryRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryResponse">CleanDownloadCacheDirectoryResponse</a></td>
+<td>Clean the download cache directory (where archives are downloaded).</td>
 </tr>
 <tr>
 <td>SettingsGetAll</td>
