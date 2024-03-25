@@ -16,10 +16,12 @@
 package cache
 
 import (
+	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	"github.com/arduino/arduino-cli/commands/cache"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -39,8 +41,7 @@ func initCleanCommand() *cobra.Command {
 func runCleanCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli cache clean`")
 
-	cachePath := configuration.DownloadsDir(configuration.Settings)
-	err := cachePath.RemoveAll()
+	_, err := cache.CleanDownloadCacheDirectory(context.Background(), &rpc.CleanDownloadCacheDirectoryRequest{})
 	if err != nil {
 		feedback.Fatal(tr("Error cleaning caches: %v", err), feedback.ErrGeneric)
 	}
