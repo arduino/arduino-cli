@@ -20,7 +20,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/updatecheck"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/updater"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -33,19 +32,21 @@ import (
 var tr = i18n.Tr
 
 // NewCommand created a new `version` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	versionCommand := &cobra.Command{
 		Use:     "version",
 		Short:   tr("Shows version number of Arduino CLI."),
 		Long:    tr("Shows the version number of Arduino CLI which is installed on your system."),
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
-		Run:     runVersionCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runVersionCommand(srv)
+		},
 	}
 	return versionCommand
 }
 
-func runVersionCommand(cmd *cobra.Command, args []string) {
+func runVersionCommand(srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli version`")
 
 	info := version.VersionInfo
@@ -57,7 +58,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 	}
 
 	latestVersion := ""
-	res, err := updatecheck.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
+	res, err := srv.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
 	if err != nil {
 		feedback.Warning("Failed to check for updates: " + err.Error())
 	} else {

@@ -18,8 +18,6 @@ package commands
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands/cache"
-	"github.com/arduino/arduino-cli/commands/updatecheck"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -40,14 +38,4 @@ type arduinoCoreServerImpl struct {
 // Version returns the version of the Arduino CLI
 func (s *arduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionRequest) (*rpc.VersionResponse, error) {
 	return &rpc.VersionResponse{Version: s.versionString}, nil
-}
-
-// CheckForArduinoCLIUpdates FIXMEDOC
-func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, req *rpc.CheckForArduinoCLIUpdatesRequest) (*rpc.CheckForArduinoCLIUpdatesResponse, error) {
-	return updatecheck.CheckForArduinoCLIUpdates(ctx, req)
-}
-
-// CleanDownloadCacheDirectory FIXMEDOC
-func (s *arduinoCoreServerImpl) CleanDownloadCacheDirectory(ctx context.Context, req *rpc.CleanDownloadCacheDirectoryRequest) (*rpc.CleanDownloadCacheDirectoryResponse, error) {
-	return cache.CleanDownloadCacheDirectory(ctx, req)
 }

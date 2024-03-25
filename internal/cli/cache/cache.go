@@ -19,13 +19,14 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
 var tr = i18n.Tr
 
 // NewCommand created a new `cache` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cacheCommand := &cobra.Command{
 		Use:   "cache",
 		Short: tr("Arduino cache commands."),
@@ -34,7 +35,7 @@ func NewCommand() *cobra.Command {
 			" " + os.Args[0] + " cache clean\n\n",
 	}
 
-	cacheCommand.AddCommand(initCleanCommand())
+	cacheCommand.AddCommand(initCleanCommand(srv))
 
 	return cacheCommand
 }

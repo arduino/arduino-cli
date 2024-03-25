@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2024 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package cache
+package commands
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 )
 
 // CleanDownloadCacheDirectory clean the download cache directory (where archives are downloaded).
-func CleanDownloadCacheDirectory(ctx context.Context, req *rpc.CleanDownloadCacheDirectoryRequest) (*rpc.CleanDownloadCacheDirectoryResponse, error) {
+func (s *arduinoCoreServerImpl) CleanDownloadCacheDirectory(ctx context.Context, req *rpc.CleanDownloadCacheDirectoryRequest) (*rpc.CleanDownloadCacheDirectoryResponse, error) {
 	cachePath := configuration.DownloadsDir(configuration.Settings)
 	err := cachePath.RemoveAll()
 	if err != nil {

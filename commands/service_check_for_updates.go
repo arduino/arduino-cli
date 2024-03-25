@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package updatecheck
+package commands
 
 import (
 	"context"
@@ -29,7 +29,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func CheckForArduinoCLIUpdates(ctx context.Context, req *rpc.CheckForArduinoCLIUpdatesRequest) (*rpc.CheckForArduinoCLIUpdatesResponse, error) {
+func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, req *rpc.CheckForArduinoCLIUpdatesRequest) (*rpc.CheckForArduinoCLIUpdatesResponse, error) {
 	currentVersion, err := semver.Parse(version.VersionInfo.VersionString)
 	if err != nil {
 		return nil, err

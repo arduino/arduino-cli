@@ -22,7 +22,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/updatecheck"
 	"github.com/arduino/arduino-cli/internal/cli/board"
 	"github.com/arduino/arduino-cli/internal/cli/burnbootloader"
 	"github.com/arduino/arduino-cli/internal/cli/cache"
@@ -85,7 +84,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			if cmd.Name() != "version" {
 				updaterMessageChan = make(chan *semver.Version)
 				go func() {
-					res, err := updatecheck.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
+					res, err := srv.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
 					if err != nil {
 						logrus.Warnf("Error checking for updates: %v", err)
 						updaterMessageChan <- nil
@@ -115,7 +114,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.SetUsageTemplate(getUsageTemplate())
 
 	cmd.AddCommand(board.NewCommand(srv))
-	cmd.AddCommand(cache.NewCommand())
+	cmd.AddCommand(cache.NewCommand(srv))
 	cmd.AddCommand(compile.NewCommand(srv))
 	cmd.AddCommand(completion.NewCommand())
 	cmd.AddCommand(config.NewCommand())
@@ -131,7 +130,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.AddCommand(upload.NewCommand(srv))
 	cmd.AddCommand(debug.NewCommand(srv))
 	cmd.AddCommand(burnbootloader.NewCommand(srv))
-	cmd.AddCommand(version.NewCommand())
+	cmd.AddCommand(version.NewCommand(srv))
 	cmd.AddCommand(feedback.NewCommand())
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	cmd.Flag("verbose").Hidden = true
