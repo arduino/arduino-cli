@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/protobuf/internal/genid
-version: v1.32.0
+version: v1.33.0
 type: go
 summary: Package genid contains constants for declarations in descriptor.proto and
   the well-known types.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/genid
 license: bsd-3-clause
 licenses:
-- sources: protobuf@v1.32.0/LICENSE
+- sources: protobuf@v1.33.0/LICENSE
   text: |
     Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: protobuf@v1.32.0/PATENTS
+- sources: protobuf@v1.33.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
