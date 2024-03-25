@@ -75,6 +75,7 @@ const (
 	ArduinoCoreService_Debug_FullMethodName                             = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Debug"
 	ArduinoCoreService_IsDebugSupported_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/IsDebugSupported"
 	ArduinoCoreService_GetDebugConfig_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/GetDebugConfig"
+	ArduinoCoreService_CleanDownloadCacheDirectory_FullMethodName       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/CleanDownloadCacheDirectory"
 	ArduinoCoreService_SettingsGetAll_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetAll"
 	ArduinoCoreService_SettingsMerge_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsMerge"
 	ArduinoCoreService_SettingsGetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetValue"
@@ -177,6 +178,8 @@ type ArduinoCoreServiceClient interface {
 	IsDebugSupported(ctx context.Context, in *IsDebugSupportedRequest, opts ...grpc.CallOption) (*IsDebugSupportedResponse, error)
 	// Query the debugger information given a specific configuration.
 	GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error)
+	// Clean the download cache directory (where archives are downloaded).
+	CleanDownloadCacheDirectory(ctx context.Context, in *CleanDownloadCacheDirectoryRequest, opts ...grpc.CallOption) (*CleanDownloadCacheDirectoryResponse, error)
 	// List all the settings.
 	SettingsGetAll(ctx context.Context, in *SettingsGetAllRequest, opts ...grpc.CallOption) (*SettingsGetAllResponse, error)
 	// Set multiple settings values at once.
@@ -1049,6 +1052,15 @@ func (c *arduinoCoreServiceClient) GetDebugConfig(ctx context.Context, in *GetDe
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) CleanDownloadCacheDirectory(ctx context.Context, in *CleanDownloadCacheDirectoryRequest, opts ...grpc.CallOption) (*CleanDownloadCacheDirectoryResponse, error) {
+	out := new(CleanDownloadCacheDirectoryResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_CleanDownloadCacheDirectory_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *arduinoCoreServiceClient) SettingsGetAll(ctx context.Context, in *SettingsGetAllRequest, opts ...grpc.CallOption) (*SettingsGetAllResponse, error) {
 	out := new(SettingsGetAllResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsGetAll_FullMethodName, in, out, opts...)
@@ -1197,6 +1209,8 @@ type ArduinoCoreServiceServer interface {
 	IsDebugSupported(context.Context, *IsDebugSupportedRequest) (*IsDebugSupportedResponse, error)
 	// Query the debugger information given a specific configuration.
 	GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error)
+	// Clean the download cache directory (where archives are downloaded).
+	CleanDownloadCacheDirectory(context.Context, *CleanDownloadCacheDirectoryRequest) (*CleanDownloadCacheDirectoryResponse, error)
 	// List all the settings.
 	SettingsGetAll(context.Context, *SettingsGetAllRequest) (*SettingsGetAllResponse, error)
 	// Set multiple settings values at once.
@@ -1338,6 +1352,9 @@ func (UnimplementedArduinoCoreServiceServer) IsDebugSupported(context.Context, *
 }
 func (UnimplementedArduinoCoreServiceServer) GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDebugConfig not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) CleanDownloadCacheDirectory(context.Context, *CleanDownloadCacheDirectoryRequest) (*CleanDownloadCacheDirectoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CleanDownloadCacheDirectory not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) SettingsGetAll(context.Context, *SettingsGetAllRequest) (*SettingsGetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SettingsGetAll not implemented")
@@ -2181,6 +2198,24 @@ func _ArduinoCoreService_GetDebugConfig_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_CleanDownloadCacheDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CleanDownloadCacheDirectoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).CleanDownloadCacheDirectory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_CleanDownloadCacheDirectory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).CleanDownloadCacheDirectory(ctx, req.(*CleanDownloadCacheDirectoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ArduinoCoreService_SettingsGetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SettingsGetAllRequest)
 	if err := dec(in); err != nil {
@@ -2375,6 +2410,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDebugConfig",
 			Handler:    _ArduinoCoreService_GetDebugConfig_Handler,
+		},
+		{
+			MethodName: "CleanDownloadCacheDirectory",
+			Handler:    _ArduinoCoreService_CleanDownloadCacheDirectory_Handler,
 		},
 		{
 			MethodName: "SettingsGetAll",

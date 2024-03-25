@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/cache"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -580,4 +581,10 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		portProxy.Close()
 	}
 	return nil
+}
+
+// CleanDownloadCacheDirectory FIXMEDOC
+func (s *ArduinoCoreServerImpl) CleanDownloadCacheDirectory(ctx context.Context, req *rpc.CleanDownloadCacheDirectoryRequest) (*rpc.CleanDownloadCacheDirectoryResponse, error) {
+	resp, err := cache.CleanDownloadCacheDirectory(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
 }

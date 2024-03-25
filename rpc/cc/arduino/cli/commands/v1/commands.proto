@@ -189,6 +189,10 @@ service ArduinoCoreService {
   // Query the debugger information given a specific configuration.
   rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
 
+  // Clean the download cache directory (where archives are downloaded).
+  rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest)
+      returns (CleanDownloadCacheDirectoryResponse);
+
   // List all the settings.
   rpc SettingsGetAll(SettingsGetAllRequest) returns (SettingsGetAllResponse);
 
@@ -414,3 +418,10 @@ message SetSketchDefaultsResponse {
   // (sketch.yaml)
   string default_programmer = 4;
 }
+
+message CleanDownloadCacheDirectoryRequest {
+  // The Arduino Core Service instance.
+  Instance instance = 1;
+}
+
+message CleanDownloadCacheDirectoryResponse {}
