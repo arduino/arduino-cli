@@ -81,7 +81,7 @@ linters-settings:
 
 issues:
   # Fix found issues (if it's supported by the linter).
-  fix: true
+  fix: false
   # List of regexps of issue texts to exclude.
   #
   # But independently of this option we use default exclude patterns,

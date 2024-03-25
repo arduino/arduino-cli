@@ -116,7 +116,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.55
+          version: v1.57
 
       - name: Check style
         env:
