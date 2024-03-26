@@ -16,11 +16,13 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/updatecheck"
 	"github.com/arduino/arduino-cli/internal/cli/board"
 	"github.com/arduino/arduino-cli/internal/cli/burnbootloader"
 	"github.com/arduino/arduino-cli/internal/cli/cache"
@@ -44,6 +46,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/version"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	versioninfo "github.com/arduino/arduino-cli/version"
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
@@ -54,24 +57,54 @@ import (
 )
 
 var (
-	verbose            bool
-	outputFormat       string
-	configFile         string
-	updaterMessageChan chan *semver.Version = make(chan *semver.Version)
+	verbose      bool
+	outputFormat string
+	configFile   string
 )
 
 // NewCommand creates a new ArduinoCli command root
 func NewCommand() *cobra.Command {
 	cobra.AddTemplateFunc("tr", i18n.Tr)
 
+	var updaterMessageChan chan *semver.Version
+
 	// ArduinoCli is the root command
 	arduinoCli := &cobra.Command{
-		Use:               "arduino-cli",
-		Short:             tr("Arduino CLI."),
-		Long:              tr("Arduino Command Line Interface (arduino-cli)."),
-		Example:           fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
-		PersistentPreRun:  preRun,
-		PersistentPostRun: postRun,
+		Use:     "arduino-cli",
+		Short:   tr("Arduino CLI."),
+		Long:    tr("Arduino Command Line Interface (arduino-cli)."),
+		Example: fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			preRun(cmd, args)
+
+			if cmd.Name() != "version" {
+				updaterMessageChan = make(chan *semver.Version)
+				go func() {
+					res, err := updatecheck.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
+					if err != nil {
+						logrus.Warnf("Error checking for updates: %v", err)
+						updaterMessageChan <- nil
+						return
+					}
+					if v := res.GetNewestVersion(); v == "" {
+						updaterMessageChan <- nil
+					} else if latest, err := semver.Parse(v); err != nil {
+						logrus.Warnf("Error parsing version: %v", err)
+					} else {
+						logrus.Infof("New version available: %s", v)
+						updaterMessageChan <- latest
+					}
+				}()
+			}
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			if updaterMessageChan != nil {
+				if latestVersion := <-updaterMessageChan; latestVersion != nil {
+					// Notify the user a new version is available
+					updater.NotifyNewVersionIsAvailable(latestVersion.String())
+				}
+			}
+		},
 	}
 
 	arduinoCli.SetUsageTemplate(getUsageTemplate())
@@ -160,20 +193,6 @@ func preRun(cmd *cobra.Command, args []string) {
 	feedback.SetOut(colorable.NewColorableStdout())
 	feedback.SetErr(colorable.NewColorableStderr())
 
-	updaterMessageChan = make(chan *semver.Version)
-	go func() {
-		if cmd.Name() == "version" {
-			// The version command checks by itself if there's a new available version
-			updaterMessageChan <- nil
-		}
-		// Starts checking for updates
-		currentVersion, err := semver.Parse(versioninfo.VersionInfo.VersionString)
-		if err != nil {
-			updaterMessageChan <- nil
-		}
-		updaterMessageChan <- updater.CheckForUpdate(currentVersion)
-	}()
-
 	//
 	// Prepare logging
 	//
@@ -249,13 +268,5 @@ func preRun(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
 			feedback.Fatal(tr("Invalid Call : should show Help, but it is available only in TEXT mode."), feedback.ErrBadArgument)
 		})
-	}
-}
-
-func postRun(cmd *cobra.Command, args []string) {
-	latestVersion := <-updaterMessageChan
-	if latestVersion != nil {
-		// Notify the user a new version is available
-		updater.NotifyNewVersionIsAvailable(latestVersion.String())
 	}
 }

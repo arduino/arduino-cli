@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands/updatecheck"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -581,6 +582,12 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		portProxy.Close()
 	}
 	return nil
+}
+
+// CheckForArduinoCLIUpdates FIXMEDOC
+func (s *ArduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, req *rpc.CheckForArduinoCLIUpdatesRequest) (*rpc.CheckForArduinoCLIUpdatesResponse, error) {
+	resp, err := updatecheck.CheckForArduinoCLIUpdates(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // CleanDownloadCacheDirectory FIXMEDOC

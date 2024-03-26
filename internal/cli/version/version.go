@@ -16,17 +16,18 @@
 package version
 
 import (
-	"fmt"
+	"context"
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/updatecheck"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/updater"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	semver "go.bug.st/relaxed-semver"
 )
 
 var tr = i18n.Tr
@@ -55,20 +56,21 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	currentVersion, err := semver.Parse(info.VersionString)
+	latestVersion := ""
+	res, err := updatecheck.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
 	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), feedback.ErrGeneric)
+		feedback.Warning("Failed to check for updates: " + err.Error())
+	} else {
+		latestVersion = res.GetNewestVersion()
 	}
-	latestVersion := updater.CheckForUpdate(currentVersion)
 
-	if feedback.GetFormat() != feedback.Text && latestVersion != nil {
-		// Set this only we managed to get the latest version
-		info.LatestVersion = latestVersion.String()
+	if feedback.GetFormat() != feedback.Text {
+		info.LatestVersion = latestVersion
 	}
 
 	feedback.PrintResult(info)
 
-	if feedback.GetFormat() == feedback.Text && latestVersion != nil {
-		updater.NotifyNewVersionIsAvailable(latestVersion.String())
+	if feedback.GetFormat() == feedback.Text && latestVersion != "" {
+		updater.NotifyNewVersionIsAvailable(latestVersion)
 	}
 }

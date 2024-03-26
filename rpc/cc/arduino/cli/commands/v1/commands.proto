@@ -189,6 +189,10 @@ service ArduinoCoreService {
   // Query the debugger information given a specific configuration.
   rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
 
+  // Check for updates to the Arduino CLI.
+  rpc CheckForArduinoCLIUpdates(CheckForArduinoCLIUpdatesRequest)
+      returns (CheckForArduinoCLIUpdatesResponse);
+
   // Clean the download cache directory (where archives are downloaded).
   rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest)
       returns (CleanDownloadCacheDirectoryResponse);
@@ -417,6 +421,18 @@ message SetSketchDefaultsResponse {
   // The value of default_programmer that has been written in project file
   // (sketch.yaml)
   string default_programmer = 4;
+}
+
+message CheckForArduinoCLIUpdatesRequest {
+  // Force the check, even if the configuration says not to check for
+  // updates.
+  bool force_check = 1;
+}
+
+message CheckForArduinoCLIUpdatesResponse {
+  // The latest version of Arduino CLI available, if bigger than the
+  // current version.
+  string newest_version = 1;
 }
 
 message CleanDownloadCacheDirectoryRequest {
