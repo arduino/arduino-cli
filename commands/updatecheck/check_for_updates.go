@@ -35,7 +35,7 @@ func CheckForArduinoCLIUpdates(ctx context.Context, req *rpc.CheckForArduinoCLIU
 		return nil, err
 	}
 
-	if !shouldCheckForUpdate(currentVersion) {
+	if !shouldCheckForUpdate(currentVersion) && !req.GetForceCheck() {
 		return &rpc.CheckForArduinoCLIUpdatesResponse{}, nil
 	}
 
