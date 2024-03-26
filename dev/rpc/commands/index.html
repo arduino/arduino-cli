@@ -1275,6 +1275,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#checkforarduinocliupdatesrequest" class="md-nav__link">
+    CheckForArduinoCLIUpdatesRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checkforarduinocliupdatesresponse" class="md-nav__link">
+    CheckForArduinoCLIUpdatesResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cleandownloadcachedirectoryrequest" class="md-nav__link">
     CleanDownloadCacheDirectoryRequest
   </a>
@@ -2884,6 +2898,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#checkforarduinocliupdatesrequest" class="md-nav__link">
+    CheckForArduinoCLIUpdatesRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checkforarduinocliupdatesresponse" class="md-nav__link">
+    CheckForArduinoCLIUpdatesResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cleandownloadcachedirectoryrequest" class="md-nav__link">
     CleanDownloadCacheDirectoryRequest
   </a>
@@ -4096,6 +4124,8 @@
 <li><a href="#cc/arduino/cli/commands/v1/commands.proto">cc/arduino/cli/commands/v1/commands.proto</a>
     - <a href="#cc.arduino.cli.commands.v1.ArchiveSketchRequest">ArchiveSketchRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.ArchiveSketchResponse">ArchiveSketchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.CheckForArduinoCLIUpdatesRequest">CheckForArduinoCLIUpdatesRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.CheckForArduinoCLIUpdatesResponse">CheckForArduinoCLIUpdatesResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryRequest">CleanDownloadCacheDirectoryRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryResponse">CleanDownloadCacheDirectoryResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.CreateRequest">CreateRequest</a>
@@ -5049,6 +5079,46 @@
 </table>
 <p><a name="cc.arduino.cli.commands.v1.ArchiveSketchResponse"></a></p>
 <h3 id="archivesketchresponse">ArchiveSketchResponse<a class="headerlink" href="#archivesketchresponse" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.v1.CheckForArduinoCLIUpdatesRequest"></a></p>
+<h3 id="checkforarduinocliupdatesrequest">CheckForArduinoCLIUpdatesRequest<a class="headerlink" href="#checkforarduinocliupdatesrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>force_check</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Force the check, even if the configuration says not to check for updates.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.CheckForArduinoCLIUpdatesResponse"></a></p>
+<h3 id="checkforarduinocliupdatesresponse">CheckForArduinoCLIUpdatesResponse<a class="headerlink" href="#checkforarduinocliupdatesresponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>newest_version</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The latest version of Arduino CLI available, if bigger than the current version.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.CleanDownloadCacheDirectoryRequest"></a></p>
 <h3 id="cleandownloadcachedirectoryrequest">CleanDownloadCacheDirectoryRequest<a class="headerlink" href="#cleandownloadcachedirectoryrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -5937,6 +6007,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a></td>
 <td>Query the debugger information given a specific configuration.</td>
+</tr>
+<tr>
+<td>CheckForArduinoCLIUpdates</td>
+<td><a href="#cc.arduino.cli.commands.v1.CheckForArduinoCLIUpdatesRequest">CheckForArduinoCLIUpdatesRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.CheckForArduinoCLIUpdatesResponse">CheckForArduinoCLIUpdatesResponse</a></td>
+<td>Check for updates to the Arduino CLI.</td>
 </tr>
 <tr>
 <td>CleanDownloadCacheDirectory</td>
