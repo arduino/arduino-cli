@@ -77,12 +77,12 @@ const (
 	ArduinoCoreService_GetDebugConfig_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/GetDebugConfig"
 	ArduinoCoreService_CheckForArduinoCLIUpdates_FullMethodName         = "/cc.arduino.cli.commands.v1.ArduinoCoreService/CheckForArduinoCLIUpdates"
 	ArduinoCoreService_CleanDownloadCacheDirectory_FullMethodName       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/CleanDownloadCacheDirectory"
-	ArduinoCoreService_SettingsGetAll_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetAll"
-	ArduinoCoreService_SettingsMerge_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsMerge"
+	ArduinoCoreService_ConfigurationSave_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ConfigurationSave"
+	ArduinoCoreService_ConfigurationOpen_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ConfigurationOpen"
+	ArduinoCoreService_ConfigurationGet_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ConfigurationGet"
+	ArduinoCoreService_SettingsEnumerate_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsEnumerate"
 	ArduinoCoreService_SettingsGetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetValue"
 	ArduinoCoreService_SettingsSetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsSetValue"
-	ArduinoCoreService_SettingsWrite_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsWrite"
-	ArduinoCoreService_SettingsDelete_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsDelete"
 )
 
 // ArduinoCoreServiceClient is the client API for ArduinoCoreService service.
@@ -183,18 +183,17 @@ type ArduinoCoreServiceClient interface {
 	CheckForArduinoCLIUpdates(ctx context.Context, in *CheckForArduinoCLIUpdatesRequest, opts ...grpc.CallOption) (*CheckForArduinoCLIUpdatesResponse, error)
 	// Clean the download cache directory (where archives are downloaded).
 	CleanDownloadCacheDirectory(ctx context.Context, in *CleanDownloadCacheDirectoryRequest, opts ...grpc.CallOption) (*CleanDownloadCacheDirectoryResponse, error)
-	// List all the settings.
-	SettingsGetAll(ctx context.Context, in *SettingsGetAllRequest, opts ...grpc.CallOption) (*SettingsGetAllResponse, error)
-	// Set multiple settings values at once.
-	SettingsMerge(ctx context.Context, in *SettingsMergeRequest, opts ...grpc.CallOption) (*SettingsMergeResponse, error)
-	// Get the value of a specific setting.
+	// Writes the settings currently stored in memory in a YAML file
+	ConfigurationSave(ctx context.Context, in *ConfigurationSaveRequest, opts ...grpc.CallOption) (*ConfigurationSaveResponse, error)
+	// Read the settings from a YAML file
+	ConfigurationOpen(ctx context.Context, in *ConfigurationOpenRequest, opts ...grpc.CallOption) (*ConfigurationOpenResponse, error)
+	ConfigurationGet(ctx context.Context, in *ConfigurationGetRequest, opts ...grpc.CallOption) (*ConfigurationGetResponse, error)
+	// Enumerate all the keys/values pairs available in the configuration
+	SettingsEnumerate(ctx context.Context, in *SettingsEnumerateRequest, opts ...grpc.CallOption) (*SettingsEnumerateResponse, error)
+	// Get a single configuration value
 	SettingsGetValue(ctx context.Context, in *SettingsGetValueRequest, opts ...grpc.CallOption) (*SettingsGetValueResponse, error)
-	// Set the value of a specific setting.
+	// Set a single configuration value
 	SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error)
-	// Writes to file settings currently stored in memory
-	SettingsWrite(ctx context.Context, in *SettingsWriteRequest, opts ...grpc.CallOption) (*SettingsWriteResponse, error)
-	// Deletes an entry and rewrites the file settings
-	SettingsDelete(ctx context.Context, in *SettingsDeleteRequest, opts ...grpc.CallOption) (*SettingsDeleteResponse, error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -1073,18 +1072,36 @@ func (c *arduinoCoreServiceClient) CleanDownloadCacheDirectory(ctx context.Conte
 	return out, nil
 }
 
-func (c *arduinoCoreServiceClient) SettingsGetAll(ctx context.Context, in *SettingsGetAllRequest, opts ...grpc.CallOption) (*SettingsGetAllResponse, error) {
-	out := new(SettingsGetAllResponse)
-	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsGetAll_FullMethodName, in, out, opts...)
+func (c *arduinoCoreServiceClient) ConfigurationSave(ctx context.Context, in *ConfigurationSaveRequest, opts ...grpc.CallOption) (*ConfigurationSaveResponse, error) {
+	out := new(ConfigurationSaveResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_ConfigurationSave_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *arduinoCoreServiceClient) SettingsMerge(ctx context.Context, in *SettingsMergeRequest, opts ...grpc.CallOption) (*SettingsMergeResponse, error) {
-	out := new(SettingsMergeResponse)
-	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsMerge_FullMethodName, in, out, opts...)
+func (c *arduinoCoreServiceClient) ConfigurationOpen(ctx context.Context, in *ConfigurationOpenRequest, opts ...grpc.CallOption) (*ConfigurationOpenResponse, error) {
+	out := new(ConfigurationOpenResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_ConfigurationOpen_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) ConfigurationGet(ctx context.Context, in *ConfigurationGetRequest, opts ...grpc.CallOption) (*ConfigurationGetResponse, error) {
+	out := new(ConfigurationGetResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_ConfigurationGet_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SettingsEnumerate(ctx context.Context, in *SettingsEnumerateRequest, opts ...grpc.CallOption) (*SettingsEnumerateResponse, error) {
+	out := new(SettingsEnumerateResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsEnumerate_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1103,24 +1120,6 @@ func (c *arduinoCoreServiceClient) SettingsGetValue(ctx context.Context, in *Set
 func (c *arduinoCoreServiceClient) SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error) {
 	out := new(SettingsSetValueResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsSetValue_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *arduinoCoreServiceClient) SettingsWrite(ctx context.Context, in *SettingsWriteRequest, opts ...grpc.CallOption) (*SettingsWriteResponse, error) {
-	out := new(SettingsWriteResponse)
-	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsWrite_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *arduinoCoreServiceClient) SettingsDelete(ctx context.Context, in *SettingsDeleteRequest, opts ...grpc.CallOption) (*SettingsDeleteResponse, error) {
-	out := new(SettingsDeleteResponse)
-	err := c.cc.Invoke(ctx, ArduinoCoreService_SettingsDelete_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1225,18 +1224,17 @@ type ArduinoCoreServiceServer interface {
 	CheckForArduinoCLIUpdates(context.Context, *CheckForArduinoCLIUpdatesRequest) (*CheckForArduinoCLIUpdatesResponse, error)
 	// Clean the download cache directory (where archives are downloaded).
 	CleanDownloadCacheDirectory(context.Context, *CleanDownloadCacheDirectoryRequest) (*CleanDownloadCacheDirectoryResponse, error)
-	// List all the settings.
-	SettingsGetAll(context.Context, *SettingsGetAllRequest) (*SettingsGetAllResponse, error)
-	// Set multiple settings values at once.
-	SettingsMerge(context.Context, *SettingsMergeRequest) (*SettingsMergeResponse, error)
-	// Get the value of a specific setting.
+	// Writes the settings currently stored in memory in a YAML file
+	ConfigurationSave(context.Context, *ConfigurationSaveRequest) (*ConfigurationSaveResponse, error)
+	// Read the settings from a YAML file
+	ConfigurationOpen(context.Context, *ConfigurationOpenRequest) (*ConfigurationOpenResponse, error)
+	ConfigurationGet(context.Context, *ConfigurationGetRequest) (*ConfigurationGetResponse, error)
+	// Enumerate all the keys/values pairs available in the configuration
+	SettingsEnumerate(context.Context, *SettingsEnumerateRequest) (*SettingsEnumerateResponse, error)
+	// Get a single configuration value
 	SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error)
-	// Set the value of a specific setting.
+	// Set a single configuration value
 	SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error)
-	// Writes to file settings currently stored in memory
-	SettingsWrite(context.Context, *SettingsWriteRequest) (*SettingsWriteResponse, error)
-	// Deletes an entry and rewrites the file settings
-	SettingsDelete(context.Context, *SettingsDeleteRequest) (*SettingsDeleteResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1373,23 +1371,23 @@ func (UnimplementedArduinoCoreServiceServer) CheckForArduinoCLIUpdates(context.C
 func (UnimplementedArduinoCoreServiceServer) CleanDownloadCacheDirectory(context.Context, *CleanDownloadCacheDirectoryRequest) (*CleanDownloadCacheDirectoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CleanDownloadCacheDirectory not implemented")
 }
-func (UnimplementedArduinoCoreServiceServer) SettingsGetAll(context.Context, *SettingsGetAllRequest) (*SettingsGetAllResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SettingsGetAll not implemented")
+func (UnimplementedArduinoCoreServiceServer) ConfigurationSave(context.Context, *ConfigurationSaveRequest) (*ConfigurationSaveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigurationSave not implemented")
 }
-func (UnimplementedArduinoCoreServiceServer) SettingsMerge(context.Context, *SettingsMergeRequest) (*SettingsMergeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SettingsMerge not implemented")
+func (UnimplementedArduinoCoreServiceServer) ConfigurationOpen(context.Context, *ConfigurationOpenRequest) (*ConfigurationOpenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigurationOpen not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) ConfigurationGet(context.Context, *ConfigurationGetRequest) (*ConfigurationGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigurationGet not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SettingsEnumerate(context.Context, *SettingsEnumerateRequest) (*SettingsEnumerateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SettingsEnumerate not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SettingsGetValue not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SettingsSetValue not implemented")
-}
-func (UnimplementedArduinoCoreServiceServer) SettingsWrite(context.Context, *SettingsWriteRequest) (*SettingsWriteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SettingsWrite not implemented")
-}
-func (UnimplementedArduinoCoreServiceServer) SettingsDelete(context.Context, *SettingsDeleteRequest) (*SettingsDeleteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SettingsDelete not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 
@@ -2251,38 +2249,74 @@ func _ArduinoCoreService_CleanDownloadCacheDirectory_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ArduinoCoreService_SettingsGetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SettingsGetAllRequest)
+func _ArduinoCoreService_ConfigurationSave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigurationSaveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArduinoCoreServiceServer).SettingsGetAll(ctx, in)
+		return srv.(ArduinoCoreServiceServer).ConfigurationSave(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ArduinoCoreService_SettingsGetAll_FullMethodName,
+		FullMethod: ArduinoCoreService_ConfigurationSave_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArduinoCoreServiceServer).SettingsGetAll(ctx, req.(*SettingsGetAllRequest))
+		return srv.(ArduinoCoreServiceServer).ConfigurationSave(ctx, req.(*ConfigurationSaveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ArduinoCoreService_SettingsMerge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SettingsMergeRequest)
+func _ArduinoCoreService_ConfigurationOpen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigurationOpenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArduinoCoreServiceServer).SettingsMerge(ctx, in)
+		return srv.(ArduinoCoreServiceServer).ConfigurationOpen(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ArduinoCoreService_SettingsMerge_FullMethodName,
+		FullMethod: ArduinoCoreService_ConfigurationOpen_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArduinoCoreServiceServer).SettingsMerge(ctx, req.(*SettingsMergeRequest))
+		return srv.(ArduinoCoreServiceServer).ConfigurationOpen(ctx, req.(*ConfigurationOpenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_ConfigurationGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigurationGetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).ConfigurationGet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_ConfigurationGet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).ConfigurationGet(ctx, req.(*ConfigurationGetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SettingsEnumerate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SettingsEnumerateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SettingsEnumerate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SettingsEnumerate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SettingsEnumerate(ctx, req.(*SettingsEnumerateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2319,42 +2353,6 @@ func _ArduinoCoreService_SettingsSetValue_Handler(srv interface{}, ctx context.C
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArduinoCoreServiceServer).SettingsSetValue(ctx, req.(*SettingsSetValueRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ArduinoCoreService_SettingsWrite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SettingsWriteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ArduinoCoreServiceServer).SettingsWrite(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ArduinoCoreService_SettingsWrite_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArduinoCoreServiceServer).SettingsWrite(ctx, req.(*SettingsWriteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ArduinoCoreService_SettingsDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SettingsDeleteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ArduinoCoreServiceServer).SettingsDelete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ArduinoCoreService_SettingsDelete_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArduinoCoreServiceServer).SettingsDelete(ctx, req.(*SettingsDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2455,12 +2453,20 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ArduinoCoreService_CleanDownloadCacheDirectory_Handler,
 		},
 		{
-			MethodName: "SettingsGetAll",
-			Handler:    _ArduinoCoreService_SettingsGetAll_Handler,
+			MethodName: "ConfigurationSave",
+			Handler:    _ArduinoCoreService_ConfigurationSave_Handler,
 		},
 		{
-			MethodName: "SettingsMerge",
-			Handler:    _ArduinoCoreService_SettingsMerge_Handler,
+			MethodName: "ConfigurationOpen",
+			Handler:    _ArduinoCoreService_ConfigurationOpen_Handler,
+		},
+		{
+			MethodName: "ConfigurationGet",
+			Handler:    _ArduinoCoreService_ConfigurationGet_Handler,
+		},
+		{
+			MethodName: "SettingsEnumerate",
+			Handler:    _ArduinoCoreService_SettingsEnumerate_Handler,
 		},
 		{
 			MethodName: "SettingsGetValue",
@@ -2469,14 +2475,6 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SettingsSetValue",
 			Handler:    _ArduinoCoreService_SettingsSetValue_Handler,
-		},
-		{
-			MethodName: "SettingsWrite",
-			Handler:    _ArduinoCoreService_SettingsWrite_Handler,
-		},
-		{
-			MethodName: "SettingsDelete",
-			Handler:    _ArduinoCoreService_SettingsDelete_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

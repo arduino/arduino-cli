@@ -16,17 +16,17 @@
 package config
 
 import (
+	"context"
+	"encoding/json"
 	"os"
-	"reflect"
-	"strconv"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func initSetCommand(defaultSettings *configuration.Settings) *cobra.Command {
+func initSetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	setCommand := &cobra.Command{
 		Use:   "set",
 		Short: tr("Sets a setting value."),
@@ -38,41 +38,39 @@ func initSetCommand(defaultSettings *configuration.Settings) *cobra.Command {
 			"  " + os.Args[0] + " config set board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json",
 		Args: cobra.MinimumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			runSetCommand(defaultSettings, args)
+			runSetCommand(cmd.Context(), srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return defaultSettings.AllKeys(), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			return getAllSettingsKeys(ctx, srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return setCommand
 }
 
-func runSetCommand(defaultSettings *configuration.Settings, args []string) {
+func runSetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config set`")
-	key := args[0]
-	kind := validateKey(key)
 
-	if kind != reflect.Slice && len(args) > 2 {
-		feedback.Fatal(tr("Can't set multiple values in key %v", key), feedback.ErrGeneric)
+	req := &rpc.SettingsSetValueRequest{
+		Key: args[0],
 	}
-
-	var value interface{}
-	switch kind {
-	case reflect.Slice:
-		value = uniquify(args[1:])
-	case reflect.String:
-		value = args[1]
-	case reflect.Bool:
-		var err error
-		value, err = strconv.ParseBool(args[1])
+	if len(args) == 2 {
+		// Single value
+		req.EncodedValue = args[1]
+		req.ValueFormat = "cli"
+	} else {
+		// Array
+		jsonValues, err := json.Marshal(args[1:])
 		if err != nil {
-			feedback.Fatal(tr("error parsing value: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(tr("Error setting value: %v", err), feedback.ErrGeneric)
 		}
+		req.EncodedValue = string(jsonValues)
+		req.ValueFormat = "json"
 	}
 
-	defaultSettings.Set(key, value)
-
-	if err := defaultSettings.WriteConfig(); err != nil {
-		feedback.Fatal(tr("Writing config file: %v", err), feedback.ErrGeneric)
+	if _, err := srv.SettingsSetValue(ctx, req); err != nil {
+		feedback.Fatal(tr("Error setting value: %v", err), feedback.ErrGeneric)
 	}
+
+	saveConfiguration(ctx, srv)
 }

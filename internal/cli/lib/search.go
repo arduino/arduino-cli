@@ -116,6 +116,7 @@ func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, namesOnly
 		instance.Init(ctx, srv, inst)
 	}
 
+	// Perform library search
 	searchResp, err := srv.LibrarySearch(ctx, &rpc.LibrarySearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),

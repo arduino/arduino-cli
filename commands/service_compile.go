@@ -32,7 +32,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -67,7 +66,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
 
-	exportBinaries := s.settings.GetBool("sketch.always_export_binaries")
+	exportBinaries := s.settings.SketchAlwaysExportBinaries()
 	if e := req.ExportBinaries; e != nil {
 		exportBinaries = *e
 	}
@@ -175,8 +174,8 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	// cache is purged after compilation to not remove entries that might be required
 
 	defer maybePurgeBuildCache(
-		s.settings.GetUint("build_cache.compilations_before_purge"),
-		s.settings.GetDuration("build_cache.ttl").Abs())
+		s.settings.GetCompilationsBeforeBuildCachePurge(),
+		s.settings.GetBuildCacheTTL().Abs())
 
 	var coreBuildCachePath *paths.Path
 	if req.GetBuildCachePath() == "" {
@@ -198,7 +197,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 
 	actualPlatform := buildPlatform
 	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
-	otherLibrariesDirs.Add(configuration.LibrariesDir(s.settings))
+	otherLibrariesDirs.Add(s.settings.LibrariesDir())
 
 	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {
@@ -231,9 +230,9 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		coreBuildCachePath,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
-		configuration.HardwareDirectories(s.settings),
+		s.settings.HardwareDirectories(),
 		otherLibrariesDirs,
-		configuration.IDEBuiltinLibrariesDir(s.settings),
+		s.settings.IDEBuiltinLibrariesDir(),
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),

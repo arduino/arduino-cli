@@ -52,7 +52,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	settings := configuration.Init("")
+	settings := configuration.NewSettings()
 	settings.Set("network.user_agent_ext", goldUserAgentValue)
 	config, err := settings.DownloaderConfig()
 	require.NoError(t, err)

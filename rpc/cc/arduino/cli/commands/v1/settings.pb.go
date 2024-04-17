@@ -35,17 +35,28 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SettingsGetAllResponse struct {
+// Configuration to apply to the given instance.
+// Any missing field will be kept at the default value.
+type Configuration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The settings, in JSON format.
-	JsonData string `protobuf:"bytes,1,opt,name=json_data,json=jsonData,proto3" json:"json_data,omitempty"`
+	Directories  *Configuration_Directories  `protobuf:"bytes,1,opt,name=directories,proto3" json:"directories,omitempty"`
+	Network      *Configuration_Network      `protobuf:"bytes,2,opt,name=network,proto3" json:"network,omitempty"`
+	Sketch       *Configuration_Sketch       `protobuf:"bytes,3,opt,name=sketch,proto3" json:"sketch,omitempty"`
+	BuildCache   *Configuration_BuildCache   `protobuf:"bytes,4,opt,name=build_cache,json=buildCache,proto3" json:"build_cache,omitempty"`
+	BoardManager *Configuration_BoardManager `protobuf:"bytes,5,opt,name=board_manager,json=boardManager,proto3" json:"board_manager,omitempty"`
+	Daemon       *Configuration_Daemon       `protobuf:"bytes,6,opt,name=daemon,proto3" json:"daemon,omitempty"`
+	Output       *Configuration_Output       `protobuf:"bytes,7,opt,name=output,proto3" json:"output,omitempty"`
+	Logging      *Configuration_Logging      `protobuf:"bytes,8,opt,name=logging,proto3" json:"logging,omitempty"`
+	Library      *Configuration_Library      `protobuf:"bytes,9,opt,name=library,proto3" json:"library,omitempty"`
+	Updater      *Configuration_Updater      `protobuf:"bytes,10,opt,name=updater,proto3" json:"updater,omitempty"`
+	Locale       *string                     `protobuf:"bytes,100,opt,name=locale,proto3,oneof" json:"locale,omitempty"`
 }
 
-func (x *SettingsGetAllResponse) Reset() {
-	*x = SettingsGetAllResponse{}
+func (x *Configuration) Reset() {
+	*x = Configuration{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,13 +64,13 @@ func (x *SettingsGetAllResponse) Reset() {
 	}
 }
 
-func (x *SettingsGetAllResponse) String() string {
+func (x *Configuration) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsGetAllResponse) ProtoMessage() {}
+func (*Configuration) ProtoMessage() {}
 
-func (x *SettingsGetAllResponse) ProtoReflect() protoreflect.Message {
+func (x *Configuration) ProtoReflect() protoreflect.Message {
 	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -71,29 +82,96 @@ func (x *SettingsGetAllResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsGetAllResponse.ProtoReflect.Descriptor instead.
-func (*SettingsGetAllResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use Configuration.ProtoReflect.Descriptor instead.
+func (*Configuration) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SettingsGetAllResponse) GetJsonData() string {
+func (x *Configuration) GetDirectories() *Configuration_Directories {
 	if x != nil {
-		return x.JsonData
+		return x.Directories
+	}
+	return nil
+}
+
+func (x *Configuration) GetNetwork() *Configuration_Network {
+	if x != nil {
+		return x.Network
+	}
+	return nil
+}
+
+func (x *Configuration) GetSketch() *Configuration_Sketch {
+	if x != nil {
+		return x.Sketch
+	}
+	return nil
+}
+
+func (x *Configuration) GetBuildCache() *Configuration_BuildCache {
+	if x != nil {
+		return x.BuildCache
+	}
+	return nil
+}
+
+func (x *Configuration) GetBoardManager() *Configuration_BoardManager {
+	if x != nil {
+		return x.BoardManager
+	}
+	return nil
+}
+
+func (x *Configuration) GetDaemon() *Configuration_Daemon {
+	if x != nil {
+		return x.Daemon
+	}
+	return nil
+}
+
+func (x *Configuration) GetOutput() *Configuration_Output {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+func (x *Configuration) GetLogging() *Configuration_Logging {
+	if x != nil {
+		return x.Logging
+	}
+	return nil
+}
+
+func (x *Configuration) GetLibrary() *Configuration_Library {
+	if x != nil {
+		return x.Library
+	}
+	return nil
+}
+
+func (x *Configuration) GetUpdater() *Configuration_Updater {
+	if x != nil {
+		return x.Updater
+	}
+	return nil
+}
+
+func (x *Configuration) GetLocale() string {
+	if x != nil && x.Locale != nil {
+		return *x.Locale
 	}
 	return ""
 }
 
-type SettingsMergeRequest struct {
+type ConfigurationGetRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	// The settings, in JSON format.
-	JsonData string `protobuf:"bytes,1,opt,name=json_data,json=jsonData,proto3" json:"json_data,omitempty"`
 }
 
-func (x *SettingsMergeRequest) Reset() {
-	*x = SettingsMergeRequest{}
+func (x *ConfigurationGetRequest) Reset() {
+	*x = ConfigurationGetRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -101,13 +179,13 @@ func (x *SettingsMergeRequest) Reset() {
 	}
 }
 
-func (x *SettingsMergeRequest) String() string {
+func (x *ConfigurationGetRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsMergeRequest) ProtoMessage() {}
+func (*ConfigurationGetRequest) ProtoMessage() {}
 
-func (x *SettingsMergeRequest) ProtoReflect() protoreflect.Message {
+func (x *ConfigurationGetRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -119,31 +197,22 @@ func (x *SettingsMergeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsMergeRequest.ProtoReflect.Descriptor instead.
-func (*SettingsMergeRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConfigurationGetRequest.ProtoReflect.Descriptor instead.
+func (*ConfigurationGetRequest) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *SettingsMergeRequest) GetJsonData() string {
-	if x != nil {
-		return x.JsonData
-	}
-	return ""
-}
-
-type SettingsGetValueResponse struct {
+type ConfigurationGetResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key of the setting.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// The setting, in JSON format.
-	JsonData string `protobuf:"bytes,2,opt,name=json_data,json=jsonData,proto3" json:"json_data,omitempty"`
+	// The current configuration
+	Configuration *Configuration `protobuf:"bytes,1,opt,name=configuration,proto3" json:"configuration,omitempty"`
 }
 
-func (x *SettingsGetValueResponse) Reset() {
-	*x = SettingsGetValueResponse{}
+func (x *ConfigurationGetResponse) Reset() {
+	*x = ConfigurationGetResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -151,13 +220,13 @@ func (x *SettingsGetValueResponse) Reset() {
 	}
 }
 
-func (x *SettingsGetValueResponse) String() string {
+func (x *ConfigurationGetResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsGetValueResponse) ProtoMessage() {}
+func (*ConfigurationGetResponse) ProtoMessage() {}
 
-func (x *SettingsGetValueResponse) ProtoReflect() protoreflect.Message {
+func (x *ConfigurationGetResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -169,38 +238,29 @@ func (x *SettingsGetValueResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsGetValueResponse.ProtoReflect.Descriptor instead.
-func (*SettingsGetValueResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConfigurationGetResponse.ProtoReflect.Descriptor instead.
+func (*ConfigurationGetResponse) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SettingsGetValueResponse) GetKey() string {
+func (x *ConfigurationGetResponse) GetConfiguration() *Configuration {
 	if x != nil {
-		return x.Key
+		return x.Configuration
 	}
-	return ""
+	return nil
 }
 
-func (x *SettingsGetValueResponse) GetJsonData() string {
-	if x != nil {
-		return x.JsonData
-	}
-	return ""
-}
-
-type SettingsSetValueRequest struct {
+type ConfigurationSaveRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key of the setting.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// The setting, in JSON format.
-	JsonData string `protobuf:"bytes,2,opt,name=json_data,json=jsonData,proto3" json:"json_data,omitempty"`
+	// The format of the encoded settings, allowed values are "json" and "yaml"
+	SettingsFormat string `protobuf:"bytes,1,opt,name=settings_format,json=settingsFormat,proto3" json:"settings_format,omitempty"`
 }
 
-func (x *SettingsSetValueRequest) Reset() {
-	*x = SettingsSetValueRequest{}
+func (x *ConfigurationSaveRequest) Reset() {
+	*x = ConfigurationSaveRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -208,13 +268,13 @@ func (x *SettingsSetValueRequest) Reset() {
 	}
 }
 
-func (x *SettingsSetValueRequest) String() string {
+func (x *ConfigurationSaveRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsSetValueRequest) ProtoMessage() {}
+func (*ConfigurationSaveRequest) ProtoMessage() {}
 
-func (x *SettingsSetValueRequest) ProtoReflect() protoreflect.Message {
+func (x *ConfigurationSaveRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -226,33 +286,29 @@ func (x *SettingsSetValueRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsSetValueRequest.ProtoReflect.Descriptor instead.
-func (*SettingsSetValueRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConfigurationSaveRequest.ProtoReflect.Descriptor instead.
+func (*ConfigurationSaveRequest) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SettingsSetValueRequest) GetKey() string {
+func (x *ConfigurationSaveRequest) GetSettingsFormat() string {
 	if x != nil {
-		return x.Key
+		return x.SettingsFormat
 	}
 	return ""
 }
 
-func (x *SettingsSetValueRequest) GetJsonData() string {
-	if x != nil {
-		return x.JsonData
-	}
-	return ""
-}
-
-type SettingsGetAllRequest struct {
+type ConfigurationSaveResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	// The encoded settings
+	EncodedSettings string `protobuf:"bytes,1,opt,name=encoded_settings,json=encodedSettings,proto3" json:"encoded_settings,omitempty"`
 }
 
-func (x *SettingsGetAllRequest) Reset() {
-	*x = SettingsGetAllRequest{}
+func (x *ConfigurationSaveResponse) Reset() {
+	*x = ConfigurationSaveResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -260,13 +316,13 @@ func (x *SettingsGetAllRequest) Reset() {
 	}
 }
 
-func (x *SettingsGetAllRequest) String() string {
+func (x *ConfigurationSaveResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsGetAllRequest) ProtoMessage() {}
+func (*ConfigurationSaveResponse) ProtoMessage() {}
 
-func (x *SettingsGetAllRequest) ProtoReflect() protoreflect.Message {
+func (x *ConfigurationSaveResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -278,9 +334,111 @@ func (x *SettingsGetAllRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsGetAllRequest.ProtoReflect.Descriptor instead.
-func (*SettingsGetAllRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConfigurationSaveResponse.ProtoReflect.Descriptor instead.
+func (*ConfigurationSaveResponse) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ConfigurationSaveResponse) GetEncodedSettings() string {
+	if x != nil {
+		return x.EncodedSettings
+	}
+	return ""
+}
+
+type ConfigurationOpenRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The encoded settings
+	EncodedSettings string `protobuf:"bytes,1,opt,name=encoded_settings,json=encodedSettings,proto3" json:"encoded_settings,omitempty"`
+	// The format of the encoded settings, allowed values are "json" and "yaml"
+	SettingsFormat string `protobuf:"bytes,2,opt,name=settings_format,json=settingsFormat,proto3" json:"settings_format,omitempty"`
+}
+
+func (x *ConfigurationOpenRequest) Reset() {
+	*x = ConfigurationOpenRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConfigurationOpenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfigurationOpenRequest) ProtoMessage() {}
+
+func (x *ConfigurationOpenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfigurationOpenRequest.ProtoReflect.Descriptor instead.
+func (*ConfigurationOpenRequest) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ConfigurationOpenRequest) GetEncodedSettings() string {
+	if x != nil {
+		return x.EncodedSettings
+	}
+	return ""
+}
+
+func (x *ConfigurationOpenRequest) GetSettingsFormat() string {
+	if x != nil {
+		return x.SettingsFormat
+	}
+	return ""
+}
+
+type ConfigurationOpenResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ConfigurationOpenResponse) Reset() {
+	*x = ConfigurationOpenResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConfigurationOpenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfigurationOpenResponse) ProtoMessage() {}
+
+func (x *ConfigurationOpenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfigurationOpenResponse.ProtoReflect.Descriptor instead.
+func (*ConfigurationOpenResponse) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{6}
 }
 
 type SettingsGetValueRequest struct {
@@ -288,14 +446,17 @@ type SettingsGetValueRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key of the setting.
+	// The key to get
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The format of the encoded_value (default is "json", allowed values are
+	// "json" and "yaml)
+	ValueFormat string `protobuf:"bytes,2,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
 }
 
 func (x *SettingsGetValueRequest) Reset() {
 	*x = SettingsGetValueRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[5]
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -308,7 +469,7 @@ func (x *SettingsGetValueRequest) String() string {
 func (*SettingsGetValueRequest) ProtoMessage() {}
 
 func (x *SettingsGetValueRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[5]
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -321,7 +482,7 @@ func (x *SettingsGetValueRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SettingsGetValueRequest.ProtoReflect.Descriptor instead.
 func (*SettingsGetValueRequest) Descriptor() ([]byte, []int) {
-	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{5}
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SettingsGetValueRequest) GetKey() string {
@@ -331,29 +492,39 @@ func (x *SettingsGetValueRequest) GetKey() string {
 	return ""
 }
 
-type SettingsMergeResponse struct {
+func (x *SettingsGetValueRequest) GetValueFormat() string {
+	if x != nil {
+		return x.ValueFormat
+	}
+	return ""
+}
+
+type SettingsGetValueResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	// The value of the key (encoded)
+	EncodedValue string `protobuf:"bytes,1,opt,name=encoded_value,json=encodedValue,proto3" json:"encoded_value,omitempty"`
 }
 
-func (x *SettingsMergeResponse) Reset() {
-	*x = SettingsMergeResponse{}
+func (x *SettingsGetValueResponse) Reset() {
+	*x = SettingsGetValueResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[6]
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *SettingsMergeResponse) String() string {
+func (x *SettingsGetValueResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsMergeResponse) ProtoMessage() {}
+func (*SettingsGetValueResponse) ProtoMessage() {}
 
-func (x *SettingsMergeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[6]
+func (x *SettingsGetValueResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -364,9 +535,84 @@ func (x *SettingsMergeResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsMergeResponse.ProtoReflect.Descriptor instead.
-func (*SettingsMergeResponse) Descriptor() ([]byte, []int) {
-	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{6}
+// Deprecated: Use SettingsGetValueResponse.ProtoReflect.Descriptor instead.
+func (*SettingsGetValueResponse) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SettingsGetValueResponse) GetEncodedValue() string {
+	if x != nil {
+		return x.EncodedValue
+	}
+	return ""
+}
+
+type SettingsSetValueRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The key to change
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The new value (encoded), no objects, only scalar or array of scalars are
+	// allowed.
+	EncodedValue string `protobuf:"bytes,2,opt,name=encoded_value,json=encodedValue,proto3" json:"encoded_value,omitempty"`
+	// The format of the encoded_value (default is "json", allowed values are
+	// "json", "yaml" and "cli")
+	ValueFormat string `protobuf:"bytes,3,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
+}
+
+func (x *SettingsSetValueRequest) Reset() {
+	*x = SettingsSetValueRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SettingsSetValueRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SettingsSetValueRequest) ProtoMessage() {}
+
+func (x *SettingsSetValueRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SettingsSetValueRequest.ProtoReflect.Descriptor instead.
+func (*SettingsSetValueRequest) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SettingsSetValueRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *SettingsSetValueRequest) GetEncodedValue() string {
+	if x != nil {
+		return x.EncodedValue
+	}
+	return ""
+}
+
+func (x *SettingsSetValueRequest) GetValueFormat() string {
+	if x != nil {
+		return x.ValueFormat
+	}
+	return ""
 }
 
 type SettingsSetValueResponse struct {
@@ -378,7 +624,7 @@ type SettingsSetValueResponse struct {
 func (x *SettingsSetValueResponse) Reset() {
 	*x = SettingsSetValueResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[7]
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -391,7 +637,7 @@ func (x *SettingsSetValueResponse) String() string {
 func (*SettingsSetValueResponse) ProtoMessage() {}
 
 func (x *SettingsSetValueResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[7]
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -404,151 +650,17 @@ func (x *SettingsSetValueResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SettingsSetValueResponse.ProtoReflect.Descriptor instead.
 func (*SettingsSetValueResponse) Descriptor() ([]byte, []int) {
-	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{7}
-}
-
-type SettingsWriteRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Path to settings file (e.g. /path/to/arduino-cli.yaml)
-	FilePath string `protobuf:"bytes,1,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"`
-}
-
-func (x *SettingsWriteRequest) Reset() {
-	*x = SettingsWriteRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SettingsWriteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SettingsWriteRequest) ProtoMessage() {}
-
-func (x *SettingsWriteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SettingsWriteRequest.ProtoReflect.Descriptor instead.
-func (*SettingsWriteRequest) Descriptor() ([]byte, []int) {
-	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *SettingsWriteRequest) GetFilePath() string {
-	if x != nil {
-		return x.FilePath
-	}
-	return ""
-}
-
-type SettingsWriteResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *SettingsWriteResponse) Reset() {
-	*x = SettingsWriteResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SettingsWriteResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SettingsWriteResponse) ProtoMessage() {}
-
-func (x *SettingsWriteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SettingsWriteResponse.ProtoReflect.Descriptor instead.
-func (*SettingsWriteResponse) Descriptor() ([]byte, []int) {
-	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{9}
-}
-
-type SettingsDeleteRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// The key of the setting to delete.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-}
-
-func (x *SettingsDeleteRequest) Reset() {
-	*x = SettingsDeleteRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[10]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SettingsDeleteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SettingsDeleteRequest) ProtoMessage() {}
-
-func (x *SettingsDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[10]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SettingsDeleteRequest.ProtoReflect.Descriptor instead.
-func (*SettingsDeleteRequest) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *SettingsDeleteRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-type SettingsDeleteResponse struct {
+type SettingsEnumerateRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *SettingsDeleteResponse) Reset() {
-	*x = SettingsDeleteResponse{}
+func (x *SettingsEnumerateRequest) Reset() {
+	*x = SettingsEnumerateRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -556,13 +668,13 @@ func (x *SettingsDeleteResponse) Reset() {
 	}
 }
 
-func (x *SettingsDeleteResponse) String() string {
+func (x *SettingsEnumerateRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SettingsDeleteResponse) ProtoMessage() {}
+func (*SettingsEnumerateRequest) ProtoMessage() {}
 
-func (x *SettingsDeleteResponse) ProtoReflect() protoreflect.Message {
+func (x *SettingsEnumerateRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -574,9 +686,706 @@ func (x *SettingsDeleteResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SettingsDeleteResponse.ProtoReflect.Descriptor instead.
-func (*SettingsDeleteResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use SettingsEnumerateRequest.ProtoReflect.Descriptor instead.
+func (*SettingsEnumerateRequest) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{11}
+}
+
+type SettingsEnumerateResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The list of key/value pairs
+	Entries []*SettingsEnumerateResponse_Entry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+}
+
+func (x *SettingsEnumerateResponse) Reset() {
+	*x = SettingsEnumerateResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SettingsEnumerateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SettingsEnumerateResponse) ProtoMessage() {}
+
+func (x *SettingsEnumerateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SettingsEnumerateResponse.ProtoReflect.Descriptor instead.
+func (*SettingsEnumerateResponse) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SettingsEnumerateResponse) GetEntries() []*SettingsEnumerateResponse_Entry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+type Configuration_Directories struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Data directory
+	Data string `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	// User directory
+	User string `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	// Downloads directory
+	Downloads string `protobuf:"bytes,3,opt,name=downloads,proto3" json:"downloads,omitempty"`
+	// The directory where the built-in resources are installed
+	Builtin *Configuration_Directories_Builtin `protobuf:"bytes,4,opt,name=builtin,proto3,oneof" json:"builtin,omitempty"`
+}
+
+func (x *Configuration_Directories) Reset() {
+	*x = Configuration_Directories{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Directories) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Directories) ProtoMessage() {}
+
+func (x *Configuration_Directories) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Directories.ProtoReflect.Descriptor instead.
+func (*Configuration_Directories) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *Configuration_Directories) GetData() string {
+	if x != nil {
+		return x.Data
+	}
+	return ""
+}
+
+func (x *Configuration_Directories) GetUser() string {
+	if x != nil {
+		return x.User
+	}
+	return ""
+}
+
+func (x *Configuration_Directories) GetDownloads() string {
+	if x != nil {
+		return x.Downloads
+	}
+	return ""
+}
+
+func (x *Configuration_Directories) GetBuiltin() *Configuration_Directories_Builtin {
+	if x != nil {
+		return x.Builtin
+	}
+	return nil
+}
+
+type Configuration_Network struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Extra user-agent information to be appended in network requests
+	ExtraUserAgent *string `protobuf:"bytes,1,opt,name=extra_user_agent,json=extraUserAgent,proto3,oneof" json:"extra_user_agent,omitempty"`
+	// The proxy to use for network requests
+	Proxy *string `protobuf:"bytes,2,opt,name=proxy,proto3,oneof" json:"proxy,omitempty"`
+}
+
+func (x *Configuration_Network) Reset() {
+	*x = Configuration_Network{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Network) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Network) ProtoMessage() {}
+
+func (x *Configuration_Network) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Network.ProtoReflect.Descriptor instead.
+func (*Configuration_Network) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *Configuration_Network) GetExtraUserAgent() string {
+	if x != nil && x.ExtraUserAgent != nil {
+		return *x.ExtraUserAgent
+	}
+	return ""
+}
+
+func (x *Configuration_Network) GetProxy() string {
+	if x != nil && x.Proxy != nil {
+		return *x.Proxy
+	}
+	return ""
+}
+
+type Configuration_Sketch struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Set to true to always export binaries to the sketch directory
+	AlwaysExportBinaries bool `protobuf:"varint,1,opt,name=always_export_binaries,json=alwaysExportBinaries,proto3" json:"always_export_binaries,omitempty"`
+}
+
+func (x *Configuration_Sketch) Reset() {
+	*x = Configuration_Sketch{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Sketch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Sketch) ProtoMessage() {}
+
+func (x *Configuration_Sketch) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Sketch.ProtoReflect.Descriptor instead.
+func (*Configuration_Sketch) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 2}
+}
+
+func (x *Configuration_Sketch) GetAlwaysExportBinaries() bool {
+	if x != nil {
+		return x.AlwaysExportBinaries
+	}
+	return false
+}
+
+type Configuration_BuildCache struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The minimum number of compilations before the cache is purged
+	CompilationsBeforePurge uint64 `protobuf:"varint,1,opt,name=compilations_before_purge,json=compilationsBeforePurge,proto3" json:"compilations_before_purge,omitempty"`
+	// Time to live of the cache in seconds
+	TtlSecs uint64 `protobuf:"varint,2,opt,name=ttl_secs,json=ttlSecs,proto3" json:"ttl_secs,omitempty"`
+}
+
+func (x *Configuration_BuildCache) Reset() {
+	*x = Configuration_BuildCache{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_BuildCache) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_BuildCache) ProtoMessage() {}
+
+func (x *Configuration_BuildCache) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_BuildCache.ProtoReflect.Descriptor instead.
+func (*Configuration_BuildCache) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 3}
+}
+
+func (x *Configuration_BuildCache) GetCompilationsBeforePurge() uint64 {
+	if x != nil {
+		return x.CompilationsBeforePurge
+	}
+	return 0
+}
+
+func (x *Configuration_BuildCache) GetTtlSecs() uint64 {
+	if x != nil {
+		return x.TtlSecs
+	}
+	return 0
+}
+
+type Configuration_BoardManager struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Additional URLs to be used for the board manager
+	AdditionalUrls []string `protobuf:"bytes,1,rep,name=additional_urls,json=additionalUrls,proto3" json:"additional_urls,omitempty"`
+}
+
+func (x *Configuration_BoardManager) Reset() {
+	*x = Configuration_BoardManager{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_BoardManager) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_BoardManager) ProtoMessage() {}
+
+func (x *Configuration_BoardManager) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_BoardManager.ProtoReflect.Descriptor instead.
+func (*Configuration_BoardManager) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 4}
+}
+
+func (x *Configuration_BoardManager) GetAdditionalUrls() []string {
+	if x != nil {
+		return x.AdditionalUrls
+	}
+	return nil
+}
+
+type Configuration_Daemon struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The TCP port of the daemon
+	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
+}
+
+func (x *Configuration_Daemon) Reset() {
+	*x = Configuration_Daemon{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Daemon) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Daemon) ProtoMessage() {}
+
+func (x *Configuration_Daemon) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Daemon.ProtoReflect.Descriptor instead.
+func (*Configuration_Daemon) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 5}
+}
+
+func (x *Configuration_Daemon) GetPort() string {
+	if x != nil {
+		return x.Port
+	}
+	return ""
+}
+
+type Configuration_Output struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Set to true to disable coloring of the output
+	NoColor bool `protobuf:"varint,1,opt,name=no_color,json=noColor,proto3" json:"no_color,omitempty"`
+}
+
+func (x *Configuration_Output) Reset() {
+	*x = Configuration_Output{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Output) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Output) ProtoMessage() {}
+
+func (x *Configuration_Output) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Output.ProtoReflect.Descriptor instead.
+func (*Configuration_Output) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 6}
+}
+
+func (x *Configuration_Output) GetNoColor() bool {
+	if x != nil {
+		return x.NoColor
+	}
+	return false
+}
+
+type Configuration_Logging struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The logging level
+	Level string `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
+	// The logging format
+	Format string `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	// The logging file
+	File *string `protobuf:"bytes,3,opt,name=file,proto3,oneof" json:"file,omitempty"`
+}
+
+func (x *Configuration_Logging) Reset() {
+	*x = Configuration_Logging{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Logging) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Logging) ProtoMessage() {}
+
+func (x *Configuration_Logging) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Logging.ProtoReflect.Descriptor instead.
+func (*Configuration_Logging) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 7}
+}
+
+func (x *Configuration_Logging) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
+}
+
+func (x *Configuration_Logging) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+func (x *Configuration_Logging) GetFile() string {
+	if x != nil && x.File != nil {
+		return *x.File
+	}
+	return ""
+}
+
+type Configuration_Library struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Set to true to enable library installation from zip archives or git
+	// repositories
+	EnableUnsafeInstall bool `protobuf:"varint,1,opt,name=enable_unsafe_install,json=enableUnsafeInstall,proto3" json:"enable_unsafe_install,omitempty"`
+}
+
+func (x *Configuration_Library) Reset() {
+	*x = Configuration_Library{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Library) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Library) ProtoMessage() {}
+
+func (x *Configuration_Library) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Library.ProtoReflect.Descriptor instead.
+func (*Configuration_Library) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 8}
+}
+
+func (x *Configuration_Library) GetEnableUnsafeInstall() bool {
+	if x != nil {
+		return x.EnableUnsafeInstall
+	}
+	return false
+}
+
+type Configuration_Updater struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Set to true to enable notifications for updates
+	EnableNotification bool `protobuf:"varint,1,opt,name=enable_notification,json=enableNotification,proto3" json:"enable_notification,omitempty"`
+}
+
+func (x *Configuration_Updater) Reset() {
+	*x = Configuration_Updater{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Updater) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Updater) ProtoMessage() {}
+
+func (x *Configuration_Updater) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Updater.ProtoReflect.Descriptor instead.
+func (*Configuration_Updater) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 9}
+}
+
+func (x *Configuration_Updater) GetEnableNotification() bool {
+	if x != nil {
+		return x.EnableNotification
+	}
+	return false
+}
+
+type Configuration_Directories_Builtin struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The directory where the built-in libraries are installed
+	Libraries *string `protobuf:"bytes,1,opt,name=libraries,proto3,oneof" json:"libraries,omitempty"`
+}
+
+func (x *Configuration_Directories_Builtin) Reset() {
+	*x = Configuration_Directories_Builtin{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configuration_Directories_Builtin) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configuration_Directories_Builtin) ProtoMessage() {}
+
+func (x *Configuration_Directories_Builtin) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configuration_Directories_Builtin.ProtoReflect.Descriptor instead.
+func (*Configuration_Directories_Builtin) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{0, 0, 0}
+}
+
+func (x *Configuration_Directories_Builtin) GetLibraries() string {
+	if x != nil && x.Libraries != nil {
+		return *x.Libraries
+	}
+	return ""
+}
+
+type SettingsEnumerateResponse_Entry struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The key
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The key type
+	Type string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+}
+
+func (x *SettingsEnumerateResponse_Entry) Reset() {
+	*x = SettingsEnumerateResponse_Entry{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SettingsEnumerateResponse_Entry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SettingsEnumerateResponse_Entry) ProtoMessage() {}
+
+func (x *SettingsEnumerateResponse_Entry) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SettingsEnumerateResponse_Entry.ProtoReflect.Descriptor instead.
+func (*SettingsEnumerateResponse_Entry) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP(), []int{12, 0}
+}
+
+func (x *SettingsEnumerateResponse_Entry) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *SettingsEnumerateResponse_Entry) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
 }
 
 var File_cc_arduino_cli_commands_v1_settings_proto protoreflect.FileDescriptor
@@ -586,45 +1395,176 @@ var file_cc_arduino_cli_commands_v1_settings_proto_rawDesc = []byte{
 	0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x2f, 0x73, 0x65, 0x74,
 	0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x1a, 0x63, 0x63, 0x2e,
 	0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
-	0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x22, 0x35, 0x0a, 0x16, 0x53, 0x65, 0x74, 0x74, 0x69,
-	0x6e, 0x67, 0x73, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x1b, 0x0a, 0x09, 0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x22, 0x33,
-	0x0a, 0x14, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x4d, 0x65, 0x72, 0x67, 0x65, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x64,
-	0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44,
-	0x61, 0x74, 0x61, 0x22, 0x49, 0x0a, 0x18, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x47,
-	0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65,
-	0x79, 0x12, 0x1b, 0x0a, 0x09, 0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x22, 0x48,
-	0x0a, 0x17, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x53, 0x65, 0x74, 0x56, 0x61, 0x6c,
-	0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x6a,
-	0x73, 0x6f, 0x6e, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
-	0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x22, 0x17, 0x0a, 0x15, 0x53, 0x65, 0x74, 0x74,
-	0x69, 0x6e, 0x67, 0x73, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x22, 0x2b, 0x0a, 0x17, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x47, 0x65, 0x74,
-	0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03,
-	0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x17,
-	0x0a, 0x15, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x4d, 0x65, 0x72, 0x67, 0x65, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1a, 0x0a, 0x18, 0x53, 0x65, 0x74, 0x74, 0x69,
-	0x6e, 0x67, 0x73, 0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x33, 0x0a, 0x14, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x57,
-	0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x66,
-	0x69, 0x6c, 0x65, 0x5f, 0x70, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
-	0x66, 0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x22, 0x17, 0x0a, 0x15, 0x53, 0x65, 0x74, 0x74,
-	0x69, 0x6e, 0x67, 0x73, 0x57, 0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x29, 0x0a, 0x15, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x44, 0x65, 0x6c,
-	0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65,
-	0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x18, 0x0a, 0x16,
-	0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x48, 0x5a, 0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64,
-	0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f,
-	0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d,
-	0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x22, 0xbd, 0x0d, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x57, 0x0a, 0x0b, 0x64, 0x69, 0x72,
+	0x65, 0x63, 0x74, 0x6f, 0x72, 0x69, 0x65, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x35,
+	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x44, 0x69, 0x72, 0x65, 0x63, 0x74,
+	0x6f, 0x72, 0x69, 0x65, 0x73, 0x52, 0x0b, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x69,
+	0x65, 0x73, 0x12, 0x4b, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x31, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f,
+	0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31,
+	0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12,
+	0x48, 0x0a, 0x06, 0x73, 0x6b, 0x65, 0x74, 0x63, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x30, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
+	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x53, 0x6b, 0x65, 0x74, 0x63,
+	0x68, 0x52, 0x06, 0x73, 0x6b, 0x65, 0x74, 0x63, 0x68, 0x12, 0x55, 0x0a, 0x0b, 0x62, 0x75, 0x69,
+	0x6c, 0x64, 0x5f, 0x63, 0x61, 0x63, 0x68, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x34,
+	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x42, 0x75, 0x69, 0x6c, 0x64, 0x43,
+	0x61, 0x63, 0x68, 0x65, 0x52, 0x0a, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x43, 0x61, 0x63, 0x68, 0x65,
+	0x12, 0x5b, 0x0a, 0x0d, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x5f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65,
+	0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x36, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
+	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
+	0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x2e, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x52,
+	0x0c, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x12, 0x48, 0x0a,
+	0x06, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x30, 0x2e,
+	0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63,
+	0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69,
+	0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x52,
+	0x06, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x12, 0x48, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75,
+	0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x30, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
+	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
+	0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x2e, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75,
+	0x74, 0x12, 0x4b, 0x0a, 0x07, 0x6c, 0x6f, 0x67, 0x67, 0x69, 0x6e, 0x67, 0x18, 0x08, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x31, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
+	0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4c, 0x6f,
+	0x67, 0x67, 0x69, 0x6e, 0x67, 0x52, 0x07, 0x6c, 0x6f, 0x67, 0x67, 0x69, 0x6e, 0x67, 0x12, 0x4b,
+	0x0a, 0x07, 0x6c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x31, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
+	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4c, 0x69, 0x62, 0x72, 0x61,
+	0x72, 0x79, 0x52, 0x07, 0x6c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x12, 0x4b, 0x0a, 0x07, 0x75,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x72, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x31, 0x2e, 0x63,
+	0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x72, 0x52,
+	0x07, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x72, 0x12, 0x1b, 0x0a, 0x06, 0x6c, 0x6f, 0x63, 0x61,
+	0x6c, 0x65, 0x18, 0x64, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x6c, 0x6f, 0x63, 0x61,
+	0x6c, 0x65, 0x88, 0x01, 0x01, 0x1a, 0xf9, 0x01, 0x0a, 0x0b, 0x44, 0x69, 0x72, 0x65, 0x63, 0x74,
+	0x6f, 0x72, 0x69, 0x65, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x73, 0x65,
+	0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x12, 0x1c, 0x0a,
+	0x09, 0x64, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x09, 0x64, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x73, 0x12, 0x5c, 0x0a, 0x07, 0x62,
+	0x75, 0x69, 0x6c, 0x74, 0x69, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x3d, 0x2e, 0x63,
+	0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x44, 0x69, 0x72, 0x65, 0x63, 0x74, 0x6f, 0x72,
+	0x69, 0x65, 0x73, 0x2e, 0x42, 0x75, 0x69, 0x6c, 0x74, 0x69, 0x6e, 0x48, 0x00, 0x52, 0x07, 0x62,
+	0x75, 0x69, 0x6c, 0x74, 0x69, 0x6e, 0x88, 0x01, 0x01, 0x1a, 0x3a, 0x0a, 0x07, 0x42, 0x75, 0x69,
+	0x6c, 0x74, 0x69, 0x6e, 0x12, 0x21, 0x0a, 0x09, 0x6c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x69, 0x65,
+	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x09, 0x6c, 0x69, 0x62, 0x72, 0x61,
+	0x72, 0x69, 0x65, 0x73, 0x88, 0x01, 0x01, 0x42, 0x0c, 0x0a, 0x0a, 0x5f, 0x6c, 0x69, 0x62, 0x72,
+	0x61, 0x72, 0x69, 0x65, 0x73, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x62, 0x75, 0x69, 0x6c, 0x74, 0x69,
+	0x6e, 0x1a, 0x72, 0x0a, 0x07, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x2d, 0x0a, 0x10,
+	0x65, 0x78, 0x74, 0x72, 0x61, 0x5f, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x61, 0x67, 0x65, 0x6e, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x0e, 0x65, 0x78, 0x74, 0x72, 0x61, 0x55,
+	0x73, 0x65, 0x72, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x88, 0x01, 0x01, 0x12, 0x19, 0x0a, 0x05, 0x70,
+	0x72, 0x6f, 0x78, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52, 0x05, 0x70, 0x72,
+	0x6f, 0x78, 0x79, 0x88, 0x01, 0x01, 0x42, 0x13, 0x0a, 0x11, 0x5f, 0x65, 0x78, 0x74, 0x72, 0x61,
+	0x5f, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x5f,
+	0x70, 0x72, 0x6f, 0x78, 0x79, 0x1a, 0x3e, 0x0a, 0x06, 0x53, 0x6b, 0x65, 0x74, 0x63, 0x68, 0x12,
+	0x34, 0x0a, 0x16, 0x61, 0x6c, 0x77, 0x61, 0x79, 0x73, 0x5f, 0x65, 0x78, 0x70, 0x6f, 0x72, 0x74,
+	0x5f, 0x62, 0x69, 0x6e, 0x61, 0x72, 0x69, 0x65, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x14, 0x61, 0x6c, 0x77, 0x61, 0x79, 0x73, 0x45, 0x78, 0x70, 0x6f, 0x72, 0x74, 0x42, 0x69, 0x6e,
+	0x61, 0x72, 0x69, 0x65, 0x73, 0x1a, 0x63, 0x0a, 0x0a, 0x42, 0x75, 0x69, 0x6c, 0x64, 0x43, 0x61,
+	0x63, 0x68, 0x65, 0x12, 0x3a, 0x0a, 0x19, 0x63, 0x6f, 0x6d, 0x70, 0x69, 0x6c, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x73, 0x5f, 0x62, 0x65, 0x66, 0x6f, 0x72, 0x65, 0x5f, 0x70, 0x75, 0x72, 0x67, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x17, 0x63, 0x6f, 0x6d, 0x70, 0x69, 0x6c, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x42, 0x65, 0x66, 0x6f, 0x72, 0x65, 0x50, 0x75, 0x72, 0x67, 0x65, 0x12,
+	0x19, 0x0a, 0x08, 0x74, 0x74, 0x6c, 0x5f, 0x73, 0x65, 0x63, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x07, 0x74, 0x74, 0x6c, 0x53, 0x65, 0x63, 0x73, 0x1a, 0x37, 0x0a, 0x0c, 0x42, 0x6f,
+	0x61, 0x72, 0x64, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x12, 0x27, 0x0a, 0x0f, 0x61, 0x64,
+	0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x61, 0x6c, 0x5f, 0x75, 0x72, 0x6c, 0x73, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x0e, 0x61, 0x64, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x61, 0x6c, 0x55,
+	0x72, 0x6c, 0x73, 0x1a, 0x1c, 0x0a, 0x06, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x12, 0x12, 0x0a,
+	0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x6f, 0x72,
+	0x74, 0x1a, 0x23, 0x0a, 0x06, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x6e,
+	0x6f, 0x5f, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x6e,
+	0x6f, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x1a, 0x59, 0x0a, 0x07, 0x4c, 0x6f, 0x67, 0x67, 0x69, 0x6e,
+	0x67, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x65, 0x76, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6c, 0x65, 0x76, 0x65, 0x6c, 0x12, 0x16, 0x0a, 0x06, 0x66, 0x6f, 0x72, 0x6d, 0x61,
+	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12,
+	0x17, 0x0a, 0x04, 0x66, 0x69, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52,
+	0x04, 0x66, 0x69, 0x6c, 0x65, 0x88, 0x01, 0x01, 0x42, 0x07, 0x0a, 0x05, 0x5f, 0x66, 0x69, 0x6c,
+	0x65, 0x1a, 0x3d, 0x0a, 0x07, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x12, 0x32, 0x0a, 0x15,
+	0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x75, 0x6e, 0x73, 0x61, 0x66, 0x65, 0x5f, 0x69, 0x6e,
+	0x73, 0x74, 0x61, 0x6c, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x13, 0x65, 0x6e, 0x61,
+	0x62, 0x6c, 0x65, 0x55, 0x6e, 0x73, 0x61, 0x66, 0x65, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c,
+	0x1a, 0x3a, 0x0a, 0x07, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x72, 0x12, 0x2f, 0x0a, 0x13, 0x65,
+	0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x12, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65,
+	0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x09, 0x0a, 0x07,
+	0x5f, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x65, 0x22, 0x19, 0x0a, 0x17, 0x43, 0x6f, 0x6e, 0x66, 0x69,
+	0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x22, 0x6b, 0x0a, 0x18, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4f,
+	0x0a, 0x0d, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69,
+	0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e,
+	0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x52, 0x0d, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22,
+	0x43, 0x0a, 0x18, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x53, 0x61, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x73,
+	0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x5f, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x46, 0x6f,
+	0x72, 0x6d, 0x61, 0x74, 0x22, 0x46, 0x0a, 0x19, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x61, 0x76, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x29, 0x0a, 0x10, 0x65, 0x6e, 0x63, 0x6f, 0x64, 0x65, 0x64, 0x5f, 0x73, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x65, 0x6e, 0x63,
+	0x6f, 0x64, 0x65, 0x64, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x22, 0x6e, 0x0a, 0x18,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4f, 0x70, 0x65,
+	0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x29, 0x0a, 0x10, 0x65, 0x6e, 0x63, 0x6f,
+	0x64, 0x65, 0x64, 0x5f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0f, 0x65, 0x6e, 0x63, 0x6f, 0x64, 0x65, 0x64, 0x53, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x12, 0x27, 0x0a, 0x0f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x5f,
+	0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x73, 0x65,
+	0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x22, 0x1b, 0x0a, 0x19,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4f, 0x70, 0x65,
+	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x4e, 0x0a, 0x17, 0x53, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x21, 0x0a, 0x0c, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f,
+	0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x22, 0x3f, 0x0a, 0x18, 0x53, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x65, 0x6e, 0x63, 0x6f, 0x64, 0x65, 0x64,
+	0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x65, 0x6e,
+	0x63, 0x6f, 0x64, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x73, 0x0a, 0x17, 0x53, 0x65,
+	0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x23, 0x0a, 0x0d, 0x65, 0x6e, 0x63, 0x6f, 0x64,
+	0x65, 0x64, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c,
+	0x65, 0x6e, 0x63, 0x6f, 0x64, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x21, 0x0a, 0x0c,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0b, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x22,
+	0x1a, 0x0a, 0x18, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x53, 0x65, 0x74, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1a, 0x0a, 0x18, 0x53,
+	0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x45, 0x6e, 0x75, 0x6d, 0x65, 0x72, 0x61, 0x74, 0x65,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0xa1, 0x01, 0x0a, 0x19, 0x53, 0x65, 0x74, 0x74,
+	0x69, 0x6e, 0x67, 0x73, 0x45, 0x6e, 0x75, 0x6d, 0x65, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x55, 0x0a, 0x07, 0x65, 0x6e, 0x74, 0x72, 0x69, 0x65, 0x73,
+	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3b, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75,
+	0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73,
+	0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x45, 0x6e, 0x75, 0x6d,
+	0x65, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x45, 0x6e,
+	0x74, 0x72, 0x79, 0x52, 0x07, 0x65, 0x6e, 0x74, 0x72, 0x69, 0x65, 0x73, 0x1a, 0x2d, 0x0a, 0x05,
+	0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x42, 0x48, 0x5a, 0x46, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e,
+	0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70,
+	0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x63, 0x6c, 0x69,
+	0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x3b, 0x63, 0x6f, 0x6d,
+	0x6d, 0x61, 0x6e, 0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -639,27 +1579,53 @@ func file_cc_arduino_cli_commands_v1_settings_proto_rawDescGZIP() []byte {
 	return file_cc_arduino_cli_commands_v1_settings_proto_rawDescData
 }
 
-var file_cc_arduino_cli_commands_v1_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_cc_arduino_cli_commands_v1_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_cc_arduino_cli_commands_v1_settings_proto_goTypes = []interface{}{
-	(*SettingsGetAllResponse)(nil),   // 0: cc.arduino.cli.commands.v1.SettingsGetAllResponse
-	(*SettingsMergeRequest)(nil),     // 1: cc.arduino.cli.commands.v1.SettingsMergeRequest
-	(*SettingsGetValueResponse)(nil), // 2: cc.arduino.cli.commands.v1.SettingsGetValueResponse
-	(*SettingsSetValueRequest)(nil),  // 3: cc.arduino.cli.commands.v1.SettingsSetValueRequest
-	(*SettingsGetAllRequest)(nil),    // 4: cc.arduino.cli.commands.v1.SettingsGetAllRequest
-	(*SettingsGetValueRequest)(nil),  // 5: cc.arduino.cli.commands.v1.SettingsGetValueRequest
-	(*SettingsMergeResponse)(nil),    // 6: cc.arduino.cli.commands.v1.SettingsMergeResponse
-	(*SettingsSetValueResponse)(nil), // 7: cc.arduino.cli.commands.v1.SettingsSetValueResponse
-	(*SettingsWriteRequest)(nil),     // 8: cc.arduino.cli.commands.v1.SettingsWriteRequest
-	(*SettingsWriteResponse)(nil),    // 9: cc.arduino.cli.commands.v1.SettingsWriteResponse
-	(*SettingsDeleteRequest)(nil),    // 10: cc.arduino.cli.commands.v1.SettingsDeleteRequest
-	(*SettingsDeleteResponse)(nil),   // 11: cc.arduino.cli.commands.v1.SettingsDeleteResponse
+	(*Configuration)(nil),                     // 0: cc.arduino.cli.commands.v1.Configuration
+	(*ConfigurationGetRequest)(nil),           // 1: cc.arduino.cli.commands.v1.ConfigurationGetRequest
+	(*ConfigurationGetResponse)(nil),          // 2: cc.arduino.cli.commands.v1.ConfigurationGetResponse
+	(*ConfigurationSaveRequest)(nil),          // 3: cc.arduino.cli.commands.v1.ConfigurationSaveRequest
+	(*ConfigurationSaveResponse)(nil),         // 4: cc.arduino.cli.commands.v1.ConfigurationSaveResponse
+	(*ConfigurationOpenRequest)(nil),          // 5: cc.arduino.cli.commands.v1.ConfigurationOpenRequest
+	(*ConfigurationOpenResponse)(nil),         // 6: cc.arduino.cli.commands.v1.ConfigurationOpenResponse
+	(*SettingsGetValueRequest)(nil),           // 7: cc.arduino.cli.commands.v1.SettingsGetValueRequest
+	(*SettingsGetValueResponse)(nil),          // 8: cc.arduino.cli.commands.v1.SettingsGetValueResponse
+	(*SettingsSetValueRequest)(nil),           // 9: cc.arduino.cli.commands.v1.SettingsSetValueRequest
+	(*SettingsSetValueResponse)(nil),          // 10: cc.arduino.cli.commands.v1.SettingsSetValueResponse
+	(*SettingsEnumerateRequest)(nil),          // 11: cc.arduino.cli.commands.v1.SettingsEnumerateRequest
+	(*SettingsEnumerateResponse)(nil),         // 12: cc.arduino.cli.commands.v1.SettingsEnumerateResponse
+	(*Configuration_Directories)(nil),         // 13: cc.arduino.cli.commands.v1.Configuration.Directories
+	(*Configuration_Network)(nil),             // 14: cc.arduino.cli.commands.v1.Configuration.Network
+	(*Configuration_Sketch)(nil),              // 15: cc.arduino.cli.commands.v1.Configuration.Sketch
+	(*Configuration_BuildCache)(nil),          // 16: cc.arduino.cli.commands.v1.Configuration.BuildCache
+	(*Configuration_BoardManager)(nil),        // 17: cc.arduino.cli.commands.v1.Configuration.BoardManager
+	(*Configuration_Daemon)(nil),              // 18: cc.arduino.cli.commands.v1.Configuration.Daemon
+	(*Configuration_Output)(nil),              // 19: cc.arduino.cli.commands.v1.Configuration.Output
+	(*Configuration_Logging)(nil),             // 20: cc.arduino.cli.commands.v1.Configuration.Logging
+	(*Configuration_Library)(nil),             // 21: cc.arduino.cli.commands.v1.Configuration.Library
+	(*Configuration_Updater)(nil),             // 22: cc.arduino.cli.commands.v1.Configuration.Updater
+	(*Configuration_Directories_Builtin)(nil), // 23: cc.arduino.cli.commands.v1.Configuration.Directories.Builtin
+	(*SettingsEnumerateResponse_Entry)(nil),   // 24: cc.arduino.cli.commands.v1.SettingsEnumerateResponse.Entry
 }
 var file_cc_arduino_cli_commands_v1_settings_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	13, // 0: cc.arduino.cli.commands.v1.Configuration.directories:type_name -> cc.arduino.cli.commands.v1.Configuration.Directories
+	14, // 1: cc.arduino.cli.commands.v1.Configuration.network:type_name -> cc.arduino.cli.commands.v1.Configuration.Network
+	15, // 2: cc.arduino.cli.commands.v1.Configuration.sketch:type_name -> cc.arduino.cli.commands.v1.Configuration.Sketch
+	16, // 3: cc.arduino.cli.commands.v1.Configuration.build_cache:type_name -> cc.arduino.cli.commands.v1.Configuration.BuildCache
+	17, // 4: cc.arduino.cli.commands.v1.Configuration.board_manager:type_name -> cc.arduino.cli.commands.v1.Configuration.BoardManager
+	18, // 5: cc.arduino.cli.commands.v1.Configuration.daemon:type_name -> cc.arduino.cli.commands.v1.Configuration.Daemon
+	19, // 6: cc.arduino.cli.commands.v1.Configuration.output:type_name -> cc.arduino.cli.commands.v1.Configuration.Output
+	20, // 7: cc.arduino.cli.commands.v1.Configuration.logging:type_name -> cc.arduino.cli.commands.v1.Configuration.Logging
+	21, // 8: cc.arduino.cli.commands.v1.Configuration.library:type_name -> cc.arduino.cli.commands.v1.Configuration.Library
+	22, // 9: cc.arduino.cli.commands.v1.Configuration.updater:type_name -> cc.arduino.cli.commands.v1.Configuration.Updater
+	0,  // 10: cc.arduino.cli.commands.v1.ConfigurationGetResponse.configuration:type_name -> cc.arduino.cli.commands.v1.Configuration
+	24, // 11: cc.arduino.cli.commands.v1.SettingsEnumerateResponse.entries:type_name -> cc.arduino.cli.commands.v1.SettingsEnumerateResponse.Entry
+	23, // 12: cc.arduino.cli.commands.v1.Configuration.Directories.builtin:type_name -> cc.arduino.cli.commands.v1.Configuration.Directories.Builtin
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_cc_arduino_cli_commands_v1_settings_proto_init() }
@@ -669,7 +1635,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsGetAllResponse); i {
+			switch v := v.(*Configuration); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -681,7 +1647,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsMergeRequest); i {
+			switch v := v.(*ConfigurationGetRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -693,7 +1659,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsGetValueResponse); i {
+			switch v := v.(*ConfigurationGetResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -705,7 +1671,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsSetValueRequest); i {
+			switch v := v.(*ConfigurationSaveRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -717,7 +1683,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsGetAllRequest); i {
+			switch v := v.(*ConfigurationSaveResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -729,7 +1695,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsGetValueRequest); i {
+			switch v := v.(*ConfigurationOpenRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -741,7 +1707,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsMergeResponse); i {
+			switch v := v.(*ConfigurationOpenResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -753,7 +1719,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsSetValueResponse); i {
+			switch v := v.(*SettingsGetValueRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -765,7 +1731,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsWriteRequest); i {
+			switch v := v.(*SettingsGetValueResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -777,7 +1743,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsWriteResponse); i {
+			switch v := v.(*SettingsSetValueRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -789,7 +1755,7 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsDeleteRequest); i {
+			switch v := v.(*SettingsSetValueResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -801,7 +1767,163 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SettingsDeleteResponse); i {
+			switch v := v.(*SettingsEnumerateRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SettingsEnumerateResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Directories); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Network); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Sketch); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_BuildCache); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_BoardManager); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Daemon); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Output); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Logging); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Library); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Updater); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Configuration_Directories_Builtin); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SettingsEnumerateResponse_Entry); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -813,13 +1935,18 @@ func file_cc_arduino_cli_commands_v1_settings_proto_init() {
 			}
 		}
 	}
+	file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[0].OneofWrappers = []interface{}{}
+	file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[13].OneofWrappers = []interface{}{}
+	file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[14].OneofWrappers = []interface{}{}
+	file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[20].OneofWrappers = []interface{}{}
+	file_cc_arduino_cli_commands_v1_settings_proto_msgTypes[23].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cc_arduino_cli_commands_v1_settings_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

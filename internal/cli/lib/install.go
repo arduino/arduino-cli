@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -34,13 +33,13 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func initInstallCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
+func initInstallCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	var noDeps bool
 	var noOverwrite bool
 	var gitURL bool
 	var zipPath bool
 	var useBuiltinLibrariesDir bool
-	enableUnsafeInstall := defaultSettings.GetBool("library.enable_unsafe_install")
+	enableUnsafeInstall := settings.GetLibrary().GetEnableUnsafeInstall()
 	installCommand := &cobra.Command{
 		Use:   fmt.Sprintf("install %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
 		Short: tr("Installs one or more specified libraries into the system."),

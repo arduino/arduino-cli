@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2024 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -28,7 +28,7 @@ import (
 )
 
 // UserAgent returns the user agent (mainly used by HTTP clients)
-func UserAgent(settings *Settings) string {
+func (settings *Settings) UserAgent() string {
 	subComponent := ""
 	if settings != nil {
 		subComponent = settings.GetString("network.user_agent_ext")
@@ -51,15 +51,14 @@ func UserAgent(settings *Settings) string {
 		extendedUA)
 }
 
+// ExtraUserAgent returns the extended user-agent section provided via configuration settings
+func (settings *Settings) ExtraUserAgent() string {
+	return settings.GetString("network.user_agent_ext")
+}
+
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
-func NetworkProxy(settings *Settings) (*url.URL, error) {
-	if settings == nil || !settings.IsSet("network.proxy") {
-		return nil, nil
-	}
-	if proxyConfig := settings.GetString("network.proxy"); proxyConfig == "" {
-		// empty configuration
-		// this workaround must be here until viper can UnSet properties:
-		// https://github.com/spf13/viper/pull/519
+func (settings *Settings) NetworkProxy() (*url.URL, error) {
+	if proxyConfig, ok, _ := settings.GetStringOk("network.proxy"); !ok {
 		return nil, nil
 	} else if proxy, err := url.Parse(proxyConfig); err != nil {
 		return nil, fmt.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
@@ -70,7 +69,7 @@ func NetworkProxy(settings *Settings) (*url.URL, error) {
 
 // NewHttpClient returns a new http client for use in the arduino-cli
 func (settings *Settings) NewHttpClient() (*http.Client, error) {
-	proxy, err := NetworkProxy(settings)
+	proxy, err := settings.NetworkProxy()
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +78,7 @@ func (settings *Settings) NewHttpClient() (*http.Client, error) {
 			transport: &http.Transport{
 				Proxy: http.ProxyURL(proxy),
 			},
-			userAgent: UserAgent(settings),
+			userAgent: settings.UserAgent(),
 		},
 	}, nil
 }

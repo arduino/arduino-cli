@@ -48,7 +48,8 @@ func TestGetByVidPid(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0xf420", "0XF069", configuration.Init(""))
+	settings := configuration.NewSettings()
+	res, err := apiByVidPid("0xf420", "0XF069", settings)
 	require.Nil(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].GetName())
@@ -56,23 +57,27 @@ func TestGetByVidPid(t *testing.T) {
 
 	// wrong vid (too long), wrong pid (not an hex value)
 
-	_, err = apiByVidPid("0xfffff", "0xDEFG", configuration.Init(""))
+	_, err = apiByVidPid("0xfffff", "0xDEFG", settings)
 	require.NotNil(t, err)
 }
 
 func TestGetByVidPidNotFound(t *testing.T) {
+	settings := configuration.NewSettings()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069", configuration.Init(""))
+	res, err := apiByVidPid("0x0420", "0x0069", settings)
 	require.NoError(t, err)
 	require.Empty(t, res)
 }
 
 func TestGetByVidPid5xx(t *testing.T) {
+	settings := configuration.NewSettings()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 - Ooooops!"))
@@ -80,27 +85,30 @@ func TestGetByVidPid5xx(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069", configuration.Init(""))
+	res, err := apiByVidPid("0x0420", "0x0069", settings)
 	require.NotNil(t, err)
 	require.Equal(t, "the server responded with status 500 Internal Server Error", err.Error())
 	require.Len(t, res, 0)
 }
 
 func TestGetByVidPidMalformedResponse(t *testing.T) {
+	settings := configuration.NewSettings()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "{}")
 	}))
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069", configuration.Init(""))
+	res, err := apiByVidPid("0x0420", "0x0069", settings)
 	require.NotNil(t, err)
 	require.Equal(t, "wrong format in server response", err.Error())
 	require.Len(t, res, 0)
 }
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
-	items, err := identifyViaCloudAPI(properties.NewMap(), configuration.Init(""))
+	settings := configuration.NewSettings()
+	items, err := identifyViaCloudAPI(properties.NewMap(), settings)
 	require.NoError(t, err)
 	require.Empty(t, items)
 }
@@ -112,7 +120,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	defer paths.TempDir().Join("test").RemoveAll()
 
 	// We don't really care about the paths in this case
-	pmb := packagemanager.NewBuilder(dataDir, dataDir, dataDir, dataDir, "test", downloader.GetDefaultConfig())
+	pmb := packagemanager.NewBuilder(dataDir, dataDir, nil, dataDir, dataDir, "test", downloader.GetDefaultConfig())
 
 	// Create some boards with identical VID:PID combination
 	pack := pmb.GetOrCreatePackage("packager")
@@ -148,7 +156,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	settings := configuration.Init("")
+	settings := configuration.NewSettings()
 	res, err := identify(pme, &discovery.Port{Properties: idPrefs}, settings)
 	require.NoError(t, err)
 	require.NotNil(t, res)

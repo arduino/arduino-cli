@@ -29,7 +29,7 @@ func initCleanCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cleanCommand := &cobra.Command{
 		Use:     "clean",
 		Short:   tr("Delete Boards/Library Manager download cache."),
-		Long:    tr("Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms."),
+		Long:    tr("Delete contents of the downloads cache folder, where archive files are staged during installation of libraries and boards platforms."),
 		Example: "  " + os.Args[0] + " cache clean",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {

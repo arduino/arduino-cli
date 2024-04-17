@@ -16,12 +16,12 @@
 package config
 
 import (
+	"context"
 	"os"
-	"strings"
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,7 +35,7 @@ var (
 
 const defaultFileName = "arduino-cli.yaml"
 
-func initInitCommand(defaultSettings *configuration.Settings) *cobra.Command {
+func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
 		Short: tr("Writes current configuration to a configuration file."),
@@ -50,7 +50,7 @@ func initInitCommand(defaultSettings *configuration.Settings) *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "dest-file", "dest-dir")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runInitCommand(cmd, defaultSettings)
+			runInitCommand(srv)
 		},
 	}
 	initCommand.Flags().StringVar(&destDir, "dest-dir", "", tr("Sets where to save the configuration file."))
@@ -59,8 +59,9 @@ func initInitCommand(defaultSettings *configuration.Settings) *cobra.Command {
 	return initCommand
 }
 
-func runInitCommand(cmd *cobra.Command, defaultSettings *configuration.Settings) {
+func runInitCommand(srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli config init`")
+	ctx := context.Background()
 
 	var configFileAbsPath *paths.Path
 	var configFileDir *paths.Path
@@ -72,17 +73,18 @@ func runInitCommand(cmd *cobra.Command, defaultSettings *configuration.Settings)
 		if err != nil {
 			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
-
 		configFileDir = configFileAbsPath.Parent()
-	case destDir == "":
-		destDir = defaultSettings.GetString("directories.Data")
-		fallthrough
-	default:
+
+	case destDir != "":
 		configFileDir, err = paths.New(destDir).Abs()
 		if err != nil {
 			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
 		configFileAbsPath = configFileDir.Join(defaultFileName)
+
+	default:
+		configFileAbsPath = paths.New(ctx.Value("config_file").(string))
+		configFileDir = configFileAbsPath.Parent()
 	}
 
 	if !overwrite && configFileAbsPath.Exist() {
@@ -95,19 +97,22 @@ func runInitCommand(cmd *cobra.Command, defaultSettings *configuration.Settings)
 		feedback.Fatal(tr("Cannot create config file directory: %v", err), feedback.ErrGeneric)
 	}
 
-	newSettings := configuration.NewSettings()
-	configuration.BindFlags(cmd, newSettings)
+	// for _, url := range newSettings.GetStringSlice("board_manager.additional_urls") {
+	// 	if strings.Contains(url, ",") {
+	// 		feedback.Fatal(tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
+	// 			feedback.ErrGeneric)
+	// 	}
+	// }
 
-	for _, url := range newSettings.GetStringSlice("board_manager.additional_urls") {
-		if strings.Contains(url, ",") {
-			feedback.Fatal(tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
-				feedback.ErrGeneric)
-		}
+	resp, err := srv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"})
+	if err != nil {
+		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 	}
 
-	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
+	if err := configFileAbsPath.WriteFile([]byte(resp.GetEncodedSettings())); err != nil {
 		feedback.Fatal(tr("Cannot create config file: %v", err), feedback.ErrGeneric)
 	}
+
 	feedback.PrintResult(initResult{ConfigFileAbsPath: configFileAbsPath})
 }
 

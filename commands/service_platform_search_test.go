@@ -19,7 +19,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -36,9 +35,17 @@ func TestPlatformSearch(t *testing.T) {
 	err := paths.New("testdata", "platform", "package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	settings := configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
-	srv := NewArduinoCoreServer("", settings)
 	ctx := context.Background()
+	srv := NewArduinoCoreServer()
+
+	conf, err := paths.TempDir().Join("test", "arduino-cli.yaml").ReadFile()
+	require.NoError(t, err)
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{
+		SettingsFormat:  "yaml",
+		EncodedSettings: string(conf),
+	})
+	require.NoError(t, err)
+
 	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
 	require.NoError(t, err)
 
@@ -337,9 +344,16 @@ func TestPlatformSearchSorting(t *testing.T) {
 	err := paths.New("testdata", "platform", "package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	settings := configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
-	srv := NewArduinoCoreServer("", settings)
 	ctx := context.Background()
+	srv := NewArduinoCoreServer()
+
+	conf, err := paths.TempDir().Join("test", "arduino-cli.yaml").ReadFile()
+	require.NoError(t, err)
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{
+		SettingsFormat:  "yaml",
+		EncodedSettings: string(conf),
+	})
+	require.NoError(t, err)
 
 	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
 	require.NoError(t, err)

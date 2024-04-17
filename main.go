@@ -16,6 +16,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -23,17 +25,45 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
-	"github.com/arduino/arduino-cli/version"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 )
 
 func main() {
-	defaultSettings := configuration.Init(configuration.FindConfigFileInArgsFallbackOnEnv(os.Args))
-	i18n.Init(defaultSettings.GetString("locale"))
+	// Create a new ArduinoCoreServer
+	srv := commands.NewArduinoCoreServer()
 
-	srv := commands.NewArduinoCoreServer(version.VersionInfo.VersionString, defaultSettings)
+	// Search for the configuration file in the command line arguments and in the environment
+	configFile := configuration.FindConfigFileInArgsFallbackOnEnv(os.Args)
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "config_file", configFile)
 
-	arduinoCmd := cli.NewCommand(srv, defaultSettings)
-	if err := arduinoCmd.Execute(); err != nil {
+	// Read the settings from the configuration file
+	openReq := &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"}
+	if configData, err := paths.New(configFile).ReadFile(); err == nil {
+		openReq.EncodedSettings = string(configData)
+	} else if !os.IsNotExist(err) {
+		feedback.FatalError(fmt.Errorf("couldn't read configuration file: %w", err), feedback.ErrGeneric)
+	}
+	if _, err := srv.ConfigurationOpen(ctx, openReq); err != nil {
+		feedback.FatalError(fmt.Errorf("couldn't load configuration: %w", err), feedback.ErrGeneric)
+	}
+
+	// Get the current settings from the server
+	resp, err := srv.ConfigurationGet(ctx, &rpc.ConfigurationGetRequest{})
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
+	}
+	config := resp.GetConfiguration()
+
+	// Setup i18n
+	i18n.Init(config.GetLocale())
+
+	// Setup command line parser with the server and settings
+	arduinoCmd := cli.NewCommand(srv)
+
+	// Execute the command line
+	if err := arduinoCmd.ExecuteContext(ctx); err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 }

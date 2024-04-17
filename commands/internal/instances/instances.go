@@ -134,7 +134,7 @@ func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager
 }
 
 // Create a new *rpc.Instance ready to be initialized
-func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent string, downloaderConfig downloader.Config) (*rpc.Instance, error) {
+func Create(dataDir, packagesDir, userPackagesDir, downloadsDir *paths.Path, extraUserAgent string, downloaderConfig downloader.Config) (*rpc.Instance, error) {
 	// Create package manager
 	userAgent := "arduino-cli/" + version.VersionInfo.VersionString
 	if extraUserAgent != "" {
@@ -142,7 +142,7 @@ func Create(dataDir, packagesDir, downloadsDir *paths.Path, extraUserAgent strin
 	}
 	tempDir := dataDir.Join("tmp")
 
-	pm := packagemanager.NewBuilder(dataDir, packagesDir, downloadsDir, tempDir, userAgent, downloaderConfig).Build()
+	pm := packagemanager.NewBuilder(dataDir, packagesDir, userPackagesDir, downloadsDir, tempDir, userAgent, downloaderConfig).Build()
 	lm, _ := librariesmanager.NewBuilder().Build()
 
 	instance := &coreInstance{

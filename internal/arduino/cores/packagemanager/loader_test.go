@@ -175,7 +175,7 @@ func TestLoadDiscoveries(t *testing.T) {
 	defer fakePath.RemoveAll()
 
 	createTestPackageManager := func() *PackageManager {
-		pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test", downloader.GetDefaultConfig())
+		pmb := NewBuilder(fakePath, fakePath, nil, fakePath, fakePath, "test", downloader.GetDefaultConfig())
 		pack := pmb.packages.GetOrCreatePackage("arduino")
 		// ble-discovery tool
 		tool := pack.GetOrCreateTool("ble-discovery")

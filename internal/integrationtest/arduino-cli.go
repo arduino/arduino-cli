@@ -326,7 +326,7 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 		defer fmt.Fprintln(terminalOut, "::endgroup::")
 	}
 
-	fmt.Fprintln(terminalOut, color.HiBlackString(">>> Running: ")+color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
+	fmt.Fprintln(terminalOut, color.HiBlackString(">>> Running: ")+color.HiYellowString("%s %s %s", cli.path, strings.Join(args, " "), env))
 	cliProc, err := paths.NewProcessFromPath(cli.convertEnvForExecutils(env), cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
@@ -444,8 +444,8 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 // SetValue calls the "SetValue" gRPC method.
 func (cli *ArduinoCLI) SetValue(key, jsonData string) error {
 	req := &commands.SettingsSetValueRequest{
-		Key:      key,
-		JsonData: jsonData,
+		Key:          key,
+		EncodedValue: jsonData,
 	}
 	logCallf(">>> SetValue(%+v)\n", req)
 	_, err := cli.daemonClient.SettingsSetValue(context.Background(), req)

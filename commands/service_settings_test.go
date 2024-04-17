@@ -18,177 +18,219 @@ package commands
 import (
 	"context"
 	"encoding/json"
-	"path/filepath"
 	"testing"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
+func loadConfig(t *testing.T, srv rpc.ArduinoCoreServiceServer, confPath *paths.Path) {
+	confPath.ToAbs()
+	conf, err := confPath.ReadFile()
+	require.NoError(t, err)
+	_, err = srv.ConfigurationOpen(context.Background(), &rpc.ConfigurationOpenRequest{
+		EncodedSettings: string(conf),
+		SettingsFormat:  "yaml",
+	})
+	require.NoError(t, err)
+}
+
 func TestGetAll(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
-	resp, err := svc.SettingsGetAll(context.Background(), &rpc.SettingsGetAllRequest{})
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
+	resp, err := srv.ConfigurationGet(context.Background(), &rpc.ConfigurationGetRequest{})
 	require.Nil(t, err)
 
-	content, err := json.Marshal(settings.AllSettings())
-	require.Nil(t, err)
+	defaultUserDir, err := srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "directories.user"})
+	require.NoError(t, err)
 
-	require.Equal(t, string(content), resp.GetJsonData())
+	content, err := json.Marshal(resp.GetConfiguration())
+	require.Nil(t, err)
+	require.JSONEq(t, `{
+		"board_manager": {
+			"additional_urls": [ "http://foobar.com", "http://example.com" ]
+		},
+		"build_cache": {
+			"compilations_before_purge": 10,
+			"ttl_secs": 2592000
+		},
+		"directories": {
+			"builtin": {},
+			"data": "/home/massi/.arduino15",
+			"downloads": "/home/massi/.arduino15/staging",
+			"user": `+defaultUserDir.GetEncodedValue()+`
+		},
+		"library": {},
+		"locale": "en",
+		"logging": {
+			"format": "text",
+			"level": "info"
+		},
+		"daemon":{
+			"port":"50051"
+		},
+		"network":{
+			"proxy":"123"
+		},
+		"output": {},
+		"sketch": {},
+		"updater": {}
+	}`, string(content))
 }
 
 func TestMerge(t *testing.T) {
-	initialSettings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", initialSettings).(*arduinoCoreServerImpl)
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
+
 	ctx := context.Background()
 
+	get := func(key string) string {
+		resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: key})
+		if err != nil {
+			return "<error>"
+		}
+		return resp.GetEncodedValue()
+	}
+
 	// Verify defaults
-	require.Equal(t, "50051", svc.settings.GetString("daemon.port"))
-	require.Equal(t, "", svc.settings.GetString("foo"))
-	require.Equal(t, false, svc.settings.GetBool("sketch.always_export_binaries"))
+	require.Equal(t, `"50051"`, get("daemon.port"))
+	require.Equal(t, "<error>", get("foo"))
+	require.Equal(t, "false", get("sketch.always_export_binaries"))
 
 	bulkSettings := `{"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}`
-	res, err := svc.SettingsMerge(ctx, &rpc.SettingsMergeRequest{JsonData: bulkSettings})
-	require.NotNil(t, res)
+	_, err := srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{EncodedSettings: bulkSettings, SettingsFormat: "json"})
+	require.Error(t, err)
+
+	bulkSettings = `{"daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}`
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{EncodedSettings: bulkSettings, SettingsFormat: "json"})
+	require.Error(t, err)
+
+	bulkSettings = `{"daemon":{"port":"420"}, "sketch": {"always_export_binaries": true}}`
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{EncodedSettings: bulkSettings, SettingsFormat: "json"})
 	require.NoError(t, err)
 
-	require.Equal(t, "420", svc.settings.GetString("daemon.port"))
-	require.Equal(t, "bar", svc.settings.GetString("foo"))
-	require.Equal(t, true, svc.settings.GetBool("sketch.always_export_binaries"))
+	require.Equal(t, `"420"`, get("daemon.port"))
+	require.Equal(t, `<error>`, get("foo"))
+	require.Equal(t, "true", get("sketch.always_export_binaries"))
 
-	bulkSettings = `{"foo":"", "daemon": {}, "sketch": {"always_export_binaries": "false"}}`
-	res, err = svc.SettingsMerge(ctx, &rpc.SettingsMergeRequest{JsonData: bulkSettings})
-	require.NotNil(t, res)
+	bulkSettings = `{"daemon": {}, "sketch": {"always_export_binaries": false}}`
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{EncodedSettings: bulkSettings, SettingsFormat: "json"})
 	require.NoError(t, err)
 
-	require.Equal(t, "50051", svc.settings.GetString("daemon.port"))
-	require.Equal(t, "", svc.settings.GetString("foo"))
-	require.Equal(t, false, svc.settings.GetBool("sketch.always_export_binaries"))
+	require.Equal(t, `"50051"`, get("daemon.port"))
+	require.Equal(t, "<error>", get("foo"))
+	require.Equal(t, "false", get("sketch.always_export_binaries"))
 
-	bulkSettings = `{"daemon": {"port":""}}`
-	res, err = svc.SettingsMerge(ctx, &rpc.SettingsMergeRequest{JsonData: bulkSettings})
-	require.NotNil(t, res)
+	_, err = srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: "daemon.port", EncodedValue: ""})
 	require.NoError(t, err)
 
-	require.Equal(t, "", svc.settings.GetString("daemon.port"))
+	require.Equal(t, `"50051"`, get("daemon.port"))
 	// Verifies other values are not changed
-	require.Equal(t, "", svc.settings.GetString("foo"))
-	require.Equal(t, false, svc.settings.GetBool("sketch.always_export_binaries"))
+	require.Equal(t, "<error>", get("foo"))
+	require.Equal(t, "false", get("sketch.always_export_binaries"))
 
-	bulkSettings = `{"network": {}}`
-	res, err = svc.SettingsMerge(ctx, &rpc.SettingsMergeRequest{JsonData: bulkSettings})
-	require.NotNil(t, res)
-	require.NoError(t, err)
-
-	require.Equal(t, "", svc.settings.GetString("proxy"))
 }
 
 func TestGetValue(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
 
 	key := &rpc.SettingsGetValueRequest{Key: "daemon"}
-	resp, err := svc.SettingsGetValue(context.Background(), key)
+	resp, err := srv.SettingsGetValue(context.Background(), key)
 	require.NoError(t, err)
-	require.Equal(t, `{"port":"50051"}`, resp.GetJsonData())
+	require.Equal(t, `{"port":"50051"}`, resp.GetEncodedValue())
 
 	key = &rpc.SettingsGetValueRequest{Key: "daemon.port"}
-	resp, err = svc.SettingsGetValue(context.Background(), key)
+	resp, err = srv.SettingsGetValue(context.Background(), key)
 	require.NoError(t, err)
-	require.Equal(t, `"50051"`, resp.GetJsonData())
+	require.Equal(t, `"50051"`, resp.GetEncodedValue())
 }
 
-func TestGetMergedValue(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
+func TestGetOfSettedValue(t *testing.T) {
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
 
-	// Verifies value is not set
-	key := &rpc.SettingsGetValueRequest{Key: "foo"}
-	res, err := svc.SettingsGetValue(context.Background(), key)
+	// Verifies value is not set (try with a key without a default, like "directories.builtin.libraries")
+	ctx := context.Background()
+	res, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: "directories.builtin.libraries"})
 	require.Nil(t, res)
 	require.Error(t, err, "Error getting settings value")
 
-	// Merge value
-	bulkSettings := `{"foo": "bar"}`
-	_, err = svc.SettingsMerge(context.Background(), &rpc.SettingsMergeRequest{JsonData: bulkSettings})
+	// Set value
+	_, err = srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
+		Key:          "directories.builtin.libraries",
+		EncodedValue: `"bar"`})
 	require.NoError(t, err)
 
 	// Verifies value is correctly returned
-	key = &rpc.SettingsGetValueRequest{Key: "foo"}
-	res, err = svc.SettingsGetValue(context.Background(), key)
+	res, err = srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: "directories.builtin.libraries"})
 	require.NoError(t, err)
-	require.Equal(t, `"bar"`, res.GetJsonData())
+	require.Equal(t, `"bar"`, res.GetEncodedValue())
 }
 
 func TestGetValueNotFound(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
 
 	key := &rpc.SettingsGetValueRequest{Key: "DOESNTEXIST"}
-	_, err := svc.SettingsGetValue(context.Background(), key)
+	_, err := srv.SettingsGetValue(context.Background(), key)
 	require.Error(t, err)
-}
-
-func TestSetValue(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
-
-	val := &rpc.SettingsSetValueRequest{
-		Key:      "foo",
-		JsonData: `"bar"`,
-	}
-	_, err := svc.SettingsSetValue(context.Background(), val)
-	require.Nil(t, err)
-	require.Equal(t, "bar", settings.GetString("foo"))
 }
 
 func TestWrite(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
 
 	// Writes some settings
 	val := &rpc.SettingsSetValueRequest{
-		Key:      "foo",
-		JsonData: `"bar"`,
+		Key:          "directories.builtin.libraries",
+		EncodedValue: `"bar"`,
 	}
-	_, err := svc.SettingsSetValue(context.Background(), val)
+	_, err := srv.SettingsSetValue(context.Background(), val)
 	require.NoError(t, err)
 
-	tempDir := paths.TempDir()
-	testFolder, err := tempDir.MkTempDir("testdata")
-	require.NoError(t, err)
-	defer testFolder.RemoveAll()
-
-	// Verifies config files doesn't exist
-	configFile := testFolder.Join("arduino-cli.yml")
-	require.True(t, configFile.NotExist())
-
-	_, err = svc.SettingsWrite(context.Background(), &rpc.SettingsWriteRequest{
-		FilePath: configFile.String(),
+	resp, err := srv.ConfigurationSave(context.Background(), &rpc.ConfigurationSaveRequest{
+		SettingsFormat: "yaml",
 	})
 	require.NoError(t, err)
 
-	// Verifies config file is created.
-	// We don't verify the content since we expect config library, Viper, to work
-	require.True(t, configFile.Exist())
+	// Verify encoded content
+	require.YAMLEq(t, `
+board_manager:
+  additional_urls:
+    - http://foobar.com
+    - http://example.com
+
+daemon:
+  port: "50051"
+
+directories:
+  data: /home/massi/.arduino15
+  downloads: /home/massi/.arduino15/staging
+  builtin:
+    libraries: bar
+
+logging:
+  file: ""
+  format: text
+  level: info
+
+network:
+  proxy: "123"
+`, resp.GetEncodedSettings())
 }
 
 func TestDelete(t *testing.T) {
-	settings := configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
-	svc := NewArduinoCoreServer("", settings)
+	srv := NewArduinoCoreServer()
+	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
 
-	_, err := svc.SettingsDelete(context.Background(), &rpc.SettingsDeleteRequest{
-		Key: "doesnotexist",
-	})
-	require.Error(t, err)
-
-	_, err = svc.SettingsDelete(context.Background(), &rpc.SettingsDeleteRequest{
-		Key: "network",
-	})
+	_, err := srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
 	require.NoError(t, err)
 
-	_, err = svc.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
+	_, err = srv.SettingsSetValue(context.Background(), &rpc.SettingsSetValueRequest{Key: "network", EncodedValue: ""})
+	require.NoError(t, err)
+
+	_, err = srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
 	require.Error(t, err)
 }

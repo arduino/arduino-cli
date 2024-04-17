@@ -16,55 +16,70 @@
 package configuration
 
 import (
-	"path/filepath"
-	"strings"
+	"os"
 	"time"
 )
 
 // SetDefaults sets the default values for certain keys
 func SetDefaults(settings *Settings) {
+	setKeyTypeSchema := func(k string, v any) {
+		settings.SetKeyTypeSchema(k, v)
+		settings.Defaults.SetKeyTypeSchema(k, v)
+	}
+	setDefaultValueAndKeyTypeSchema := func(k string, v any) {
+		setKeyTypeSchema(k, v)
+		settings.Defaults.Set(k, v)
+	}
+
 	// logging
-	settings.SetDefault("logging.level", "info")
-	settings.SetDefault("logging.format", "text")
+	setDefaultValueAndKeyTypeSchema("logging.level", "info")
+	setDefaultValueAndKeyTypeSchema("logging.format", "text")
+	setKeyTypeSchema("logging.file", "")
 
 	// Libraries
-	settings.SetDefault("library.enable_unsafe_install", false)
+	setDefaultValueAndKeyTypeSchema("library.enable_unsafe_install", false)
 
 	// Boards Manager
-	settings.SetDefault("board_manager.additional_urls", []string{})
+	setDefaultValueAndKeyTypeSchema("board_manager.additional_urls", []string{})
 
 	// arduino directories
-	settings.SetDefault("directories.Data", getDefaultArduinoDataDir())
-	settings.SetDefault("directories.Downloads", filepath.Join(getDefaultArduinoDataDir(), "staging"))
-	settings.SetDefault("directories.User", getDefaultUserDir())
+	setDefaultValueAndKeyTypeSchema("directories.data", getDefaultArduinoDataDir())
+	setDefaultValueAndKeyTypeSchema("directories.downloads", "")
+	setDefaultValueAndKeyTypeSchema("directories.user", getDefaultUserDir())
 
 	// Sketch compilation
-	settings.SetDefault("sketch.always_export_binaries", false)
-	settings.SetDefault("build_cache.ttl", time.Hour*24*30)
-	settings.SetDefault("build_cache.compilations_before_purge", 10)
+	setDefaultValueAndKeyTypeSchema("sketch.always_export_binaries", false)
+	setDefaultValueAndKeyTypeSchema("build_cache.ttl", (time.Hour * 24 * 30).String())
+	setDefaultValueAndKeyTypeSchema("build_cache.compilations_before_purge", uint(10))
 
 	// daemon settings
-	settings.SetDefault("daemon.port", "50051")
+	setDefaultValueAndKeyTypeSchema("daemon.port", "50051")
 
 	// metrics settings
-	settings.SetDefault("metrics.enabled", true)
-	settings.SetDefault("metrics.addr", ":9090")
+	setDefaultValueAndKeyTypeSchema("metrics.enabled", true)
+	setDefaultValueAndKeyTypeSchema("metrics.addr", ":9090")
 
 	// output settings
-	settings.SetDefault("output.no_color", false)
+	setDefaultValueAndKeyTypeSchema("output.no_color", false)
 
 	// updater settings
-	settings.SetDefault("updater.enable_notification", true)
+	setDefaultValueAndKeyTypeSchema("updater.enable_notification", true)
+}
 
+// InjectEnvVars change settings based on the environment variables values
+func InjectEnvVars(settings *Settings) {
 	// Bind env vars
-	settings.SetEnvPrefix("ARDUINO")
-	settings.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	settings.AutomaticEnv()
+	settings.InjectEnvVars(os.Environ(), "ARDUINO")
 
 	// Bind env aliases to keep backward compatibility
-	settings.BindEnv("library.enable_unsafe_install", "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL")
-	settings.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
-	settings.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
-	settings.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
-	settings.BindEnv("sketch.always_export_binaries", "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES")
+	setIfEnvExists := func(key, env string) {
+		if v, ok := os.LookupEnv(env); ok {
+			settings.SetFromCLIArgs(key, v)
+		}
+	}
+	setIfEnvExists("library.enable_unsafe_install", "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL")
+	setIfEnvExists("directories.user", "ARDUINO_SKETCHBOOK_DIR")
+	setIfEnvExists("directories.downloads", "ARDUINO_DOWNLOADS_DIR")
+	setIfEnvExists("directories.data", "ARDUINO_DATA_DIR")
+	setIfEnvExists("sketch.always_export_binaries", "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES")
 }

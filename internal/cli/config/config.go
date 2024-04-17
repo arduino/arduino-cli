@@ -16,46 +16,64 @@
 package config
 
 import (
+	"context"
 	"os"
-	"reflect"
+	"strings"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
 
 var tr = i18n.Tr
 
 // NewCommand created a new `config` command
-func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
 		Short:   tr("Arduino configuration commands."),
 		Example: "  " + os.Args[0] + " config init",
 	}
 
-	configCommand.AddCommand(initAddCommand(defaultSettings))
-	configCommand.AddCommand(initDeleteCommand(srv, defaultSettings))
-	configCommand.AddCommand(initDumpCommand(defaultSettings))
-	configCommand.AddCommand(initGetCommand(srv, defaultSettings))
-	configCommand.AddCommand(initInitCommand(defaultSettings))
-	configCommand.AddCommand(initRemoveCommand(defaultSettings))
-	configCommand.AddCommand(initSetCommand(defaultSettings))
+	configCommand.AddCommand(initAddCommand(srv))
+	configCommand.AddCommand(initDeleteCommand(srv))
+	configCommand.AddCommand(initDumpCommand(srv))
+	configCommand.AddCommand(initGetCommand(srv))
+	configCommand.AddCommand(initInitCommand(srv))
+	configCommand.AddCommand(initRemoveCommand(srv))
+	configCommand.AddCommand(initSetCommand(srv))
 
 	return configCommand
 }
 
-// GetSlicesConfigurationKeys is an helper function useful to autocomplete.
-// It returns a list of configuration keys which can be changed
-func GetSlicesConfigurationKeys(settings *configuration.Settings) []string {
-	var res []string
-	keys := settings.AllKeys()
-	for _, key := range keys {
-		kind, _ := typeOf(key)
-		if kind == reflect.Slice {
-			res = append(res, key)
-		}
+func getAllSettingsKeys(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
+	res, _ := srv.SettingsEnumerate(ctx, &rpc.SettingsEnumerateRequest{})
+	allKeys := f.Map(res.GetEntries(), (*rpc.SettingsEnumerateResponse_Entry).GetKey)
+	return allKeys
+}
+
+func getAllArraySettingsKeys(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
+	res, _ := srv.SettingsEnumerate(ctx, &rpc.SettingsEnumerateRequest{})
+	arrayEntries := f.Filter(res.GetEntries(), func(e *rpc.SettingsEnumerateResponse_Entry) bool {
+		return strings.HasPrefix(e.GetType(), "[]")
+	})
+	arrayKeys := f.Map(arrayEntries, (*rpc.SettingsEnumerateResponse_Entry).GetKey)
+	return arrayKeys
+}
+
+func saveConfiguration(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
+	var outConfig []byte
+	if res, err := srv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"}); err != nil {
+		feedback.Fatal(tr("Error writing to file: %v", err), feedback.ErrGeneric)
+	} else {
+		outConfig = []byte(res.GetEncodedSettings())
 	}
-	return res
+
+	configFile := ctx.Value("config_file").(string)
+	if err := paths.New(configFile).WriteFile(outConfig); err != nil {
+		feedback.Fatal(tr("Error writing to file: %v", err), feedback.ErrGeneric)
+	}
 }

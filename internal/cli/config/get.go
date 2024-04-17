@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -29,7 +28,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func initGetCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
+func initGetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	getCommand := &cobra.Command{
 		Use:   "get",
 		Short: tr("Gets a settings key value."),
@@ -43,7 +42,8 @@ func initGetCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configura
 			runGetCommand(srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return defaultSettings.AllKeys(), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			return getAllSettingsKeys(ctx, srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return getCommand
@@ -59,8 +59,7 @@ func runGetCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
 			feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}
 		var result getResult
-		err = json.Unmarshal([]byte(resp.GetJsonData()), &result.resp)
-		if err != nil {
+		if err := json.Unmarshal([]byte(resp.GetEncodedValue()), &result.resp); err != nil {
 			// Should never happen...
 			panic(fmt.Sprintf("Cannot parse JSON for key %[1]s: %[2]v", toGet, err))
 		}

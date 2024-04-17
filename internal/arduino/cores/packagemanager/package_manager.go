@@ -55,6 +55,7 @@ type PackageManager struct {
 	log              logrus.FieldLogger
 	IndexDir         *paths.Path
 	PackagesDir      *paths.Path
+	userPackagesDir  *paths.Path
 	DownloadDir      *paths.Path
 	tempDir          *paths.Path
 	profile          *sketch.Profile
@@ -76,12 +77,13 @@ type Explorer PackageManager
 var tr = i18n.Tr
 
 // NewBuilder returns a new Builder
-func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string, downloaderConfig downloader.Config) *Builder {
+func NewBuilder(indexDir, packagesDir, userPackagesDir, downloadDir, tempDir *paths.Path, userAgent string, downloaderConfig downloader.Config) *Builder {
 	return &Builder{
 		log:                            logrus.StandardLogger(),
 		packages:                       cores.NewPackages(),
 		IndexDir:                       indexDir,
 		PackagesDir:                    packagesDir,
+		userPackagesDir:                userPackagesDir,
 		DownloadDir:                    downloadDir,
 		tempDir:                        tempDir,
 		packagesCustomGlobalProperties: properties.NewMap(),
@@ -100,6 +102,7 @@ func (pmb *Builder) BuildIntoExistingPackageManager(target *PackageManager) {
 	target.packages = pmb.packages
 	target.IndexDir = pmb.IndexDir
 	target.PackagesDir = pmb.PackagesDir
+	target.userPackagesDir = pmb.userPackagesDir
 	target.DownloadDir = pmb.DownloadDir
 	target.tempDir = pmb.tempDir
 	target.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
@@ -116,6 +119,7 @@ func (pmb *Builder) Build() *PackageManager {
 		packages:                       pmb.packages,
 		IndexDir:                       pmb.IndexDir,
 		PackagesDir:                    pmb.PackagesDir,
+		userPackagesDir:                pmb.userPackagesDir,
 		DownloadDir:                    pmb.DownloadDir,
 		tempDir:                        pmb.tempDir,
 		packagesCustomGlobalProperties: pmb.packagesCustomGlobalProperties,
@@ -166,7 +170,7 @@ func (pmb *Builder) calculateCompatibleReleases() {
 // this function will make the builder write the new configuration into this
 // PackageManager.
 func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
-	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent, pm.downloaderConfig)
+	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.userPackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent, pm.downloaderConfig)
 	return pmb, func() {
 		pmb.calculateCompatibleReleases()
 		pmb.BuildIntoExistingPackageManager(pm)

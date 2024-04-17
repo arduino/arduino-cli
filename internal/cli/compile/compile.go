@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -58,7 +57,7 @@ var (
 	uploadAfterCompile      bool                     // Upload the binary after the compilation.
 	portArgs                arguments.Port           // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify                  bool                     // Upload, verify uploaded binary after the upload.
-	exportBinaries          bool                     //
+	exportBinaries          bool                     // If set built binaries will be exported to the sketch folder
 	exportDir               string                   // The compiled binary is written to this file
 	optimizeForDebug        bool                     // Optimize compile output for debug, not for release
 	programmer              arguments.Programmer     // Use the specified programmer to upload
@@ -77,7 +76,7 @@ var (
 )
 
 // NewCommand created a new `compile` command
-func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	compileCommand := &cobra.Command{
 		Use:   "compile",
 		Short: tr("Compiles Arduino sketches."),
@@ -99,7 +98,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration
 	showPropertiesArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
-	compileCommand.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
+	compileCommand.Flags().StringVar(&exportDir, "output-dir", "", tr("Save build artifacts in this directory."))
 	compileCommand.Flags().StringVar(&buildPath, "build-path", "",
 		tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))
 	compileCommand.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
@@ -127,13 +126,13 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration
 	programmer.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
 	compileCommand.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
-	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
+	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", settings.GetSketch().GetAlwaysExportBinaries(),
+		tr("If set built binaries will be exported to the sketch folder."))
 	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	compileCommand.Flag("source-override").Hidden = true
 	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")
 	compileCommand.Flag("skip-libraries-discovery").Hidden = true
 	compileCommand.Flags().Int32VarP(&jobs, "jobs", "j", 0, tr("Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used."))
-	defaultSettings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
 
 	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
 
@@ -233,6 +232,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		Warnings:                      warnings,
 		Verbose:                       verbose,
 		Quiet:                         quiet,
+		ExportBinaries:                &exportBinaries,
 		ExportDir:                     exportDir,
 		Libraries:                     libraries,
 		OptimizeForDebug:              optimizeForDebug,

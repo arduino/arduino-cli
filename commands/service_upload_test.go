@@ -128,7 +128,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
 	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "upload", "hardware"))
 	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "upload", "build_path_1")

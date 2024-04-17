@@ -17,6 +17,7 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -28,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/compile"
 	"github.com/arduino/arduino-cli/internal/cli/completion"
 	"github.com/arduino/arduino-cli/internal/cli/config"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/core"
 	"github.com/arduino/arduino-cli/internal/cli/daemon"
 	"github.com/arduino/arduino-cli/internal/cli/debug"
@@ -55,31 +55,73 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-var (
-	verbose      bool
-	jsonOutput   bool
-	outputFormat string
-	configFile   string
-)
-
 // NewCommand creates a new ArduinoCli command root
-func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cobra.AddTemplateFunc("tr", i18n.Tr)
 
 	var updaterMessageChan chan *semver.Version
 
-	// ArduinoCli is the root command
+	var (
+		verbose        bool
+		noColor        bool
+		logLevel       string
+		logFile        string
+		logFormat      string
+		jsonOutput     bool
+		outputFormat   string
+		configFile     string
+		additionalUrls []string
+	)
+
+	resp, err := srv.ConfigurationGet(context.Background(), &rpc.ConfigurationGetRequest{})
+	if err != nil {
+		panic("Error creating configuration: " + err.Error())
+	}
+	settings := resp.GetConfiguration()
+
+	defaultLogFile := settings.GetLogging().GetFile()
+	defaultLogFormat := settings.GetLogging().GetFormat()
+	defaultAdditionalURLs := settings.GetBoardManager().GetAdditionalUrls()
+	defaultOutputNoColor := settings.GetOutput().GetNoColor()
+
 	cmd := &cobra.Command{
 		Use:     "arduino-cli",
 		Short:   tr("Arduino CLI."),
 		Long:    tr("Arduino Command Line Interface (arduino-cli)."),
 		Example: fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+
+			// Override server settings with the flags from the command line
+			set := func(key string, value any) {
+				if valueJson, err := json.Marshal(value); err != nil {
+					feedback.Fatal(tr("Error setting value %s: %v", key, err), feedback.ErrGeneric)
+				} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: string(valueJson)}); err != nil {
+					feedback.Fatal(tr("Error setting value %s: %v", key, err), feedback.ErrGeneric)
+				}
+			}
+			set("logging.level", logLevel)
+			set("logging.file", logFile)
+			set("board_manager.additional_urls", additionalUrls)
+			set("output.no_color", noColor)
+
 			if jsonOutput {
 				outputFormat = "json"
 			}
+			if outputFormat != "text" {
+				cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+					feedback.Fatal(tr("Should show help message, but it is available only in TEXT mode."), feedback.ErrBadArgument)
+				})
+			}
 
-			preRun(cmd, defaultSettings)
+			preRun(verbose, outputFormat, logLevel, logFile, logFormat, noColor, settings)
+
+			// Log the configuration file used
+			if configFile := ctx.Value("config_file").(string); configFile != "" {
+				logrus.Infof("Using config file: %s", configFile)
+			} else {
+				logrus.Info("Config file not found, using default values")
+			}
 
 			if cmd.Name() != "version" {
 				updaterMessageChan = make(chan *semver.Version)
@@ -115,13 +157,13 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration
 
 	cmd.AddCommand(board.NewCommand(srv))
 	cmd.AddCommand(cache.NewCommand(srv))
-	cmd.AddCommand(compile.NewCommand(srv, defaultSettings))
+	cmd.AddCommand(compile.NewCommand(srv, settings))
 	cmd.AddCommand(completion.NewCommand())
-	cmd.AddCommand(config.NewCommand(srv, defaultSettings))
+	cmd.AddCommand(config.NewCommand(srv, settings))
 	cmd.AddCommand(core.NewCommand(srv))
-	cmd.AddCommand(daemon.NewCommand(srv, defaultSettings))
+	cmd.AddCommand(daemon.NewCommand(srv, settings))
 	cmd.AddCommand(generatedocs.NewCommand())
-	cmd.AddCommand(lib.NewCommand(srv, defaultSettings))
+	cmd.AddCommand(lib.NewCommand(srv, settings))
 	cmd.AddCommand(monitor.NewCommand(srv))
 	cmd.AddCommand(outdated.NewCommand(srv))
 	cmd.AddCommand(sketch.NewCommand(srv))
@@ -132,31 +174,26 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration
 	cmd.AddCommand(burnbootloader.NewCommand(srv))
 	cmd.AddCommand(version.NewCommand(srv))
 	cmd.AddCommand(feedback.NewCommand())
+
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	cmd.Flag("verbose").Hidden = true
 	cmd.PersistentFlags().BoolVar(&verbose, "log", false, tr("Print the logs on the standard output."))
+	defaultLogLevel := settings.GetLogging().GetLevel()
 	validLogLevels := []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}
-	cmd.PersistentFlags().String("log-level", "", tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
-	cmd.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return validLogLevels, cobra.ShellCompDirectiveDefault
-	})
-	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
+	cmd.PersistentFlags().StringVar(&logLevel, "log-level", defaultLogLevel, tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
+	cmd.RegisterFlagCompletionFunc("log-level", cobra.FixedCompletions(validLogLevels, cobra.ShellCompDirectiveDefault))
+	cmd.PersistentFlags().StringVar(&logFile, "log-file", defaultLogFile, tr("Path to the file where logs will be written."))
 	validLogFormats := []string{"text", "json"}
-	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
-	cmd.RegisterFlagCompletionFunc("log-format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return validLogFormats, cobra.ShellCompDirectiveDefault
-	})
+	cmd.PersistentFlags().StringVar(&logFormat, "log-format", defaultLogFormat, tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
+	cmd.RegisterFlagCompletionFunc("log-format", cobra.FixedCompletions(validLogFormats, cobra.ShellCompDirectiveDefault))
 	validOutputFormats := []string{"text", "json", "jsonmini"}
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The command output format, can be: %s", strings.Join(validOutputFormats, ", ")))
-	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return validOutputFormats, cobra.ShellCompDirectiveDefault
-	})
+	cmd.RegisterFlagCompletionFunc("format", cobra.FixedCompletions(validOutputFormats, cobra.ShellCompDirectiveDefault))
 	cmd.Flag("format").Hidden = true
 	cmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, tr("Print the output in JSON format."))
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
-	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
-	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
-	configuration.BindFlags(cmd, defaultSettings)
+	cmd.PersistentFlags().StringSliceVar(&additionalUrls, "additional-urls", defaultAdditionalURLs, tr("Comma-separated list of additional URLs for the Boards Manager."))
+	cmd.PersistentFlags().BoolVar(&noColor, "no-color", defaultOutputNoColor, "Disable colored output.")
 
 	return cmd
 }
@@ -177,17 +214,15 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 	return
 }
 
-func preRun(cmd *cobra.Command, defaultSettings *configuration.Settings) {
-	configFile := defaultSettings.ConfigFileUsed()
-
+func preRun(verbose bool, outputFormat string, logLevel, logFile, logFormat string, noColor bool, settings *rpc.Configuration) {
 	// initialize inventory
-	err := inventory.Init(configuration.DataDir(defaultSettings).String())
+	err := inventory.Init(settings.GetDirectories().GetData())
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrInitializingInventory)
 	}
 
 	// https://no-color.org/
-	color.NoColor = defaultSettings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
+	color.NoColor = noColor || os.Getenv("NO_COLOR") != ""
 
 	// Set default feedback output to colorable
 	feedback.SetOut(colorable.NewColorableStdout())
@@ -210,13 +245,12 @@ func preRun(cmd *cobra.Command, defaultSettings *configuration.Settings) {
 	}
 
 	// set the Logger format
-	logFormat := strings.ToLower(defaultSettings.GetString("logging.format"))
+	logFormat = strings.ToLower(logFormat)
 	if logFormat == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
 	// should we log to file?
-	logFile := defaultSettings.GetString("logging.file")
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -232,41 +266,26 @@ func preRun(cmd *cobra.Command, defaultSettings *configuration.Settings) {
 	}
 
 	// configure logging filter
-	if lvl, found := toLogLevel(defaultSettings.GetString("logging.level")); !found {
-		feedback.Fatal(tr("Invalid option for --log-level: %s", defaultSettings.GetString("logging.level")), feedback.ErrBadArgument)
+	if logrusLevel, found := toLogLevel(logLevel); !found {
+		feedback.Fatal(tr("Invalid logging level: %s", logLevel), feedback.ErrBadArgument)
 	} else {
-		logrus.SetLevel(lvl)
+		logrus.SetLevel(logrusLevel)
 	}
 
 	//
 	// Prepare the Feedback system
 	//
 
-	// check the right output format was passed
-	format, found := feedback.ParseOutputFormat(outputFormat)
-	if !found {
+	// use the output format to configure the Feedback
+	format, ok := feedback.ParseOutputFormat(outputFormat)
+	if !ok {
 		feedback.Fatal(tr("Invalid output format: %s", outputFormat), feedback.ErrBadArgument)
 	}
-
-	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
 
 	//
 	// Print some status info and check command is consistent
 	//
 
-	if configFile != "" {
-		logrus.Infof("Using config file: %s", configFile)
-	} else {
-		logrus.Info("Config file not found, using default values")
-	}
-
 	logrus.Info(versioninfo.VersionInfo.Application + " version " + versioninfo.VersionInfo.VersionString)
-
-	if outputFormat != "text" {
-		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
-			logrus.Warn("Calling help on JSON format")
-			feedback.Fatal(tr("Invalid Call : should show Help, but it is available only in TEXT mode."), feedback.ErrBadArgument)
-		})
-	}
 }

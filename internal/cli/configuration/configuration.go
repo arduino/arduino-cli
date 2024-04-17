@@ -19,71 +19,29 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/go-configmap"
 	"github.com/arduino/arduino-cli/internal/i18n"
-	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var tr = i18n.Tr
 
 // Settings contains the configuration of the Arduino CLI core service
 type Settings struct {
-	*viper.Viper
+	*configmap.Map
+	Defaults *configmap.Map
 }
 
 // NewSettings creates a new instance of Settings with the default values set
 func NewSettings() *Settings {
-	res := &Settings{viper.New()}
+	res := &Settings{
+		Map:      configmap.New(),
+		Defaults: configmap.New(),
+	}
 	SetDefaults(res)
 	return res
-}
-
-// Init initialize defaults and read the configuration file.
-// Please note the logging system hasn't been configured yet,
-// so logging shouldn't be used here.
-func Init(configFile string) *Settings {
-	// Create a new viper instance with default values for all the settings
-	settings := NewSettings()
-
-	// Set config name and config path
-	if configFilePath := paths.New(configFile); configFilePath != nil {
-		settings.SetConfigName(strings.TrimSuffix(configFilePath.Base(), configFilePath.Ext()))
-		settings.AddConfigPath(configFilePath.Parent().String())
-	} else {
-		configDir := settings.GetString("directories.Data")
-		// Get default data path if none was provided
-		if configDir == "" {
-			configDir = getDefaultArduinoDataDir()
-		}
-
-		settings.SetConfigName("arduino-cli")
-		settings.AddConfigPath(configDir)
-	}
-
-	// Attempt to read config file
-	if err := settings.ReadInConfig(); err != nil {
-		// ConfigFileNotFoundError is acceptable, anything else
-		// should be reported to the user
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			feedback.Warning(tr("Error reading config file: %v", err))
-		}
-	}
-
-	return settings
-}
-
-// BindFlags creates all the flags binding between the cobra Command and the instance of viper
-func BindFlags(cmd *cobra.Command, settings *Settings) {
-	settings.BindPFlag("logging.level", cmd.Flag("log-level"))
-	settings.BindPFlag("logging.file", cmd.Flag("log-file"))
-	settings.BindPFlag("logging.format", cmd.Flag("log-format"))
-	settings.BindPFlag("board_manager.additional_urls", cmd.Flag("additional-urls"))
-	settings.BindPFlag("output.no_color", cmd.Flag("no-color"))
 }
 
 // getDefaultArduinoDataDir returns the full path to the default arduino folder
@@ -136,11 +94,6 @@ func getDefaultUserDir() string {
 	}
 }
 
-// GetDefaultBuiltinLibrariesDir returns the full path to the default builtin libraries dir
-func GetDefaultBuiltinLibrariesDir() string {
-	return filepath.Join(getDefaultArduinoDataDir(), "libraries")
-}
-
 // FindConfigFileInArgsFallbackOnEnv returns the config file path using the
 // argument '--config-file' (if specified), if empty looks for the ARDUINO_CONFIG_FILE env,
 // or looking in the current working dir
@@ -153,5 +106,8 @@ func FindConfigFileInArgsFallbackOnEnv(args []string) string {
 			}
 		}
 	}
-	return os.Getenv("ARDUINO_CONFIG_FILE")
+	if p, ok := os.LookupEnv("ARDUINO_CONFIG_FILE"); ok {
+		return p
+	}
+	return filepath.Join(getDefaultArduinoDataDir(), "arduino-cli.yaml")
 }

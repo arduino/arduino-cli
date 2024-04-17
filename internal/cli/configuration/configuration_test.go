@@ -16,47 +16,28 @@
 package configuration
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func tmpDirOrDie() string {
-	dir, err := os.MkdirTemp(os.TempDir(), "cli_test")
-	if err != nil {
-		panic(fmt.Sprintf("error creating tmp dir: %v", err))
-	}
-	// Symlinks are evaluated becase the temp folder on Mac OS is inside /var, it's not writable
-	// and is a symlink to /private/var, we want the full path so we do this
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		panic(fmt.Sprintf("error evaluating tmp dir symlink: %v", err))
-	}
-	return dir
-}
-
 func TestInit(t *testing.T) {
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-	settings := Init(filepath.Join(tmp, "arduino-cli.yaml"))
-	require.NotNil(t, settings)
+	settings := NewSettings()
 
-	require.Equal(t, "info", settings.GetString("logging.level"))
-	require.Equal(t, "text", settings.GetString("logging.format"))
+	require.Equal(t, "info", settings.Defaults.GetString("logging.level"))
+	require.Equal(t, "text", settings.Defaults.GetString("logging.format"))
 
-	require.Empty(t, settings.GetStringSlice("board_manager.additional_urls"))
+	require.Empty(t, settings.Defaults.GetStringSlice("board_manager.additional_urls"))
 
-	require.NotEmpty(t, settings.GetString("directories.Data"))
-	require.NotEmpty(t, settings.GetString("directories.Downloads"))
-	require.NotEmpty(t, settings.GetString("directories.User"))
+	require.NotEmpty(t, settings.Defaults.GetString("directories.data"))
+	require.Empty(t, settings.Defaults.GetString("directories.downloads"))
+	require.NotEmpty(t, settings.DownloadsDir().String())
+	require.NotEmpty(t, settings.Defaults.GetString("directories.user"))
 
-	require.Equal(t, "50051", settings.GetString("daemon.port"))
+	require.Equal(t, "50051", settings.Defaults.GetString("daemon.port"))
 
-	require.Equal(t, true, settings.GetBool("metrics.enabled"))
-	require.Equal(t, ":9090", settings.GetString("metrics.addr"))
+	require.Equal(t, true, settings.Defaults.GetBool("metrics.enabled"))
+	require.Equal(t, ":9090", settings.Defaults.GetString("metrics.addr"))
 }
 
 func TestFindConfigFile(t *testing.T) {

@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2024 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,20 +13,26 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package commands
+package configmap
 
 import (
-	"context"
-
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"gopkg.in/yaml.v3"
 )
 
-// CleanDownloadCacheDirectory clean the download cache directory (where archives are downloaded).
-func (s *arduinoCoreServerImpl) CleanDownloadCacheDirectory(ctx context.Context, req *rpc.CleanDownloadCacheDirectoryRequest) (*rpc.CleanDownloadCacheDirectoryResponse, error) {
-	cachePath := s.settings.DownloadsDir()
-	err := cachePath.RemoveAll()
-	if err != nil {
-		return nil, err
+func (c Map) MarshalYAML() (interface{}, error) {
+	return c.values, nil
+}
+
+func (c *Map) UnmarshalYAML(node *yaml.Node) error {
+	in := map[string]any{}
+	if err := node.Decode(&in); err != nil {
+		return err
 	}
-	return &rpc.CleanDownloadCacheDirectoryResponse{}, nil
+
+	for k, v := range flattenMap(in) {
+		if err := c.Set(k, v); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -18,161 +18,204 @@ package commands
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"strings"
+	"reflect"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/protobuf/proto"
+	"gopkg.in/yaml.v3"
 )
-
-// SettingsGetAll returns a message with a string field containing all the settings
-// currently in use, marshalled in JSON format.
-func (s *arduinoCoreServerImpl) SettingsGetAll(ctx context.Context, req *rpc.SettingsGetAllRequest) (*rpc.SettingsGetAllResponse, error) {
-	b, err := json.Marshal(s.settings.AllSettings())
-	if err == nil {
-		return &rpc.SettingsGetAllResponse{
-			JsonData: string(b),
-		}, nil
-	}
-
-	return nil, err
-}
-
-// mapper converts a map of nested maps to a map of scalar values.
-// For example:
-//
-//	{"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}
-//
-// would convert to:
-//
-//	{"foo": "bar", "daemon.port":"420", "sketch.always_export_binaries": "true"}
-func mapper(toMap map[string]interface{}) map[string]interface{} {
-	res := map[string]interface{}{}
-	for k, v := range toMap {
-		switch data := v.(type) {
-		case map[string]interface{}:
-			for mK, mV := range mapper(data) {
-				// Concatenate keys
-				res[fmt.Sprintf("%s.%s", k, mK)] = mV
-			}
-			// This is done to avoid skipping keys containing empty maps
-			if len(data) == 0 {
-				res[k] = map[string]interface{}{}
-			}
-		default:
-			res[k] = v
-		}
-	}
-	return res
-}
-
-// SettingsMerge applies multiple settings values at once.
-func (s *arduinoCoreServerImpl) SettingsMerge(ctx context.Context, req *rpc.SettingsMergeRequest) (*rpc.SettingsMergeResponse, error) {
-	var toMerge map[string]interface{}
-	if err := json.Unmarshal([]byte(req.GetJsonData()), &toMerge); err != nil {
-		return nil, err
-	}
-
-	mapped := mapper(toMerge)
-
-	// Set each value individually.
-	// This is done because Viper ignores empty strings or maps when
-	// using the MergeConfigMap function.
-	updatedSettings := configuration.Init("")
-	for k, v := range mapped {
-		updatedSettings.Set(k, v)
-	}
-	configPath := s.settings.ConfigFileUsed()
-	updatedSettings.SetConfigFile(configPath)
-	s.settings = updatedSettings
-
-	return &rpc.SettingsMergeResponse{}, nil
-}
 
 // SettingsGetValue returns a settings value given its key. If the key is not present
 // an error will be returned, so that we distinguish empty settings from missing
 // ones.
-func (s *arduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.SettingsGetValueRequest) (*rpc.SettingsGetValueResponse, error) {
+func (s *arduinoCoreServerImpl) ConfigurationGet(ctx context.Context, req *rpc.ConfigurationGetRequest) (*rpc.ConfigurationGetResponse, error) {
+	conf := &rpc.Configuration{
+		Directories: &rpc.Configuration_Directories{
+			Builtin:   &rpc.Configuration_Directories_Builtin{},
+			Data:      s.settings.DataDir().String(),
+			Downloads: s.settings.DownloadsDir().String(),
+			User:      s.settings.UserDir().String(),
+		},
+		Network: &rpc.Configuration_Network{},
+		Sketch: &rpc.Configuration_Sketch{
+			AlwaysExportBinaries: s.settings.SketchAlwaysExportBinaries(),
+		},
+		BuildCache: &rpc.Configuration_BuildCache{
+			CompilationsBeforePurge: uint64(s.settings.GetCompilationsBeforeBuildCachePurge()),
+			TtlSecs:                 uint64(s.settings.GetBuildCacheTTL().Seconds()),
+		},
+		BoardManager: &rpc.Configuration_BoardManager{
+			AdditionalUrls: s.settings.BoardManagerAdditionalUrls(),
+		},
+		Daemon: &rpc.Configuration_Daemon{
+			Port: s.settings.DaemonPort(),
+		},
+		Output: &rpc.Configuration_Output{
+			NoColor: s.settings.NoColor(),
+		},
+		Logging: &rpc.Configuration_Logging{
+			Level:  s.settings.LoggingLevel(),
+			Format: s.settings.LoggingFormat(),
+		},
+		Library: &rpc.Configuration_Library{
+			EnableUnsafeInstall: s.settings.LibraryEnableUnsafeInstall(),
+		},
+		Updater: &rpc.Configuration_Updater{
+			EnableNotification: s.settings.UpdaterEnableNotification(),
+		},
+	}
+
+	if builtinLibs := s.settings.IDEBuiltinLibrariesDir(); builtinLibs != nil {
+		conf.Directories.Builtin.Libraries = proto.String(builtinLibs.String())
+	}
+
+	if ua := s.settings.ExtraUserAgent(); ua != "" {
+		conf.Network.ExtraUserAgent = &ua
+	}
+	if proxy, err := s.settings.NetworkProxy(); err == nil && proxy != nil {
+		conf.Network.Proxy = proto.String(proxy.String())
+	}
+
+	if logFile := s.settings.LoggingFile(); logFile != nil {
+		file := logFile.String()
+		conf.Logging.File = &file
+	}
+
+	if locale := s.settings.Locale(); locale != "" {
+		conf.Locale = &locale
+	}
+
+	return &rpc.ConfigurationGetResponse{Configuration: conf}, nil
+}
+
+func (s *arduinoCoreServerImpl) SettingsSetValue(ctx context.Context, req *rpc.SettingsSetValueRequest) (*rpc.SettingsSetValueResponse, error) {
+	// Determine the existence and the kind of the value
 	key := req.GetKey()
 
-	// Check if settings key actually existing, we don't use Viper.InConfig()
-	// since that doesn't check for keys formatted like daemon.port or those set
-	// with Viper.Set(). This way we check for all existing settings for sure.
-	keyExists := false
-	for _, k := range s.settings.AllKeys() {
-		if k == key || strings.HasPrefix(k, key) {
-			keyExists = true
-			break
+	// Extract the value from the request
+	encodedValue := []byte(req.GetEncodedValue())
+	if len(encodedValue) == 0 {
+		// If the value is empty, unset the key
+		s.settings.Delete(key)
+		return &rpc.SettingsSetValueResponse{}, nil
+	}
+
+	var newValue any
+	switch req.GetValueFormat() {
+	case "", "json":
+		if err := json.Unmarshal(encodedValue, &newValue); err != nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("invalid value: %v", err)}
 		}
-	}
-	if !keyExists {
-		return nil, errors.New(tr("key not found in settings"))
-	}
-
-	b, err := json.Marshal(s.settings.Get(key))
-	value := &rpc.SettingsGetValueResponse{}
-	if err == nil {
-		value.Key = key
-		value.JsonData = string(b)
-	}
-
-	return value, err
-}
-
-// SettingsSetValue updates or set a value for a certain key.
-func (s *arduinoCoreServerImpl) SettingsSetValue(ctx context.Context, val *rpc.SettingsSetValueRequest) (*rpc.SettingsSetValueResponse, error) {
-	key := val.GetKey()
-	var value interface{}
-
-	err := json.Unmarshal([]byte(val.GetJsonData()), &value)
-	if err == nil {
-		s.settings.Set(key, value)
+	case "yaml":
+		if err := yaml.Unmarshal(encodedValue, &newValue); err != nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("invalid value: %v", err)}
+		}
+	case "cli":
+		err := s.settings.SetFromCLIArgs(key, req.GetEncodedValue())
+		if err != nil {
+			return nil, err
+		}
+		return &rpc.SettingsSetValueResponse{}, nil
+	default:
+		return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("unsupported value format: %s", req.ValueFormat)}
 	}
 
-	return &rpc.SettingsSetValueResponse{}, err
-}
+	// If the value is "null", unset the key
+	if reflect.TypeOf(newValue) == reflect.TypeOf(nil) {
+		s.settings.Delete(key)
+		return &rpc.SettingsSetValueResponse{}, nil
+	}
 
-// SettingsWrite to file set in request the settings currently stored in memory.
-// We don't have a Read() function, that's not necessary since we only want one config file to be used
-// and that's picked up when the CLI is run as daemon, either using the default path or a custom one
-// set with the --config-file flag.
-func (s *arduinoCoreServerImpl) SettingsWrite(ctx context.Context, req *rpc.SettingsWriteRequest) (*rpc.SettingsWriteResponse, error) {
-	if err := s.settings.WriteConfigAs(req.GetFilePath()); err != nil {
+	// Set the value
+	if err := s.settings.Set(key, newValue); err != nil {
 		return nil, err
 	}
-	return &rpc.SettingsWriteResponse{}, nil
+
+	return &rpc.SettingsSetValueResponse{}, nil
 }
 
-// SettingsDelete removes a key from the config file
-func (s *arduinoCoreServerImpl) SettingsDelete(ctx context.Context, req *rpc.SettingsDeleteRequest) (*rpc.SettingsDeleteResponse, error) {
-	toDelete := req.GetKey()
+func (s *arduinoCoreServerImpl) SettingsGetValue(ctx context.Context, req *rpc.SettingsGetValueRequest) (*rpc.SettingsGetValueResponse, error) {
+	key := req.GetKey()
+	value, ok := s.settings.GetOk(key)
+	if !ok {
+		value, ok = s.settings.Defaults.GetOk(key)
+	}
+	if !ok {
+		return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("key %s not found", key)}
+	}
 
-	// Check if settings key actually existing, we don't use Viper.InConfig()
-	// since that doesn't check for keys formatted like daemon.port or those set
-	// with Viper.Set(). This way we check for all existing settings for sure.
-	keyExists := false
-	keys := []string{}
-	for _, k := range s.settings.AllKeys() {
-		if !strings.HasPrefix(k, toDelete) {
-			keys = append(keys, k)
-			continue
+	switch req.GetValueFormat() {
+	case "", "json":
+		valueJson, err := json.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("error marshalling value: %v", err)
 		}
-		keyExists = true
+		return &rpc.SettingsGetValueResponse{EncodedValue: string(valueJson)}, nil
+	case "yaml":
+		valueYaml, err := yaml.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("error marshalling value: %v", err)
+		}
+		return &rpc.SettingsGetValueResponse{EncodedValue: string(valueYaml)}, nil
+	default:
+		return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("unsupported value format: %s", req.ValueFormat)}
+	}
+}
+
+// ConfigurationSave encodes the current configuration in the specified format
+func (s *arduinoCoreServerImpl) ConfigurationSave(ctx context.Context, req *rpc.ConfigurationSaveRequest) (*rpc.ConfigurationSaveResponse, error) {
+	switch req.GetSettingsFormat() {
+	case "yaml":
+		data, err := yaml.Marshal(s.settings)
+		if err != nil {
+			return nil, fmt.Errorf("error marshalling settings: %v", err)
+		}
+		return &rpc.ConfigurationSaveResponse{EncodedSettings: string(data)}, nil
+	case "json":
+		data, err := json.Marshal(s.settings)
+		if err != nil {
+			return nil, fmt.Errorf("error marshalling settings: %v", err)
+		}
+		return &rpc.ConfigurationSaveResponse{EncodedSettings: string(data)}, nil
+	default:
+		return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("unsupported format: %s", req.GetSettingsFormat())}
+	}
+}
+
+// SettingsReadFromFile read settings from a YAML file and replace the settings currently stored in memory.
+func (s *arduinoCoreServerImpl) ConfigurationOpen(ctx context.Context, req *rpc.ConfigurationOpenRequest) (*rpc.ConfigurationOpenResponse, error) {
+	switch req.GetSettingsFormat() {
+	case "yaml":
+		err := yaml.Unmarshal([]byte(req.GetEncodedSettings()), s.settings)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshalling settings: %v", err)
+		}
+	case "json":
+		err := json.Unmarshal([]byte(req.GetEncodedSettings()), s.settings)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshalling settings: %v", err)
+		}
+	default:
+		return nil, &cmderrors.InvalidArgumentError{Message: fmt.Sprintf("unsupported format: %s", req.GetSettingsFormat())}
 	}
 
-	if !keyExists {
-		return nil, errors.New(tr("key not found in settings"))
-	}
+	configuration.InjectEnvVars(s.settings)
+	return &rpc.ConfigurationOpenResponse{}, nil
+}
 
-	// Override current settings to delete the key
-	updatedSettings := configuration.Init("")
-	for _, k := range keys {
-		updatedSettings.Set(k, s.settings.Get(k))
+// SettingsEnumerate returns the list of all the settings keys.
+func (s *arduinoCoreServerImpl) SettingsEnumerate(ctx context.Context, req *rpc.SettingsEnumerateRequest) (*rpc.SettingsEnumerateResponse, error) {
+	var entries []*rpc.SettingsEnumerateResponse_Entry
+	for k, t := range s.settings.Defaults.Schema() {
+		entries = append(entries, &rpc.SettingsEnumerateResponse_Entry{
+			Key:  k,
+			Type: t.String(),
+		})
 	}
-	configPath := s.settings.ConfigFileUsed()
-	updatedSettings.SetConfigFile(configPath)
-	s.settings = updatedSettings
-
-	return &rpc.SettingsDeleteResponse{}, nil
+	return &rpc.SettingsEnumerateResponse{
+		Entries: entries,
+	}, nil
 }

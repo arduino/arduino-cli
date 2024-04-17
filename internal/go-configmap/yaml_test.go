@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2024 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,22 +13,36 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package commands
+package configmap_test
 
 import (
-	"context"
+	"fmt"
 	"testing"
 
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/internal/go-configmap"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
-func TestLoadSketchProfiles(t *testing.T) {
-	srv := NewArduinoCoreServer()
-	loadResp, err := srv.LoadSketch(context.Background(), &commands.LoadSketchRequest{
-		SketchPath: "./testdata/sketch_with_profile",
-	})
+func TestYaml(t *testing.T) {
+	c := configmap.New()
+	c.Set("foo", "bar")
+	c.Set("fooz.bar", "baz")
+	c.Set("answer", 42)
+	require.Equal(t, "bar", c.Get("foo"))
+	require.Equal(t, "baz", c.Get("fooz.bar"))
+	require.Equal(t, 42, c.Get("answer"))
+
+	y1, err := yaml.Marshal(c)
 	require.NoError(t, err)
-	require.Len(t, loadResp.GetSketch().GetProfiles(), 2)
-	require.Equal(t, loadResp.GetSketch().GetDefaultProfile().GetName(), "nanorp")
+	fmt.Println(string(y1))
+
+	d := configmap.New()
+	err = yaml.Unmarshal(y1, d)
+	require.NoError(t, err)
+	require.Equal(t, "baz", d.Get("fooz.bar"))
+
+	y2, err := yaml.Marshal(d)
+	require.NoError(t, err)
+	require.Equal(t, string(y1), string(y2))
 }

@@ -23,7 +23,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -245,84 +244,84 @@ func callVersion(client rpc.ArduinoCoreServiceClient) {
 }
 
 func callSetValue(client rpc.ArduinoCoreServiceClient) {
-	_, err := client.SettingsSetValue(context.Background(),
-		&rpc.SettingsSetValueRequest{
-			Key:      "directories",
-			JsonData: `{"data": "` + dataDir + `", "downloads": "` + path.Join(dataDir, "staging") + `", "user": "` + path.Join(dataDir, "sketchbook") + `"}`,
-		})
+	// _, err := client.SettingsSetValue(context.Background(),
+	// 	&rpc.SettingsSetValueRequest{
+	// 		Key:      "directories",
+	// 		JsonData: `{"data": "` + dataDir + `", "downloads": "` + path.Join(dataDir, "staging") + `", "user": "` + path.Join(dataDir, "sketchbook") + `"}`,
+	// 	})
 
-	if err != nil {
-		log.Fatalf("Error setting settings value: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error setting settings value: %s", err)
+	// }
 }
 
 func callSetProxy(client rpc.ArduinoCoreServiceClient) {
-	_, err := client.SettingsSetValue(context.Background(),
-		&rpc.SettingsSetValueRequest{
-			Key:      "network.proxy",
-			JsonData: `"http://localhost:3128"`,
-		})
+	// _, err := client.SettingsSetValue(context.Background(),
+	// 	&rpc.SettingsSetValueRequest{
+	// 		Key:      "network.proxy",
+	// 		JsonData: `"http://localhost:3128"`,
+	// 	})
 
-	if err != nil {
-		log.Fatalf("Error setting settings value: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error setting settings value: %s", err)
+	// }
 }
 
 func callUnsetProxy(client rpc.ArduinoCoreServiceClient) {
-	_, err := client.SettingsSetValue(context.Background(),
-		&rpc.SettingsSetValueRequest{
-			Key:      "network.proxy",
-			JsonData: `""`,
-		})
+	// _, err := client.SettingsSetValue(context.Background(),
+	// 	&rpc.SettingsSetValueRequest{
+	// 		Key:      "network.proxy",
+	// 		JsonData: `""`,
+	// 	})
 
-	if err != nil {
-		log.Fatalf("Error setting settings value: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error setting settings value: %s", err)
+	// }
 }
 
 func callMerge(client rpc.ArduinoCoreServiceClient, jsonData string) {
-	_, err := client.SettingsMerge(context.Background(),
-		&rpc.SettingsMergeRequest{
-			JsonData: jsonData,
-		})
+	// _, err := client.SettingsMerge(context.Background(),
+	// 	&rpc.SettingsMergeRequest{
+	// 		JsonData: jsonData,
+	// 	})
 
-	if err != nil {
-		log.Fatalf("Error merging settings: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error merging settings: %s", err)
+	// }
 }
 
 func callGetValue(client rpc.ArduinoCoreServiceClient) {
-	getValueResp, err := client.SettingsGetValue(context.Background(),
-		&rpc.SettingsGetValueRequest{
-			Key: "foo",
-		})
+	// getValueResp, err := client.SettingsGetValue(context.Background(),
+	// 	&rpc.SettingsGetValueRequest{
+	// 		Key: "foo",
+	// 	})
 
-	if err != nil {
-		log.Fatalf("Error getting settings value: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error getting settings value: %s", err)
+	// }
 
-	log.Printf("Value: %s: %s", getValueResp.GetKey(), getValueResp.GetJsonData())
+	// log.Printf("Value: %s: %s", getValueResp.GetKey(), getValueResp.GetJsonData())
 }
 
 func callGetAll(client rpc.ArduinoCoreServiceClient) {
-	getAllResp, err := client.SettingsGetAll(context.Background(), &rpc.SettingsGetAllRequest{})
+	// getAllResp, err := client.SettingsGetAll(context.Background(), &rpc.SettingsGetAllRequest{})
 
-	if err != nil {
-		log.Fatalf("Error getting settings: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error getting settings: %s", err)
+	// }
 
-	log.Printf("Settings: %s", getAllResp.GetJsonData())
+	// log.Printf("Settings: %s", getAllResp.GetJsonData())
 }
 
 func callWrite(client rpc.ArduinoCoreServiceClient) {
-	_, err := client.SettingsWrite(context.Background(),
-		&rpc.SettingsWriteRequest{
-			FilePath: path.Join(dataDir, "written-rpc.Settingsyml"),
-		})
+	// _, err := client.SettingsWrite(context.Background(),
+	// 	&rpc.SettingsWriteRequest{
+	// 		FilePath: path.Join(dataDir, "written-rpc.Settingsyml"),
+	// 	})
 
-	if err != nil {
-		log.Fatalf("Error writing settings: %s", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Error writing settings: %s", err)
+	// }
 }
 
 func createInstance(client rpc.ArduinoCoreServiceClient) *rpc.Instance {

@@ -36,7 +36,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -72,7 +71,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	}
 
 	// Setup downloads directory
-	downloadsDir := configuration.DownloadsDir(s.settings)
+	downloadsDir := s.settings.DownloadsDir()
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
@@ -81,8 +80,9 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	}
 
 	// Setup data directory
-	dataDir := configuration.DataDir(s.settings)
-	packagesDir := configuration.PackagesDir(s.settings)
+	dataDir := s.settings.DataDir()
+	userPackagesDir := s.settings.UserDir().Join("hardware")
+	packagesDir := s.settings.PackagesDir()
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
@@ -94,7 +94,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	if err != nil {
 		return nil, err
 	}
-	inst, err := instances.Create(dataDir, packagesDir, downloadsDir, userAgent, config)
+	inst, err := instances.Create(dataDir, packagesDir, userPackagesDir, downloadsDir, userAgent, config)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	defaultIndexURL, _ := utils.URLParse(globals.DefaultIndexURL)
 	allPackageIndexUrls := []*url.URL{defaultIndexURL}
 	if profile == nil {
-		for _, u := range s.settings.GetStringSlice("board_manager.additional_urls") {
+		for _, u := range s.settings.BoardManagerAdditionalUrls() {
 			URL, err := utils.URLParse(u)
 			if err != nil {
 				e := &cmderrors.InitFailedError{
@@ -192,7 +192,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		}
 	}
 
-	if err := firstUpdate(ctx, s, req.GetInstance(), configuration.DataDir(s.settings), downloadCallback, allPackageIndexUrls); err != nil {
+	if err := firstUpdate(ctx, s, req.GetInstance(), s.settings.DataDir(), downloadCallback, allPackageIndexUrls); err != nil {
 		e := &cmderrors.InitFailedError{
 			Code:   codes.InvalidArgument,
 			Cause:  err,
@@ -245,7 +245,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 		// Load Platforms
 		if profile == nil {
-			for _, err := range pmb.LoadHardware(s.settings) {
+			for _, err := range pmb.LoadHardware() {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
 			}
@@ -349,7 +349,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
-		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(s.settings); bundledLibsDir != nil {
+		if bundledLibsDir := s.settings.IDEBuiltinLibrariesDir(); bundledLibsDir != nil {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     bundledLibsDir,
 				Location: libraries.IDEBuiltIn,
@@ -358,14 +358,14 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 		// Add libraries directory from config file
 		lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
-			Path:     configuration.LibrariesDir(s.settings),
+			Path:     s.settings.LibrariesDir(),
 			Location: libraries.User,
 		})
 	} else {
 		// Load libraries required for profile
 		for _, libraryRef := range profile.Libraries {
 			uid := libraryRef.InternalUniqueIdentifier()
-			libRoot := configuration.ProfilesCacheDir(s.settings).Join(uid)
+			libRoot := s.settings.ProfilesCacheDir().Join(uid)
 			libDir := libRoot.Join(libraryRef.Library)
 
 			if !libDir.IsDir() {
@@ -548,7 +548,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			Message: &rpc.UpdateIndexResponse_DownloadProgress{DownloadProgress: p},
 		})
 	}
-	indexpath := configuration.DataDir(s.settings)
+	indexpath := s.settings.DataDir()
 
 	urls := []string{globals.DefaultIndexURL}
 	if !req.GetIgnoreCustomPackageIndexes() {
@@ -614,6 +614,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, tr("Invalid network configuration: %s", err))
 			failed = true
+			continue
 		}
 
 		if strings.HasSuffix(URL.Host, "arduino.cc") && strings.HasSuffix(URL.Path, ".json") {

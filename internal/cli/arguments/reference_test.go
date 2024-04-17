@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -55,7 +54,7 @@ func TestArgsStringify(t *testing.T) {
 }
 
 func TestParseReferenceCores(t *testing.T) {
-	srv := commands.NewArduinoCoreServer("", configuration.Init(""))
+	srv := commands.NewArduinoCoreServer()
 	ctx := context.Background()
 	for _, tt := range goodCores {
 		actual, err := arguments.ParseReference(ctx, srv, tt.in)
@@ -76,7 +75,7 @@ func TestParseArgs(t *testing.T) {
 		input = append(input, tt.in)
 	}
 
-	srv := commands.NewArduinoCoreServer("", configuration.Init(""))
+	srv := commands.NewArduinoCoreServer()
 	refs, err := arguments.ParseReferences(context.Background(), srv, input)
 	assert.Nil(t, err)
 	assert.Equal(t, len(goodCores), len(refs))

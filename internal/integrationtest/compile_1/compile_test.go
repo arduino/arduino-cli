@@ -522,7 +522,7 @@ func compileWithExportBinariesConfig(t *testing.T, env *integrationtest.Environm
 		{
 			"config": {
 				"sketch": {
-					"always_export_binaries": "true"
+					"always_export_binaries": true
 				}
 			}
 		}`)

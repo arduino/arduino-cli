@@ -18,7 +18,6 @@ package lib
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
@@ -27,7 +26,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand created a new `lib` command
-func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *configuration.Settings) *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *rpc.Configuration) *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
 		Short: tr("Arduino commands about libraries."),

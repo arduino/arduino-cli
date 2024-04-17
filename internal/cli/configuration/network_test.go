@@ -32,7 +32,7 @@ func TestUserAgentHeader(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	settings := configuration.Init("")
+	settings := configuration.NewSettings()
 	settings.Set("network.user_agent_ext", "test-user-agent")
 	client, err := settings.NewHttpClient()
 	require.NoError(t, err)
@@ -55,7 +55,7 @@ func TestProxy(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	settings := configuration.Init("")
+	settings := configuration.NewSettings()
 	settings.Set("network.proxy", ts.URL)
 	client, err := settings.NewHttpClient()
 	require.NoError(t, err)
