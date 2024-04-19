@@ -38,12 +38,7 @@ func TestPlatformSearch(t *testing.T) {
 	ctx := context.Background()
 	srv := NewArduinoCoreServer()
 
-	conf, err := paths.TempDir().Join("test", "arduino-cli.yaml").ReadFile()
-	require.NoError(t, err)
-	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{
-		SettingsFormat:  "yaml",
-		EncodedSettings: string(conf),
-	})
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"})
 	require.NoError(t, err)
 
 	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
@@ -347,12 +342,7 @@ func TestPlatformSearchSorting(t *testing.T) {
 	ctx := context.Background()
 	srv := NewArduinoCoreServer()
 
-	conf, err := paths.TempDir().Join("test", "arduino-cli.yaml").ReadFile()
-	require.NoError(t, err)
-	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{
-		SettingsFormat:  "yaml",
-		EncodedSettings: string(conf),
-	})
+	_, err = srv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"})
 	require.NoError(t, err)
 
 	createResp, err := srv.Create(ctx, &rpc.CreateRequest{})
