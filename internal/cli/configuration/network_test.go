@@ -33,7 +33,7 @@ func TestUserAgentHeader(t *testing.T) {
 	defer ts.Close()
 
 	settings := configuration.NewSettings()
-	settings.Set("network.user_agent_ext", "test-user-agent")
+	require.NoError(t, settings.Set("network.user_agent_ext", "test-user-agent"))
 	client, err := settings.NewHttpClient()
 	require.NoError(t, err)
 
@@ -46,6 +46,7 @@ func TestUserAgentHeader(t *testing.T) {
 	b, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
 
+	fmt.Println("RESPONSE:", string(b))
 	require.Contains(t, string(b), "test-user-agent")
 }
 

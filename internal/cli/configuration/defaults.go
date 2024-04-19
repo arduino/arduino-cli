@@ -64,6 +64,10 @@ func SetDefaults(settings *Settings) {
 
 	// updater settings
 	setDefaultValueAndKeyTypeSchema("updater.enable_notification", true)
+
+	// network settings
+	setKeyTypeSchema("network.proxy", "")
+	setKeyTypeSchema("network.user_agent_ext", "")
 }
 
 // InjectEnvVars change settings based on the environment variables values
