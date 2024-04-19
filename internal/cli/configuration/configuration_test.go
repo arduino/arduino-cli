@@ -16,6 +16,7 @@
 package configuration
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -41,8 +42,9 @@ func TestInit(t *testing.T) {
 }
 
 func TestFindConfigFile(t *testing.T) {
+	defaultConfigFile := filepath.Join(getDefaultArduinoDataDir(), "arduino-cli.yaml")
 	configFile := FindConfigFileInArgsFallbackOnEnv([]string{"--config-file"})
-	require.Equal(t, "", configFile)
+	require.Equal(t, defaultConfigFile, configFile)
 
 	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "some/path/to/config"})
 	require.Equal(t, "some/path/to/config", configFile)
@@ -51,7 +53,7 @@ func TestFindConfigFile(t *testing.T) {
 	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
 
 	configFile = FindConfigFileInArgsFallbackOnEnv([]string{})
-	require.Equal(t, "", configFile)
+	require.Equal(t, defaultConfigFile, configFile)
 
 	t.Setenv("ARDUINO_CONFIG_FILE", "some/path/to/config")
 	configFile = FindConfigFileInArgsFallbackOnEnv([]string{})
