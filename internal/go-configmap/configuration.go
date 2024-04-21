@@ -109,7 +109,12 @@ func tryConversion(current any, desiredType reflect.Type) (any, error) {
 		}
 		return currentArray, nil
 	}
-	return nil, fmt.Errorf("invalid conversion, got %T but want %v", current, desiredType)
+
+	currentTypeString := currentType.String()
+	if currentTypeString == "[]interface {}" {
+		currentTypeString = "array"
+	}
+	return nil, fmt.Errorf("invalid conversion, got %s but want %v", currentTypeString, desiredType)
 }
 
 func (c Map) set(keys []string, value any) {
