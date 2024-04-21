@@ -17,7 +17,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -81,6 +80,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	defaultLogFile := settings.GetLogging().GetFile()
 	defaultLogFormat := settings.GetLogging().GetFormat()
+	defaultLogLevel := settings.GetLogging().GetLevel()
 	defaultAdditionalURLs := settings.GetBoardManager().GetAdditionalUrls()
 	defaultOutputNoColor := settings.GetOutput().GetNoColor()
 
@@ -92,18 +92,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 
-			// Override server settings with the flags from the command line
-			set := func(key string, value any) {
-				if valueJson, err := json.Marshal(value); err != nil {
-					feedback.Fatal(tr("Error setting value %s: %v", key, err), feedback.ErrGeneric)
-				} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: string(valueJson)}); err != nil {
-					feedback.Fatal(tr("Error setting value %s: %v", key, err), feedback.ErrGeneric)
-				}
-			}
-			set("logging.level", logLevel)
-			set("logging.file", logFile)
-			set("board_manager.additional_urls", additionalUrls)
-			set("output.no_color", noColor)
+			config.ApplyGlobalFlagsToConfiguration(ctx, cmd, srv)
 
 			if jsonOutput {
 				outputFormat = "json"
@@ -178,7 +167,6 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	cmd.Flag("verbose").Hidden = true
 	cmd.PersistentFlags().BoolVar(&verbose, "log", false, tr("Print the logs on the standard output."))
-	defaultLogLevel := settings.GetLogging().GetLevel()
 	validLogLevels := []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}
 	cmd.PersistentFlags().StringVar(&logLevel, "log-level", defaultLogLevel, tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-level", cobra.FixedCompletions(validLogLevels, cobra.ShellCompDirectiveDefault))

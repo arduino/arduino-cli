@@ -42,7 +42,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	configCommand.AddCommand(initDeleteCommand(srv))
 	configCommand.AddCommand(initDumpCommand(srv))
 	configCommand.AddCommand(initGetCommand(srv))
-	configCommand.AddCommand(initInitCommand(srv))
+	configCommand.AddCommand(initInitCommand())
 	configCommand.AddCommand(initRemoveCommand(srv))
 	configCommand.AddCommand(initSetCommand(srv))
 

@@ -17,8 +17,11 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"os"
+	"strings"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -35,7 +38,7 @@ var (
 
 const defaultFileName = "arduino-cli.yaml"
 
-func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
+func initInitCommand() *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
 		Short: tr("Writes current configuration to a configuration file."),
@@ -50,7 +53,7 @@ func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "dest-file", "dest-dir")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runInitCommand(srv)
+			runInitCommand(cmd.Context(), cmd)
 		},
 	}
 	initCommand.Flags().StringVar(&destDir, "dest-dir", "", tr("Sets where to save the configuration file."))
@@ -59,9 +62,8 @@ func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return initCommand
 }
 
-func runInitCommand(srv rpc.ArduinoCoreServiceServer) {
+func runInitCommand(ctx context.Context, cmd *cobra.Command) {
 	logrus.Info("Executing `arduino-cli config init`")
-	ctx := context.Background()
 
 	var configFileAbsPath *paths.Path
 	var configFileDir *paths.Path
@@ -97,14 +99,22 @@ func runInitCommand(srv rpc.ArduinoCoreServiceServer) {
 		feedback.Fatal(tr("Cannot create config file directory: %v", err), feedback.ErrGeneric)
 	}
 
-	// for _, url := range newSettings.GetStringSlice("board_manager.additional_urls") {
-	// 	if strings.Contains(url, ",") {
-	// 		feedback.Fatal(tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
-	// 			feedback.ErrGeneric)
-	// 	}
-	// }
+	tmpSrv := commands.NewArduinoCoreServer()
 
-	resp, err := srv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"})
+	if _, err := tmpSrv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml", EncodedSettings: ""}); err != nil {
+		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+	}
+
+	// Ensure to always output an empty array for additional urls
+	if _, err := tmpSrv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
+		Key: "board_manager.additional_urls", EncodedValue: "[]",
+	}); err != nil {
+		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+	}
+
+	ApplyGlobalFlagsToConfiguration(ctx, cmd, tmpSrv)
+
+	resp, err := tmpSrv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"})
 	if err != nil {
 		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 	}
@@ -114,6 +124,44 @@ func runInitCommand(srv rpc.ArduinoCoreServiceServer) {
 	}
 
 	feedback.PrintResult(initResult{ConfigFileAbsPath: configFileAbsPath})
+}
+
+// ApplyGlobalFlagsToConfiguration overrides server settings with the flags from the command line
+func ApplyGlobalFlagsToConfiguration(ctx context.Context, cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
+	set := func(k string, v any) {
+		if jsonValue, err := json.Marshal(v); err != nil {
+			feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
+			Key: k, EncodedValue: string(jsonValue),
+		}); err != nil {
+			feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		}
+
+	}
+
+	if f := cmd.Flags().Lookup("log-level"); f.Changed {
+		logLevel, _ := cmd.Flags().GetString("log-level")
+		set("logging.level", logLevel)
+	}
+	if f := cmd.Flags().Lookup("log-file"); f.Changed {
+		logFile, _ := cmd.Flags().GetString("log-file")
+		set("logging.file", logFile)
+	}
+	if f := cmd.Flags().Lookup("no-color"); f.Changed {
+		noColor, _ := cmd.Flags().GetBool("no-color")
+		set("output.no_color", noColor)
+	}
+	if f := cmd.Flags().Lookup("additional-urls"); f.Changed {
+		urls, _ := cmd.Flags().GetStringSlice("additional-urls")
+		for _, url := range urls {
+			if strings.Contains(url, ",") {
+				feedback.Fatal(
+					tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
+					feedback.ErrBadArgument)
+			}
+		}
+		set("board_manager.additional_urls", urls)
+	}
 }
 
 // output from this command requires special formatting, let's create a dedicated
