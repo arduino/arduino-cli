@@ -109,5 +109,11 @@ func FindConfigFileInArgsFallbackOnEnv(args []string) string {
 	if p, ok := os.LookupEnv("ARDUINO_CONFIG_FILE"); ok {
 		return p
 	}
+	if p, ok := os.LookupEnv("ARDUINO_DIRECTORIES_DATA"); ok {
+		return filepath.Join(p, "arduino-cli.yaml")
+	}
+	if p, ok := os.LookupEnv("ARDUINO_DATA_DIR"); ok {
+		return filepath.Join(p, "arduino-cli.yaml")
+	}
 	return filepath.Join(getDefaultArduinoDataDir(), "arduino-cli.yaml")
 }
