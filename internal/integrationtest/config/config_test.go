@@ -50,15 +50,6 @@ func TestInitWithExistingCustomConfig(t *testing.T) {
 	err = yaml.Unmarshal(configFile, config)
 	require.NoError(t, err)
 	require.Equal(t, config["board_manager"]["additional_urls"].([]interface{})[0].(string), "https://example.com")
-	require.Equal(t, config["daemon"]["port"].(string), "50051")
-	require.Equal(t, config["directories"]["data"].(string), cli.DataDir().String())
-	require.Equal(t, config["directories"]["downloads"].(string), cli.DownloadDir().String())
-	require.Equal(t, config["directories"]["user"].(string), cli.SketchbookDir().String())
-	require.Empty(t, config["logging"]["file"])
-	require.Equal(t, config["logging"]["format"].(string), "text")
-	require.Equal(t, config["logging"]["level"].(string), "info")
-	require.Equal(t, config["metrics"]["addr"].(string), ":9090")
-	require.True(t, config["metrics"]["enabled"].(bool))
 
 	configFilePath := cli.WorkingDir().Join("config", "test", "config.yaml")
 	require.NoFileExists(t, configFilePath.String())
@@ -71,15 +62,6 @@ func TestInitWithExistingCustomConfig(t *testing.T) {
 	err = yaml.Unmarshal(configFile, config)
 	require.NoError(t, err)
 	require.Empty(t, config["board_manager"]["additional_urls"])
-	require.Equal(t, config["daemon"]["port"].(string), "50051")
-	require.Equal(t, config["directories"]["data"].(string), cli.DataDir().String())
-	require.Equal(t, config["directories"]["downloads"].(string), cli.DownloadDir().String())
-	require.Equal(t, config["directories"]["user"].(string), cli.SketchbookDir().String())
-	require.Empty(t, config["logging"]["file"])
-	require.Equal(t, config["logging"]["format"].(string), "text")
-	require.Equal(t, config["logging"]["level"].(string), "info")
-	require.Equal(t, config["metrics"]["addr"].(string), ":9090")
-	require.True(t, config["metrics"]["enabled"].(bool))
 }
 
 func TestInitOverwriteExistingCustomFile(t *testing.T) {
@@ -96,15 +78,6 @@ func TestInitOverwriteExistingCustomFile(t *testing.T) {
 	err = yaml.Unmarshal(configFile, config)
 	require.NoError(t, err)
 	require.Equal(t, config["board_manager"]["additional_urls"].([]interface{})[0].(string), "https://example.com")
-	require.Equal(t, config["daemon"]["port"].(string), "50051")
-	require.Equal(t, config["directories"]["data"].(string), cli.DataDir().String())
-	require.Equal(t, config["directories"]["downloads"].(string), cli.DownloadDir().String())
-	require.Equal(t, config["directories"]["user"].(string), cli.SketchbookDir().String())
-	require.Empty(t, config["logging"]["file"])
-	require.Equal(t, config["logging"]["format"].(string), "text")
-	require.Equal(t, config["logging"]["level"].(string), "info")
-	require.Equal(t, config["metrics"]["addr"].(string), ":9090")
-	require.True(t, config["metrics"]["enabled"].(bool))
 
 	stdout, _, err = cli.Run("config", "init", "--overwrite")
 	require.NoError(t, err)
@@ -115,15 +88,6 @@ func TestInitOverwriteExistingCustomFile(t *testing.T) {
 	err = yaml.Unmarshal(configFile, config)
 	require.NoError(t, err)
 	require.Empty(t, config["board_manager"]["additional_urls"])
-	require.Equal(t, config["daemon"]["port"].(string), "50051")
-	require.Equal(t, config["directories"]["data"].(string), cli.DataDir().String())
-	require.Equal(t, config["directories"]["downloads"].(string), cli.DownloadDir().String())
-	require.Equal(t, config["directories"]["user"].(string), cli.SketchbookDir().String())
-	require.Empty(t, config["logging"]["file"])
-	require.Equal(t, config["logging"]["format"].(string), "text")
-	require.Equal(t, config["logging"]["level"].(string), "info")
-	require.Equal(t, config["metrics"]["addr"].(string), ":9090")
-	require.True(t, config["metrics"]["enabled"].(bool))
 }
 
 func TestInitDestAbsolutePath(t *testing.T) {
@@ -289,21 +253,37 @@ func TestAddRemoveSetDeleteOnUnexistingKey(t *testing.T) {
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
 
-	_, stderr, err := cli.Run("config", "add", "some.key", "some_value", "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-	require.Contains(t, string(stderr), "Settings key doesn't exist")
+	j, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.Contains(t, j, `{"config":{ "board_manager": {"additional_urls":[]} } }`)
 
-	_, stderr, err = cli.Run("config", "remove", "some.key", "some_value", "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-	require.Contains(t, string(stderr), "Settings key doesn't exist")
+	// Delete array key
+	_, _, err = cli.Run("config", "delete", "board_manager.additional_urls", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	j, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.NotContains(t, j, `{"config":{ "board_manager": {"additional_urls":[]} } }`)
 
-	_, stderr, err = cli.Run("config", "set", "some.key", "some_value", "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-	require.Contains(t, string(stderr), "Settings key doesn't exist")
+	// Add to non-existing array key
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", "some_value", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	j, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.Contains(t, j, `{"config":{ "board_manager": {"additional_urls":["some_value"]} } }`)
 
-	_, stderr, err = cli.Run("config", "delete", "some.key", "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-	require.Contains(t, string(stderr), "Cannot delete the key some.key: key not found in settings\n")
+	// Remove from non-existing array key
+	_, _, err = cli.Run("config", "remove", "board_manager.additional_urls", "some_value", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	j, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.NotContains(t, j, `{"config":{ "board_manager": {"additional_urls":["some_value"]} } }`)
+
+	// Set on non-existing key
+	_, _, err = cli.Run("config", "set", "board_manager.additional_urls", "some_value", "other_value", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	j, _, err = cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	requirejson.Contains(t, j, `{"config":{ "board_manager": {"additional_urls":["some_value","other_value"]} } }`)
 }
 
 func TestAddSingleArgument(t *testing.T) {
@@ -434,6 +414,8 @@ func TestAddOnUnsupportedKey(t *testing.T) {
 	// Create a config file
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "daemon.port", "50051", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
 
 	// Verifies default value
 	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
@@ -541,6 +523,8 @@ func TestRemoveOnUnsupportedKey(t *testing.T) {
 
 	// Create a config file
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "daemon.port", "50051", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Verifies default value
@@ -700,7 +684,7 @@ func TestSetStringWithSingleArgument(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".config | .logging | .level", "\"info\"")
+	requirejson.NotContains(t, stdout, `{"config":{"logging":{"level"}}}`)
 
 	// Changes value
 	_, _, err = cli.Run("config", "set", "logging.level", "trace", "--config-file", "arduino-cli.yaml")
@@ -723,12 +707,12 @@ func TestSetStringWithMultipleArguments(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".config | .logging | .level", "\"info\"")
+	requirejson.NotContains(t, stdout, `{"config":{"logging":{"level"}}}`)
 
 	// Tries to change value
 	_, stderr, err := cli.Run("config", "set", "logging.level", "trace", "debug")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Can't set multiple values in key logging.level")
+	require.Contains(t, string(stderr), "Error setting value: invalid type for key 'logging.level': invalid conversion, got array but want string")
 }
 
 func TestSetBoolWithSingleArgument(t *testing.T) {
@@ -742,7 +726,7 @@ func TestSetBoolWithSingleArgument(t *testing.T) {
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".config | .library | .enable_unsafe_install", "false")
+	requirejson.NotContains(t, stdout, `{"config": {"library": {"enable_unsafe_install"}}}`)
 
 	// Changes value
 	_, _, err = cli.Run("config", "set", "library.enable_unsafe_install", "true", "--config-file", "arduino-cli.yaml")
@@ -761,6 +745,8 @@ func TestSetBoolWithMultipleArguments(t *testing.T) {
 	// Create a config file
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "library.enable_unsafe_install", "false", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
 
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
@@ -770,7 +756,7 @@ func TestSetBoolWithMultipleArguments(t *testing.T) {
 	// Changes value
 	_, stderr, err := cli.Run("config", "set", "library.enable_unsafe_install", "true", "foo", "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Can't set multiple values in key library.enable_unsafe_install")
+	require.Contains(t, string(stderr), "Error setting value: invalid type for key 'library.enable_unsafe_install': invalid conversion, got array but want bool")
 }
 
 func TestDelete(t *testing.T) {
@@ -779,6 +765,8 @@ func TestDelete(t *testing.T) {
 
 	// Create a config file
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "library.enable_unsafe_install", "false", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Verifies default state
@@ -824,6 +812,8 @@ func TestGet(t *testing.T) {
 	// Create a config file
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "daemon.port", "50051", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
 
 	// Verifies default state
 	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
@@ -843,7 +833,7 @@ func TestGet(t *testing.T) {
 	// Get undefined key
 	_, stderr, err := cli.Run("config", "get", "foo", "--json", "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
-	requirejson.Contains(t, stderr, `{"error":"Cannot get the configuration key foo: key not found in settings"}`)
+	requirejson.Contains(t, stderr, `{"error":"Cannot get the configuration key foo: key foo not found"}`)
 }
 
 func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
@@ -851,9 +841,10 @@ func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
 	defer env.CleanUp()
 
 	tmp := t.TempDir()
-	cliConfig, envConfig := paths.New(filepath.Join(tmp, "cli.yaml")), paths.New(filepath.Join(tmp, "env.yaml"))
-	cliConfig.WriteFile([]byte(`cli-test: "test"`))
-	envConfig.WriteFile([]byte(`env-test: "test"`))
+	cliConfig := paths.New(filepath.Join(tmp, "cli.yaml"))
+	cliConfig.WriteFile([]byte(`locale: "test"`))
+	envConfig := paths.New(filepath.Join(tmp, "env.yaml"))
+	envConfig.WriteFile([]byte(`locale: "test2"`))
 
 	// No flag nor env specified.
 	stdout, _, err := cli.Run("config", "dump", "--json")
@@ -863,16 +854,16 @@ func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
 	// Flag specified
 	stdout, _, err = cli.Run("config", "dump", "--config-file", cliConfig.String(), "--json")
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `{"config":{ "cli-test": "test" }}`)
+	requirejson.Contains(t, stdout, `{"config":{ "locale": "test" }}`)
 
 	// Env specified
 	customEnv := map[string]string{"ARDUINO_CONFIG_FILE": envConfig.String()}
 	stdout, _, err = cli.RunWithCustomEnv(customEnv, "config", "dump", "--json")
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `{"config":{ "env-test": "test" }}`)
+	requirejson.Contains(t, stdout, `{"config":{ "locale": "test2" }}`)
 
 	// Flag and env specified, flag takes precedence
 	stdout, _, err = cli.RunWithCustomEnv(customEnv, "config", "dump", "--config-file", cliConfig.String(), "--json")
 	require.NoError(t, err)
-	requirejson.Contains(t, stdout, `{"config":{ "cli-test": "test" }}`)
+	requirejson.Contains(t, stdout, `{"config":{ "locale": "test" }}`)
 }
