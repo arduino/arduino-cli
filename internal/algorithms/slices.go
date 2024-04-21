@@ -71,3 +71,17 @@ func NotEquals[T comparable](value T) Matcher[T] {
 		return x != value
 	}
 }
+
+// Uniq return a copy of the input array with all duplicates removed
+func Uniq[T comparable](in []T) []T {
+	have := map[T]bool{}
+	var out []T
+	for _, v := range in {
+		if have[v] {
+			continue
+		}
+		out = append(out, v)
+		have[v] = true
+	}
+	return out
+}

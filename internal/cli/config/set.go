@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"os"
 
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -59,8 +60,8 @@ func runSetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args [
 		req.EncodedValue = args[1]
 		req.ValueFormat = "cli"
 	} else {
-		// Array
-		jsonValues, err := json.Marshal(args[1:])
+		// Uniq Array
+		jsonValues, err := json.Marshal(f.Uniq(args[1:]))
 		if err != nil {
 			feedback.Fatal(tr("Error setting value: %v", err), feedback.ErrGeneric)
 		}
