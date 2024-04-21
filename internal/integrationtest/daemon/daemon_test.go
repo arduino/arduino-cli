@@ -357,7 +357,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 	}
 
 	// Un-Set builtin libraries dir
-	err := cli.SetValue("directories.builtin.libraries", `""`)
+	err := cli.SetValue("directories.builtin.libraries", "")
 	require.NoError(t, err)
 
 	// Re-init

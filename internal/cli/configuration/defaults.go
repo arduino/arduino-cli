@@ -46,6 +46,7 @@ func SetDefaults(settings *Settings) {
 	setDefaultValueAndKeyTypeSchema("directories.data", getDefaultArduinoDataDir())
 	setDefaultValueAndKeyTypeSchema("directories.downloads", "")
 	setDefaultValueAndKeyTypeSchema("directories.user", getDefaultUserDir())
+	setKeyTypeSchema("directories.builtin.libraries", "")
 
 	// Sketch compilation
 	setDefaultValueAndKeyTypeSchema("sketch.always_export_binaries", false)
