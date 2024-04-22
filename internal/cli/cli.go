@@ -117,7 +117,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			preRun(verbose, outputFormat, logLevel, logFile, logFormat, noColor, settings)
 
 			// Log the configuration file used
-			if configFile := ctx.Value("config_file").(string); configFile != "" {
+			if configFile := config.GetConfigFile(ctx); configFile != "" {
 				logrus.Infof("Using config file: %s", configFile)
 			} else {
 				logrus.Info("Config file not found, using default values")

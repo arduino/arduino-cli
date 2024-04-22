@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli"
+	"github.com/arduino/arduino-cli/internal/cli/config"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -35,8 +36,7 @@ func main() {
 
 	// Search for the configuration file in the command line arguments and in the environment
 	configFile := configuration.FindConfigFileInArgsFallbackOnEnv(os.Args)
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, "config_file", configFile)
+	ctx := config.SetConfigFile(context.Background(), configFile)
 
 	// Read the settings from the configuration file
 	openReq := &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"}

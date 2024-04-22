@@ -64,6 +64,22 @@ func getAllArraySettingsKeys(ctx context.Context, srv rpc.ArduinoCoreServiceServ
 	return arrayKeys
 }
 
+type ctxValue string
+
+// GetConfigFile returns the configuration file path from the context
+func GetConfigFile(ctx context.Context) string {
+	res := ctx.Value(ctxValue("config_file"))
+	if res == nil {
+		return ""
+	}
+	return res.(string)
+}
+
+// SetConfigFile sets the configuration file path in the context
+func SetConfigFile(ctx context.Context, configFile string) context.Context {
+	return context.WithValue(ctx, ctxValue("config_file"), configFile)
+}
+
 func saveConfiguration(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	var outConfig []byte
 	if res, err := srv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"}); err != nil {
@@ -72,7 +88,7 @@ func saveConfiguration(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 		outConfig = []byte(res.GetEncodedSettings())
 	}
 
-	configFile := ctx.Value("config_file").(string)
+	configFile := GetConfigFile(ctx)
 	if err := paths.New(configFile).WriteFile(outConfig); err != nil {
 		feedback.Fatal(tr("Error writing to file: %v", err), feedback.ErrGeneric)
 	}

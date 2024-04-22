@@ -83,7 +83,7 @@ func runInitCommand(srv rpc.ArduinoCoreServiceServer) {
 		configFileAbsPath = configFileDir.Join(defaultFileName)
 
 	default:
-		configFileAbsPath = paths.New(ctx.Value("config_file").(string))
+		configFileAbsPath = paths.New(GetConfigFile(ctx))
 		configFileDir = configFileAbsPath.Parent()
 	}
 
