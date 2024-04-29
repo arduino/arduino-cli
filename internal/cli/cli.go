@@ -58,6 +58,7 @@ import (
 
 var (
 	verbose      bool
+	jsonOutput   bool
 	outputFormat string
 	configFile   string
 )
@@ -75,6 +76,10 @@ func NewCommand() *cobra.Command {
 		Long:    tr("Arduino Command Line Interface (arduino-cli)."),
 		Example: fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if jsonOutput {
+				outputFormat = "json"
+			}
+
 			preRun(cmd, args)
 
 			if cmd.Name() != "version" {
@@ -155,6 +160,8 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validOutputFormats, cobra.ShellCompDirectiveDefault
 	})
+	cmd.Flag("format").Hidden = true
+	cmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, tr("Print the output in JSON format."))
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
