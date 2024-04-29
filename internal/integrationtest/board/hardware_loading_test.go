@@ -43,7 +43,7 @@ func TestHardwareLoading(t *testing.T) {
 
 	t.Run("Simple", func(t *testing.T) {
 		{
-			out, _, err := cli.Run("core", "list", "--format", "json")
+			out, _, err := cli.Run("core", "list", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.LengthMustEqualTo(1)
@@ -73,7 +73,7 @@ func TestHardwareLoading(t *testing.T) {
 
 		{
 			// Also test local platform.txt properties override
-			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--format", "json")
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.MustContain(`{
@@ -100,7 +100,7 @@ func TestHardwareLoading(t *testing.T) {
 		}
 
 		{
-			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--format", "json")
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.MustContain(`{
@@ -115,7 +115,7 @@ func TestHardwareLoading(t *testing.T) {
 
 		{
 			// Check un-expansion of board_properties
-			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:robotMotor", "--show-properties=unexpanded", "--format", "json")
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:robotMotor", "--show-properties=unexpanded", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.MustContain(`{
@@ -131,7 +131,7 @@ func TestHardwareLoading(t *testing.T) {
 
 		{
 			// Also test local boards.txt properties override
-			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:diecimila", "--show-properties=unexpanded", "--format", "json")
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:diecimila", "--show-properties=unexpanded", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.MustContain(`{
@@ -152,7 +152,7 @@ func TestHardwareLoading(t *testing.T) {
 		require.NoError(t, customHwDir.CopyDirTo(cli.SketchbookDir().Join("hardware")))
 
 		{
-			out, _, err := cli.Run("core", "list", "--format", "json")
+			out, _, err := cli.Run("core", "list", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.Query(`.platforms | length`).LengthMustEqualTo(3)
@@ -217,7 +217,7 @@ func TestHardwareLoading(t *testing.T) {
 
 		{
 			// Also test local platform.txt properties override
-			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--format", "json")
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.MustContain(`{
@@ -244,7 +244,7 @@ func TestHardwareLoading(t *testing.T) {
 		}
 
 		{
-			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--show-properties=unexpanded", "--format", "json")
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--show-properties=unexpanded", "--json")
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			jsonOut.MustContain(`{

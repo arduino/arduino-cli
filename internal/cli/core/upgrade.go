@@ -142,7 +142,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 	feedback.PrintResult(&platformUpgradeResult{})
 }
 
-// This is needed so we can print warning messages in case users use --format json
+// This is needed so we can print warning messages in case users use --json
 type platformUpgradeResult struct{}
 
 // Data implements feedback.Result.

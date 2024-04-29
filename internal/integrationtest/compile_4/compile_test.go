@@ -845,7 +845,7 @@ func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationte
 	args := []string{
 		"compile",
 		"-b", fqbn,
-		"--format", "json",
+		"--json",
 		options.Sketch.String()}
 	if !options.NoTestLibraries {
 		libsPath, err := paths.New("testdata", "libraries").Abs()

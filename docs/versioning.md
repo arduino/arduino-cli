@@ -45,8 +45,8 @@ The following changes to the command-line syntax are NOT considered breaking:
 Any change in the **human-readable** text output is **NOT** considered a breaking change. In general, the human-readable
 text is subject to translation and small adjustments in natural language syntax and presentation.
 
-We will consider breaking changes only in the **machine-readable** output of the commands using the `--format json`
-flag. In particular, we have a breaking change in the JSON command output if:
+We will consider breaking changes only in the **machine-readable** output of the commands using the `--json` flag. In
+particular, we have a breaking change in the JSON command output if:
 
 - a key in a JSON object is renamed or removed.
 - a value in a JSON object or array changes meaning or changes format.

@@ -48,8 +48,8 @@ func TestVersion(t *testing.T) {
 	require.Contains(t, string(stdout), "Commit:")
 	require.Empty(t, string(stderr))
 
-	// Checks if "version --format json" has a json as an output
-	stdout, _, err = cli.Run("version", "--format", "json")
+	// Checks if "version --json" has a json as an output
+	stdout, _, err = cli.Run("version", "--json")
 	require.NoError(t, err)
 	var jsonMap map[string]string
 	err = json.Unmarshal(stdout, &jsonMap)

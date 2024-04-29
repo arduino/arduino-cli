@@ -89,12 +89,12 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 
 	{
 		// no default profile -> error missing FQBN
-		_, _, err := cli.Run("compile", sketchWithoutDefProfilePath.String(), "--format", "json")
+		_, _, err := cli.Run("compile", sketchWithoutDefProfilePath.String(), "--json")
 		require.Error(t, err)
 	}
 	{
 		// specified fbqn -> compile with specified FQBN and use global installation
-		stdout, _, err := cli.Run("compile", "-b", "arduino:avr:nano", sketchWithoutDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "-b", "arduino:avr:nano", sketchWithoutDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.3"}`)
@@ -102,7 +102,7 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 	}
 	{
 		// specified profile -> use the specified profile
-		stdout, _, err := cli.Run("compile", "--profile", "avr1", sketchWithoutDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "--profile", "avr1", sketchWithoutDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.4"}`)
@@ -110,7 +110,7 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 	}
 	{
 		// specified profile and fqbn -> use the specified profile and override fqbn
-		stdout, _, err := cli.Run("compile", "--profile", "avr1", "-b", "arduino:avr:nano", sketchWithoutDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "--profile", "avr1", "-b", "arduino:avr:nano", sketchWithoutDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.4"}`)
@@ -119,7 +119,7 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 
 	{
 		// default profile -> use default profile
-		stdout, _, err := cli.Run("compile", sketchWithDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", sketchWithDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.5"}`)
@@ -127,7 +127,7 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 	}
 	{
 		// default profile, specified fbqn -> use default profile, override fqbn
-		stdout, _, err := cli.Run("compile", "-b", "arduino:avr:nano", sketchWithDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "-b", "arduino:avr:nano", sketchWithDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.5"}`)
@@ -135,7 +135,7 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 	}
 	{
 		// default profile, specified different profile -> use the specified profile
-		stdout, _, err := cli.Run("compile", "--profile", "avr1", sketchWithDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "--profile", "avr1", sketchWithDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.4"}`)
@@ -143,7 +143,7 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 	}
 	{
 		// default profile, specified different profile and fqbn -> use the specified profile and override fqbn
-		stdout, _, err := cli.Run("compile", "--profile", "avr1", "-b", "arduino:avr:nano", sketchWithDefProfilePath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "--profile", "avr1", "-b", "arduino:avr:nano", sketchWithDefProfilePath.String(), "--json")
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, stdout)
 		jsonOut.Query(".builder_result.build_platform").MustContain(`{"id":"arduino:avr", "version":"1.8.4"}`)

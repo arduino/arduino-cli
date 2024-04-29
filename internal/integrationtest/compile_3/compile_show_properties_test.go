@@ -51,9 +51,9 @@ func TestCompileShowProperties(t *testing.T) {
 	require.True(t, props.ContainsKey("sketch_path"))
 	require.NotContains(t, props.Get("archive_file_path"), "{build.path}")
 
-	// Test --show-properties --format JSON output is clean
+	// Test --show-properties --json JSON output is clean
 	// properties are expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties", "--format", "json", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties", "--json", bareMinimum.String())
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	props, err = properties.LoadFromSlice(
@@ -69,8 +69,8 @@ func TestCompileShowProperties(t *testing.T) {
 	require.NoError(t, err, "Output must be a clean property list")
 	require.NotEmpty(t, stderr)
 
-	// Test --show-properties --format JSON output is clean, with a wrong FQBN
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:unoa", "-v", "--show-properties", "--format", "json", bareMinimum.String())
+	// Test --show-properties --json JSON output is clean, with a wrong FQBN
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:unoa", "-v", "--show-properties", "--json", bareMinimum.String())
 	require.Error(t, err)
 	require.Empty(t, stderr)
 	requireCompileResponseJson(t, stdout)
@@ -87,7 +87,7 @@ func TestCompileShowProperties(t *testing.T) {
 
 	// Test --show-properties=unexpanded output is clean
 	// properties are not expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=unexpanded", "--format", "json", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=unexpanded", "--json", bareMinimum.String())
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	props, err = properties.LoadFromSlice(
@@ -106,9 +106,9 @@ func TestCompileShowProperties(t *testing.T) {
 	require.True(t, props.ContainsKey("archive_file_path"))
 	require.NotContains(t, props.Get("archive_file_path"), "{build.path}")
 
-	// Test --show-properties=expanded --format JSON output is clean
+	// Test --show-properties=expanded --json JSON output is clean
 	// properties are expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=expanded", "--format", "json", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=expanded", "--json", bareMinimum.String())
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	props, err = properties.LoadFromSlice(

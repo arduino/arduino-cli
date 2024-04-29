@@ -40,13 +40,13 @@ type board struct {
 
 func detectedBoards(t *testing.T, cli *integrationtest.ArduinoCLI) []board {
 	// This fixture provides a list of all the boards attached to the host.
-	// This fixture will parse the JSON output of `arduino-cli board list --format json`
+	// This fixture will parse the JSON output of `arduino-cli board list --json`
 	// to extract all the connected boards data.
 
 	// :returns a list `Board` objects.
 
 	var boards []board
-	stdout, _, err := cli.Run("board", "list", "--format", "json")
+	stdout, _, err := cli.Run("board", "list", "--json")
 	require.NoError(t, err)
 	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".[] | .matching_boards | length").String())
 	require.NoError(t, err)
@@ -67,7 +67,7 @@ func detectedBoards(t *testing.T, cli *integrationtest.ArduinoCLI) []board {
 func waitForBoard(t *testing.T, cli *integrationtest.ArduinoCLI) {
 	timeEnd := time.Now().Unix() + 10
 	for time.Now().Unix() < timeEnd {
-		stdout, _, err := cli.Run("board", "list", "--format", "json")
+		stdout, _, err := cli.Run("board", "list", "--json")
 		require.NoError(t, err)
 		length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
 		require.NoError(t, err)
@@ -370,7 +370,7 @@ func TestUploadSketchWithPdeExtension(t *testing.T) {
 		require.NoError(t, err)
 
 		// Compile sketch first
-		stdout, _, err := cli.Run("compile", "--clean", "-b", board.fqbn, sketchPath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "--clean", "-b", board.fqbn, sketchPath.String(), "--json")
 		require.NoError(t, err)
 		buildDir := requirejson.Parse(t, stdout).Query(".builder_result | .build_path").String()
 		buildDir = strings.Trim(strings.ReplaceAll(buildDir, "\\\\", "\\"), "\"")
@@ -435,7 +435,7 @@ func TestUploadWithInputDirContainingMultipleBinaries(t *testing.T) {
 		binariesDir := cli.SketchbookDir().Join("build", "BuiltBinaries")
 		_, _, err = cli.Run("compile", "--clean", "-b", board.fqbn, sketchOnePath.String(), "--build-path", binariesDir.String())
 		require.NoError(t, err)
-		stdout, _, err := cli.Run("compile", "--clean", "-b", board.fqbn, sketchTwoPath.String(), "--format", "json")
+		stdout, _, err := cli.Run("compile", "--clean", "-b", board.fqbn, sketchTwoPath.String(), "--json")
 		require.NoError(t, err)
 		buildDirTwo := requirejson.Parse(t, stdout).Query(".builder_result | .build_path").String()
 		buildDirTwo = strings.Trim(strings.ReplaceAll(buildDirTwo, "\\\\", "\\"), "\"")

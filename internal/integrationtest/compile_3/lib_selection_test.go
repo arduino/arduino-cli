@@ -45,7 +45,7 @@ func TestCompileLibrarySelection(t *testing.T) {
 
 	// Perform two compile:
 	// - the first should use LibraryA
-	stdout, _, err := cli.RunWithCustomEnv(vars, "compile", "-b", "arduino:avr:mega", "--format", "json", sketch.String())
+	stdout, _, err := cli.RunWithCustomEnv(vars, "compile", "-b", "arduino:avr:mega", "--json", sketch.String())
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `{
 		"builder_result" : {
@@ -56,7 +56,7 @@ func TestCompileLibrarySelection(t *testing.T) {
 	}`)
 
 	// - the second should use AnotherLibrary (because it was forced by --library)
-	stdout, _, err = cli.RunWithCustomEnv(vars, "compile", "-b", "arduino:avr:mega", "--library", anotherLib.String(), "--format", "json", sketch.String())
+	stdout, _, err = cli.RunWithCustomEnv(vars, "compile", "-b", "arduino:avr:mega", "--library", anotherLib.String(), "--json", sketch.String())
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `{
 		"builder_result" : {

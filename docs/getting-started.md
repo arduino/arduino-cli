@@ -8,34 +8,35 @@ IDE. Let's see some examples.
 
 ```console
 $ arduino-cli help core
-Arduino Core operations.
+Arduino core operations.
 
 Usage:
-    arduino-cli core [command]
+  arduino-cli core [command]
 
 Examples:
-    ./arduino-cli core update-index
+  arduino-cli core update-index
 
 Available Commands:
-    download     Downloads one or more cores and corresponding tool dependencies.
-    install      Installs one or more cores and corresponding tool dependencies.
-    list         Shows the list of installed platforms.
-    search       Search for a core in Boards Manager.
-    uninstall    Uninstalls one or more cores and corresponding tool dependencies if no more used.
-    update-index Updates the index of cores.
-    upgrade      Upgrades one or all installed platforms to the latest version.
+  download     Downloads one or more cores and corresponding tool dependencies.
+  install      Installs one or more cores and corresponding tool dependencies.
+  list         Shows the list of installed platforms.
+  search       Search for a core in Boards Manager.
+  uninstall    Uninstalls one or more cores and corresponding tool dependencies if no longer used.
+  update-index Updates the index of cores.
+  upgrade      Upgrades one or all installed platforms to the latest version.
 
 Flags:
-    -h, --help   help for core
+  -h, --help   help for core
 
 Global Flags:
-        --additional-urls strings   Additional URLs for Boards Manager.
-        --config-file string        The custom config file (if not specified the default will be used).
-        --format string             The output format, can be [text|json]. (default "text")
-        --log-file string           Path to the file where logs will be written.
-        --log-format string         The output format for the logs, can be [text|json].
-        --log-level string          Messages with this level and above will be logged.
-    -v, --verbose                   Print the logs on the standard output.
+      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.
+      --config-file string        The custom config file (if not specified the default will be used).
+      --json                      Print the output in JSON format.
+      --log                       Print the logs on the standard output.
+      --log-file string           Path to the file where logs will be written.
+      --log-format string         The output format for the logs, can be: text, json
+      --log-level string          Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic
+      --no-color                  Disable colored output.
 
 Use "arduino-cli core [command] --help" for more information about a command.
 ```
