@@ -4,6 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### Configuration file now supports only YAML format.
+
+The Arduino CLI configuration file now supports only the YAML format.
+
 ### gRPC Setting API important changes
 
 The Settings API has been heavily refactored. Here a quick recap of the new methods:
