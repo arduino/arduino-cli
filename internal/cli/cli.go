@@ -150,8 +150,8 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.RegisterFlagCompletionFunc("log-format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validLogFormats, cobra.ShellCompDirectiveDefault
 	})
-	validOutputFormats := []string{"text", "json", "jsonmini", "yaml"}
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", strings.Join(validOutputFormats, ", ")))
+	validOutputFormats := []string{"text", "json", "jsonmini"}
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The command output format, can be: %s", strings.Join(validOutputFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validOutputFormats, cobra.ShellCompDirectiveDefault
 	})

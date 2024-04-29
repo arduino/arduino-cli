@@ -26,7 +26,6 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/sirupsen/logrus"
-	"sigs.k8s.io/yaml"
 )
 
 // OutputFormat is an output format
@@ -39,14 +38,11 @@ const (
 	JSON
 	// MinifiedJSON format
 	MinifiedJSON
-	// YAML format
-	YAML
 )
 
 var formats = map[string]OutputFormat{
 	"json":     JSON,
 	"jsonmini": MinifiedJSON,
-	"yaml":     YAML,
 	"text":     Text,
 }
 
@@ -204,8 +200,6 @@ func Fatal(errorMsg string, exitCode ExitCode) {
 		d, _ = json.MarshalIndent(augment(res), "", "  ")
 	case MinifiedJSON:
 		d, _ = json.Marshal(augment(res))
-	case YAML:
-		d, _ = yaml.Marshal(augment(res))
 	default:
 		panic("unknown output format")
 	}
@@ -248,12 +242,6 @@ func PrintResult(res Result) {
 		d, err := json.Marshal(augment(res.Data()))
 		if err != nil {
 			Fatal(tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
-		}
-		data = string(d)
-	case YAML:
-		d, err := yaml.Marshal(augment(res.Data()))
-		if err != nil {
-			Fatal(tr("Error during YAML encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case Text:
