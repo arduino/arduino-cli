@@ -38,15 +38,14 @@ func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
 		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(srv, args)
+			runUpgradeCommand(cmd.Context(), srv, args)
 		},
 	}
 	return upgradeCommand
 }
 
-func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
+func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib upgrade`")
-	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
 	Upgrade(ctx, srv, instance, args)
 }

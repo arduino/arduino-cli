@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 
@@ -32,7 +33,7 @@ import (
 
 // LoadHardwareForProfile load the hardware platforms for the given profile.
 // If installMissing is true then possibly missing tools and platforms will be downloaded and installed.
-func (pmb *Builder) LoadHardwareForProfile(p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) []error {
+func (pmb *Builder) LoadHardwareForProfile(ctx context.Context, p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) []error {
 	pmb.profile = p
 
 	// Load required platforms
@@ -40,7 +41,7 @@ func (pmb *Builder) LoadHardwareForProfile(p *sketch.Profile, installMissing boo
 	var platformReleases []*cores.PlatformRelease
 	indexURLs := map[string]*url.URL{}
 	for _, platformRef := range p.Platforms {
-		if platformRelease, err := pmb.loadProfilePlatform(platformRef, installMissing, downloadCB, taskCB, settings); err != nil {
+		if platformRelease, err := pmb.loadProfilePlatform(ctx, platformRef, installMissing, downloadCB, taskCB, settings); err != nil {
 			merr = append(merr, fmt.Errorf("%s: %w", tr("loading required platform %s", platformRef), err))
 			logrus.WithField("platform", platformRef).WithError(err).Debugf("Error loading platform for profile")
 		} else {
@@ -68,7 +69,7 @@ func (pmb *Builder) LoadHardwareForProfile(p *sketch.Profile, installMissing boo
 	return merr
 }
 
-func (pmb *Builder) loadProfilePlatform(platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) (*cores.PlatformRelease, error) {
+func (pmb *Builder) loadProfilePlatform(ctx context.Context, platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) (*cores.PlatformRelease, error) {
 	targetPackage := pmb.packages.GetOrCreatePackage(platformRef.Packager)
 	platform := targetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	release := platform.GetOrCreateRelease(platformRef.Version)
@@ -77,14 +78,14 @@ func (pmb *Builder) loadProfilePlatform(platformRef *sketch.ProfilePlatformRefer
 	destDir := settings.ProfilesCacheDir().Join(uid)
 	if !destDir.IsDir() && installMissing {
 		// Try installing the missing platform
-		if err := pmb.installMissingProfilePlatform(platformRef, destDir, downloadCB, taskCB); err != nil {
+		if err := pmb.installMissingProfilePlatform(ctx, platformRef, destDir, downloadCB, taskCB); err != nil {
 			return nil, err
 		}
 	}
 	return release, pmb.loadPlatformRelease(release, destDir)
 }
 
-func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePlatformReference, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func (pmb *Builder) installMissingProfilePlatform(ctx context.Context, platformRef *sketch.ProfilePlatformReference, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	// Instantiate a temporary package manager only for platform installation
 	_ = pmb.tempDir.MkdirAll()
 	tmp, err := paths.MkTempDir(pmb.tempDir.String(), "")
@@ -103,7 +104,7 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 	}
 	for _, indexURL := range indexesToDownload {
 		indexResource := resources.IndexResource{URL: indexURL}
-		if err := indexResource.Download(tmpPmb.IndexDir, downloadCB, pmb.downloaderConfig); err != nil {
+		if err := indexResource.Download(ctx, tmpPmb.IndexDir, downloadCB, pmb.downloaderConfig); err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
 			return &cmderrors.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
 		}

@@ -52,10 +52,10 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configur
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(srv, args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir, enableUnsafeInstall)
+			runInstallCommand(cmd.Context(), srv, args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir, enableUnsafeInstall)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
@@ -66,8 +66,7 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configur
 	return installCommand
 }
 
-func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool, enableUnsafeInstall bool) {
-	ctx := context.Background()
+func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool, enableUnsafeInstall bool) {
 	instance := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli lib install`")
 

@@ -43,7 +43,7 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runDetailsCommand(srv, fqbn.String(), showFullDetails, listProgrammers, showProperties)
+			runDetailsCommand(cmd.Context(), srv, fqbn.String(), showFullDetails, listProgrammers, showProperties)
 		},
 	}
 
@@ -55,8 +55,7 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return detailsCommand
 }
 
-func runDetailsCommand(srv rpc.ArduinoCoreServiceServer, fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
-	ctx := context.Background()
+func runDetailsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
 	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board details`")
@@ -65,7 +64,7 @@ func runDetailsCommand(srv rpc.ArduinoCoreServiceServer, fqbn string, showFullDe
 	if err != nil {
 		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
-	res, err := srv.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
+	res, err := srv.BoardDetails(ctx, &rpc.BoardDetailsRequest{
 		Instance:                   inst,
 		Fqbn:                       fqbn,
 		DoNotExpandBuildProperties: showPropertiesMode == arguments.ShowPropertiesUnexpanded,

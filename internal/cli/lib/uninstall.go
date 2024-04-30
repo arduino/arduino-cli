@@ -37,18 +37,17 @@ func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runUninstallCommand(srv, args)
+			runUninstallCommand(cmd.Context(), srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableLibraries(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableLibraries(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return uninstallCommand
 }
 
-func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
+func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib uninstall`")
-	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
 
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)

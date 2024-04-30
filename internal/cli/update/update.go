@@ -41,16 +41,15 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " update",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpdateCommand(srv, showOutdated)
+			runUpdateCommand(cmd.Context(), srv, showOutdated)
 		},
 	}
 	updateCommand.Flags().BoolVar(&showOutdated, "show-outdated", false, tr("Show outdated cores and libraries after index update"))
 	return updateCommand
 }
 
-func runUpdateCommand(srv rpc.ArduinoCoreServiceServer, showOutdated bool) {
+func runUpdateCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, showOutdated bool) {
 	logrus.Info("Executing `arduino-cli update`")
-	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 
 	lib.UpdateIndex(ctx, srv, inst)

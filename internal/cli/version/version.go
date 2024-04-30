@@ -40,13 +40,13 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runVersionCommand(srv)
+			runVersionCommand(cmd.Context(), srv)
 		},
 	}
 	return versionCommand
 }
 
-func runVersionCommand(srv rpc.ArduinoCoreServiceServer) {
+func runVersionCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli version`")
 
 	info := version.VersionInfo
@@ -58,7 +58,7 @@ func runVersionCommand(srv rpc.ArduinoCoreServiceServer) {
 	}
 
 	latestVersion := ""
-	res, err := srv.CheckForArduinoCLIUpdates(context.Background(), &rpc.CheckForArduinoCLIUpdatesRequest{})
+	res, err := srv.CheckForArduinoCLIUpdates(ctx, &rpc.CheckForArduinoCLIUpdatesRequest{})
 	if err != nil {
 		feedback.Warning("Failed to check for updates: " + err.Error())
 	} else {

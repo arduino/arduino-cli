@@ -46,15 +46,14 @@ that can be upgraded. If nothing needs to be updated the output is empty.`),
 		Example: "  " + os.Args[0] + " outdated\n",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runOutdatedCommand(srv)
+			runOutdatedCommand(cmd.Context(), srv)
 		},
 	}
 	return outdatedCommand
 }
 
-func runOutdatedCommand(srv rpc.ArduinoCoreServiceServer) {
+func runOutdatedCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli outdated`")
-	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 	Outdated(ctx, srv, inst)
 }

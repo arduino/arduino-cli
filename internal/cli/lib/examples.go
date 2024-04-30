@@ -45,19 +45,18 @@ func initExamplesCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " lib examples Wire",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runExamplesCommand(srv, args)
+			runExamplesCommand(cmd.Context(), srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstalledLibraries(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstalledLibraries(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	fqbn.AddToCommand(examplesCommand, srv)
 	return examplesCommand
 }
 
-func runExamplesCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
+func runExamplesCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib examples`")
-	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
 
 	name := ""

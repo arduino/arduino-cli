@@ -33,16 +33,16 @@ func initCleanCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " cache clean",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runCleanCommand(srv)
+			runCleanCommand(cmd.Context(), srv)
 		},
 	}
 	return cleanCommand
 }
 
-func runCleanCommand(srv rpc.ArduinoCoreServiceServer) {
+func runCleanCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli cache clean`")
 
-	_, err := srv.CleanDownloadCacheDirectory(context.Background(), &rpc.CleanDownloadCacheDirectoryRequest{})
+	_, err := srv.CleanDownloadCacheDirectory(ctx, &rpc.CleanDownloadCacheDirectoryRequest{})
 	if err != nil {
 		feedback.Fatal(tr("Error cleaning caches: %v", err), feedback.ErrGeneric)
 	}

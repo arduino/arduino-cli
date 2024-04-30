@@ -24,6 +24,7 @@ import (
 func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
+		b.ctx,
 		b.sketch, b.buildPath, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase, b.logger.Verbose(),
 	)

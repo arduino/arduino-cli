@@ -66,7 +66,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runMonitorCmd(srv, &portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
+			runMonitorCmd(cmd.Context(), srv, &portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
 		},
 	}
 	portArgs.AddToCommand(monitorCommand, srv)
@@ -81,12 +81,11 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 func runMonitorCmd(
-	srv rpc.ArduinoCoreServiceServer,
+	ctx context.Context, srv rpc.ArduinoCoreServiceServer,
 	portArgs *arguments.Port, fqbnArg *arguments.Fqbn, profileArg *arguments.Profile, sketchPathArg string,
 	configs []string, describe, timestamp, quiet, raw bool,
 ) {
 	logrus.Info("Executing `arduino-cli monitor`")
-	ctx := context.Background()
 
 	if !feedback.HasConsole() {
 		quiet = true
@@ -139,10 +138,10 @@ func runMonitorCmd(
 	case sketch.GetDefaultFqbn() != "":
 		fqbn = sketch.GetDefaultFqbn()
 	default:
-		fqbn, _ = portArgs.DetectFQBN(inst, srv)
+		fqbn, _ = portArgs.DetectFQBN(ctx, inst, srv)
 	}
 
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, srv, defaultPort, defaultProtocol)
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(ctx, inst, srv, defaultPort, defaultProtocol)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

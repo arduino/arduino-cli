@@ -251,7 +251,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			}
 		} else {
 			// Load platforms from profile
-			errs := pmb.LoadHardwareForProfile(profile, true, downloadCallback, taskCallback, s.settings)
+			errs := pmb.LoadHardwareForProfile(ctx, profile, true, downloadCallback, taskCallback, s.settings)
 			for _, err := range errs {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
@@ -497,13 +497,11 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	}
 
 	// Perform index update
-	// TODO: pass context
-	// ctx := stream.Context()
 	config, err := s.settings.DownloaderConfig()
 	if err != nil {
 		return err
 	}
-	if err := globals.LibrariesIndexResource.Download(indexDir, downloadCB, config); err != nil {
+	if err := globals.LibrariesIndexResource.Download(stream.Context(), indexDir, downloadCB, config); err != nil {
 		resultCB(rpc.IndexUpdateReport_STATUS_FAILED)
 		return err
 	}
@@ -621,7 +619,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			indexResource.SignatureURL, _ = url.Parse(u) // should not fail because we already parsed it
 			indexResource.SignatureURL.Path += ".sig"
 		}
-		if err := indexResource.Download(indexpath, downloadCB, config); err != nil {
+		if err := indexResource.Download(stream.Context(), indexpath, downloadCB, config); err != nil {
 			failed = true
 			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 		} else {

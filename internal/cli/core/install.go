@@ -45,10 +45,10 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "run-post-install", "skip-post-install")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(srv, args, scriptFlags, noOverwrite)
+			runInstallCommand(cmd.Context(), srv, args, scriptFlags, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	scriptFlags.AddToCommand(installCommand)
@@ -56,9 +56,8 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
+func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
 	logrus.Info("Executing `arduino-cli core install`")
-	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 
 	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)

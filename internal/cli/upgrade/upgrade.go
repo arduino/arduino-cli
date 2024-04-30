@@ -41,15 +41,14 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " upgrade",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(srv, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
+			runUpgradeCommand(cmd.Context(), srv, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, skipPostInstall bool, skipPreUninstall bool) {
-	ctx := context.Background()
+func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, skipPostInstall bool, skipPreUninstall bool) {
 	inst := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli upgrade`")
 	lib.Upgrade(ctx, srv, inst, []string{})

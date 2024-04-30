@@ -30,6 +30,7 @@ import (
 // GCC performs a run of the gcc preprocess (macro/includes expansion). The function outputs the result
 // to targetFilePath. Returns the stdout/stderr of gcc if any.
 func GCC(
+	ctx context.Context,
 	sourceFilePath, targetFilePath *paths.Path,
 	includes paths.PathList, buildProperties *properties.Map,
 ) (Result, error) {
@@ -75,7 +76,7 @@ func GCC(
 	if err != nil {
 		return Result{}, err
 	}
-	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
+	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
 
 	// Append gcc arguments to stdout
 	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)

@@ -43,7 +43,7 @@ func initArchiveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch /home/user/MySketchArchive.zip",
 		Args: cobra.MaximumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			runArchiveCommand(srv, args, includeBuildDir, overwrite)
+			runArchiveCommand(cmd.Context(), srv, args, includeBuildDir, overwrite)
 		},
 	}
 
@@ -53,9 +53,8 @@ func initArchiveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return archiveCommand
 }
 
-func runArchiveCommand(srv rpc.ArduinoCoreServiceServer, args []string, includeBuildDir bool, overwrite bool) {
+func runArchiveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, includeBuildDir bool, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch archive`")
-	ctx := context.Background()
 	sketchPathArg := ""
 	if len(args) > 0 {
 		sketchPathArg = args[0]

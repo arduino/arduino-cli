@@ -42,18 +42,17 @@ func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDepsCommand(srv, args, noOverwrite)
+			runDepsCommand(cmd.Context(), srv, args, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstalledLibraries(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstalledLibraries(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not try to update library dependencies if already installed."))
 	return depsCommand
 }
 
-func runDepsCommand(srv rpc.ArduinoCoreServiceServer, args []string, noOverwrite bool) {
-	ctx := context.Background()
+func runDepsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, noOverwrite bool) {
 	instance := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli lib deps`")

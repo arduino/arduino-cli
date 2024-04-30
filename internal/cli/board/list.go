@@ -46,7 +46,7 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " board list --discovery-timeout 10s",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(srv, watch, timeoutArg.Get().Milliseconds(), fqbn.String())
+			runListCommand(cmd.Context(), srv, watch, timeoutArg.Get().Milliseconds(), fqbn.String())
 		},
 	}
 
@@ -57,18 +57,17 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 }
 
 // runListCommand detects and lists the connected arduino boards
-func runListCommand(srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64, fqbn string) {
-	ctx := context.Background()
+func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64, fqbn string) {
 	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board list`")
 
 	if watch {
-		watchList(inst, srv)
+		watchList(ctx, inst, srv)
 		return
 	}
 
-	list, err := srv.BoardList(context.Background(), &rpc.BoardListRequest{
+	list, err := srv.BoardList(ctx, &rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeout,
 		Fqbn:     fqbn,
@@ -89,8 +88,8 @@ func runListCommand(srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64,
 	feedback.PrintResult(listResult{result.NewDetectedPorts(ports)})
 }
 
-func watchList(inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) {
-	stream, eventsChan := commands.BoardListWatchProxyToChan(context.Background())
+func watchList(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) {
+	stream, eventsChan := commands.BoardListWatchProxyToChan(ctx)
 	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: inst}, stream)
 	if err != nil {
 		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)

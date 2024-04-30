@@ -38,7 +38,7 @@ func initNewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runNewCommand(srv, args, overwrite)
+			runNewCommand(cmd.Context(), srv, args, overwrite)
 		},
 	}
 
@@ -47,8 +47,7 @@ func initNewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return newCommand
 }
 
-func runNewCommand(srv rpc.ArduinoCoreServiceServer, args []string, overwrite bool) {
-	ctx := context.Background()
+func runNewCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch new`")
 	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
 	inputSketchName := args[0]

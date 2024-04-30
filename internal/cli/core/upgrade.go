@@ -43,16 +43,15 @@ func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  # " + tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
+			runUpgradeCommand(cmd.Context(), srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool) {
+func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	logrus.Info("Executing `arduino-cli core upgrade`")
-	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 	Upgrade(ctx, srv, inst, args, skipPostInstall, skipPreUninstall)
 }

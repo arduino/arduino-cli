@@ -44,6 +44,8 @@ var ErrSketchCannotBeLocatedInBuildPath = errors.New("sketch cannot be located i
 
 // Builder is a Sketch builder.
 type Builder struct {
+	ctx context.Context
+
 	sketch          *sketch.Sketch
 	buildProperties *properties.Map
 
@@ -198,6 +200,7 @@ func NewBuilder(
 
 	diagnosticStore := diagnostics.NewStore()
 	b := &Builder{
+		ctx:                           ctx,
 		sketch:                        sk,
 		buildProperties:               buildProperties,
 		buildPath:                     buildPath,
@@ -305,6 +308,7 @@ func (b *Builder) preprocess() error {
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
 	err := b.libsDetector.FindIncludes(
+		b.ctx,
 		b.buildPath,
 		b.buildProperties.GetPath("build.core.path"),
 		b.buildProperties.GetPath("build.variant.path"),

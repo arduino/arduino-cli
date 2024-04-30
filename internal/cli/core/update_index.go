@@ -36,15 +36,14 @@ func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " core update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpdateIndexCommand(srv)
+			runUpdateIndexCommand(cmd.Context(), srv)
 		},
 	}
 	return updateIndexCommand
 }
 
-func runUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) {
+func runUpdateIndexCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli core update-index`")
-	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 	resp := UpdateIndex(ctx, srv, inst)
 

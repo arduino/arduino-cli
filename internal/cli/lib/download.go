@@ -39,18 +39,17 @@ func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " lib download AudioZero@1.0.0 # " + tr("for a specific version."),
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDownloadCommand(srv, args)
+			runDownloadCommand(cmd.Context(), srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand
 }
 
-func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
+func runDownloadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib download`")
-	ctx := context.Background()
 	instance := instance.CreateAndInit(ctx, srv)
 
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)

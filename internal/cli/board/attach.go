@@ -40,11 +40,12 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " board attach -P atmel_ice",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
 			sketchPath := ""
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runAttachCommand(srv, sketchPath, &port, fqbn.String(), &programmer)
+			runAttachCommand(ctx, srv, sketchPath, &port, fqbn.String(), &programmer)
 		},
 	}
 	fqbn.AddToCommand(attachCommand, srv)
@@ -54,11 +55,10 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return attachCommand
 }
 
-func runAttachCommand(srv rpc.ArduinoCoreServiceServer, path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
-	ctx := context.Background()
+func runAttachCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
 	sketchPath := arguments.InitSketchPath(path)
 
-	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, srv, "", "")
+	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(ctx, nil, srv, "", "")
 	newDefaults, err := srv.SetSketchDefaults(ctx, &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,

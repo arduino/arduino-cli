@@ -38,19 +38,18 @@ func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runUninstallCommand(srv, args, preUninstallFlags)
+			runUninstallCommand(cmd.Context(), srv, args, preUninstallFlags)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableCores(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableCores(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	preUninstallFlags.AddToCommand(uninstallCommand)
 	return uninstallCommand
 }
 
-func runUninstallCommand(srv rpc.ArduinoCoreServiceServer, args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
+func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
 	logrus.Info("Executing `arduino-cli core uninstall`")
-	ctx := context.Background()
 	inst := instance.CreateAndInit(ctx, srv)
 
 	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)

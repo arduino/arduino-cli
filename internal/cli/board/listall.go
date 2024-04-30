@@ -43,7 +43,7 @@ for a specific board if you specify the board name`),
 			"  " + os.Args[0] + " board listall zero",
 		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runListAllCommand(args, srv)
+			runListAllCommand(cmd.Context(), args, srv)
 		},
 	}
 	listAllCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
@@ -51,13 +51,12 @@ for a specific board if you specify the board name`),
 }
 
 // runListAllCommand list all installed boards
-func runListAllCommand(args []string, srv rpc.ArduinoCoreServiceServer) {
-	ctx := context.Background()
+func runListAllCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer) {
 	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board listall`")
 
-	list, err := srv.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
+	list, err := srv.BoardListAll(ctx, &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          args,
 		IncludeHiddenBoards: showHiddenBoard,

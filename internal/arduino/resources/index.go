@@ -58,7 +58,7 @@ func (res *IndexResource) IndexFileName() (string, error) {
 
 // Download will download the index and possibly check the signature using the Arduino's public key.
 // If the file is in .gz format it will be unpacked first.
-func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadProgressCB, config downloader.Config) error {
+func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, config downloader.Config) error {
 	// Create destination directory
 	if err := destDir.MkdirAll(); err != nil {
 		return &cmderrors.PermissionDeniedError{Message: tr("Can't create data directory %s", destDir), Cause: err}
@@ -100,7 +100,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		defer f.Close()
 		tmpArchivePath := tmp.Join("archive")
 		_ = tmpArchivePath.MkdirAll()
-		if err := extract.Bz2(context.Background(), f, tmpArchivePath.String(), nil); err != nil {
+		if err := extract.Bz2(ctx, f, tmpArchivePath.String(), nil); err != nil {
 			return &cmderrors.PermissionDeniedError{Message: tr("Error extracting %s", tmpIndexPath), Cause: err}
 		}
 

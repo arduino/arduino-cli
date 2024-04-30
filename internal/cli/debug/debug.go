@@ -56,7 +56,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCommand(srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
+			runDebugCommand(cmd.Context(), srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
 		},
 	}
 
@@ -72,10 +72,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return debugCommand
 }
 
-func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
+func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
 	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile) {
 	logrus.Info("Executing `arduino-cli debug`")
-	ctx := context.Background()
 
 	path := ""
 	if len(args) > 0 {
@@ -103,11 +102,11 @@ func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, portArgs, fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {
-		prog = programmer.String(inst, srv, fqbn)
+		prog = programmer.String(ctx, inst, srv, fqbn)
 	}
 	if prog == "" {
 		prog = sk.GetDefaultProgrammer()
@@ -125,7 +124,7 @@ func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *
 
 	if printInfo {
 
-		if res, err := commands.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
+		if res, err := commands.GetDebugConfig(ctx, debugConfigRequested); err != nil {
 			errcode := feedback.ErrBadArgument
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
@@ -145,7 +144,7 @@ func runDebugCommand(srv rpc.ArduinoCoreServiceServer, args []string, portArgs *
 		if err != nil {
 			feedback.FatalError(err, feedback.ErrBadArgument)
 		}
-		if _, err := commands.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
+		if _, err := commands.Debug(ctx, debugConfigRequested, in, out, ctrlc); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer

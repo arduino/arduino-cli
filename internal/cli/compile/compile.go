@@ -16,7 +16,6 @@
 package compile
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -141,7 +140,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 
 func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli compile`")
-	ctx := context.Background()
+	ctx := cmd.Context()
 
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
@@ -178,7 +177,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, &portArgs, &fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
 		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
@@ -274,7 +273,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 
 		prog := profile.GetProgrammer()
 		if prog == "" || programmer.GetProgrammer() != "" {
-			prog = programmer.String(inst, srv, fqbn)
+			prog = programmer.String(ctx, inst, srv, fqbn)
 		}
 		if prog == "" {
 			prog = sk.GetDefaultProgrammer()

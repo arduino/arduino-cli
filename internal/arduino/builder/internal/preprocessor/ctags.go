@@ -41,6 +41,7 @@ var DebugPreprocessor bool
 
 // PreprocessSketchWithCtags performs preprocessing of the arduino sketch using CTags.
 func PreprocessSketchWithCtags(
+	ctx context.Context,
 	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
 	lineOffset int, buildProperties *properties.Map,
 	onlyUpdateCompilationDatabase, verbose bool,
@@ -57,7 +58,7 @@ func PreprocessSketchWithCtags(
 
 	// Run GCC preprocessor
 	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	result, err := GCC(sourceFile, ctagsTarget, includes, buildProperties)
+	result, err := GCC(ctx, sourceFile, ctagsTarget, includes, buildProperties)
 	stdout.Write(result.Stdout())
 	stderr.Write(result.Stderr())
 	if err != nil {
@@ -84,7 +85,7 @@ func PreprocessSketchWithCtags(
 	}
 
 	// Run CTags on gcc-preprocessed source
-	ctagsOutput, ctagsStdErr, err := RunCTags(ctagsTarget, buildProperties)
+	ctagsOutput, ctagsStdErr, err := RunCTags(ctx, ctagsTarget, buildProperties)
 	if verbose {
 		stderr.Write(ctagsStdErr)
 	}
@@ -179,7 +180,7 @@ func isFirstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) 
 }
 
 // RunCTags performs a run of ctags on the given source file. Returns the ctags output and the stderr contents.
-func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
+func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
 	ctagsBuildProperties := properties.NewMap()
 	ctagsBuildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
 	ctagsBuildProperties.Set("tools.ctags.cmd.path", "{path}/ctags")
@@ -202,7 +203,7 @@ func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
+	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
 
 	// Append ctags arguments to stderr
 	args := fmt.Sprintln(strings.Join(parts, " "))

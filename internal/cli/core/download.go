@@ -39,17 +39,16 @@ func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("download a specific version (in this case 1.6.9)."),
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDownloadCommand(srv, args)
+			runDownloadCommand(cmd.Context(), srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(context.Background(), srv), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand
 }
 
-func runDownloadCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
-	ctx := context.Background()
+func runDownloadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli core download`")

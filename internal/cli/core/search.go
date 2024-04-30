@@ -41,7 +41,7 @@ func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runSearchCommand(srv, args, allVersions)
+			runSearchCommand(cmd.Context(), srv, args, allVersions)
 		},
 	}
 	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, tr("Show all available core versions."))
@@ -52,8 +52,7 @@ func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 // indexUpdateInterval specifies the time threshold over which indexes are updated
 const indexUpdateInterval = 24 * time.Hour
 
-func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string, allVersions bool) {
-	ctx := context.Background()
+func runSearchCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, allVersions bool) {
 	inst := instance.CreateAndInit(ctx, srv)
 
 	stream, res := commands.UpdateIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())

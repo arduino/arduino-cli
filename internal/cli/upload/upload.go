@@ -63,7 +63,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runUploadCommand(srv, args, uploadFields)
+			runUploadCommand(cmd.Context(), srv, args, uploadFields)
 		},
 	}
 
@@ -81,10 +81,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return uploadCommand
 }
 
-func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFieldsArgs map[string]string) {
+func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, uploadFieldsArgs map[string]string) {
 	logrus.Info("Executing `arduino-cli upload`")
-
-	ctx := context.Background()
 
 	path := ""
 	if len(args) > 0 {
@@ -116,7 +114,7 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 	defaultFQBN := sketch.GetDefaultFqbn()
 	defaultAddress := sketch.GetDefaultPort()
 	defaultProtocol := sketch.GetDefaultProtocol()
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, srv, defaultFQBN, defaultAddress, defaultProtocol)
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, &portArgs, &fqbnArg, inst, srv, defaultFQBN, defaultAddress, defaultProtocol)
 
 	userFieldRes, err := srv.SupportedUserFields(ctx, &rpc.SupportedUserFieldsRequest{
 		Instance: inst,
@@ -179,7 +177,7 @@ func runUploadCommand(srv rpc.ArduinoCoreServiceServer, args []string, uploadFie
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {
-		prog = programmer.String(inst, srv, fqbn)
+		prog = programmer.String(ctx, inst, srv, fqbn)
 	}
 	if prog == "" {
 		prog = sketch.GetDefaultProgrammer()

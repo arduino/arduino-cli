@@ -41,20 +41,19 @@ func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " board search zero",
 		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runSearchCommand(srv, args)
+			runSearchCommand(cmd.Context(), srv, args)
 		},
 	}
 	searchCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return searchCommand
 }
 
-func runSearchCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
-	ctx := context.Background()
+func runSearchCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board search`")
 
-	res, err := srv.BoardSearch(context.Background(), &rpc.BoardSearchRequest{
+	res, err := srv.BoardSearch(ctx, &rpc.BoardSearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		IncludeHiddenBoards: showHiddenBoard,

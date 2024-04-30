@@ -33,20 +33,20 @@ type Programmer struct {
 func (p *Programmer) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&p.programmer, "programmer", "P", "", tr("Programmer to use, e.g: atmel_ice"))
 	cmd.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledProgrammers(context.Background(), srv), cobra.ShellCompDirectiveDefault
+		return GetInstalledProgrammers(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 	})
 }
 
 // String returns the programmer specified by the user, or the default programmer
 // for the given board if defined.
-func (p *Programmer) String(inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer, fqbn string) string {
+func (p *Programmer) String(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer, fqbn string) string {
 	if p.programmer != "" {
 		return p.programmer
 	}
 	if inst == nil || fqbn == "" {
 		return ""
 	}
-	details, err := srv.BoardDetails(context.Background(), &rpc.BoardDetailsRequest{
+	details, err := srv.BoardDetails(ctx, &rpc.BoardDetailsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 	})

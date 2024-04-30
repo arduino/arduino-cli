@@ -17,6 +17,7 @@ package detector
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -196,6 +197,7 @@ func (l *SketchLibrariesDetector) appendIncludeFolder(
 
 // FindIncludes todo
 func (l *SketchLibrariesDetector) FindIncludes(
+	ctx context.Context,
 	buildPath *paths.Path,
 	buildCorePath *paths.Path,
 	buildVariantPath *paths.Path,
@@ -205,7 +207,7 @@ func (l *SketchLibrariesDetector) FindIncludes(
 	buildProperties *properties.Map,
 	platformArch string,
 ) error {
-	err := l.findIncludes(buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch)
+	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch)
 	if err != nil && l.onlyUpdateCompilationDatabase {
 		l.logger.Info(
 			fmt.Sprintf(
@@ -220,6 +222,7 @@ func (l *SketchLibrariesDetector) FindIncludes(
 }
 
 func (l *SketchLibrariesDetector) findIncludes(
+	ctx context.Context,
 	buildPath *paths.Path,
 	buildCorePath *paths.Path,
 	buildVariantPath *paths.Path,
@@ -269,7 +272,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		for !sourceFileQueue.empty() {
-			err := l.findIncludesUntilDone(cache, sourceFileQueue, buildProperties, sketchBuildPath, librariesBuildPath, platformArch)
+			err := l.findIncludesUntilDone(ctx, cache, sourceFileQueue, buildProperties, sketchBuildPath, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
 				return err
@@ -297,6 +300,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 }
 
 func (l *SketchLibrariesDetector) findIncludesUntilDone(
+	ctx context.Context,
 	cache *includeCache,
 	sourceFileQueue *uniqueSourceFileQueue,
 	buildProperties *properties.Map,
@@ -350,7 +354,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				l.logger.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preprocFirstResult, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
+			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 			if l.logger.Verbose() {
 				l.logger.WriteStdout(preprocFirstResult.Stdout())
 			}
@@ -381,7 +385,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			// Library could not be resolved, show error
 			if preprocErr == nil || preprocFirstResult.Stderr() == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				result, err := preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
+				result, err := preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 				if l.logger.Verbose() {
 					l.logger.WriteStdout(result.Stdout())
 				}

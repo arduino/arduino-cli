@@ -16,8 +16,6 @@
 package arguments
 
 import (
-	"context"
-
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +35,7 @@ func (f *Profile) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceSer
 		if len(args) > 0 {
 			sketchProfile = args[0]
 		}
-		return GetSketchProfiles(context.Background(), srv, sketchProfile), cobra.ShellCompDirectiveDefault
+		return GetSketchProfiles(cmd.Context(), srv, sketchProfile), cobra.ShellCompDirectiveDefault
 	})
 }
 

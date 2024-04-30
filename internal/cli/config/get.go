@@ -39,7 +39,7 @@ func initGetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " config get board_manager.additional_urls",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runGetCommand(srv, args)
+			runGetCommand(cmd.Context(), srv, args)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			ctx := cmd.Context()
@@ -49,9 +49,8 @@ func initGetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	return getCommand
 }
 
-func runGetCommand(srv rpc.ArduinoCoreServiceServer, args []string) {
+func runGetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
-	ctx := context.Background()
 
 	for _, toGet := range args {
 		resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: toGet})

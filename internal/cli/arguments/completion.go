@@ -29,7 +29,7 @@ import (
 func GetInstalledBoards(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit(ctx, srv)
 
-	list, _ := srv.BoardListAll(context.Background(), &rpc.BoardListAllRequest{
+	list, _ := srv.BoardListAll(ctx, &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
@@ -53,7 +53,7 @@ func GetInstalledProgrammers(ctx context.Context, srv rpc.ArduinoCoreServiceServ
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
 	}
-	list, _ := srv.BoardListAll(context.Background(), listAllReq)
+	list, _ := srv.BoardListAll(ctx, listAllReq)
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.GetBoards() {
@@ -149,7 +149,7 @@ func getLibraries(ctx context.Context, srv rpc.ArduinoCoreServiceServer, all boo
 func GetInstallableLibs(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []string {
 	inst := instance.CreateAndInit(ctx, srv)
 
-	libs, _ := srv.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+	libs, _ := srv.LibrarySearch(ctx, &rpc.LibrarySearchRequest{
 		Instance:   inst,
 		SearchArgs: "", // if no query is specified all the libs are returned
 	})
