@@ -101,7 +101,7 @@ func TestCoreSearch(t *testing.T) {
 
 	checkPlatformIsInJSONOutput := func(stdout []byte, id, version string) {
 		jqquery := fmt.Sprintf(`{"platforms":[{id:"%s", releases:{"%s":{}}}]}`, id, version)
-		requirejson.Contains(t, out, jqquery, "platform %s@%s is missing from the output", id, version)
+		requirejson.Contains(t, stdout, jqquery, "platform %s@%s is missing from the output", id, version)
 	}
 
 	// Search all Retrokit platforms
