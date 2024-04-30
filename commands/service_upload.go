@@ -188,9 +188,8 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		})
 	})
 	defer errStream.Close()
-	// TODO: inject context
-	// ctx := stream.Context()
 	updatedPort, err := runProgramAction(
+		stream.Context(),
 		pme,
 		sk,
 		req.GetImportFile(),
@@ -259,7 +258,7 @@ func (s *arduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 	}, streamAdapter)
 }
 
-func runProgramAction(pme *packagemanager.Explorer,
+func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
 	importFile, importDir, fqbnIn string, userPort *rpc.Port,
 	programmerID string,
@@ -447,7 +446,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 
 	// This context is kept alive for the entire duration of the upload
-	uploadCtx, uploadCompleted := context.WithCancel(context.Background())
+	uploadCtx, uploadCompleted := context.WithCancel(ctx)
 	defer uploadCompleted()
 
 	// Start the upload port change detector.

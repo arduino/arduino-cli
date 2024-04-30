@@ -17,6 +17,7 @@ package commands
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -186,6 +187,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
 		_, err := runProgramAction(
+			context.Background(),
 			pme,
 			nil,                     // sketch
 			"",                      // importFile

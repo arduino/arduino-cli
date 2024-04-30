@@ -73,6 +73,7 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 	defer release()
 
 	if _, err := runProgramAction(
+		stream.Context(),
 		pme,
 		nil, // sketch
 		"",  // importFile
