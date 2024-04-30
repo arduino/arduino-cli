@@ -272,7 +272,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		for !sourceFileQueue.empty() {
-			err := l.findIncludesUntilDone(ctx, cache, sourceFileQueue, buildProperties, sketchBuildPath, librariesBuildPath, platformArch)
+			err := l.findIncludesUntilDone(ctx, cache, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
 				return err
@@ -304,7 +304,6 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 	cache *includeCache,
 	sourceFileQueue *uniqueSourceFileQueue,
 	buildProperties *properties.Map,
-	sketchBuildPath *paths.Path,
 	librariesBuildPath *paths.Path,
 	platformArch string,
 ) error {
