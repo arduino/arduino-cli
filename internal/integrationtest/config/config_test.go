@@ -893,4 +893,12 @@ build.unk: 123
 	out, _, err = cli.Run("config", "get", "locale", "--config-file", invalidConfig.String())
 	require.NoError(t, err)
 	require.Equal(t, "en", strings.TrimSpace(string(out)))
+
+	// Run "config get" with a configuration containing a null array
+	nullArrayConfig := paths.New(filepath.Join(tmp, "null_array.yaml"))
+	nullArrayConfig.WriteFile([]byte(`board_manager.additional_urls:`))
+	t.Cleanup(func() { nullArrayConfig.Remove() })
+	out, _, err = cli.Run("config", "get", "locale", "--config-file", invalidConfig.String())
+	require.NoError(t, err)
+	require.Equal(t, "en", strings.TrimSpace(string(out)))
 }

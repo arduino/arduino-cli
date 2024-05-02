@@ -97,7 +97,7 @@ func tryConversion(current any, desiredType reflect.Type) (any, error) {
 		}
 	case reflect.Array, reflect.Slice:
 		currentArray, ok := current.([]any)
-		if !ok {
+		if !ok && current != nil {
 			break
 		}
 		for i, elem := range currentArray {
