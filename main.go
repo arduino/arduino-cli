@@ -45,8 +45,12 @@ func main() {
 	} else if !os.IsNotExist(err) {
 		feedback.FatalError(fmt.Errorf("couldn't read configuration file: %w", err), feedback.ErrGeneric)
 	}
-	if _, err := srv.ConfigurationOpen(ctx, openReq); err != nil {
+	if resp, err := srv.ConfigurationOpen(ctx, openReq); err != nil {
 		feedback.FatalError(fmt.Errorf("couldn't load configuration: %w", err), feedback.ErrGeneric)
+	} else if warnings := resp.GetWarnings(); len(warnings) > 0 {
+		for _, warning := range warnings {
+			feedback.Warning(warning)
+		}
 	}
 
 	// Get the current settings from the server

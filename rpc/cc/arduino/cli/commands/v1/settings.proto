@@ -120,7 +120,11 @@ message ConfigurationOpenRequest {
   string settings_format = 2;
 }
 
-message ConfigurationOpenResponse {}
+message ConfigurationOpenResponse {
+  // Warnings that occurred while opening the configuration (e.g. unknown keys,
+  // or invalid values)
+  repeated string warnings = 1;
+}
 
 message SettingsGetValueRequest {
   // The key to get

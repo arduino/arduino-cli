@@ -22,7 +22,9 @@ import (
 	"reflect"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	"github.com/arduino/arduino-cli/internal/go-configmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
@@ -187,15 +189,21 @@ func (s *arduinoCoreServerImpl) ConfigurationSave(ctx context.Context, req *rpc.
 
 // SettingsReadFromFile read settings from a YAML file and replace the settings currently stored in memory.
 func (s *arduinoCoreServerImpl) ConfigurationOpen(ctx context.Context, req *rpc.ConfigurationOpenRequest) (*rpc.ConfigurationOpenResponse, error) {
+	warnings := []string{}
+
 	switch req.GetSettingsFormat() {
 	case "yaml":
 		err := yaml.Unmarshal([]byte(req.GetEncodedSettings()), s.settings)
-		if err != nil {
+		if errs, ok := err.(*configmap.UnmarshalErrors); ok {
+			warnings = f.Map(errs.WrappedErrors(), (error).Error)
+		} else if err != nil {
 			return nil, fmt.Errorf("error unmarshalling settings: %v", err)
 		}
 	case "json":
 		err := json.Unmarshal([]byte(req.GetEncodedSettings()), s.settings)
-		if err != nil {
+		if errs, ok := err.(*configmap.UnmarshalErrors); ok {
+			warnings = f.Map(errs.WrappedErrors(), (error).Error)
+		} else if err != nil {
 			return nil, fmt.Errorf("error unmarshalling settings: %v", err)
 		}
 	default:
@@ -203,7 +211,7 @@ func (s *arduinoCoreServerImpl) ConfigurationOpen(ctx context.Context, req *rpc.
 	}
 
 	configuration.InjectEnvVars(s.settings)
-	return &rpc.ConfigurationOpenResponse{}, nil
+	return &rpc.ConfigurationOpenResponse{Warnings: warnings}, nil
 }
 
 // SettingsEnumerate returns the list of all the settings keys.

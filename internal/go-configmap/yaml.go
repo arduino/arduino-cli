@@ -29,10 +29,11 @@ func (c *Map) UnmarshalYAML(node *yaml.Node) error {
 		return err
 	}
 
+	errs := &UnmarshalErrors{}
 	for k, v := range flattenMap(in) {
 		if err := c.Set(k, v); err != nil {
-			return err
+			errs.append(err)
 		}
 	}
-	return nil
+	return errs.result()
 }

@@ -17,6 +17,7 @@ package config_test
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -866,4 +867,30 @@ func TestInitializationOrderOfConfigThroughFlagAndEnv(t *testing.T) {
 	stdout, _, err = cli.RunWithCustomEnv(customEnv, "config", "dump", "--config-file", cliConfig.String(), "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `{"config":{ "locale": "test" }}`)
+}
+
+func TestConfigLoadWithUnknownOrInvalidKeys(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	tmp := t.TempDir()
+	unkwnownConfig := paths.New(filepath.Join(tmp, "unknown.yaml"))
+	unkwnownConfig.WriteFile([]byte(`
+unk: "test"
+build.unk: 123
+`))
+	t.Cleanup(func() { unkwnownConfig.Remove() })
+
+	// Run "config get" with a configuration containing an unknown key
+	out, _, err := cli.Run("config", "get", "locale", "--config-file", unkwnownConfig.String())
+	require.NoError(t, err)
+	require.Equal(t, "en", strings.TrimSpace(string(out)))
+
+	// Run "config get" with a configuration containing an invalid key
+	invalidConfig := paths.New(filepath.Join(tmp, "invalid.yaml"))
+	invalidConfig.WriteFile([]byte(`locale: 123`))
+	t.Cleanup(func() { invalidConfig.Remove() })
+	out, _, err = cli.Run("config", "get", "locale", "--config-file", invalidConfig.String())
+	require.NoError(t, err)
+	require.Equal(t, "en", strings.TrimSpace(string(out)))
 }
