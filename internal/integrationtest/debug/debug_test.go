@@ -109,12 +109,12 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 	require.NoError(t, err)
 
 	// Build sketch
-	_, _, err = cli.Run("compile", "-b", "my:samd:my", sketchPath.String(), "--format", "json")
+	_, _, err = cli.Run("compile", "-b", "my:samd:my", sketchPath.String(), "--json")
 	require.NoError(t, err)
 
 	{
 		// Starts debugger
-		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "atmel_ice", sketchPath.String(), "--info", "--json")
 		require.NoError(t, err)
 		debugOut := requirejson.Parse(t, jsonDebugOut)
 		debugOut.MustContain(`
@@ -172,7 +172,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 
 	// Starts debugger with another programmer
 	{
-		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "my_cold_ice", sketchPath.String(), "--info", "--json")
 		require.NoError(t, err)
 		debugOut := requirejson.Parse(t, jsonDebugOut)
 		debugOut.MustContain(`
@@ -229,7 +229,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 
 		{
 			// Starts debugger with an old-style openocd script definition
-			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "atmel_ice", sketchPath.String(), "--info", "--json")
 			require.NoError(t, err)
 			debugOut := requirejson.Parse(t, jsonDebugOut)
 			debugOut.MustContain(`
@@ -253,7 +253,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 
 		{
 			// Starts debugger with mixed old and new-style openocd script definition
-			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "my_cold_ice", sketchPath.String(), "--info", "--json")
 			require.NoError(t, err)
 			debugOut := requirejson.Parse(t, jsonDebugOut)
 			debugOut.MustContain(`
@@ -277,7 +277,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 
 		{
 			// Mixing programmer and additional_config
-			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my3", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my3", "-P", "my_cold_ice", sketchPath.String(), "--info", "--json")
 			require.NoError(t, err)
 			debugOut := requirejson.Parse(t, jsonDebugOut)
 			debugOut.MustContain(`
@@ -306,7 +306,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 
 		{
 			// Mixing programmer and additional_config selected by another variable
-			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my4", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my4", "-P", "my_cold_ice", sketchPath.String(), "--info", "--json")
 			require.NoError(t, err)
 			debugOut := requirejson.Parse(t, jsonDebugOut)
 			debugOut.MustContain(`
@@ -340,7 +340,7 @@ func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integra
 	require.NoError(t, err)
 	require.Contains(t, string(out), "The given board/programmer configuration supports debugging.")
 
-	out, _, err = cli.Run("debug", "check", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, out, `.debugging_supported`, `true`)
 
@@ -348,28 +348,28 @@ func testDebugCheck(t *testing.T, env *integrationtest.Environment, cli *integra
 	require.NoError(t, err)
 	require.Contains(t, string(out), "The given board/programmer configuration does NOT support debugging.")
 
-	out, _, err = cli.Run("debug", "check", "-b", "arduino:avr:uno", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "arduino:avr:uno", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, out, `.debugging_supported`, `false`)
 
 	// Test minimum FQBN compute
-	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, out, `{ "debugging_supported" : false }`)
 
-	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5:dbg=on", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5:dbg=on", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my5:dbg=on" }`)
 
-	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5:dbg=on,cpu=150m", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my5:dbg=on,cpu=150m", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my5:dbg=on" }`)
 
-	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my6", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my6", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my6" }`)
 
-	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my6:dbg=on", "-P", "atmel_ice", "--format", "json")
+	out, _, err = cli.Run("debug", "check", "-b", "my:samd:my6:dbg=on", "-P", "atmel_ice", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, out, `{ "debugging_supported" : true, "debug_fqbn" : "my:samd:my6" }`)
 }

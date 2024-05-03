@@ -36,7 +36,7 @@ func TestCorrectBoardListOrdering(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("core", "install", "arduino:avr")
 	require.NoError(t, err)
-	jsonOut, _, err := cli.Run("board", "listall", "--format", "json")
+	jsonOut, _, err := cli.Run("board", "listall", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, jsonOut, "[.boards[] | .fqbn]", `[
 		"arduino:avr:yun",
@@ -80,7 +80,7 @@ func TestBoardList(t *testing.T) {
 
 	cli.InstallMockedSerialDiscovery(t)
 
-	stdout, _, err := cli.Run("board", "list", "--format", "json")
+	stdout, _, err := cli.Run("board", "list", "--json")
 	require.NoError(t, err)
 	// check is a valid json and contains a list of ports
 	requirejson.Parse(t, stdout).
@@ -97,7 +97,7 @@ func TestBoardListMock(t *testing.T) {
 
 	cli.InstallMockedSerialDiscovery(t)
 
-	stdout, _, err := cli.Run("board", "list", "--format", "json")
+	stdout, _, err := cli.Run("board", "list", "--json")
 	require.NoError(t, err)
 
 	// check is a valid json and contains a list of ports
@@ -136,7 +136,7 @@ func TestBoardListWithFqbnFilter(t *testing.T) {
 
 	cli.InstallMockedSerialDiscovery(t)
 
-	stdout, _, err := cli.Run("board", "list", "-b", "foo:bar:baz", "--format", "json")
+	stdout, _, err := cli.Run("board", "list", "-b", "foo:bar:baz", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.detected_ports | length`, `0`)
 }
@@ -150,7 +150,7 @@ func TestBoardListWithFqbnFilterInvalid(t *testing.T) {
 
 	cli.InstallMockedSerialDiscovery(t)
 
-	_, stderr, err := cli.Run("board", "list", "-b", "yadayada", "--format", "json")
+	_, stderr, err := cli.Run("board", "list", "-b", "yadayada", "--json")
 	require.Error(t, err)
 	requirejson.Query(t, stderr, ".error", `"Invalid FQBN: not an FQBN: yadayada"`)
 }
@@ -164,7 +164,7 @@ func TestBoardListall(t *testing.T) {
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("board", "listall", "--format", "json")
+	stdout, _, err := cli.Run("board", "listall", "--json")
 	require.NoError(t, err)
 
 	requirejson.Query(t, stdout, ".boards | length", "26")
@@ -224,7 +224,7 @@ func TestBoardListallWithManuallyInstalledPlatform(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("board", "listall", "--format", "json")
+	stdout, _, err := cli.Run("board", "listall", "--json")
 	require.NoError(t, err)
 
 	requirejson.Query(t, stdout, ".boards | length", "17")
@@ -274,11 +274,11 @@ func TestBoardDetails(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test board listall with and without showing hidden elements
-	stdout, _, err := cli.Run("board", "listall", "MIPS", "--format", "json")
+	stdout, _, err := cli.Run("board", "listall", "MIPS", "--json")
 	require.NoError(t, err)
 	require.Equal(t, string(stdout), "{}\n")
 
-	stdout, _, err = cli.Run("board", "listall", "MIPS", "-a", "--format", "json")
+	stdout, _, err = cli.Run("board", "listall", "MIPS", "-a", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `{
 		"boards": [
@@ -288,7 +288,7 @@ func TestBoardDetails(t *testing.T) {
 		]
 	}`)
 
-	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")
+	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--json")
 	require.NoError(t, err)
 
 	requirejson.Contains(t, stdout, `{
@@ -425,7 +425,7 @@ func TestBoardSearch(t *testing.T) {
 	_, _, err := cli.Run("update")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("board", "search", "--format", "json")
+	stdout, _, err := cli.Run("board", "search", "--json")
 	require.NoError(t, err)
 	// Verifies boards are returned
 	requirejson.NotEmpty(t, stdout)
@@ -441,7 +441,7 @@ func TestBoardSearch(t *testing.T) {
 		]}`)
 
 	// Search in non installed boards
-	stdout, _, err = cli.Run("board", "search", "--format", "json", "nano", "33")
+	stdout, _, err = cli.Run("board", "search", "--json", "nano", "33")
 	require.NoError(t, err)
 	// Verifies boards are returned
 	requirejson.NotEmpty(t, stdout)
@@ -457,7 +457,7 @@ func TestBoardSearch(t *testing.T) {
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
 	require.NoError(t, err)
 
-	stdout, _, err = cli.Run("board", "search", "--format", "json")
+	stdout, _, err = cli.Run("board", "search", "--json")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	// Verifies some FQBNs are now returned after installing a platform
@@ -474,7 +474,7 @@ func TestBoardSearch(t *testing.T) {
 			}
 		]}`)
 
-	stdout, _, err = cli.Run("board", "search", "--format", "json", "arduino", "yun")
+	stdout, _, err = cli.Run("board", "search", "--json", "arduino", "yun")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	requirejson.Contains(t, stdout, `{
@@ -494,7 +494,7 @@ func TestBoardSearch(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	stdout, _, err = cli.Run("board", "search", "--format", "json")
+	stdout, _, err = cli.Run("board", "search", "--json")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	// Verifies some FQBNs are now returned after installing a platform
@@ -531,7 +531,7 @@ func TestBoardSearch(t *testing.T) {
 			}
 		]}`)
 
-	stdout, _, err = cli.Run("board", "search", "--format", "json", "mkr1000")
+	stdout, _, err = cli.Run("board", "search", "--json", "mkr1000")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
 	// Verifies some FQBNs are now returned after installing a platform
@@ -557,7 +557,7 @@ func TestBoardAttach(t *testing.T) {
 	require.NoError(t, err)
 
 	{
-		stdout, _, err := cli.Run("board", "attach", "-b", "arduino:avr:uno", sketchPath.String(), "--format", "json")
+		stdout, _, err := cli.Run("board", "attach", "-b", "arduino:avr:uno", sketchPath.String(), "--json")
 		require.NoError(t, err)
 		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
 
@@ -568,7 +568,7 @@ func TestBoardAttach(t *testing.T) {
 		require.NotContains(t, string(yamlData), "default_protocol:")
 	}
 	{
-		stdout, _, err := cli.Run("board", "attach", "-p", "/dev/ttyACM0", "-l", "serial", sketchPath.String(), "--format", "json")
+		stdout, _, err := cli.Run("board", "attach", "-p", "/dev/ttyACM0", "-l", "serial", sketchPath.String(), "--json")
 		require.NoError(t, err)
 		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
 		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
@@ -581,7 +581,7 @@ func TestBoardAttach(t *testing.T) {
 		require.Contains(t, string(yamlData), "default_protocol: serial")
 	}
 	{
-		stdout, _, err := cli.Run("board", "attach", "-p", "/dev/ttyACM0", sketchPath.String(), "--format", "json")
+		stdout, _, err := cli.Run("board", "attach", "-p", "/dev/ttyACM0", sketchPath.String(), "--json")
 		require.NoError(t, err)
 		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
 		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
@@ -594,7 +594,7 @@ func TestBoardAttach(t *testing.T) {
 		require.NotContains(t, string(yamlData), "default_protocol:")
 	}
 	{
-		stdout, _, err := cli.Run("board", "attach", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", sketchPath.String(), "--format", "json")
+		stdout, _, err := cli.Run("board", "attach", "-b", "arduino:samd:mkr1000", "-P", "atmel_ice", sketchPath.String(), "--json")
 		require.NoError(t, err)
 		requirejson.Query(t, stdout, ".fqbn", `"arduino:samd:mkr1000"`)
 		requirejson.Query(t, stdout, ".programmer", `"atmel_ice"`)

@@ -36,7 +36,7 @@ func TestCompileCommandsJSONGeneration(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a test sketch
-	out, _, err := cli.Run("sketch", "new", "Test", "--format", "json")
+	out, _, err := cli.Run("sketch", "new", "Test", "--json")
 	require.NoError(t, err)
 	var s struct {
 		Path string `json:"sketch_path"`

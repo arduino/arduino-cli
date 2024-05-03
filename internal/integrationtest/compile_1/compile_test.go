@@ -164,7 +164,7 @@ func compileWithSimpleSketchCustomEnv(t *testing.T, env *integrationtest.Environ
 	require.NoError(t, err)
 
 	// Build sketch for arduino:avr:uno with json output
-	stdout, _, err = cli.RunWithCustomEnv(customEnv, "compile", "-b", fqbn, sketchPath.String(), "--format", "json")
+	stdout, _, err = cli.RunWithCustomEnv(customEnv, "compile", "-b", fqbn, sketchPath.String(), "--json")
 	require.NoError(t, err)
 	// check is a valid json and contains requested data
 	var compileOutput map[string]interface{}
@@ -516,7 +516,7 @@ func compileWithExportBinariesConfig(t *testing.T, env *integrationtest.Environm
 	defer cli.WorkingDir().Join("arduino-cli.yaml").Remove()
 
 	// Test if arduino-cli config file written in the previous run has the `always_export_binaries` flag set.
-	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
+	stdout, _, err := cli.Run("config", "dump", "--json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `
 		{
@@ -845,7 +845,7 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--format", "json", "--config-file", "arduino-cli.yaml")
+	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	libOutput := strings.Trim(requirejson.Parse(t, stdout).Query(`.examples.[0].library.install_dir`).String(), `"`)
 	sketchPath := paths.New(libOutput)
@@ -1189,7 +1189,7 @@ void loop() {
 `
 	expected = strings.ReplaceAll(expected, "%SKETCH_PATH%", cpp.QuoteString(sketchPath.Join("SketchSimple.ino").String()))
 
-	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String(), "--format", "json")
+	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String(), "--json")
 	require.NoError(t, err)
 	var ex struct {
 		CompilerOut string `json:"compiler_out"`

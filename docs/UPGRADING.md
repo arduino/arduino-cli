@@ -4,6 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### YAML output format is no more supported
+
+The `yaml` option of the `--format` flag is no more supported. Use `--format json` if machine parsable output is needed.
+
 ### The gRPC `cc.arduino.cli.commands.v1.CompileRequest.export_binaries` changed type.
 
 Previously the field `export_binaries` was a `google.protobuf.BoolValue`. We used this type because it expresses this

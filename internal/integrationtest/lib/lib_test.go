@@ -55,13 +55,13 @@ func TestLibUpgradeCommand(t *testing.T) {
 	// Test upgrade of installed library
 	_, _, err = cli.Run("lib", "install", "Servo@1.1.6")
 	require.NoError(t, err)
-	stdOut, _, err := cli.Run("lib", "list", "--format", "json")
+	stdOut, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdOut, `{"installed_libraries": [ { "library":{ "name":"Servo", "version": "1.1.6" } } ]}`)
 
 	_, _, err = cli.Run("lib", "upgrade", "Servo")
 	require.NoError(t, err)
-	stdOut, _, err = cli.Run("lib", "list", "--format", "json")
+	stdOut, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	jsonOut := requirejson.Parse(t, stdOut)
 	jsonOut.MustNotContain(`{"installed_libraries": [{"library":{ "name":"Servo", "version": "1.1.6" }}]}`)
@@ -70,7 +70,7 @@ func TestLibUpgradeCommand(t *testing.T) {
 	// Upgrade of already up-to-date library
 	_, _, err = cli.Run("lib", "upgrade", "Servo")
 	require.NoError(t, err)
-	stdOut, _, err = cli.Run("lib", "list", "--format", "json")
+	stdOut, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdOut, `.installed_libraries.[].library | select(.name=="Servo") | .version`, servoVersion)
 }
@@ -82,11 +82,11 @@ func TestLibCommandsUsingNameInsteadOfDirName(t *testing.T) {
 	_, _, err := cli.Run("lib", "install", "Robot Motor")
 	require.NoError(t, err)
 
-	jsonOut, _, err := cli.Run("lib", "examples", "Robot Motor", "--format", "json")
+	jsonOut, _, err := cli.Run("lib", "examples", "Robot Motor", "--json")
 	require.NoError(t, err)
 	requirejson.Len(t, jsonOut, 1, "Library 'Robot Motor' not matched in lib examples command.")
 
-	jsonOut, _, err = cli.Run("lib", "list", "Robot Motor", "--format", "json")
+	jsonOut, _, err = cli.Run("lib", "list", "Robot Motor", "--json")
 	require.NoError(t, err)
 	requirejson.Len(t, jsonOut, 1, "Library 'Robot Motor' not matched in lib list command.")
 }
@@ -103,7 +103,7 @@ func TestLibInstallMultipleSameLibrary(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "Arduino SigFox for MKRFox1200")
 	require.NoError(t, err)
-	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
+	jsonOut, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	// Count how many libraries with the name "Arduino SigFox for MKRFox1200" are installed
 	requirejson.Parse(t, jsonOut).
@@ -118,7 +118,7 @@ func TestLibInstallMultipleSameLibrary(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "upgrade", "Arduino SigFox for MKRFox1200")
 	require.NoError(t, err)
-	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
+	jsonOut, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	// Count how many libraries with the name "Arduino SigFox for MKRFox1200" are installed
 	requirejson.Parse(t, jsonOut).
@@ -138,7 +138,7 @@ func TestDuplicateLibInstallDetection(t *testing.T) {
 	otaLibPath := cli.SketchbookDir().Join("libraries", "ArduinoOTA")
 	err = otaLibPath.CopyDirTo(otaLibPath.Parent().Join("CopyOfArduinoOTA"))
 	require.NoError(t, err)
-	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
+	jsonOut, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, jsonOut, `.installed_libraries | length`, `2`, "Duplicate library install is not detected by the CLI")
 
@@ -166,7 +166,7 @@ func TestDuplicateLibInstallFromGitDetection(t *testing.T) {
 	_, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "--git-url", "https://github.com/arduino-libraries/SigFox#1.0.3")
 	require.NoError(t, err)
 
-	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
+	jsonOut, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	// Count how many libraries with the name "Arduino SigFox for MKRFox1200" are installed
 	requirejson.Parse(t, jsonOut).
@@ -178,7 +178,7 @@ func TestDuplicateLibInstallFromGitDetection(t *testing.T) {
 	require.NoError(t, err)
 
 	// Check if double install happened
-	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
+	jsonOut, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Parse(t, jsonOut).
 		Query(`[.installed_libraries.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
@@ -203,7 +203,7 @@ func TestDuplicateLibInstallFromGitDetection(t *testing.T) {
 	require.NoError(t, err)
 
 	// Check if double install happened
-	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
+	jsonOut, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Parse(t, jsonOut).
 		Query(`[.installed_libraries.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
@@ -242,7 +242,7 @@ func TestLibDepsOutput(t *testing.T) {
 	require.Regexp(t, `^✕ MKRWAN \d+\.\d+\.\d+ must be installed\.$`, lines[5])
 	require.Regexp(t, `^✕ WiFi101 \d+\.\d+\.\d+ must be installed\.$`, lines[6])
 
-	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--format", "json")
+	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--json")
 	require.NoError(t, err)
 
 	var jsonDeps struct {
@@ -284,7 +284,7 @@ func TestUpgradeLibraryWithDependencies(t *testing.T) {
 	// Install library
 	_, _, err = cli.Run("lib", "install", "Arduino_ConnectionHandler@0.3.3")
 	require.NoError(t, err)
-	stdOut, _, err := cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.3.3", "--format", "json")
+	stdOut, _, err := cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.3.3", "--json")
 	require.NoError(t, err)
 
 	var jsonDeps struct {
@@ -308,7 +308,7 @@ func TestUpgradeLibraryWithDependencies(t *testing.T) {
 	// Test lib upgrade also install new dependencies of already installed library
 	_, _, err = cli.Run("lib", "upgrade", "Arduino_ConnectionHandler")
 	require.NoError(t, err)
-	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler", "--format", "json")
+	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler", "--json")
 	require.NoError(t, err)
 
 	jsonOut := requirejson.Parse(t, stdOut)
@@ -329,7 +329,7 @@ func TestList(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	require.Contains(t, string(stdout), "No libraries installed.")
-	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
+	stdout, stderr, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
@@ -355,7 +355,7 @@ func TestList(t *testing.T) {
 	require.Contains(t, toks[4], "An efficient and elegant JSON library...")
 
 	// Look at the JSON output
-	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
+	stdout, stderr, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
@@ -366,7 +366,7 @@ func TestList(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "Arduino_APDS9960@1.0.3")
 	require.NoError(t, err)
 	// Look at the JSON output
-	stdout, stderr, err = cli.Run("lib", "list", "Arduino_APDS9960", "--format", "json")
+	stdout, stderr, err = cli.Run("lib", "list", "Arduino_APDS9960", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
@@ -448,7 +448,7 @@ func TestListWithFqbn(t *testing.T) {
 	require.Equal(t, "ArduinoJson", toks[0])
 
 	// Look at the JSON output
-	stdout, stderr, err = cli.Run("lib", "list", "-b", "arduino:avr:uno", "--format", "json")
+	stdout, stderr, err = cli.Run("lib", "list", "-b", "arduino:avr:uno", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `6`)
@@ -477,7 +477,7 @@ func TestListProvidesIncludesFallback(t *testing.T) {
 	require.NoError(t, err)
 
 	// List all libraries, even the ones installed with the above core
-	stdout, stderr, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json")
+	stdout, stderr, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 
@@ -546,7 +546,7 @@ func TestInstall(t *testing.T) {
 	// https://github.com/arduino/arduino-cli/issues/1727
 	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1.0")
 	require.NoError(t, err)
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Parse(t, stdout).Query(`.installed_libraries.[] | select(.library.name == "ILI9341_t3") | .library.version`).MustEqual(`"1.0"`)
 	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1")
@@ -563,7 +563,7 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verifies libraries are not installed
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
 
@@ -572,7 +572,7 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verifies library's dependencies are correctly installed
-	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	stdout, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `[.installed_libraries.[] | .library | .name ] | sort`, `["MD_MAX72XX","MD_Parola"]`)
 
@@ -603,7 +603,7 @@ func TestInstallNoDeps(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verifies libraries are not installed
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
 
@@ -612,7 +612,7 @@ func TestInstallNoDeps(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verifies library's dependencies are not installed
-	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	stdout, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries.[] | .library | .name`, `"MD_Parola"`)
 }
@@ -712,7 +712,7 @@ func TestUninstallSpaces(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "uninstall", key)
 	require.NoError(t, err)
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
 }
@@ -740,7 +740,7 @@ func TestLibOpsCaseInsensitive(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "uninstall", key)
 	require.NoError(t, err)
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
 }
@@ -763,12 +763,12 @@ func TestSearch(t *testing.T) {
 	expected := []string{"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
 	require.Subset(t, libs, expected)
 
-	stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json")
+	stdout, _, err = cli.Run("lib", "search", "--names", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".libraries | length", fmt.Sprint(len(libs)))
 
 	runSearch := func(args string, expectedLibs []string) {
-		stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json", args)
+		stdout, _, err = cli.Run("lib", "search", "--names", "--json", args)
 		require.NoError(t, err)
 		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
 		for _, l := range expectedLibs {
@@ -795,7 +795,7 @@ func TestQualifiedSearch(t *testing.T) {
 	defer env.CleanUp()
 
 	runSearch := func(args string, expectedLibs []string) {
-		stdout, _, err := cli.Run("lib", "search", "--names", "--format", "json", args)
+		stdout, _, err := cli.Run("lib", "search", "--names", "--json", args)
 		require.NoError(t, err)
 		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
 		for _, l := range expectedLibs {
@@ -821,7 +821,7 @@ func TestSearchParagraph(t *testing.T) {
 	// within the index file.
 	_, _, err := cli.Run("lib", "update-index")
 	require.NoError(t, err)
-	stdout, _, err := cli.Run("lib", "search", "A simple and efficient JSON library", "--names", "--format", "json")
+	stdout, _, err := cli.Run("lib", "search", "A simple and efficient JSON library", "--names", "--json")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `{
 		"libraries": [
@@ -846,7 +846,7 @@ func TestLibListWithUpdatableFlag(t *testing.T) {
 	require.Empty(t, stderr)
 	require.Contains(t, string(stdout), "No libraries update is available.")
 	// No library to update in json
-	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--format", "json")
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
@@ -876,7 +876,7 @@ func TestLibListWithUpdatableFlag(t *testing.T) {
 	require.Equal(t, "An efficient and elegant JSON library...", lines[1][4])
 
 	// Look at the JSON output
-	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--format", "json")
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
@@ -1041,7 +1041,7 @@ func TestLibExamples(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "Arduino_JSON@0.1.0")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "examples", "Arduino_JSON", "--format", "json")
+	stdout, _, err := cli.Run("lib", "examples", "Arduino_JSON", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.examples | length`, `1`)
 	examples := requirejson.Parse(t, stdout).Query(".examples.[0] | .examples").String()
@@ -1061,7 +1061,7 @@ func TestLibExamplesWithPdeFile(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "Encoder@1.4.1")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "examples", "Encoder", "--format", "json")
+	stdout, _, err := cli.Run("lib", "examples", "Encoder", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.examples | length`, `1`)
 	examples := requirejson.Parse(t, stdout).Query(".examples.[0] | .examples").String()
@@ -1082,7 +1082,7 @@ func TestLibExamplesWithCaseMismatch(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "WiFiManager@2.0.3-alpha")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "examples", "WiFiManager", "--format", "json")
+	stdout, _, err := cli.Run("lib", "examples", "WiFiManager", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.examples | length`, `1`)
 	requirejson.Query(t, stdout, ".examples.[0] | .examples | length", "14")
@@ -1122,7 +1122,7 @@ func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verifies library is correctly returned
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
 	requirejson.Query(t, stdout, ".installed_libraries.[0] | .library | .version", `"0.16.1"`)
@@ -1133,7 +1133,7 @@ func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
 	require.NoError(t, libPath.WriteFile([]byte("name=WiFi101\nversion=1.0001")))
 
 	// Verifies version is now empty
-	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	stdout, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
 	requirejson.Query(t, stdout, ".installed_libraries.[0] | .library | .version", "null")
@@ -1143,7 +1143,7 @@ func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verifies library has been updated
-	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	stdout, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
 	requirejson.Query(t, stdout, ".installed_libraries.[0] | .library | .version != \"\"", "true")
@@ -1301,7 +1301,7 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibrariesInSketchbook(t *testing.T
 	_, _, err = cli.Run("lib", "install", "USBHost")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "list", "--all", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--all", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `2`)
 	// Verify both libraries have the same name
@@ -1333,7 +1333,7 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibraries(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "USBHost")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "list", "--all", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--all", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `2`)
 	// Verify both libraries have the same name
@@ -1545,7 +1545,7 @@ func TestLibQueryParameters(t *testing.T) {
 	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.5.zip?query=upgrade"`)
 
 	// Check query=depends when a library dependency is installed
-	stdout, _, err = cli.Run("lib", "deps", "MD_Parola@3.5.5", "--format", "json")
+	stdout, _, err = cli.Run("lib", "deps", "MD_Parola@3.5.5", "--json")
 	require.NoError(t, err)
 	// determine the version installed as dependency
 	MDMAX72XXversion := strings.Trim(requirejson.Parse(t, stdout).Query(`.dependencies[0].version_required`).String(), `"`)
@@ -1580,7 +1580,7 @@ func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
 	_, _, err := cli.Run("core", "install", "arduino:samd@1.8.13")
 	require.NoError(t, err)
 	{
-		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--format", "json")
+		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--json")
 		require.NoError(t, err)
 		j := requirejson.Parse(t, stdout)
 		j.Query(`.installed_libraries.[0].library.name`).MustEqual(`"USBHost"`)
@@ -1590,7 +1590,7 @@ func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
 	require.NoError(t, err)
 	{
 		// Check that the architecture-specific library is still listed
-		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--format", "json")
+		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--json")
 		require.NoError(t, err)
 		j := requirejson.Parse(t, stdout)
 		j.Query(`.installed_libraries.[0].library.name`).MustEqual(`"USBHost"`)
@@ -1605,7 +1605,7 @@ func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
 		require.NoError(t, err)
 		_, _, err = cli.Run("lib", "install", "ArduinoOTA@1.0.7")
 		require.NoError(t, err)
-		stdout, _, err := cli.Run("lib", "examples", "--fqbn", "esp8266:esp8266:generic", "ArduinoOTA", "--format", "json")
+		stdout, _, err := cli.Run("lib", "examples", "--fqbn", "esp8266:esp8266:generic", "ArduinoOTA", "--json")
 		require.NoError(t, err)
 		requirejson.Parse(t, stdout).Query(`.examples.[].library.examples[0]`).MustContain(`"BasicOTA"`)
 		requirejson.Parse(t, stdout).Query(`.examples.[].library.examples[1]`).MustContain(`"OTALeds"`)
@@ -1624,11 +1624,11 @@ func TestLibListDoesNotIncludeEmptyLibraries(t *testing.T) {
 	require.NoError(t, emptyLib.MkdirAll())
 
 	// Check that the output of lib list and lib examples is empty
-	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	stdout, _, err := cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `0`)
 
-	stdout, _, err = cli.Run("lib", "examples", "--format", "json")
+	stdout, _, err = cli.Run("lib", "examples", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.examples | length`, `0`)
 
@@ -1640,11 +1640,11 @@ func TestLibListDoesNotIncludeEmptyLibraries(t *testing.T) {
 	require.NoError(t, f.Close())
 
 	// Check that the output of lib list and lib examples contains the library
-	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	stdout, _, err = cli.Run("lib", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.installed_libraries | length`, `1`)
 
-	stdout, _, err = cli.Run("lib", "examples", "--format", "json")
+	stdout, _, err = cli.Run("lib", "examples", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.examples | length`, `1`)
 }
@@ -1677,7 +1677,7 @@ func TestDependencyResolverNoOverwrite(t *testing.T) {
 	_, _, err := cli.Run("lib", "install", "Bounce2@2.53.0")
 	require.NoError(t, err)
 
-	out, _, err := cli.Run("lib", "deps", "EncoderTool@2.2.0", "--format", "json")
+	out, _, err := cli.Run("lib", "deps", "EncoderTool@2.2.0", "--json")
 	require.NoError(t, err)
 	outjson := requirejson.Parse(t, out)
 	outjson.MustContain(`{
@@ -1695,7 +1695,7 @@ func TestDependencyResolverNoOverwrite(t *testing.T) {
 	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53.0"`)
 	require.NotEqual(t, outjson.Query("dependencies[0].version_required").String(), `"2.53"`)
 
-	out, _, err = cli.Run("lib", "deps", "EncoderTool@2.2.0", "--no-overwrite", "--format", "json")
+	out, _, err = cli.Run("lib", "deps", "EncoderTool@2.2.0", "--no-overwrite", "--json")
 	require.NoError(t, err)
 	outjson = requirejson.Parse(t, out)
 	outjson.MustContain(`{

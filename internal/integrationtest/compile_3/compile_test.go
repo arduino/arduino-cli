@@ -113,7 +113,7 @@ func TestCompilerErrOutput(t *testing.T) {
 		require.NoError(t, err)
 
 		// Run compile and catch err stream
-		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--json", sketch.String())
 		require.Error(t, err)
 		outJson := requirejson.Parse(t, out)
 		outJson.Query(`.compiler_err`).MustContain(`"error"`)
@@ -135,7 +135,7 @@ func TestCompilerErrOutput(t *testing.T) {
 		require.NoError(t, err)
 
 		// Run compile and catch err stream
-		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--json", sketch.String())
 		require.Error(t, err)
 		outJson := requirejson.Parse(t, out)
 		outJson.Query(`.success`).MustContain(`false`)
@@ -161,7 +161,7 @@ func TestCompilerErrOutput(t *testing.T) {
 		require.NoError(t, err)
 
 		// Run compile and catch err stream
-		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--json", sketch.String())
 		require.Error(t, err)
 		outJson := requirejson.Parse(t, out)
 		outJson.Query(`.success`).MustContain(`false`)
@@ -185,7 +185,7 @@ func TestCompilerErrOutput(t *testing.T) {
 		require.NoError(t, err)
 
 		// Run compile and catch err stream
-		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--json", sketch.String())
 		require.NoError(t, err)
 		jsonOut := requirejson.Parse(t, out)
 		jsonOut.Query(".compiler_out").MustNotContain(`"fatal error"`)
