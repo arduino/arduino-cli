@@ -1483,34 +1483,35 @@ IDE. Let's see some examples.</p>
 <p><code>arduino-cli</code> is a container of commands and each command has its own dedicated help text that can be shown with the
 <code>help</code> command like this:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>arduino-cli<span class="w"> </span><span class="nb">help</span><span class="w"> </span>core
-<span class="go">Arduino Core operations.</span>
+<span class="go">Arduino core operations.</span>
 
 <span class="go">Usage:</span>
-<span class="go">    arduino-cli core [command]</span>
+<span class="go">  arduino-cli core [command]</span>
 
 <span class="go">Examples:</span>
-<span class="go">    ./arduino-cli core update-index</span>
+<span class="go">  arduino-cli core update-index</span>
 
 <span class="go">Available Commands:</span>
-<span class="go">    download     Downloads one or more cores and corresponding tool dependencies.</span>
-<span class="go">    install      Installs one or more cores and corresponding tool dependencies.</span>
-<span class="go">    list         Shows the list of installed platforms.</span>
-<span class="go">    search       Search for a core in Boards Manager.</span>
-<span class="go">    uninstall    Uninstalls one or more cores and corresponding tool dependencies if no more used.</span>
-<span class="go">    update-index Updates the index of cores.</span>
-<span class="go">    upgrade      Upgrades one or all installed platforms to the latest version.</span>
+<span class="go">  download     Downloads one or more cores and corresponding tool dependencies.</span>
+<span class="go">  install      Installs one or more cores and corresponding tool dependencies.</span>
+<span class="go">  list         Shows the list of installed platforms.</span>
+<span class="go">  search       Search for a core in Boards Manager.</span>
+<span class="go">  uninstall    Uninstalls one or more cores and corresponding tool dependencies if no longer used.</span>
+<span class="go">  update-index Updates the index of cores.</span>
+<span class="go">  upgrade      Upgrades one or all installed platforms to the latest version.</span>
 
 <span class="go">Flags:</span>
-<span class="go">    -h, --help   help for core</span>
+<span class="go">  -h, --help   help for core</span>
 
 <span class="go">Global Flags:</span>
-<span class="go">        --additional-urls strings   Additional URLs for Boards Manager.</span>
-<span class="go">        --config-file string        The custom config file (if not specified the default will be used).</span>
-<span class="go">        --format string             The output format, can be [text|json]. (default &quot;text&quot;)</span>
-<span class="go">        --log-file string           Path to the file where logs will be written.</span>
-<span class="go">        --log-format string         The output format for the logs, can be [text|json].</span>
-<span class="go">        --log-level string          Messages with this level and above will be logged.</span>
-<span class="go">    -v, --verbose                   Print the logs on the standard output.</span>
+<span class="go">      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.</span>
+<span class="go">      --config-file string        The custom config file (if not specified the default will be used).</span>
+<span class="go">      --json                      Print the output in JSON format.</span>
+<span class="go">      --log                       Print the logs on the standard output.</span>
+<span class="go">      --log-file string           Path to the file where logs will be written.</span>
+<span class="go">      --log-format string         The output format for the logs, can be: text, json</span>
+<span class="go">      --log-level string          Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic</span>
+<span class="go">      --no-color                  Disable colored output.</span>
 
 <span class="go">Use &quot;arduino-cli core [command] --help&quot; for more information about a command.</span>
 </code></pre></div>

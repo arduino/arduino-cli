@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#yaml-output-format-is-no-more-supported" class="md-nav__link">
+    YAML output format is no more supported
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.CompileRequest.export_binaries changed type.
   </a>
@@ -2539,6 +2546,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#yaml-output-format-is-no-more-supported" class="md-nav__link">
+    YAML output format is no more supported
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.CompileRequest.export_binaries changed type.
   </a>
@@ -3742,6 +3756,8 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="yaml-output-format-is-no-more-supported">YAML output format is no more supported<a class="headerlink" href="#yaml-output-format-is-no-more-supported" title="Permanent link">&para;</a></h3>
+<p>The <code>yaml</code> option of the <code>--format</code> flag is no more supported. Use <code>--format json</code> if machine parsable output is needed.</p>
 <h3 id="the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type">The gRPC <code>cc.arduino.cli.commands.v1.CompileRequest.export_binaries</code> changed type.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" title="Permanent link">&para;</a></h3>
 <p>Previously the field <code>export_binaries</code> was a <code>google.protobuf.BoolValue</code>. We used this type because it expresses this
 field's optional nature (that is, it could be <code>true</code>, <code>false</code>, and <code>null</code> if not set).</p>
