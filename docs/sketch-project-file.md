@@ -81,9 +81,9 @@ profiles:
     notes: testing the very limit of the AVR platform, it will be very unstable
     fqbn: attiny:avr:ATtinyX5:cpu=attiny85,clock=internal16
     platforms:
-      - platform: attiny:avr@1.0.2
+      - platform: attiny:avr (1.0.2)
         platform_index_url: https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json
-      - platform: arduino:avr@1.8.3
+      - platform: arduino:avr (1.8.3)
     libraries:
       - ArduinoIoTCloud (1.0.2)
       - Arduino_ConnectionHandler (0.6.4)
