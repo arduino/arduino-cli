@@ -30,6 +30,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -45,6 +46,7 @@ func main() {
 
 	// Read the settings from the configuration file
 	openReq := &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"}
+	var configFileLoadingWarnings []string
 	if configData, err := paths.New(configFile).ReadFile(); err == nil {
 		openReq.EncodedSettings = string(configData)
 	} else if !os.IsNotExist(err) {
@@ -53,9 +55,8 @@ func main() {
 	if resp, err := srv.ConfigurationOpen(ctx, openReq); err != nil {
 		feedback.FatalError(fmt.Errorf("couldn't load configuration: %w", err), feedback.ErrGeneric)
 	} else if warnings := resp.GetWarnings(); len(warnings) > 0 {
-		for _, warning := range warnings {
-			feedback.Warning(warning)
-		}
+		// Save the warnings to show them later when the feedback package is fully initialized
+		configFileLoadingWarnings = warnings
 	}
 
 	// Get the current settings from the server
@@ -70,6 +71,15 @@ func main() {
 
 	// Setup command line parser with the server and settings
 	arduinoCmd := cli.NewCommand(srv)
+	parentPreRun := arduinoCmd.PersistentPreRun
+	arduinoCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		if parentPreRun != nil {
+			parentPreRun(cmd, args)
+		}
+		for _, warning := range configFileLoadingWarnings {
+			feedback.Warning(warning)
+		}
+	}
 
 	// Execute the command line
 	if err := arduinoCmd.ExecuteContext(ctx); err != nil {
