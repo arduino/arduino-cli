@@ -177,7 +177,7 @@ func (s *arduinoCoreServerImpl) ConfigurationSave(ctx context.Context, req *rpc.
 		}
 		return &rpc.ConfigurationSaveResponse{EncodedSettings: string(data)}, nil
 	case "json":
-		data, err := json.Marshal(s.settings)
+		data, err := json.MarshalIndent(s.settings, "", "  ")
 		if err != nil {
 			return nil, fmt.Errorf("error marshalling settings: %v", err)
 		}

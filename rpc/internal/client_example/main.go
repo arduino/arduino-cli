@@ -23,6 +23,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -71,40 +72,24 @@ func main() {
 	callLoadSketch(client)
 
 	// Use SetValue to configure the arduino-cli directories.
-	log.Println("calling SetValue")
-	callSetValue(client)
+	callSetValue(client, "directories.data", `"`+dataDir+`"`)
+	callSetValue(client, "directories.downloads", `"`+path.Join(dataDir, "staging")+`"`)
+	callSetValue(client, "directories.user", `"`+path.Join(dataDir, "sketchbook")+`"`)
 
 	// List all settings
-	log.Println("calling SettingsGetAll()")
-	callGetAll(client)
+	callConfigurationSave(client)
 
 	// Merge applies multiple settings values at once.
-	log.Println("calling SettingsMerge()")
-	callMerge(client, `{"foo": {"value": "bar"}, "daemon":{"port":"422"}, "board_manager": {"additional_urls":["https://example.com"]}}`)
+	callSetValue(client, "daemon.port", `"422"`)
+	callSetValue(client, "board_manager.additional_urls", `[ "https://example.com" ]`)
 
-	log.Println("calling SettingsGetAll()")
-	callGetAll(client)
+	callConfigurationSave(client)
 
-	log.Println("calling SettingsMerge()")
-	callMerge(client, `{"foo": {} }`)
+	callSetValue(client, "daemon.port", "")
+	callGetValue(client, "daemon.port")
+	callGetValue(client, "directories.data")
 
-	log.Println("calling SettingsGetAll()")
-	callGetAll(client)
-
-	log.Println("calling SettingsMerge()")
-	callMerge(client, `{"foo": "bar" }`)
-
-	// Get the value of the foo key.
-	log.Println("calling SettingsGetValue(foo)")
-	callGetValue(client)
-
-	// List all settings
-	log.Println("calling SettingsGetAll()")
-	callGetAll(client)
-
-	// Write settings to file.
-	log.Println("calling Write()")
-	callWrite(client)
+	callConfigurationSave(client)
 
 	// Before we can do anything with the CLI, an "instance" must be created.
 	// We keep a reference to the created instance because we will need it to
@@ -243,85 +228,66 @@ func callVersion(client rpc.ArduinoCoreServiceClient) {
 	log.Printf("arduino-cli version: %v", versionResp.GetVersion())
 }
 
-func callSetValue(client rpc.ArduinoCoreServiceClient) {
-	// _, err := client.SettingsSetValue(context.Background(),
-	// 	&rpc.SettingsSetValueRequest{
-	// 		Key:      "directories",
-	// 		JsonData: `{"data": "` + dataDir + `", "downloads": "` + path.Join(dataDir, "staging") + `", "user": "` + path.Join(dataDir, "sketchbook") + `"}`,
-	// 	})
+func callSetValue(client rpc.ArduinoCoreServiceClient, key, jsonValue string) {
+	log.Printf("Calling SetValue: %s = %s", key, jsonValue)
+	_, err := client.SettingsSetValue(context.Background(),
+		&rpc.SettingsSetValueRequest{
+			Key:          key,
+			EncodedValue: jsonValue,
+		})
 
-	// if err != nil {
-	// 	log.Fatalf("Error setting settings value: %s", err)
-	// }
+	if err != nil {
+		log.Fatalf("Error setting settings value: %s", err)
+	}
 }
 
 func callSetProxy(client rpc.ArduinoCoreServiceClient) {
-	// _, err := client.SettingsSetValue(context.Background(),
-	// 	&rpc.SettingsSetValueRequest{
-	// 		Key:      "network.proxy",
-	// 		JsonData: `"http://localhost:3128"`,
-	// 	})
+	_, err := client.SettingsSetValue(context.Background(),
+		&rpc.SettingsSetValueRequest{
+			Key:          "network.proxy",
+			EncodedValue: `"http://localhost:3128"`,
+		})
 
-	// if err != nil {
-	// 	log.Fatalf("Error setting settings value: %s", err)
-	// }
+	if err != nil {
+		log.Fatalf("Error setting settings value: %s", err)
+	}
 }
 
 func callUnsetProxy(client rpc.ArduinoCoreServiceClient) {
-	// _, err := client.SettingsSetValue(context.Background(),
-	// 	&rpc.SettingsSetValueRequest{
-	// 		Key:      "network.proxy",
-	// 		JsonData: `""`,
-	// 	})
+	_, err := client.SettingsSetValue(context.Background(),
+		&rpc.SettingsSetValueRequest{
+			Key: "network.proxy",
+		})
 
-	// if err != nil {
-	// 	log.Fatalf("Error setting settings value: %s", err)
-	// }
+	if err != nil {
+		log.Fatalf("Error setting settings value: %s", err)
+	}
 }
 
-func callMerge(client rpc.ArduinoCoreServiceClient, jsonData string) {
-	// _, err := client.SettingsMerge(context.Background(),
-	// 	&rpc.SettingsMergeRequest{
-	// 		JsonData: jsonData,
-	// 	})
+func callGetValue(client rpc.ArduinoCoreServiceClient, key string) {
+	getValueResp, err := client.SettingsGetValue(context.Background(),
+		&rpc.SettingsGetValueRequest{
+			Key: key,
+		})
 
-	// if err != nil {
-	// 	log.Fatalf("Error merging settings: %s", err)
-	// }
+	if err != nil {
+		log.Fatalf("Error getting settings value: %s", err)
+	}
+
+	log.Printf("%s = %s", key, getValueResp.GetEncodedValue())
 }
 
-func callGetValue(client rpc.ArduinoCoreServiceClient) {
-	// getValueResp, err := client.SettingsGetValue(context.Background(),
-	// 	&rpc.SettingsGetValueRequest{
-	// 		Key: "foo",
-	// 	})
+func callConfigurationSave(client rpc.ArduinoCoreServiceClient) {
+	log.Println("calling ConfigurationSave() >>")
+	getAllResp, err := client.ConfigurationSave(context.Background(), &rpc.ConfigurationSaveRequest{
+		SettingsFormat: "json",
+	})
 
-	// if err != nil {
-	// 	log.Fatalf("Error getting settings value: %s", err)
-	// }
+	if err != nil {
+		log.Fatalf("Error getting settings: %s", err)
+	}
 
-	// log.Printf("Value: %s: %s", getValueResp.GetKey(), getValueResp.GetJsonData())
-}
-
-func callGetAll(client rpc.ArduinoCoreServiceClient) {
-	// getAllResp, err := client.SettingsGetAll(context.Background(), &rpc.SettingsGetAllRequest{})
-
-	// if err != nil {
-	// 	log.Fatalf("Error getting settings: %s", err)
-	// }
-
-	// log.Printf("Settings: %s", getAllResp.GetJsonData())
-}
-
-func callWrite(client rpc.ArduinoCoreServiceClient) {
-	// _, err := client.SettingsWrite(context.Background(),
-	// 	&rpc.SettingsWriteRequest{
-	// 		FilePath: path.Join(dataDir, "written-rpc.Settingsyml"),
-	// 	})
-
-	// if err != nil {
-	// 	log.Fatalf("Error writing settings: %s", err)
-	// }
+	log.Printf("Settings follow:\n\n%s", getAllResp.GetEncodedSettings())
 }
 
 func createInstance(client rpc.ArduinoCoreServiceClient) *rpc.Instance {
