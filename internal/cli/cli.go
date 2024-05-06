@@ -203,18 +203,21 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 }
 
 func preRun(verbose bool, outputFormat string, logLevel, logFile, logFormat string, noColor bool, settings *rpc.Configuration) {
-	// initialize inventory
-	err := inventory.Init(settings.GetDirectories().GetData())
-	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrInitializingInventory)
-	}
-
-	// https://no-color.org/
-	color.NoColor = noColor || os.Getenv("NO_COLOR") != ""
+	//
+	// Prepare the Feedback system
+	//
 
 	// Set default feedback output to colorable
+	color.NoColor = noColor || os.Getenv("NO_COLOR") != "" // https://no-color.org/
 	feedback.SetOut(colorable.NewColorableStdout())
 	feedback.SetErr(colorable.NewColorableStderr())
+
+	// use the output format to configure the Feedback
+	format, ok := feedback.ParseOutputFormat(outputFormat)
+	if !ok {
+		feedback.Fatal(tr("Invalid output format: %s", outputFormat), feedback.ErrBadArgument)
+	}
+	feedback.SetFormat(format)
 
 	//
 	// Prepare logging
@@ -260,20 +263,14 @@ func preRun(verbose bool, outputFormat string, logLevel, logFile, logFormat stri
 		logrus.SetLevel(logrusLevel)
 	}
 
-	//
-	// Prepare the Feedback system
-	//
-
-	// use the output format to configure the Feedback
-	format, ok := feedback.ParseOutputFormat(outputFormat)
-	if !ok {
-		feedback.Fatal(tr("Invalid output format: %s", outputFormat), feedback.ErrBadArgument)
-	}
-	feedback.SetFormat(format)
-
-	//
 	// Print some status info and check command is consistent
-	//
-
 	logrus.Info(versioninfo.VersionInfo.Application + " version " + versioninfo.VersionInfo.VersionString)
+
+	//
+	// Initialize inventory
+	//
+	err := inventory.Init(settings.GetDirectories().GetData())
+	if err != nil {
+		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrInitializingInventory)
+	}
 }
