@@ -18,6 +18,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -28,9 +29,13 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	// Disable logging until it is setup in the arduino-cli pre-run
+	logrus.SetOutput(io.Discard)
+
 	// Create a new ArduinoCoreServer
 	srv := commands.NewArduinoCoreServer()
 
