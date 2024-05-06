@@ -137,8 +137,8 @@ The "location priority" is determined as follows (in order of highest to lowest 
 
 #### Location priorities in Arduino Web Editor
 
-The location priorities system works in the same manner in [Arduino Web Editor](https://create.arduino.cc/editor), but
-its cloud-based nature may make the locations of libraries less obvious.
+The location priorities system works in the same manner in [Arduino Web Editor](https://create.arduino.cc/), but its
+cloud-based nature may make the locations of libraries less obvious.
 
 1. **Custom**: the imported libraries, shown under the **Libraries > Custom** tab.
    - These libraries are under `/tmp/\<some number>/custom`
