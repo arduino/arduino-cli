@@ -146,19 +146,73 @@ func TestSchema(t *testing.T) {
 	c.SetKeyTypeSchema("int", 15)
 	c.SetKeyTypeSchema("obj.string", "")
 	c.SetKeyTypeSchema("obj.int", 15)
-	require.NoError(t, c.Set("string", "abc"))
-	require.Error(t, c.Set("string", 123))
-	require.NoError(t, c.Set("int", 123))
-	require.Error(t, c.Set("int", "abc"))
-	require.Equal(t, "abc", c.Get("string"))
+	c.SetKeyTypeSchema("uint", uint(15))
+	c.SetKeyTypeSchema("obj.uint", uint(15))
+	c.SetKeyTypeSchema("array", []string{})
+	c.SetKeyTypeSchema("obj.array", []string{})
 
-	json1 := []byte(`{"string":"abc","int":123,"obj":{"string":"abc","int":123}}`)
-	require.NoError(t, json.Unmarshal(json1, &c))
+	// Set array of string
+	require.NoError(t, c.Set("array", []string{"abc", "def"}))
+	require.NoError(t, c.Set("obj.array", []string{"abc", "def"}))
+	require.Equal(t, []string{"abc", "def"}, c.Get("array"))
+	require.Equal(t, []string{"abc", "def"}, c.Get("obj.array"))
+	// Set array of string with array of any
+	require.NoError(t, c.Set("array", []any{"abc", "def"}))
+	require.NoError(t, c.Set("obj.array", []any{"abc", "def"}))
+	require.Equal(t, []string{"abc", "def"}, c.Get("array"))
+	require.Equal(t, []string{"abc", "def"}, c.Get("obj.array"))
+	// Set array of string with array of int
+	require.EqualError(t, c.Set("array", []any{"abc", 123}), "invalid type for key 'array': invalid conversion, got int but want string")
+	require.EqualError(t, c.Set("obj.array", []any{"abc", 123}), "invalid type for key 'obj.array': invalid conversion, got int but want string")
+
+	// Set string
+	require.NoError(t, c.Set("string", "abc"))
+	require.NoError(t, c.Set("obj.string", "abc"))
 	require.Equal(t, "abc", c.Get("string"))
+	require.Equal(t, "abc", c.Get("obj.string"))
+	// Set string with int
+	require.EqualError(t, c.Set("string", 123), "invalid type for key 'string': invalid conversion, got int but want string")
+	require.EqualError(t, c.Set("obj.string", 123), "invalid type for key 'obj.string': invalid conversion, got int but want string")
+
+	// Set int
+	require.NoError(t, c.Set("int", 123))
+	require.NoError(t, c.Set("obj.int", 123))
 	require.Equal(t, 123, c.Get("int"))
+	require.Equal(t, 123, c.Get("obj.int"))
+	// Set int with string
+	require.EqualError(t, c.Set("int", "abc"), "invalid type for key 'int': invalid conversion, got string but want int")
+	require.EqualError(t, c.Set("obj.int", "abc"), "invalid type for key 'obj.int': invalid conversion, got string but want int")
+
+	// Set uint
+	require.NoError(t, c.Set("uint", uint(234)))
+	require.NoError(t, c.Set("obj.uint", uint(234)))
+	require.Equal(t, uint(234), c.Get("uint"))
+	require.Equal(t, uint(234), c.Get("obj.uint"))
+	// Set uint using int
+	require.NoError(t, c.Set("uint", 345))
+	require.NoError(t, c.Set("obj.uint", 345))
+	require.Equal(t, uint(345), c.Get("uint"))
+	require.Equal(t, uint(345), c.Get("obj.uint"))
+	// Set uint using float
+	require.NoError(t, c.Set("uint", 456.0))
+	require.NoError(t, c.Set("obj.uint", 456.0))
+	require.Equal(t, uint(456), c.Get("uint"))
+	require.Equal(t, uint(456), c.Get("obj.uint"))
+	// Set uint using string
+	require.EqualError(t, c.Set("uint", "567"), "invalid type for key 'uint': invalid conversion, got string but want uint")
+	require.EqualError(t, c.Set("obj.uint", "567"), "invalid type for key 'obj.uint': invalid conversion, got string but want uint")
+	require.Equal(t, uint(456), c.Get("uint"))
+	require.Equal(t, uint(456), c.Get("obj.uint"))
+
+	json1 := []byte(`{"string":"abcd","int":1234,"obj":{"string":"abcd","int":1234}}`)
+	require.NoError(t, json.Unmarshal(json1, &c))
+	require.Equal(t, "abcd", c.Get("string"))
+	require.Equal(t, 1234, c.Get("int"))
+	require.Equal(t, "abcd", c.Get("obj.string"))
+	require.Equal(t, 1234, c.Get("obj.int"))
 
 	json2 := []byte(`{"string":123,"int":123,"obj":{"string":"abc","int":123}}`)
-	require.Error(t, json.Unmarshal(json2, &c))
+	require.EqualError(t, json.Unmarshal(json2, &c), "invalid type for key 'string': invalid conversion, got float64 but want string")
 	json3 := []byte(`{"string":"avc","int":123,"obj":{"string":123,"int":123}}`)
-	require.Error(t, json.Unmarshal(json3, &c))
+	require.EqualError(t, json.Unmarshal(json3, &c), "invalid type for key 'obj.string': invalid conversion, got float64 but want string")
 }

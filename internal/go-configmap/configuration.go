@@ -100,14 +100,16 @@ func tryConversion(current any, desiredType reflect.Type) (any, error) {
 		if !ok && current != nil {
 			break
 		}
+
+		resArray := reflect.MakeSlice(desiredType, len(currentArray), len(currentArray))
 		for i, elem := range currentArray {
 			newElem, err := tryConversion(elem, desiredType.Elem())
 			if err != nil {
 				return nil, err
 			}
-			currentArray[i] = newElem
+			resArray.Index(i).Set(reflect.ValueOf(newElem))
 		}
-		return currentArray, nil
+		return resArray.Interface(), nil
 	}
 
 	currentTypeString := currentType.String()
