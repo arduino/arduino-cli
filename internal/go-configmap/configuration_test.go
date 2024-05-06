@@ -17,7 +17,6 @@ package configmap_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/go-configmap"
@@ -36,7 +35,6 @@ func TestConfiguration(t *testing.T) {
 
 	yml, err := yaml.Marshal(c)
 	require.NoError(t, err)
-	fmt.Println(string(yml))
 
 	d := configmap.New()
 	err = yaml.Unmarshal(yml, &d)
@@ -109,13 +107,11 @@ func TestMerge(t *testing.T) {
 
 	f := configmap.New()
 	f.Set("fooz.bar", 10)
-	require.Error(t, c.Merge(f))
-	fmt.Println(c.Merge(f))
+	require.EqualError(t, c.Merge(f), "invalid types for key 'bar': got string but want int")
 
 	g := configmap.New()
 	g.Set("fooz.bart", "baz")
-	require.Error(t, c.Merge(g))
-	fmt.Println(c.Merge(g))
+	require.EqualError(t, c.Merge(g), "target key do not exist: 'bart'")
 }
 
 func TestAllKeys(t *testing.T) {

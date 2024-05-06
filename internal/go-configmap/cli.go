@@ -83,21 +83,19 @@ func (c *Map) InjectEnvVars(env []string, prefix string) []error {
 	envKeyToConfigKey := map[string]string{}
 	for _, k := range c.AllKeys() {
 		normalizedKey := prefix + strings.ToUpper(k)
-		normalizedKey = strings.Replace(normalizedKey, ".", "_", -1)
+		normalizedKey = strings.ReplaceAll(normalizedKey, ".", "_")
 		envKeyToConfigKey[normalizedKey] = k
 	}
 
 	for _, e := range env {
 		// Extract key and value from env
-		parts := strings.SplitN(e, "=", 2)
-		if len(parts) != 2 {
+		envKey, envValue, ok := strings.Cut(e, "=")
+		if !ok {
 			continue
 		}
-		envKey := strings.ToUpper(parts[0])
-		envValue := parts[1]
 
 		// Check if the configuration has a matching key
-		key, ok := envKeyToConfigKey[envKey]
+		key, ok := envKeyToConfigKey[strings.ToUpper(envKey)]
 		if !ok {
 			continue
 		}
