@@ -12,7 +12,7 @@ updates:
     labels:
       - "topic: infrastructure"
     commit-message:
-      prefix: "[skip-changelog] "
+      prefix: "[skip changelog] "
   - package-ecosystem: gomod
     directory: /
     schedule:
@@ -21,4 +21,4 @@ updates:
     labels:
       - "topic: infrastructure"
     commit-message:
-      prefix: "[skip-changelog] "
+      prefix: "[skip changelog] "
