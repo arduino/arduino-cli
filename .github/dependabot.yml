@@ -11,6 +11,8 @@ updates:
       interval: daily
     labels:
       - "topic: infrastructure"
+    commit-message:
+      prefix: "[skip changelog] "
   - package-ecosystem: gomod
     directory: /
     schedule:
@@ -18,3 +20,5 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - "topic: infrastructure"
+    commit-message:
+      prefix: "[skip changelog] "
