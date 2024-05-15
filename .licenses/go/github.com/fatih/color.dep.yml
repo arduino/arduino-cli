@@ -1,6 +1,6 @@
 ---
 name: github.com/fatih/color
-version: v1.16.0
+version: v1.17.0
 type: go
 summary: Package color is an ANSI color package to output colorized or SGR defined
   output to the standard output.
