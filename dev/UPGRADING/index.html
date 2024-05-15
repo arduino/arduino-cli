@@ -285,6 +285,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#configuration-file-now-supports-only-yaml-format" class="md-nav__link">
+    Configuration file now supports only YAML format.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-setting-api-important-changes" class="md-nav__link">
+    gRPC Setting API important changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-importing-arduino-cli-as-a-library-now-requires-the-creation-of-a-grpc-service" class="md-nav__link">
+    golang: importing arduino-cli as a library now requires the creation of a gRPC service.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#yaml-output-format-is-no-more-supported" class="md-nav__link">
     YAML output format is no more supported
   </a>
@@ -2546,6 +2567,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#configuration-file-now-supports-only-yaml-format" class="md-nav__link">
+    Configuration file now supports only YAML format.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-setting-api-important-changes" class="md-nav__link">
+    gRPC Setting API important changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-importing-arduino-cli-as-a-library-now-requires-the-creation-of-a-grpc-service" class="md-nav__link">
+    golang: importing arduino-cli as a library now requires the creation of a gRPC service.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#yaml-output-format-is-no-more-supported" class="md-nav__link">
     YAML output format is no more supported
   </a>
@@ -3756,6 +3798,159 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0360">0.36.0<a class="headerlink" href="#0360" title="Permanent link">&para;</a></h2>
+<h3 id="configuration-file-now-supports-only-yaml-format">Configuration file now supports only YAML format.<a class="headerlink" href="#configuration-file-now-supports-only-yaml-format" title="Permanent link">&para;</a></h3>
+<p>The Arduino CLI configuration file now supports only the YAML format.</p>
+<h3 id="grpc-setting-api-important-changes">gRPC Setting API important changes<a class="headerlink" href="#grpc-setting-api-important-changes" title="Permanent link">&para;</a></h3>
+<p>The Settings API has been heavily refactored. Here a quick recap of the new methods:</p>
+<ul>
+<li>
+<p><code>SettingsGetValue</code> returns the value of a setting given the key. The returned value is a string encoded in JSON, or
+  YAML</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">SettingsGetValueRequest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// The key to get</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// The format of the encoded_value (default is</span>
+<span class="w">  </span><span class="c1">// &quot;json&quot;, allowed values are &quot;json&quot; and &quot;yaml)</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">value_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span><span class="w"> </span><span class="nc">SettingsGetValueResponse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// The value of the key (encoded)</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">encoded_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>SettingsSetValue</code> change the value of a setting. The value may be specified in JSON, YAML, or as a command-line
+  argument. If <code>encoded_value</code> is an empty string the setting is deleted.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">message</span><span class="w"> </span><span class="nc">SettingsSetValueRequest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// The key to change</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// The new value (encoded), no objects,</span>
+<span class="w">  </span><span class="c1">// only scalar, or array of scalars are</span>
+<span class="w">  </span><span class="c1">// allowed.</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">encoded_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// The format of the encoded_value (default is</span>
+<span class="w">  </span><span class="c1">// &quot;json&quot;, allowed values are &quot;json&quot;, &quot;yaml&quot;,</span>
+<span class="w">  </span><span class="c1">// and &quot;cli&quot;)</span>
+<span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="na">value_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li><code>SettingsEnumerate</code> returns all the available keys and their type (<code>string</code>, <code>int</code>, <code>[]string</code>...)</li>
+<li><code>ConfigurationOpen</code> replaces the current configuration with the one passed as argument. Differently from
+  <code>SettingsSetValue</code>, this call replaces the whole configuration.</li>
+<li><code>ConfigurationSave</code> outputs the current configuration in the specified format. The configuration is not saved in a
+  file, this call returns just the content, it's a duty of the caller to store the content in a file.</li>
+<li><code>ConfigurationGet</code> return the current configuration in a structured gRPC message <code>Configuration</code>.</li>
+</ul>
+<p>The previous gRPC Setting rpc call may be replaced as follows:</p>
+<ul>
+<li>The old <code>SettingsMerge</code> rpc call can now be done trough <code>SettingsSetValue</code>.</li>
+<li>The old <code>SettingsDelete</code> rpc call can now be done trough <code>SettingsSetValue</code> passing the <code>key</code> to delete with an empty
+  <code>value</code>.</li>
+<li>The old <code>SettingsGetAll</code> rpc call has been replaced by <code>ConfigurationGet</code> that returns a structured message
+  <code>Configuration</code> with all the settings populated.</li>
+<li>The old <code>SettingsWrite</code> rpc call has been removed. It is partially replaced by <code>ConfigurationSave</code> but the actual file
+  save must be performed by the caller.</li>
+</ul>
+<h3 id="golang-importing-arduino-cli-as-a-library-now-requires-the-creation-of-a-grpc-service">golang: importing <code>arduino-cli</code> as a library now requires the creation of a gRPC service.<a class="headerlink" href="#golang-importing-arduino-cli-as-a-library-now-requires-the-creation-of-a-grpc-service" title="Permanent link">&para;</a></h3>
+<p>Previously the methods implementing the Arduino business logic were available in the global namespace
+<code>github.com/arduino/arduino-cli/commands/*</code> and could be called directly.</p>
+<p>The above is no more true. All the global <code>commands.*</code> functions have been converted to methods of the
+<code>arduinoCoreServerImpl</code> struct that implements the gRPC <code>ArduinoCoreServer</code> interface. The configuration is now part of
+the server internal state. Developers may create a "daemon-less" server by calling the <code>commands.NewArduinoCoreServer()</code>
+function and can use the returned object to call all the needed gRPC functions.</p>
+<p>The methods of the <code>ArduinoCoreServer</code> are generated through the gRPC protobuf definitions, some of those methods are
+gRPC "streaming" methods and requires a streaming object to be passed as argument, we provided helper methods to create
+these objects.</p>
+<p>For example if previously we could call <code>commands.Init</code> like this:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// old Init signature</span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">Init</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">responseCallback</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitResponse</span><span class="p">))</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// ...</span>
+
+<span class="c1">// Initialize instance</span>
+<span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">commands</span><span class="p">.</span><span class="nx">Init</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">GetInstance</span><span class="p">()},</span><span class="w"> </span><span class="nx">respCB</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">err</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>now the <code>responseCallback</code> must be wrapped into an <code>rpc.ArduinoCoreService_InitServer</code>, and we provided a method exactly
+for that:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// new Init method</span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">arduinoCoreServerImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">Init</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">stream</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">ArduinoCoreService_InitServer</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">/// ...</span>
+
+<span class="c1">// Initialize instance</span>
+<span class="nx">initStream</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">InitStreamResponseToCallbackFunction</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">respCB</span><span class="p">)</span>
+<span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">srv</span><span class="p">.</span><span class="nx">Init</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">GetInstance</span><span class="p">()},</span><span class="w"> </span><span class="nx">initStream</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">err</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Each gRPC method has an helper method to obtain the corresponding <code>ArduinoCoreService_*Server</code> parameter. Here a simple,
+but complete, example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">main</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;context&quot;</span>
+<span class="w">    </span><span class="s">&quot;fmt&quot;</span>
+<span class="w">    </span><span class="s">&quot;io&quot;</span>
+<span class="w">    </span><span class="s">&quot;log&quot;</span>
+
+<span class="w">    </span><span class="s">&quot;github.com/arduino/arduino-cli/commands&quot;</span>
+<span class="w">    </span><span class="nx">rpc</span><span class="w"> </span><span class="s">&quot;github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1&quot;</span>
+<span class="w">    </span><span class="s">&quot;github.com/sirupsen/logrus&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Create a new ArduinoCoreServer</span>
+<span class="w">    </span><span class="nx">srv</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">commands</span><span class="p">.</span><span class="nx">NewArduinoCoreServer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Disable logging</span>
+<span class="w">    </span><span class="nx">logrus</span><span class="p">.</span><span class="nx">SetOutput</span><span class="p">(</span><span class="nx">io</span><span class="p">.</span><span class="nx">Discard</span><span class="p">)</span>
+
+<span class="w">    </span><span class="c1">// Create a new instance in the server</span>
+<span class="w">    </span><span class="nx">ctx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">()</span>
+<span class="w">    </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">srv</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CreateRequest</span><span class="p">{})</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="s">&quot;Error creating instance:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">instance</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">resp</span><span class="p">.</span><span class="nx">GetInstance</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Defer the destruction of the instance</span>
+<span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">srv</span><span class="p">.</span><span class="nx">Destroy</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DestroyRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">instance</span><span class="p">});</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="s">&quot;Error destroying instance:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Instance successfully destroyed&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}()</span>
+
+<span class="w">    </span><span class="c1">// Initialize the instance</span>
+<span class="w">    </span><span class="nx">initStream</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">commands</span><span class="p">.</span><span class="nx">InitStreamResponseToCallbackFunction</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitResponse</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;INIT&gt; &quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">srv</span><span class="p">.</span><span class="nx">Init</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InitRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">instance</span><span class="p">},</span><span class="w"> </span><span class="nx">initStream</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="s">&quot;Error during initialization:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Search for platforms and output the result</span>
+<span class="w">    </span><span class="nx">searchResp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">srv</span><span class="p">.</span><span class="nx">PlatformSearch</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">PlatformSearchRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">instance</span><span class="p">})</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="s">&quot;Error searching for platforms:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">platformSummary</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">searchResp</span><span class="p">.</span><span class="nx">GetSearchOutput</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">installed</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">platformSummary</span><span class="p">.</span><span class="nx">GetInstalledRelease</span><span class="p">()</span>
+<span class="w">        </span><span class="nx">meta</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">platformSummary</span><span class="p">.</span><span class="nx">GetMetadata</span><span class="p">()</span>
+<span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%30s %8s %s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">.</span><span class="nx">GetId</span><span class="p">(),</span><span class="w"> </span><span class="nx">installed</span><span class="p">.</span><span class="nx">GetVersion</span><span class="p">(),</span><span class="w"> </span><span class="nx">installed</span><span class="p">.</span><span class="nx">GetName</span><span class="p">())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 <h3 id="yaml-output-format-is-no-more-supported">YAML output format is no more supported<a class="headerlink" href="#yaml-output-format-is-no-more-supported" title="Permanent link">&para;</a></h3>
 <p>The <code>yaml</code> option of the <code>--format</code> flag is no more supported. Use <code>--format json</code> if machine parsable output is needed.</p>
 <h3 id="the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type">The gRPC <code>cc.arduino.cli.commands.v1.CompileRequest.export_binaries</code> changed type.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" title="Permanent link">&para;</a></h3>
@@ -5064,7 +5259,7 @@ API.</p>
 <a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse">https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse</a>
 <a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest">https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest</a>
 <a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse">https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse</a></p>
-<p><a href="https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go">https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go</a></p>
+<p><a href="https://github.com/arduino/arduino-cli/blob/752709af9bf1bf8f6c1e6f689b1e8b86cc4e884e/commands/daemon/term_example/main.go">https://github.com/arduino/arduino-cli/blob/752709af9bf1bf8f6c1e6f689b1e8b86cc4e884e/commands/daemon/term_example/main.go</a></p>
 <h2 id="0230">0.23.0<a class="headerlink" href="#0230" title="Permanent link">&para;</a></h2>
 <h3 id="arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone">Arduino IDE builtin libraries are now excluded from the build when running <code>arduino-cli</code> standalone<a class="headerlink" href="#arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone" title="Permanent link">&para;</a></h3>
 <p>Previously the "builtin libraries" in the Arduino IDE 1.8.x were always included in the build process. This wasn't the
