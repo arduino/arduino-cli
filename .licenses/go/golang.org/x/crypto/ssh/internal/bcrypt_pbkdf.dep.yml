@@ -1,12 +1,12 @@
 ---
 name: golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-version: v0.18.0
+version: v0.21.0
 type: go
 summary: Package bcrypt_pbkdf implements bcrypt_pbkdf(3) from OpenBSD.
 homepage: https://pkg.go.dev/golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 license: bsd-3-clause
 licenses:
-- sources: crypto@v0.18.0/LICENSE
+- sources: crypto@v0.21.0/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: crypto@v0.18.0/PATENTS
+- sources: crypto@v0.21.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
