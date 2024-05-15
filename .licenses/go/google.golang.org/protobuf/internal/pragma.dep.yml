@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/protobuf/internal/pragma
-version: v1.33.0
+version: v1.34.1
 type: go
 summary: Package pragma provides types that can be embedded into a struct to statically
   enforce or prevent certain language properties.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/pragma
 license: bsd-3-clause
 licenses:
-- sources: protobuf@v1.33.0/LICENSE
+- sources: protobuf@v1.34.1/LICENSE
   text: |
     Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: protobuf@v1.33.0/PATENTS
+- sources: protobuf@v1.34.1/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 

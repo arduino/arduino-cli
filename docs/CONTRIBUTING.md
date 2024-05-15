@@ -80,9 +80,9 @@ If you want to run integration tests you will also need:
 If you're working on the gRPC interface you will also have to:
 
 - download and install the [protoc][6] compiler (use the version required to match the generated code, please note that
-  the latest releases does not follow semantic versioning anymore so, for example, the version 4.24.3 must be searched
-  as 24.3 dropping the major number)
-- install `protoc-gen-go` using: `go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31.0` (use the version
+  the latest releases does not follow semantic versioning anymore so, for example, the version 5.26.1 must be searched
+  as 26.1 dropping the major number)
+- install `protoc-gen-go` using: `go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.1` (use the version
   required to match the generated code)
 - install `protoc-gen-go-grpc` using: `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0` (use the version
   required to match the generated code)

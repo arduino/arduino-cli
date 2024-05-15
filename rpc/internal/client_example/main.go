@@ -43,7 +43,7 @@ func main() {
 
 	// Establish a connection with the gRPC server, started with the command:
 	// arduino-cli daemon
-	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("error connecting to arduino-cli rpc server, you can start it by running `arduino-cli daemon`")
 	}

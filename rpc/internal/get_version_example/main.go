@@ -18,7 +18,6 @@ package main
 import (
 	"context"
 	"log"
-	"time"
 
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/grpc"
@@ -27,11 +26,7 @@ import (
 
 func main() {
 	// Establish a connection with the gRPC server
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	conn, err := grpc.DialContext(ctx, "localhost:50051",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock())
-	cancel()
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Println(err)
 		log.Fatal("error connecting to arduino-cli rpc server, you can start it by running `arduino-cli daemon`")

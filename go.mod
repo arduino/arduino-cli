@@ -18,9 +18,9 @@ require (
 	github.com/codeclysm/extract/v3 v3.1.1
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.17.0
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/gofrs/uuid/v5 v5.0.0
+	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/mailru/easyjson v0.7.7
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
@@ -40,9 +40,9 @@ require (
 	go.bug.st/testifyjson v1.1.1
 	golang.org/x/term v0.20.0
 	golang.org/x/text v0.15.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80
-	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237
+	google.golang.org/grpc v1.64.0
+	google.golang.org/protobuf v1.34.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -58,7 +58,6 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
