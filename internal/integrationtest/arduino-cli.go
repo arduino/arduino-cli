@@ -408,7 +408,7 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	}
 	go _copy(os.Stdout, stdout)
 	go _copy(os.Stderr, stderr)
-	conn, err := grpc.Dial(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	conn, err := grpc.NewClient(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	cli.t.NoError(err)
 	cli.daemonConn = conn
 	cli.daemonClient = commands.NewArduinoCoreServiceClient(conn)
