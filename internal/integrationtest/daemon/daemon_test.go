@@ -63,15 +63,15 @@ func TestArduinoCliDaemon(t *testing.T) {
 		require.NoError(t, err)
 		watcherCanceldCh := make(chan struct{})
 		go func() {
+			defer close(watcherCanceldCh)
 			for {
 				msg, err := watcher.Recv()
 				if errors.Is(err, io.EOF) {
-					fmt.Println("Watcher EOF")
+					fmt.Println("Got EOF from watcher")
 					return
 				}
 				if s, ok := status.FromError(err); ok && s.Code() == codes.Canceled {
-					fmt.Println("Watcher canceled")
-					watcherCanceldCh <- struct{}{}
+					fmt.Println("Got Canceled error from watcher")
 					return
 				}
 				require.NoError(t, err, "BoardListWatch grpc call returned an error")
@@ -357,7 +357,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 	}
 
 	// Un-Set builtin libraries dir
-	err := cli.SetValue("directories.builtin.libraries", `""`)
+	err := cli.SetValue("directories.builtin.libraries", "")
 	require.NoError(t, err)
 
 	// Re-init
@@ -503,7 +503,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
-			require.ErrorIs(t, upgradeError, (&cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
+			require.ErrorIs(t, upgradeError, (&cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).GRPCStatus().Err())
 			require.NotNil(t, platform)
 			require.False(t, platform.GetMetadata().GetIndexed())        // the esp866 is not present in the additional-urls
 			require.False(t, platform.GetRelease().GetMissingMetadata()) // install.json is present
@@ -528,7 +528,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
-			require.ErrorIs(t, upgradeError, (&cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
+			require.ErrorIs(t, upgradeError, (&cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).GRPCStatus().Err())
 			require.NotNil(t, platform)
 			require.False(t, platform.GetMetadata().GetIndexed())       // the esp866 is not present in the additional-urls
 			require.True(t, platform.GetRelease().GetMissingMetadata()) // install.json is present

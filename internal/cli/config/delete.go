@@ -16,17 +16,16 @@
 package config
 
 import (
+	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/daemon"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func initDeleteCommand() *cobra.Command {
+func initDeleteCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	deleteCommand := &cobra.Command{
 		Use:   "delete",
 		Short: tr("Deletes a settings key and all its sub keys."),
@@ -35,25 +34,25 @@ func initDeleteCommand() *cobra.Command {
 			"  " + os.Args[0] + " config delete board_manager\n" +
 			"  " + os.Args[0] + " config delete board_manager.additional_urls",
 		Args: cobra.ExactArgs(1),
-		Run:  runDeleteCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+			runDeleteCommand(ctx, srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			return getAllSettingsKeys(ctx, srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return deleteCommand
 }
 
-func runDeleteCommand(cmd *cobra.Command, args []string) {
+func runDeleteCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config delete`")
-	toDelete := args[0]
 
-	svc := daemon.ArduinoCoreServerImpl{}
-	_, err := svc.SettingsDelete(cmd.Context(), &rpc.SettingsDeleteRequest{Key: toDelete})
-	if err != nil {
-		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", toDelete, err), feedback.ErrGeneric)
+	key := args[0]
+	if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: ""}); err != nil {
+		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	}
-	_, err = svc.SettingsWrite(cmd.Context(), &rpc.SettingsWriteRequest{FilePath: configuration.Settings.ConfigFileUsed()})
-	if err != nil {
-		feedback.Fatal(tr("Cannot write the file %[1]s: %[2]v", configuration.Settings.ConfigFileUsed(), err), feedback.ErrGeneric)
-	}
+
+	saveConfiguration(ctx, srv)
 }

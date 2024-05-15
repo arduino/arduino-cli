@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUninstallCommand() *cobra.Command {
+func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var preUninstallFlags arguments.PrePostScriptsFlags
 	uninstallCommand := &cobra.Command{
 		Use:     fmt.Sprintf("uninstall %s:%s ...", tr("PACKAGER"), tr("ARCH")),
@@ -38,21 +38,21 @@ func initUninstallCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runUninstallCommand(args, preUninstallFlags)
+			runUninstallCommand(cmd.Context(), srv, args, preUninstallFlags)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableCores(), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableCores(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	preUninstallFlags.AddToCommand(uninstallCommand)
 	return uninstallCommand
 }
 
-func runUninstallCommand(args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
-	inst := instance.CreateAndInit()
+func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
 	logrus.Info("Executing `arduino-cli core uninstall`")
+	inst := instance.CreateAndInit(ctx, srv)
 
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
@@ -63,13 +63,14 @@ func runUninstallCommand(args []string, preUninstallFlags arguments.PrePostScrip
 		}
 	}
 	for _, platformRef := range platformsRefs {
-		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
+		req := &rpc.PlatformUninstallRequest{
 			Instance:         inst,
 			PlatformPackage:  platformRef.PackageName,
 			Architecture:     platformRef.Architecture,
 			SkipPreUninstall: preUninstallFlags.DetectSkipPreUninstallValue(),
-		}, feedback.NewTaskProgressCB())
-		if err != nil {
+		}
+		stream := commands.PlatformUninstallStreamResponseToCallbackFunction(ctx, feedback.NewTaskProgressCB())
+		if err := srv.PlatformUninstall(req, stream); err != nil {
 			feedback.Fatal(tr("Error during uninstall: %v", err), feedback.ErrGeneric)
 		}
 	}

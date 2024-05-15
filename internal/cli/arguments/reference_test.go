@@ -16,10 +16,11 @@
 package arguments_test
 
 import (
+	"context"
 	"testing"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -46,10 +47,6 @@ var badCores = []struct {
 	{"", nil},
 }
 
-func init() {
-	configuration.Settings = configuration.Init("")
-}
-
 func TestArgsStringify(t *testing.T) {
 	for _, core := range goodCores {
 		require.Equal(t, core.in, core.expected.String())
@@ -57,14 +54,16 @@ func TestArgsStringify(t *testing.T) {
 }
 
 func TestParseReferenceCores(t *testing.T) {
+	srv := commands.NewArduinoCoreServer()
+	ctx := context.Background()
 	for _, tt := range goodCores {
-		actual, err := arguments.ParseReference(tt.in)
+		actual, err := arguments.ParseReference(ctx, srv, tt.in)
 		assert.Nil(t, err)
 		assert.Equal(t, tt.expected, actual)
 	}
 
 	for _, tt := range badCores {
-		actual, err := arguments.ParseReference(tt.in)
+		actual, err := arguments.ParseReference(ctx, srv, tt.in)
 		require.NotNil(t, err, "Testing bad core '%s'", tt.in)
 		require.Equal(t, tt.expected, actual, "Testing bad core '%s'", tt.in)
 	}
@@ -76,7 +75,8 @@ func TestParseArgs(t *testing.T) {
 		input = append(input, tt.in)
 	}
 
-	refs, err := arguments.ParseReferences(input)
+	srv := commands.NewArduinoCoreServer()
+	refs, err := arguments.ParseReferences(context.Background(), srv, input)
 	assert.Nil(t, err)
 	assert.Equal(t, len(goodCores), len(refs))
 

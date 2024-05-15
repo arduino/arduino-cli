@@ -33,12 +33,12 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/arduino/go-timeutils"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -55,11 +55,13 @@ type PackageManager struct {
 	log              logrus.FieldLogger
 	IndexDir         *paths.Path
 	PackagesDir      *paths.Path
+	userPackagesDir  *paths.Path
 	DownloadDir      *paths.Path
 	tempDir          *paths.Path
 	profile          *sketch.Profile
 	discoveryManager *discoverymanager.DiscoveryManager
 	userAgent        string
+	downloaderConfig downloader.Config
 }
 
 // Builder is used to create a new PackageManager. The builder
@@ -75,17 +77,19 @@ type Explorer PackageManager
 var tr = i18n.Tr
 
 // NewBuilder returns a new Builder
-func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *Builder {
+func NewBuilder(indexDir, packagesDir, userPackagesDir, downloadDir, tempDir *paths.Path, userAgent string, downloaderConfig downloader.Config) *Builder {
 	return &Builder{
 		log:                            logrus.StandardLogger(),
 		packages:                       cores.NewPackages(),
 		IndexDir:                       indexDir,
 		PackagesDir:                    packagesDir,
+		userPackagesDir:                userPackagesDir,
 		DownloadDir:                    downloadDir,
 		tempDir:                        tempDir,
 		packagesCustomGlobalProperties: properties.NewMap(),
-		discoveryManager:               discoverymanager.New(configuration.UserAgent(configuration.Settings)),
+		discoveryManager:               discoverymanager.New(userAgent),
 		userAgent:                      userAgent,
+		downloaderConfig:               downloaderConfig,
 	}
 }
 
@@ -98,6 +102,7 @@ func (pmb *Builder) BuildIntoExistingPackageManager(target *PackageManager) {
 	target.packages = pmb.packages
 	target.IndexDir = pmb.IndexDir
 	target.PackagesDir = pmb.PackagesDir
+	target.userPackagesDir = pmb.userPackagesDir
 	target.DownloadDir = pmb.DownloadDir
 	target.tempDir = pmb.tempDir
 	target.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
@@ -114,6 +119,7 @@ func (pmb *Builder) Build() *PackageManager {
 		packages:                       pmb.packages,
 		IndexDir:                       pmb.IndexDir,
 		PackagesDir:                    pmb.PackagesDir,
+		userPackagesDir:                pmb.userPackagesDir,
 		DownloadDir:                    pmb.DownloadDir,
 		tempDir:                        pmb.tempDir,
 		packagesCustomGlobalProperties: pmb.packagesCustomGlobalProperties,
@@ -164,7 +170,7 @@ func (pmb *Builder) calculateCompatibleReleases() {
 // this function will make the builder write the new configuration into this
 // PackageManager.
 func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
-	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent)
+	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.userPackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent, pm.downloaderConfig)
 	return pmb, func() {
 		pmb.calculateCompatibleReleases()
 		pmb.BuildIntoExistingPackageManager(pm)
@@ -188,6 +194,7 @@ func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
 		profile:                        pm.profile,
 		discoveryManager:               pm.discoveryManager,
 		userAgent:                      pm.userAgent,
+		downloaderConfig:               pm.downloaderConfig,
 	}, pm.packagesLock.RUnlock
 }
 

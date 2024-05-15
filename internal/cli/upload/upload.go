@@ -22,10 +22,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/core"
-	sk "github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -51,7 +49,7 @@ var (
 )
 
 // NewCommand created a new `upload` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	uploadFields := map[string]string{}
 	uploadCommand := &cobra.Command{
 		Use:   "upload",
@@ -65,25 +63,25 @@ func NewCommand() *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runUploadCommand(args, uploadFields)
+			runUploadCommand(cmd.Context(), srv, args, uploadFields)
 		},
 	}
 
-	fqbnArg.AddToCommand(uploadCommand)
-	portArgs.AddToCommand(uploadCommand)
-	profileArg.AddToCommand(uploadCommand)
+	fqbnArg.AddToCommand(uploadCommand, srv)
+	portArgs.AddToCommand(uploadCommand, srv)
+	profileArg.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
-	programmer.AddToCommand(uploadCommand)
+	programmer.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
 	arguments.AddKeyValuePFlag(uploadCommand, &uploadFields, "upload-field", "F", nil, tr("Set a value for a field required to upload."))
 	return uploadCommand
 }
 
-func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
+func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, uploadFieldsArgs map[string]string) {
 	logrus.Info("Executing `arduino-cli upload`")
 
 	path := ""
@@ -91,7 +89,8 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		path = args[0]
 	}
 	sketchPath := arguments.InitSketchPath(path)
-	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	sketch := resp.GetSketch()
 	if importDir == "" && importFile == "" {
 		if err != nil {
 			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
@@ -103,9 +102,9 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sketch.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {
@@ -115,9 +114,9 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	defaultFQBN := sketch.GetDefaultFqbn()
 	defaultAddress := sketch.GetDefaultPort()
 	defaultProtocol := sketch.GetDefaultProtocol()
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, &portArgs, &fqbnArg, inst, srv, defaultFQBN, defaultAddress, defaultProtocol)
 
-	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+	userFieldRes, err := srv.SupportedUserFields(ctx, &rpc.SupportedUserFieldsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 		Protocol: port.GetProtocol(),
@@ -135,7 +134,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 			}
 
 			msg += "\n"
-			if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+			if platform, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 				Instance:   inst,
 				SearchArgs: platformErr.Platform,
 			}); err != nil {
@@ -178,7 +177,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {
-		prog = programmer.String(inst, fqbn)
+		prog = programmer.String(ctx, inst, srv, fqbn)
 	}
 	if prog == "" {
 		prog = sketch.GetDefaultProgrammer()
@@ -198,7 +197,8 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		DryRun:     dryRun,
 		UserFields: fields,
 	}
-	if res, err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
+	stream, streamResp := commands.UploadToServerStreams(ctx, stdOut, stdErr)
+	if err := srv.Upload(req, stream); err != nil {
 		errcode := feedback.ErrGeneric
 		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer
@@ -212,7 +212,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 		feedback.PrintResult(&uploadResult{
 			Stdout:            io.Stdout,
 			Stderr:            io.Stderr,
-			UpdatedUploadPort: result.NewPort(res.GetUpdatedUploadPort()),
+			UpdatedUploadPort: result.NewPort(streamResp().GetUpdatedUploadPort()),
 		})
 	}
 }

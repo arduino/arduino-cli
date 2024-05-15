@@ -21,9 +21,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -34,12 +33,13 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func initInstallCommand() *cobra.Command {
+func initInstallCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	var noDeps bool
 	var noOverwrite bool
 	var gitURL bool
 	var zipPath bool
 	var useBuiltinLibrariesDir bool
+	enableUnsafeInstall := settings.GetLibrary().GetEnableUnsafeInstall()
 	installCommand := &cobra.Command{
 		Use:   fmt.Sprintf("install %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
 		Short: tr("Installs one or more specified libraries into the system."),
@@ -52,10 +52,10 @@ func initInstallCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir)
+			runInstallCommand(cmd.Context(), srv, args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir, enableUnsafeInstall)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
@@ -66,12 +66,12 @@ func initInstallCommand() *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool) {
-	instance := instance.CreateAndInit()
+func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool, enableUnsafeInstall bool) {
+	instance := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli lib install`")
 
 	if zipPath || gitURL {
-		if !configuration.Settings.GetBool("library.enable_unsafe_install") {
+		if !enableUnsafeInstall {
 			documentationURL := "https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys"
 			_, err := semver.Parse(version.VersionInfo.VersionString)
 			if err == nil {
@@ -89,12 +89,13 @@ func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool
 
 	if zipPath {
 		for _, path := range args {
-			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
+			req := &rpc.ZipLibraryInstallRequest{
 				Instance:  instance,
 				Path:      path,
 				Overwrite: !noOverwrite,
-			}, feedback.TaskProgress())
-			if err != nil {
+			}
+			stream := commands.ZipLibraryInstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
+			if err := srv.ZipLibraryInstall(req, stream); err != nil {
 				feedback.Fatal(tr("Error installing Zip Library: %v", err), feedback.ErrGeneric)
 			}
 		}
@@ -110,19 +111,20 @@ func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool
 				}
 				url = wd.String()
 			}
-			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
+			req := &rpc.GitLibraryInstallRequest{
 				Instance:  instance,
 				Url:       url,
 				Overwrite: !noOverwrite,
-			}, feedback.TaskProgress())
-			if err != nil {
+			}
+			stream := commands.GitLibraryInstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
+			if err := srv.GitLibraryInstall(req, stream); err != nil {
 				feedback.Fatal(tr("Error installing Git Library: %v", err), feedback.ErrGeneric)
 			}
 		}
 		return
 	}
 
-	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
 		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
@@ -140,8 +142,8 @@ func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool
 			NoOverwrite:     noOverwrite,
 			InstallLocation: installLocation,
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
-		if err != nil {
+		stream := commands.LibraryInstallStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		if err := srv.LibraryInstall(libraryInstallRequest, stream); err != nil {
 			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
 		}
 	}

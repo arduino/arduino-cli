@@ -16,6 +16,7 @@
 package outdated
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -36,7 +37,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand creates a new `outdated` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	outdatedCommand := &cobra.Command{
 		Use:   "outdated",
 		Short: tr("Lists cores and libraries that can be upgraded"),
@@ -44,21 +45,25 @@ func NewCommand() *cobra.Command {
 that can be upgraded. If nothing needs to be updated the output is empty.`),
 		Example: "  " + os.Args[0] + " outdated\n",
 		Args:    cobra.NoArgs,
-		Run:     runOutdatedCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runOutdatedCommand(cmd.Context(), srv)
+		},
 	}
 	return outdatedCommand
 }
 
-func runOutdatedCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runOutdatedCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli outdated`")
-	Outdated(inst)
+	inst := instance.CreateAndInit(ctx, srv)
+	Outdated(ctx, srv, inst)
 }
 
 // Outdated prints a list of outdated platforms and libraries
-func Outdated(inst *rpc.Instance) {
+func Outdated(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance) {
 	feedback.PrintResult(
-		newOutdatedResult(core.GetList(inst, false, true), lib.GetList(inst, []string{}, false, true)),
+		newOutdatedResult(
+			core.GetList(ctx, srv, inst, false, true),
+			lib.GetList(ctx, srv, inst, []string{}, false, true)),
 	)
 }
 

@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -32,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initDetailsCommand() *cobra.Command {
+func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var showFullDetails bool
 	var listProgrammers bool
 	var fqbn arguments.Fqbn
@@ -44,11 +43,11 @@ func initDetailsCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runDetailsCommand(fqbn.String(), showFullDetails, listProgrammers, showProperties)
+			runDetailsCommand(cmd.Context(), srv, fqbn.String(), showFullDetails, listProgrammers, showProperties)
 		},
 	}
 
-	fqbn.AddToCommand(detailsCommand)
+	fqbn.AddToCommand(detailsCommand, srv)
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
 	detailsCommand.MarkFlagRequired("fqbn")
@@ -56,8 +55,8 @@ func initDetailsCommand() *cobra.Command {
 	return detailsCommand
 }
 
-func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
-	inst := instance.CreateAndInit()
+func runDetailsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board details`")
 
@@ -65,7 +64,7 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 	if err != nil {
 		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
-	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
+	res, err := srv.BoardDetails(ctx, &rpc.BoardDetailsRequest{
 		Instance:                   inst,
 		Fqbn:                       fqbn,
 		DoNotExpandBuildProperties: showPropertiesMode == arguments.ShowPropertiesUnexpanded,

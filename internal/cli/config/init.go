@@ -16,16 +16,18 @@
 package config
 
 import (
+	"context"
+	"encoding/json"
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -50,7 +52,9 @@ func initInitCommand() *cobra.Command {
 		PreRun: func(cmd *cobra.Command, args []string) {
 			arguments.CheckFlagsConflicts(cmd, "dest-file", "dest-dir")
 		},
-		Run: runInitCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runInitCommand(cmd.Context(), cmd)
+		},
 	}
 	initCommand.Flags().StringVar(&destDir, "dest-dir", "", tr("Sets where to save the configuration file."))
 	initCommand.Flags().StringVar(&destFile, "dest-file", "", tr("Sets where to save the configuration file."))
@@ -58,11 +62,11 @@ func initInitCommand() *cobra.Command {
 	return initCommand
 }
 
-func runInitCommand(cmd *cobra.Command, args []string) {
+func runInitCommand(ctx context.Context, cmd *cobra.Command) {
 	logrus.Info("Executing `arduino-cli config init`")
 
 	var configFileAbsPath *paths.Path
-	var absPath *paths.Path
+	var configFileDir *paths.Path
 	var err error
 
 	switch {
@@ -71,44 +75,93 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 		if err != nil {
 			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
+		configFileDir = configFileAbsPath.Parent()
 
-		absPath = configFileAbsPath.Parent()
-	case destDir == "":
-		destDir = configuration.Settings.GetString("directories.Data")
-		fallthrough
-	default:
-		absPath, err = paths.New(destDir).Abs()
+	case destDir != "":
+		configFileDir, err = paths.New(destDir).Abs()
 		if err != nil {
 			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
-		configFileAbsPath = absPath.Join(defaultFileName)
+		configFileAbsPath = configFileDir.Join(defaultFileName)
+
+	default:
+		configFileAbsPath = paths.New(GetConfigFile(ctx))
+		configFileDir = configFileAbsPath.Parent()
 	}
 
 	if !overwrite && configFileAbsPath.Exist() {
 		feedback.Fatal(tr("Config file already exists, use --overwrite to discard the existing one."), feedback.ErrGeneric)
 	}
 
-	logrus.Infof("Writing config file to: %s", absPath)
+	logrus.Infof("Writing config file to: %s", configFileDir)
 
-	if err := absPath.MkdirAll(); err != nil {
+	if err := configFileDir.MkdirAll(); err != nil {
 		feedback.Fatal(tr("Cannot create config file directory: %v", err), feedback.ErrGeneric)
 	}
 
-	newSettings := viper.New()
-	configuration.SetDefaults(newSettings)
-	configuration.BindFlags(cmd, newSettings)
+	tmpSrv := commands.NewArduinoCoreServer()
 
-	for _, url := range newSettings.GetStringSlice("board_manager.additional_urls") {
-		if strings.Contains(url, ",") {
-			feedback.Fatal(tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
-				feedback.ErrGeneric)
-		}
+	if _, err := tmpSrv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml", EncodedSettings: ""}); err != nil {
+		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 	}
 
-	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
+	// Ensure to always output an empty array for additional urls
+	if _, err := tmpSrv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
+		Key: "board_manager.additional_urls", EncodedValue: "[]",
+	}); err != nil {
+		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+	}
+
+	ApplyGlobalFlagsToConfiguration(ctx, cmd, tmpSrv)
+
+	resp, err := tmpSrv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"})
+	if err != nil {
+		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+	}
+
+	if err := configFileAbsPath.WriteFile([]byte(resp.GetEncodedSettings())); err != nil {
 		feedback.Fatal(tr("Cannot create config file: %v", err), feedback.ErrGeneric)
 	}
+
 	feedback.PrintResult(initResult{ConfigFileAbsPath: configFileAbsPath})
+}
+
+// ApplyGlobalFlagsToConfiguration overrides server settings with the flags from the command line
+func ApplyGlobalFlagsToConfiguration(ctx context.Context, cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
+	set := func(k string, v any) {
+		if jsonValue, err := json.Marshal(v); err != nil {
+			feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
+			Key: k, EncodedValue: string(jsonValue),
+		}); err != nil {
+			feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		}
+
+	}
+
+	if f := cmd.Flags().Lookup("log-level"); f.Changed {
+		logLevel, _ := cmd.Flags().GetString("log-level")
+		set("logging.level", logLevel)
+	}
+	if f := cmd.Flags().Lookup("log-file"); f.Changed {
+		logFile, _ := cmd.Flags().GetString("log-file")
+		set("logging.file", logFile)
+	}
+	if f := cmd.Flags().Lookup("no-color"); f.Changed {
+		noColor, _ := cmd.Flags().GetBool("no-color")
+		set("output.no_color", noColor)
+	}
+	if f := cmd.Flags().Lookup("additional-urls"); f.Changed {
+		urls, _ := cmd.Flags().GetStringSlice("additional-urls")
+		for _, url := range urls {
+			if strings.Contains(url, ",") {
+				feedback.Fatal(
+					tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
+					feedback.ErrBadArgument)
+			}
+		}
+		set("board_manager.additional_urls", urls)
+	}
 }
 
 // output from this command requires special formatting, let's create a dedicated

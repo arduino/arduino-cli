@@ -237,7 +237,7 @@ jobs:
         module:
           - path: internal/arduino/discovery/discovery_client
           - path: rpc/internal/client_example
-          - path: commands/daemon/term_example
+          - path: commands/term_example
 
     steps:
       - name: Checkout repository

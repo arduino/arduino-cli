@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -39,14 +39,14 @@ type Port struct {
 }
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
-func (p *Port) AddToCommand(cmd *cobra.Command) {
+func (p *Port) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return f.Map(GetAvailablePorts(), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(cmd.Context(), srv), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return f.Map(GetAvailablePorts(), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(cmd.Context(), srv), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
 	})
 	p.timeout.AddToCommand(cmd)
 }
@@ -56,12 +56,12 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 // This method allows will bypass the discoveries if:
 // - a nil instance is passed: in this case the plain port and protocol arguments are returned (even if empty)
 // - a protocol is specified: in this case the discoveries are not needed to autodetect the protocol.
-func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, defaultAddress, defaultProtocol string) (string, string, error) {
+func (p *Port) GetPortAddressAndProtocol(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string) (string, string, error) {
 	if p.protocol != "" || instance == nil {
 		return p.address, p.protocol, nil
 	}
 
-	port, err := p.GetPort(instance, defaultAddress, defaultProtocol)
+	port, err := p.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol)
 	if err != nil {
 		return "", "", err
 	}
@@ -70,8 +70,7 @@ func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, defaultAddress,
 
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
-func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol string) (*rpc.Port, error) {
-
+func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string) (*rpc.Port, error) {
 	address := p.address
 	protocol := p.protocol
 	if address == "" && (defaultAddress != "" || defaultProtocol != "") {
@@ -89,9 +88,12 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	watcher, err := board.Watch(ctx, &rpc.BoardListWatchRequest{Instance: instance})
+
+	stream, watcher := commands.BoardListWatchProxyToChan(ctx)
+	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: instance}, stream)
+
 	if err != nil {
 		return nil, err
 	}
@@ -129,15 +131,15 @@ func (p *Port) GetSearchTimeout() time.Duration {
 // DetectFQBN tries to identify the board connected to the port and returns the
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
-func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
-	detectedPorts, _, err := board.List(&rpc.BoardListRequest{
+func (p *Port) DetectFQBN(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) (string, *rpc.Port) {
+	detectedPorts, err := srv.BoardList(ctx, &rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error during FQBN detection: %v", err), feedback.ErrGeneric)
 	}
-	for _, detectedPort := range detectedPorts {
+	for _, detectedPort := range detectedPorts.GetPorts() {
 		port := detectedPort.GetPort()
 		if p.address != port.GetAddress() {
 			continue

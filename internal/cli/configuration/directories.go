@@ -17,24 +17,18 @@ package configuration
 
 import (
 	"github.com/arduino/go-paths-helper"
-	"github.com/spf13/viper"
 )
 
 // HardwareDirectories returns all paths that may contains hardware packages.
-func HardwareDirectories(settings *viper.Viper) paths.PathList {
+func (settings *Settings) HardwareDirectories() paths.PathList {
 	res := paths.PathList{}
 
-	if settings.IsSet("directories.Data") {
-		packagesDir := PackagesDir(Settings)
-		if packagesDir.IsDir() {
-			res.Add(packagesDir)
-		}
+	if packagesDir := settings.PackagesDir(); packagesDir.IsDir() {
+		res.Add(packagesDir)
 	}
 
-	if settings.IsSet("directories.User") {
-		skDir := paths.New(settings.GetString("directories.User"))
-		hwDir := skDir.Join("hardware")
-		if hwDir.IsDir() {
+	if userDir, ok, _ := settings.GetStringOk("directories.user"); ok {
+		if hwDir := paths.New(userDir, "hardware"); hwDir.IsDir() {
 			res.Add(hwDir)
 		}
 	}
@@ -44,34 +38,51 @@ func HardwareDirectories(settings *viper.Viper) paths.PathList {
 
 // IDEBuiltinLibrariesDir returns the IDE-bundled libraries path. Usually
 // this directory is present in the Arduino IDE.
-func IDEBuiltinLibrariesDir(settings *viper.Viper) *paths.Path {
-	return paths.New(Settings.GetString("directories.builtin.Libraries"))
+func (settings *Settings) IDEBuiltinLibrariesDir() *paths.Path {
+	if builtinLibsDir, ok, _ := settings.GetStringOk("directories.builtin.libraries"); ok {
+		return paths.New(builtinLibsDir)
+	}
+	return nil
 }
 
 // LibrariesDir returns the full path to the user directory containing
 // custom libraries
-func LibrariesDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.User")).Join("libraries")
+func (settings *Settings) LibrariesDir() *paths.Path {
+	return settings.UserDir().Join("libraries")
+}
+
+// UserDir returns the full path to the user directory
+func (settings *Settings) UserDir() *paths.Path {
+	if userDir, ok, _ := settings.GetStringOk("directories.user"); ok {
+		return paths.New(userDir)
+	}
+	return paths.New(settings.Defaults.GetString("directories.user"))
 }
 
 // PackagesDir returns the full path to the packages folder
-func PackagesDir(settings *viper.Viper) *paths.Path {
-	return DataDir(settings).Join("packages")
+func (settings *Settings) PackagesDir() *paths.Path {
+	return settings.DataDir().Join("packages")
 }
 
 // ProfilesCacheDir returns the full path to the profiles cache directory
 // (it contains all the platforms and libraries used to compile a sketch
 // using profiles)
-func ProfilesCacheDir(settings *viper.Viper) *paths.Path {
-	return DataDir(settings).Join("internal")
+func (settings *Settings) ProfilesCacheDir() *paths.Path {
+	return settings.DataDir().Join("internal")
 }
 
 // DataDir returns the full path to the data directory
-func DataDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.Data"))
+func (settings *Settings) DataDir() *paths.Path {
+	if dataDir, ok, _ := settings.GetStringOk("directories.data"); ok {
+		return paths.New(dataDir)
+	}
+	return paths.New(settings.Defaults.GetString("directories.data"))
 }
 
 // DownloadsDir returns the full path to the download cache directory
-func DownloadsDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.Downloads"))
+func (settings *Settings) DownloadsDir() *paths.Path {
+	if downloadDir, ok, _ := settings.GetStringOk("directories.downloads"); ok {
+		return paths.New(downloadDir)
+	}
+	return settings.DataDir().Join("staging")
 }

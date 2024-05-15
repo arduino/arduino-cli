@@ -16,12 +16,11 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/daemon"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -29,7 +28,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func initGetCommand() *cobra.Command {
+func initGetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	getCommand := &cobra.Command{
 		Use:   "get",
 		Short: tr("Gets a settings key value."),
@@ -39,26 +38,27 @@ func initGetCommand() *cobra.Command {
 			"  " + os.Args[0] + " config get daemon.port\n" +
 			"  " + os.Args[0] + " config get board_manager.additional_urls",
 		Args: cobra.MinimumNArgs(1),
-		Run:  runGetCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runGetCommand(cmd.Context(), srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			return getAllSettingsKeys(ctx, srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return getCommand
 }
 
-func runGetCommand(cmd *cobra.Command, args []string) {
+func runGetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
 
-	svc := daemon.ArduinoCoreServerImpl{}
 	for _, toGet := range args {
-		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
+		resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {
 			feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}
 		var result getResult
-		err = json.Unmarshal([]byte(resp.GetJsonData()), &result.resp)
-		if err != nil {
+		if err := json.Unmarshal([]byte(resp.GetEncodedValue()), &result.resp); err != nil {
 			// Should never happen...
 			panic(fmt.Sprintf("Cannot parse JSON for key %[1]s: %[2]v", toGet, err))
 		}

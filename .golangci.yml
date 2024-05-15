@@ -134,5 +134,7 @@ issues:
     - path-except: internal/cli/
       linters:
         - forbidigo
+    - path: internal/cli/.*_test.go
+      linters: [forbidigo]
     - path: internal/cli/feedback/
       linters: [forbidigo]

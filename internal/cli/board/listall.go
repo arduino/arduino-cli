@@ -21,7 +21,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -33,7 +32,7 @@ import (
 
 var showHiddenBoard bool
 
-func initListAllCommand() *cobra.Command {
+func initListAllCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var listAllCommand = &cobra.Command{
 		Use:   fmt.Sprintf("listall [%s]", tr("boardname")),
 		Short: tr("List all known boards and their corresponding FQBN."),
@@ -43,19 +42,21 @@ for a specific board if you specify the board name`),
 			"  " + os.Args[0] + " board listall\n" +
 			"  " + os.Args[0] + " board listall zero",
 		Args: cobra.ArbitraryArgs,
-		Run:  runListAllCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runListAllCommand(cmd.Context(), args, srv)
+		},
 	}
 	listAllCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return listAllCommand
 }
 
 // runListAllCommand list all installed boards
-func runListAllCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runListAllCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer) {
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board listall`")
 
-	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
+	list, err := srv.BoardListAll(ctx, &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          args,
 		IncludeHiddenBoards: showHiddenBoard,

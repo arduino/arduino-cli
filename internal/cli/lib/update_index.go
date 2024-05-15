@@ -28,34 +28,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpdateIndexCommand() *cobra.Command {
+func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
 		Short:   tr("Updates the libraries index."),
 		Long:    tr("Updates the libraries index to the latest version."),
 		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
-		Run:     runUpdateIndexCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpdateIndexCommand(cmd.Context(), srv)
+		},
 	}
 	return updateIndexCommand
 }
 
-func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runUpdateIndexCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
+	inst := instance.CreateAndInit(ctx, srv)
+
 	logrus.Info("Executing `arduino-cli lib update-index`")
-	resp := UpdateIndex(inst)
+	resp := UpdateIndex(ctx, srv, inst)
 	feedback.PrintResult(&libUpdateIndexResult{result.NewUpdateLibrariesIndexResponse_ResultResult(resp)})
 }
 
 // UpdateIndex updates the index of libraries.
-func UpdateIndex(inst *rpc.Instance) *rpc.UpdateLibrariesIndexResponse_Result {
-	resp, err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
-		Instance: inst,
-	}, feedback.ProgressBar())
-	if err != nil {
+func UpdateIndex(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance) *rpc.UpdateLibrariesIndexResponse_Result {
+	req := &rpc.UpdateLibrariesIndexRequest{Instance: inst}
+	stream, resp := commands.UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+	if err := srv.UpdateLibrariesIndex(req, stream); err != nil {
 		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
-	return resp
+	return resp()
 }
 
 type libUpdateIndexResult struct {

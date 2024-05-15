@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initInstallCommand() *cobra.Command {
+func initInstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noOverwrite bool
 	var scriptFlags arguments.PrePostScriptsFlags
 	installCommand := &cobra.Command{
@@ -45,10 +45,10 @@ func initInstallCommand() *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "run-post-install", "skip-post-install")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(args, scriptFlags, noOverwrite)
+			runInstallCommand(cmd.Context(), srv, args, scriptFlags, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	scriptFlags.AddToCommand(installCommand)
@@ -56,11 +56,11 @@ func initInstallCommand() *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
-	inst := instance.CreateAndInit()
+func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
 	logrus.Info("Executing `arduino-cli core install`")
+	inst := instance.CreateAndInit(ctx, srv)
 
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
@@ -75,8 +75,8 @@ func runInstallCommand(args []string, scriptFlags arguments.PrePostScriptsFlags,
 			NoOverwrite:      noOverwrite,
 			SkipPreUninstall: scriptFlags.DetectSkipPreUninstallValue(),
 		}
-		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
-		if err != nil {
+		stream := commands.PlatformInstallStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		if err := srv.PlatformInstall(platformInstallRequest, stream); err != nil {
 			feedback.Fatal(tr("Error during install: %v", err), feedback.ErrGeneric)
 		}
 	}

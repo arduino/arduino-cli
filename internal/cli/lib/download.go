@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initDownloadCommand() *cobra.Command {
+func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	downloadCommand := &cobra.Command{
 		Use:   fmt.Sprintf("download [%s]...", tr("LIBRARY_NAME")),
 		Short: tr("Downloads one or more libraries without installing them."),
@@ -38,18 +38,21 @@ func initDownloadCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib download AudioZero       # " + tr("for the latest version.") + "\n" +
 			"  " + os.Args[0] + " lib download AudioZero@1.0.0 # " + tr("for a specific version."),
 		Args: cobra.MinimumNArgs(1),
-		Run:  runDownloadCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runDownloadCommand(cmd.Context(), srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand
 }
 
-func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+func runDownloadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib download`")
-	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	instance := instance.CreateAndInit(ctx, srv)
+
+	refs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
@@ -60,8 +63,8 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
-		if err != nil {
+		stream := commands.LibraryDownloadStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+		if err := srv.LibraryDownload(libraryDownloadRequest, stream); err != nil {
 			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", library, err), feedback.ErrNetwork)
 		}
 	}

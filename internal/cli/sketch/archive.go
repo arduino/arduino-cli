@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -29,7 +28,7 @@ import (
 )
 
 // initArchiveCommand creates a new `archive` command
-func initArchiveCommand() *cobra.Command {
+func initArchiveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var includeBuildDir, overwrite bool
 
 	archiveCommand := &cobra.Command{
@@ -43,7 +42,9 @@ func initArchiveCommand() *cobra.Command {
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch\n" +
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch /home/user/MySketchArchive.zip",
 		Args: cobra.MaximumNArgs(2),
-		Run:  func(cmd *cobra.Command, args []string) { runArchiveCommand(args, includeBuildDir, overwrite) },
+		Run: func(cmd *cobra.Command, args []string) {
+			runArchiveCommand(cmd.Context(), srv, args, includeBuildDir, overwrite)
+		},
 	}
 
 	archiveCommand.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
@@ -52,9 +53,8 @@ func initArchiveCommand() *cobra.Command {
 	return archiveCommand
 }
 
-func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
+func runArchiveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, includeBuildDir bool, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch archive`")
-
 	sketchPathArg := ""
 	if len(args) > 0 {
 		sketchPathArg = args[0]
@@ -66,13 +66,14 @@ func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 	}
 
 	sketchPath := arguments.InitSketchPath(sketchPathArg)
-	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	sk := resp.GetSketch()
 	feedback.WarnAboutDeprecatedFiles(sk)
 
-	if _, err := sketch.ArchiveSketch(context.Background(),
+	if _, err := srv.ArchiveSketch(ctx,
 		&rpc.ArchiveSketchRequest{
 			SketchPath:      sketchPath.String(),
 			ArchivePath:     archivePathArg,

@@ -19,51 +19,149 @@ package cc.arduino.cli.commands.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
-message SettingsGetAllResponse {
-  // The settings, in JSON format.
-  string json_data = 1;
+// Configuration to apply to the given instance.
+// Any missing field will be kept at the default value.
+message Configuration {
+  message Directories {
+    message Builtin {
+      // The directory where the built-in libraries are installed
+      optional string libraries = 1;
+    }
+    // Data directory
+    string data = 1;
+    // User directory
+    string user = 2;
+    // Downloads directory
+    string downloads = 3;
+    // The directory where the built-in resources are installed
+    optional Builtin builtin = 4;
+  };
+  message Network {
+    // Extra user-agent information to be appended in network requests
+    optional string extra_user_agent = 1;
+    // The proxy to use for network requests
+    optional string proxy = 2;
+  };
+  message Sketch {
+    // Set to true to always export binaries to the sketch directory
+    bool always_export_binaries = 1;
+  }
+  message BuildCache {
+    // The minimum number of compilations before the cache is purged
+    uint64 compilations_before_purge = 1;
+    // Time to live of the cache in seconds
+    uint64 ttl_secs = 2;
+  }
+  message BoardManager {
+    // Additional URLs to be used for the board manager
+    repeated string additional_urls = 1;
+  }
+  message Daemon {
+    // The TCP port of the daemon
+    string port = 1;
+  }
+  message Output {
+    // Set to true to disable coloring of the output
+    bool no_color = 1;
+  }
+  message Logging {
+    // The logging level
+    string level = 1;
+    // The logging format
+    string format = 2;
+    // The logging file
+    optional string file = 3;
+  }
+  message Library {
+    // Set to true to enable library installation from zip archives or git
+    // repositories
+    bool enable_unsafe_install = 1;
+  }
+  message Updater {
+    // Set to true to enable notifications for updates
+    bool enable_notification = 1;
+  }
+
+  Directories directories = 1;
+  Network network = 2;
+  Sketch sketch = 3;
+  BuildCache build_cache = 4;
+  BoardManager board_manager = 5;
+  Daemon daemon = 6;
+  Output output = 7;
+  Logging logging = 8;
+  Library library = 9;
+  Updater updater = 10;
+
+  optional string locale = 100;
 }
 
-message SettingsMergeRequest {
-  // The settings, in JSON format.
-  string json_data = 1;
+message ConfigurationGetRequest {}
+
+message ConfigurationGetResponse {
+  // The current configuration
+  Configuration configuration = 1;
+}
+
+message ConfigurationSaveRequest {
+  // The format of the encoded settings, allowed values are "json" and "yaml"
+  string settings_format = 1;
+}
+
+message ConfigurationSaveResponse {
+  // The encoded settings
+  string encoded_settings = 1;
+}
+
+message ConfigurationOpenRequest {
+  // The encoded settings
+  string encoded_settings = 1;
+  // The format of the encoded settings, allowed values are "json" and "yaml"
+  string settings_format = 2;
+}
+
+message ConfigurationOpenResponse {
+  // Warnings that occurred while opening the configuration (e.g. unknown keys,
+  // or invalid values)
+  repeated string warnings = 1;
+}
+
+message SettingsGetValueRequest {
+  // The key to get
+  string key = 1;
+  // The format of the encoded_value (default is "json", allowed values are
+  // "json" and "yaml)
+  string value_format = 2;
 }
 
 message SettingsGetValueResponse {
-  // The key of the setting.
-  string key = 1;
-  // The setting, in JSON format.
-  string json_data = 2;
+  // The value of the key (encoded)
+  string encoded_value = 1;
 }
 
 message SettingsSetValueRequest {
-  // The key of the setting.
+  // The key to change
   string key = 1;
-  // The setting, in JSON format.
-  string json_data = 2;
+  // The new value (encoded), no objects, only scalar or array of scalars are
+  // allowed.
+  string encoded_value = 2;
+  // The format of the encoded_value (default is "json", allowed values are
+  // "json", "yaml" and "cli")
+  string value_format = 3;
 }
-
-message SettingsGetAllRequest {}
-
-message SettingsGetValueRequest {
-  // The key of the setting.
-  string key = 1;
-}
-
-message SettingsMergeResponse {}
 
 message SettingsSetValueResponse {}
 
-message SettingsWriteRequest {
-  // Path to settings file (e.g. /path/to/arduino-cli.yaml)
-  string file_path = 1;
+message SettingsEnumerateRequest {}
+
+message SettingsEnumerateResponse {
+  message Entry {
+    // The key
+    string key = 1;
+    // The key type
+    string type = 2;
+  }
+
+  // The list of key/value pairs
+  repeated Entry entries = 1;
 }
-
-message SettingsWriteResponse {}
-
-message SettingsDeleteRequest {
-  // The key of the setting to delete.
-  string key = 1;
-}
-
-message SettingsDeleteResponse {}

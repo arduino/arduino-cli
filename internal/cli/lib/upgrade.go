@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpgradeCommand() *cobra.Command {
+func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	upgradeCommand := &cobra.Command{
 		Use:   "upgrade",
 		Short: tr("Upgrades installed libraries."),
@@ -37,31 +37,34 @@ func initUpgradeCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib upgrade Audio\n" +
 			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
 		Args: cobra.ArbitraryArgs,
-		Run:  runUpgradeCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpgradeCommand(cmd.Context(), srv, args)
+		},
 	}
 	return upgradeCommand
 }
 
-func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli lib upgrade`")
-	Upgrade(instance, args)
+	instance := instance.CreateAndInit(ctx, srv)
+	Upgrade(ctx, srv, instance, args)
 }
 
 // Upgrade upgrades the specified libraries
-func Upgrade(instance *rpc.Instance, libraries []string) {
+func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, libraries []string) {
 	var upgradeErr error
 	if len(libraries) == 0 {
 		req := &rpc.LibraryUpgradeAllRequest{Instance: instance}
-		upgradeErr = lib.LibraryUpgradeAll(req, feedback.ProgressBar(), feedback.TaskProgress())
+		stream := commands.LibraryUpgradeAllStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		upgradeErr = srv.LibraryUpgradeAll(req, stream)
 	} else {
 		for _, libName := range libraries {
 			req := &rpc.LibraryUpgradeRequest{
 				Instance: instance,
 				Name:     libName,
 			}
-			upgradeErr = lib.LibraryUpgrade(context.Background(), req, feedback.ProgressBar(), feedback.TaskProgress())
-			if upgradeErr != nil {
+			stream := commands.LibraryUpgradeStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+			if upgradeErr = srv.LibraryUpgrade(req, stream); upgradeErr != nil {
 				break
 			}
 		}

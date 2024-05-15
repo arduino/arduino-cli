@@ -28,33 +28,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpdateIndexCommand() *cobra.Command {
+func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
 		Short:   tr("Updates the index of cores."),
 		Long:    tr("Updates the index of cores to the latest version."),
 		Example: "  " + os.Args[0] + " core update-index",
 		Args:    cobra.NoArgs,
-		Run:     runUpdateIndexCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpdateIndexCommand(cmd.Context(), srv)
+		},
 	}
 	return updateIndexCommand
 }
 
-func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+func runUpdateIndexCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli core update-index`")
-	resp := UpdateIndex(inst)
+	inst := instance.CreateAndInit(ctx, srv)
+	resp := UpdateIndex(ctx, srv, inst)
 
 	feedback.PrintResult(&updateIndexResult{result.NewUpdateIndexResponse_ResultResult(resp)})
 }
 
 // UpdateIndex updates the index of platforms.
-func UpdateIndex(inst *rpc.Instance) *rpc.UpdateIndexResponse_Result {
-	res, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
+func UpdateIndex(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance) *rpc.UpdateIndexResponse_Result {
+	stream, res := commands.UpdateIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+	err := srv.UpdateIndex(&rpc.UpdateIndexRequest{Instance: inst}, stream)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
-	return res
+	return res()
 }
 
 type updateIndexResult struct {

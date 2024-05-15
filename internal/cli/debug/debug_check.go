@@ -19,7 +19,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/debug"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newDebugCheckCommand() *cobra.Command {
+func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
 		fqbnArg     arguments.Fqbn
 		portArgs    arguments.Port
@@ -41,31 +41,31 @@ func newDebugCheckCommand() *cobra.Command {
 		Short:   tr("Check if the given board/programmer combination supports debugging."),
 		Example: "  " + os.Args[0] + " debug check -b arduino:samd:mkr1000 -P atmel_ice",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCheckCommand(&portArgs, &fqbnArg, interpreter, &programmer)
+			runDebugCheckCommand(cmd.Context(), srv, &portArgs, &fqbnArg, interpreter, &programmer)
 		},
 	}
-	fqbnArg.AddToCommand(debugCheckCommand)
-	portArgs.AddToCommand(debugCheckCommand)
-	programmer.AddToCommand(debugCheckCommand)
+	fqbnArg.AddToCommand(debugCheckCommand, srv)
+	portArgs.AddToCommand(debugCheckCommand, srv)
+	programmer.AddToCommand(debugCheckCommand, srv)
 	debugCheckCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	return debugCheckCommand
 }
 
-func runDebugCheckCommand(portArgs *arguments.Port, fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer) {
-	instance := instance.CreateAndInit()
+func runDebugCheckCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, portArgs *arguments.Port, fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer) {
+	instance := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli debug`")
 
-	port, err := portArgs.GetPort(instance, "", "")
+	port, err := portArgs.GetPort(ctx, instance, srv, "", "")
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrBadArgument)
 	}
 	fqbn := fqbnArg.String()
-	resp, err := debug.IsDebugSupported(context.Background(), &rpc.IsDebugSupportedRequest{
+	resp, err := commands.IsDebugSupported(ctx, &rpc.IsDebugSupportedRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		Port:        port,
 		Interpreter: interpreter,
-		Programmer:  programmerArg.String(instance, fqbn),
+		Programmer:  programmerArg.String(ctx, instance, srv, fqbn),
 	})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)

@@ -16,16 +16,18 @@
 package config
 
 import (
+	"context"
+	"encoding/json"
 	"os"
-	"reflect"
+	"slices"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func initRemoveCommand() *cobra.Command {
+func initRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	removeCommand := &cobra.Command{
 		Use:   "remove",
 		Short: tr("Removes one or more values from a setting."),
@@ -34,38 +36,43 @@ func initRemoveCommand() *cobra.Command {
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
 		Args: cobra.MinimumNArgs(2),
-		Run:  runRemoveCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+			runRemoveCommand(ctx, srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			return getAllArraySettingsKeys(ctx, srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return removeCommand
 }
 
-func runRemoveCommand(cmd *cobra.Command, args []string) {
+func runRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config remove`")
 	key := args[0]
-	kind := validateKey(key)
 
-	if kind != reflect.Slice {
+	if !slices.Contains(getAllArraySettingsKeys(ctx, srv), key) {
 		msg := tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?", key, "config delete")
 		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
-	mappedValues := map[string]bool{}
-	for _, v := range configuration.Settings.GetStringSlice(key) {
-		mappedValues[v] = true
+	var currentValues []string
+	if resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: key}); err != nil {
+		feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+	} else if err := json.Unmarshal([]byte(resp.GetEncodedValue()), &currentValues); err != nil {
+		feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	}
-	for _, arg := range args[1:] {
-		delete(mappedValues, arg)
-	}
-	values := []string{}
-	for k := range mappedValues {
-		values = append(values, k)
-	}
-	configuration.Settings.Set(key, values)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
+	for _, arg := range args[1:] {
+		currentValues = slices.DeleteFunc(currentValues, func(in string) bool { return in == arg })
 	}
+
+	if newValuesJSON, err := json.Marshal(currentValues); err != nil {
+		feedback.Fatal(tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+	} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: string(newValuesJSON)}); err != nil {
+		feedback.Fatal(tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+	}
+
+	saveConfiguration(ctx, srv)
 }

@@ -19,13 +19,14 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
 var tr = i18n.Tr
 
 // NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	boardCommand := &cobra.Command{
 		Use:   "board",
 		Short: tr("Arduino board commands."),
@@ -34,11 +35,11 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " board list",
 	}
 
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
-	boardCommand.AddCommand(initSearchCommand())
+	boardCommand.AddCommand(initAttachCommand(srv))
+	boardCommand.AddCommand(initDetailsCommand(srv))
+	boardCommand.AddCommand(initListCommand(srv))
+	boardCommand.AddCommand(initListAllCommand(srv))
+	boardCommand.AddCommand(initSearchCommand(srv))
 
 	return boardCommand
 }

@@ -22,7 +22,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -32,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initListCommand() *cobra.Command {
+func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var all bool
 	var updatable bool
 	listCommand := &cobra.Command{
@@ -46,20 +45,21 @@ not listed, they can be listed by adding the --all flag.`),
 		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			instance := instance.CreateAndInit()
+			ctx := cmd.Context()
+			instance := instance.CreateAndInit(ctx, srv)
 			logrus.Info("Executing `arduino-cli lib list`")
-			List(instance, args, all, updatable)
+			List(ctx, srv, instance, args, all, updatable)
 		},
 	}
 	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
-	fqbn.AddToCommand(listCommand)
+	fqbn.AddToCommand(listCommand, srv)
 	listCommand.Flags().BoolVar(&updatable, "updatable", false, tr("List updatable libraries."))
 	return listCommand
 }
 
 // List gets and prints a list of installed libraries.
-func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
-	installedLibs := GetList(instance, args, all, updatable)
+func List(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, args []string, all bool, updatable bool) {
+	installedLibs := GetList(ctx, srv, instance, args, all, updatable)
 
 	installedLibsResult := make([]*result.InstalledLibrary, len(installedLibs))
 	for i, v := range installedLibs {
@@ -73,18 +73,13 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 }
 
 // GetList returns a list of installed libraries.
-func GetList(
-	instance *rpc.Instance,
-	args []string,
-	all bool,
-	updatable bool,
-) []*rpc.InstalledLibrary {
+func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, args []string, all bool, updatable bool) []*rpc.InstalledLibrary {
 	name := ""
 	if len(args) > 0 {
 		name = args[0]
 	}
 
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
+	res, err := srv.LibraryList(ctx, &rpc.LibraryListRequest{
 		Instance:  instance,
 		All:       all,
 		Updatable: updatable,

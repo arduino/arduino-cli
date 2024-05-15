@@ -19,29 +19,30 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/cache"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func initCleanCommand() *cobra.Command {
+func initCleanCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cleanCommand := &cobra.Command{
 		Use:     "clean",
 		Short:   tr("Delete Boards/Library Manager download cache."),
-		Long:    tr("Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms."),
+		Long:    tr("Delete contents of the downloads cache folder, where archive files are staged during installation of libraries and boards platforms."),
 		Example: "  " + os.Args[0] + " cache clean",
 		Args:    cobra.NoArgs,
-		Run:     runCleanCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runCleanCommand(cmd.Context(), srv)
+		},
 	}
 	return cleanCommand
 }
 
-func runCleanCommand(cmd *cobra.Command, args []string) {
+func runCleanCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli cache clean`")
 
-	_, err := cache.CleanDownloadCacheDirectory(context.Background(), &rpc.CleanDownloadCacheDirectoryRequest{})
+	_, err := srv.CleanDownloadCacheDirectory(ctx, &rpc.CleanDownloadCacheDirectoryRequest{})
 	if err != nil {
 		feedback.Fatal(tr("Error cleaning caches: %v", err), feedback.ErrGeneric)
 	}

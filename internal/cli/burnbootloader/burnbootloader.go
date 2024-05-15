@@ -20,8 +20,8 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -42,19 +42,21 @@ var (
 )
 
 // NewCommand created a new `burn-bootloader` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	burnBootloaderCommand := &cobra.Command{
 		Use:     "burn-bootloader",
 		Short:   tr("Upload the bootloader."),
 		Long:    tr("Upload the bootloader on the board using an external programmer."),
 		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     runBootloaderCommand,
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			runBootloaderCommand(cmd.Context(), srv)
+		},
 	}
 
-	fqbn.AddToCommand(burnBootloaderCommand)
-	port.AddToCommand(burnBootloaderCommand)
-	programmer.AddToCommand(burnBootloaderCommand)
+	fqbn.AddToCommand(burnBootloaderCommand, srv)
+	port.AddToCommand(burnBootloaderCommand, srv)
+	programmer.AddToCommand(burnBootloaderCommand, srv)
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
 	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
@@ -63,27 +65,28 @@ func NewCommand() *cobra.Command {
 	return burnBootloaderCommand
 }
 
-func runBootloaderCommand(command *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+func runBootloaderCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
+	instance := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli burn-bootloader`")
 
 	// We don't need a Sketch to upload a board's bootloader
-	discoveryPort, err := port.GetPort(instance, "", "")
+	discoveryPort, err := port.GetPort(ctx, instance, srv, "", "")
 	if err != nil {
 		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 
 	stdOut, stdErr, res := feedback.OutputStreams()
-	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
+	stream := commands.BurnBootloaderToServerStreams(ctx, stdOut, stdErr)
+	if err := srv.BurnBootloader(&rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn.String(),
 		Port:       discoveryPort,
 		Verbose:    verbose,
 		Verify:     verify,
-		Programmer: programmer.String(instance, fqbn.String()),
+		Programmer: programmer.String(ctx, instance, srv, fqbn.String()),
 		DryRun:     dryRun,
-	}, stdOut, stdErr); err != nil {
+	}, stream); err != nil {
 		errcode := feedback.ErrGeneric
 		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 			errcode = feedback.ErrMissingProgrammer

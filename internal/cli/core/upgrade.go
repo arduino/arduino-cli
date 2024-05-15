@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initUpgradeCommand() *cobra.Command {
+func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
 		Use:   fmt.Sprintf("upgrade [%s:%s] ...", tr("PACKAGER"), tr("ARCH")),
@@ -43,24 +43,24 @@ func initUpgradeCommand() *cobra.Command {
 			"  # " + tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
+			runUpgradeCommand(cmd.Context(), srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(args []string, skipPostInstall bool, skipPreUninstall bool) {
-	inst := instance.CreateAndInit()
+func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	logrus.Info("Executing `arduino-cli core upgrade`")
-	Upgrade(inst, args, skipPostInstall, skipPreUninstall)
+	inst := instance.CreateAndInit(ctx, srv)
+	Upgrade(ctx, srv, inst, args, skipPostInstall, skipPreUninstall)
 }
 
 // Upgrade upgrades one or all installed platforms to the latest version.
-func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
+func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		platforms, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 			Instance: inst,
 		})
 		if err != nil {
@@ -92,17 +92,17 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 		}
 	}
 
-	warningMissingIndex := func(response *rpc.PlatformUpgradeResponse) {
-		if response == nil || response.GetPlatform() == nil {
+	warningMissingIndex := func(platform *rpc.Platform) {
+		if platform == nil {
 			return
 		}
-		if !response.GetPlatform().GetMetadata().GetIndexed() {
-			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.GetPlatform().GetMetadata().GetId()))
+		if !platform.GetMetadata().GetIndexed() {
+			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", platform.GetMetadata().GetId()))
 		}
 	}
 
 	// proceed upgrading, if anything is upgradable
-	platformsRefs, err := arguments.ParseReferences(args)
+	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
@@ -122,8 +122,9 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 			SkipPostInstall:  skipPostInstall,
 			SkipPreUninstall: skipPreUninstall,
 		}
-		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
-		warningMissingIndex(response)
+		stream, respCB := commands.PlatformUpgradeStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
+		err := srv.PlatformUpgrade(r, stream)
+		warningMissingIndex(respCB())
 		if err != nil {
 			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError
 			if errors.As(err, &alreadyAtLatestVersionErr) {

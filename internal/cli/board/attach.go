@@ -20,14 +20,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
-func initAttachCommand() *cobra.Command {
+func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var port arguments.Port
 	var fqbn arguments.Fqbn
 	var programmer arguments.Programmer
@@ -41,25 +40,26 @@ func initAttachCommand() *cobra.Command {
 			"  " + os.Args[0] + " board attach -P atmel_ice",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
 			sketchPath := ""
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runAttachCommand(sketchPath, &port, fqbn.String(), &programmer)
+			runAttachCommand(ctx, srv, sketchPath, &port, fqbn.String(), &programmer)
 		},
 	}
-	fqbn.AddToCommand(attachCommand)
-	port.AddToCommand(attachCommand)
-	programmer.AddToCommand(attachCommand)
+	fqbn.AddToCommand(attachCommand, srv)
+	port.AddToCommand(attachCommand, srv)
+	programmer.AddToCommand(attachCommand, srv)
 
 	return attachCommand
 }
 
-func runAttachCommand(path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
+func runAttachCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
 	sketchPath := arguments.InitSketchPath(path)
 
-	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, "", "")
-	newDefaults, err := sketch.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
+	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(ctx, nil, srv, "", "")
+	newDefaults, err := srv.SetSketchDefaults(ctx, &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,
 		DefaultProgrammer:   programmer.GetProgrammer(),

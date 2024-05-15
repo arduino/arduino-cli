@@ -651,7 +651,7 @@ func TestCLIStartupWithCorruptedInventory(t *testing.T) {
 	require.NoError(t, f.Close())
 
 	// the CLI should not be able to load inventory and report it to the logs
-	_, stderr, err := cli.Run("core", "update-index", "-v")
+	stdout, _, err := cli.Run("core", "update-index", "-v")
 	require.NoError(t, err)
-	require.Contains(t, string(stderr), "Error loading inventory store")
+	require.Contains(t, string(stdout), "Error loading inventory store")
 }

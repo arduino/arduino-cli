@@ -16,35 +16,18 @@
 package config
 
 import (
+	"context"
+	"encoding/json"
 	"os"
-	"reflect"
+	"slices"
 
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func uniquify[T comparable](s []T) []T {
-	// use a map, which enforces unique keys
-	inResult := make(map[T]bool)
-	var result []T
-	// loop through input slice **in order**,
-	// to ensure output retains that order
-	// (except that it removes duplicates)
-	for i := 0; i < len(s); i++ {
-		// attempt to use the element as a key
-		if _, ok := inResult[s[i]]; !ok {
-			// if key didn't exist in map,
-			// add to map and append to result
-			inResult[s[i]] = true
-			result = append(result, s[i])
-		}
-	}
-	return result
-}
-
-func initAddCommand() *cobra.Command {
+func initAddCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "add",
 		Short: tr("Adds one or more values to a setting."),
@@ -53,30 +36,45 @@ func initAddCommand() *cobra.Command {
 			"  " + os.Args[0] + " config add board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config add board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
 		Args: cobra.MinimumNArgs(2),
-		Run:  runAddCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+			runAddCommand(ctx, srv, args)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			return getAllArraySettingsKeys(ctx, srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return addCommand
 }
 
-func runAddCommand(cmd *cobra.Command, args []string) {
+func runAddCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string) {
 	logrus.Info("Executing `arduino-cli config add`")
 	key := args[0]
-	kind := validateKey(key)
 
-	if kind != reflect.Slice {
+	if !slices.Contains(getAllArraySettingsKeys(ctx, srv), key) {
 		msg := tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?", key, "config set")
 		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
-	v := configuration.Settings.GetStringSlice(key)
-	v = append(v, args[1:]...)
-	v = uniquify(v)
-	configuration.Settings.Set(key, v)
-
-	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
+	var currentValues []string
+	if resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: key}); err != nil {
+		feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+	} else if err := json.Unmarshal([]byte(resp.GetEncodedValue()), &currentValues); err != nil {
+		feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	}
+
+	for _, arg := range args[1:] {
+		if !slices.Contains(currentValues, arg) {
+			currentValues = append(currentValues, arg)
+		}
+	}
+
+	if newValuesJSON, err := json.Marshal(currentValues); err != nil {
+		feedback.Fatal(tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+	} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: string(newValuesJSON)}); err != nil {
+		feedback.Fatal(tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+	}
+
+	saveConfiguration(ctx, srv)
 }

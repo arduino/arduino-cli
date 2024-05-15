@@ -16,9 +16,9 @@
 package core
 
 import (
+	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initListCommand() *cobra.Command {
+func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var updatableOnly bool
 	var all bool
 	listCommand := &cobra.Command{
@@ -38,7 +38,7 @@ func initListCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " core list",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(args, all, updatableOnly)
+			runListCommand(cmd.Context(), srv, all, updatableOnly)
 		},
 	}
 	listCommand.Flags().BoolVar(&updatableOnly, "updatable", false, tr("List updatable platforms."))
@@ -46,21 +46,21 @@ func initListCommand() *cobra.Command {
 	return listCommand
 }
 
-func runListCommand(args []string, all bool, updatableOnly bool) {
-	inst := instance.CreateAndInit()
+func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, all bool, updatableOnly bool) {
+	inst := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli core list`")
-	List(inst, all, updatableOnly)
+	List(ctx, srv, inst, all, updatableOnly)
 }
 
 // List gets and prints a list of installed platforms.
-func List(inst *rpc.Instance, all bool, updatableOnly bool) {
-	platforms := GetList(inst, all, updatableOnly)
+func List(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, all bool, updatableOnly bool) {
+	platforms := GetList(ctx, srv, inst, all, updatableOnly)
 	feedback.PrintResult(newCoreListResult(platforms, updatableOnly))
 }
 
 // GetList returns a list of installed platforms.
-func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
-	platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
+	platforms, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:          inst,
 		ManuallyInstalled: true,
 	})

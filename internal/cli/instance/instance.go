@@ -16,6 +16,8 @@
 package instance
 
 import (
+	"context"
+
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -29,26 +31,26 @@ var tr = i18n.Tr
 // If Create fails the CLI prints an error and exits since
 // to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
-func CreateAndInit() *rpc.Instance {
-	inst, _ := CreateAndInitWithProfile("", nil)
+func CreateAndInit(ctx context.Context, srv rpc.ArduinoCoreServiceServer) *rpc.Instance {
+	inst, _ := CreateAndInitWithProfile(ctx, srv, "", nil)
 	return inst
 }
 
 // CreateAndInitWithProfile returns a new initialized instance using the given profile of the given sketch.
 // If Create fails the CLI prints an error and exits since to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
-func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.SketchProfile) {
-	instance, err := create()
+func CreateAndInitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.SketchProfile) {
+	instance, err := create(ctx, srv)
 	if err != nil {
 		feedback.Fatal(tr("Error creating instance: %v", err), feedback.ErrGeneric)
 	}
-	profile := InitWithProfile(instance, profileName, sketchPath)
+	profile := InitWithProfile(ctx, srv, instance, profileName, sketchPath)
 	return instance, profile
 }
 
 // create and return a new Instance.
-func create() (*rpc.Instance, error) {
-	res, err := commands.Create(&rpc.CreateRequest{})
+func create(ctx context.Context, srv rpc.ArduinoCoreServiceServer) (*rpc.Instance, error) {
+	res, err := srv.Create(ctx, &rpc.CreateRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -60,14 +62,14 @@ func create() (*rpc.Instance, error) {
 // platform or library that we failed to load.
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
-func Init(instance *rpc.Instance) {
-	InitWithProfile(instance, "", nil)
+func Init(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance) {
+	InitWithProfile(ctx, srv, instance, "", nil)
 }
 
 // InitWithProfile initializes instance by loading libraries and platforms specified in the given profile of the given sketch.
 // In case of loading failures return a list of errors for each platform or library that we failed to load.
 // Required Package and library indexes files are automatically downloaded.
-func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.SketchProfile {
+func InitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.SketchProfile {
 	downloadCallback := feedback.ProgressBar()
 	taskCallback := feedback.TaskProgress()
 
@@ -77,7 +79,7 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		initReq.Profile = profileName
 	}
 	var profile *rpc.SketchProfile
-	err := commands.Init(initReq, func(res *rpc.InitResponse) {
+	err := srv.Init(initReq, commands.InitStreamResponseToCallbackFunction(ctx, func(res *rpc.InitResponse) error {
 		if st := res.GetError(); st != nil {
 			feedback.Warning(tr("Error initializing instance: %v", st.GetMessage()))
 		}
@@ -94,7 +96,8 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		if p := res.GetProfile(); p != nil {
 			profile = p
 		}
-	})
+		return nil
+	}))
 	if err != nil {
 		feedback.Warning(tr("Error initializing instance: %v", err))
 	}

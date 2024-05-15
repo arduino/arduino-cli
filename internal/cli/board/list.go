@@ -22,7 +22,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -35,7 +35,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initListCommand() *cobra.Command {
+func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var timeoutArg arguments.DiscoveryTimeout
 	var watch bool
 	var fqbn arguments.Fqbn
@@ -46,32 +46,34 @@ func initListCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " board list --discovery-timeout 10s",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(watch, timeoutArg.Get().Milliseconds(), fqbn.String())
+			runListCommand(cmd.Context(), srv, watch, timeoutArg.Get().Milliseconds(), fqbn.String())
 		},
 	}
 
 	timeoutArg.AddToCommand(listCommand)
-	fqbn.AddToCommand(listCommand)
+	fqbn.AddToCommand(listCommand, srv)
 	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
 	return listCommand
 }
 
 // runListCommand detects and lists the connected arduino boards
-func runListCommand(watch bool, timeout int64, fqbn string) {
-	inst := instance.CreateAndInit()
+func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, watch bool, timeout int64, fqbn string) {
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli board list`")
 
 	if watch {
-		watchList(inst)
+		watchList(ctx, inst, srv)
 		return
 	}
 
-	ports, discoveryErrors, err := board.List(&rpc.BoardListRequest{
+	list, err := srv.BoardList(ctx, &rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeout,
 		Fqbn:     fqbn,
 	})
+	ports := list.GetPorts()
+	discoveryErrors := list.GetWarnings()
 	var invalidFQBNErr *cmderrors.InvalidFQBNError
 	if errors.As(err, &invalidFQBNErr) {
 		feedback.Fatal(tr(err.Error()), feedback.ErrBadArgument)
@@ -86,8 +88,9 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 	feedback.PrintResult(listResult{result.NewDetectedPorts(ports)})
 }
 
-func watchList(inst *rpc.Instance) {
-	eventsChan, err := board.Watch(context.Background(), &rpc.BoardListWatchRequest{Instance: inst})
+func watchList(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) {
+	stream, eventsChan := commands.BoardListWatchProxyToChan(ctx)
+	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: inst}, stream)
 	if err != nil {
 		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
 	}

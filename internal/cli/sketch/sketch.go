@@ -19,13 +19,14 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
 var tr = i18n.Tr
 
 // NewCommand created a new `sketch` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	sketchCommand := &cobra.Command{
 		Use:     "sketch",
 		Short:   tr("Arduino CLI sketch commands."),
@@ -33,8 +34,8 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " sketch new MySketch",
 	}
 
-	sketchCommand.AddCommand(initNewCommand())
-	sketchCommand.AddCommand(initArchiveCommand())
+	sketchCommand.AddCommand(initNewCommand(srv))
+	sketchCommand.AddCommand(initArchiveCommand(srv))
 
 	return sketchCommand
 }

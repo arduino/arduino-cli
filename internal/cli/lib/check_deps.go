@@ -21,7 +21,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -32,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initDepsCommand() *cobra.Command {
+func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noOverwrite bool
 	depsCommand := &cobra.Command{
 		Use:   fmt.Sprintf("deps %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
@@ -43,25 +42,26 @@ func initDepsCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDepsCommand(args, noOverwrite)
+			runDepsCommand(cmd.Context(), srv, args, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstalledLibraries(), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstalledLibraries(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not try to update library dependencies if already installed."))
 	return depsCommand
 }
 
-func runDepsCommand(args []string, noOverwrite bool) {
-	instance := instance.CreateAndInit()
+func runDepsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, noOverwrite bool) {
+	instance := instance.CreateAndInit(ctx, srv)
+
 	logrus.Info("Executing `arduino-cli lib deps`")
-	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
+	libRef, err := ParseLibraryReferenceArgAndAdjustCase(ctx, srv, instance, args[0])
 	if err != nil {
 		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
 
-	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
+	deps, err := srv.LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesRequest{
 		Instance:                      instance,
 		Name:                          libRef.Name,
 		Version:                       libRef.Version,

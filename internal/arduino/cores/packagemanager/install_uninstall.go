@@ -92,11 +92,11 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 	// Package download
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading packages")})
 	for _, tool := range toolsToInstall {
-		if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+		if err := pme.DownloadToolRelease(tool, downloadCB); err != nil {
 			return err
 		}
 	}
-	if err := pme.DownloadPlatformRelease(platformRelease, nil, downloadCB); err != nil {
+	if err := pme.DownloadPlatformRelease(platformRelease, downloadCB); err != nil {
 		return err
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})

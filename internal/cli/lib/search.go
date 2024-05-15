@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -32,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initSearchCommand() *cobra.Command {
+func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var namesOnly bool
 	var omitReleasesDetails bool
 	searchCommand := &cobra.Command{
@@ -91,7 +90,7 @@ In addition to the fields listed above, QV terms can use these qualifiers:
 			"  " + os.Args[0] + " lib search dependencies=IRremote               # " + tr("libraries that depend only on \"IRremote\"") + "\n",
 		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runSearchCommand(args, namesOnly, omitReleasesDetails)
+			runSearchCommand(cmd.Context(), srv, args, namesOnly, omitReleasesDetails)
 		},
 	}
 	searchCommand.Flags().BoolVar(&namesOnly, "names", false, tr("Show library names only."))
@@ -102,24 +101,22 @@ In addition to the fields listed above, QV terms can use these qualifiers:
 // indexUpdateInterval specifies the time threshold over which indexes are updated
 const indexUpdateInterval = 60 * time.Minute
 
-func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
-	inst := instance.CreateAndInit()
+func runSearchCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, namesOnly bool, omitReleasesDetails bool) {
+	inst := instance.CreateAndInit(ctx, srv)
 
 	logrus.Info("Executing `arduino-cli lib search`")
 
-	res, err := commands.UpdateLibrariesIndex(
-		context.Background(),
-		&rpc.UpdateLibrariesIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())},
-		feedback.ProgressBar(),
-	)
-	if err != nil {
+	stream, res := commands.UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
+	req := &rpc.UpdateLibrariesIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())}
+	if err := srv.UpdateLibrariesIndex(req, stream); err != nil {
 		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
-	if res.GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
-		instance.Init(inst)
+	if res().GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
+		instance.Init(ctx, srv, inst)
 	}
 
-	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+	// Perform library search
+	searchResp, err := srv.LibrarySearch(ctx, &rpc.LibrarySearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		OmitReleasesDetails: omitReleasesDetails,

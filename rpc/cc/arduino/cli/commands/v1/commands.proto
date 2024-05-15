@@ -197,25 +197,28 @@ service ArduinoCoreService {
   rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest)
       returns (CleanDownloadCacheDirectoryResponse);
 
-  // List all the settings.
-  rpc SettingsGetAll(SettingsGetAllRequest) returns (SettingsGetAllResponse);
+  // Writes the settings currently stored in memory in a YAML file
+  rpc ConfigurationSave(ConfigurationSaveRequest)
+      returns (ConfigurationSaveResponse);
 
-  // Set multiple settings values at once.
-  rpc SettingsMerge(SettingsMergeRequest) returns (SettingsMergeResponse);
+  // Read the settings from a YAML file
+  rpc ConfigurationOpen(ConfigurationOpenRequest)
+      returns (ConfigurationOpenResponse);
 
-  // Get the value of a specific setting.
+  rpc ConfigurationGet(ConfigurationGetRequest)
+      returns (ConfigurationGetResponse);
+
+  // Enumerate all the keys/values pairs available in the configuration
+  rpc SettingsEnumerate(SettingsEnumerateRequest)
+      returns (SettingsEnumerateResponse);
+
+  // Get a single configuration value
   rpc SettingsGetValue(SettingsGetValueRequest)
       returns (SettingsGetValueResponse);
 
-  // Set the value of a specific setting.
+  // Set a single configuration value
   rpc SettingsSetValue(SettingsSetValueRequest)
       returns (SettingsSetValueResponse);
-
-  // Writes to file settings currently stored in memory
-  rpc SettingsWrite(SettingsWriteRequest) returns (SettingsWriteResponse);
-
-  // Deletes an entry and rewrites the file settings
-  rpc SettingsDelete(SettingsDeleteRequest) returns (SettingsDeleteResponse);
 }
 
 message CreateRequest {}

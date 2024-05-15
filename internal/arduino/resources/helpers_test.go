@@ -22,11 +22,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
+	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v2"
 )
 
 type EchoHandler struct{}
@@ -37,8 +36,7 @@ func (h *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
-	goldUserAgentValue := "arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111"
-	goldUserAgentString := "User-Agent: " + goldUserAgentValue
+	goldUserAgentValue := "arduino-cli/0.0.0-test.preview"
 
 	tmp, err := paths.MkTempDir("", "")
 	require.NoError(t, err)
@@ -54,9 +52,11 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	httpClient := httpclient.NewWithConfig(&httpclient.Config{UserAgent: goldUserAgentValue})
-
-	err = r.Download(tmp, &downloader.Config{HttpClient: *httpClient}, "", func(progress *rpc.DownloadProgress) {}, "")
+	settings := configuration.NewSettings()
+	settings.Set("network.user_agent_ext", goldUserAgentValue)
+	config, err := settings.DownloaderConfig()
+	require.NoError(t, err)
+	err = r.Download(tmp, config, "", func(progress *rpc.DownloadProgress) {}, "")
 	require.NoError(t, err)
 
 	// leverage the download helper to download the echo for the request made by the downloader itself
@@ -71,12 +71,11 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	requestLines := strings.Split(string(b), "\r\n")
-	userAgentHeaderString := ""
+	userAgentHeader := ""
 	for _, line := range requestLines {
 		if strings.Contains(line, "User-Agent: ") {
-			userAgentHeaderString = line
+			userAgentHeader = line
 		}
 	}
-	require.Equal(t, goldUserAgentString, userAgentHeaderString)
-
+	require.Contains(t, userAgentHeader, goldUserAgentValue)
 }

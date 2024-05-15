@@ -22,9 +22,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/debug"
-	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -39,7 +38,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand created a new `upload` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
 		fqbnArg     arguments.Fqbn
 		portArgs    arguments.Port
@@ -57,15 +56,15 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCommand(args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
+			runDebugCommand(cmd.Context(), srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
 		},
 	}
 
-	debugCommand.AddCommand(newDebugCheckCommand())
-	fqbnArg.AddToCommand(debugCommand)
-	portArgs.AddToCommand(debugCommand)
-	programmer.AddToCommand(debugCommand)
-	profileArg.AddToCommand(debugCommand)
+	debugCommand.AddCommand(newDebugCheckCommand(srv))
+	fqbnArg.AddToCommand(debugCommand, srv)
+	portArgs.AddToCommand(debugCommand, srv)
+	programmer.AddToCommand(debugCommand, srv)
+	profileArg.AddToCommand(debugCommand, srv)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
@@ -73,7 +72,7 @@ func NewCommand() *cobra.Command {
 	return debugCommand
 }
 
-func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
+func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
 	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile) {
 	logrus.Info("Executing `arduino-cli debug`")
 
@@ -83,30 +82,31 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	sk := resp.GetSketch()
 	feedback.WarnAboutDeprecatedFiles(sk)
 
 	var inst *rpc.Instance
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sk.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(portArgs, fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, portArgs, fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {
-		prog = programmer.String(inst, fqbn)
+		prog = programmer.String(ctx, inst, srv, fqbn)
 	}
 	if prog == "" {
 		prog = sk.GetDefaultProgrammer()
@@ -124,7 +124,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 
 	if printInfo {
 
-		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
+		if res, err := commands.GetDebugConfig(ctx, debugConfigRequested); err != nil {
 			errcode := feedback.ErrBadArgument
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
@@ -144,7 +144,7 @@ func runDebugCommand(args []string, portArgs *arguments.Port, fqbnArg *arguments
 		if err != nil {
 			feedback.FatalError(err, feedback.ErrBadArgument)
 		}
-		if _, err := debug.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
+		if _, err := commands.Debug(ctx, debugConfigRequested, in, out, ctrlc); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer

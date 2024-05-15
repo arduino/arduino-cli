@@ -18,8 +18,7 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
@@ -31,23 +30,23 @@ type Programmer struct {
 }
 
 // AddToCommand adds the flags used to set the programmer to the specified Command
-func (p *Programmer) AddToCommand(cmd *cobra.Command) {
+func (p *Programmer) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	cmd.Flags().StringVarP(&p.programmer, "programmer", "P", "", tr("Programmer to use, e.g: atmel_ice"))
 	cmd.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
+		return GetInstalledProgrammers(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 	})
 }
 
 // String returns the programmer specified by the user, or the default programmer
 // for the given board if defined.
-func (p *Programmer) String(inst *commands.Instance, fqbn string) string {
+func (p *Programmer) String(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer, fqbn string) string {
 	if p.programmer != "" {
 		return p.programmer
 	}
 	if inst == nil || fqbn == "" {
 		return ""
 	}
-	details, err := board.Details(context.Background(), &commands.BoardDetailsRequest{
+	details, err := srv.BoardDetails(ctx, &rpc.BoardDetailsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 	})

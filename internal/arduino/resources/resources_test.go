@@ -16,6 +16,7 @@
 package resources
 
 import (
+	"context"
 	"crypto"
 	"encoding/hex"
 	"fmt"
@@ -49,7 +50,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
-		err := r.Download(tmp, &downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
+		err := r.Download(tmp, downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
 		require.NoError(t, err)
 
 		data, err := testFile.ReadFile()
@@ -63,7 +64,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	downloadAndTestChecksum()
 
 	// Download with cached file
-	err = r.Download(tmp, &downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
+	err = r.Download(tmp, downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
 	require.NoError(t, err)
 
 	// Download if cached file has data in excess (redownload)
@@ -116,6 +117,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 }
 
 func TestIndexDownloadAndSignatureWithinArchive(t *testing.T) {
+	ctx := context.Background()
 	// Spawn test webserver
 	mux := http.NewServeMux()
 	fs := http.FileServer(http.Dir("testdata"))
@@ -132,7 +134,7 @@ func TestIndexDownloadAndSignatureWithinArchive(t *testing.T) {
 	destDir, err := paths.MkTempDir("", "")
 	require.NoError(t, err)
 	defer destDir.RemoveAll()
-	err = idxResource.Download(destDir, func(curr *rpc.DownloadProgress) {})
+	err = idxResource.Download(ctx, destDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
 	require.NoError(t, err)
 	require.True(t, destDir.Join("package_index.json").Exist())
 	require.True(t, destDir.Join("package_index.json.sig").Exist())
@@ -143,7 +145,7 @@ func TestIndexDownloadAndSignatureWithinArchive(t *testing.T) {
 	invDestDir, err := paths.MkTempDir("", "")
 	require.NoError(t, err)
 	defer invDestDir.RemoveAll()
-	err = invIdxResource.Download(invDestDir, func(curr *rpc.DownloadProgress) {})
+	err = invIdxResource.Download(ctx, invDestDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid signature")
 	require.False(t, invDestDir.Join("package_index.json").Exist())

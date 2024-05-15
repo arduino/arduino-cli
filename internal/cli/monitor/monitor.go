@@ -26,8 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/commands/monitor"
-	sk "github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -44,7 +43,7 @@ import (
 var tr = i18n.Tr
 
 // NewCommand created a new `monitor` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
 		portArgs   arguments.Port
 		fqbnArg    arguments.Fqbn
@@ -67,21 +66,22 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			runMonitorCmd(&portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
+			runMonitorCmd(cmd.Context(), srv, &portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
 		},
 	}
-	portArgs.AddToCommand(monitorCommand)
-	profileArg.AddToCommand(monitorCommand)
+	portArgs.AddToCommand(monitorCommand, srv)
+	profileArg.AddToCommand(monitorCommand, srv)
 	monitorCommand.Flags().BoolVar(&raw, "raw", false, tr("Set terminal in raw mode (unbuffered)."))
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, tr("Timestamp each incoming line."))
-	fqbnArg.AddToCommand(monitorCommand)
+	fqbnArg.AddToCommand(monitorCommand, srv)
 	return monitorCommand
 }
 
 func runMonitorCmd(
+	ctx context.Context, srv rpc.ArduinoCoreServiceServer,
 	portArgs *arguments.Port, fqbnArg *arguments.Fqbn, profileArg *arguments.Profile, sketchPathArg string,
 	configs []string, describe, timestamp, quiet, raw bool,
 ) {
@@ -104,25 +104,26 @@ func runMonitorCmd(
 	// If only --port is set we read the fqbn in the following order: default_fqbn -> discovery
 	// If only --fqbn is set we read the port in the following order: default_port
 	sketchPath := arguments.InitSketchPath(sketchPathArg)
-	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && !portArgs.IsPortFlagSet() {
 		feedback.Fatal(
 			tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
 			feedback.ErrGeneric,
 		)
 	}
+	sketch := resp.GetSketch()
 	if sketch != nil {
 		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
 	}
 	if fqbnArg.String() == "" {
 		if profileArg.Get() == "" {
-			inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
+			inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sketch.GetDefaultProfile().GetName(), sketchPath)
 		} else {
-			inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+			inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
 		}
 	}
 	if inst == nil {
-		inst = instance.CreateAndInit()
+		inst = instance.CreateAndInit(ctx, srv)
 	}
 	// Priority on how to retrieve the fqbn
 	// 1. from flag
@@ -137,15 +138,15 @@ func runMonitorCmd(
 	case sketch.GetDefaultFqbn() != "":
 		fqbn = sketch.GetDefaultFqbn()
 	default:
-		fqbn, _ = portArgs.DetectFQBN(inst)
+		fqbn, _ = portArgs.DetectFQBN(ctx, inst, srv)
 	}
 
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, defaultPort, defaultProtocol)
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(ctx, inst, srv, defaultPort, defaultProtocol)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
-	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
+	enumerateResp, err := srv.EnumerateMonitorPortSettings(ctx, &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     inst,
 		PortProtocol: portProtocol,
 		Fqbn:         fqbn,
@@ -203,20 +204,6 @@ func runMonitorCmd(
 			}
 		}
 	}
-	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorPortOpenRequest{
-		Instance:          inst,
-		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
-		Fqbn:              fqbn,
-		PortConfiguration: configuration,
-	})
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
-	defer portProxy.Close()
-
-	if !quiet {
-		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", portAddress))
-	}
 
 	ttyIn, ttyOut, err := feedback.InteractiveStreams()
 	if err != nil {
@@ -227,7 +214,7 @@ func runMonitorCmd(
 		ttyOut = newTimeStampWriter(ttyOut)
 	}
 
-	ctx, cancel := cleanup.InterruptableContext(context.Background())
+	ctx, cancel := cleanup.InterruptableContext(ctx)
 	if raw {
 		if feedback.IsInteractive() {
 			if err := feedback.SetRawModeStdin(); err != nil {
@@ -245,6 +232,22 @@ func runMonitorCmd(
 		ttyIn = io.TeeReader(ttyIn, ctrlCDetector)
 	}
 
+	monitorServer, portProxy := commands.MonitorServerToReadWriteCloser(ctx, &rpc.MonitorPortOpenRequest{
+		Instance:          inst,
+		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
+		Fqbn:              fqbn,
+		PortConfiguration: configuration,
+	})
+	go func() {
+		if !quiet {
+			feedback.Print(tr("Connecting to %s. Press CTRL-C to exit.", portAddress))
+		}
+		if err := srv.Monitor(monitorServer); err != nil {
+			feedback.FatalError(err, feedback.ErrGeneric)
+		}
+		portProxy.Close()
+		cancel()
+	}()
 	go func() {
 		_, err := io.Copy(ttyOut, portProxy)
 		if err != nil && !errors.Is(err, io.EOF) {

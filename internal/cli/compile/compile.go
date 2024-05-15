@@ -16,7 +16,6 @@
 package compile
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,13 +23,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/compile"
-	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
@@ -61,7 +56,7 @@ var (
 	uploadAfterCompile      bool                     // Upload the binary after the compilation.
 	portArgs                arguments.Port           // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify                  bool                     // Upload, verify uploaded binary after the upload.
-	exportBinaries          bool                     //
+	exportBinaries          bool                     // If set built binaries will be exported to the sketch folder
 	exportDir               string                   // The compiled binary is written to this file
 	optimizeForDebug        bool                     // Optimize compile output for debug, not for release
 	programmer              arguments.Programmer     // Use the specified programmer to upload
@@ -80,7 +75,7 @@ var (
 )
 
 // NewCommand created a new `compile` command
-func NewCommand() *cobra.Command {
+func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	compileCommand := &cobra.Command{
 		Use:   "compile",
 		Short: tr("Compiles Arduino sketches."),
@@ -91,16 +86,18 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
 		Args: cobra.MaximumNArgs(1),
-		Run:  runCompileCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runCompileCommand(cmd, args, srv)
+		},
 	}
 
-	fqbnArg.AddToCommand(compileCommand)
-	profileArg.AddToCommand(compileCommand)
+	fqbnArg.AddToCommand(compileCommand, srv)
+	profileArg.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
 	showPropertiesArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
-	compileCommand.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
+	compileCommand.Flags().StringVar(&exportDir, "output-dir", "", tr("Save build artifacts in this directory."))
 	compileCommand.Flags().StringVar(&buildPath, "build-path", "",
 		tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))
 	compileCommand.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
@@ -118,31 +115,32 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
 	compileCommand.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
 	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
-	portArgs.AddToCommand(compileCommand)
+	portArgs.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	compileCommand.Flags().StringSliceVar(&library, "library", []string{},
 		tr("Path to a single library’s root folder. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		tr("Path to a collection of libraries. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
-	programmer.AddToCommand(compileCommand)
+	programmer.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
 	compileCommand.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
-	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
+	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", settings.GetSketch().GetAlwaysExportBinaries(),
+		tr("If set built binaries will be exported to the sketch folder."))
 	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	compileCommand.Flag("source-override").Hidden = true
 	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")
 	compileCommand.Flag("skip-libraries-discovery").Hidden = true
 	compileCommand.Flags().Int32VarP(&jobs, "jobs", "j", 0, tr("Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used."))
-	configuration.Settings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
 
 	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
 
 	return compileCommand
 }
 
-func runCompileCommand(cmd *cobra.Command, args []string) {
+func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli compile`")
+	ctx := cmd.Context()
 
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
@@ -159,26 +157,27 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+	sk := resp.GetSketch()
 	feedback.WarnAboutDeprecatedFiles(sk)
 
 	var inst *rpc.Instance
 	var profile *rpc.SketchProfile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sk.GetDefaultProfile().GetName(), sketchPath)
 	} else {
-		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
 	}
 
 	if fqbnArg.String() == "" {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, &portArgs, &fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
 		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
@@ -232,6 +231,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		Warnings:                      warnings,
 		Verbose:                       verbose,
 		Quiet:                         quiet,
+		ExportBinaries:                &exportBinaries,
 		ExportDir:                     exportDir,
 		Libraries:                     libraries,
 		OptimizeForDebug:              optimizeForDebug,
@@ -246,11 +246,13 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
 		Jobs:                          jobs,
 	}
-	builderRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
+	server, builderResCB := commands.CompilerServerToStreams(ctx, stdOut, stdErr)
+	compileError := srv.Compile(compileRequest, server)
+	builderRes := builderResCB()
 
 	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {
-		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+		userFieldRes, err := srv.SupportedUserFields(ctx, &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
 			Fqbn:     fqbn,
 			Protocol: port.GetProtocol(),
@@ -271,7 +273,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		prog := profile.GetProgrammer()
 		if prog == "" || programmer.GetProgrammer() != "" {
-			prog = programmer.String(inst, fqbn)
+			prog = programmer.String(ctx, inst, srv, fqbn)
 		}
 		if prog == "" {
 			prog = sk.GetDefaultProgrammer()
@@ -289,7 +291,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			UserFields: fields,
 		}
 
-		if res, err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
+		stream, streamRes := commands.UploadToServerStreams(ctx, stdOut, stdErr)
+		if err := srv.Upload(uploadRequest, stream); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {
 				errcode = feedback.ErrMissingProgrammer
@@ -299,7 +302,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			}
 			feedback.Fatal(tr("Error during Upload: %v", err), errcode)
 		} else {
-			uploadRes = res
+			uploadRes = streamRes()
 		}
 	}
 
@@ -384,7 +387,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			if profileArg.String() == "" {
 				res.Error += fmt.Sprintln()
 
-				if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+				if platform, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 					Instance:   inst,
 					SearchArgs: platformErr.Platform,
 				}); err != nil {

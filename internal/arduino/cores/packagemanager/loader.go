@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
-	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -32,7 +31,13 @@ import (
 
 // LoadHardware read all plaforms from the configured paths
 func (pm *Builder) LoadHardware() []error {
-	hardwareDirs := configuration.HardwareDirectories(configuration.Settings)
+	hardwareDirs := paths.NewPathList()
+	if pm.PackagesDir.IsDir() {
+		hardwareDirs.Add(pm.PackagesDir)
+	}
+	if pm.userPackagesDir != nil && pm.userPackagesDir.IsDir() {
+		hardwareDirs.Add(pm.userPackagesDir)
+	}
 	return pm.LoadHardwareFromDirectories(hardwareDirs)
 }
 

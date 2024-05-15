@@ -4,6 +4,173 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.36.0
 
+### Configuration file now supports only YAML format.
+
+The Arduino CLI configuration file now supports only the YAML format.
+
+### gRPC Setting API important changes
+
+The Settings API has been heavily refactored. Here a quick recap of the new methods:
+
+- `SettingsGetValue` returns the value of a setting given the key. The returned value is a string encoded in JSON, or
+  YAML
+
+  ```proto
+  message SettingsGetValueRequest {
+    // The key to get
+    string key = 1;
+    // The format of the encoded_value (default is
+    // "json", allowed values are "json" and "yaml)
+    string value_format = 2;
+  }
+
+  message SettingsGetValueResponse {
+    // The value of the key (encoded)
+    string encoded_value = 1;
+  }
+  ```
+
+- `SettingsSetValue` change the value of a setting. The value may be specified in JSON, YAML, or as a command-line
+  argument. If `encoded_value` is an empty string the setting is deleted.
+
+  ```proto
+  message SettingsSetValueRequest {
+    // The key to change
+    string key = 1;
+    // The new value (encoded), no objects,
+    // only scalar, or array of scalars are
+    // allowed.
+    string encoded_value = 2;
+    // The format of the encoded_value (default is
+    // "json", allowed values are "json", "yaml",
+    // and "cli")
+    string value_format = 3;
+  }
+  ```
+
+- `SettingsEnumerate` returns all the available keys and their type (`string`, `int`, `[]string`...)
+- `ConfigurationOpen` replaces the current configuration with the one passed as argument. Differently from
+  `SettingsSetValue`, this call replaces the whole configuration.
+- `ConfigurationSave` outputs the current configuration in the specified format. The configuration is not saved in a
+  file, this call returns just the content, it's a duty of the caller to store the content in a file.
+- `ConfigurationGet` return the current configuration in a structured gRPC message `Configuration`.
+
+The previous gRPC Setting rpc call may be replaced as follows:
+
+- The old `SettingsMerge` rpc call can now be done trough `SettingsSetValue`.
+- The old `SettingsDelete` rpc call can now be done trough `SettingsSetValue` passing the `key` to delete with an empty
+  `value`.
+- The old `SettingsGetAll` rpc call has been replaced by `ConfigurationGet` that returns a structured message
+  `Configuration` with all the settings populated.
+- The old `SettingsWrite` rpc call has been removed. It is partially replaced by `ConfigurationSave` but the actual file
+  save must be performed by the caller.
+
+### golang: importing `arduino-cli` as a library now requires the creation of a gRPC service.
+
+Previously the methods implementing the Arduino business logic were available in the global namespace
+`github.com/arduino/arduino-cli/commands/*` and could be called directly.
+
+The above is no more true. All the global `commands.*` functions have been converted to methods of the
+`arduinoCoreServerImpl` struct that implements the gRPC `ArduinoCoreServer` interface. The configuration is now part of
+the server internal state. Developers may create a "daemon-less" server by calling the `commands.NewArduinoCoreServer()`
+function and can use the returned object to call all the needed gRPC functions.
+
+The methods of the `ArduinoCoreServer` are generated through the gRPC protobuf definitions, some of those methods are
+gRPC "streaming" methods and requires a streaming object to be passed as argument, we provided helper methods to create
+these objects.
+
+For example if previously we could call `commands.Init` like this:
+
+```go
+// old Init signature
+func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) error { ... }
+
+// ...
+
+// Initialize instance
+if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, respCB); err != nil {
+  return err
+}
+```
+
+now the `responseCallback` must be wrapped into an `rpc.ArduinoCoreService_InitServer`, and we provided a method exactly
+for that:
+
+```go
+// new Init method
+func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error { ... }
+
+/// ...
+
+// Initialize instance
+initStream := InitStreamResponseToCallbackFunction(ctx, respCB)
+if err := srv.Init(&rpc.InitRequest{Instance: req.GetInstance()}, initStream); err != nil {
+  return err
+}
+```
+
+Each gRPC method has an helper method to obtain the corresponding `ArduinoCoreService_*Server` parameter. Here a simple,
+but complete, example:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"io"
+	"log"
+
+	"github.com/arduino/arduino-cli/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
+)
+
+func main() {
+	// Create a new ArduinoCoreServer
+	srv := commands.NewArduinoCoreServer()
+
+	// Disable logging
+	logrus.SetOutput(io.Discard)
+
+	// Create a new instance in the server
+	ctx := context.Background()
+	resp, err := srv.Create(ctx, &rpc.CreateRequest{})
+	if err != nil {
+		log.Fatal("Error creating instance:", err)
+	}
+	instance := resp.GetInstance()
+
+	// Defer the destruction of the instance
+	defer func() {
+		if _, err := srv.Destroy(ctx, &rpc.DestroyRequest{Instance: instance}); err != nil {
+			log.Fatal("Error destroying instance:", err)
+		}
+		fmt.Println("Instance successfully destroyed")
+	}()
+
+	// Initialize the instance
+	initStream := commands.InitStreamResponseToCallbackFunction(ctx, func(r *rpc.InitResponse) error {
+		fmt.Println("INIT> ", r)
+		return nil
+	})
+	if err := srv.Init(&rpc.InitRequest{Instance: instance}, initStream); err != nil {
+		log.Fatal("Error during initialization:", err)
+	}
+
+	// Search for platforms and output the result
+	searchResp, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{Instance: instance})
+	if err != nil {
+		log.Fatal("Error searching for platforms:", err)
+	}
+	for _, platformSummary := range searchResp.GetSearchOutput() {
+		installed := platformSummary.GetInstalledRelease()
+		meta := platformSummary.GetMetadata()
+		fmt.Printf("%30s %8s %s\n", meta.GetId(), installed.GetVersion(), installed.GetName())
+	}
+}
+```
+
 ### YAML output format is no more supported
 
 The `yaml` option of the `--format` flag is no more supported. Use `--format json` if machine parsable output is needed.
@@ -1698,7 +1865,7 @@ https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse
 https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest
 https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse
 
-https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go
+https://github.com/arduino/arduino-cli/blob/752709af9bf1bf8f6c1e6f689b1e8b86cc4e884e/commands/daemon/term_example/main.go
 
 ## 0.23.0
 

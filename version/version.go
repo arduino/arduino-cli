@@ -16,9 +16,6 @@
 package version
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/arduino/arduino-cli/internal/i18n"
 )
 
@@ -70,5 +67,5 @@ func init() {
 		versionString = defaultVersionString
 	}
 
-	VersionInfo = NewInfo(filepath.Base(os.Args[0]))
+	VersionInfo = NewInfo("arduino-cli")
 }

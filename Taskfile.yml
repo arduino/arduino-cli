@@ -95,7 +95,7 @@ tasks:
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
-        go test \
+        LANG=en go test \
           -v \
           -short \
           -run '{{default ".*" .GO_TEST_REGEX}}' \
@@ -115,7 +115,7 @@ tasks:
       - |
         rm -fr coverage_data
         mkdir coverage_data
-        INTEGRATION_GOCOVERDIR={{ .ROOT_DIR }}/coverage_data go test \
+        LANG=en INTEGRATION_GOCOVERDIR={{ .ROOT_DIR }}/coverage_data go test \
           -v \
           -short \
           {{ .GO_TEST_PACKAGE }} \
