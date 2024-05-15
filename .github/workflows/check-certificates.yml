@@ -90,7 +90,7 @@ jobs:
             EXPIRATION_DATE="$(
                 (
                 openssl pkcs12 \
-                    -in "${{ env.CERTIFICATE_PATH }}" \
+                    -in ${{ env.CERTIFICATE_PATH }} \
                     -clcerts \
                     -legacy \
                     -nodes \
@@ -111,7 +111,7 @@ jobs:
             EXPIRATION_DATE="$(
                 (
                 openssl x509 \
-                    -in "${{ env.CERTIFICATE_PATH }}" \
+                    -in ${{ env.CERTIFICATE_PATH }} \
                     -noout \
                     -enddate
                 ) | (
