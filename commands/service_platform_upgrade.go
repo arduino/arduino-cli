@@ -26,21 +26,20 @@ import (
 
 // PlatformUpgradeStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformUpgrade that sends
 // all responses to the callback function.
-func PlatformUpgradeStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (rpc.ArduinoCoreService_PlatformUpgradeServer, func() *rpc.Platform) {
-	var resp *rpc.Platform
+func PlatformUpgradeStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (rpc.ArduinoCoreService_PlatformUpgradeServer, func() *rpc.PlatformUpgradeResponse_Result) {
+	var resp *rpc.PlatformUpgradeResponse_Result
 	return streamResponseToCallback(ctx, func(r *rpc.PlatformUpgradeResponse) error {
-			// TODO: use oneof in protoc files?
 			if r.GetProgress() != nil {
 				downloadCB(r.GetProgress())
 			}
 			if r.GetTaskProgress() != nil {
 				taskCB(r.GetTaskProgress())
 			}
-			if r.GetPlatform() != nil {
-				resp = r.GetPlatform()
+			if r.GetResult() != nil {
+				resp = r.GetResult()
 			}
 			return nil
-		}), func() *rpc.Platform {
+		}), func() *rpc.PlatformUpgradeResponse_Result {
 			return resp
 		}
 }
@@ -49,8 +48,20 @@ func PlatformUpgradeStreamResponseToCallbackFunction(ctx context.Context, downlo
 func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest, stream rpc.ArduinoCoreService_PlatformUpgradeServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
 	ctx := stream.Context()
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{Progress: p}) }
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{TaskProgress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.PlatformUpgradeResponse{
+			Message: &rpc.PlatformUpgradeResponse_Progress{
+				Progress: p,
+			},
+		})
+	}
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.PlatformUpgradeResponse{
+			Message: &rpc.PlatformUpgradeResponse_TaskProgress{
+				TaskProgress: p,
+			},
+		})
+	}
 
 	upgrade := func() (*cores.PlatformRelease, error) {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
@@ -75,9 +86,13 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 	platformRelease, err := upgrade()
 	if platformRelease != nil {
 		syncSend.Send(&rpc.PlatformUpgradeResponse{
-			Platform: &rpc.Platform{
-				Metadata: platformToRPCPlatformMetadata(platformRelease.Platform),
-				Release:  platformReleaseToRPC(platformRelease),
+			Message: &rpc.PlatformUpgradeResponse_Result_{
+				Result: &rpc.PlatformUpgradeResponse_Result{
+					Platform: &rpc.Platform{
+						Metadata: platformToRPCPlatformMetadata(platformRelease.Platform),
+						Release:  platformReleaseToRPC(platformRelease),
+					},
+				},
 			},
 		})
 	}

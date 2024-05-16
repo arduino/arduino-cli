@@ -559,8 +559,8 @@ func analyzePlatformUpgradeClient(cl commands.ArduinoCoreService_PlatformUpgrade
 		if errors.Is(err, io.EOF) {
 			break
 		}
-		if msg.GetPlatform() != nil {
-			platform = msg.GetPlatform()
+		if res := msg.GetResult(); res != nil {
+			platform = res.GetPlatform()
 		}
 		if err != nil {
 			upgradeError = err

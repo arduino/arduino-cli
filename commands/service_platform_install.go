@@ -43,8 +43,20 @@ func PlatformInstallStreamResponseToCallbackFunction(ctx context.Context, downlo
 func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest, stream rpc.ArduinoCoreService_PlatformInstallServer) error {
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformInstallResponse{TaskProgress: p}) }
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformInstallResponse{Progress: p}) }
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.PlatformInstallResponse{
+			Message: &rpc.PlatformInstallResponse_TaskProgress{
+				TaskProgress: p,
+			},
+		})
+	}
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.PlatformInstallResponse{
+			Message: &rpc.PlatformInstallResponse_Progress{
+				Progress: p,
+			},
+		})
+	}
 
 	install := func() error {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
@@ -102,5 +114,9 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 		return err
 	}
 
-	return syncSend.Send(&rpc.PlatformInstallResponse{})
+	return syncSend.Send(&rpc.PlatformInstallResponse{
+		Message: &rpc.PlatformInstallResponse_Result_{
+			Result: &rpc.PlatformInstallResponse_Result{},
+		},
+	})
 }
