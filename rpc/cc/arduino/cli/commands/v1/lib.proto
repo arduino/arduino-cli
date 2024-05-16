@@ -31,8 +31,15 @@ message LibraryDownloadRequest {
 }
 
 message LibraryDownloadResponse {
-  // Progress of the library download.
-  DownloadProgress progress = 1;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the library download.
+    DownloadProgress progress = 1;
+    // Download result.
+    Result result = 2;
+  }
 }
 
 message LibraryInstallRequest {
@@ -61,10 +68,17 @@ enum LibraryInstallLocation {
 }
 
 message LibraryInstallResponse {
-  // Progress of the library download.
-  DownloadProgress progress = 1;
-  // Description of the current stage of the installation.
-  TaskProgress task_progress = 2;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the library download.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // Download result.
+    Result result = 3;
+  }
 }
 
 message LibraryUpgradeRequest {
@@ -78,10 +92,17 @@ message LibraryUpgradeRequest {
 }
 
 message LibraryUpgradeResponse {
-  // Progress of the library download.
-  DownloadProgress progress = 1;
-  // Description of the current stage of the installation.
-  TaskProgress task_progress = 2;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the library download.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // Download result.
+    Result result = 3;
+  }
 }
 
 message LibraryUninstallRequest {
@@ -94,8 +115,15 @@ message LibraryUninstallRequest {
 }
 
 message LibraryUninstallResponse {
-  // Description of the current stage of the uninstallation.
-  TaskProgress task_progress = 1;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the uninstallation.
+    TaskProgress task_progress = 1;
+    // Uninstall result.
+    Result result = 2;
+  }
 }
 
 message LibraryUpgradeAllRequest {
@@ -104,10 +132,17 @@ message LibraryUpgradeAllRequest {
 }
 
 message LibraryUpgradeAllResponse {
-  // Progress of the downloads of files needed for the upgrades.
-  DownloadProgress progress = 1;
-  // Description of the current stage of the upgrade.
-  TaskProgress task_progress = 2;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of files needed for the upgrades.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the upgrade.
+    TaskProgress task_progress = 2;
+    // Upgrade result.
+    Result result = 3;
+  }
 }
 
 message LibraryResolveDependenciesRequest {
@@ -352,8 +387,15 @@ message ZipLibraryInstallRequest {
 }
 
 message ZipLibraryInstallResponse {
-  // Description of the current stage of the installation.
-  TaskProgress task_progress = 1;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
+    // Installation result.
+    Result result = 2;
+  }
 }
 
 message GitLibraryInstallRequest {
@@ -367,6 +409,13 @@ message GitLibraryInstallRequest {
 }
 
 message GitLibraryInstallResponse {
-  // Description of the current stage of the installation.
-  TaskProgress task_progress = 1;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
+    // Installation result.
+    Result result = 2;
+  }
 }

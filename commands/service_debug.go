@@ -42,7 +42,11 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	// Launch debug recipe attaching stdin and out to grpc streaming
 	signalChan := make(chan os.Signal)
 	defer close(signalChan)
-	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.DebugResponse{Data: data}) })
+	outStream := feedStreamTo(func(data []byte) {
+		stream.Send(&rpc.DebugResponse{Message: &rpc.DebugResponse_Data{
+			Data: data,
+		}})
+	})
 	resp, debugErr := Debug(stream.Context(), req,
 		consumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()

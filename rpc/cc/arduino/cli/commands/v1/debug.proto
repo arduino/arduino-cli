@@ -46,10 +46,16 @@ message DebugRequest {
 // The streaming response may contain chunks of data from the debugger or an
 // error.
 message DebugResponse {
-  // Incoming data from the debugger tool.
-  bytes data = 1;
-  // Incoming error output from the debugger tool.
-  string error = 2;
+  message Result {
+    // Incoming error output from the debugger tool.
+    string error = 1;
+  }
+  oneof message {
+    // Incoming data from the debugger tool.
+    bytes data = 1;
+    // Debugging result.
+    Result result = 2;
+  }
 }
 
 message IsDebugSupportedRequest {

@@ -41,8 +41,16 @@ func LibraryUpgradeAllStreamResponseToCallbackFunction(ctx context.Context, down
 func (s *arduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, stream rpc.ArduinoCoreService_LibraryUpgradeAllServer) error {
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryUpgradeAllResponse{Progress: p}) }
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUpgradeAllResponse{TaskProgress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.LibraryUpgradeAllResponse{
+			Message: &rpc.LibraryUpgradeAllResponse_Progress{Progress: p},
+		})
+	}
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.LibraryUpgradeAllResponse{
+			Message: &rpc.LibraryUpgradeAllResponse_TaskProgress{TaskProgress: p},
+		})
+	}
 
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
@@ -67,6 +75,11 @@ func (s *arduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequ
 		return err
 	}
 
+	syncSend.Send(&rpc.LibraryUpgradeAllResponse{
+		Message: &rpc.LibraryUpgradeAllResponse_Result_{
+			Result: &rpc.LibraryUpgradeAllResponse_Result{},
+		},
+	})
 	return nil
 }
 
@@ -88,8 +101,16 @@ func LibraryUpgradeStreamResponseToCallbackFunction(ctx context.Context, downloa
 func (s *arduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, stream rpc.ArduinoCoreService_LibraryUpgradeServer) error {
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryUpgradeResponse{Progress: p}) }
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUpgradeResponse{TaskProgress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.LibraryUpgradeResponse{
+			Message: &rpc.LibraryUpgradeResponse_Progress{Progress: p},
+		})
+	}
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.LibraryUpgradeResponse{
+			Message: &rpc.LibraryUpgradeResponse_TaskProgress{TaskProgress: p},
+		})
+	}
 
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
 	if err != nil {
@@ -111,12 +132,21 @@ func (s *arduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, s
 		return &cmderrors.LibraryNotFoundError{Library: name}
 	}
 	if lib.Available == nil {
+		// library already at the latest version
 		taskCB(&rpc.TaskProgress{Message: tr("Library %s is already at the latest version", name), Completed: true})
-		return nil
+	} else {
+		// Install update
+		if err := s.libraryUpgrade(ctx, req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB); err != nil {
+			return err
+		}
 	}
 
-	// Install update
-	return s.libraryUpgrade(ctx, req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB)
+	syncSend.Send(&rpc.LibraryUpgradeResponse{
+		Message: &rpc.LibraryUpgradeResponse_Result_{
+			Result: &rpc.LibraryUpgradeResponse_Result{},
+		},
+	})
+	return nil
 }
 
 func (s *arduinoCoreServerImpl) libraryUpgrade(ctx context.Context, instance *rpc.Instance, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
