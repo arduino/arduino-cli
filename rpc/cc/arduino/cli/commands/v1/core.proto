@@ -43,7 +43,7 @@ message PlatformInstallRequest {
 
 message PlatformInstallResponse {
   message Result {
-    // Empty message, reserved for future exapansion.
+    // Empty message, reserved for future expansion.
   }
   oneof message {
     // Progress of the downloads of the platform and tool files.
@@ -69,7 +69,7 @@ message PlatformDownloadRequest {
 
 message PlatformDownloadResponse {
   message Result {
-    // Empty message, reserved for future exapansion.
+    // Empty message, reserved for future expansion.
   }
   oneof message {
     // Progress of the downloads of platform and tool files.
@@ -93,7 +93,7 @@ message PlatformUninstallRequest {
 
 message PlatformUninstallResponse {
   message Result {
-    // Empty message, reserved for future exapansion.
+    // Empty message, reserved for future expansion.
   }
   oneof message {
     // Description of the current stage of the uninstall.

@@ -217,7 +217,7 @@ to:
 ```proto
 message PlatformInstallResponse {
   message Result {
-    // Empty message, reserved for future exapansion.
+    // Empty message, reserved for future expansion.
   }
   oneof message {
     // Progress of the downloads of the platform and tool files.
