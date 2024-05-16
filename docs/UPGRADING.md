@@ -182,6 +182,56 @@ field's optional nature (that is, it could be `true`, `false`, and `null` if not
 
 Now the field is an `optional bool`, since the latest protobuf protocol changes now allows optional fields.
 
+### Some gRPC responses messages now uses the `oneof` clause.
+
+The following responses message:
+
+- `cc.arduino.cli.commands.v1.PlatformInstallResponse`
+- `cc.arduino.cli.commands.v1.PlatformDownloadResponse`
+- `cc.arduino.cli.commands.v1.PlatformUninstallResponse`
+- `cc.arduino.cli.commands.v1.PlatformUpgradeResponse`
+- `cc.arduino.cli.commands.v1.DebugResponse`
+- `cc.arduino.cli.commands.v1.LibraryDownloadResponse`
+- `cc.arduino.cli.commands.v1.LibraryInstallResponse`
+- `cc.arduino.cli.commands.v1.LibraryUpgradeResponse`
+- `cc.arduino.cli.commands.v1.LibraryUninstallResponse`
+- `cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse`
+- `cc.arduino.cli.commands.v1.ZipLibraryInstallResponse`
+- `cc.arduino.cli.commands.v1.GitLibraryInstallResponse`
+- `cc.arduino.cli.commands.v1.MonitorResponse`
+
+now use the `oneof` clause to make the stream nature of the message more explicit. Just to give an example, the
+`PlatformInstallResponse` message has been changed from:
+
+```proto
+message PlatformInstallResponse {
+  // Progress of the downloads of the platform and tool files.
+  DownloadProgress progress = 1;
+  // Description of the current stage of the installation.
+  TaskProgress task_progress = 2;
+}
+```
+
+to:
+
+```proto
+message PlatformInstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of the platform and tool files.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // The installation result.
+    Result result = 3;
+  }
+}
+```
+
+The other messages have been changed in a similar way.
+
 ### The gRPC `cc.arduino.cli.commands.v1.UpdateIndexResponse` and `UpdateLibrariesIndexResponse` have changed.
 
 The responses coming from the update index commands:

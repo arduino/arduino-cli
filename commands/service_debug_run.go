@@ -71,7 +71,9 @@ func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Read
 	// Get stdIn pipe from tool
 	in, err := cmd.StdinPipe()
 	if err != nil {
-		return &rpc.DebugResponse{Error: err.Error()}, nil
+		return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
+			Result: &rpc.DebugResponse_Result{Error: err.Error()},
+		}}, nil
 	}
 	defer in.Close()
 
@@ -81,7 +83,9 @@ func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Read
 
 	// Start the debug command
 	if err := cmd.Start(); err != nil {
-		return &rpc.DebugResponse{Error: err.Error()}, nil
+		return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
+			Result: &rpc.DebugResponse_Result{Error: err.Error()},
+		}}, nil
 	}
 
 	if interrupt != nil {
@@ -107,9 +111,13 @@ func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Read
 
 	// Wait for process to finish
 	if err := cmd.Wait(); err != nil {
-		return &rpc.DebugResponse{Error: err.Error()}, nil
+		return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
+			Result: &rpc.DebugResponse_Result{Error: err.Error()},
+		}}, nil
 	}
-	return &rpc.DebugResponse{}, nil
+	return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
+		Result: &rpc.DebugResponse_Result{},
+	}}, nil
 }
 
 // getCommandLine compose a debug command represented by a core recipe

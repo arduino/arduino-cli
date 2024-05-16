@@ -39,14 +39,24 @@ func PlatformUninstallStreamResponseToCallbackFunction(ctx context.Context, task
 func (s *arduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallRequest, stream rpc.ArduinoCoreService_PlatformUninstallServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
 	ctx := stream.Context()
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUninstallResponse{TaskProgress: p}) }
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.PlatformUninstallResponse{
+			Message: &rpc.PlatformUninstallResponse_TaskProgress{
+				TaskProgress: p,
+			},
+		})
+	}
 	if err := platformUninstall(ctx, req, taskCB); err != nil {
 		return err
 	}
 	if err := s.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
 		return err
 	}
-	return syncSend.Send(&rpc.PlatformUninstallResponse{})
+	return syncSend.Send(&rpc.PlatformUninstallResponse{
+		Message: &rpc.PlatformUninstallResponse_Result_{
+			Result: &rpc.PlatformUninstallResponse_Result{},
+		},
+	})
 }
 
 // platformUninstall is the implementation of platform unistaller

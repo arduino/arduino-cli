@@ -42,10 +42,17 @@ message PlatformInstallRequest {
 }
 
 message PlatformInstallResponse {
-  // Progress of the downloads of the platform and tool files.
-  DownloadProgress progress = 1;
-  // Description of the current stage of the installation.
-  TaskProgress task_progress = 2;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of the platform and tool files.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // The installation result.
+    Result result = 3;
+  }
 }
 
 message PlatformLoadingError {}
@@ -61,8 +68,15 @@ message PlatformDownloadRequest {
 }
 
 message PlatformDownloadResponse {
-  // Progress of the downloads of platform and tool files.
-  DownloadProgress progress = 1;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of platform and tool files.
+    DownloadProgress progress = 1;
+    // The download result.
+    Result result = 2;
+  }
 }
 
 message PlatformUninstallRequest {
@@ -78,8 +92,15 @@ message PlatformUninstallRequest {
 }
 
 message PlatformUninstallResponse {
-  // Description of the current stage of the uninstall.
-  TaskProgress task_progress = 1;
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the uninstall.
+    TaskProgress task_progress = 1;
+    // The uninstall result.
+    Result result = 2;
+  }
 }
 
 // AlreadyAtLatestVersionError is returned when an upgrade is not possible
@@ -102,12 +123,18 @@ message PlatformUpgradeRequest {
 }
 
 message PlatformUpgradeResponse {
-  // Progress of the downloads of the platform and tool files.
-  DownloadProgress progress = 1;
-  // Description of the current stage of the upgrade.
-  TaskProgress task_progress = 2;
-  // The upgraded platform.
-  Platform platform = 3;
+  message Result {
+    // The upgraded platform.
+    Platform platform = 1;
+  }
+  oneof message {
+    // Progress of the downloads of the platform and tool files.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the upgrade.
+    TaskProgress task_progress = 2;
+    // The upgrade result.
+    Result result = 3;
+  }
 }
 
 message PlatformSearchRequest {

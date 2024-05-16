@@ -41,7 +41,11 @@ func LibraryDownloadStreamResponseToCallbackFunction(ctx context.Context, downlo
 func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest, stream rpc.ArduinoCoreService_LibraryDownloadServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
 	ctx := stream.Context()
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryDownloadResponse{Progress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.LibraryDownloadResponse{
+			Message: &rpc.LibraryDownloadResponse_Progress{Progress: p},
+		})
+	}
 
 	var downloadsDir *paths.Path
 	if pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
@@ -70,7 +74,11 @@ func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 		return err
 	}
 
-	return syncSend.Send(&rpc.LibraryDownloadResponse{})
+	return syncSend.Send(&rpc.LibraryDownloadResponse{
+		Message: &rpc.LibraryDownloadResponse_Result_{
+			Result: &rpc.LibraryDownloadResponse_Result{},
+		},
+	})
 }
 
 func downloadLibrary(_ context.Context, downloadsDir *paths.Path, libRelease *librariesindex.Release,

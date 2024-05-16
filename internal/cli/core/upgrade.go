@@ -124,7 +124,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 		}
 		stream, respCB := commands.PlatformUpgradeStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
 		err := srv.PlatformUpgrade(r, stream)
-		warningMissingIndex(respCB())
+		warningMissingIndex(respCB().GetPlatform())
 		if err != nil {
 			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError
 			if errors.As(err, &alreadyAtLatestVersionErr) {

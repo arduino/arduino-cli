@@ -38,9 +38,12 @@ func LibraryUninstallStreamResponseToCallbackFunction(ctx context.Context, taskC
 
 // LibraryUninstall uninstalls a library
 func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallRequest, stream rpc.ArduinoCoreService_LibraryUninstallServer) error {
-	// ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryUninstallResponse{TaskProgress: p}) }
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.LibraryUninstallResponse{
+			Message: &rpc.LibraryUninstallResponse_TaskProgress{TaskProgress: p},
+		})
+	}
 
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
@@ -57,14 +60,19 @@ func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 	libs := lmi.FindByReference(req.GetName(), version, libraries.User)
 	if len(libs) == 0 {
 		taskCB(&rpc.TaskProgress{Message: tr("Library %s is not installed", req.GetName()), Completed: true})
+		syncSend.Send(&rpc.LibraryUninstallResponse{
+			Message: &rpc.LibraryUninstallResponse_Result_{Result: &rpc.LibraryUninstallResponse_Result{}},
+		})
 		return nil
 	}
 
 	if len(libs) == 1 {
 		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", libs)})
-		// TODO: pass context
 		lmi.Uninstall(libs[0])
 		taskCB(&rpc.TaskProgress{Completed: true})
+		syncSend.Send(&rpc.LibraryUninstallResponse{
+			Message: &rpc.LibraryUninstallResponse_Result_{Result: &rpc.LibraryUninstallResponse_Result{}},
+		})
 		return nil
 	}
 

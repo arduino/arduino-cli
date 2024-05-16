@@ -63,7 +63,13 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 		return &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformDownloadResponse{Progress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.PlatformDownloadResponse{
+			Message: &rpc.PlatformDownloadResponse_Progress{
+				Progress: p,
+			},
+		})
+	}
 
 	// TODO: pass context
 	// ctx := stream.Context()
@@ -78,5 +84,7 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 		}
 	}
 
-	return syncSend.Send(&rpc.PlatformDownloadResponse{})
+	return syncSend.Send(&rpc.PlatformDownloadResponse{Message: &rpc.PlatformDownloadResponse_Result_{
+		Result: &rpc.PlatformDownloadResponse_Result{},
+	}})
 }

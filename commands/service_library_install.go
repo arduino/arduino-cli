@@ -48,8 +48,16 @@ func LibraryInstallStreamResponseToCallbackFunction(ctx context.Context, downloa
 func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, stream rpc.ArduinoCoreService_LibraryInstallServer) error {
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
-	downloadCB := func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.LibraryInstallResponse{Progress: p}) }
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.LibraryInstallResponse{TaskProgress: p}) }
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.LibraryInstallResponse{
+			Message: &rpc.LibraryInstallResponse_Progress{Progress: p},
+		})
+	}
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.LibraryInstallResponse{
+			Message: &rpc.LibraryInstallResponse_TaskProgress{TaskProgress: p},
+		})
+	}
 
 	// Obtain the library index from the manager
 	li, err := instances.GetLibrariesIndex(req.GetInstance())
@@ -162,6 +170,11 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		return err
 	}
 
+	syncSend.Send(&rpc.LibraryInstallResponse{
+		Message: &rpc.LibraryInstallResponse_Result_{
+			Result: &rpc.LibraryInstallResponse_Result{},
+		},
+	})
 	return nil
 }
 
@@ -202,7 +215,11 @@ func ZipLibraryInstallStreamResponseToCallbackFunction(ctx context.Context, task
 func (s *arduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequest, stream rpc.ArduinoCoreService_ZipLibraryInstallServer) error {
 	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.ZipLibraryInstallResponse{TaskProgress: p}) }
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.ZipLibraryInstallResponse{
+			Message: &rpc.ZipLibraryInstallResponse_TaskProgress{TaskProgress: p},
+		})
+	}
 
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
@@ -214,6 +231,11 @@ func (s *arduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequ
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
+	syncSend.Send(&rpc.ZipLibraryInstallResponse{
+		Message: &rpc.ZipLibraryInstallResponse_Result_{
+			Result: &rpc.ZipLibraryInstallResponse_Result{},
+		},
+	})
 	return nil
 }
 
@@ -231,7 +253,11 @@ func GitLibraryInstallStreamResponseToCallbackFunction(ctx context.Context, task
 // GitLibraryInstall FIXMEDOC
 func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequest, stream rpc.ArduinoCoreService_GitLibraryInstallServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	taskCB := func(p *rpc.TaskProgress) { syncSend.Send(&rpc.GitLibraryInstallResponse{TaskProgress: p}) }
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.GitLibraryInstallResponse{
+			Message: &rpc.GitLibraryInstallResponse_TaskProgress{TaskProgress: p},
+		})
+	}
 	lm, err := instances.GetLibraryManager(req.GetInstance())
 	if err != nil {
 		return err
@@ -245,5 +271,10 @@ func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
+	syncSend.Send(&rpc.GitLibraryInstallResponse{
+		Message: &rpc.GitLibraryInstallResponse_Result_{
+			Result: &rpc.GitLibraryInstallResponse_Result{},
+		},
+	})
 	return nil
 }
