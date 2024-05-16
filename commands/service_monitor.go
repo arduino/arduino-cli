@@ -160,7 +160,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 
 	// Send a message with Success set to true to notify the caller of the port being now active
 	syncSend := NewSynchronizedSend(stream.Send)
-	_ = syncSend.Send(&rpc.MonitorResponse{Success: true})
+	_ = syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Success{Success: true}})
 
 	ctx, cancel := context.WithCancel(stream.Context())
 	gracefulCloseInitiated := &atomic.Bool{}
@@ -175,13 +175,13 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 				return
 			}
 			if err != nil {
-				syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
+				syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Error{Error: err.Error()}})
 				return
 			}
 			if conf := msg.GetUpdatedConfiguration(); conf != nil {
 				for _, c := range conf.GetSettings() {
 					if err := monitor.Configure(c.GetSettingId(), c.GetValue()); err != nil {
-						syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
+						syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Error{Error: err.Error()}})
 					}
 				}
 			}
@@ -199,7 +199,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 					return
 				}
 				if err != nil {
-					syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
+					syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Error{Error: err.Error()}})
 					return
 				}
 				tx = tx[n:]
@@ -217,10 +217,10 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 				break
 			}
 			if err != nil {
-				syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
+				syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Error{Error: err.Error()}})
 				break
 			}
-			if err := syncSend.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
+			if err := syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_RxData{RxData: buff[:n]}}); err != nil {
 				break
 			}
 		}
