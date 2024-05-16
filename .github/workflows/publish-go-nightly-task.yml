@@ -174,7 +174,7 @@ jobs:
           path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
   create-windows-installer:
-    runs-on: windows-latest
+    runs-on: windows-sign-pc
     needs: create-nightly-artifacts
 
     defaults:
@@ -182,11 +182,10 @@ jobs:
         shell: bash
 
     env:
-      INSTALLER_CERT_WINDOWS_PFX: "/tmp/cert.pfx"
+      INSTALLER_CERT_WINDOWS_CER: "/tmp/cert.cer"
       # We are hardcoding the path for signtool because is not present on the windows PATH env var by default.
       # Keep in mind that this path could change when upgrading to a new runner version
-      # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#installed-windows-sdks
-      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe"
+      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x86/signtool.exe"
 
     steps:
       - name: Checkout repository
@@ -211,14 +210,16 @@ jobs:
           MSBuild.exe ./installer/cli.wixproj -p:SourceDir="$SOURCE_DIR" -p:OutputPath="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}" -p:OutputName="$PACKAGE_FILENAME" -p:ProductVersion="$WIX_VERSION"
 
       - name: Save Win signing certificate to file
-        run: echo "${{ secrets.INSTALLER_CERT_WINDOWS_PFX }}" | base64 --decode > ${{ env.INSTALLER_CERT_WINDOWS_PFX}}
+        run: echo "${{ secrets.INSTALLER_CERT_WINDOWS_CER }}" | base64 --decode > ${{ env.INSTALLER_CERT_WINDOWS_CER}}
 
       - name: Sign MSI
         env:
           MSI_FILE: ${{ steps.buildmsi.outputs.msi }} # this comes from .installer/cli.wixproj
           CERT_PASSWORD: ${{ secrets.INSTALLER_CERT_WINDOWS_PASSWORD }}
+          CONTAINER_NAME: ${{ secrets.INSTALLER_CERT_WINDOWS_CONTAINER }}
+          # https://stackoverflow.com/questions/17927895/automate-extended-validation-ev-code-signing-with-safenet-etoken
         run: |
-          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_PFX}} -p ${{ env.CERT_PASSWORD }} -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
+          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_CER}} -csp "eToken Base Cryptographic Provider" -k "[{{${{ env.CERT_PASSWORD }}}}]=${{ env.CONTAINER_NAME }}" -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
