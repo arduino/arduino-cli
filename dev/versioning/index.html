@@ -1439,20 +1439,20 @@
                 
                 <h1 id="backward-compatibility-policy-for-arduino-cli">Backward compatibility policy for arduino-cli.<a class="headerlink" href="#backward-compatibility-policy-for-arduino-cli" title="Permanent link">&para;</a></h1>
 <p>The arduino-cli project follows a strict semantic versioning policy. We are committing not to make breaking changes in
-minor releases after the release of version 1.0.0. The project is currently in the last period of the Beta phase.</p>
+minor releases of Arduino CLI 1.x.x.</p>
 <p>The release rules are the following:</p>
 <ul>
 <li>Alpha phase <code>0.0.X</code>: In this phase, the software is going through a quick iteration of the API, each release (with
   increments of X) may contain massive and breaking changes.</li>
-<li><strong>Beta phase <code>0.Y.X</code></strong>: The software is usable, but the API is still not settled and is under continuous testing and
+<li>Beta phase <code>0.Y.X</code>: The software is usable, but the API is still not settled and is under continuous testing and
   review. Breaking changes are expected. Bug fixes and new features are made as patch releases (with increments of X).
   Breaking changes due to API refinements are made as minor releases (with increments of Y).</li>
 <li>Production release-candidate <code>1.0.0-rc.X</code>: in this phase, the software is considered ready for release and distributed
   to the users for final testing. Release candidates (with increments of X) are possible for bug fixes only.</li>
-<li>Production release <code>1.Y.X</code>: For the production releases backward compatibility is guaranteed, and all the breaking
+<li><strong>Production release <code>1.Y.X</code></strong>: For the production releases backward compatibility is guaranteed, and all the breaking
   changes are cumulated for the next major release (2.0.0). Bug fixes are made as patch releases (with increments of X);
   New features are released as minor releases (with increments of Y).</li>
-<li>Next major release development <code>2.0.0</code> and up: see below.</li>
+<li>Next major release development <code>&gt;=2.0.0</code> and up: see below.</li>
 </ul>
 <h2 id="backward-compatibility-guarantees-and-definition-of-breaking-change">Backward compatibility guarantees and definition of "breaking change"<a class="headerlink" href="#backward-compatibility-guarantees-and-definition-of-breaking-change" title="Permanent link">&para;</a></h2>
 <p>There are three main user facing API in the arduino-cli project:</p>
@@ -1470,7 +1470,7 @@ minor releases after the release of version 1.0.0. The project is currently in t
 <li>an optional positional argument or a flag is made mandatory</li>
 <li>a positional argument or a flag format is changed</li>
 </ul>
-<p>The following changes to the command-line syntax are NOT considered breaking:</p>
+<p>The following changes to the command-line syntax are NOT considered breaking changes:</p>
 <ul>
 <li>a new command is added</li>
 <li>a new optional positional argument is added</li>
