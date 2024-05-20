@@ -105,10 +105,6 @@ func New(path *paths.Path) (*Sketch, error) {
 		return nil, err
 	}
 
-	if mainFile == nil {
-		return nil, fmt.Errorf(tr("can't find main Sketch file in %s"), path)
-	}
-
 	sketchFolderFiles, err := sketch.supportedFiles()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", tr("reading sketch files"), err)

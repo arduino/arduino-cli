@@ -68,7 +68,6 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		logFormat      string
 		jsonOutput     bool
 		outputFormat   string
-		configFile     string
 		additionalUrls []string
 	)
 
@@ -179,10 +178,12 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.RegisterFlagCompletionFunc("format", cobra.FixedCompletions(validOutputFormats, cobra.ShellCompDirectiveDefault))
 	cmd.Flag("format").Hidden = true
 	cmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, tr("Print the output in JSON format."))
-	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSliceVar(&additionalUrls, "additional-urls", defaultAdditionalURLs, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().BoolVar(&noColor, "no-color", defaultOutputNoColor, "Disable colored output.")
 
+	// We are not using cobra to parse this flag, because we manually parse it in main.go.
+	// Just leaving it here so cobra will not complain about it.
+	cmd.PersistentFlags().String("config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	return cmd
 }
 
