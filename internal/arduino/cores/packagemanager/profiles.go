@@ -17,6 +17,7 @@ package packagemanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -150,7 +151,7 @@ func (pmb *Builder) loadProfileTool(ctx context.Context, toolRef *cores.ToolDepe
 		// Try installing the missing tool
 		toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
 		if toolRelease == nil {
-			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(i18n.Tr("version %s not found", toolRef.ToolVersion))}
+			return &cmderrors.InvalidVersionError{Cause: errors.New(i18n.Tr("version %s not found", toolRef.ToolVersion))}
 		}
 		if err := pmb.installMissingProfileTool(ctx, toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
@@ -171,7 +172,7 @@ func (pmb *Builder) installMissingProfileTool(ctx context.Context, toolRelease *
 	// Download the tool
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(i18n.Tr("version %s not available for this operating system", toolRelease))}
+		return &cmderrors.InvalidVersionError{Cause: errors.New(i18n.Tr("version %s not available for this operating system", toolRelease))}
 	}
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Downloading tool %s", toolRelease)})
 	if err := toolResource.Download(ctx, pmb.DownloadDir, pmb.downloaderConfig, toolRelease.String(), downloadCB, ""); err != nil {

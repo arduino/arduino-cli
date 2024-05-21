@@ -252,7 +252,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	platform.Timestamps.AddFile(installedJSONPath)
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
-			return fmt.Errorf(i18n.Tr("loading %[1]s: %[2]s"), installedJSONPath, err)
+			return errors.New(i18n.Tr("loading %[1]s: %[2]s", installedJSONPath, err))
 		}
 	}
 
@@ -265,7 +265,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	if p, err := properties.SafeLoadFromPath(platformTxtPath); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf(i18n.Tr("loading %[1]s: %[2]s"), platformTxtPath, err)
+		return errors.New(i18n.Tr("loading %[1]s: %[2]s", platformTxtPath, err))
 	}
 
 	platformTxtLocalPath := path.Join("platform.local.txt")
@@ -273,7 +273,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	if p, err := properties.SafeLoadFromPath(platformTxtLocalPath); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf(i18n.Tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
+		return errors.New(i18n.Tr("loading %[1]s: %[2]s", platformTxtLocalPath, err))
 	}
 
 	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 || platform.Properties.SubTree("pluggable_monitor").Size() > 0 {
@@ -311,7 +311,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	}
 
 	if err := pm.loadBoards(platform); err != nil {
-		return fmt.Errorf(i18n.Tr("loading boards: %s"), err)
+		return errors.New(i18n.Tr("loading boards: %s", err))
 	}
 
 	if !platform.PluggableDiscoveryAware {
@@ -323,7 +323,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
 		split := strings.Split(ref, ":")
 		if len(split) != 2 {
-			return fmt.Errorf(i18n.Tr("invalid pluggable monitor reference: %s"), ref)
+			return errors.New(i18n.Tr("invalid pluggable monitor reference: %s", ref))
 		}
 		pm.log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
 		platform.Monitors[protocol] = &cores.MonitorDependency{
@@ -417,7 +417,7 @@ func (pm *Builder) loadProgrammer(programmerProperties *properties.Map) *cores.P
 
 func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.InstallDir == nil {
-		return fmt.Errorf(i18n.Tr("platform not installed"))
+		return errors.New(i18n.Tr("platform not installed"))
 	}
 
 	boardsTxtPath := platform.InstallDir.Join("boards.txt")

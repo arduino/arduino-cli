@@ -17,7 +17,7 @@ package arguments
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -119,7 +119,7 @@ func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.Ardu
 					Protocol: "serial",
 				}, nil
 			}
-			return nil, fmt.Errorf(i18n.Tr("port not found: %[1]s %[2]s"), address, protocol)
+			return nil, errors.New(i18n.Tr("port not found: %[1]s %[2]s", address, protocol))
 		}
 	}
 }

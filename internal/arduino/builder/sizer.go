@@ -212,7 +212,7 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
 	command, err := b.prepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
-		resErr = fmt.Errorf(i18n.Tr("Error while determining sketch size: %s"), err)
+		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
 	if b.logger.Verbose() {
@@ -222,11 +222,11 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 	command.RedirectStdoutTo(commandStdout)
 	command.RedirectStderrTo(b.logger.Stderr())
 	if err := command.Start(); err != nil {
-		resErr = fmt.Errorf(i18n.Tr("Error while determining sketch size: %s"), err)
+		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
 	if err := command.Wait(); err != nil {
-		resErr = fmt.Errorf(i18n.Tr("Error while determining sketch size: %s"), err)
+		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
 
@@ -237,7 +237,7 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 
 	textSize, err = computeSize(properties.Get("recipe.size.regex"), out)
 	if err != nil {
-		resErr = fmt.Errorf(i18n.Tr("Invalid size regexp: %s"), err)
+		resErr = errors.New(i18n.Tr("Invalid size regexp: %s", err))
 		return
 	}
 	if textSize == -1 {
@@ -247,13 +247,13 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 
 	dataSize, err = computeSize(properties.Get("recipe.size.regex.data"), out)
 	if err != nil {
-		resErr = fmt.Errorf(i18n.Tr("Invalid data size regexp: %s"), err)
+		resErr = errors.New(i18n.Tr("Invalid data size regexp: %s", err))
 		return
 	}
 
 	eepromSize, err = computeSize(properties.Get("recipe.size.regex.eeprom"), out)
 	if err != nil {
-		resErr = fmt.Errorf(i18n.Tr("Invalid eeprom size regexp: %s"), err)
+		resErr = errors.New(i18n.Tr("Invalid eeprom size regexp: %s", err))
 		return
 	}
 

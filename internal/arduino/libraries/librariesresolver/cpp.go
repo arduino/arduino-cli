@@ -16,6 +16,7 @@
 package librariesresolver
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -86,7 +87,7 @@ func (resolver *Cpp) ScanPlatformLibraries(allLibs []*libraries.Library, platfor
 func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
 	cppHeaders, err := lib.SourceHeaders()
 	if err != nil {
-		return fmt.Errorf(i18n.Tr("reading lib headers: %s"), err)
+		return errors.New(i18n.Tr("reading lib headers: %s", err))
 	}
 	for _, cppHeader := range cppHeaders {
 		l := resolver.headers[cppHeader]

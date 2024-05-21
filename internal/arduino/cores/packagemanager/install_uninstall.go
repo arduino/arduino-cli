@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -281,14 +280,14 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Uninstalling %s", platformRelease)})
 
 	if platformRelease.InstallDir == nil {
-		err := fmt.Errorf(i18n.Tr("platform not installed"))
+		err := errors.New(i18n.Tr("platform not installed"))
 		log.WithError(err).Error("Error uninstalling")
 		return &cmderrors.FailedUninstallError{Message: err.Error()}
 	}
 
 	// Safety measure
 	if !pme.IsManagedPlatformRelease(platformRelease) {
-		err := fmt.Errorf(i18n.Tr("%s is not managed by package manager"), platformRelease)
+		err := errors.New(i18n.Tr("%s is not managed by package manager", platformRelease))
 		log.WithError(err).Error("Error uninstalling")
 		return &cmderrors.FailedUninstallError{Message: err.Error()}
 	}
@@ -308,7 +307,7 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 	}
 
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
-		err = fmt.Errorf(i18n.Tr("removing platform files: %s"), err)
+		err = errors.New(i18n.Tr("removing platform files: %s", err))
 		log.WithError(err).Error("Error uninstalling")
 		return &cmderrors.FailedUninstallError{Message: err.Error()}
 	}
@@ -335,8 +334,9 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return fmt.Errorf(i18n.Tr("no compatible version of %[1]s tools found for the current os, try contacting %[2]s"),
-			toolRelease.Tool.Name, toolRelease.Tool.Package.Email)
+		return errors.New(
+			i18n.Tr("no compatible version of %[1]s tools found for the current os, try contacting %[2]s",
+				toolRelease.Tool.Name, toolRelease.Tool.Package.Email))
 	}
 	destDir := pme.PackagesDir.Join(
 		toolRelease.Tool.Package.Name,
@@ -396,7 +396,7 @@ func (pme *Explorer) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Ta
 	log.Info("Uninstalling tool")
 
 	if toolRelease.InstallDir == nil {
-		return fmt.Errorf(i18n.Tr("tool not installed"))
+		return errors.New(i18n.Tr("tool not installed"))
 	}
 
 	// Safety measure

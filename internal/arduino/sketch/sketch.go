@@ -46,12 +46,12 @@ type Sketch struct {
 // by file type.
 func New(path *paths.Path) (*Sketch, error) {
 	if path == nil {
-		return nil, fmt.Errorf(i18n.Tr("sketch path is not valid"))
+		return nil, errors.New(i18n.Tr("sketch path is not valid"))
 	}
 
 	path = path.Canonical()
 	if exist, err := path.ExistCheck(); err != nil {
-		return nil, fmt.Errorf("%s: %s", i18n.Tr("sketch path is not valid"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("sketch path is not valid"), err)
 	} else if !exist {
 		return nil, fmt.Errorf("%s: %s", i18n.Tr("no such file or directory"), path)
 	}
@@ -74,7 +74,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		}
 	}
 	if mainFile == nil {
-		return nil, fmt.Errorf(i18n.Tr("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension)))
+		return nil, errors.New(i18n.Tr("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension)))
 	}
 
 	sketch := &Sketch{

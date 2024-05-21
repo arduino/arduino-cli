@@ -270,7 +270,7 @@ func BoardListWatchProxyToChan(ctx context.Context) (rpc.ArduinoCoreService_Boar
 func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, stream rpc.ArduinoCoreService_BoardListWatchServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
 	if req.GetInstance() == nil {
-		err := fmt.Errorf(i18n.Tr("no instance specified"))
+		err := errors.New(i18n.Tr("no instance specified"))
 		syncSend.Send(&rpc.BoardListWatchResponse{
 			EventType: "error",
 			Error:     err.Error(),

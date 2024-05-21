@@ -16,7 +16,7 @@
 package librariesindex
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -61,13 +61,13 @@ type indexDependency struct {
 func LoadIndex(indexFile *paths.Path) (*Index, error) {
 	buff, err := indexFile.ReadFile()
 	if err != nil {
-		return nil, fmt.Errorf(i18n.Tr("reading library_index.json: %s"), err)
+		return nil, errors.New(i18n.Tr("reading library_index.json: %s", err))
 	}
 
 	var i indexJSON
 	err = easyjson.Unmarshal(buff, &i)
 	if err != nil {
-		return nil, fmt.Errorf(i18n.Tr("parsing library_index.json: %s"), err)
+		return nil, errors.New(i18n.Tr("parsing library_index.json: %s", err))
 	}
 
 	return i.extractIndex()

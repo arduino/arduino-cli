@@ -18,6 +18,7 @@ package sketch
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -206,9 +207,9 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 		return err
 	}
 	if platformID, ok := data["platform"]; !ok {
-		return fmt.Errorf(i18n.Tr("missing '%s' directive", "platform"))
+		return errors.New(i18n.Tr("missing '%s' directive", "platform"))
 	} else if platformID, platformVersion, ok := parseNameAndVersion(platformID); !ok {
-		return fmt.Errorf(i18n.Tr("invalid '%s' directive", "platform"))
+		return errors.New(i18n.Tr("invalid '%s' directive", "platform"))
 	} else if c, err := semver.Parse(platformVersion); err != nil {
 		return fmt.Errorf("%s: %w", i18n.Tr("error parsing version constraints"), err)
 	} else if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {

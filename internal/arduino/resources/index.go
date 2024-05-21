@@ -108,7 +108,7 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		// Look for index.json
 		tmpIndexPath = tmpArchivePath.Join(indexFileName)
 		if !tmpIndexPath.Exist() {
-			return &cmderrors.NotFoundError{Message: i18n.Tr("Invalid archive: file %{1}s not found in archive %{2}s", indexFileName, tmpArchivePath.Base())}
+			return &cmderrors.NotFoundError{Message: i18n.Tr("Invalid archive: file %[1]s not found in archive %[2]s", indexFileName, tmpArchivePath.Base())}
 		}
 
 		// Look for signature

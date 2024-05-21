@@ -16,7 +16,7 @@
 package arguments
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/spf13/cobra"
@@ -49,7 +49,7 @@ func (p *ShowProperties) Get() (ShowPropertiesMode, error) {
 	case "expanded":
 		return ShowPropertiesExpanded, nil
 	default:
-		return ShowPropertiesDisabled, fmt.Errorf(i18n.Tr("invalid option '%s'.", p.arg))
+		return ShowPropertiesDisabled, errors.New(i18n.Tr("invalid option '%s'.", p.arg))
 	}
 }
 

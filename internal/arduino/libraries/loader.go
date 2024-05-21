@@ -52,7 +52,7 @@ func addUtilityDirectory(library *Library) {
 func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library, error) {
 	libProperties, err := properties.Load(libraryDir.Join("library.properties").String())
 	if err != nil {
-		return nil, fmt.Errorf(i18n.Tr("loading library.properties: %s"), err)
+		return nil, errors.New(i18n.Tr("loading library.properties: %s", err))
 	}
 
 	if libProperties.Get("maintainer") == "" && libProperties.Get("email") != "" {
@@ -196,7 +196,7 @@ func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error
 func containsHeaderFile(d *paths.Path) (bool, error) {
 	dirContent, err := d.ReadDir()
 	if err != nil {
-		return false, fmt.Errorf(i18n.Tr("reading directory %[1]s content: %[2]w", d, err))
+		return false, fmt.Errorf("%s: %w", i18n.Tr("reading directory %[1]s content", d), err)
 	}
 	dirContent.FilterOutDirs()
 	headerExtensions := []string{}

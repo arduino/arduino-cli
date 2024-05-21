@@ -118,7 +118,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		if targetPlatform == nil {
 			return &cmderrors.PlatformNotFoundError{
 				Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
-				Cause:    fmt.Errorf(i18n.Tr("platform not installed")),
+				Cause:    errors.New(i18n.Tr("platform not installed")),
 			}
 		}
 		return &cmderrors.InvalidFQBNError{Cause: err}
@@ -152,7 +152,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	encryptProp := boardBuildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
 	if !(keychainProp == signProp && signProp == encryptProp) {
-		return fmt.Errorf(i18n.Tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
+		return errors.New(i18n.Tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
 
 	// Generate or retrieve build path

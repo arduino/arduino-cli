@@ -210,7 +210,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			return statuses
 		}
 		if err != nil {
-			s := status.Newf(codes.FailedPrecondition, i18n.Tr("reading dir %[1]s: %[2]s"), librariesDir.Path, err)
+			s := status.Newf(codes.FailedPrecondition, i18n.Tr("reading dir %[1]s: %[2]s", librariesDir.Path, err))
 			return append(statuses, s)
 		}
 		d.FilterDirs()
@@ -221,7 +221,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 	for _, libDir := range libDirs {
 		library, err := libraries.Load(libDir, librariesDir.Location)
 		if err != nil {
-			s := status.Newf(codes.Internal, i18n.Tr("loading library from %[1]s: %[2]s"), libDir, err)
+			s := status.Newf(codes.Internal, i18n.Tr("loading library from %[1]s: %[2]s", libDir, err))
 			statuses = append(statuses, s)
 			continue
 		}

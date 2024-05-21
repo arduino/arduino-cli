@@ -17,7 +17,7 @@ package lib
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -46,12 +46,12 @@ func ParseLibraryReferenceArg(arg string) (*LibraryReferenceArg, error) {
 	// TODO: check library Name constraints
 	// TODO: check library Version constraints
 	if tokens[0] == "" {
-		return nil, fmt.Errorf(i18n.Tr("invalid empty library name"))
+		return nil, errors.New(i18n.Tr("invalid empty library name"))
 	}
 	ret.Name = tokens[0]
 	if len(tokens) > 1 {
 		if tokens[1] == "" {
-			return nil, fmt.Errorf(i18n.Tr("invalid empty library version: %s"), arg)
+			return nil, errors.New(i18n.Tr("invalid empty library version: %s", arg))
 		}
 		ret.Version = tokens[1]
 	}

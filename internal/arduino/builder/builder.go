@@ -482,7 +482,7 @@ func (b *Builder) build() error {
 func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*paths.Process, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, fmt.Errorf(i18n.Tr("%[1]s pattern is missing"), recipe)
+		return nil, errors.New(i18n.Tr("%[1]s pattern is missing", recipe))
 	}
 
 	commandLine := buildProperties.ExpandPropsInString(pattern)

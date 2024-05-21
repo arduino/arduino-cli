@@ -138,7 +138,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 
 		if req.GetNoOverwrite() {
 			if installTask.ReplacedLib != nil {
-				return fmt.Errorf(i18n.Tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, installTask.ReplacedLib))
+				return errors.New(i18n.Tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, installTask.ReplacedLib))
 			}
 		}
 		libReleasesToInstall[libRelease] = installTask

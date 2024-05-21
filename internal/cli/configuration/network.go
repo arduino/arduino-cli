@@ -16,6 +16,7 @@
 package configuration
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -62,7 +63,7 @@ func (settings *Settings) NetworkProxy() (*url.URL, error) {
 	if proxyConfig, ok, _ := settings.GetStringOk("network.proxy"); !ok {
 		return nil, nil
 	} else if proxy, err := url.Parse(proxyConfig); err != nil {
-		return nil, fmt.Errorf(i18n.Tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
+		return nil, errors.New(i18n.Tr("Invalid network.proxy '%[1]s': %[2]s", proxyConfig, err))
 	} else {
 		return proxy, nil
 	}

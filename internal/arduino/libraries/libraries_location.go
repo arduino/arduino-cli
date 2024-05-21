@@ -17,6 +17,7 @@ package libraries
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -86,7 +87,7 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 		*d = Unmanaged
 		return nil
 	default:
-		return fmt.Errorf(i18n.Tr("invalid library location: %s"), s)
+		return errors.New(i18n.Tr("invalid library location: %s", s))
 	}
 }
 

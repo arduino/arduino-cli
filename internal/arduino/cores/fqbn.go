@@ -16,7 +16,7 @@
 package cores
 
 import (
-	"fmt"
+	"errors"
 	"regexp"
 	"strings"
 
@@ -47,7 +47,7 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 	// Split fqbn
 	fqbnParts := strings.Split(fqbnIn, ":")
 	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
-		return nil, fmt.Errorf("not an FQBN: %s", fqbnIn)
+		return nil, errors.New(i18n.Tr("not an FQBN: %s", fqbnIn))
 	}
 
 	fqbn := &FQBN{
@@ -57,33 +57,33 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 		Configs:      properties.NewMap(),
 	}
 	if fqbn.BoardID == "" {
-		return nil, fmt.Errorf(i18n.Tr("empty board identifier"))
+		return nil, errors.New(i18n.Tr("empty board identifier"))
 	}
 	// Check if the fqbn contains invalid characters
 	fqbnValidationRegex := regexp.MustCompile(`^[a-zA-Z0-9_.-]*$`)
 	for i := 0; i < 3; i++ {
 		if !fqbnValidationRegex.MatchString(fqbnParts[i]) {
-			return nil, fmt.Errorf(i18n.Tr("fqbn's field %s contains an invalid character"), fqbnParts[i])
+			return nil, errors.New(i18n.Tr("fqbn's field %s contains an invalid character", fqbnParts[i]))
 		}
 	}
 	if len(fqbnParts) > 3 {
 		for _, pair := range strings.Split(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf(i18n.Tr("invalid config option: %s"), pair)
+				return nil, errors.New(i18n.Tr("invalid config option: %s", pair))
 			}
 			k := strings.TrimSpace(parts[0])
 			v := strings.TrimSpace(parts[1])
 			if k == "" {
-				return nil, fmt.Errorf(i18n.Tr("invalid config option: %s"), pair)
+				return nil, errors.New(i18n.Tr("invalid config option: %s", pair))
 			}
 			if !fqbnValidationRegex.MatchString(k) {
-				return nil, fmt.Errorf(i18n.Tr("config key %s contains an invalid character"), k)
+				return nil, errors.New(i18n.Tr("config key %s contains an invalid character", k))
 			}
 			// The config value can also contain the = symbol
 			valueValidationRegex := regexp.MustCompile(`^[a-zA-Z0-9=_.-]*$`)
 			if !valueValidationRegex.MatchString(v) {
-				return nil, fmt.Errorf(i18n.Tr("config value %s contains an invalid character"), v)
+				return nil, errors.New(i18n.Tr("config value %s contains an invalid character", v))
 			}
 			fqbn.Configs.Set(k, v)
 		}

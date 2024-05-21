@@ -17,7 +17,7 @@ package arguments
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -66,30 +66,30 @@ func ParseReference(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg s
 	logrus.Infof("Parsing reference %s", arg)
 	ret := &Reference{}
 	if arg == "" {
-		return nil, fmt.Errorf(i18n.Tr("invalid empty core argument"))
+		return nil, errors.New(i18n.Tr("invalid empty core argument"))
 	}
 
 	toks := strings.SplitN(arg, "@", 2)
 	if toks[0] == "" {
-		return nil, fmt.Errorf(i18n.Tr("invalid empty core reference '%s'"), arg)
+		return nil, errors.New(i18n.Tr("invalid empty core reference '%s'", arg))
 	}
 	ret.PackageName = toks[0]
 	if len(toks) > 1 {
 		if toks[1] == "" {
-			return nil, fmt.Errorf(i18n.Tr("invalid empty core version: '%s'"), arg)
+			return nil, errors.New(i18n.Tr("invalid empty core version: '%s'", arg))
 		}
 		ret.Version = toks[1]
 	}
 
 	toks = strings.Split(ret.PackageName, ":")
 	if len(toks) != 2 {
-		return nil, fmt.Errorf(i18n.Tr("invalid item %s"), arg)
+		return nil, errors.New(i18n.Tr("invalid item %s", arg))
 	}
 	if toks[0] == "" {
-		return nil, fmt.Errorf(i18n.Tr("invalid empty core name '%s'"), arg)
+		return nil, errors.New(i18n.Tr("invalid empty core name '%s'", arg))
 	}
 	if toks[1] == "" {
-		return nil, fmt.Errorf(i18n.Tr("invalid empty core architecture '%s'"), arg)
+		return nil, errors.New(i18n.Tr("invalid empty core architecture '%s'", arg))
 	}
 	ret.PackageName = toks[0]
 	ret.Architecture = toks[1]

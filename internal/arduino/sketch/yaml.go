@@ -16,6 +16,7 @@
 package sketch
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -80,11 +81,11 @@ func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 	}
 	dstMap, ok := dst.(map[string]interface{})
 	if !ok {
-		return fmt.Errorf(i18n.Tr("could not update sketch project file"))
+		return errors.New(i18n.Tr("could not update sketch project file"))
 	}
 	writtenValue, notRemoved := dstMap[key]
 	if (newValue == "" && notRemoved) || (newValue != "" && newValue != writtenValue) {
-		return fmt.Errorf(i18n.Tr("could not update sketch project file"))
+		return errors.New(i18n.Tr("could not update sketch project file"))
 	}
 
 	// Write back the updated YAML

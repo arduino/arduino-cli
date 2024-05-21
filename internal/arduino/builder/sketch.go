@@ -78,7 +78,7 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 		}
 		data, err := f.ReadFile()
 		if err != nil {
-			return "", fmt.Errorf(i18n.Tr("reading file %[1]s: %[2]s"), f, err)
+			return "", errors.New(i18n.Tr("reading file %[1]s: %[2]s", f, err))
 		}
 		return string(data), nil
 	}

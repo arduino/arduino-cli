@@ -26,7 +26,7 @@ func getUsageTemplate() string {
 	_ = i18n.Tr("Flags:")
 	_ = i18n.Tr("Global Flags:")
 	_ = i18n.Tr("Additional help topics:")
-	_ = i18n.Tr("Use %s for more information about a command.")
+	_ = i18n.Tr("Use %s for more information about a command.", "")
 
 	return `{{tr "Usage:"}}{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}

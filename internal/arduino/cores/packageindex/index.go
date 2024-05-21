@@ -17,6 +17,7 @@ package packageindex
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
@@ -273,7 +274,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 
 	size, err := inPlatformRelease.Size.Int64()
 	if err != nil {
-		return fmt.Errorf(i18n.Tr("invalid platform archive size: %s"), err)
+		return errors.New(i18n.Tr("invalid platform archive size: %s", err))
 	}
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.Name = inPlatformRelease.Name

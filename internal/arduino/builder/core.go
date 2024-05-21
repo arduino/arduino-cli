@@ -19,7 +19,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
@@ -93,7 +92,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		targetArchivedCore = b.coreBuildCachePath.Join(archivedCoreName, "core.a")
 
 		if _, err := buildcache.New(b.coreBuildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
-			return nil, nil, fmt.Errorf(i18n.Tr("creating core cache folder: %s", err))
+			return nil, nil, errors.New(i18n.Tr("creating core cache folder: %s", err))
 		}
 
 		var canUseArchivedCore bool

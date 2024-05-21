@@ -201,7 +201,7 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.Client) (discErr error) 
 	}()
 
 	if err := d.Run(); err != nil {
-		return fmt.Errorf(i18n.Tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("discovery %[1]s process not started", d.GetID()), err)
 	}
 	eventCh, err := d.StartSync(5)
 	if err != nil {

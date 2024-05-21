@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"path/filepath"
@@ -51,11 +52,11 @@ func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *c
 
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Downloading missing tool %s", tool)})
 	if err := pme.DownloadToolRelease(ctx, tool, downloadCB); err != nil {
-		return fmt.Errorf(i18n.Tr("downloading %[1]s tool: %[2]s"), tool, err)
+		return errors.New(i18n.Tr("downloading %[1]s tool: %[2]s", tool, err))
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	if err := pme.InstallTool(tool, taskCB, true); err != nil {
-		return fmt.Errorf(i18n.Tr("installing %[1]s tool: %[2]s"), tool, err)
+		return errors.New(i18n.Tr("installing %[1]s tool: %[2]s", tool, err))
 	}
 	return nil
 }
@@ -182,7 +183,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if err != nil {
 				e := &cmderrors.InitFailedError{
 					Code:   codes.InvalidArgument,
-					Cause:  fmt.Errorf(i18n.Tr("Invalid additional URL: %v", err)),
+					Cause:  errors.New(i18n.Tr("Invalid additional URL: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL,
 				}
 				responseError(e.GRPCStatus())
@@ -220,7 +221,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				if err != nil {
 					e := &cmderrors.InitFailedError{
 						Code:   codes.FailedPrecondition,
-						Cause:  fmt.Errorf(i18n.Tr("Loading index file: %v", err)),
+						Cause:  errors.New(i18n.Tr("Loading index file: %v", err)),
 						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 					}
 					responseError(e.GRPCStatus())
@@ -231,7 +232,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if err := pmb.LoadPackageIndex(URL); err != nil {
 				e := &cmderrors.InitFailedError{
 					Code:   codes.FailedPrecondition,
-					Cause:  fmt.Errorf(i18n.Tr("Loading index file: %v", err)),
+					Cause:  errors.New(i18n.Tr("Loading index file: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 				}
 				responseError(e.GRPCStatus())
@@ -271,7 +272,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if latest == nil {
 				e := &cmderrors.InitFailedError{
 					Code:   codes.Internal,
-					Cause:  fmt.Errorf(i18n.Tr("can't find latest release of tool %s", name)),
+					Cause:  errors.New(i18n.Tr("can't find latest release of tool %s", name)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
 				}
 				responseError(e.GRPCStatus())
@@ -341,7 +342,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	logrus.WithField("index", indexFile).Info("Loading libraries index file")
 	li, err := librariesindex.LoadIndex(indexFile)
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, i18n.Tr("Loading index file: %v"), err)
+		s := status.Newf(codes.FailedPrecondition, i18n.Tr("Loading index file: %v", err))
 		responseError(s)
 		li = librariesindex.EmptyIndex
 	}

@@ -181,7 +181,7 @@ func (res librarySearchResult) String() string {
 				continue
 			}
 		} else {
-			out.WriteString(fmt.Sprintf("%s\n", lib.Name))
+			out.WriteString(lib.Name + "\n")
 			continue
 		}
 
@@ -196,23 +196,23 @@ func (res librarySearchResult) String() string {
 			}
 		}
 
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Author: %s")+"\n", latest.Author))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Maintainer: %s")+"\n", latest.Maintainer))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Sentence: %s")+"\n", latest.Sentence))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Paragraph: %s")+"\n", latest.Paragraph))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Website: %s")+"\n", latest.Website))
+		out.WriteString("  " + i18n.Tr("Author: %s", latest.Author) + "\n")
+		out.WriteString("  " + i18n.Tr("Maintainer: %s", latest.Maintainer) + "\n")
+		out.WriteString("  " + i18n.Tr("Sentence: %s", latest.Sentence) + "\n")
+		out.WriteString("  " + i18n.Tr("Paragraph: %s", latest.Paragraph) + "\n")
+		out.WriteString("  " + i18n.Tr("Website: %s", latest.Website) + "\n")
 		if latest.License != "" {
-			out.WriteString(fmt.Sprintf("  "+i18n.Tr("License: %s")+"\n", latest.License))
+			out.WriteString("  " + i18n.Tr("License: %s", latest.License) + "\n")
 		}
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Category: %s")+"\n", latest.Category))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Architecture: %s")+"\n", strings.Join(latest.Architectures, ", ")))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Types: %s")+"\n", strings.Join(latest.Types, ", ")))
-		out.WriteString(fmt.Sprintf("  "+i18n.Tr("Versions: %s")+"\n", strings.ReplaceAll(fmt.Sprint(lib.AvailableVersions), " ", ", ")))
+		out.WriteString("  " + i18n.Tr("Category: %s", latest.Category) + "\n")
+		out.WriteString("  " + i18n.Tr("Architecture: %s", strings.Join(latest.Architectures, ", ")) + "\n")
+		out.WriteString("  " + i18n.Tr("Types: %s", strings.Join(latest.Types, ", ")) + "\n")
+		out.WriteString("  " + i18n.Tr("Versions: %s", strings.ReplaceAll(fmt.Sprint(lib.AvailableVersions), " ", ", ")) + "\n")
 		if len(latest.ProvidesIncludes) > 0 {
-			out.WriteString(fmt.Sprintf("  "+i18n.Tr("Provides includes: %s")+"\n", strings.Join(latest.ProvidesIncludes, ", ")))
+			out.WriteString("  " + i18n.Tr("Provides includes: %s", strings.Join(latest.ProvidesIncludes, ", ")) + "\n")
 		}
 		if len(latest.Dependencies) > 0 {
-			out.WriteString(fmt.Sprintf("  "+i18n.Tr("Dependencies: %s")+"\n", strings.Join(deps, ", ")))
+			out.WriteString("  " + i18n.Tr("Dependencies: %s", strings.Join(deps, ", ")) + "\n")
 		}
 	}
 
