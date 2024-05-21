@@ -1,6 +1,6 @@
 ---
 name: go.bug.st/downloader/v2
-version: v2.1.1
+version: v2.2.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/go.bug.st/downloader/v2

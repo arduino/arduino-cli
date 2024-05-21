@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -119,21 +120,21 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
 // is returned. Uses the given downloader configuration for download, or the default config if nil.
-func (pme *Explorer) DownloadToolRelease(tool *cores.ToolRelease, progressCB rpc.DownloadProgressCB) error {
+func (pme *Explorer) DownloadToolRelease(ctx context.Context, tool *cores.ToolRelease, progressCB rpc.DownloadProgressCB) error {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return &cmderrors.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
 			Cause:   errors.New(tr("no versions available for the current OS, try contacting %s", tool.Tool.Package.Email))}
 	}
-	return resource.Download(pme.DownloadDir, pme.downloaderConfig, tool.String(), progressCB, "")
+	return resource.Download(ctx, pme.DownloadDir, pme.downloaderConfig, tool.String(), progressCB, "")
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
-func (pme *Explorer) DownloadPlatformRelease(platform *cores.PlatformRelease, progressCB rpc.DownloadProgressCB) error {
+func (pme *Explorer) DownloadPlatformRelease(ctx context.Context, platform *cores.PlatformRelease, progressCB rpc.DownloadProgressCB) error {
 	if platform.Resource == nil {
 		return &cmderrors.PlatformNotFoundError{Platform: platform.String()}
 	}
-	return platform.Resource.Download(pme.DownloadDir, pme.downloaderConfig, platform.String(), progressCB, "")
+	return platform.Resource.Download(ctx, pme.DownloadDir, pme.downloaderConfig, platform.String(), progressCB, "")
 }

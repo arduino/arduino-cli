@@ -94,8 +94,7 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 			}
 		}
 
-		// TODO: Pass context
-		if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall()); err != nil {
+		if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall()); err != nil {
 			return err
 		}
 

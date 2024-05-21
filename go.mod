@@ -35,7 +35,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.bug.st/cleanup v1.0.0
-	go.bug.st/downloader/v2 v2.1.1
+	go.bug.st/downloader/v2 v2.2.0
 	go.bug.st/relaxed-semver v0.12.0
 	go.bug.st/testifyjson v1.1.1
 	golang.org/x/term v0.20.0

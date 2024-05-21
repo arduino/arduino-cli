@@ -16,6 +16,7 @@
 package httpclient
 
 import (
+	"context"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -31,7 +32,7 @@ var tr = i18n.Tr
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
 // If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
-func DownloadFile(path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
 	if queryParameter != "" {
 		URL = URL + "?query=" + queryParameter
 	}
@@ -45,7 +46,7 @@ func DownloadFile(path *paths.Path, URL string, queryParameter string, label str
 		}
 	}()
 
-	d, err := downloader.DownloadWithConfig(path.String(), URL, config, options...)
+	d, err := downloader.DownloadWithConfigAndContext(ctx, path.String(), URL, config, options...)
 	if err != nil {
 		return err
 	}

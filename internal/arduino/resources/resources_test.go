@@ -50,7 +50,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
-		err := r.Download(tmp, downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
+		err := r.Download(context.Background(), tmp, downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
 		require.NoError(t, err)
 
 		data, err := testFile.ReadFile()
@@ -64,7 +64,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	downloadAndTestChecksum()
 
 	// Download with cached file
-	err = r.Download(tmp, downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
+	err = r.Download(context.Background(), tmp, downloader.Config{}, "", func(*rpc.DownloadProgress) {}, "")
 	require.NoError(t, err)
 
 	// Download if cached file has data in excess (redownload)

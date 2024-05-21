@@ -78,7 +78,7 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		return err
 	}
 	tmpIndexPath := tmp.Join(downloadFileName)
-	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", downloadFileName), downloadCB, config, downloader.NoResume); err != nil {
+	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", downloadFileName), downloadCB, config, downloader.NoResume); err != nil {
 		return &cmderrors.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
@@ -133,7 +133,7 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		// Download signature
 		signaturePath = destDir.Join(signatureFileName)
 		tmpSignaturePath = tmp.Join(signatureFileName)
-		if err := httpclient.DownloadFile(tmpSignaturePath, res.SignatureURL.String(), "", tr("Downloading index signature: %s", signatureFileName), downloadCB, config, downloader.NoResume); err != nil {
+		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", tr("Downloading index signature: %s", signatureFileName), downloadCB, config, downloader.NoResume); err != nil {
 			return &cmderrors.FailedDownloadError{Message: tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 
