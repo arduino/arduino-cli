@@ -35,8 +35,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `upload` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
@@ -51,8 +49,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	debugCommand := &cobra.Command{
 		Use:     "debug",
-		Short:   tr("Debug Arduino sketches."),
-		Long:    tr("Debug Arduino sketches. (this command opens an interactive gdb session)"),
+		Short:   i18n.Tr("Debug Arduino sketches."),
+		Long:    i18n.Tr("Debug Arduino sketches. (this command opens an interactive gdb session)"),
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -65,9 +63,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	portArgs.AddToCommand(debugCommand, srv)
 	programmer.AddToCommand(debugCommand, srv)
 	profileArg.AddToCommand(debugCommand, srv)
-	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
-	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
-	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
+	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", i18n.Tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
+	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", i18n.Tr("Directory containing binaries for debug."))
+	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, i18n.Tr("Show metadata about the debug session instead of starting the debugger."))
 
 	return debugCommand
 }
@@ -129,7 +127,7 @@ func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
-			feedback.Fatal(tr("Error getting Debug info: %v", err), errcode)
+			feedback.Fatal(i18n.Tr("Error getting Debug info: %v", err), errcode)
 		} else {
 			feedback.PrintResult(newDebugInfoResult(res))
 		}
@@ -149,7 +147,7 @@ func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
-			feedback.Fatal(tr("Error during Debug: %v", err), errcode)
+			feedback.Fatal(i18n.Tr("Error during Debug: %v", err), errcode)
 		}
 
 	}
@@ -182,7 +180,7 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 	case "openocd":
 		var openocdConf rpc.DebugOpenOCDServerConfiguration
 		if err := info.GetServerConfiguration().UnmarshalTo(&openocdConf); err != nil {
-			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error during Debug: %v", err), feedback.ErrGeneric)
 		}
 		serverConfig = &openOcdServerConfigResult{
 			Path:       openocdConf.GetPath(),
@@ -220,24 +218,24 @@ func (r *debugInfoResult) String() string {
 	t := table.New()
 	green := color.New(color.FgHiGreen)
 	dimGreen := color.New(color.FgGreen)
-	t.AddRow(tr("Executable to debug"), table.NewCell(r.Executable, green))
-	t.AddRow(tr("Toolchain type"), table.NewCell(r.Toolchain, green))
-	t.AddRow(tr("Toolchain path"), table.NewCell(r.ToolchainPath, dimGreen))
-	t.AddRow(tr("Toolchain prefix"), table.NewCell(r.ToolchainPrefix, dimGreen))
+	t.AddRow(i18n.Tr("Executable to debug"), table.NewCell(r.Executable, green))
+	t.AddRow(i18n.Tr("Toolchain type"), table.NewCell(r.Toolchain, green))
+	t.AddRow(i18n.Tr("Toolchain path"), table.NewCell(r.ToolchainPath, dimGreen))
+	t.AddRow(i18n.Tr("Toolchain prefix"), table.NewCell(r.ToolchainPrefix, dimGreen))
 	if r.SvdFile != "" {
-		t.AddRow(tr("SVD file path"), table.NewCell(r.SvdFile, dimGreen))
+		t.AddRow(i18n.Tr("SVD file path"), table.NewCell(r.SvdFile, dimGreen))
 	}
 	switch r.Toolchain {
 	case "gcc":
 		// no options available at the moment...
 	default:
 	}
-	t.AddRow(tr("Server type"), table.NewCell(r.Server, green))
-	t.AddRow(tr("Server path"), table.NewCell(r.ServerPath, dimGreen))
+	t.AddRow(i18n.Tr("Server type"), table.NewCell(r.Server, green))
+	t.AddRow(i18n.Tr("Server path"), table.NewCell(r.ServerPath, dimGreen))
 
 	switch r.Server {
 	case "openocd":
-		t.AddRow(tr("Configuration options for %s", r.Server))
+		t.AddRow(i18n.Tr("Configuration options for %s", r.Server))
 		openocdConf := r.ServerConfig.(*openOcdServerConfigResult)
 		if openocdConf.Path != "" {
 			t.AddRow(" - Path", table.NewCell(openocdConf.Path, dimGreen))
@@ -253,7 +251,7 @@ func (r *debugInfoResult) String() string {
 	if custom := r.CustomConfigs; custom != nil {
 		for id, config := range custom {
 			configJson, _ := json.MarshalIndent(config, "", "  ")
-			t.AddRow(tr("Custom configuration for %s:", id))
+			t.AddRow(i18n.Tr("Custom configuration for %s:", id))
 			return t.Render() + "  " + string(configJson)
 		}
 	}

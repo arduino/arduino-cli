@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -433,13 +434,13 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	if !burnBootloader {
 		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk)
 		if err != nil {
-			return nil, &cmderrors.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
+			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Error finding build artifacts"), Cause: err}
 		}
 		if !importPath.Exist() {
-			return nil, &cmderrors.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
+			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return nil, &cmderrors.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
@@ -492,20 +493,20 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 
 		// if touch is requested but port is not specified, print a warning
 		if touch && portToTouch == "" {
-			outStream.Write([]byte(fmt.Sprintln(tr("Skipping 1200-bps touch reset: no serial port selected!"))))
+			outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Skipping 1200-bps touch reset: no serial port selected!"))))
 		}
 
 		cb := &serialutils.ResetProgressCallbacks{
 			TouchingPort: func(portAddress string) {
 				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", portAddress)
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintln(tr("Performing 1200-bps touch reset on serial port %s", portAddress))))
+					outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Performing 1200-bps touch reset on serial port %s", portAddress))))
 				}
 			},
 			WaitingForNewSerial: func() {
 				logrus.WithField("phase", "board reset").Info("Waiting for upload port...")
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintln(tr("Waiting for upload port..."))))
+					outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Waiting for upload port..."))))
 				}
 			},
 			BootloaderPortFound: func(portAddress string) {
@@ -516,9 +517,9 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 				}
 				if verbose {
 					if portAddress != "" {
-						outStream.Write([]byte(fmt.Sprintln(tr("Upload port found on %s", portAddress))))
+						outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Upload port found on %s", portAddress))))
 					} else {
-						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort.Address))))
+						outStream.Write([]byte(fmt.Sprintln(i18n.Tr("No upload port found, using %s as fallback", actualPort.Address))))
 					}
 				}
 			},
@@ -528,7 +529,7 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 		}
 
 		if newPortAddress, err := serialutils.Reset(portToTouch, wait, dryRun, nil, cb); err != nil {
-			errStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
+			errStream.Write([]byte(fmt.Sprintln(i18n.Tr("Cannot perform port reset: %s", err))))
 		} else {
 			if newPortAddress != "" {
 				actualPort.Address = newPortAddress
@@ -562,18 +563,18 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
+			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed chip erase"), Cause: err}
 		}
 		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
+			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed to burn bootloader"), Cause: err}
 		}
 	} else if programmer != nil {
 		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: tr("Failed programming"), Cause: err}
+			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed programming"), Cause: err}
 		}
 	} else {
 		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
+			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed uploading"), Cause: err}
 		}
 	}
 
@@ -693,18 +694,18 @@ func detectUploadPort(
 func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {
 	recipe, ok := props.GetOk(recipeID)
 	if !ok {
-		return fmt.Errorf(tr("recipe not found '%s'"), recipeID)
+		return fmt.Errorf(i18n.Tr("recipe not found '%s'"), recipeID)
 	}
 	if strings.TrimSpace(recipe) == "" {
 		return nil // Nothing to run
 	}
 	if props.IsPropertyMissingInExpandPropsInString("serial.port", recipe) || props.IsPropertyMissingInExpandPropsInString("serial.port.file", recipe) {
-		return fmt.Errorf(tr("no upload port provided"))
+		return fmt.Errorf(i18n.Tr("no upload port provided"))
 	}
 	cmdLine := props.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
-		return fmt.Errorf(tr("invalid recipe '%[1]s': %[2]s"), recipe, err)
+		return fmt.Errorf(i18n.Tr("invalid recipe '%[1]s': %[2]s"), recipe, err)
 	}
 
 	// Run Tool
@@ -717,18 +718,18 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	}
 	cmd, err := paths.NewProcess(toolEnv, cmdArgs...)
 	if err != nil {
-		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
+		return fmt.Errorf(i18n.Tr("cannot execute upload tool: %s"), err)
 	}
 
 	cmd.RedirectStdoutTo(outStream)
 	cmd.RedirectStderrTo(errStream)
 
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
+		return fmt.Errorf(i18n.Tr("cannot execute upload tool: %s"), err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf(tr("uploading error: %s"), err)
+		return fmt.Errorf(i18n.Tr("uploading error: %s"), err)
 	}
 
 	return nil
@@ -750,7 +751,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 	// Case 1: importFile flag has been specified
 	if importFile != "" {
 		if importDir != "" {
-			return nil, "", fmt.Errorf(tr("%s and %s cannot be used together", "importFile", "importDir"))
+			return nil, "", fmt.Errorf(i18n.Tr("%s and %s cannot be used together", "importFile", "importDir"))
 		}
 
 		// We have a path like "path/to/my/build/SketchName.ino.bin". We are going to
@@ -760,7 +761,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 
 		importFilePath := paths.New(importFile)
 		if !importFilePath.Exist() {
-			return nil, "", fmt.Errorf(tr("binary file not found in %s"), importFilePath)
+			return nil, "", fmt.Errorf(i18n.Tr("binary file not found in %s"), importFilePath)
 		}
 		return importFilePath.Parent(), strings.TrimSuffix(importFilePath.Base(), importFilePath.Ext()), nil
 	}
@@ -775,14 +776,14 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 		buildPath := paths.New(importDir)
 		sketchName, err := detectSketchNameFromBuildPath(buildPath)
 		if err != nil {
-			return nil, "", fmt.Errorf("%s: %w", tr("looking for build artifacts"), err)
+			return nil, "", fmt.Errorf("%s: %w", i18n.Tr("looking for build artifacts"), err)
 		}
 		return buildPath, sketchName, nil
 	}
 
 	// Case 3: nothing given...
 	if sk == nil {
-		return nil, "", errors.New(tr("no sketch or build directory/file specified"))
+		return nil, "", errors.New(i18n.Tr("no sketch or build directory/file specified"))
 	}
 
 	// Case 4: only sketch specified. In this case we use the generated build path
@@ -827,12 +828,12 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 		}
 
 		if candidateName != name {
-			return "", errors.New(tr("multiple build artifacts found: '%[1]s' and '%[2]s'", candidateFile, file))
+			return "", errors.New(i18n.Tr("multiple build artifacts found: '%[1]s' and '%[2]s'", candidateFile, file))
 		}
 	}
 
 	if candidateName == "" {
-		return "", errors.New(tr("could not find a valid build artifact"))
+		return "", errors.New(i18n.Tr("could not find a valid build artifact"))
 	}
 	return candidateName, nil
 }

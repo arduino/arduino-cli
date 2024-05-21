@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,8 +32,8 @@ import (
 func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
-		Short:   tr("Updates the index of cores."),
-		Long:    tr("Updates the index of cores to the latest version."),
+		Short:   i18n.Tr("Updates the index of cores."),
+		Long:    i18n.Tr("Updates the index of cores to the latest version."),
 		Example: "  " + os.Args[0] + " core update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {

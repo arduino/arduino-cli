@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -26,7 +27,7 @@ import (
 func (b *Builder) link() error {
 	if b.onlyUpdateCompilationDatabase {
 		if b.logger.Verbose() {
-			b.logger.Info(tr("Skip linking of final executable."))
+			b.logger.Info(i18n.Tr("Skip linking of final executable."))
 		}
 		return nil
 	}

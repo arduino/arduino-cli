@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,8 +32,8 @@ import (
 func initUpdateIndexCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
-		Short:   tr("Updates the libraries index."),
-		Long:    tr("Updates the libraries index to the latest version."),
+		Short:   i18n.Tr("Updates the libraries index."),
+		Long:    i18n.Tr("Updates the libraries index to the latest version."),
 		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -55,7 +56,7 @@ func UpdateIndex(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rp
 	req := &rpc.UpdateLibrariesIndexRequest{Instance: inst}
 	stream, resp := commands.UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
 	if err := srv.UpdateLibrariesIndex(req, stream); err != nil {
-		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
 	return resp()
 }

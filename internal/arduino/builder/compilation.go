@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -177,9 +178,9 @@ func (b *Builder) compileFileWithRecipe(
 		}
 	} else if b.logger.Verbose() {
 		if objIsUpToDate {
-			b.logger.Info(tr("Using previously compiled file: %[1]s", objectFile))
+			b.logger.Info(i18n.Tr("Using previously compiled file: %[1]s", objectFile))
 		} else {
-			b.logger.Info(tr("Skipping compile of: %[1]s", objectFile))
+			b.logger.Info(i18n.Tr("Skipping compile of: %[1]s", objectFile))
 		}
 	}
 

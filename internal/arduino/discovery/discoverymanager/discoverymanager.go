@@ -43,8 +43,6 @@ type DiscoveryManager struct {
 	userAgent          string
 }
 
-var tr = i18n.Tr
-
 // New creates a new DiscoveryManager
 func New(userAgent string) *DiscoveryManager {
 	return &DiscoveryManager{
@@ -132,7 +130,7 @@ func (dm *DiscoveryManager) add(d *discovery.Client) error {
 
 	id := d.GetID()
 	if _, has := dm.discoveries[id]; has {
-		return errors.New(tr("pluggable discovery already added: %s", id))
+		return errors.New(i18n.Tr("pluggable discovery already added: %s", id))
 	}
 	dm.discoveries[id] = d
 
@@ -203,11 +201,11 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.Client) (discErr error) 
 	}()
 
 	if err := d.Run(); err != nil {
-		return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
+		return fmt.Errorf(i18n.Tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
 	}
 	eventCh, err := d.StartSync(5)
 	if err != nil {
-		return fmt.Errorf("%s: %s", tr("starting discovery %s", d.GetID()), err)
+		return fmt.Errorf("%s: %s", i18n.Tr("starting discovery %s", d.GetID()), err)
 	}
 
 	go func(d *discovery.Client) {

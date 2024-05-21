@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -117,7 +118,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		if targetPlatform == nil {
 			return &cmderrors.PlatformNotFoundError{
 				Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
-				Cause:    fmt.Errorf(tr("platform not installed")),
+				Cause:    fmt.Errorf(i18n.Tr("platform not installed")),
 			}
 		}
 		return &cmderrors.InvalidFQBNError{Cause: err}
@@ -151,7 +152,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	encryptProp := boardBuildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
 	if !(keychainProp == signProp && signProp == encryptProp) {
-		return fmt.Errorf(tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
+		return fmt.Errorf(i18n.Tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
 
 	// Generate or retrieve build path
@@ -168,7 +169,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		buildPath = sk.DefaultBuildPath()
 	}
 	if err = buildPath.MkdirAll(); err != nil {
-		return &cmderrors.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build directory"), Cause: err}
 	}
 	buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
 	// cache is purged after compilation to not remove entries that might be required
@@ -183,10 +184,10 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	} else {
 		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
 		if err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
 		}
 		if err := buildCachePath.MkdirAll(); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
 		}
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
@@ -247,11 +248,11 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
-			return &cmderrors.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
+			return &cmderrors.InvalidArgumentError{Message: i18n.Tr("Invalid build properties"), Cause: err}
 		}
 		if errors.Is(err, builder.ErrSketchCannotBeLocatedInBuildPath) {
 			return &cmderrors.CompileFailedError{
-				Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
+				Message: i18n.Tr("Sketch cannot be located in build path. Please specify a different build path"),
 			}
 		}
 		return &cmderrors.CompileFailedError{Message: err.Error()}
@@ -303,7 +304,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		for _, lib := range sketchBuilder.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
-				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
+				msg := i18n.Tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
 				errStream.Write([]byte(msg))
 			}
 			importedLibs = append(importedLibs, rpcLib)
@@ -326,13 +327,13 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		}
 		outStream.Write([]byte(fmt.Sprintf("FQBN: %s\n", normalizedFQBN)))
 		core = core[strings.Index(core, ":")+1:]
-		outStream.Write([]byte(tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir) + "\n"))
-		outStream.Write([]byte(tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir) + "\n"))
+		outStream.Write([]byte(i18n.Tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir) + "\n"))
+		outStream.Write([]byte(i18n.Tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir) + "\n"))
 		outStream.Write([]byte("\n"))
 	}
 	if !targetBoard.Properties.ContainsKey("build.board") {
 		outStream.Write([]byte(
-			tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
+			i18n.Tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
 				targetBoard.String(), "'build.board'", sketchBuilder.GetBuildProperties().Get("build.board")) + "\n"))
 	}
 
@@ -364,7 +365,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		if !buildPath.EqualsTo(exportPath) {
 			logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 			if err := exportPath.MkdirAll(); err != nil {
-				return &cmderrors.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
+				return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error creating output dir"), Cause: err}
 			}
 
 			baseName, ok := sketchBuilder.GetBuildProperties().GetOk("build.project_name") // == "sketch.ino"
@@ -373,14 +374,14 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 			}
 			buildFiles, err := sketchBuilder.GetBuildPath().ReadDir()
 			if err != nil {
-				return &cmderrors.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
+				return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error reading build directory"), Cause: err}
 			}
 			buildFiles.FilterPrefix(baseName)
 			for _, buildFile := range buildFiles {
 				exportedFile := exportPath.Join(buildFile.Base())
 				logrus.WithField("src", buildFile).WithField("dest", exportedFile).Trace("Copying artifact.")
 				if err = buildFile.CopyTo(exportedFile); err != nil {
-					return &cmderrors.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
+					return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error copying output file %s", buildFile), Cause: err}
 				}
 			}
 		}

@@ -42,20 +42,18 @@ type Sketch struct {
 	Project          *Project
 }
 
-var tr = i18n.Tr
-
 // New creates an Sketch instance by reading all the files composing a sketch and grouping them
 // by file type.
 func New(path *paths.Path) (*Sketch, error) {
 	if path == nil {
-		return nil, fmt.Errorf(tr("sketch path is not valid"))
+		return nil, fmt.Errorf(i18n.Tr("sketch path is not valid"))
 	}
 
 	path = path.Canonical()
 	if exist, err := path.ExistCheck(); err != nil {
-		return nil, fmt.Errorf("%s: %s", tr("sketch path is not valid"), err)
+		return nil, fmt.Errorf("%s: %s", i18n.Tr("sketch path is not valid"), err)
 	} else if !exist {
-		return nil, fmt.Errorf("%s: %s", tr("no such file or directory"), path)
+		return nil, fmt.Errorf("%s: %s", i18n.Tr("no such file or directory"), path)
 	}
 	if globals.MainFileValidExtensions[path.Ext()] && !path.IsDir() {
 		path = path.Parent()
@@ -68,7 +66,7 @@ func New(path *paths.Path) (*Sketch, error) {
 			if mainFile == nil {
 				mainFile = candidateSketchMainFile
 			} else {
-				return nil, errors.New(tr("multiple main sketch files found (%[1]v, %[2]v)",
+				return nil, errors.New(i18n.Tr("multiple main sketch files found (%[1]v, %[2]v)",
 					mainFile,
 					candidateSketchMainFile,
 				))
@@ -76,7 +74,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		}
 	}
 	if mainFile == nil {
-		return nil, fmt.Errorf(tr("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension)))
+		return nil, fmt.Errorf(i18n.Tr("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension)))
 	}
 
 	sketch := &Sketch{
@@ -92,7 +90,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	if projectFile := sketch.GetProjectPath(); projectFile.Exist() {
 		prj, err := LoadProjectFile(projectFile)
 		if err != nil {
-			return nil, fmt.Errorf("%s %w", tr("error loading sketch project file:"), err)
+			return nil, fmt.Errorf("%s %w", i18n.Tr("error loading sketch project file:"), err)
 		}
 		sketch.Project = prj
 	}
@@ -107,7 +105,7 @@ func New(path *paths.Path) (*Sketch, error) {
 
 	sketchFolderFiles, err := sketch.supportedFiles()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", tr("reading sketch files"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("reading sketch files"), err)
 	}
 
 	// Collect files
@@ -136,7 +134,7 @@ func New(path *paths.Path) (*Sketch, error) {
 				sketch.RootFolderFiles.Add(p)
 			}
 		} else {
-			return nil, errors.New(tr("unknown sketch file extension '%s'", ext))
+			return nil, errors.New(i18n.Tr("unknown sketch file extension '%s'", ext))
 		}
 	}
 
@@ -197,7 +195,7 @@ func (s *Sketch) GetProfile(profileName string) (*Profile, error) {
 func (s *Sketch) checkSketchCasing() error {
 	files, err := s.FullPath.ReadDir()
 	if err != nil {
-		return fmt.Errorf("%s: %w", tr("reading files"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("reading files"), err)
 	}
 	files.FilterOutDirs()
 
@@ -278,7 +276,7 @@ type InvalidSketchFolderNameError struct {
 }
 
 func (e *InvalidSketchFolderNameError) Error() string {
-	return tr("no valid sketch found in %[1]s: missing %[2]s", e.SketchFolder, e.SketchFile)
+	return i18n.Tr("no valid sketch found in %[1]s: missing %[2]s", e.SketchFolder, e.SketchFile)
 }
 
 // DefaultBuildPath generates the default build directory for a given sketch.

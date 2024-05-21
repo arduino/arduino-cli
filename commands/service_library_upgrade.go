@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -133,7 +134,7 @@ func (s *arduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, s
 	}
 	if lib.Available == nil {
 		// library already at the latest version
-		taskCB(&rpc.TaskProgress{Message: tr("Library %s is already at the latest version", name), Completed: true})
+		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Library %s is already at the latest version", name), Completed: true})
 	} else {
 		// Install update
 		if err := s.libraryUpgrade(ctx, req.GetInstance(), []*installedLib{lib}, downloadCB, taskCB); err != nil {

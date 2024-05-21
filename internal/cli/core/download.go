@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,12 +32,12 @@ import (
 
 func initDownloadCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	downloadCommand := &cobra.Command{
-		Use:   fmt.Sprintf("download [%s:%s[@%s]]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
-		Short: tr("Downloads one or more cores and corresponding tool dependencies."),
-		Long:  tr("Downloads one or more cores and corresponding tool dependencies."),
+		Use:   fmt.Sprintf("download [%s:%s[@%s]]...", i18n.Tr("PACKAGER"), i18n.Tr("ARCH"), i18n.Tr("VERSION")),
+		Short: i18n.Tr("Downloads one or more cores and corresponding tool dependencies."),
+		Long:  i18n.Tr("Downloads one or more cores and corresponding tool dependencies."),
 		Example: "" +
-			"  " + os.Args[0] + " core download arduino:samd       # " + tr("download the latest version of Arduino SAMD core.") + "\n" +
-			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("download a specific version (in this case 1.6.9)."),
+			"  " + os.Args[0] + " core download arduino:samd       # " + i18n.Tr("download the latest version of Arduino SAMD core.") + "\n" +
+			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + i18n.Tr("download a specific version (in this case 1.6.9)."),
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			runDownloadCommand(cmd.Context(), srv, args)
@@ -55,7 +56,7 @@ func runDownloadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, a
 
 	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for i, platformRef := range platformsRefs {
@@ -67,7 +68,7 @@ func runDownloadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, a
 		}
 		stream := commands.PlatformDownloadStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
 		if err := srv.PlatformDownload(platformDownloadreq, stream); err != nil {
-			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", args[i], err), feedback.ErrNetwork)
+			feedback.Fatal(i18n.Tr("Error downloading %[1]s: %[2]v", args[i], err), feedback.ErrNetwork)
 		}
 	}
 }

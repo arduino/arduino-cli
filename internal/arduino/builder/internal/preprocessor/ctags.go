@@ -33,8 +33,6 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 )
 
-var tr = i18n.Tr
-
 // DebugPreprocessor when set to true the CTags preprocessor will output debugging info to stdout
 // this is useful for unit-testing to provide more infos
 var DebugPreprocessor bool
@@ -68,8 +66,8 @@ func PreprocessSketchWithCtags(
 
 		// Do not bail out if we are generating the compile commands database
 		stderr.WriteString(fmt.Sprintf("%s: %s",
-			tr("An error occurred adding prototypes"),
-			tr("the compilation database may be incomplete or inaccurate")))
+			i18n.Tr("An error occurred adding prototypes"),
+			i18n.Tr("the compilation database may be incomplete or inaccurate")))
 		if err := sourceFile.CopyTo(ctagsTarget); err != nil {
 			return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 		}
@@ -191,7 +189,7 @@ func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *prop
 
 	pattern := ctagsBuildProperties.Get("pattern")
 	if pattern == "" {
-		return nil, nil, errors.New(tr("%s pattern is missing", "ctags"))
+		return nil, nil, errors.New(i18n.Tr("%s pattern is missing", "ctags"))
 	}
 
 	commandLine := ctagsBuildProperties.ExpandPropsInString(pattern)

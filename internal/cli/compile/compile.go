@@ -71,15 +71,14 @@ var (
 	library                []string // List of paths to libraries root folders. Can be used multiple times for different libraries
 	libraries              []string // List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	skipLibrariesDiscovery bool
-	tr                     = i18n.Tr
 )
 
 // NewCommand created a new `compile` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	compileCommand := &cobra.Command{
 		Use:   "compile",
-		Short: tr("Compiles Arduino sketches."),
-		Long:  tr("Compiles Arduino sketches."),
+		Short: i18n.Tr("Compiles Arduino sketches."),
+		Long:  i18n.Tr("Compiles Arduino sketches."),
 		Example: "" +
 			"  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=\"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
@@ -93,47 +92,47 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 
 	fqbnArg.AddToCommand(compileCommand, srv)
 	profileArg.AddToCommand(compileCommand, srv)
-	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
+	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, i18n.Tr("Create and print a profile configuration from the build."))
 	showPropertiesArg.AddToCommand(compileCommand)
-	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
-	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
-	compileCommand.Flags().StringVar(&exportDir, "output-dir", "", tr("Save build artifacts in this directory."))
+	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, i18n.Tr("Print preprocessed code to stdout instead of compiling."))
+	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", i18n.Tr("Builds of 'core.a' are saved into this path to be cached and reused."))
+	compileCommand.Flags().StringVar(&exportDir, "output-dir", "", i18n.Tr("Save build artifacts in this directory."))
 	compileCommand.Flags().StringVar(&buildPath, "build-path", "",
-		tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))
+		i18n.Tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))
 	compileCommand.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
-		tr("List of custom build properties separated by commas. Or can be used multiple times for multiple properties."))
+		i18n.Tr("List of custom build properties separated by commas. Or can be used multiple times for multiple properties."))
 	compileCommand.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
-		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
+		i18n.Tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
 	compileCommand.Flags().StringVar(&keysKeychain, "keys-keychain", "",
-		tr("The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it."))
+		i18n.Tr("The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it."))
 	compileCommand.Flags().StringVar(&signKey, "sign-key", "",
-		tr("The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that support it."))
+		i18n.Tr("The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that support it."))
 	compileCommand.Flags().StringVar(&encryptKey, "encrypt-key", "",
-		tr("The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that support it."))
+		i18n.Tr("The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that support it."))
 	compileCommand.Flags().StringVar(&warnings, "warnings", "none",
-		tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
-	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
-	compileCommand.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
-	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
+		i18n.Tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
+	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Optional, turns on verbose mode."))
+	compileCommand.Flags().BoolVar(&quiet, "quiet", false, i18n.Tr("Optional, suppresses almost every output."))
+	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, i18n.Tr("Upload the binary after the compilation."))
 	portArgs.AddToCommand(compileCommand, srv)
-	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
+	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
 	compileCommand.Flags().StringSliceVar(&library, "library", []string{},
-		tr("Path to a single library’s root folder. Can be used multiple times or entries can be comma separated."))
+		i18n.Tr("Path to a single library’s root folder. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().StringSliceVar(&libraries, "libraries", []string{},
-		tr("Path to a collection of libraries. Can be used multiple times or entries can be comma separated."))
-	compileCommand.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
+		i18n.Tr("Path to a collection of libraries. Can be used multiple times or entries can be comma separated."))
+	compileCommand.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, i18n.Tr("Optional, optimize compile output for debugging, rather than for release."))
 	programmer.AddToCommand(compileCommand, srv)
-	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
-	compileCommand.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
+	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, i18n.Tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
+	compileCommand.Flags().BoolVar(&clean, "clean", false, i18n.Tr("Optional, cleanup the build folder and do not use any cached build."))
 	compileCommand.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", settings.GetSketch().GetAlwaysExportBinaries(),
-		tr("If set built binaries will be exported to the sketch folder."))
-	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
+		i18n.Tr("If set built binaries will be exported to the sketch folder."))
+	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", i18n.Tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	compileCommand.Flag("source-override").Hidden = true
 	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")
 	compileCommand.Flag("skip-libraries-discovery").Hidden = true
-	compileCommand.Flags().Int32VarP(&jobs, "jobs", "j", 0, tr("Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used."))
+	compileCommand.Flags().Int32VarP(&jobs, "jobs", "j", 0, i18n.Tr("Max number of parallel compiles. If set to 0 the number of available CPUs cores will be used."))
 
-	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
+	compileCommand.Flags().MarkDeprecated("build-properties", i18n.Tr("please use --build-property instead."))
 
 	return compileCommand
 }
@@ -144,10 +143,10 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
-			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"), feedback.ErrBadArgument)
+			feedback.Fatal(i18n.Tr("You cannot use the %s flag while compiling with a profile.", "--libraries"), feedback.ErrBadArgument)
 		}
 		if len(library) > 0 {
-			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--library"), feedback.ErrBadArgument)
+			feedback.Fatal(i18n.Tr("You cannot use the %s flag while compiling with a profile.", "--library"), feedback.ErrBadArgument)
 		}
 	}
 
@@ -187,20 +186,20 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	if sourceOverrides != "" {
 		data, err := paths.New(sourceOverrides).ReadFile()
 		if err != nil {
-			feedback.Fatal(tr("Error opening source code overrides data file: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error opening source code overrides data file: %v", err), feedback.ErrGeneric)
 		}
 		var o struct {
 			Overrides map[string]string `json:"overrides"`
 		}
 		if err := json.Unmarshal(data, &o); err != nil {
-			feedback.Fatal(tr("Error: invalid source code overrides data file: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error: invalid source code overrides data file: %v", err), feedback.ErrGeneric)
 		}
 		overrides = o.Overrides
 	}
 
 	showProperties, err := showPropertiesArg.Get()
 	if err != nil {
-		feedback.Fatal(tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
 	}
 
 	var stdOut, stdErr io.Writer
@@ -214,7 +213,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	var libraryAbs []string
 	for _, libPath := range paths.NewPathList(library...) {
 		if libPath, err = libPath.Abs(); err != nil {
-			feedback.Fatal(tr("Error converting path to absolute: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error converting path to absolute: %v", err), feedback.ErrGeneric)
 		}
 		libraryAbs = append(libraryAbs, libPath.String())
 	}
@@ -258,12 +257,12 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			Protocol: port.GetProtocol(),
 		})
 		if err != nil {
-			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error during Upload: %v", err), feedback.ErrGeneric)
 		}
 
 		fields := map[string]string{}
 		if len(userFieldRes.GetUserFields()) > 0 {
-			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.GetProtocol()))
+			feedback.Print(i18n.Tr("Uploading to specified board using %s protocol requires the following info:", port.GetProtocol()))
 			if f, err := arguments.AskForUserFields(userFieldRes.GetUserFields()); err != nil {
 				feedback.FatalError(err, feedback.ErrBadArgument)
 			} else {
@@ -300,7 +299,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer
 			}
-			feedback.Fatal(tr("Error during Upload: %v", err), errcode)
+			feedback.Fatal(i18n.Tr("Error during Upload: %v", err), errcode)
 		} else {
 			uploadRes = streamRes()
 		}
@@ -324,8 +323,8 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		}
 		if hasVendoredLibs {
 			msg := "\n"
-			msg += tr("WARNING: The sketch is compiled using one or more custom libraries.") + "\n"
-			msg += tr("Currently, Build Profiles only support libraries available through Arduino Library Manager.")
+			msg += i18n.Tr("WARNING: The sketch is compiled using one or more custom libraries.") + "\n"
+			msg += i18n.Tr("Currently, Build Profiles only support libraries available through Arduino Library Manager.")
 			feedback.Warning(msg)
 		}
 
@@ -373,7 +372,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	}
 
 	if compileError != nil {
-		res.Error = tr("Error during build: %v", compileError)
+		res.Error = i18n.Tr("Error during build: %v", compileError)
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
@@ -381,7 +380,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		if errors.As(compileError, &platformErr) {
 			split := strings.Split(platformErr.Platform, ":")
 			if len(split) < 2 {
-				panic(tr("Platform ID is not correct"))
+				panic(i18n.Tr("Platform ID is not correct"))
 			}
 
 			if profileArg.String() == "" {
@@ -394,9 +393,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 					res.Error += err.Error()
 				} else if len(platform.GetSearchOutput()) > 0 {
 					suggestion := fmt.Sprintf("`%s core install %s`", version.VersionInfo.Application, platformErr.Platform)
-					res.Error += tr("Try running %s", suggestion)
+					res.Error += i18n.Tr("Try running %s", suggestion)
 				} else {
-					res.Error += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
+					res.Error += i18n.Tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 				}
 			}
 		}
@@ -446,9 +445,9 @@ func (r *compileResult) String() string {
 	if build != nil && len(build.UsedLibraries) > 0 {
 		libraries := table.New()
 		libraries.SetHeader(
-			table.NewCell(tr("Used library"), titleColor),
-			table.NewCell(tr("Version"), titleColor),
-			table.NewCell(tr("Path"), pathColor))
+			table.NewCell(i18n.Tr("Used library"), titleColor),
+			table.NewCell(i18n.Tr("Version"), titleColor),
+			table.NewCell(i18n.Tr("Path"), pathColor))
 		for _, l := range build.UsedLibraries {
 			libraries.AddRow(
 				table.NewCell(l.Name, nameColor),
@@ -461,9 +460,9 @@ func (r *compileResult) String() string {
 		boardPlatform := build.BoardPlatform
 		platforms := table.New()
 		platforms.SetHeader(
-			table.NewCell(tr("Used platform"), titleColor),
-			table.NewCell(tr("Version"), titleColor),
-			table.NewCell(tr("Path"), pathColor))
+			table.NewCell(i18n.Tr("Used platform"), titleColor),
+			table.NewCell(i18n.Tr("Version"), titleColor),
+			table.NewCell(i18n.Tr("Path"), pathColor))
 		platforms.AddRow(
 			table.NewCell(boardPlatform.Id, nameColor),
 			boardPlatform.Version,

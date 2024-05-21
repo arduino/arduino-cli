@@ -33,7 +33,6 @@ import (
 
 var (
 	includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
-	tr               = i18n.Tr
 )
 
 // prepareSketchBuildPath copies the sketch source files in the build path.
@@ -41,7 +40,7 @@ var (
 // .cpp file still needs to be Arduino-preprocessed to compile).
 func (b *Builder) prepareSketchBuildPath() error {
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
-		return fmt.Errorf("%s: %w", tr("unable to create a folder to save the sketch"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("unable to create a folder to save the sketch"), err)
 	}
 
 	offset, mergedSource, err := b.sketchMergeSources(b.sourceOverrides)
@@ -72,14 +71,14 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 	getSource := func(f *paths.Path) (string, error) {
 		path, err := b.sketch.FullPath.RelTo(f)
 		if err != nil {
-			return "", fmt.Errorf("%s: %w", tr("unable to compute relative path to the sketch for the item"), err)
+			return "", fmt.Errorf("%s: %w", i18n.Tr("unable to compute relative path to the sketch for the item"), err)
 		}
 		if override, ok := overrides[path.String()]; ok {
 			return override, nil
 		}
 		data, err := f.ReadFile()
 		if err != nil {
-			return "", fmt.Errorf(tr("reading file %[1]s: %[2]s"), f, err)
+			return "", fmt.Errorf(i18n.Tr("reading file %[1]s: %[2]s"), f, err)
 		}
 		return string(data), nil
 	}
@@ -116,13 +115,13 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 	for _, file := range b.sketch.AdditionalFiles {
 		relpath, err := b.sketch.FullPath.RelTo(file)
 		if err != nil {
-			return fmt.Errorf("%s: %w", tr("unable to compute relative path to the sketch for the item"), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("unable to compute relative path to the sketch for the item"), err)
 		}
 
 		targetPath := buildPath.JoinPath(relpath)
 		// create the directory containing the target
 		if err = targetPath.Parent().MkdirAll(); err != nil {
-			return fmt.Errorf("%s: %w", tr("unable to create the folder containing the item"), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("unable to create the folder containing the item"), err)
 		}
 
 		var sourceBytes []byte
@@ -133,7 +132,7 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 			// read the source file
 			s, err := file.ReadFile()
 			if err != nil {
-				return fmt.Errorf("%s: %w", tr("unable to read contents of the source item"), err)
+				return fmt.Errorf("%s: %w", i18n.Tr("unable to read contents of the source item"), err)
 			}
 			sourceBytes = s
 		}
@@ -143,7 +142,7 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {
-			return fmt.Errorf("%s: %w", tr("unable to write to destination file"), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("unable to write to destination file"), err)
 		}
 	}
 
@@ -160,7 +159,7 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	// Read the destination file if it exists
 	existingBytes, err := destPath.ReadFile()
 	if err != nil {
-		return fmt.Errorf("%s: %w", tr("unable to read contents of the destination item"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("unable to read contents of the destination item"), err)
 	}
 
 	// Overwrite if contents are different
@@ -241,7 +240,7 @@ func (b *Builder) mergeSketchWithBootloader() error {
 	bootloaderPath := b.buildProperties.GetPath("runtime.platform.path").Join("bootloaders", bootloader)
 	if bootloaderPath.NotExist() {
 		if b.logger.Verbose() {
-			b.logger.Warn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
+			b.logger.Warn(i18n.Tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
 		}
 		return nil
 	}

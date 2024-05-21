@@ -18,6 +18,7 @@ package arguments
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/spf13/cobra"
 )
 
@@ -48,7 +49,7 @@ func (p *ShowProperties) Get() (ShowPropertiesMode, error) {
 	case "expanded":
 		return ShowPropertiesExpanded, nil
 	default:
-		return ShowPropertiesDisabled, fmt.Errorf(tr("invalid option '%s'.", p.arg))
+		return ShowPropertiesDisabled, fmt.Errorf(i18n.Tr("invalid option '%s'.", p.arg))
 	}
 }
 
@@ -56,7 +57,7 @@ func (p *ShowProperties) Get() (ShowPropertiesMode, error) {
 func (p *ShowProperties) AddToCommand(command *cobra.Command) {
 	command.Flags().StringVar(&p.arg,
 		"show-properties", "disabled",
-		tr(`Show build properties. The properties are expanded, use "--show-properties=unexpanded" if you want them exactly as they are defined.`),
+		i18n.Tr(`Show build properties. The properties are expanded, use "--show-properties=unexpanded" if you want them exactly as they are defined.`),
 	)
 	command.Flags().Lookup("show-properties").NoOptDefVal = "expanded" // default if the flag is present with no value
 }

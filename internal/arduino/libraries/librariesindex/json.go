@@ -57,19 +57,17 @@ type indexDependency struct {
 	Version string `json:"version,omitempty"`
 }
 
-var tr = i18n.Tr
-
 // LoadIndex reads a library_index.json and create the corresponding Index
 func LoadIndex(indexFile *paths.Path) (*Index, error) {
 	buff, err := indexFile.ReadFile()
 	if err != nil {
-		return nil, fmt.Errorf(tr("reading library_index.json: %s"), err)
+		return nil, fmt.Errorf(i18n.Tr("reading library_index.json: %s"), err)
 	}
 
 	var i indexJSON
 	err = easyjson.Unmarshal(buff, &i)
 	if err != nil {
-		return nil, fmt.Errorf(tr("parsing library_index.json: %s"), err)
+		return nil, fmt.Errorf(i18n.Tr("parsing library_index.json: %s"), err)
 	}
 
 	return i.extractIndex()

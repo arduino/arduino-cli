@@ -20,6 +20,7 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -33,7 +34,7 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 	} else {
 		wd, err := paths.Getwd()
 		if err != nil {
-			feedback.Fatal(tr("Couldn't get current working directory: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Couldn't get current working directory: %v", err), feedback.ErrGeneric)
 		}
 		logrus.Infof("Reading sketch from dir: %s", wd)
 		sketchPath = wd

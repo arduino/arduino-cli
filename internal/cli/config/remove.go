@@ -22,6 +22,7 @@ import (
 	"slices"
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -30,8 +31,8 @@ import (
 func initRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	removeCommand := &cobra.Command{
 		Use:   "remove",
-		Short: tr("Removes one or more values from a setting."),
-		Long:  tr("Removes one or more values from a setting."),
+		Short: i18n.Tr("Removes one or more values from a setting."),
+		Long:  i18n.Tr("Removes one or more values from a setting."),
 		Example: "" +
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
@@ -53,15 +54,15 @@ func runRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 	key := args[0]
 
 	if !slices.Contains(getAllArraySettingsKeys(ctx, srv), key) {
-		msg := tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?", key, "config delete")
+		msg := i18n.Tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?", key, "config delete")
 		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
 	var currentValues []string
 	if resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: key}); err != nil {
-		feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	} else if err := json.Unmarshal([]byte(resp.GetEncodedValue()), &currentValues); err != nil {
-		feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot get the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	}
 
 	for _, arg := range args[1:] {
@@ -69,9 +70,9 @@ func runRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 	}
 
 	if newValuesJSON, err := json.Marshal(currentValues); err != nil {
-		feedback.Fatal(tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: string(newValuesJSON)}); err != nil {
-		feedback.Fatal(tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot remove the configuration key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	}
 
 	saveConfiguration(ctx, srv)

@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -55,17 +56,17 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 	var merr []error
 	pm.log.Infof("Loading hardware from: %s", path)
 	if err := path.ToAbs(); err != nil {
-		return append(merr, fmt.Errorf("%s: %w", tr("finding absolute path of %s", path), err))
+		return append(merr, fmt.Errorf("%s: %w", i18n.Tr("finding absolute path of %s", path), err))
 	}
 
 	if path.IsNotDir() {
-		return append(merr, errors.New(tr("%s is not a directory", path)))
+		return append(merr, errors.New(i18n.Tr("%s is not a directory", path)))
 	}
 
 	// Scan subdirs
 	packagersPaths, err := path.ReadDir()
 	if err != nil {
-		return append(merr, fmt.Errorf("%s: %w", tr("reading directory %s", path), err))
+		return append(merr, fmt.Errorf("%s: %w", i18n.Tr("reading directory %s", path), err))
 	}
 	packagersPaths.FilterOutHiddenFiles()
 	packagersPaths.FilterDirs()
@@ -94,7 +95,7 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		// Follow symlinks
 		err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
 		if err != nil {
-			merr = append(merr, fmt.Errorf("%s: %w", tr("following symlink %s", path), err))
+			merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("following symlink %s", path), err))
 			continue
 		}
 
@@ -147,7 +148,7 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 
 	platformsDirs, err := packageDir.ReadDir()
 	if err != nil {
-		return append(merr, fmt.Errorf("%s: %w", tr("reading directory %s", packageDir), err))
+		return append(merr, fmt.Errorf("%s: %w", i18n.Tr("reading directory %s", packageDir), err))
 	}
 
 	// A platform can only be inside a directory, thus we skip everything else.
@@ -175,7 +176,7 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path) error {
 	// This is not a platform
 	if platformPath.IsNotDir() {
-		return errors.New(tr("path is not a platform directory: %s", platformPath))
+		return errors.New(i18n.Tr("path is not a platform directory: %s", platformPath))
 	}
 
 	// There are two possible platform directory structures:
@@ -184,14 +185,14 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 	// We identify them by checking where is the bords.txt file
 	possibleBoardTxtPath := platformPath.Join("boards.txt")
 	if exist, err := possibleBoardTxtPath.ExistCheck(); err != nil {
-		return fmt.Errorf("%s: %w", tr("looking for boards.txt in %s", possibleBoardTxtPath), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("looking for boards.txt in %s", possibleBoardTxtPath), err)
 	} else if exist {
 		// case: ARCHITECTURE/boards.txt
 
 		platformTxtPath := platformPath.Join("platform.txt")
 		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
 		if err != nil {
-			return fmt.Errorf("%s: %w", tr("loading platform.txt"), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("loading platform.txt"), err)
 		}
 
 		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
@@ -204,7 +205,7 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 		platform.ManuallyInstalled = true
 		release := platform.GetOrCreateRelease(version)
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
-			return fmt.Errorf("%s: %w", tr("loading platform release %s", release), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
 		}
 		pm.log.WithField("platform", release).Infof("Loaded platform")
 
@@ -214,25 +215,25 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 
 		versionDirs, err := platformPath.ReadDir()
 		if err != nil {
-			return fmt.Errorf("%s: %w", tr("reading directory %s", platformPath), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("reading directory %s", platformPath), err)
 		}
 		versionDirs.FilterDirs()
 		versionDirs.FilterOutHiddenFiles()
 		for _, versionDir := range versionDirs {
 			if exist, err := versionDir.Join("boards.txt").ExistCheck(); err != nil {
-				return fmt.Errorf("%s: %w", tr("opening boards.txt"), err)
+				return fmt.Errorf("%s: %w", i18n.Tr("opening boards.txt"), err)
 			} else if !exist {
 				continue
 			}
 
 			version, err := semver.Parse(versionDir.Base())
 			if err != nil {
-				return fmt.Errorf("%s: %w", tr("invalid version directory %s", versionDir), err)
+				return fmt.Errorf("%s: %w", i18n.Tr("invalid version directory %s", versionDir), err)
 			}
 			platform := targetPackage.GetOrCreatePlatform(architecture)
 			release := platform.GetOrCreateRelease(version)
 			if err := pm.loadPlatformRelease(release, versionDir); err != nil {
-				return fmt.Errorf("%s: %w", tr("loading platform release %s", release), err)
+				return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
 			}
 			pm.log.WithField("platform", release).Infof("Loaded platform")
 		}
@@ -251,7 +252,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	platform.Timestamps.AddFile(installedJSONPath)
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
-			return fmt.Errorf(tr("loading %[1]s: %[2]s"), installedJSONPath, err)
+			return fmt.Errorf(i18n.Tr("loading %[1]s: %[2]s"), installedJSONPath, err)
 		}
 	}
 
@@ -264,7 +265,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	if p, err := properties.SafeLoadFromPath(platformTxtPath); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtPath, err)
+		return fmt.Errorf(i18n.Tr("loading %[1]s: %[2]s"), platformTxtPath, err)
 	}
 
 	platformTxtLocalPath := path.Join("platform.local.txt")
@@ -272,7 +273,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	if p, err := properties.SafeLoadFromPath(platformTxtLocalPath); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
+		return fmt.Errorf(i18n.Tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
 	}
 
 	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 || platform.Properties.SubTree("pluggable_monitor").Size() > 0 {
@@ -310,7 +311,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	}
 
 	if err := pm.loadBoards(platform); err != nil {
-		return fmt.Errorf(tr("loading boards: %s"), err)
+		return fmt.Errorf(i18n.Tr("loading boards: %s"), err)
 	}
 
 	if !platform.PluggableDiscoveryAware {
@@ -322,7 +323,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
 		split := strings.Split(ref, ":")
 		if len(split) != 2 {
-			return fmt.Errorf(tr("invalid pluggable monitor reference: %s"), ref)
+			return fmt.Errorf(i18n.Tr("invalid pluggable monitor reference: %s"), ref)
 		}
 		pm.log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
 		platform.Monitors[protocol] = &cores.MonitorDependency{
@@ -416,7 +417,7 @@ func (pm *Builder) loadProgrammer(programmerProperties *properties.Map) *cores.P
 
 func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.InstallDir == nil {
-		return fmt.Errorf(tr("platform not installed"))
+		return fmt.Errorf(i18n.Tr("platform not installed"))
 	}
 
 	boardsTxtPath := platform.InstallDir.Join("boards.txt")
@@ -578,7 +579,7 @@ func (pm *Builder) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPa
 
 	toolsPaths, err := toolsPath.ReadDir()
 	if err != nil {
-		return append(merr, fmt.Errorf("%s: %w", tr("reading directory %s", toolsPath), err))
+		return append(merr, fmt.Errorf("%s: %w", i18n.Tr("reading directory %s", toolsPath), err))
 	}
 	toolsPaths.FilterDirs()
 	toolsPaths.FilterOutHiddenFiles()
@@ -586,7 +587,7 @@ func (pm *Builder) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPa
 		name := toolPath.Base()
 		tool := targetPackage.GetOrCreateTool(name)
 		if err = pm.loadToolReleasesFromTool(tool, toolPath); err != nil {
-			merr = append(merr, fmt.Errorf("%s: %w", tr("loading tool release in %s", toolPath), err))
+			merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("loading tool release in %s", toolPath), err))
 		}
 	}
 	return merr
@@ -611,9 +612,9 @@ func (pm *Builder) loadToolReleasesFromTool(tool *cores.Tool, toolPath *paths.Pa
 
 func (pm *Builder) loadToolReleaseFromDirectory(tool *cores.Tool, version *semver.RelaxedVersion, toolReleasePath *paths.Path) error {
 	if absToolReleasePath, err := toolReleasePath.Abs(); err != nil {
-		return errors.New(tr("error opening %s", absToolReleasePath))
+		return errors.New(i18n.Tr("error opening %s", absToolReleasePath))
 	} else if !absToolReleasePath.IsDir() {
-		return errors.New(tr("%s is not a directory", absToolReleasePath))
+		return errors.New(i18n.Tr("%s is not a directory", absToolReleasePath))
 	} else {
 		toolRelease := tool.GetOrCreateRelease(version)
 		toolRelease.InstallDir = absToolReleasePath
@@ -640,11 +641,11 @@ func (pme *Explorer) LoadDiscoveries() []error {
 func (pme *Explorer) loadDiscovery(id string) error {
 	tool := pme.GetTool(id)
 	if tool == nil {
-		return errors.New(tr("discovery %s not found", id))
+		return errors.New(i18n.Tr("discovery %s not found", id))
 	}
 	toolRelease := tool.GetLatestInstalled()
 	if toolRelease == nil {
-		return errors.New(tr("discovery %s not installed", id))
+		return errors.New(i18n.Tr("discovery %s not installed", id))
 	}
 	discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
 	pme.discoveryManager.Add(id, discoveryPath)
@@ -708,7 +709,7 @@ func (pme *Explorer) loadDiscoveries(release *cores.PlatformRelease) []error {
 	for discoveryID, props := range discoveryIDs {
 		pattern, ok := props.GetOk("pattern")
 		if !ok {
-			merr = append(merr, errors.New(tr("can't find pattern for discovery with id %s", discoveryID)))
+			merr = append(merr, errors.New(i18n.Tr("can't find pattern for discovery with id %s", discoveryID)))
 			continue
 		}
 		configuration := release.Properties.Clone()

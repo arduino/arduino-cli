@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,8 +32,8 @@ import (
 func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	upgradeCommand := &cobra.Command{
 		Use:   "upgrade",
-		Short: tr("Upgrades installed libraries."),
-		Long:  tr("This command upgrades an installed library to the latest available version. Multiple libraries can be passed separated by a space. If no arguments are provided, the command will upgrade all the installed libraries where an update is available."),
+		Short: i18n.Tr("Upgrades installed libraries."),
+		Long:  i18n.Tr("This command upgrades an installed library to the latest available version. Multiple libraries can be passed separated by a space. If no arguments are provided, the command will upgrade all the installed libraries where an update is available."),
 		Example: "  " + os.Args[0] + " lib upgrade \n" +
 			"  " + os.Args[0] + " lib upgrade Audio\n" +
 			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
@@ -71,7 +72,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rp
 	}
 
 	if upgradeErr != nil {
-		feedback.Fatal(fmt.Sprintf("%s: %v", tr("Error upgrading libraries"), upgradeErr), feedback.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("%s: %v", i18n.Tr("Error upgrading libraries"), upgradeErr), feedback.ErrGeneric)
 	}
 
 	logrus.Info("Done")

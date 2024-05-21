@@ -18,6 +18,7 @@ package arguments
 import (
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +29,7 @@ type DiscoveryTimeout struct {
 
 // AddToCommand adds the flags used to set fqbn to the specified Command
 func (d *DiscoveryTimeout) AddToCommand(cmd *cobra.Command) {
-	cmd.Flags().DurationVar(&d.timeout, "discovery-timeout", time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
+	cmd.Flags().DurationVar(&d.timeout, "discovery-timeout", time.Second, i18n.Tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
 }
 
 // Get returns the timeout

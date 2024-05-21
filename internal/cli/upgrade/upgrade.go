@@ -29,15 +29,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand creates a new `upgrade` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
 		Use:     "upgrade",
-		Short:   tr("Upgrades installed cores and libraries."),
-		Long:    tr("Upgrades installed cores and libraries to latest version."),
+		Short:   i18n.Tr("Upgrades installed cores and libraries."),
+		Long:    i18n.Tr("Upgrades installed cores and libraries to latest version."),
 		Example: "  " + os.Args[0] + " upgrade",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {

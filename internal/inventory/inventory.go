@@ -35,7 +35,6 @@ var (
 	Type = "yaml"
 	// Name is the inventory file Name with Type as extension
 	Name           = "inventory" + "." + Type
-	tr             = i18n.Tr
 	configFilePath string
 )
 
@@ -65,13 +64,13 @@ func Init(configPath string) error {
 func generateInstallationData() error {
 	installationID, err := uuid.NewV4()
 	if err != nil {
-		return fmt.Errorf(tr("generating installation.id: %w"), err)
+		return fmt.Errorf(i18n.Tr("generating installation.id: %w"), err)
 	}
 	Store.Set("installation.id", installationID.String())
 
 	installationSecret, err := uuid.NewV4()
 	if err != nil {
-		return fmt.Errorf(tr("generating installation.secret: %w"), err)
+		return fmt.Errorf(i18n.Tr("generating installation.secret: %w"), err)
 	}
 	Store.Set("installation.secret", installationSecret.String())
 	return nil
@@ -90,13 +89,13 @@ func WriteStore() error {
 	// Create config dir if not present,
 	// MkdirAll will retrun no error if the path already exists
 	if err := os.MkdirAll(configPath, os.FileMode(0755)); err != nil {
-		return fmt.Errorf(tr("invalid path creating config dir: %[1]s error: %[2]w"), configPath, err)
+		return fmt.Errorf(i18n.Tr("invalid path creating config dir: %[1]s error: %[2]w"), configPath, err)
 	}
 
 	// Create file if not present
 	err := Store.WriteConfigAs(configFilePath)
 	if err != nil {
-		return fmt.Errorf(tr("invalid path writing inventory file: %[1]s error: %[2]w"), configFilePath, err)
+		return fmt.Errorf(i18n.Tr("invalid path writing inventory file: %[1]s error: %[2]w"), configFilePath, err)
 	}
 
 	return nil

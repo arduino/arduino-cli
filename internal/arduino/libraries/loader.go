@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -51,7 +52,7 @@ func addUtilityDirectory(library *Library) {
 func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library, error) {
 	libProperties, err := properties.Load(libraryDir.Join("library.properties").String())
 	if err != nil {
-		return nil, fmt.Errorf(tr("loading library.properties: %s"), err)
+		return nil, fmt.Errorf(i18n.Tr("loading library.properties: %s"), err)
 	}
 
 	if libProperties.Get("maintainer") == "" && libProperties.Get("email") != "" {
@@ -113,7 +114,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	}
 
 	if err := addExamples(library); err != nil {
-		return nil, fmt.Errorf("%s: %w", tr("scanning sketch examples"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("scanning sketch examples"), err)
 	}
 	library.DirName = libraryDir.Base()
 	library.Name = strings.TrimSpace(libProperties.Get("name"))
@@ -136,7 +137,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 	if foundHeader, err := containsHeaderFile(path); err != nil {
 		return nil, err
 	} else if !foundHeader {
-		return nil, errors.New(tr("invalid library: no header files found"))
+		return nil, errors.New(i18n.Tr("invalid library: no header files found"))
 	}
 	library := &Library{
 		InstallDir:    path.Canonical(),
@@ -151,7 +152,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		InDevelopment: path.Join(".development").Exist(),
 	}
 	if err := addExamples(library); err != nil {
-		return nil, fmt.Errorf("%s: %w", tr("scanning sketch examples"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("scanning sketch examples"), err)
 	}
 	addUtilityDirectory(library)
 	return library, nil
@@ -195,7 +196,7 @@ func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error
 func containsHeaderFile(d *paths.Path) (bool, error) {
 	dirContent, err := d.ReadDir()
 	if err != nil {
-		return false, fmt.Errorf(tr("reading directory %[1]s content: %[2]w", d, err))
+		return false, fmt.Errorf(i18n.Tr("reading directory %[1]s content: %[2]w", d, err))
 	}
 	dirContent.FilterOutDirs()
 	headerExtensions := []string{}

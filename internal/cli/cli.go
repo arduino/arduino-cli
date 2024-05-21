@@ -85,9 +85,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "arduino-cli",
-		Short:   tr("Arduino CLI."),
-		Long:    tr("Arduino Command Line Interface (arduino-cli)."),
-		Example: fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
+		Short:   i18n.Tr("Arduino CLI."),
+		Long:    i18n.Tr("Arduino Command Line Interface (arduino-cli)."),
+		Example: fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], i18n.Tr("command"), i18n.Tr("flags")),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 
@@ -98,7 +98,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			}
 			if outputFormat != "text" {
 				cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
-					feedback.Fatal(tr("Should show help message, but it is available only in TEXT mode."), feedback.ErrBadArgument)
+					feedback.Fatal(i18n.Tr("Should show help message, but it is available only in TEXT mode."), feedback.ErrBadArgument)
 				})
 			}
 
@@ -163,27 +163,27 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.AddCommand(version.NewCommand(srv))
 	cmd.AddCommand(feedback.NewCommand())
 
-	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
+	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Print the logs on the standard output."))
 	cmd.Flag("verbose").Hidden = true
-	cmd.PersistentFlags().BoolVar(&verbose, "log", false, tr("Print the logs on the standard output."))
+	cmd.PersistentFlags().BoolVar(&verbose, "log", false, i18n.Tr("Print the logs on the standard output."))
 	validLogLevels := []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}
-	cmd.PersistentFlags().StringVar(&logLevel, "log-level", defaultLogLevel, tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
+	cmd.PersistentFlags().StringVar(&logLevel, "log-level", defaultLogLevel, i18n.Tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-level", cobra.FixedCompletions(validLogLevels, cobra.ShellCompDirectiveDefault))
-	cmd.PersistentFlags().StringVar(&logFile, "log-file", defaultLogFile, tr("Path to the file where logs will be written."))
+	cmd.PersistentFlags().StringVar(&logFile, "log-file", defaultLogFile, i18n.Tr("Path to the file where logs will be written."))
 	validLogFormats := []string{"text", "json"}
-	cmd.PersistentFlags().StringVar(&logFormat, "log-format", defaultLogFormat, tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
+	cmd.PersistentFlags().StringVar(&logFormat, "log-format", defaultLogFormat, i18n.Tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-format", cobra.FixedCompletions(validLogFormats, cobra.ShellCompDirectiveDefault))
 	validOutputFormats := []string{"text", "json", "jsonmini"}
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The command output format, can be: %s", strings.Join(validOutputFormats, ", ")))
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", i18n.Tr("The command output format, can be: %s", strings.Join(validOutputFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("format", cobra.FixedCompletions(validOutputFormats, cobra.ShellCompDirectiveDefault))
 	cmd.Flag("format").Hidden = true
-	cmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, tr("Print the output in JSON format."))
-	cmd.PersistentFlags().StringSliceVar(&additionalUrls, "additional-urls", defaultAdditionalURLs, tr("Comma-separated list of additional URLs for the Boards Manager."))
+	cmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, i18n.Tr("Print the output in JSON format."))
+	cmd.PersistentFlags().StringSliceVar(&additionalUrls, "additional-urls", defaultAdditionalURLs, i18n.Tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().BoolVar(&noColor, "no-color", defaultOutputNoColor, "Disable colored output.")
 
 	// We are not using cobra to parse this flag, because we manually parse it in main.go.
 	// Just leaving it here so cobra will not complain about it.
-	cmd.PersistentFlags().String("config-file", "", tr("The custom config file (if not specified the default will be used)."))
+	cmd.PersistentFlags().String("config-file", "", i18n.Tr("The custom config file (if not specified the default will be used)."))
 	return cmd
 }
 
@@ -216,7 +216,7 @@ func preRun(verbose bool, outputFormat string, logLevel, logFile, logFormat stri
 	// use the output format to configure the Feedback
 	format, ok := feedback.ParseOutputFormat(outputFormat)
 	if !ok {
-		feedback.Fatal(tr("Invalid output format: %s", outputFormat), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Invalid output format: %s", outputFormat), feedback.ErrBadArgument)
 	}
 	feedback.SetFormat(format)
 
@@ -246,7 +246,7 @@ func preRun(verbose bool, outputFormat string, logLevel, logFile, logFormat stri
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			feedback.Fatal(tr("Unable to open file for logging: %s", logFile), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Unable to open file for logging: %s", logFile), feedback.ErrGeneric)
 		}
 
 		// we use a hook so we don't get color codes in the log file
@@ -259,7 +259,7 @@ func preRun(verbose bool, outputFormat string, logLevel, logFile, logFormat stri
 
 	// configure logging filter
 	if logrusLevel, found := toLogLevel(logLevel); !found {
-		feedback.Fatal(tr("Invalid logging level: %s", logLevel), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Invalid logging level: %s", logLevel), feedback.ErrBadArgument)
 	} else {
 		logrus.SetLevel(logrusLevel)
 	}

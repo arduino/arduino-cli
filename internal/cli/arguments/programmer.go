@@ -18,6 +18,7 @@ package arguments
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +32,7 @@ type Programmer struct {
 
 // AddToCommand adds the flags used to set the programmer to the specified Command
 func (p *Programmer) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
-	cmd.Flags().StringVarP(&p.programmer, "programmer", "P", "", tr("Programmer to use, e.g: atmel_ice"))
+	cmd.Flags().StringVarP(&p.programmer, "programmer", "P", "", i18n.Tr("Programmer to use, e.g: atmel_ice"))
 	cmd.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledProgrammers(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 	})

@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -38,7 +39,7 @@ func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	)
 	debugCheckCommand := &cobra.Command{
 		Use:     "check",
-		Short:   tr("Check if the given board/programmer combination supports debugging."),
+		Short:   i18n.Tr("Check if the given board/programmer combination supports debugging."),
 		Example: "  " + os.Args[0] + " debug check -b arduino:samd:mkr1000 -P atmel_ice",
 		Run: func(cmd *cobra.Command, args []string) {
 			runDebugCheckCommand(cmd.Context(), srv, &portArgs, &fqbnArg, interpreter, &programmer)
@@ -47,7 +48,7 @@ func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	fqbnArg.AddToCommand(debugCheckCommand, srv)
 	portArgs.AddToCommand(debugCheckCommand, srv)
 	programmer.AddToCommand(debugCheckCommand, srv)
-	debugCheckCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
+	debugCheckCommand.Flags().StringVar(&interpreter, "interpreter", "console", i18n.Tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	return debugCheckCommand
 }
 
@@ -83,7 +84,7 @@ func (d *debugCheckResult) Data() interface{} {
 
 func (d *debugCheckResult) String() string {
 	if d.Result.DebuggingSupported {
-		return tr("The given board/programmer configuration supports debugging.")
+		return i18n.Tr("The given board/programmer configuration supports debugging.")
 	}
-	return tr("The given board/programmer configuration does NOT support debugging.")
+	return i18n.Tr("The given board/programmer configuration does NOT support debugging.")
 }

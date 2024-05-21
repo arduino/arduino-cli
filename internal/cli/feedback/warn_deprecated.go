@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -35,7 +36,7 @@ func WarnAboutDeprecatedFiles(s *rpc.Sketch) {
 	}
 	if len(files) > 0 {
 		// .pde files are still supported but deprecated, this warning urges the user to rename them
-		msg := tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+		msg := i18n.Tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 		for _, f := range files {
 			msg += fmt.Sprintf("\n - %s", f)
 		}

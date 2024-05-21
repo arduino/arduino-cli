@@ -45,8 +45,8 @@ var (
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	burnBootloaderCommand := &cobra.Command{
 		Use:     "burn-bootloader",
-		Short:   tr("Upload the bootloader."),
-		Long:    tr("Upload the bootloader on the board using an external programmer."),
+		Short:   i18n.Tr("Upload the bootloader."),
+		Long:    i18n.Tr("Upload the bootloader on the board using an external programmer."),
 		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -57,9 +57,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	fqbn.AddToCommand(burnBootloaderCommand, srv)
 	port.AddToCommand(burnBootloaderCommand, srv)
 	programmer.AddToCommand(burnBootloaderCommand, srv)
-	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
-	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
-	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
+	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
+	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Turns on verbose mode."))
+	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, i18n.Tr("Do not perform the actual upload, just log out actions"))
 	burnBootloaderCommand.Flags().MarkHidden("dry-run")
 
 	return burnBootloaderCommand
@@ -73,7 +73,7 @@ func runBootloaderCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer)
 	// We don't need a Sketch to upload a board's bootloader
 	discoveryPort, err := port.GetPort(ctx, instance, srv, "", "")
 	if err != nil {
-		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 
 	stdOut, stdErr, res := feedback.OutputStreams()
@@ -94,7 +94,7 @@ func runBootloaderCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer)
 		if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 			errcode = feedback.ErrMissingProgrammer
 		}
-		feedback.Fatal(tr("Error during Upload: %v", err), errcode)
+		feedback.Fatal(i18n.Tr("Error during Upload: %v", err), errcode)
 	}
 	feedback.PrintResult(res())
 }

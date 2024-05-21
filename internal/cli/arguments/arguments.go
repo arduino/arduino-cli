@@ -23,8 +23,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // CheckFlagsConflicts is a helper function useful to report errors when more than one conflicting flag is used
 func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
 	for _, flagName := range flagNames {
@@ -33,7 +31,7 @@ func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
 		}
 	}
 	flags := "--" + strings.Join(flagNames, ", --")
-	msg := tr("Can't use the following flags together: %s", flags)
+	msg := i18n.Tr("Can't use the following flags together: %s", flags)
 	feedback.Fatal(msg, feedback.ErrBadArgument)
 }
 
@@ -44,7 +42,7 @@ func CheckFlagsMandatory(command *cobra.Command, flagNames ...string) {
 			continue
 		}
 		flags := "--" + strings.Join(flagNames, ", --")
-		msg := tr("Flag %[1]s is mandatory when used in conjunction with: %[2]s", "--"+flagName, flags)
+		msg := i18n.Tr("Flag %[1]s is mandatory when used in conjunction with: %[2]s", "--"+flagName, flags)
 		feedback.Fatal(msg, feedback.ErrBadArgument)
 	}
 }

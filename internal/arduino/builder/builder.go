@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -306,7 +307,7 @@ func (b *Builder) preprocess() error {
 	}
 	b.Progress.CompleteStep()
 
-	b.logIfVerbose(false, tr("Detecting libraries used..."))
+	b.logIfVerbose(false, i18n.Tr("Detecting libraries used..."))
 	err := b.libsDetector.FindIncludes(
 		b.ctx,
 		b.buildPath,
@@ -326,7 +327,7 @@ func (b *Builder) preprocess() error {
 	b.warnAboutArchIncompatibleLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 
-	b.logIfVerbose(false, tr("Generating function prototypes..."))
+	b.logIfVerbose(false, i18n.Tr("Generating function prototypes..."))
 	if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
@@ -378,7 +379,7 @@ func (b *Builder) Build() error {
 
 // Build fixdoc
 func (b *Builder) build() error {
-	b.logIfVerbose(false, tr("Compiling sketch..."))
+	b.logIfVerbose(false, i18n.Tr("Compiling sketch..."))
 	if err := b.RunRecipe("recipe.hooks.sketch.prebuild", ".pattern", false); err != nil {
 		return err
 	}
@@ -394,7 +395,7 @@ func (b *Builder) build() error {
 	}
 	b.Progress.CompleteStep()
 
-	b.logIfVerbose(false, tr("Compiling libraries..."))
+	b.logIfVerbose(false, i18n.Tr("Compiling libraries..."))
 	if err := b.RunRecipe("recipe.hooks.libraries.prebuild", ".pattern", false); err != nil {
 		return err
 	}
@@ -415,7 +416,7 @@ func (b *Builder) build() error {
 	}
 	b.Progress.CompleteStep()
 
-	b.logIfVerbose(false, tr("Compiling core..."))
+	b.logIfVerbose(false, i18n.Tr("Compiling core..."))
 	if err := b.RunRecipe("recipe.hooks.core.prebuild", ".pattern", false); err != nil {
 		return err
 	}
@@ -431,7 +432,7 @@ func (b *Builder) build() error {
 	}
 	b.Progress.CompleteStep()
 
-	b.logIfVerbose(false, tr("Linking everything together..."))
+	b.logIfVerbose(false, i18n.Tr("Linking everything together..."))
 	if err := b.RunRecipe("recipe.hooks.linking.prelink", ".pattern", false); err != nil {
 		return err
 	}
@@ -481,7 +482,7 @@ func (b *Builder) build() error {
 func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*paths.Process, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, fmt.Errorf(tr("%[1]s pattern is missing"), recipe)
+		return nil, fmt.Errorf(i18n.Tr("%[1]s pattern is missing"), recipe)
 	}
 
 	commandLine := buildProperties.ExpandPropsInString(pattern)

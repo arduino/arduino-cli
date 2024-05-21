@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 )
@@ -59,7 +60,7 @@ func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 
 	libs := lmi.FindByReference(req.GetName(), version, libraries.User)
 	if len(libs) == 0 {
-		taskCB(&rpc.TaskProgress{Message: tr("Library %s is not installed", req.GetName()), Completed: true})
+		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Library %s is not installed", req.GetName()), Completed: true})
 		syncSend.Send(&rpc.LibraryUninstallResponse{
 			Message: &rpc.LibraryUninstallResponse_Result_{Result: &rpc.LibraryUninstallResponse_Result{}},
 		})
@@ -67,7 +68,7 @@ func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 	}
 
 	if len(libs) == 1 {
-		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", libs)})
+		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Uninstalling %s", libs)})
 		lmi.Uninstall(libs[0])
 		taskCB(&rpc.TaskProgress{Completed: true})
 		syncSend.Send(&rpc.LibraryUninstallResponse{
@@ -83,6 +84,6 @@ func (s *arduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 	return &cmderrors.MultipleLibraryInstallDetected{
 		LibName: libs[0].Name,
 		LibsDir: libsDir,
-		Message: tr("Automatic library uninstall can't be performed in this case, please manually remove them."),
+		Message: i18n.Tr("Automatic library uninstall can't be performed in this case, please manually remove them."),
 	}
 }

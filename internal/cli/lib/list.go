@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,9 +36,9 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var all bool
 	var updatable bool
 	listCommand := &cobra.Command{
-		Use:   fmt.Sprintf("list [%s]", tr("LIBNAME")),
-		Short: tr("Shows a list of installed libraries."),
-		Long: tr(`Shows a list of installed libraries.
+		Use:   fmt.Sprintf("list [%s]", i18n.Tr("LIBNAME")),
+		Short: i18n.Tr("Shows a list of installed libraries."),
+		Long: i18n.Tr(`Shows a list of installed libraries.
 
 If the LIBNAME parameter is specified the listing is limited to that specific
 library. By default the libraries provided as built-in by platforms/core are
@@ -51,9 +52,9 @@ not listed, they can be listed by adding the --all flag.`),
 			List(ctx, srv, instance, args, all, updatable)
 		},
 	}
-	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
+	listCommand.Flags().BoolVar(&all, "all", false, i18n.Tr("Include built-in libraries (from platforms and IDE) in listing."))
 	fqbn.AddToCommand(listCommand, srv)
-	listCommand.Flags().BoolVar(&updatable, "updatable", false, tr("List updatable libraries."))
+	listCommand.Flags().BoolVar(&updatable, "updatable", false, i18n.Tr("List updatable libraries."))
 	return listCommand
 }
 
@@ -87,7 +88,7 @@ func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rp
 		Fqbn:      fqbn.String(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error listing libraries: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error listing libraries: %v", err), feedback.ErrGeneric)
 	}
 
 	libs := []*rpc.InstalledLibrary{}
@@ -124,9 +125,9 @@ func (ir installedResult) Data() interface{} {
 func (ir installedResult) String() string {
 	if len(ir.InstalledLibs) == 0 {
 		if ir.onlyUpdates {
-			return tr("No libraries update is available.")
+			return i18n.Tr("No libraries update is available.")
 		}
-		return tr("No libraries installed.")
+		return i18n.Tr("No libraries installed.")
 	}
 	sort.Slice(ir.InstalledLibs, func(i, j int) bool {
 		return strings.ToLower(ir.InstalledLibs[i].Library.Name) < strings.ToLower(ir.InstalledLibs[j].Library.Name) ||
@@ -134,7 +135,7 @@ func (ir installedResult) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader(tr("Name"), tr("Installed"), tr("Available"), tr("Location"), tr("Description"))
+	t.SetHeader(i18n.Tr("Name"), i18n.Tr("Installed"), i18n.Tr("Available"), i18n.Tr("Location"), i18n.Tr("Description"))
 	t.SetColumnWidthMode(1, table.Average)
 	t.SetColumnWidthMode(2, table.Average)
 	t.SetColumnWidthMode(4, table.Average)

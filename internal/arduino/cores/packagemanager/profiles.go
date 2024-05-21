@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -42,7 +43,7 @@ func (pmb *Builder) LoadHardwareForProfile(ctx context.Context, p *sketch.Profil
 	indexURLs := map[string]*url.URL{}
 	for _, platformRef := range p.Platforms {
 		if platformRelease, err := pmb.loadProfilePlatform(ctx, platformRef, installMissing, downloadCB, taskCB, settings); err != nil {
-			merr = append(merr, fmt.Errorf("%s: %w", tr("loading required platform %s", platformRef), err))
+			merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("loading required platform %s", platformRef), err))
 			logrus.WithField("platform", platformRef).WithError(err).Debugf("Error loading platform for profile")
 		} else {
 			platformReleases = append(platformReleases, platformRelease)
@@ -58,7 +59,7 @@ func (pmb *Builder) LoadHardwareForProfile(ctx context.Context, p *sketch.Profil
 		for _, toolDep := range platformRelease.ToolDependencies {
 			indexURL := indexURLs[toolDep.ToolPackager]
 			if err := pmb.loadProfileTool(ctx, toolDep, indexURL, installMissing, downloadCB, taskCB, settings); err != nil {
-				merr = append(merr, fmt.Errorf("%s: %w", tr("loading required tool %s", toolDep), err))
+				merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("loading required tool %s", toolDep), err))
 				logrus.WithField("tool", toolDep).WithField("index_url", indexURL).WithError(err).Debugf("Error loading tool for profile")
 			} else {
 				logrus.WithField("tool", toolDep).WithField("index_url", indexURL).Debugf("Loaded tool for profile")
@@ -96,7 +97,7 @@ func (pmb *Builder) installMissingProfilePlatform(ctx context.Context, platformR
 	defer tmp.RemoveAll()
 
 	// Download the main index and parse it
-	taskCB(&rpc.TaskProgress{Name: tr("Downloading platform %s", platformRef)})
+	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Downloading platform %s", platformRef)})
 	defaultIndexURL, _ := url.Parse(globals.DefaultIndexURL)
 	indexesToDownload := []*url.URL{defaultIndexURL}
 	if platformRef.PlatformIndexURL != nil {
@@ -105,12 +106,12 @@ func (pmb *Builder) installMissingProfilePlatform(ctx context.Context, platformR
 	for _, indexURL := range indexesToDownload {
 		indexResource := resources.IndexResource{URL: indexURL}
 		if err := indexResource.Download(ctx, tmpPmb.IndexDir, downloadCB, pmb.downloaderConfig); err != nil {
-			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
-			return &cmderrors.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
+			taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error downloading %s", indexURL)})
+			return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading %s", indexURL), Cause: err}
 		}
 		if err := tmpPmb.LoadPackageIndex(indexURL); err != nil {
-			taskCB(&rpc.TaskProgress{Name: tr("Error loading index %s", indexURL)})
-			return &cmderrors.FailedInstallError{Message: tr("Error loading index %s", indexURL), Cause: err}
+			taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error loading index %s", indexURL)})
+			return &cmderrors.FailedInstallError{Message: i18n.Tr("Error loading index %s", indexURL), Cause: err}
 		}
 	}
 
@@ -123,16 +124,16 @@ func (pmb *Builder) installMissingProfilePlatform(ctx context.Context, platformR
 	defer tmpRelease()
 
 	if err := tmpPme.DownloadPlatformRelease(ctx, tmpPlatformRelease, downloadCB); err != nil {
-		taskCB(&rpc.TaskProgress{Name: tr("Error downloading platform %s", tmpPlatformRelease)})
-		return &cmderrors.FailedInstallError{Message: tr("Error downloading platform %s", tmpPlatformRelease), Cause: err}
+		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error downloading platform %s", tmpPlatformRelease)})
+		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error downloading platform %s", tmpPlatformRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Perform install
-	taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", tmpPlatformRelease)})
+	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing platform %s", tmpPlatformRelease)})
 	if err := tmpPme.InstallPlatformInDirectory(tmpPlatformRelease, destDir); err != nil {
-		taskCB(&rpc.TaskProgress{Name: tr("Error installing platform %s", tmpPlatformRelease)})
-		return &cmderrors.FailedInstallError{Message: tr("Error installing platform %s", tmpPlatformRelease), Cause: err}
+		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error installing platform %s", tmpPlatformRelease)})
+		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing platform %s", tmpPlatformRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	return nil
@@ -149,7 +150,7 @@ func (pmb *Builder) loadProfileTool(ctx context.Context, toolRef *cores.ToolDepe
 		// Try installing the missing tool
 		toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
 		if toolRelease == nil {
-			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not found", toolRef.ToolVersion))}
+			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(i18n.Tr("version %s not found", toolRef.ToolVersion))}
 		}
 		if err := pmb.installMissingProfileTool(ctx, toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
@@ -170,20 +171,20 @@ func (pmb *Builder) installMissingProfileTool(ctx context.Context, toolRelease *
 	// Download the tool
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not available for this operating system", toolRelease))}
+		return &cmderrors.InvalidVersionError{Cause: fmt.Errorf(i18n.Tr("version %s not available for this operating system", toolRelease))}
 	}
-	taskCB(&rpc.TaskProgress{Name: tr("Downloading tool %s", toolRelease)})
+	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Downloading tool %s", toolRelease)})
 	if err := toolResource.Download(ctx, pmb.DownloadDir, pmb.downloaderConfig, toolRelease.String(), downloadCB, ""); err != nil {
-		taskCB(&rpc.TaskProgress{Name: tr("Error downloading tool %s", toolRelease)})
-		return &cmderrors.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
+		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error downloading tool %s", toolRelease)})
+		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing tool %s", toolRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Install tool
-	taskCB(&rpc.TaskProgress{Name: tr("Installing tool %s", toolRelease)})
+	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing tool %s", toolRelease)})
 	if err := toolResource.Install(pmb.DownloadDir, tmp, destDir); err != nil {
-		taskCB(&rpc.TaskProgress{Name: tr("Error installing tool %s", toolRelease)})
-		return &cmderrors.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
+		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error installing tool %s", toolRelease)})
+		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing tool %s", toolRelease), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	return nil

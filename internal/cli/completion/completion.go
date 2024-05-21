@@ -35,13 +35,13 @@ func NewCommand() *cobra.Command {
 		Use:       "completion [bash|zsh|fish|powershell] [--no-descriptions]",
 		ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
 		Args:      cobra.ExactArgs(1),
-		Short:     tr("Generates completion scripts"),
-		Long:      tr("Generates completion scripts for various shells"),
+		Short:     i18n.Tr("Generates completion scripts"),
+		Long:      i18n.Tr("Generates completion scripts for various shells"),
 		Example: "  " + os.Args[0] + " completion bash > completion.sh\n" +
 			"  " + "source completion.sh",
 		Run: runCompletionCommand,
 	}
-	completionCommand.Flags().BoolVar(&completionNoDesc, "no-descriptions", false, tr("Disable completion description for shells that support it"))
+	completionCommand.Flags().BoolVar(&completionNoDesc, "no-descriptions", false, i18n.Tr("Disable completion description for shells that support it"))
 
 	return completionCommand
 }
@@ -53,7 +53,7 @@ func runCompletionCommand(cmd *cobra.Command, args []string) {
 		feedback.Fatal(err.Error(), feedback.ErrGeneric)
 	}
 	if completionNoDesc && (args[0] == "powershell") {
-		feedback.Fatal(tr("Error: command description is not supported by %v", args[0]), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error: command description is not supported by %v", args[0]), feedback.ErrGeneric)
 	}
 	switch args[0] {
 	case "bash":

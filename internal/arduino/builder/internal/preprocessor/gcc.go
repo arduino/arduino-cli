@@ -23,6 +23,7 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -58,7 +59,7 @@ func GCC(
 
 	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
 	if pattern == "" {
-		return Result{}, errors.New(tr("%s pattern is missing", gccPreprocRecipeProperty))
+		return Result{}, errors.New(i18n.Tr("%s pattern is missing", gccPreprocRecipeProperty))
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)

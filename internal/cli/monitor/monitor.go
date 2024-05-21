@@ -40,8 +40,6 @@ import (
 	"go.bug.st/cleanup"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `monitor` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
@@ -56,8 +54,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	)
 	monitorCommand := &cobra.Command{
 		Use:   "monitor",
-		Short: tr("Open a communication port with a board."),
-		Long:  tr("Open a communication port with a board."),
+		Short: i18n.Tr("Open a communication port with a board."),
+		Long:  i18n.Tr("Open a communication port with a board."),
 		Example: "" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
@@ -71,11 +69,11 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 	portArgs.AddToCommand(monitorCommand, srv)
 	profileArg.AddToCommand(monitorCommand, srv)
-	monitorCommand.Flags().BoolVar(&raw, "raw", false, tr("Set terminal in raw mode (unbuffered)."))
-	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
-	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
-	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
-	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, tr("Timestamp each incoming line."))
+	monitorCommand.Flags().BoolVar(&raw, "raw", false, i18n.Tr("Set terminal in raw mode (unbuffered)."))
+	monitorCommand.Flags().BoolVar(&describe, "describe", false, i18n.Tr("Show all the settings of the communication port."))
+	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, i18n.Tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
+	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, i18n.Tr("Run in silent mode, show only monitor input and output."))
+	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, i18n.Tr("Timestamp each incoming line."))
 	fqbnArg.AddToCommand(monitorCommand, srv)
 	return monitorCommand
 }
@@ -107,7 +105,7 @@ func runMonitorCmd(
 	resp, err := srv.LoadSketch(ctx, &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && !portArgs.IsPortFlagSet() {
 		feedback.Fatal(
-			tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
+			i18n.Tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
 			feedback.ErrGeneric,
 		)
 	}
@@ -152,7 +150,7 @@ func runMonitorCmd(
 		Fqbn:         fqbn,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
 	}
 	if describe {
 		settings := make([]*result.MonitorPortSettingDescriptor, len(enumerateResp.GetSettings()))
@@ -184,7 +182,7 @@ func runMonitorCmd(
 				} else {
 					if strings.EqualFold(s.GetSettingId(), k) {
 						if !contains(s.GetEnumValues(), v) {
-							feedback.Fatal(tr("invalid port configuration value for %s: %s", k, v), feedback.ErrBadArgument)
+							feedback.Fatal(i18n.Tr("invalid port configuration value for %s: %s", k, v), feedback.ErrBadArgument)
 						}
 						setting = s
 						break
@@ -192,14 +190,14 @@ func runMonitorCmd(
 				}
 			}
 			if setting == nil {
-				feedback.Fatal(tr("invalid port configuration: %s", config), feedback.ErrBadArgument)
+				feedback.Fatal(i18n.Tr("invalid port configuration: %s", config), feedback.ErrBadArgument)
 			}
 			configuration.Settings = append(configuration.GetSettings(), &rpc.MonitorPortSetting{
 				SettingId: setting.GetSettingId(),
 				Value:     v,
 			})
 			if !quiet {
-				feedback.Print(tr("Monitor port settings:"))
+				feedback.Print(i18n.Tr("Monitor port settings:"))
 				feedback.Print(fmt.Sprintf("%s=%s", setting.GetSettingId(), v))
 			}
 		}
@@ -218,7 +216,7 @@ func runMonitorCmd(
 	if raw {
 		if feedback.IsInteractive() {
 			if err := feedback.SetRawModeStdin(); err != nil {
-				feedback.Warning(tr("Error setting raw mode: %s", err.Error()))
+				feedback.Warning(i18n.Tr("Error setting raw mode: %s", err.Error()))
 			}
 			defer feedback.RestoreModeStdin()
 		}
@@ -240,7 +238,7 @@ func runMonitorCmd(
 	})
 	go func() {
 		if !quiet {
-			feedback.Print(tr("Connecting to %s. Press CTRL-C to exit.", portAddress))
+			feedback.Print(i18n.Tr("Connecting to %s. Press CTRL-C to exit.", portAddress))
 		}
 		if err := srv.Monitor(monitorServer); err != nil {
 			feedback.FatalError(err, feedback.ErrGeneric)
@@ -252,7 +250,7 @@ func runMonitorCmd(
 		_, err := io.Copy(ttyOut, portProxy)
 		if err != nil && !errors.Is(err, io.EOF) {
 			if !quiet {
-				feedback.Print(tr("Port closed: %v", err))
+				feedback.Print(i18n.Tr("Port closed: %v", err))
 			}
 		}
 		cancel()
@@ -261,7 +259,7 @@ func runMonitorCmd(
 		_, err := io.Copy(portProxy, ttyIn)
 		if err != nil && !errors.Is(err, io.EOF) {
 			if !quiet {
-				feedback.Print(tr("Port closed: %v", err))
+				feedback.Print(i18n.Tr("Port closed: %v", err))
 			}
 		}
 		cancel()
@@ -296,7 +294,7 @@ func (r *detailsResult) String() string {
 		return ""
 	}
 	t := table.New()
-	t.SetHeader(tr("ID"), tr("Setting"), tr("Default"), tr("Values"))
+	t.SetHeader(i18n.Tr("ID"), i18n.Tr("Setting"), i18n.Tr("Default"), i18n.Tr("Values"))
 
 	green := color.New(color.FgGreen)
 	sort.Slice(r.Settings, func(i, j int) bool {

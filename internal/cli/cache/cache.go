@@ -23,15 +23,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `cache` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cacheCommand := &cobra.Command{
 		Use:   "cache",
-		Short: tr("Arduino cache commands."),
-		Long:  tr("Arduino cache commands."),
-		Example: "# " + tr("Clean caches.") + "\n" +
+		Short: i18n.Tr("Arduino cache commands."),
+		Long:  i18n.Tr("Arduino cache commands."),
+		Example: "# " + i18n.Tr("Clean caches.") + "\n" +
 			" " + os.Args[0] + " cache clean\n\n",
 	}
 

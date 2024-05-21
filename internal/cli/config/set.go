@@ -22,6 +22,7 @@ import (
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -30,8 +31,8 @@ import (
 func initSetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	setCommand := &cobra.Command{
 		Use:   "set",
-		Short: tr("Sets a setting value."),
-		Long:  tr("Sets a setting value."),
+		Short: i18n.Tr("Sets a setting value."),
+		Long:  i18n.Tr("Sets a setting value."),
 		Example: "" +
 			"  " + os.Args[0] + " config set logging.level trace\n" +
 			"  " + os.Args[0] + " config set logging.file my-log.txt\n" +
@@ -63,14 +64,14 @@ func runSetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args [
 		// Uniq Array
 		jsonValues, err := json.Marshal(f.Uniq(args[1:]))
 		if err != nil {
-			feedback.Fatal(tr("Error setting value: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error setting value: %v", err), feedback.ErrGeneric)
 		}
 		req.EncodedValue = string(jsonValues)
 		req.ValueFormat = "json"
 	}
 
 	if _, err := srv.SettingsSetValue(ctx, req); err != nil {
-		feedback.Fatal(tr("Error setting value: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error setting value: %v", err), feedback.ErrGeneric)
 	}
 
 	saveConfiguration(ctx, srv)

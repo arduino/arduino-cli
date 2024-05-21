@@ -20,6 +20,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-properties-orderedmap"
 )
 
@@ -139,14 +140,14 @@ func (b *Board) GetBuildProperties(fqbn *FQBN) (*properties.Map, error) {
 	// Check for residual invalid options...
 	for option, value := range config.AsMap() {
 		if option == "" {
-			return nil, fmt.Errorf(tr("invalid empty option found"))
+			return nil, fmt.Errorf(i18n.Tr("invalid empty option found"))
 		}
 		if _, ok := b.configOptions.GetOk(option); !ok {
-			return nil, fmt.Errorf(tr("invalid option '%s'"), option)
+			return nil, fmt.Errorf(i18n.Tr("invalid option '%s'"), option)
 		}
 		optionsConf, ok := b.configOptionProperties[option+"="+value]
 		if !ok {
-			return nil, fmt.Errorf(tr("invalid value '%[1]s' for option '%[2]s'"), value, option)
+			return nil, fmt.Errorf(i18n.Tr("invalid value '%[1]s' for option '%[2]s'"), value, option)
 		}
 		buildProperties.Merge(optionsConf)
 	}
@@ -162,7 +163,7 @@ func (b *Board) GetBuildProperties(fqbn *FQBN) (*properties.Map, error) {
 func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.Map, error) {
 	fqbn, err := ParseFQBN(b.String() + ":" + config)
 	if err != nil {
-		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
+		return nil, fmt.Errorf(i18n.Tr("parsing fqbn: %s"), err)
 	}
 	return b.GetBuildProperties(fqbn)
 }

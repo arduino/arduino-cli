@@ -21,11 +21,8 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
-
-var tr = i18n.Tr
 
 // PlatformDownloadStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformDownload that sends
 // all responses to the callback function.

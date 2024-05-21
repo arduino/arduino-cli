@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
@@ -74,10 +75,10 @@ func cachedAPIByVidPid(vid, pid string, settings *configuration.Settings) ([]*rp
 func apiByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
 	if !validVidPid.MatchString(vid) {
-		return nil, errors.New(tr("Invalid vid value: '%s'", vid))
+		return nil, errors.New(i18n.Tr("Invalid vid value: '%s'", vid))
 	}
 	if !validVidPid.MatchString(pid) {
-		return nil, errors.New(tr("Invalid pid value: '%s'", pid))
+		return nil, errors.New(i18n.Tr("Invalid pid value: '%s'", pid))
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
@@ -86,19 +87,19 @@ func apiByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.Boar
 
 	httpClient, err := settings.NewHttpClient()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", tr("failed to initialize http client"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("failed to initialize http client"), err)
 	}
 
 	res, err := httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", tr("error querying Arduino Cloud Api"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("error querying Arduino Cloud Api"), err)
 	}
 	if res.StatusCode == 404 {
 		// This is not an error, it just means that the board is not recognized
 		return nil, nil
 	}
 	if res.StatusCode >= 400 {
-		return nil, errors.New(tr("the server responded with status %s", res.Status))
+		return nil, errors.New(i18n.Tr("the server responded with status %s", res.Status))
 	}
 
 	resp, err := io.ReadAll(res.Body)
@@ -111,12 +112,12 @@ func apiByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.Boar
 
 	var dat map[string]interface{}
 	if err := json.Unmarshal(resp, &dat); err != nil {
-		return nil, fmt.Errorf("%s: %w", tr("error processing response from server"), err)
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("error processing response from server"), err)
 	}
 	name, nameFound := dat["name"].(string)
 	fqbn, fbqnFound := dat["fqbn"].(string)
 	if !nameFound || !fbqnFound {
-		return nil, errors.New(tr("wrong format in server response"))
+		return nil, errors.New(i18n.Tr("wrong format in server response"))
 	}
 
 	return []*rpc.BoardListItem{
@@ -269,7 +270,7 @@ func BoardListWatchProxyToChan(ctx context.Context) (rpc.ArduinoCoreService_Boar
 func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, stream rpc.ArduinoCoreService_BoardListWatchServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
 	if req.GetInstance() == nil {
-		err := fmt.Errorf(tr("no instance specified"))
+		err := fmt.Errorf(i18n.Tr("no instance specified"))
 		syncSend.Send(&rpc.BoardListWatchResponse{
 			EventType: "error",
 			Error:     err.Error(),

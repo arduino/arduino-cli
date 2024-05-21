@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -73,37 +74,37 @@ func (pme *Explorer) FindPlatformRelease(ref *PlatformReference) *cores.Platform
 func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
 	targetPackage, exists := pme.packages[item.Package]
 	if !exists {
-		return nil, nil, fmt.Errorf(tr("package %s not found"), item.Package)
+		return nil, nil, fmt.Errorf(i18n.Tr("package %s not found"), item.Package)
 	}
 	platform, exists := targetPackage.Platforms[item.PlatformArchitecture]
 	if !exists {
-		return nil, nil, fmt.Errorf(tr("platform %[1]s not found in package %[2]s"), item.PlatformArchitecture, targetPackage.String())
+		return nil, nil, fmt.Errorf(i18n.Tr("platform %[1]s not found in package %[2]s"), item.PlatformArchitecture, targetPackage.String())
 	}
 
 	var release *cores.PlatformRelease
 	if item.PlatformVersion != nil {
 		release = platform.FindReleaseWithVersion(item.PlatformVersion)
 		if release == nil {
-			return nil, nil, fmt.Errorf(tr("required version %[1]s not found for platform %[2]s"), item.PlatformVersion, platform.String())
+			return nil, nil, fmt.Errorf(i18n.Tr("required version %[1]s not found for platform %[2]s"), item.PlatformVersion, platform.String())
 		}
 	} else {
 		release = platform.GetLatestCompatibleRelease()
 		if release == nil {
-			return nil, nil, fmt.Errorf(tr("platform is not available for your OS"))
+			return nil, nil, fmt.Errorf(i18n.Tr("platform is not available for your OS"))
 		}
 	}
 
 	// replaces "latest" with latest version too
 	toolDeps, err := pme.packages.GetPlatformReleaseToolDependencies(release)
 	if err != nil {
-		return nil, nil, fmt.Errorf(tr("getting tool dependencies for platform %[1]s: %[2]s"), release.String(), err)
+		return nil, nil, fmt.Errorf(i18n.Tr("getting tool dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 
 	// discovery dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
 	discoveryDependencies, err := pme.packages.GetPlatformReleaseDiscoveryDependencies(release)
 	if err != nil {
-		return nil, nil, fmt.Errorf(tr("getting discovery dependencies for platform %[1]s: %[2]s"), release.String(), err)
+		return nil, nil, fmt.Errorf(i18n.Tr("getting discovery dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 	toolDeps = append(toolDeps, discoveryDependencies...)
 
@@ -111,7 +112,7 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 	// available version for the platform package
 	monitorDependencies, err := pme.packages.GetPlatformReleaseMonitorDependencies(release)
 	if err != nil {
-		return nil, nil, fmt.Errorf(tr("getting monitor dependencies for platform %[1]s: %[2]s"), release.String(), err)
+		return nil, nil, fmt.Errorf(i18n.Tr("getting monitor dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 	toolDeps = append(toolDeps, monitorDependencies...)
 
@@ -124,8 +125,8 @@ func (pme *Explorer) DownloadToolRelease(ctx context.Context, tool *cores.ToolRe
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return &cmderrors.FailedDownloadError{
-			Message: tr("Error downloading tool %s", tool),
-			Cause:   errors.New(tr("no versions available for the current OS, try contacting %s", tool.Tool.Package.Email))}
+			Message: i18n.Tr("Error downloading tool %s", tool),
+			Cause:   errors.New(i18n.Tr("no versions available for the current OS, try contacting %s", tool.Tool.Package.Email))}
 	}
 	return resource.Download(ctx, pme.DownloadDir, pme.downloaderConfig, tool.String(), progressCB, "")
 }

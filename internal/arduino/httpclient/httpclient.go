@@ -27,8 +27,6 @@ import (
 	"go.bug.st/downloader/v2"
 )
 
-var tr = i18n.Tr
-
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
 // If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
@@ -60,7 +58,7 @@ func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParame
 
 	// The URL is not reachable for some reason
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		msg := tr("Server responded with: %s", d.Resp.Status)
+		msg := i18n.Tr("Server responded with: %s", d.Resp.Status)
 		return &cmderrors.FailedDownloadError{Message: msg}
 	}
 

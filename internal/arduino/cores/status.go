@@ -21,6 +21,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -88,21 +89,21 @@ func (packages Packages) Names() []string {
 // GetPlatformReleaseToolDependencies returns the tool releases needed by the specified PlatformRelease
 func (packages Packages) GetPlatformReleaseToolDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
-		return nil, errors.New(tr("release cannot be nil"))
+		return nil, errors.New(i18n.Tr("release cannot be nil"))
 	}
 	ret := []*ToolRelease{}
 	for _, dep := range release.ToolDependencies {
 		pkg, exists := packages[dep.ToolPackager]
 		if !exists {
-			return nil, fmt.Errorf(tr("package %s not found"), dep.ToolPackager)
+			return nil, fmt.Errorf(i18n.Tr("package %s not found"), dep.ToolPackager)
 		}
 		tool, exists := pkg.Tools[dep.ToolName]
 		if !exists {
-			return nil, fmt.Errorf(tr("tool %s not found"), dep.ToolName)
+			return nil, fmt.Errorf(i18n.Tr("tool %s not found"), dep.ToolName)
 		}
 		toolRelease, exists := tool.Releases[dep.ToolVersion.NormalizedString()]
 		if !exists {
-			return nil, fmt.Errorf(tr("tool version %s not found"), dep.ToolVersion)
+			return nil, fmt.Errorf(i18n.Tr("tool version %s not found"), dep.ToolVersion)
 		}
 		ret = append(ret, toolRelease)
 	}
@@ -112,24 +113,24 @@ func (packages Packages) GetPlatformReleaseToolDependencies(release *PlatformRel
 // GetPlatformReleaseDiscoveryDependencies returns the discovery releases needed by the specified PlatformRelease
 func (packages Packages) GetPlatformReleaseDiscoveryDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
-		return nil, fmt.Errorf(tr("release cannot be nil"))
+		return nil, fmt.Errorf(i18n.Tr("release cannot be nil"))
 	}
 
 	res := []*ToolRelease{}
 	for _, discovery := range release.DiscoveryDependencies {
 		pkg, exists := packages[discovery.Packager]
 		if !exists {
-			return nil, fmt.Errorf(tr("package %s not found"), discovery.Packager)
+			return nil, fmt.Errorf(i18n.Tr("package %s not found"), discovery.Packager)
 		}
 		tool, exists := pkg.Tools[discovery.Name]
 		if !exists {
-			return nil, fmt.Errorf(tr("tool %s not found"), discovery.Name)
+			return nil, fmt.Errorf(i18n.Tr("tool %s not found"), discovery.Name)
 		}
 
 		// We always want to use the latest available release for discoveries
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
-			return nil, fmt.Errorf(tr("can't find latest release of %s"), discovery.Name)
+			return nil, fmt.Errorf(i18n.Tr("can't find latest release of %s"), discovery.Name)
 		}
 		res = append(res, latestRelease)
 	}
@@ -139,24 +140,24 @@ func (packages Packages) GetPlatformReleaseDiscoveryDependencies(release *Platfo
 // GetPlatformReleaseMonitorDependencies returns the monitor releases needed by the specified PlatformRelease
 func (packages Packages) GetPlatformReleaseMonitorDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
-		return nil, fmt.Errorf(tr("release cannot be nil"))
+		return nil, fmt.Errorf(i18n.Tr("release cannot be nil"))
 	}
 
 	res := []*ToolRelease{}
 	for _, monitor := range release.MonitorDependencies {
 		pkg, exists := packages[monitor.Packager]
 		if !exists {
-			return nil, fmt.Errorf(tr("package %s not found"), monitor.Packager)
+			return nil, fmt.Errorf(i18n.Tr("package %s not found"), monitor.Packager)
 		}
 		tool, exists := pkg.Tools[monitor.Name]
 		if !exists {
-			return nil, fmt.Errorf(tr("tool %s not found"), monitor.Name)
+			return nil, fmt.Errorf(i18n.Tr("tool %s not found"), monitor.Name)
 		}
 
 		// We always want to use the latest available release for monitors
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
-			return nil, fmt.Errorf(tr("can't find latest release of %s"), monitor.Name)
+			return nil, fmt.Errorf(i18n.Tr("can't find latest release of %s"), monitor.Name)
 		}
 		res = append(res, latestRelease)
 	}

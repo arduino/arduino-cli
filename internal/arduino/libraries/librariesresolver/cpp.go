@@ -33,8 +33,6 @@ type Cpp struct {
 	headers map[string]libraries.List
 }
 
-var tr = i18n.Tr
-
 // NewCppResolver creates a new Cpp resolver
 func NewCppResolver(allLibs []*libraries.Library, targetPlatform, actualPlatform *cores.PlatformRelease) *Cpp {
 	resolver := &Cpp{
@@ -88,7 +86,7 @@ func (resolver *Cpp) ScanPlatformLibraries(allLibs []*libraries.Library, platfor
 func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
 	cppHeaders, err := lib.SourceHeaders()
 	if err != nil {
-		return fmt.Errorf(tr("reading lib headers: %s"), err)
+		return fmt.Errorf(i18n.Tr("reading lib headers: %s"), err)
 	}
 	for _, cppHeader := range cppHeaders {
 		l := resolver.headers[cppHeader]

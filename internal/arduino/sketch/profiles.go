@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
@@ -205,13 +206,13 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 		return err
 	}
 	if platformID, ok := data["platform"]; !ok {
-		return fmt.Errorf(tr("missing '%s' directive", "platform"))
+		return fmt.Errorf(i18n.Tr("missing '%s' directive", "platform"))
 	} else if platformID, platformVersion, ok := parseNameAndVersion(platformID); !ok {
-		return fmt.Errorf(tr("invalid '%s' directive", "platform"))
+		return fmt.Errorf(i18n.Tr("invalid '%s' directive", "platform"))
 	} else if c, err := semver.Parse(platformVersion); err != nil {
-		return fmt.Errorf("%s: %w", tr("error parsing version constraints"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("error parsing version constraints"), err)
 	} else if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {
-		return fmt.Errorf("%s: %s", tr("invalid platform identifier"), platformID)
+		return fmt.Errorf("%s: %s", i18n.Tr("invalid platform identifier"), platformID)
 	} else {
 		p.Packager = split[0]
 		p.Architecture = split[1]
@@ -221,7 +222,7 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 	if rawIndexURL, ok := data["platform_index_url"]; ok {
 		indexURL, err := url.Parse(rawIndexURL)
 		if err != nil {
-			return fmt.Errorf("%s: %w", tr("invalid platform index URL:"), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("invalid platform index URL:"), err)
 		}
 		p.PlatformIndexURL = indexURL
 	}
@@ -241,9 +242,9 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 		return err
 	}
 	if libName, libVersion, ok := parseNameAndVersion(data); !ok {
-		return fmt.Errorf("%s %s", tr("invalid library directive:"), data)
+		return fmt.Errorf("%s %s", i18n.Tr("invalid library directive:"), data)
 	} else if v, err := semver.Parse(libVersion); err != nil {
-		return fmt.Errorf("%s %w", tr("invalid version:"), err)
+		return fmt.Errorf("%s %w", i18n.Tr("invalid version:"), err)
 	} else {
 		l.Library = libName
 		l.Version = v

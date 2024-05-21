@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -53,7 +54,7 @@ func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 
 	archivePath, err = archivePath.Clean().Abs()
 	if err != nil {
-		return nil, &cmderrors.PermissionDeniedError{Message: tr("Error getting absolute path of sketch archive"), Cause: err}
+		return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error getting absolute path of sketch archive"), Cause: err}
 	}
 
 	// Makes archivePath point to a zip file
@@ -65,19 +66,19 @@ func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 
 	if !req.GetOverwrite() {
 		if archivePath.Exist() {
-			return nil, &cmderrors.InvalidArgumentError{Message: tr("Archive already exists")}
+			return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Archive already exists")}
 		}
 	}
 
 	filesToZip, err := sketchPath.ReadDirRecursive()
 	if err != nil {
-		return nil, &cmderrors.PermissionDeniedError{Message: tr("Error reading sketch files"), Cause: err}
+		return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error reading sketch files"), Cause: err}
 	}
 	filesToZip.FilterOutDirs()
 
 	archive, err := archivePath.Create()
 	if err != nil {
-		return nil, &cmderrors.PermissionDeniedError{Message: tr("Error creating sketch archive"), Cause: err}
+		return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error creating sketch archive"), Cause: err}
 	}
 	defer archive.Close()
 
@@ -89,7 +90,7 @@ func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 		if !req.GetIncludeBuildDir() {
 			filePath, err := sketchPath.Parent().RelTo(f)
 			if err != nil {
-				return nil, &cmderrors.PermissionDeniedError{Message: tr("Error calculating relative file path"), Cause: err}
+				return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error calculating relative file path"), Cause: err}
 			}
 
 			// Skips build folder
@@ -101,7 +102,7 @@ func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 		// We get the parent path since we want the archive to unpack as a folder.
 		// If we don't do this the archive would contain all the sketch files as top level.
 		if err := addFileToSketchArchive(zipWriter, f, sketchPath.Parent()); err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Error adding file to sketch archive"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error adding file to sketch archive"), Cause: err}
 		}
 	}
 

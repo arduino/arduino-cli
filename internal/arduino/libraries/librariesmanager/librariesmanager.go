@@ -68,8 +68,6 @@ type LibrariesDir struct {
 	scanned         bool
 }
 
-var tr = i18n.Tr
-
 // Names returns an array with all the names of the installed libraries.
 func (lm *Explorer) Names() []string {
 	res := make([]string, len(lm.libraries))
@@ -188,9 +186,9 @@ func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLoc
 	}
 	switch installLocation {
 	case libraries.User:
-		return nil, errors.New(tr("user directory not set"))
+		return nil, errors.New(i18n.Tr("user directory not set"))
 	case libraries.IDEBuiltIn:
-		return nil, errors.New(tr("built-in libraries directory not set"))
+		return nil, errors.New(i18n.Tr("built-in libraries directory not set"))
 	default:
 		return nil, fmt.Errorf("libraries directory not set: %s", installLocation.String())
 	}
@@ -212,7 +210,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			return statuses
 		}
 		if err != nil {
-			s := status.Newf(codes.FailedPrecondition, tr("reading dir %[1]s: %[2]s"), librariesDir.Path, err)
+			s := status.Newf(codes.FailedPrecondition, i18n.Tr("reading dir %[1]s: %[2]s"), librariesDir.Path, err)
 			return append(statuses, s)
 		}
 		d.FilterDirs()
@@ -223,7 +221,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 	for _, libDir := range libDirs {
 		library, err := libraries.Load(libDir, librariesDir.Location)
 		if err != nil {
-			s := status.Newf(codes.Internal, tr("loading library from %[1]s: %[2]s"), libDir, err)
+			s := status.Newf(codes.Internal, i18n.Tr("loading library from %[1]s: %[2]s"), libDir, err)
 			statuses = append(statuses, s)
 			continue
 		}

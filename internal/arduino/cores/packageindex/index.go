@@ -139,8 +139,6 @@ type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
 
-var tr = i18n.Tr
-
 // MergeIntoPackages converts the Index data into a cores.Packages and merge them
 // with the existing contents of the cores.Packages passed as parameter.
 func (index Index) MergeIntoPackages(outPackages cores.Packages) {
@@ -275,7 +273,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 
 	size, err := inPlatformRelease.Size.Int64()
 	if err != nil {
-		return fmt.Errorf(tr("invalid platform archive size: %s"), err)
+		return fmt.Errorf(i18n.Tr("invalid platform archive size: %s"), err)
 	}
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.Name = inPlatformRelease.Name

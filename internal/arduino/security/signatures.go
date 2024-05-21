@@ -26,8 +26,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-var tr = i18n.Tr
-
 //go:embed keys/*
 var keys embed.FS
 
@@ -71,16 +69,16 @@ func VerifyDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path, 
 func VerifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoKeyringFile io.Reader) (bool, *openpgp.Entity, error) {
 	keyRing, err := openpgp.ReadKeyRing(arduinoKeyringFile)
 	if err != nil {
-		return false, nil, fmt.Errorf(tr("retrieving Arduino public keys: %s"), err)
+		return false, nil, fmt.Errorf(i18n.Tr("retrieving Arduino public keys: %s"), err)
 	}
 	target, err := targetPath.Open()
 	if err != nil {
-		return false, nil, fmt.Errorf(tr("opening target file: %s"), err)
+		return false, nil, fmt.Errorf(i18n.Tr("opening target file: %s"), err)
 	}
 	defer target.Close()
 	signature, err := signaturePath.Open()
 	if err != nil {
-		return false, nil, fmt.Errorf(tr("opening signature file: %s"), err)
+		return false, nil, fmt.Errorf(i18n.Tr("opening signature file: %s"), err)
 	}
 	defer signature.Close()
 	signer, err := openpgp.CheckDetachedSignature(keyRing, target, signature, nil)
