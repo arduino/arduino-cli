@@ -16,6 +16,7 @@
 package resources
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -56,7 +57,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	settings.Set("network.user_agent_ext", goldUserAgentValue)
 	config, err := settings.DownloaderConfig()
 	require.NoError(t, err)
-	err = r.Download(tmp, config, "", func(progress *rpc.DownloadProgress) {}, "")
+	err = r.Download(context.Background(), tmp, config, "", func(progress *rpc.DownloadProgress) {}, "")
 	require.NoError(t, err)
 
 	// leverage the download helper to download the echo for the request made by the downloader itself

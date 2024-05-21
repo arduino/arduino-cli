@@ -17,6 +17,7 @@ package packagemanager
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,6 +34,7 @@ import (
 // This method takes care of downloading missing archives, upgrading platforms and tools, and
 // removing the previously installed platform/tools that are no longer needed after the upgrade.
 func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
+	ctx context.Context,
 	platformRef *PlatformReference,
 	downloadCB rpc.DownloadProgressCB,
 	taskCB rpc.TaskProgressCB,
@@ -62,7 +64,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	if err != nil {
 		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
 	}
-	if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, skipPostInstall, skipPreUninstall); err != nil {
+	if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, skipPostInstall, skipPreUninstall); err != nil {
 		return nil, err
 	}
 
@@ -73,6 +75,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 // This method takes care of downloading missing archives, installing/upgrading platforms and tools, and
 // removing the previously installed platform/tools that are no longer needed after the upgrade.
 func (pme *Explorer) DownloadAndInstallPlatformAndTools(
+	ctx context.Context,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
 	skipPostInstall bool, skipPreUninstall bool) error {
@@ -92,11 +95,11 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 	// Package download
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading packages")})
 	for _, tool := range toolsToInstall {
-		if err := pme.DownloadToolRelease(tool, downloadCB); err != nil {
+		if err := pme.DownloadToolRelease(ctx, tool, downloadCB); err != nil {
 			return err
 		}
 	}
-	if err := pme.DownloadPlatformRelease(platformRelease, downloadCB); err != nil {
+	if err := pme.DownloadPlatformRelease(ctx, platformRelease, downloadCB); err != nil {
 		return err
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})

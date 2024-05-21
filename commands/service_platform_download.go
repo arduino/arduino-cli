@@ -40,6 +40,7 @@ func PlatformDownloadStreamResponseToCallbackFunction(ctx context.Context, downl
 
 // PlatformDownload downloads a platform package
 func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadRequest, stream rpc.ArduinoCoreService_PlatformDownloadServer) error {
+	ctx := stream.Context()
 	syncSend := NewSynchronizedSend(stream.Send)
 
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
@@ -71,15 +72,12 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 		})
 	}
 
-	// TODO: pass context
-	// ctx := stream.Context()
-	if err := pme.DownloadPlatformRelease(platform, downloadCB); err != nil {
+	if err := pme.DownloadPlatformRelease(ctx, platform, downloadCB); err != nil {
 		return err
 	}
 
 	for _, tool := range tools {
-		// TODO: pass context
-		if err := pme.DownloadToolRelease(tool, downloadCB); err != nil {
+		if err := pme.DownloadToolRelease(ctx, tool, downloadCB); err != nil {
 			return err
 		}
 	}

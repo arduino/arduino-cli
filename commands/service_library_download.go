@@ -81,7 +81,7 @@ func (s *arduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 	})
 }
 
-func downloadLibrary(_ context.Context, downloadsDir *paths.Path, libRelease *librariesindex.Release,
+func downloadLibrary(ctx context.Context, downloadsDir *paths.Path, libRelease *librariesindex.Release,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, queryParameter string, settings *configuration.Settings) error {
 
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
@@ -89,8 +89,7 @@ func downloadLibrary(_ context.Context, downloadsDir *paths.Path, libRelease *li
 	if err != nil {
 		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
-	// TODO: Pass context
-	if err := libRelease.Resource.Download(downloadsDir, config, libRelease.String(), downloadCB, queryParameter); err != nil {
+	if err := libRelease.Resource.Download(ctx, downloadsDir, config, libRelease.String(), downloadCB, queryParameter); err != nil {
 		return &cmderrors.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})

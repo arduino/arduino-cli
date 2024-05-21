@@ -45,12 +45,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	pme, release := pm.NewExplorer()
 	defer release()
 
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
-	if err := pme.DownloadToolRelease(tool, downloadCB); err != nil {
+	if err := pme.DownloadToolRelease(ctx, tool, downloadCB); err != nil {
 		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
@@ -283,7 +283,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		// Install builtin tools if necessary
 		if len(builtinToolsToInstall) > 0 {
 			for _, toolRelease := range builtinToolsToInstall {
-				if err := installTool(pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
+				if err := installTool(ctx, pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
 					e := &cmderrors.InitFailedError{
 						Code:   codes.Internal,
 						Cause:  err,
@@ -385,7 +385,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					responseError(e.GRPCStatus())
 					continue
 				}
-				if err := libRelease.Resource.Download(pme.DownloadDir, config, libRelease.String(), downloadCallback, ""); err != nil {
+				if err := libRelease.Resource.Download(ctx, pme.DownloadDir, config, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())

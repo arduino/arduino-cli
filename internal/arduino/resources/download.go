@@ -16,6 +16,7 @@
 package resources
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -28,7 +29,7 @@ import (
 // Download performs a download loop using the provided downloader.Config.
 // Messages are passed back to the DownloadProgressCB using label as text for the File field.
 // queryParameter is passed for analysis purposes.
-func (r *DownloadResource) Download(downloadDir *paths.Path, config downloader.Config, label string, downloadCB rpc.DownloadProgressCB, queryParameter string) error {
+func (r *DownloadResource) Download(ctx context.Context, downloadDir *paths.Path, config downloader.Config, label string, downloadCB rpc.DownloadProgressCB, queryParameter string) error {
 	path, err := r.ArchivePath(downloadDir)
 	if err != nil {
 		return fmt.Errorf(tr("getting archive path: %s"), err)
@@ -52,5 +53,5 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config downloader.C
 	} else {
 		return fmt.Errorf(tr("getting archive file info: %s"), err)
 	}
-	return httpclient.DownloadFile(path, r.URL, queryParameter, label, downloadCB, config)
+	return httpclient.DownloadFile(ctx, path, r.URL, queryParameter, label, downloadCB, config)
 }

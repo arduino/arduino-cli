@@ -75,7 +75,7 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 			Package:              req.GetPlatformPackage(),
 			PlatformArchitecture: req.GetArchitecture(),
 		}
-		platform, err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall())
+		platform, err := pme.DownloadAndInstallPlatformUpgrades(ctx, ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall())
 		if err != nil {
 			return platform, err
 		}
