@@ -77,7 +77,7 @@ func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, watch
 	discoveryErrors := list.GetWarnings()
 	var invalidFQBNErr *cmderrors.InvalidFQBNError
 	if errors.As(err, &invalidFQBNErr) {
-		feedback.Fatal(i18n.Tr(err.Error()), feedback.ErrBadArgument)
+		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
 	if err != nil {
 		feedback.Warning(i18n.Tr("Error detecting boards: %v", err))
