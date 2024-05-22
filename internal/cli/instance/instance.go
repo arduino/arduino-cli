@@ -25,8 +25,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-var tr = i18n.Tr
-
 // CreateAndInit return a new initialized instance.
 // If Create fails the CLI prints an error and exits since
 // to execute further operations a valid Instance is mandatory.
@@ -42,7 +40,7 @@ func CreateAndInit(ctx context.Context, srv rpc.ArduinoCoreServiceServer) *rpc.I
 func CreateAndInitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.SketchProfile) {
 	instance, err := create(ctx, srv)
 	if err != nil {
-		feedback.Fatal(tr("Error creating instance: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error creating instance: %v", err), feedback.ErrGeneric)
 	}
 	profile := InitWithProfile(ctx, srv, instance, profileName, sketchPath)
 	return instance, profile
@@ -81,7 +79,7 @@ func InitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst
 	var profile *rpc.SketchProfile
 	err := srv.Init(initReq, commands.InitStreamResponseToCallbackFunction(ctx, func(res *rpc.InitResponse) error {
 		if st := res.GetError(); st != nil {
-			feedback.Warning(tr("Error initializing instance: %v", st.GetMessage()))
+			feedback.Warning(i18n.Tr("Error initializing instance: %v", st.GetMessage()))
 		}
 
 		if progress := res.GetInitProgress(); progress != nil {
@@ -99,7 +97,7 @@ func InitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst
 		return nil
 	}))
 	if err != nil {
-		feedback.Warning(tr("Error initializing instance: %v", err))
+		feedback.Warning(i18n.Tr("Error initializing instance: %v", err))
 	}
 
 	return profile

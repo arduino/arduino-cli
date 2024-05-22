@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -136,8 +135,6 @@ type BoardManifest struct {
 type BoardManifestID struct {
 	USB string `json:"-"`
 }
-
-var tr = i18n.Tr
 
 // HasUsbID returns true if the BoardManifes contains the specified USB id as
 // identification for this board. usbID should be in the format "0000:0000"

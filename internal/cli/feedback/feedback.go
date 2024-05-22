@@ -105,8 +105,6 @@ type ErrorResult interface {
 	ErrorString() string
 }
 
-var tr = i18n.Tr
-
 // SetOut can be used to change the out writer at runtime
 func SetOut(out io.Writer) {
 	if formatSelected {
@@ -235,13 +233,13 @@ func PrintResult(res Result) {
 	case JSON:
 		d, err := json.MarshalIndent(augment(res.Data()), "", "  ")
 		if err != nil {
-			Fatal(tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
+			Fatal(i18n.Tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case MinifiedJSON:
 		d, err := json.Marshal(augment(res.Data()))
 		if err != nil {
-			Fatal(tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
+			Fatal(i18n.Tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case Text:

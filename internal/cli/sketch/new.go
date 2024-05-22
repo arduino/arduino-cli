@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -33,8 +34,8 @@ func initNewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	newCommand := &cobra.Command{
 		Use:     "new",
-		Short:   tr("Create a new Sketch"),
-		Long:    tr("Create a new Sketch"),
+		Short:   i18n.Tr("Create a new Sketch"),
+		Long:    i18n.Tr("Create a new Sketch"),
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -42,7 +43,7 @@ func initNewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 
-	newCommand.Flags().BoolVarP(&overwrite, "overwrite", "f", false, tr("Overwrites an existing .ino sketch."))
+	newCommand.Flags().BoolVarP(&overwrite, "overwrite", "f", false, i18n.Tr("Overwrites an existing .ino sketch."))
 
 	return newCommand
 }
@@ -67,7 +68,7 @@ func runNewCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args [
 	} else {
 		sketchDirPath, err = paths.New(trimmedSketchName).Abs()
 		if err != nil {
-			feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error creating sketch: %v", err), feedback.ErrGeneric)
 		}
 		sketchDir = sketchDirPath.Parent().String()
 		sketchName = sketchDirPath.Base()
@@ -79,7 +80,7 @@ func runNewCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args [
 		Overwrite:  overwrite,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error creating sketch: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(sketchResult{SketchDirPath: sketchDirPath})
@@ -94,5 +95,5 @@ func (ir sketchResult) Data() interface{} {
 }
 
 func (ir sketchResult) String() string {
-	return tr("Sketch created in: %s", ir.SketchDirPath)
+	return i18n.Tr("Sketch created in: %s", ir.SketchDirPath)
 }

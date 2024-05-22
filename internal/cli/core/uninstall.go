@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -32,9 +33,9 @@ import (
 func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var preUninstallFlags arguments.PrePostScriptsFlags
 	uninstallCommand := &cobra.Command{
-		Use:     fmt.Sprintf("uninstall %s:%s ...", tr("PACKAGER"), tr("ARCH")),
-		Short:   tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
-		Long:    tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
+		Use:     fmt.Sprintf("uninstall %s:%s ...", i18n.Tr("PACKAGER"), i18n.Tr("ARCH")),
+		Short:   i18n.Tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
+		Long:    i18n.Tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -54,12 +55,12 @@ func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, 
 
 	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Fatal(tr("Invalid parameter %s: version not allowed", platformRef), feedback.ErrBadArgument)
+			feedback.Fatal(i18n.Tr("Invalid parameter %s: version not allowed", platformRef), feedback.ErrBadArgument)
 		}
 	}
 	for _, platformRef := range platformsRefs {
@@ -71,7 +72,7 @@ func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, 
 		}
 		stream := commands.PlatformUninstallStreamResponseToCallbackFunction(ctx, feedback.NewTaskProgressCB())
 		if err := srv.PlatformUninstall(req, stream); err != nil {
-			feedback.Fatal(tr("Error during uninstall: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error during uninstall: %v", err), feedback.ErrGeneric)
 		}
 	}
 }

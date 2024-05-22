@@ -25,8 +25,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-var tr = i18n.Tr
-
 // Database keeps track of all the compile commands run by the builder
 type Database struct {
 	lock     sync.Mutex
@@ -66,10 +64,10 @@ func (db *Database) SaveToFile() {
 	db.lock.Lock()
 	defer db.lock.Unlock()
 	if jsonContents, err := json.MarshalIndent(db.contents, "", " "); err != nil {
-		fmt.Println(tr("Error serializing compilation database: %s", err))
+		fmt.Println(i18n.Tr("Error serializing compilation database: %s", err))
 		return
 	} else if err := db.file.WriteFile(jsonContents); err != nil {
-		fmt.Println(tr("Error writing compilation database: %s", err))
+		fmt.Println(i18n.Tr("Error writing compilation database: %s", err))
 	}
 }
 
@@ -81,7 +79,7 @@ func (db *Database) Add(target *paths.Path, command *paths.Process) {
 		// current directory otherwise
 		dir, err := os.Getwd()
 		if err != nil {
-			fmt.Println(tr("Error getting current directory for compilation database: %s", err))
+			fmt.Println(i18n.Tr("Error getting current directory for compilation database: %s", err))
 		}
 		commandDir = dir
 	}

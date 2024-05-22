@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,9 +36,9 @@ func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var namesOnly bool
 	var omitReleasesDetails bool
 	searchCommand := &cobra.Command{
-		Use:   fmt.Sprintf("search [%s ...]", tr("SEARCH_TERM")),
-		Short: tr("Searches for one or more libraries matching a query."),
-		Long: tr(`Search for libraries matching zero or more search terms.
+		Use:   fmt.Sprintf("search [%s ...]", i18n.Tr("SEARCH_TERM")),
+		Short: i18n.Tr("Searches for one or more libraries matching a query."),
+		Long: i18n.Tr(`Search for libraries matching zero or more search terms.
 
 All searches are performed in a case-insensitive fashion. Queries containing
 multiple search terms will return only libraries that match all of the terms.
@@ -80,21 +81,21 @@ In addition to the fields listed above, QV terms can use these qualifiers:
  - Version
  - Website
 		`),
-		Example: "  " + os.Args[0] + " lib search audio                               # " + tr("basic search for \"audio\"") + "\n" +
-			"  " + os.Args[0] + " lib search name:buzzer                         # " + tr("libraries with \"buzzer\" in the Name field") + "\n" +
-			"  " + os.Args[0] + " lib search name=pcf8523                        # " + tr("libraries with a Name exactly matching \"pcf8523\"") + "\n" +
-			"  " + os.Args[0] + " lib search \"author:\\\"Daniel Garcia\\\"\"          # " + tr("libraries authored by Daniel Garcia") + "\n" +
-			"  " + os.Args[0] + " lib search author=Adafruit name:gfx            # " + tr("libraries authored only by Adafruit with \"gfx\" in their Name") + "\n" +
-			"  " + os.Args[0] + " lib search esp32 display maintainer=espressif  # " + tr("basic search for \"esp32\" and \"display\" limited to official Maintainer") + "\n" +
-			"  " + os.Args[0] + " lib search dependencies:IRremote               # " + tr("libraries that depend on at least \"IRremote\"") + "\n" +
-			"  " + os.Args[0] + " lib search dependencies=IRremote               # " + tr("libraries that depend only on \"IRremote\"") + "\n",
+		Example: "  " + os.Args[0] + " lib search audio                               # " + i18n.Tr("basic search for \"audio\"") + "\n" +
+			"  " + os.Args[0] + " lib search name:buzzer                         # " + i18n.Tr("libraries with \"buzzer\" in the Name field") + "\n" +
+			"  " + os.Args[0] + " lib search name=pcf8523                        # " + i18n.Tr("libraries with a Name exactly matching \"pcf8523\"") + "\n" +
+			"  " + os.Args[0] + " lib search \"author:\\\"Daniel Garcia\\\"\"          # " + i18n.Tr("libraries authored by Daniel Garcia") + "\n" +
+			"  " + os.Args[0] + " lib search author=Adafruit name:gfx            # " + i18n.Tr("libraries authored only by Adafruit with \"gfx\" in their Name") + "\n" +
+			"  " + os.Args[0] + " lib search esp32 display maintainer=espressif  # " + i18n.Tr("basic search for \"esp32\" and \"display\" limited to official Maintainer") + "\n" +
+			"  " + os.Args[0] + " lib search dependencies:IRremote               # " + i18n.Tr("libraries that depend on at least \"IRremote\"") + "\n" +
+			"  " + os.Args[0] + " lib search dependencies=IRremote               # " + i18n.Tr("libraries that depend only on \"IRremote\"") + "\n",
 		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			runSearchCommand(cmd.Context(), srv, args, namesOnly, omitReleasesDetails)
 		},
 	}
-	searchCommand.Flags().BoolVar(&namesOnly, "names", false, tr("Show library names only."))
-	searchCommand.Flags().BoolVar(&omitReleasesDetails, "omit-releases-details", false, tr("Omit library details far all versions except the latest (produce a more compact JSON output)."))
+	searchCommand.Flags().BoolVar(&namesOnly, "names", false, i18n.Tr("Show library names only."))
+	searchCommand.Flags().BoolVar(&omitReleasesDetails, "omit-releases-details", false, i18n.Tr("Omit library details far all versions except the latest (produce a more compact JSON output)."))
 	return searchCommand
 }
 
@@ -109,7 +110,7 @@ func runSearchCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 	stream, res := commands.UpdateLibrariesIndexStreamResponseToCallbackFunction(ctx, feedback.ProgressBar())
 	req := &rpc.UpdateLibrariesIndexRequest{Instance: inst, UpdateIfOlderThanSecs: int64(indexUpdateInterval.Seconds())}
 	if err := srv.UpdateLibrariesIndex(req, stream); err != nil {
-		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
 	if res().GetLibrariesIndex().GetStatus() == rpc.IndexUpdateReport_STATUS_UPDATED {
 		instance.Init(ctx, srv, inst)
@@ -122,7 +123,7 @@ func runSearchCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 		OmitReleasesDetails: omitReleasesDetails,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error searching for Libraries: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error searching for Libraries: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(librarySearchResult{
@@ -164,23 +165,23 @@ func (res librarySearchResult) Data() interface{} {
 func (res librarySearchResult) String() string {
 	results := res.results.Libraries
 	if len(results) == 0 {
-		return tr("No libraries matching your search.")
+		return i18n.Tr("No libraries matching your search.")
 	}
 
 	var out strings.Builder
 
 	if res.results.Status == result.LibrarySearchStatusFailed {
-		out.WriteString(tr("No libraries matching your search.\nDid you mean...\n"))
+		out.WriteString(i18n.Tr("No libraries matching your search.\nDid you mean...\n"))
 	}
 
 	for _, lib := range results {
 		if res.results.Status == result.LibrarySearchStatusSuccess {
-			out.WriteString(tr(`Name: "%s"`, lib.Name) + "\n")
+			out.WriteString(i18n.Tr(`Name: "%s"`, lib.Name) + "\n")
 			if res.namesOnly {
 				continue
 			}
 		} else {
-			out.WriteString(fmt.Sprintf("%s\n", lib.Name))
+			out.WriteString(lib.Name + "\n")
 			continue
 		}
 
@@ -195,23 +196,23 @@ func (res librarySearchResult) String() string {
 			}
 		}
 
-		out.WriteString(fmt.Sprintf("  "+tr("Author: %s")+"\n", latest.Author))
-		out.WriteString(fmt.Sprintf("  "+tr("Maintainer: %s")+"\n", latest.Maintainer))
-		out.WriteString(fmt.Sprintf("  "+tr("Sentence: %s")+"\n", latest.Sentence))
-		out.WriteString(fmt.Sprintf("  "+tr("Paragraph: %s")+"\n", latest.Paragraph))
-		out.WriteString(fmt.Sprintf("  "+tr("Website: %s")+"\n", latest.Website))
+		out.WriteString("  " + i18n.Tr("Author: %s", latest.Author) + "\n")
+		out.WriteString("  " + i18n.Tr("Maintainer: %s", latest.Maintainer) + "\n")
+		out.WriteString("  " + i18n.Tr("Sentence: %s", latest.Sentence) + "\n")
+		out.WriteString("  " + i18n.Tr("Paragraph: %s", latest.Paragraph) + "\n")
+		out.WriteString("  " + i18n.Tr("Website: %s", latest.Website) + "\n")
 		if latest.License != "" {
-			out.WriteString(fmt.Sprintf("  "+tr("License: %s")+"\n", latest.License))
+			out.WriteString("  " + i18n.Tr("License: %s", latest.License) + "\n")
 		}
-		out.WriteString(fmt.Sprintf("  "+tr("Category: %s")+"\n", latest.Category))
-		out.WriteString(fmt.Sprintf("  "+tr("Architecture: %s")+"\n", strings.Join(latest.Architectures, ", ")))
-		out.WriteString(fmt.Sprintf("  "+tr("Types: %s")+"\n", strings.Join(latest.Types, ", ")))
-		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.ReplaceAll(fmt.Sprint(lib.AvailableVersions), " ", ", ")))
+		out.WriteString("  " + i18n.Tr("Category: %s", latest.Category) + "\n")
+		out.WriteString("  " + i18n.Tr("Architecture: %s", strings.Join(latest.Architectures, ", ")) + "\n")
+		out.WriteString("  " + i18n.Tr("Types: %s", strings.Join(latest.Types, ", ")) + "\n")
+		out.WriteString("  " + i18n.Tr("Versions: %s", strings.ReplaceAll(fmt.Sprint(lib.AvailableVersions), " ", ", ")) + "\n")
 		if len(latest.ProvidesIncludes) > 0 {
-			out.WriteString(fmt.Sprintf("  "+tr("Provides includes: %s")+"\n", strings.Join(latest.ProvidesIncludes, ", ")))
+			out.WriteString("  " + i18n.Tr("Provides includes: %s", strings.Join(latest.ProvidesIncludes, ", ")) + "\n")
 		}
 		if len(latest.Dependencies) > 0 {
-			out.WriteString(fmt.Sprintf("  "+tr("Dependencies: %s")+"\n", strings.Join(deps, ", ")))
+			out.WriteString("  " + i18n.Tr("Dependencies: %s", strings.Join(deps, ", ")) + "\n")
 		}
 	}
 

@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,13 +35,13 @@ import (
 func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
-		Use:   fmt.Sprintf("upgrade [%s:%s] ...", tr("PACKAGER"), tr("ARCH")),
-		Short: tr("Upgrades one or all installed platforms to the latest version."),
-		Long:  tr("Upgrades one or all installed platforms to the latest version."),
+		Use:   fmt.Sprintf("upgrade [%s:%s] ...", i18n.Tr("PACKAGER"), i18n.Tr("ARCH")),
+		Short: i18n.Tr("Upgrades one or all installed platforms to the latest version."),
+		Long:  i18n.Tr("Upgrades one or all installed platforms to the latest version."),
 		Example: "" +
-			"  # " + tr("upgrade everything to the latest version") + "\n" +
+			"  # " + i18n.Tr("upgrade everything to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade\n\n" +
-			"  # " + tr("upgrade arduino:samd to the latest version") + "\n" +
+			"  # " + i18n.Tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: func(cmd *cobra.Command, args []string) {
 			runUpgradeCommand(cmd.Context(), srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
@@ -64,7 +65,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 			Instance: inst,
 		})
 		if err != nil {
-			feedback.Fatal(tr("Error retrieving core list: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error retrieving core list: %v", err), feedback.ErrGeneric)
 		}
 
 		targets := []*rpc.Platform{}
@@ -83,7 +84,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 		}
 
 		if len(targets) == 0 {
-			feedback.Print(tr("All the cores are already at the latest version"))
+			feedback.Print(i18n.Tr("All the cores are already at the latest version"))
 			return
 		}
 
@@ -97,20 +98,20 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 			return
 		}
 		if !platform.GetMetadata().GetIndexed() {
-			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", platform.GetMetadata().GetId()))
+			feedback.Warning(i18n.Tr("missing package index for %s, future updates cannot be guaranteed", platform.GetMetadata().GetId()))
 		}
 	}
 
 	// proceed upgrading, if anything is upgradable
 	platformsRefs, err := arguments.ParseReferences(ctx, srv, args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	hasBadArguments := false
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Warning(tr("Invalid item %s", args[i]))
+			feedback.Warning(i18n.Tr("Invalid item %s", args[i]))
 			hasBadArguments = true
 			continue
 		}
@@ -132,12 +133,12 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 				continue
 			}
 
-			feedback.Fatal(tr("Error during upgrade: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error during upgrade: %v", err), feedback.ErrGeneric)
 		}
 	}
 
 	if hasBadArguments {
-		feedback.Fatal(tr("Some upgrades failed, please check the output for details."), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Some upgrades failed, please check the output for details."), feedback.ErrBadArgument)
 	}
 
 	feedback.PrintResult(&platformUpgradeResult{})

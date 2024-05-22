@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -85,7 +86,7 @@ func platformUninstall(_ context.Context, req *rpc.PlatformUninstallRequest, tas
 
 	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return &cmderrors.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
+		return &cmderrors.NotFoundError{Message: i18n.Tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
 	// TODO: pass context
@@ -95,7 +96,7 @@ func platformUninstall(_ context.Context, req *rpc.PlatformUninstallRequest, tas
 
 	for _, tool := range tools {
 		if !pme.IsToolRequired(tool) {
-			taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", tool)})
+			taskCB(&rpc.TaskProgress{Name: i18n.Tr("Uninstalling %s, tool is no more required", tool)})
 			pme.UninstallTool(tool, taskCB, req.GetSkipPreUninstall())
 		}
 	}

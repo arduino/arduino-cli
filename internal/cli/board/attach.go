@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -31,9 +32,9 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var fqbn arguments.Fqbn
 	var programmer arguments.Programmer
 	attachCommand := &cobra.Command{
-		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [-P <%s>] [%s]", tr("port"), tr("FQBN"), tr("programmer"), tr("sketchPath")),
-		Short: tr("Attaches a sketch to a board."),
-		Long:  tr("Sets the default values for port and FQBN. If no port, FQBN or programmer are specified, the current default port, FQBN and programmer are displayed."),
+		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [-P <%s>] [%s]", i18n.Tr("port"), i18n.Tr("FQBN"), i18n.Tr("programmer"), i18n.Tr("sketchPath")),
+		Short: i18n.Tr("Attaches a sketch to a board."),
+		Long:  i18n.Tr("Sets the default values for port and FQBN. If no port, FQBN or programmer are specified, the current default port, FQBN and programmer are displayed."),
 		Example: "  " + os.Args[0] + " board attach -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " board attach -p /dev/ttyACM0 HelloWorld\n" +
 			"  " + os.Args[0] + " board attach -b arduino:samd:mkr1000" +
@@ -108,10 +109,10 @@ func (b *boardAttachResult) Data() interface{} {
 
 func (b *boardAttachResult) String() string {
 	if b.Port == nil && b.Fqbn == "" && b.Programmer == "" {
-		return tr("No default port, FQBN or programmer set")
+		return i18n.Tr("No default port, FQBN or programmer set")
 	}
-	res := fmt.Sprintf("%s: %s\n", tr("Default port set to"), b.Port)
-	res += fmt.Sprintf("%s: %s\n", tr("Default FQBN set to"), b.Fqbn)
-	res += fmt.Sprintf("%s: %s\n", tr("Default programmer set to"), b.Programmer)
+	res := fmt.Sprintf("%s: %s\n", i18n.Tr("Default port set to"), b.Port)
+	res += fmt.Sprintf("%s: %s\n", i18n.Tr("Default FQBN set to"), b.Fqbn)
+	res += fmt.Sprintf("%s: %s\n", i18n.Tr("Default programmer set to"), b.Programmer)
 	return res
 }

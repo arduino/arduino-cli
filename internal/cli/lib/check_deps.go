@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
@@ -34,12 +35,12 @@ import (
 func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noOverwrite bool
 	depsCommand := &cobra.Command{
-		Use:   fmt.Sprintf("deps %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
-		Short: tr("Check dependencies status for the specified library."),
-		Long:  tr("Check dependencies status for the specified library."),
+		Use:   fmt.Sprintf("deps %s[@%s]...", i18n.Tr("LIBRARY"), i18n.Tr("VERSION_NUMBER")),
+		Short: i18n.Tr("Check dependencies status for the specified library."),
+		Long:  i18n.Tr("Check dependencies status for the specified library."),
 		Example: "" +
-			"  " + os.Args[0] + " lib deps AudioZero       # " + tr("for the latest version.") + "\n" +
-			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
+			"  " + os.Args[0] + " lib deps AudioZero       # " + i18n.Tr("for the latest version.") + "\n" +
+			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + i18n.Tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			runDepsCommand(cmd.Context(), srv, args, noOverwrite)
@@ -48,7 +49,7 @@ func initDepsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			return arguments.GetInstalledLibraries(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
-	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not try to update library dependencies if already installed."))
+	depsCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, i18n.Tr("Do not try to update library dependencies if already installed."))
 	return depsCommand
 }
 
@@ -58,7 +59,7 @@ func runDepsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args 
 	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(ctx, srv, instance, args[0])
 	if err != nil {
-		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
 
 	deps, err := srv.LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesRequest{
@@ -68,7 +69,7 @@ func runDepsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args 
 		DoNotUpdateInstalledLibraries: noOverwrite,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(&checkDepResult{deps: result.NewLibraryResolveDependenciesResponse(deps)})
@@ -114,13 +115,13 @@ func outputDep(dep *result.LibraryDependencyStatus) string {
 	red := color.New(color.FgRed)
 	yellow := color.New(color.FgYellow)
 	if dep.VersionInstalled == "" {
-		res += tr("%s must be installed.",
+		res += i18n.Tr("%s must be installed.",
 			red.Sprintf("✕ %s %s", dep.Name, dep.VersionRequired))
 	} else if dep.VersionInstalled == dep.VersionRequired {
-		res += tr("%s is already installed.",
+		res += i18n.Tr("%s is already installed.",
 			green.Sprintf("✓ %s %s", dep.Name, dep.VersionRequired))
 	} else {
-		res += tr("%[1]s is required but %[2]s is currently installed.",
+		res += i18n.Tr("%[1]s is required but %[2]s is currently installed.",
 			yellow.Sprintf("✕ %s %s", dep.Name, dep.VersionRequired),
 			yellow.Sprintf("%s", dep.VersionInstalled))
 	}

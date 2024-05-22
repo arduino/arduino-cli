@@ -16,6 +16,7 @@
 package arguments
 
 import (
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -29,7 +30,7 @@ type Profile struct {
 
 // AddToCommand adds the flags used to set fqbn to the specified Command
 func (f *Profile) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
-	cmd.Flags().StringVarP(&f.profile, "profile", "m", "", tr("Sketch profile to use"))
+	cmd.Flags().StringVarP(&f.profile, "profile", "m", "", i18n.Tr("Sketch profile to use"))
 	cmd.RegisterFlagCompletionFunc("profile", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var sketchProfile string
 		if len(args) > 0 {

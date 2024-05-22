@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -28,8 +29,8 @@ import (
 func initDeleteCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	deleteCommand := &cobra.Command{
 		Use:   "delete",
-		Short: tr("Deletes a settings key and all its sub keys."),
-		Long:  tr("Deletes a settings key and all its sub keys."),
+		Short: i18n.Tr("Deletes a settings key and all its sub keys."),
+		Long:  i18n.Tr("Deletes a settings key and all its sub keys."),
 		Example: "" +
 			"  " + os.Args[0] + " config delete board_manager\n" +
 			"  " + os.Args[0] + " config delete board_manager.additional_urls",
@@ -51,7 +52,7 @@ func runDeleteCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 
 	key := args[0]
 	if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{Key: key, EncodedValue: ""}); err != nil {
-		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot delete the key %[1]s: %[2]v", key, err), feedback.ErrGeneric)
 	}
 
 	saveConfiguration(ctx, srv)

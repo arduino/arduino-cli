@@ -17,7 +17,6 @@ package packagemanager
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -73,8 +72,6 @@ type Builder PackageManager
 // a read-only lock on the PackageManager that must be released when the
 // job is completed.
 type Explorer PackageManager
-
-var tr = i18n.Tr
 
 // NewBuilder returns a new Builder
 func NewBuilder(indexDir, packagesDir, userPackagesDir, downloadDir, tempDir *paths.Path, userAgent string, downloaderConfig downloader.Config) *Builder {
@@ -295,7 +292,7 @@ func (pme *Explorer) FindBoardsWithID(id string) []*cores.Board {
 func (pme *Explorer) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
+		return nil, errors.New(i18n.Tr("parsing fqbn: %s", err))
 	}
 
 	_, _, board, _, _, err := pme.ResolveFQBN(fqbn)
@@ -329,32 +326,32 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	targetPackage := pme.packages[fqbn.Package]
 	if targetPackage == nil {
 		return nil, nil, nil, nil, nil,
-			fmt.Errorf(tr("unknown package %s"), fqbn.Package)
+			errors.New(i18n.Tr("unknown package %s", fqbn.Package))
 	}
 
 	// Find platform
 	platform := targetPackage.Platforms[fqbn.PlatformArch]
 	if platform == nil {
 		return targetPackage, nil, nil, nil, nil,
-			fmt.Errorf(tr("unknown platform %s:%s"), targetPackage, fqbn.PlatformArch)
+			errors.New(i18n.Tr("unknown platform %s:%s", targetPackage, fqbn.PlatformArch))
 	}
 	boardPlatformRelease := pme.GetInstalledPlatformRelease(platform)
 	if boardPlatformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
-			fmt.Errorf(tr("platform %s is not installed"), platform)
+			errors.New(i18n.Tr("platform %s is not installed", platform))
 	}
 
 	// Find board
 	board := boardPlatformRelease.Boards[fqbn.BoardID]
 	if board == nil {
 		return targetPackage, boardPlatformRelease, nil, nil, nil,
-			fmt.Errorf(tr("board %s not found"), fqbn.StringWithoutConfig())
+			errors.New(i18n.Tr("board %s not found", fqbn.StringWithoutConfig()))
 	}
 
 	boardBuildProperties, err := board.GetBuildProperties(fqbn)
 	if err != nil {
 		return targetPackage, boardPlatformRelease, board, nil, nil,
-			fmt.Errorf(tr("getting build properties for board %[1]s: %[2]s"), board, err)
+			errors.New(i18n.Tr("getting build properties for board %[1]s: %[2]s", board, err))
 	}
 
 	// Determine the platform used for the build and the variant (in case the board refers
@@ -443,7 +440,8 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 	// core and variant cannot refer to two different platforms
 	if referredCore != "" && referredVariant != "" && referredCore != referredVariant {
 		return "", nil, "", nil,
-			fmt.Errorf(tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"), referredCore+":"+core, referredVariant+":"+variant)
+			errors.New(i18n.Tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s",
+				referredCore+":"+core, referredVariant+":"+variant))
 	}
 
 	// extract the referred platform
@@ -456,17 +454,17 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 		referredPackage := pme.packages[referredPackageName]
 		if referredPackage == nil {
 			return "", nil, "", nil,
-				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackageName, fqbn)
+				errors.New(i18n.Tr("missing package %[1]s referenced by board %[2]s", referredPackageName, fqbn))
 		}
 		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
 		if referredPlatform == nil {
 			return "", nil, "", nil,
-				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
+				errors.New(i18n.Tr("missing platform %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.PlatformArch, fqbn))
 		}
 		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
 		if referredPlatformRelease == nil {
 			return "", nil, "", nil,
-				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
+				errors.New(i18n.Tr("missing platform release %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.PlatformArch, fqbn))
 		}
 	}
 
@@ -495,7 +493,7 @@ func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 	indexPath := pmb.IndexDir.Join(indexFileName)
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
-		return fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
+		return errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", indexPath, err))
 	}
 
 	for _, p := range index.Packages {
@@ -510,7 +508,7 @@ func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 func (pmb *Builder) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageindex.Index, error) {
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
-		return nil, fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
+		return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", indexPath, err))
 	}
 
 	index.MergeIntoPackages(pmb.packages)
@@ -524,7 +522,7 @@ func (pme *Explorer) Package(name string) *PackageActions {
 	var err error
 	thePackage := pme.packages[name]
 	if thePackage == nil {
-		err = fmt.Errorf(tr("package '%s' not found"), name)
+		err = errors.New(i18n.Tr("package '%s' not found", name))
 	}
 	return &PackageActions{
 		aPackage:     thePackage,
@@ -550,7 +548,7 @@ func (pa *PackageActions) Tool(name string) *ToolActions {
 		tool = pa.aPackage.Tools[name]
 
 		if tool == nil {
-			err = fmt.Errorf(tr("tool '%[1]s' not found in package '%[2]s'"), name, pa.aPackage.Name)
+			err = errors.New(i18n.Tr("tool '%[1]s' not found in package '%[2]s'", name, pa.aPackage.Name))
 		}
 	}
 	return &ToolActions{
@@ -600,7 +598,7 @@ func (ta *ToolActions) Release(version *semver.RelaxedVersion) *ToolReleaseActio
 	}
 	release := ta.tool.FindReleaseWithRelaxedVersion(version)
 	if release == nil {
-		return &ToolReleaseActions{forwardError: fmt.Errorf(tr("release %[1]s not found for tool %[2]s"), version, ta.tool.String())}
+		return &ToolReleaseActions{forwardError: errors.New(i18n.Tr("release %[1]s not found for tool %[2]s", version, ta.tool))}
 	}
 	return &ToolReleaseActions{release: release}
 }
@@ -729,7 +727,7 @@ func (pme *Explorer) FindToolsRequiredFromPlatformRelease(platform *cores.Platfo
 		pme.log.WithField("tool", toolDep).Debugf("Required tool")
 		tool := pme.FindToolDependency(toolDep)
 		if tool == nil {
-			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
+			return nil, errors.New(i18n.Tr("tool release not found: %s", toolDep))
 		}
 		requiredTools = append(requiredTools, tool)
 		delete(foundTools, tool.Tool.Name)
@@ -740,7 +738,7 @@ func (pme *Explorer) FindToolsRequiredFromPlatformRelease(platform *cores.Platfo
 		pme.log.WithField("discovery", discoveryDep).Infof("Required discovery")
 		tool := pme.FindDiscoveryDependency(discoveryDep)
 		if tool == nil {
-			return nil, fmt.Errorf(tr("discovery release not found: %s"), discoveryDep)
+			return nil, errors.New(i18n.Tr("discovery release not found: %s", discoveryDep))
 		}
 		requiredTools = append(requiredTools, tool)
 		delete(foundTools, tool.Tool.Name)
@@ -751,7 +749,7 @@ func (pme *Explorer) FindToolsRequiredFromPlatformRelease(platform *cores.Platfo
 		pme.log.WithField("monitor", monitorDep).Infof("Required monitor")
 		tool := pme.FindMonitorDependency(monitorDep)
 		if tool == nil {
-			return nil, fmt.Errorf(tr("monitor release not found: %s"), monitorDep)
+			return nil, errors.New(i18n.Tr("monitor release not found: %s", monitorDep))
 		}
 		requiredTools = append(requiredTools, tool)
 		delete(foundTools, tool.Tool.Name)
@@ -835,7 +833,7 @@ func (pme *Explorer) FindToolsRequiredForBuild(platform, buildPlatform *cores.Pl
 		pme.log.WithField("tool", toolDep).Debugf("Required tool")
 		tool := pme.FindToolDependency(toolDep)
 		if tool == nil {
-			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
+			return nil, errors.New(i18n.Tr("tool release not found: %s", toolDep))
 		}
 		requiredTools = append(requiredTools, tool)
 		delete(allToolsAlternatives, tool.Tool.Name)

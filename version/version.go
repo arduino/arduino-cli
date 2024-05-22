@@ -53,7 +53,7 @@ func NewInfo(application string) *Info {
 }
 
 func (i *Info) String() string {
-	return tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
+	return i18n.Tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
 }
 
 // Data implements feedback.Result interface

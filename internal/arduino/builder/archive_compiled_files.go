@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -23,7 +24,7 @@ import (
 func (b *Builder) archiveCompiledFiles(archiveFilePath *paths.Path, objectFilesToArchive paths.PathList) (*paths.Path, error) {
 	if b.onlyUpdateCompilationDatabase {
 		if b.logger.Verbose() {
-			b.logger.Info(tr("Skipping archive creation of: %[1]s", archiveFilePath))
+			b.logger.Info(i18n.Tr("Skipping archive creation of: %[1]s", archiveFilePath))
 		}
 		return archiveFilePath, nil
 	}
@@ -46,7 +47,7 @@ func (b *Builder) archiveCompiledFiles(archiveFilePath *paths.Path, objectFilesT
 			}
 		} else {
 			if b.logger.Verbose() {
-				b.logger.Info(tr("Using previously compiled file: %[1]s", archiveFilePath))
+				b.logger.Info(i18n.Tr("Using previously compiled file: %[1]s", archiveFilePath))
 			}
 			return archiveFilePath, nil
 		}

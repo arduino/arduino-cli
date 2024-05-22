@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
@@ -37,9 +38,9 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var fqbn arguments.Fqbn
 	var showProperties arguments.ShowProperties
 	var detailsCommand = &cobra.Command{
-		Use:     fmt.Sprintf("details -b <%s>", tr("FQBN")),
-		Short:   tr("Print details about a board."),
-		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
+		Use:     fmt.Sprintf("details -b <%s>", i18n.Tr("FQBN")),
+		Short:   i18n.Tr("Print details about a board."),
+		Long:    i18n.Tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -48,8 +49,8 @@ func initDetailsCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 
 	fqbn.AddToCommand(detailsCommand, srv)
-	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
-	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
+	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, i18n.Tr("Show full board details"))
+	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, i18n.Tr("Show list of available programmers"))
 	detailsCommand.MarkFlagRequired("fqbn")
 	showProperties.AddToCommand(detailsCommand)
 	return detailsCommand
@@ -70,7 +71,7 @@ func runDetailsCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, fq
 		DoNotExpandBuildProperties: showPropertiesMode == arguments.ShowPropertiesUnexpanded,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error getting board details: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error getting board details: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(detailsResult{
@@ -107,7 +108,7 @@ func (dr detailsResult) String() string {
 
 	if dr.listProgrammers {
 		t := table.New()
-		t.AddRow(tr("Id"), tr("Programmer name"))
+		t.AddRow(i18n.Tr("Id"), i18n.Tr("Programmer name"))
 		for _, programmer := range details.Programmers {
 			t.AddRow(programmer.Id, programmer.Name)
 		}
@@ -135,13 +136,13 @@ func (dr detailsResult) String() string {
 	}
 
 	t.SetColumnWidthMode(1, table.Average)
-	t.AddRow(tr("Board name:"), details.Name)
-	t.AddRow(tr("FQBN:"), details.Fqbn)
-	addIfNotEmpty(tr("Board version:"), details.Version)
+	t.AddRow(i18n.Tr("Board name:"), details.Name)
+	t.AddRow(i18n.Tr("FQBN:"), details.Fqbn)
+	addIfNotEmpty(i18n.Tr("Board version:"), details.Version)
 
 	if details.Official {
 		t.AddRow() // get some space from above
-		t.AddRow(tr("Official Arduino board:"),
+		t.AddRow(i18n.Tr("Official Arduino board:"),
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
@@ -150,7 +151,7 @@ func (dr detailsResult) String() string {
 			continue
 		}
 		t.AddRow() // get some space from above
-		header := tr("Identification properties:")
+		header := i18n.Tr("Identification properties:")
 		keys := idp.Properties.Keys()
 		for _, k := range keys {
 			t.AddRow(header, k+"="+idp.Properties.Get(k))
@@ -159,35 +160,35 @@ func (dr detailsResult) String() string {
 	}
 
 	t.AddRow() // get some space from above
-	addIfNotEmpty(tr("Package name:"), details.Package.Name)
-	addIfNotEmpty(tr("Package maintainer:"), details.Package.Maintainer)
-	addIfNotEmpty(tr("Package URL:"), details.Package.Url)
-	addIfNotEmpty(tr("Package website:"), details.Package.WebsiteUrl)
-	addIfNotEmpty(tr("Package online help:"), details.Package.Help.Online)
+	addIfNotEmpty(i18n.Tr("Package name:"), details.Package.Name)
+	addIfNotEmpty(i18n.Tr("Package maintainer:"), details.Package.Maintainer)
+	addIfNotEmpty(i18n.Tr("Package URL:"), details.Package.Url)
+	addIfNotEmpty(i18n.Tr("Package website:"), details.Package.WebsiteUrl)
+	addIfNotEmpty(i18n.Tr("Package online help:"), details.Package.Help.Online)
 
 	t.AddRow() // get some space from above
-	addIfNotEmpty(tr("Platform name:"), details.Platform.Name)
-	addIfNotEmpty(tr("Platform category:"), details.Platform.Category)
-	addIfNotEmpty(tr("Platform architecture:"), details.Platform.Architecture)
-	addIfNotEmpty(tr("Platform URL:"), details.Platform.Url)
-	addIfNotEmpty(tr("Platform file name:"), details.Platform.ArchiveFilename)
+	addIfNotEmpty(i18n.Tr("Platform name:"), details.Platform.Name)
+	addIfNotEmpty(i18n.Tr("Platform category:"), details.Platform.Category)
+	addIfNotEmpty(i18n.Tr("Platform architecture:"), details.Platform.Architecture)
+	addIfNotEmpty(i18n.Tr("Platform URL:"), details.Platform.Url)
+	addIfNotEmpty(i18n.Tr("Platform file name:"), details.Platform.ArchiveFilename)
 	if details.Platform.Size != 0 {
-		addIfNotEmpty(tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
+		addIfNotEmpty(i18n.Tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
 	}
-	addIfNotEmpty(tr("Platform checksum:"), details.Platform.Checksum)
+	addIfNotEmpty(i18n.Tr("Platform checksum:"), details.Platform.Checksum)
 
 	t.AddRow() // get some space from above
 
 	tab.SetColumnWidthMode(1, table.Average)
 	for _, tool := range details.ToolsDependencies {
-		tab.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, tool.Version)
+		tab.AddRow(i18n.Tr("Required tool:"), tool.Packager+":"+tool.Name, tool.Version)
 		if dr.showFullDetails {
 			for _, sys := range tool.Systems {
-				tab.AddRow("", tr("OS:"), sys.Host)
-				tab.AddRow("", tr("File:"), sys.ArchiveFilename)
-				tab.AddRow("", tr("Size (bytes):"), fmt.Sprint(sys.Size))
-				tab.AddRow("", tr("Checksum:"), sys.Checksum)
-				tab.AddRow("", tr("URL:"), sys.Url)
+				tab.AddRow("", i18n.Tr("OS:"), sys.Host)
+				tab.AddRow("", i18n.Tr("File:"), sys.ArchiveFilename)
+				tab.AddRow("", i18n.Tr("Size (bytes):"), fmt.Sprint(sys.Size))
+				tab.AddRow("", i18n.Tr("Checksum:"), sys.Checksum)
+				tab.AddRow("", i18n.Tr("URL:"), sys.Url)
 				tab.AddRow() // get some space from above
 			}
 		}
@@ -196,7 +197,7 @@ func (dr detailsResult) String() string {
 	green := color.New(color.FgGreen)
 	tab.AddRow() // get some space from above
 	for _, option := range details.ConfigOptions {
-		tab.AddRow(tr("Option:"), option.OptionLabel, "", option.Option)
+		tab.AddRow(i18n.Tr("Option:"), option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
 			if value.Selected {
 				tab.AddRow("",
@@ -212,7 +213,7 @@ func (dr detailsResult) String() string {
 		}
 	}
 
-	tab.AddRow(tr("Programmers:"), tr("ID"), tr("Name"), "")
+	tab.AddRow(i18n.Tr("Programmers:"), i18n.Tr("ID"), i18n.Tr("Name"), "")
 	for _, programmer := range details.Programmers {
 		if programmer.Id == details.DefaultProgrammerID {
 			tab.AddRow("", table.NewCell(programmer.Id, green), table.NewCell(programmer.Name, green), table.NewCell("✔ (default)", green))

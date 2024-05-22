@@ -17,6 +17,7 @@ package arguments
 
 import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -34,10 +35,10 @@ type PrePostScriptsFlags struct {
 // AddToCommand adds flags that can be used to force running or skipping
 // of post installation scripts
 func (p *PrePostScriptsFlags) AddToCommand(cmd *cobra.Command) {
-	cmd.Flags().BoolVar(&p.runPostInstall, "run-post-install", false, tr("Force run of post-install scripts (if the CLI is not running interactively)."))
-	cmd.Flags().BoolVar(&p.skipPostInstall, "skip-post-install", false, tr("Force skip of post-install scripts (if the CLI is running interactively)."))
-	cmd.Flags().BoolVar(&p.runPreUninstall, "run-pre-uninstall", false, tr("Force run of pre-uninstall scripts (if the CLI is not running interactively)."))
-	cmd.Flags().BoolVar(&p.skipPreUninstall, "skip-pre-uninstall", false, tr("Force skip of pre-uninstall scripts (if the CLI is running interactively)."))
+	cmd.Flags().BoolVar(&p.runPostInstall, "run-post-install", false, i18n.Tr("Force run of post-install scripts (if the CLI is not running interactively)."))
+	cmd.Flags().BoolVar(&p.skipPostInstall, "skip-post-install", false, i18n.Tr("Force skip of post-install scripts (if the CLI is running interactively)."))
+	cmd.Flags().BoolVar(&p.runPreUninstall, "run-pre-uninstall", false, i18n.Tr("Force run of pre-uninstall scripts (if the CLI is not running interactively)."))
+	cmd.Flags().BoolVar(&p.skipPreUninstall, "skip-pre-uninstall", false, i18n.Tr("Force skip of pre-uninstall scripts (if the CLI is running interactively)."))
 }
 
 // GetRunPostInstall returns the run-post-install flag value

@@ -23,14 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `lib` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer, defaultSettings *rpc.Configuration) *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
-		Short: tr("Arduino commands about libraries."),
-		Long:  tr("Arduino commands about libraries."),
+		Short: i18n.Tr("Arduino commands about libraries."),
+		Long:  i18n.Tr("Arduino commands about libraries."),
 		Example: "" +
 			"  " + os.Args[0] + " lib install AudioZero\n" +
 			"  " + os.Args[0] + " lib update-index",

@@ -15,22 +15,18 @@
 
 package cli
 
-import (
-	"github.com/arduino/arduino-cli/internal/i18n"
-)
-
-var tr = i18n.Tr
+import "github.com/arduino/arduino-cli/internal/i18n"
 
 func getUsageTemplate() string {
 	// Force i18n to generate translation strings
-	_ = tr("Usage:")
-	_ = tr("Aliases:")
-	_ = tr("Examples:")
-	_ = tr("Available Commands:")
-	_ = tr("Flags:")
-	_ = tr("Global Flags:")
-	_ = tr("Additional help topics:")
-	_ = tr("Use %s for more information about a command.")
+	_ = i18n.Tr("Usage:")
+	_ = i18n.Tr("Aliases:")
+	_ = i18n.Tr("Examples:")
+	_ = i18n.Tr("Available Commands:")
+	_ = i18n.Tr("Flags:")
+	_ = i18n.Tr("Global Flags:")
+	_ = i18n.Tr("Additional help topics:")
+	_ = i18n.Tr("Use %s for more information about a command.", "")
 
 	return `{{tr "Usage:"}}{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}

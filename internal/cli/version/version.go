@@ -29,14 +29,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `version` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	versionCommand := &cobra.Command{
 		Use:     "version",
-		Short:   tr("Shows version number of Arduino CLI."),
-		Long:    tr("Shows the version number of Arduino CLI which is installed on your system."),
+		Short:   i18n.Tr("Shows version number of Arduino CLI."),
+		Long:    i18n.Tr("Shows the version number of Arduino CLI which is installed on your system."),
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {

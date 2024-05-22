@@ -20,6 +20,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -36,7 +37,7 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	// Ensure it's a config message and not data
 	req := msg.GetDebugRequest()
 	if req == nil {
-		return errors.New(tr("First message must contain debug request, not data"))
+		return errors.New(i18n.Tr("First message must contain debug request, not data"))
 	}
 
 	// Launch debug recipe attaching stdin and out to grpc streaming

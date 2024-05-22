@@ -17,13 +17,14 @@ package arguments
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -40,11 +41,11 @@ type Port struct {
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
 func (p *Port) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
-	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
+	cmd.Flags().StringVarP(&p.address, "port", "p", "", i18n.Tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return f.Map(GetAvailablePorts(cmd.Context(), srv), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
 	})
-	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
+	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", i18n.Tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return f.Map(GetAvailablePorts(cmd.Context(), srv), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
 	})
@@ -118,7 +119,7 @@ func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.Ardu
 					Protocol: "serial",
 				}, nil
 			}
-			return nil, fmt.Errorf(tr("port not found: %[1]s %[2]s"), address, protocol)
+			return nil, errors.New(i18n.Tr("port not found: %[1]s %[2]s", address, protocol))
 		}
 	}
 }
@@ -137,7 +138,7 @@ func (p *Port) DetectFQBN(ctx context.Context, inst *rpc.Instance, srv rpc.Ardui
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error during FQBN detection: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error during FQBN detection: %v", err), feedback.ErrGeneric)
 	}
 	for _, detectedPort := range detectedPorts.GetPorts() {
 		port := detectedPort.GetPort()

@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesresolver"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -111,7 +112,7 @@ func (s *arduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error getting information for library %s", lib.Library.Name), Cause: err}
 		}
 		installedLibs = append(installedLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,

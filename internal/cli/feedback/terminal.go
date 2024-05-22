@@ -22,6 +22,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/mattn/go-isatty"
 	"golang.org/x/term"
 )
@@ -34,7 +35,7 @@ func InteractiveStreams() (io.Reader, io.Writer, error) {
 		panic("output format not yet selected")
 	}
 	if format != Text {
-		return nil, nil, errors.New(tr("interactive terminal not supported for the '%s' output format", format))
+		return nil, nil, errors.New(i18n.Tr("interactive terminal not supported for the '%s' output format", format))
 	}
 	return os.Stdin, stdOut, nil
 }
@@ -48,7 +49,7 @@ func SetRawModeStdin() error {
 		panic("terminal already in RAW mode")
 	}
 	if !IsInteractive() {
-		return errors.New(tr("not running in a terminal"))
+		return errors.New(i18n.Tr("not running in a terminal"))
 	}
 	old, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
@@ -90,10 +91,10 @@ func IsCI() bool {
 // InputUserField prompts the user to input the provided user field.
 func InputUserField(prompt string, secret bool) (string, error) {
 	if format != Text {
-		return "", errors.New(tr("user input not supported for the '%s' output format", format))
+		return "", errors.New(i18n.Tr("user input not supported for the '%s' output format", format))
 	}
 	if !IsInteractive() {
-		return "", errors.New(tr("user input not supported in non interactive mode"))
+		return "", errors.New(i18n.Tr("user input not supported in non interactive mode"))
 	}
 
 	fmt.Fprintf(stdOut, "%s: ", prompt)

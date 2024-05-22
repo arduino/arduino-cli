@@ -47,7 +47,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	var daemonPort string
 	daemonCommand := &cobra.Command{
 		Use:     "daemon",
-		Short:   tr("Run the Arduino CLI as a gRPC daemon."),
+		Short:   i18n.Tr("Run the Arduino CLI as a gRPC daemon."),
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		PreRun: func(cmd *cobra.Command, args []string) {
@@ -73,19 +73,19 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 
 	daemonCommand.Flags().StringVar(&daemonPort,
 		"port", defaultDaemonPort,
-		tr("The TCP port the daemon will listen to"))
+		i18n.Tr("The TCP port the daemon will listen to"))
 	daemonCommand.Flags().BoolVar(&daemonize,
 		"daemonize", false,
-		tr("Do not terminate daemon process if the parent process dies"))
+		i18n.Tr("Do not terminate daemon process if the parent process dies"))
 	daemonCommand.Flags().BoolVar(&debug,
 		"debug", false,
-		tr("Enable debug logging of gRPC calls"))
+		i18n.Tr("Enable debug logging of gRPC calls"))
 	daemonCommand.Flags().StringVar(&debugFile,
 		"debug-file", "",
-		tr("Append debug logging to the specified file"))
+		i18n.Tr("Append debug logging to the specified file"))
 	daemonCommand.Flags().StringSliceVar(&debugFilters,
 		"debug-filter", []string{},
-		tr("Display only the provided gRPC calls"))
+		i18n.Tr("Display only the provided gRPC calls"))
 	return daemonCommand
 }
 
@@ -95,7 +95,7 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort string) {
 	gRPCOptions := []grpc.ServerOption{}
 	if debugFile != "" {
 		if !debug {
-			feedback.Fatal(tr("The flag --debug-file must be used with --debug."), feedback.ErrBadArgument)
+			feedback.Fatal(i18n.Tr("The flag --debug-file must be used with --debug."), feedback.ErrBadArgument)
 		}
 	}
 	if debug {
@@ -103,13 +103,13 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort string) {
 			outFile := paths.New(debugFile)
 			f, err := outFile.Append()
 			if err != nil {
-				feedback.Fatal(tr("Error opening debug logging file: %s", err), feedback.ErrGeneric)
+				feedback.Fatal(i18n.Tr("Error opening debug logging file: %s", err), feedback.ErrGeneric)
 			}
 			defer f.Close()
 			debugStdOut = f
 		} else {
 			if out, _, err := feedback.DirectStreams(); err != nil {
-				feedback.Fatal(tr("Can't write debug log: %s", err), feedback.ErrBadArgument)
+				feedback.Fatal(i18n.Tr("Can't write debug log: %s", err), feedback.ErrBadArgument)
 			} else {
 				debugStdOut = out
 			}
@@ -135,19 +135,19 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort string) {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
 		if errors.As(err, &dnsError) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", daemonPort, dnsError.Name), feedback.ErrBadTCPPortArgument)
+			feedback.Fatal(i18n.Tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", daemonPort, dnsError.Name), feedback.ErrBadTCPPortArgument)
 		}
 		// Invalid port number, such as -1
 		var addrError *net.AddrError
 		if errors.As(err, &addrError) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", daemonPort, addrError.Addr), feedback.ErrBadTCPPortArgument)
+			feedback.Fatal(i18n.Tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", daemonPort, addrError.Addr), feedback.ErrBadTCPPortArgument)
 		}
 		// Port is already in use
 		var syscallErr *os.SyscallError
 		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %s. Address already in use.", daemonPort), feedback.ErrFailedToListenToTCPPort)
+			feedback.Fatal(i18n.Tr("Failed to listen on TCP port: %s. Address already in use.", daemonPort), feedback.ErrFailedToListenToTCPPort)
 		}
-		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", daemonPort, err), feedback.ErrFailedToListenToTCPPort)
+		feedback.Fatal(i18n.Tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", daemonPort, err), feedback.ErrFailedToListenToTCPPort)
 	}
 
 	// We need to retrieve the port used only if the user did not specify it
@@ -158,7 +158,7 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort string) {
 		split := strings.Split(address.String(), ":")
 
 		if len(split) <= 1 {
-			feedback.Fatal(tr("Invalid TCP address: port is missing"), feedback.ErrBadTCPPortArgument)
+			feedback.Fatal(i18n.Tr("Invalid TCP address: port is missing"), feedback.ErrBadTCPPortArgument)
 		}
 
 		daemonPort = split[1]
@@ -185,5 +185,5 @@ func (r daemonResult) Data() interface{} {
 
 func (r daemonResult) String() string {
 	j, _ := json.Marshal(r)
-	return fmt.Sprintln(tr("Daemon is now listening on %s:%s", r.IP, r.Port)) + fmt.Sprintln(string(j))
+	return fmt.Sprintln(i18n.Tr("Daemon is now listening on %s:%s", r.IP, r.Port)) + fmt.Sprintln(string(j))
 }

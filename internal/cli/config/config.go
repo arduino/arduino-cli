@@ -28,13 +28,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `config` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
-		Short:   tr("Arduino configuration commands."),
+		Short:   i18n.Tr("Arduino configuration commands."),
 		Example: "  " + os.Args[0] + " config init",
 	}
 
@@ -83,13 +81,13 @@ func SetConfigFile(ctx context.Context, configFile string) context.Context {
 func saveConfiguration(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	var outConfig []byte
 	if res, err := srv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"}); err != nil {
-		feedback.Fatal(tr("Error writing to file: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error writing to file: %v", err), feedback.ErrGeneric)
 	} else {
 		outConfig = []byte(res.GetEncodedSettings())
 	}
 
 	configFile := GetConfigFile(ctx)
 	if err := paths.New(configFile).WriteFile(outConfig); err != nil {
-		feedback.Fatal(tr("Error writing to file: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error writing to file: %v", err), feedback.ErrGeneric)
 	}
 }

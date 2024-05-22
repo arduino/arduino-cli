@@ -23,6 +23,7 @@ import (
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -87,25 +88,25 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 		}
 	}
 
-	b.logger.Info(tr("Library %[1]s has been declared precompiled:", library.Name))
+	b.logger.Info(i18n.Tr("Library %[1]s has been declared precompiled:", library.Name))
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
 		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
 		if fullPrecompDir.Exist() && directoryContainsFile(fullPrecompDir) {
-			b.logger.Info(tr("Using precompiled library in %[1]s", fullPrecompDir))
+			b.logger.Info(i18n.Tr("Using precompiled library in %[1]s", fullPrecompDir))
 			return fullPrecompDir
 		}
-		b.logger.Info(tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
+		b.logger.Info(i18n.Tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
 	}
 
 	precompDir := library.SourceDir.Join(mcu)
 	if precompDir.Exist() && directoryContainsFile(precompDir) {
-		b.logger.Info(tr("Using precompiled library in %[1]s", precompDir))
+		b.logger.Info(i18n.Tr("Using precompiled library in %[1]s", precompDir))
 		return precompDir
 	}
-	b.logger.Info(tr(`Precompiled library in "%[1]s" not found`, precompDir))
+	b.logger.Info(i18n.Tr(`Precompiled library in "%[1]s" not found`, precompDir))
 	return nil
 }
 
@@ -129,7 +130,7 @@ func (b *Builder) compileLibraries(libraries libraries.List, includes []string) 
 
 func (b *Builder) compileLibrary(library *libraries.Library, includes []string) (paths.PathList, error) {
 	if b.logger.Verbose() {
-		b.logger.Info(tr(`Compiling library "%[1]s"`, library.Name))
+		b.logger.Info(i18n.Tr(`Compiling library "%[1]s"`, library.Name))
 	}
 	libraryBuildPath := b.librariesBuildPath.Join(library.DirName)
 
@@ -147,7 +148,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 		)
 
 		if !coreSupportPrecompiled {
-			b.logger.Info(tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
+			b.logger.Info(i18n.Tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
 		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath
 			libs, err := precompiledPath.ReadDir()
@@ -279,7 +280,7 @@ func (b *Builder) warnAboutArchIncompatibleLibraries(importedLibraries libraries
 	for _, importedLibrary := range importedLibraries {
 		if !importedLibrary.SupportsAnyArchitectureIn(archs...) {
 			b.logger.Info(
-				tr("WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s).",
+				i18n.Tr("WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s).",
 					importedLibrary.Name,
 					strings.Join(importedLibrary.Architectures, ", "),
 					strings.Join(archs, ", ")))
@@ -298,17 +299,17 @@ func (b *Builder) printUsedLibraries(importedLibraries libraries.List) {
 	for _, library := range importedLibraries {
 		legacy := ""
 		if library.IsLegacy {
-			legacy = tr("(legacy)")
+			legacy = i18n.Tr("(legacy)")
 		}
 		if library.Version.String() == "" {
 			b.logger.Info(
-				tr("Using library %[1]s in folder: %[2]s %[3]s",
+				i18n.Tr("Using library %[1]s in folder: %[2]s %[3]s",
 					library.Name,
 					library.InstallDir,
 					legacy))
 		} else {
 			b.logger.Info(
-				tr("Using library %[1]s at version %[2]s in folder: %[3]s %[4]s",
+				i18n.Tr("Using library %[1]s at version %[2]s in folder: %[3]s %[4]s",
 					library.Name,
 					library.Version,
 					library.InstallDir,

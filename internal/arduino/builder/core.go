@@ -19,7 +19,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
@@ -27,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -38,8 +38,8 @@ func (b *Builder) buildCore() error {
 
 	if b.coreBuildCachePath != nil {
 		if _, err := b.coreBuildCachePath.RelTo(b.buildPath); err != nil {
-			b.logger.Info(tr("Couldn't deeply cache core build: %[1]s", err))
-			b.logger.Info(tr("Running normal build of the core..."))
+			b.logger.Info(i18n.Tr("Couldn't deeply cache core build: %[1]s", err))
+			b.logger.Info(i18n.Tr("Running normal build of the core..."))
 			// TODO decide if we want to override this or not. (It's only used by the
 			// compileCore function).
 			b.coreBuildCachePath = nil
@@ -92,7 +92,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		targetArchivedCore = b.coreBuildCachePath.Join(archivedCoreName, "core.a")
 
 		if _, err := buildcache.New(b.coreBuildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
-			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
+			return nil, nil, errors.New(i18n.Tr("creating core cache folder: %s", err))
 		}
 
 		var canUseArchivedCore bool
@@ -113,7 +113,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		if canUseArchivedCore {
 			// use archived core
 			if b.logger.Verbose() {
-				b.logger.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
+				b.logger.Info(i18n.Tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
@@ -138,13 +138,13 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if b.logger.Verbose() {
 			if err == nil {
-				b.logger.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
+				b.logger.Info(i18n.Tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
-				b.logger.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
+				b.logger.Info(i18n.Tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
 					b.actualPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
-				b.logger.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
+				b.logger.Info(i18n.Tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
 			}
 		}
 	}

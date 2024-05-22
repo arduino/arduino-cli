@@ -16,9 +16,11 @@
 package sketch
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"gopkg.in/yaml.v3"
 )
@@ -75,15 +77,15 @@ func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 	dstYaml := []byte(strings.Join(srcYaml, fmt.Sprintln()) + fmt.Sprintln())
 	var dst interface{}
 	if err := yaml.Unmarshal(dstYaml, &dst); err != nil {
-		return fmt.Errorf("%s: %w", tr("could not update sketch project file"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("could not update sketch project file"), err)
 	}
 	dstMap, ok := dst.(map[string]interface{})
 	if !ok {
-		return fmt.Errorf(tr("could not update sketch project file"))
+		return errors.New(i18n.Tr("could not update sketch project file"))
 	}
 	writtenValue, notRemoved := dstMap[key]
 	if (newValue == "" && notRemoved) || (newValue != "" && newValue != writtenValue) {
-		return fmt.Errorf(tr("could not update sketch project file"))
+		return errors.New(i18n.Tr("could not update sketch project file"))
 	}
 
 	// Write back the updated YAML

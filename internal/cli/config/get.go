@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,8 +32,8 @@ import (
 func initGetCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	getCommand := &cobra.Command{
 		Use:   "get",
-		Short: tr("Gets a settings key value."),
-		Long:  tr("Gets a settings key value."),
+		Short: i18n.Tr("Gets a settings key value."),
+		Long:  i18n.Tr("Gets a settings key value."),
 		Example: "" +
 			"  " + os.Args[0] + " config get logging\n" +
 			"  " + os.Args[0] + " config get daemon.port\n" +
@@ -55,7 +56,7 @@ func runGetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args [
 	for _, toGet := range args {
 		resp, err := srv.SettingsGetValue(ctx, &rpc.SettingsGetValueRequest{Key: toGet})
 		if err != nil {
-			feedback.Fatal(tr("Cannot get the configuration key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Cannot get the configuration key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
 		}
 		var result getResult
 		if err := json.Unmarshal([]byte(resp.GetEncodedValue()), &result.resp); err != nil {
@@ -81,7 +82,7 @@ func (gr getResult) String() string {
 	gs, err := yaml.Marshal(gr.resp)
 	if err != nil {
 		// Should never happen
-		panic(tr("unable to marshal config to YAML: %v", err))
+		panic(i18n.Tr("unable to marshal config to YAML: %v", err))
 	}
 	return string(gs)
 }

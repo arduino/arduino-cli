@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,9 +32,9 @@ import (
 
 func initUninstallCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	uninstallCommand := &cobra.Command{
-		Use:     fmt.Sprintf("uninstall %s...", tr("LIBRARY_NAME")),
-		Short:   tr("Uninstalls one or more libraries."),
-		Long:    tr("Uninstalls one or more libraries."),
+		Use:     fmt.Sprintf("uninstall %s...", i18n.Tr("LIBRARY_NAME")),
+		Short:   i18n.Tr("Uninstalls one or more libraries."),
+		Long:    i18n.Tr("Uninstalls one or more libraries."),
 		Example: "  " + os.Args[0] + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -52,7 +53,7 @@ func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, 
 
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, library := range refs {
@@ -63,7 +64,7 @@ func runUninstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, 
 		}
 		stream := commands.LibraryUninstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
 		if err := srv.LibraryUninstall(req, stream); err != nil {
-			feedback.Fatal(tr("Error uninstalling %[1]s: %[2]v", library, err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error uninstalling %[1]s: %[2]v", library, err), feedback.ErrGeneric)
 		}
 	}
 

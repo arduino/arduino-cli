@@ -17,6 +17,7 @@ package librariesmanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -26,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
 	"github.com/go-git/go-git/v5"
@@ -74,7 +76,7 @@ func (lmi *Installer) InstallPrerequisiteCheck(name string, version *semver.Vers
 		return nil, &cmderrors.MultipleLibraryInstallDetected{
 			LibName: name,
 			LibsDir: libsDir,
-			Message: tr("Automatic library install can't be performed in this case, please manually remove all duplicates and retry."),
+			Message: i18n.Tr("Automatic library install can't be performed in this case, please manually remove all duplicates and retry."),
 		}
 	}
 
@@ -89,7 +91,7 @@ func (lmi *Installer) InstallPrerequisiteCheck(name string, version *semver.Vers
 	libPath := installDir.Join(utils.SanitizeName(name))
 	if libPath.IsDir() {
 		if replaced == nil || !replaced.InstallDir.EquivalentTo(libPath) {
-			return nil, fmt.Errorf(tr("destination dir %s already exists, cannot install"), libPath)
+			return nil, errors.New(i18n.Tr("destination dir %s already exists, cannot install", libPath))
 		}
 	}
 
@@ -121,22 +123,22 @@ func (lmi *Installer) importLibraryFromDirectory(libPath *paths.Path, overwrite 
 
 	if installPlan.UpToDate {
 		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), installPlan.Name)
+			return errors.New(i18n.Tr("library %s already installed", installPlan.Name))
 		}
 	}
 	if installPlan.ReplacedLib != nil {
 		if !overwrite {
-			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", installPlan.Name, installPlan.ReplacedLib))
+			return errors.New(i18n.Tr("Library %[1]s is already installed, but with a different version: %[2]s", installPlan.Name, installPlan.ReplacedLib))
 		}
 		if err := lmi.Uninstall(installPlan.ReplacedLib); err != nil {
 			return err
 		}
 	}
 	if installPlan.TargetPath.Exist() {
-		return fmt.Errorf("%s: %s", tr("destination directory already exists"), installPlan.TargetPath)
+		return fmt.Errorf("%s: %s", i18n.Tr("destination directory already exists"), installPlan.TargetPath)
 	}
 	if err := libPath.CopyDirTo(installPlan.TargetPath); err != nil {
-		return fmt.Errorf("%s: %w", tr("copying library to destination directory:"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("copying library to destination directory:"), err)
 	}
 	return nil
 }
@@ -144,10 +146,10 @@ func (lmi *Installer) importLibraryFromDirectory(libPath *paths.Path, overwrite 
 // Uninstall removes a Library
 func (lmi *Installer) Uninstall(lib *libraries.Library) error {
 	if lib == nil || lib.InstallDir == nil {
-		return fmt.Errorf(tr("install directory not set"))
+		return errors.New(i18n.Tr("install directory not set"))
 	}
 	if err := lib.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf(tr("removing library directory: %s"), err)
+		return errors.New(i18n.Tr("removing library directory: %s", err))
 	}
 
 	alternatives := lmi.libraries[lib.Name]
@@ -174,7 +176,7 @@ func (lmi *Installer) InstallZipLib(ctx context.Context, archivePath *paths.Path
 	// Extract to a temporary directory so we can check if the zip is structured correctly.
 	// We also use the top level folder from the archive to infer the library name.
 	if err := extract.Archive(ctx, file, tmpDir.String(), nil); err != nil {
-		return fmt.Errorf(tr("extracting archive: %w"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("extracting archive"), err)
 	}
 
 	libRootFiles, err := tmpDir.ReadDir()
@@ -183,16 +185,16 @@ func (lmi *Installer) InstallZipLib(ctx context.Context, archivePath *paths.Path
 	}
 	libRootFiles.FilterOutPrefix("__MACOSX") // Ignores metadata from Mac OS X
 	if len(libRootFiles) > 1 {
-		return fmt.Errorf(tr("archive is not valid: multiple files found in zip file top level"))
+		return errors.New(i18n.Tr("archive is not valid: multiple files found in zip file top level"))
 	}
 	if len(libRootFiles) == 0 {
-		return fmt.Errorf(tr("archive is not valid: no files found in zip file top level"))
+		return errors.New(i18n.Tr("archive is not valid: no files found in zip file top level"))
 	}
 	tmpInstallPath := libRootFiles[0]
 
 	// Install extracted library in the destination directory
 	if err := lmi.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
-		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
+		return errors.New(i18n.Tr("moving extracted archive to destination dir: %s", err))
 	}
 
 	return nil
@@ -241,7 +243,7 @@ func (lmi *Installer) InstallGitLib(gitURL string, overwrite bool) error {
 
 	// Install extracted library in the destination directory
 	if err := lmi.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
-		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
+		return errors.New(i18n.Tr("moving extracted archive to destination dir: %s", err))
 	}
 
 	return nil
@@ -263,7 +265,7 @@ func parseGitURL(gitURL string) (string, plumbing.Revision, error) {
 		res = strings.TrimSuffix(parsed.Path[i+1:], ".git")
 		rev = plumbing.Revision(parsed.Fragment)
 	} else {
-		return "", "", fmt.Errorf(tr("invalid git url"))
+		return "", "", errors.New(i18n.Tr("invalid git url"))
 	}
 	return res, rev, nil
 }
@@ -273,7 +275,7 @@ func parseGitURL(gitURL string) (string, plumbing.Revision, error) {
 // Returns nil if dir contains a valid library, error on all other cases.
 func validateLibrary(dir *paths.Path) error {
 	if dir.NotExist() {
-		return fmt.Errorf(tr("directory doesn't exist: %s", dir))
+		return errors.New(i18n.Tr("directory doesn't exist: %s", dir))
 	}
 
 	searchHeaderFile := func(d *paths.Path) (bool, error) {
@@ -283,7 +285,7 @@ func validateLibrary(dir *paths.Path) error {
 		}
 		dirContent, err := d.ReadDir()
 		if err != nil {
-			return false, fmt.Errorf(tr("reading directory %s content: %w", dir, err))
+			return false, fmt.Errorf("%s: %w", i18n.Tr("reading directory %s content", dir), err)
 		}
 		dirContent.FilterOutDirs()
 		headerExtensions := []string{}
@@ -310,5 +312,5 @@ func validateLibrary(dir *paths.Path) error {
 		return nil
 	}
 
-	return fmt.Errorf(tr("library not valid"))
+	return errors.New(i18n.Tr("library not valid"))
 }

@@ -16,6 +16,7 @@
 package configuration
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -23,6 +24,7 @@ import (
 	"runtime"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/version"
 	"go.bug.st/downloader/v2"
 )
@@ -61,7 +63,7 @@ func (settings *Settings) NetworkProxy() (*url.URL, error) {
 	if proxyConfig, ok, _ := settings.GetStringOk("network.proxy"); !ok {
 		return nil, nil
 	} else if proxy, err := url.Parse(proxyConfig); err != nil {
-		return nil, fmt.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
+		return nil, errors.New(i18n.Tr("Invalid network.proxy '%[1]s': %[2]s", proxyConfig, err))
 	} else {
 		return proxy, nil
 	}
@@ -98,7 +100,7 @@ func (settings *Settings) DownloaderConfig() (downloader.Config, error) {
 	httpClient, err := settings.NewHttpClient()
 	if err != nil {
 		return downloader.Config{}, &cmderrors.InvalidArgumentError{
-			Message: tr("Could not connect via HTTP"),
+			Message: i18n.Tr("Could not connect via HTTP"),
 			Cause:   err}
 	}
 	return downloader.Config{

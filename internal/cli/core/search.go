@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,16 +36,16 @@ import (
 func initSearchCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var allVersions bool
 	searchCommand := &cobra.Command{
-		Use:     fmt.Sprintf("search <%s...>", tr("keywords")),
-		Short:   tr("Search for a core in Boards Manager."),
-		Long:    tr("Search for a core in Boards Manager using the specified keywords."),
+		Use:     fmt.Sprintf("search <%s...>", i18n.Tr("keywords")),
+		Short:   i18n.Tr("Search for a core in Boards Manager."),
+		Long:    i18n.Tr("Search for a core in Boards Manager using the specified keywords."),
 		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			runSearchCommand(cmd.Context(), srv, args, allVersions)
 		},
 	}
-	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, tr("Show all available core versions."))
+	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, i18n.Tr("Show all available core versions."))
 
 	return searchCommand
 }
@@ -78,7 +79,7 @@ func runSearchCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 		SearchArgs: arguments,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error searching for platforms: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error searching for platforms: %v", err), feedback.ErrGeneric)
 	}
 
 	coreslist := resp.GetSearchOutput()
@@ -109,11 +110,11 @@ func (sr searchResults) Data() interface{} {
 
 func (sr searchResults) String() string {
 	if len(sr.Platforms) == 0 {
-		return tr("No platforms matching your search.")
+		return i18n.Tr("No platforms matching your search.")
 	}
 
 	t := table.New()
-	t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
+	t.SetHeader(i18n.Tr("ID"), i18n.Tr("Version"), i18n.Tr("Name"))
 
 	addRow := func(platform *result.PlatformSummary, release *result.PlatformRelease) {
 		if release == nil {

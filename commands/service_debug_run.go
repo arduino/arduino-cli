@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -65,7 +66,7 @@ func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Read
 
 	cmd, err := paths.NewProcess(pme.GetEnvVarsForSpawnedProcess(), commandLine...)
 	if err != nil {
-		return nil, &cmderrors.FailedDebugError{Message: tr("Cannot execute debug tool"), Cause: err}
+		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("Cannot execute debug tool"), Cause: err}
 	}
 
 	// Get stdIn pipe from tool
@@ -140,7 +141,7 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 		}
 		gdbPath = paths.New(debugInfo.GetToolchainPath()).Join(gdbexecutable)
 	default:
-		return nil, &cmderrors.FailedDebugError{Message: tr("Toolchain '%s' is not supported", debugInfo.GetToolchain())}
+		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("Toolchain '%s' is not supported", debugInfo.GetToolchain())}
 	}
 	add(gdbPath.String())
 
@@ -184,7 +185,7 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 		add(serverCmd)
 
 	default:
-		return nil, &cmderrors.FailedDebugError{Message: tr("GDB server '%s' is not supported", debugInfo.GetServer())}
+		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("GDB server '%s' is not supported", debugInfo.GetServer())}
 	}
 
 	// Add executable

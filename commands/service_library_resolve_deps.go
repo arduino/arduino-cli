@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -82,7 +83,7 @@ func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesind
 		// Check if there is a problem with the first level deps
 		for _, directDep := range reqLibRelease.GetDependencies() {
 			if _, ok := li.Libraries[directDep.GetName()]; !ok {
-				err := errors.New(tr("dependency '%s' is not available", directDep.GetName()))
+				err := errors.New(i18n.Tr("dependency '%s' is not available", directDep.GetName()))
 				return nil, &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
 			}
 		}

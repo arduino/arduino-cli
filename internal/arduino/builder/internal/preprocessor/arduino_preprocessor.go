@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -60,7 +61,7 @@ func PreprocessSketchWithArduinoPreprocessor(
 	arduiniPreprocessorProperties.SetPath("source_file", targetFile)
 	pattern := arduiniPreprocessorProperties.Get("pattern")
 	if pattern == "" {
-		return nil, errors.New(tr("arduino-preprocessor pattern is missing"))
+		return nil, errors.New(i18n.Tr("arduino-preprocessor pattern is missing"))
 	}
 
 	commandLine := arduiniPreprocessorProperties.ExpandPropsInString(pattern)

@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
@@ -107,10 +108,10 @@ func (b *Builder) wipeBuildPath() error {
 	// control when this should be printed.
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
 	if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
-		return fmt.Errorf("%s: %w", tr("cleaning build path"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("cleaning build path"), err)
 	}
 	if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
-		return fmt.Errorf("%s: %w", tr("cleaning build path"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("cleaning build path"), err)
 	}
 	return nil
 }
@@ -136,7 +137,7 @@ func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
 
 	var prevOpts *properties.Map
 	if err := json.Unmarshal(buildOptionsJSONPrevious, &prevOpts); err != nil || prevOpts == nil {
-		b.logger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
+		b.logger.Info(i18n.Tr("%[1]s invalid, rebuilding all", "build.options.json"))
 		return b.wipeBuildPath()
 	}
 

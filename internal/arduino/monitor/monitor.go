@@ -20,6 +20,7 @@ package monitor
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -83,8 +84,6 @@ func (msg monitorMessage) String() string {
 	return s
 }
 
-var tr = i18n.Tr
-
 // New create and connect to the given pluggable monitor
 func New(id string, args ...string) *PluggableMonitor {
 	return &PluggableMonitor{
@@ -137,20 +136,20 @@ func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt stri
 		}
 		msg = m
 	case <-time.After(timeout):
-		return nil, fmt.Errorf(tr("timeout waiting for message"))
+		return nil, errors.New(i18n.Tr("timeout waiting for message"))
 	}
 	if expectedEvt == "" {
 		// No message processing required for this call
 		return msg, nil
 	}
 	if msg.EventType != expectedEvt {
-		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), expectedEvt, msg.EventType)
+		return msg, errors.New(i18n.Tr("communication out of sync, expected '%[1]s', received '%[2]s'", expectedEvt, msg.EventType))
 	}
 	if msg.Error {
-		return msg, fmt.Errorf(tr("command '%[1]s' failed: %[2]s"), expectedEvt, msg.Message)
+		return msg, errors.New(i18n.Tr("command '%[1]s' failed: %[2]s", expectedEvt, msg.Message))
 	}
 	if strings.ToUpper(msg.Message) != "OK" {
-		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
+		return msg, errors.New(i18n.Tr("communication out of sync, expected '%[1]s', received '%[2]s'", "OK", msg.Message))
 	}
 	return msg, nil
 }
@@ -233,7 +232,7 @@ func (mon *PluggableMonitor) Run() (err error) {
 	if msg, err := mon.waitMessage(time.Second*10, "hello"); err != nil {
 		return err
 	} else if msg.ProtocolVersion > 1 {
-		return fmt.Errorf(tr("protocol version not supported: requested %[1]d, got %[2]d"), 1, msg.ProtocolVersion)
+		return errors.New(i18n.Tr("protocol version not supported: requested %[1]d, got %[2]d", 1, msg.ProtocolVersion))
 	}
 	return nil
 }

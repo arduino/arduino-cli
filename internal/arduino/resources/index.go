@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/arduino/security"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
@@ -61,7 +62,7 @@ func (res *IndexResource) IndexFileName() (string, error) {
 func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, config downloader.Config) error {
 	// Create destination directory
 	if err := destDir.MkdirAll(); err != nil {
-		return &cmderrors.PermissionDeniedError{Message: tr("Can't create data directory %s", destDir), Cause: err}
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Can't create data directory %s", destDir), Cause: err}
 	}
 
 	// Create a temp dir to stage all downloads
@@ -78,8 +79,8 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		return err
 	}
 	tmpIndexPath := tmp.Join(downloadFileName)
-	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", downloadFileName), downloadCB, config, downloader.NoResume); err != nil {
-		return &cmderrors.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
+	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config, downloader.NoResume); err != nil {
+		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
 	var signaturePath, tmpSignaturePath *paths.Path
@@ -95,19 +96,19 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		// Extract archive in a tmp/archive subdirectory
 		f, err := tmpIndexPath.Open()
 		if err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error opening %s", tmpIndexPath), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error opening %s", tmpIndexPath), Cause: err}
 		}
 		defer f.Close()
 		tmpArchivePath := tmp.Join("archive")
 		_ = tmpArchivePath.MkdirAll()
 		if err := extract.Bz2(ctx, f, tmpArchivePath.String(), nil); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error extracting %s", tmpIndexPath), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error extracting %s", tmpIndexPath), Cause: err}
 		}
 
 		// Look for index.json
 		tmpIndexPath = tmpArchivePath.Join(indexFileName)
 		if !tmpIndexPath.Exist() {
-			return &cmderrors.NotFoundError{Message: tr("Invalid archive: file %{1}s not found in archive %{2}s", indexFileName, tmpArchivePath.Base())}
+			return &cmderrors.NotFoundError{Message: i18n.Tr("Invalid archive: file %[1]s not found in archive %[2]s", indexFileName, tmpArchivePath.Base())}
 		}
 
 		// Look for signature
@@ -120,7 +121,7 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	} else if strings.HasSuffix(downloadFileName, ".gz") {
 		tmpUnzippedIndexPath := tmp.Join(indexFileName)
 		if err := paths.GUnzip(tmpIndexPath, tmpUnzippedIndexPath); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error extracting %s", indexFileName), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error extracting %s", indexFileName), Cause: err}
 		}
 		tmpIndexPath = tmpUnzippedIndexPath
 	}
@@ -133,8 +134,8 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		// Download signature
 		signaturePath = destDir.Join(signatureFileName)
 		tmpSignaturePath = tmp.Join(signatureFileName)
-		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", tr("Downloading index signature: %s", signatureFileName), downloadCB, config, downloader.NoResume); err != nil {
-			return &cmderrors.FailedDownloadError{Message: tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
+		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", i18n.Tr("Downloading index signature: %s", signatureFileName), downloadCB, config, downloader.NoResume); err != nil {
+			return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 
 		hasSignature = true
@@ -143,13 +144,13 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	if hasSignature {
 		// Check signature...
 		if valid, _, err := security.VerifyArduinoDetachedSignature(tmpIndexPath, tmpSignaturePath); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error verifying signature"), Cause: err}
 		} else if !valid {
 			return &cmderrors.SignatureVerificationFailedError{File: res.URL.String()}
 		}
 	} else {
 		if res.EnforceSignatureVerification {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: errors.New(tr("missing signature"))}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error verifying signature"), Cause: errors.New(i18n.Tr("missing signature"))}
 		}
 	}
 
@@ -161,23 +162,23 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	oldIndex := tmp.Join("old_index")
 	if indexPath.Exist() {
 		if err := indexPath.CopyTo(oldIndex); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error saving downloaded index"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index"), Cause: err}
 		}
 		defer oldIndex.CopyTo(indexPath) // will silently fail in case of success
 	}
 	oldSignature := tmp.Join("old_signature")
 	if oldSignature.Exist() {
 		if err := signaturePath.CopyTo(oldSignature); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index signature"), Cause: err}
 		}
 		defer oldSignature.CopyTo(signaturePath) // will silently fail in case of success
 	}
 	if err := tmpIndexPath.CopyTo(indexPath); err != nil {
-		return &cmderrors.PermissionDeniedError{Message: tr("Error saving downloaded index"), Cause: err}
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index"), Cause: err}
 	}
 	if hasSignature {
 		if err := tmpSignaturePath.CopyTo(signaturePath); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index signature"), Cause: err}
 		}
 	}
 	_ = oldIndex.Remove()

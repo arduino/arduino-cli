@@ -24,6 +24,7 @@ import (
 	"strconv"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -75,7 +76,7 @@ func (b *Builder) size() error {
 func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 	command, err := b.prepareCommandForRecipe(b.buildProperties, "recipe.advanced_size.pattern", false)
 	if err != nil {
-		return nil, errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 	}
 	if b.logger.Verbose() {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
@@ -84,10 +85,10 @@ func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 	command.RedirectStdoutTo(out)
 	command.RedirectStderrTo(b.logger.Stderr())
 	if err := command.Start(); err != nil {
-		return nil, errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 	}
 	if err := command.Wait(); err != nil {
-		return nil, errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 	}
 
 	type AdvancedSizerResponse struct {
@@ -106,7 +107,7 @@ func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 
 	var resp AdvancedSizerResponse
 	if err := json.Unmarshal(out.Bytes(), &resp); err != nil {
-		return nil, errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 	}
 
 	executableSectionsSize := resp.Sections
@@ -150,23 +151,23 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 
 	textSize, dataSize, _, err := b.execSizeRecipe(properties)
 	if err != nil {
-		b.logger.Warn(tr("Couldn't determine program size"))
+		b.logger.Warn(i18n.Tr("Couldn't determine program size"))
 		return nil, nil
 	}
 
-	b.logger.Info(tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
+	b.logger.Info(i18n.Tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
 		strconv.Itoa(textSize),
 		strconv.Itoa(maxTextSize),
 		strconv.Itoa(textSize*100/maxTextSize)))
 	if dataSize >= 0 {
 		if maxDataSize > 0 {
-			b.logger.Info(tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
+			b.logger.Info(i18n.Tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
 				strconv.Itoa(dataSize),
 				strconv.Itoa(maxDataSize),
 				strconv.Itoa(dataSize*100/maxDataSize),
 				strconv.Itoa(maxDataSize-dataSize)))
 		} else {
-			b.logger.Info(tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
+			b.logger.Info(i18n.Tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
 		}
 	}
 
@@ -186,13 +187,13 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 	}
 
 	if textSize > maxTextSize {
-		b.logger.Warn(tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
-		return executableSectionsSize, errors.New(tr("text section exceeds available space in board"))
+		b.logger.Warn(i18n.Tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		return executableSectionsSize, errors.New(i18n.Tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		b.logger.Warn(tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
-		return executableSectionsSize, errors.New(tr("data section exceeds available space in board"))
+		b.logger.Warn(i18n.Tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		return executableSectionsSize, errors.New(i18n.Tr("data section exceeds available space in board"))
 	}
 
 	if w := properties.Get("build.warn_data_percentage"); w != "" {
@@ -201,7 +202,7 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 			return executableSectionsSize, err
 		}
 		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			b.logger.Warn(tr("Low memory available, stability problems may occur."))
+			b.logger.Warn(i18n.Tr("Low memory available, stability problems may occur."))
 		}
 	}
 
@@ -211,7 +212,7 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
 	command, err := b.prepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
 	if b.logger.Verbose() {
@@ -221,11 +222,11 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 	command.RedirectStdoutTo(commandStdout)
 	command.RedirectStderrTo(b.logger.Stderr())
 	if err := command.Start(); err != nil {
-		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
 	if err := command.Wait(); err != nil {
-		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
 
@@ -236,23 +237,23 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 
 	textSize, err = computeSize(properties.Get("recipe.size.regex"), out)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Invalid size regexp: %s"), err)
+		resErr = errors.New(i18n.Tr("Invalid size regexp: %s", err))
 		return
 	}
 	if textSize == -1 {
-		resErr = errors.New(tr("Missing size regexp"))
+		resErr = errors.New(i18n.Tr("Missing size regexp"))
 		return
 	}
 
 	dataSize, err = computeSize(properties.Get("recipe.size.regex.data"), out)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Invalid data size regexp: %s"), err)
+		resErr = errors.New(i18n.Tr("Invalid data size regexp: %s", err))
 		return
 	}
 
 	eepromSize, err = computeSize(properties.Get("recipe.size.regex.eeprom"), out)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Invalid eeprom size regexp: %s"), err)
+		resErr = errors.New(i18n.Tr("Invalid eeprom size regexp: %s", err))
 		return
 	}
 

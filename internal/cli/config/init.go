@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -41,10 +42,10 @@ const defaultFileName = "arduino-cli.yaml"
 func initInitCommand() *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
-		Short: tr("Writes current configuration to a configuration file."),
-		Long:  tr("Creates or updates the configuration file in the data directory or custom directory with the current configuration settings."),
+		Short: i18n.Tr("Writes current configuration to a configuration file."),
+		Long:  i18n.Tr("Creates or updates the configuration file in the data directory or custom directory with the current configuration settings."),
 		Example: "" +
-			"  # " + tr("Writes current configuration to the configuration file in the data directory.") + "\n" +
+			"  # " + i18n.Tr("Writes current configuration to the configuration file in the data directory.") + "\n" +
 			"  " + os.Args[0] + " config init\n" +
 			"  " + os.Args[0] + " config init --dest-dir /home/user/MyDirectory\n" +
 			"  " + os.Args[0] + " config init --dest-file /home/user/MyDirectory/my_settings.yaml",
@@ -56,9 +57,9 @@ func initInitCommand() *cobra.Command {
 			runInitCommand(cmd.Context(), cmd)
 		},
 	}
-	initCommand.Flags().StringVar(&destDir, "dest-dir", "", tr("Sets where to save the configuration file."))
-	initCommand.Flags().StringVar(&destFile, "dest-file", "", tr("Sets where to save the configuration file."))
-	initCommand.Flags().BoolVar(&overwrite, "overwrite", false, tr("Overwrite existing config file."))
+	initCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Sets where to save the configuration file."))
+	initCommand.Flags().StringVar(&destFile, "dest-file", "", i18n.Tr("Sets where to save the configuration file."))
+	initCommand.Flags().BoolVar(&overwrite, "overwrite", false, i18n.Tr("Overwrite existing config file."))
 	return initCommand
 }
 
@@ -73,14 +74,14 @@ func runInitCommand(ctx context.Context, cmd *cobra.Command) {
 	case destFile != "":
 		configFileAbsPath, err = paths.New(destFile).Abs()
 		if err != nil {
-			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
 		configFileDir = configFileAbsPath.Parent()
 
 	case destDir != "":
 		configFileDir, err = paths.New(destDir).Abs()
 		if err != nil {
-			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
 		configFileAbsPath = configFileDir.Join(defaultFileName)
 
@@ -90,37 +91,37 @@ func runInitCommand(ctx context.Context, cmd *cobra.Command) {
 	}
 
 	if !overwrite && configFileAbsPath.Exist() {
-		feedback.Fatal(tr("Config file already exists, use --overwrite to discard the existing one."), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Config file already exists, use --overwrite to discard the existing one."), feedback.ErrGeneric)
 	}
 
 	logrus.Infof("Writing config file to: %s", configFileDir)
 
 	if err := configFileDir.MkdirAll(); err != nil {
-		feedback.Fatal(tr("Cannot create config file directory: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot create config file directory: %v", err), feedback.ErrGeneric)
 	}
 
 	tmpSrv := commands.NewArduinoCoreServer()
 
 	if _, err := tmpSrv.ConfigurationOpen(ctx, &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml", EncodedSettings: ""}); err != nil {
-		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 	}
 
 	// Ensure to always output an empty array for additional urls
 	if _, err := tmpSrv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
 		Key: "board_manager.additional_urls", EncodedValue: "[]",
 	}); err != nil {
-		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 	}
 
 	ApplyGlobalFlagsToConfiguration(ctx, cmd, tmpSrv)
 
 	resp, err := tmpSrv.ConfigurationSave(ctx, &rpc.ConfigurationSaveRequest{SettingsFormat: "yaml"})
 	if err != nil {
-		feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 	}
 
 	if err := configFileAbsPath.WriteFile([]byte(resp.GetEncodedSettings())); err != nil {
-		feedback.Fatal(tr("Cannot create config file: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Cannot create config file: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(initResult{ConfigFileAbsPath: configFileAbsPath})
@@ -130,11 +131,11 @@ func runInitCommand(ctx context.Context, cmd *cobra.Command) {
 func ApplyGlobalFlagsToConfiguration(ctx context.Context, cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
 	set := func(k string, v any) {
 		if jsonValue, err := json.Marshal(v); err != nil {
-			feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 		} else if _, err := srv.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
 			Key: k, EncodedValue: string(jsonValue),
 		}); err != nil {
-			feedback.Fatal(tr("Error creating configuration: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error creating configuration: %v", err), feedback.ErrGeneric)
 		}
 
 	}
@@ -156,7 +157,7 @@ func ApplyGlobalFlagsToConfiguration(ctx context.Context, cmd *cobra.Command, sr
 		for _, url := range urls {
 			if strings.Contains(url, ",") {
 				feedback.Fatal(
-					tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
+					i18n.Tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
 					feedback.ErrBadArgument)
 			}
 		}
@@ -175,7 +176,7 @@ func (dr initResult) Data() interface{} {
 }
 
 func (dr initResult) String() string {
-	msg := tr("Config file written to: %s", dr.ConfigFileAbsPath.String())
+	msg := i18n.Tr("Config file written to: %s", dr.ConfigFileAbsPath.String())
 	logrus.Info(msg)
 	return msg
 }

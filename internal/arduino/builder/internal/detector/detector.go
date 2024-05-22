@@ -42,8 +42,6 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 )
 
-var tr = i18n.Tr
-
 type libraryResolutionResult struct {
 	Library          *libraries.Library
 	NotUsedLibraries []*libraries.Library
@@ -90,9 +88,9 @@ func (l *SketchLibrariesDetector) resolveLibrary(header, platformArch string) *l
 	candidates := l.librariesResolver.AlternativesFor(header)
 
 	if l.logger.Verbose() {
-		l.logger.Info(tr("Alternatives for %[1]s: %[2]s", header, candidates))
+		l.logger.Info(i18n.Tr("Alternatives for %[1]s: %[2]s", header, candidates))
 		l.logger.Info(fmt.Sprintf("ResolveLibrary(%s)", header))
-		l.logger.Info(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
+		l.logger.Info(fmt.Sprintf("  -> %s: %s", i18n.Tr("candidates"), candidates))
 	}
 
 	if len(candidates) == 0 {
@@ -155,10 +153,10 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 		if len(libResResult.NotUsedLibraries) == 0 {
 			continue
 		}
-		res += fmt.Sprintln(tr(`Multiple libraries were found for "%[1]s"`, header))
-		res += fmt.Sprintln("  " + tr("Used: %[1]s", libResResult.Library.InstallDir))
+		res += fmt.Sprintln(i18n.Tr(`Multiple libraries were found for "%[1]s"`, header))
+		res += fmt.Sprintln("  " + i18n.Tr("Used: %[1]s", libResResult.Library.InstallDir))
 		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-			res += fmt.Sprintln("  " + tr("Not used: %[1]s", notUsedLibrary.InstallDir))
+			res += fmt.Sprintln("  " + i18n.Tr("Not used: %[1]s", notUsedLibrary.InstallDir))
 		}
 	}
 	res = strings.TrimSpace(res)
@@ -212,8 +210,8 @@ func (l *SketchLibrariesDetector) FindIncludes(
 		l.logger.Info(
 			fmt.Sprintf(
 				"%s: %s",
-				tr("An error occurred detecting libraries"),
-				tr("the compilation database may be incomplete or inaccurate"),
+				i18n.Tr("An error occurred detecting libraries"),
+				i18n.Tr("the compilation database may be incomplete or inaccurate"),
 			),
 		)
 		return nil
@@ -350,7 +348,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		if unchanged && cache.valid {
 			missingIncludeH = cache.Next().Include
 			if first && l.logger.Verbose() {
-				l.logger.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
+				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
 			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
@@ -368,7 +366,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			} else {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr()))
 				if missingIncludeH == "" && l.logger.Verbose() {
-					l.logger.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
+					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
@@ -393,7 +391,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 					// gcc does not reproduce that, there is something wrong.
 					// Returning an error here will cause the cache to be
 					// deleted, so hopefully the next compilation will succeed.
-					return errors.New(tr("Internal error in cache"))
+					return errors.New(i18n.Tr("Internal error in cache"))
 				}
 				l.diagnosticStore.Parse(result.Args(), result.Stderr())
 				l.logger.WriteStderr(result.Stderr())
@@ -413,7 +411,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		if library.Precompiled && library.PrecompiledWithSources {
 			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
 			if l.logger.Verbose() {
-				l.logger.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+				l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 			}
 		} else {
 			for _, sourceDir := range library.SourceDirs() {
@@ -461,16 +459,16 @@ func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
 	for _, library := range l.importedLibraries {
 		if !library.IsLegacy {
 			if library.InstallDir.Join("arch").IsDir() {
-				return errors.New(tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
+				return errors.New(i18n.Tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
 			}
 			for _, propName := range libraries.MandatoryProperties {
 				if !library.Properties.ContainsKey(propName) {
-					return errors.New(tr("Missing '%[1]s' from library in %[2]s", propName, library.InstallDir))
+					return errors.New(i18n.Tr("Missing '%[1]s' from library in %[2]s", propName, library.InstallDir))
 				}
 			}
 			if library.Layout == libraries.RecursiveLayout {
 				if library.UtilityDir != nil {
-					return errors.New(tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'.", "src", "utility", library.InstallDir))
+					return errors.New(i18n.Tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'.", "src", "utility", library.InstallDir))
 				}
 			}
 		}

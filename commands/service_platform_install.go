@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -82,15 +83,15 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 
 		// Prerequisite checks before install
 		if platformRelease.IsInstalled() {
-			taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
+			taskCB(&rpc.TaskProgress{Name: i18n.Tr("Platform %s already installed", platformRelease), Completed: true})
 			return nil
 		}
 
 		if req.GetNoOverwrite() {
 			if installed := pme.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
 				return fmt.Errorf("%s: %s",
-					tr("Platform %s already installed", installed),
-					tr("could not overwrite"))
+					i18n.Tr("Platform %s already installed", installed),
+					i18n.Tr("could not overwrite"))
 			}
 		}
 

@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -88,7 +89,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 			if existingDep, has := toInstall[dep.GetName()]; has {
 				if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
 					err := errors.New(
-						tr("two different versions of the library %[1]s are required: %[2]s and %[3]s",
+						i18n.Tr("two different versions of the library %[1]s are required: %[2]s and %[3]s",
 							dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired()))
 					return &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
 				}
@@ -131,13 +132,13 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 			return err
 		}
 		if installTask.UpToDate {
-			taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
+			taskCB(&rpc.TaskProgress{Message: i18n.Tr("Already installed %s", libRelease), Completed: true})
 			continue
 		}
 
 		if req.GetNoOverwrite() {
 			if installTask.ReplacedLib != nil {
-				return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, installTask.ReplacedLib))
+				return errors.New(i18n.Tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, installTask.ReplacedLib))
 			}
 		}
 		libReleasesToInstall[libRelease] = installTask
@@ -179,14 +180,14 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 }
 
 func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB) error {
-	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
+	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
 
 	if libReplaced := installTask.ReplacedLib; libReplaced != nil {
-		taskCB(&rpc.TaskProgress{Message: tr("Replacing %[1]s with %[2]s", libReplaced, libRelease)})
+		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Replacing %[1]s with %[2]s", libReplaced, libRelease)})
 		if err := lmi.Uninstall(libReplaced); err != nil {
 			return &cmderrors.FailedLibraryInstallError{
-				Cause: fmt.Errorf("%s: %s", tr("could not remove old library"), err)}
+				Cause: fmt.Errorf("%s: %s", i18n.Tr("could not remove old library"), err)}
 		}
 	}
 
@@ -196,7 +197,7 @@ func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, l
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 
-	taskCB(&rpc.TaskProgress{Message: tr("Installed %s", libRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: i18n.Tr("Installed %s", libRelease), Completed: true})
 	return nil
 }
 
@@ -230,7 +231,7 @@ func (s *arduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequ
 	if err := lmi.InstallZipLib(ctx, paths.New(req.GetPath()), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
-	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: i18n.Tr("Library installed"), Completed: true})
 	syncSend.Send(&rpc.ZipLibraryInstallResponse{
 		Message: &rpc.ZipLibraryInstallResponse_Result_{
 			Result: &rpc.ZipLibraryInstallResponse_Result{},
@@ -270,7 +271,7 @@ func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 	if err := lmi.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
-	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: i18n.Tr("Library installed"), Completed: true})
 	syncSend.Send(&rpc.GitLibraryInstallResponse{
 		Message: &rpc.GitLibraryInstallResponse_Result_{
 			Result: &rpc.GitLibraryInstallResponse_Result{},

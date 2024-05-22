@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -35,12 +36,12 @@ type Fqbn struct {
 
 // AddToCommand adds the flags used to set fqbn to the specified Command
 func (f *Fqbn) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer) {
-	cmd.Flags().StringVarP(&f.fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	cmd.Flags().StringVarP(&f.fqbn, "fqbn", "b", "", i18n.Tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledBoards(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringSliceVar(&f.boardOptions, "board-options", []string{},
-		tr("List of board options separated by commas. Or can be used multiple times for multiple options."))
+		i18n.Tr("List of board options separated by commas. Or can be used multiple times for multiple options."))
 }
 
 // String returns the fqbn with the board options if there are any
@@ -88,7 +89,7 @@ func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, in
 
 	port, err := portArgs.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol)
 	if err != nil {
-		feedback.Fatal(tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(i18n.Tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
 	}
 	return fqbn, port
 }

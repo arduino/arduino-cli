@@ -34,14 +34,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand creates a new `outdated` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	outdatedCommand := &cobra.Command{
 		Use:   "outdated",
-		Short: tr("Lists cores and libraries that can be upgraded"),
-		Long: tr(`This commands shows a list of installed cores and/or libraries
+		Short: i18n.Tr("Lists cores and libraries that can be upgraded"),
+		Long: i18n.Tr(`This commands shows a list of installed cores and/or libraries
 that can be upgraded. If nothing needs to be updated the output is empty.`),
 		Example: "  " + os.Args[0] + " outdated\n",
 		Args:    cobra.NoArgs,
@@ -94,18 +92,18 @@ func (ir outdatedResult) Data() interface{} {
 
 func (ir outdatedResult) String() string {
 	if len(ir.Platforms) == 0 && len(ir.InstalledLibs) == 0 {
-		return tr("No outdated platforms or libraries found.")
+		return i18n.Tr("No outdated platforms or libraries found.")
 	}
 
 	// A table useful both for platforms and libraries, where some of the fields will be blank.
 	t := table.New()
 	t.SetHeader(
-		tr("ID"),
-		tr("Name"),
-		tr("Installed"),
-		tr("Latest"),
-		tr("Location"),
-		tr("Description"),
+		i18n.Tr("ID"),
+		i18n.Tr("Name"),
+		i18n.Tr("Installed"),
+		i18n.Tr("Latest"),
+		i18n.Tr("Location"),
+		i18n.Tr("Description"),
 	)
 	t.SetColumnWidthMode(2, table.Average)
 	t.SetColumnWidthMode(3, table.Average)
@@ -118,7 +116,7 @@ func (ir outdatedResult) String() string {
 			name = latest.Name
 		}
 		if p.Deprecated {
-			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
+			name = fmt.Sprintf("[%s] %s", i18n.Tr("DEPRECATED"), name)
 		}
 		t.AddRow(p.Id, name, p.InstalledVersion, p.LatestVersion, "", "")
 	}

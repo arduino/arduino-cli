@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
@@ -41,14 +42,14 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configur
 	var useBuiltinLibrariesDir bool
 	enableUnsafeInstall := settings.GetLibrary().GetEnableUnsafeInstall()
 	installCommand := &cobra.Command{
-		Use:   fmt.Sprintf("install %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
-		Short: tr("Installs one or more specified libraries into the system."),
-		Long:  tr("Installs one or more specified libraries into the system."),
+		Use:   fmt.Sprintf("install %s[@%s]...", i18n.Tr("LIBRARY"), i18n.Tr("VERSION_NUMBER")),
+		Short: i18n.Tr("Installs one or more specified libraries into the system."),
+		Long:  i18n.Tr("Installs one or more specified libraries into the system."),
 		Example: "" +
-			"  " + os.Args[0] + " lib install AudioZero       # " + tr("for the latest version.") + "\n" +
-			"  " + os.Args[0] + " lib install AudioZero@1.0.0 # " + tr("for the specific version.") + "\n" +
+			"  " + os.Args[0] + " lib install AudioZero       # " + i18n.Tr("for the latest version.") + "\n" +
+			"  " + os.Args[0] + " lib install AudioZero@1.0.0 # " + i18n.Tr("for the specific version.") + "\n" +
 			"  " + os.Args[0] + " lib install --git-url https://github.com/arduino-libraries/WiFi101.git https://github.com/arduino-libraries/ArduinoBLE.git\n" +
-			"  " + os.Args[0] + " lib install --git-url https://github.com/arduino-libraries/WiFi101.git#0.16.0 # " + tr("for the specific version.") + "\n" +
+			"  " + os.Args[0] + " lib install --git-url https://github.com/arduino-libraries/WiFi101.git#0.16.0 # " + i18n.Tr("for the specific version.") + "\n" +
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -58,11 +59,11 @@ func initInstallCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configur
 			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
-	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
-	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite already installed libraries."))
-	installCommand.Flags().BoolVar(&gitURL, "git-url", false, tr("Enter git url for libraries hosted on repositories"))
-	installCommand.Flags().BoolVar(&zipPath, "zip-path", false, tr("Enter a path to zip file"))
-	installCommand.Flags().BoolVar(&useBuiltinLibrariesDir, "install-in-builtin-dir", false, tr("Install libraries in the IDE-Builtin directory"))
+	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, i18n.Tr("Do not install dependencies."))
+	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, i18n.Tr("Do not overwrite already installed libraries."))
+	installCommand.Flags().BoolVar(&gitURL, "git-url", false, i18n.Tr("Enter git url for libraries hosted on repositories"))
+	installCommand.Flags().BoolVar(&zipPath, "zip-path", false, i18n.Tr("Enter a path to zip file"))
+	installCommand.Flags().BoolVar(&useBuiltinLibrariesDir, "install-in-builtin-dir", false, i18n.Tr("Install libraries in the IDE-Builtin directory"))
 	return installCommand
 }
 
@@ -78,12 +79,12 @@ func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, ar
 				split := strings.Split(version.VersionInfo.VersionString, ".")
 				documentationURL = fmt.Sprintf("https://arduino.github.io/arduino-cli/%s.%s/configuration/#configuration-keys", split[0], split[1])
 			}
-			feedback.Fatal(tr("--git-url and --zip-path are disabled by default, for more information see: %v", documentationURL), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("--git-url and --zip-path are disabled by default, for more information see: %v", documentationURL), feedback.ErrGeneric)
 		}
-		feedback.Print(tr("--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."))
+		feedback.Print(i18n.Tr("--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."))
 
 		if useBuiltinLibrariesDir {
-			feedback.Fatal(tr("--git-url or --zip-path can't be used with --install-in-builtin-dir"), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("--git-url or --zip-path can't be used with --install-in-builtin-dir"), feedback.ErrGeneric)
 		}
 	}
 
@@ -96,7 +97,7 @@ func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, ar
 			}
 			stream := commands.ZipLibraryInstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
 			if err := srv.ZipLibraryInstall(req, stream); err != nil {
-				feedback.Fatal(tr("Error installing Zip Library: %v", err), feedback.ErrGeneric)
+				feedback.Fatal(i18n.Tr("Error installing Zip Library: %v", err), feedback.ErrGeneric)
 			}
 		}
 		return
@@ -107,7 +108,7 @@ func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, ar
 			if url == "." {
 				wd, err := paths.Getwd()
 				if err != nil {
-					feedback.Fatal(tr("Couldn't get current working directory: %v", err), feedback.ErrGeneric)
+					feedback.Fatal(i18n.Tr("Couldn't get current working directory: %v", err), feedback.ErrGeneric)
 				}
 				url = wd.String()
 			}
@@ -118,7 +119,7 @@ func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, ar
 			}
 			stream := commands.GitLibraryInstallStreamResponseToCallbackFunction(ctx, feedback.TaskProgress())
 			if err := srv.GitLibraryInstall(req, stream); err != nil {
-				feedback.Fatal(tr("Error installing Git Library: %v", err), feedback.ErrGeneric)
+				feedback.Fatal(i18n.Tr("Error installing Git Library: %v", err), feedback.ErrGeneric)
 			}
 		}
 		return
@@ -126,7 +127,7 @@ func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, ar
 
 	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
 	if err != nil {
-		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
+		feedback.Fatal(i18n.Tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, libRef := range libRefs {
@@ -144,7 +145,7 @@ func runInstallCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, ar
 		}
 		stream := commands.LibraryInstallStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
 		if err := srv.LibraryInstall(libraryInstallRequest, stream); err != nil {
-			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
 		}
 	}
 }

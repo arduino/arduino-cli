@@ -23,15 +23,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `board` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	boardCommand := &cobra.Command{
 		Use:   "board",
-		Short: tr("Arduino board commands."),
-		Long:  tr("Arduino board commands."),
-		Example: "  # " + tr("Lists all connected boards.") + "\n" +
+		Short: i18n.Tr("Arduino board commands."),
+		Long:  i18n.Tr("Arduino board commands."),
+		Example: "  # " + i18n.Tr("Lists all connected boards.") + "\n" +
 			"  " + os.Args[0] + " board list",
 	}
 

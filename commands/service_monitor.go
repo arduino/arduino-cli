@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	pluggableMonitor "github.com/arduino/arduino-cli/internal/arduino/monitor"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/djherbis/buffer"
@@ -265,7 +266,7 @@ func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, pro
 			cmdLine := boardProperties.ExpandPropsInString(recipe)
 			cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 			if err != nil {
-				return nil, nil, &cmderrors.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
+				return nil, nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Invalid recipe in platform.txt"), Cause: err}
 			}
 			id := fmt.Sprintf("%s-%s", boardPlatform, protocol)
 			return pluggableMonitor.New(id, cmdArgs...), boardSettings, nil

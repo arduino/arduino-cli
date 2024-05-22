@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -27,8 +28,8 @@ import (
 func initDumpCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var dumpCommand = &cobra.Command{
 		Use:     "dump",
-		Short:   tr("Prints the current configuration"),
-		Long:    tr("Prints the current configuration."),
+		Short:   i18n.Tr("Prints the current configuration"),
+		Long:    i18n.Tr("Prints the current configuration."),
 		Example: "  " + os.Args[0] + " config dump",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {

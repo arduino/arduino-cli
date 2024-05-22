@@ -17,8 +17,10 @@ package libraries
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -62,7 +64,7 @@ func (d *LibraryLayout) UnmarshalJSON(b []byte) error {
 		*d = RecursiveLayout
 		return nil
 	default:
-		return fmt.Errorf(tr("invalid library layout: %s"), s)
+		return errors.New(i18n.Tr("invalid library layout: %s", s))
 	}
 }
 

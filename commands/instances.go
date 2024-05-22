@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"path/filepath"
@@ -49,13 +50,13 @@ func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *c
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
+	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Downloading missing tool %s", tool)})
 	if err := pme.DownloadToolRelease(ctx, tool, downloadCB); err != nil {
-		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
+		return errors.New(i18n.Tr("downloading %[1]s tool: %[2]s", tool, err))
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	if err := pme.InstallTool(tool, taskCB, true); err != nil {
-		return fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
+		return errors.New(i18n.Tr("installing %[1]s tool: %[2]s", tool, err))
 	}
 	return nil
 }
@@ -75,7 +76,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Failed to create downloads directory"), Cause: err}
 		}
 	}
 
@@ -86,7 +87,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
-			return nil, &cmderrors.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
+			return nil, &cmderrors.PermissionDeniedError{Message: i18n.Tr("Failed to create data directory"), Cause: err}
 		}
 	}
 
@@ -182,7 +183,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if err != nil {
 				e := &cmderrors.InitFailedError{
 					Code:   codes.InvalidArgument,
-					Cause:  fmt.Errorf(tr("Invalid additional URL: %v", err)),
+					Cause:  errors.New(i18n.Tr("Invalid additional URL: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL,
 				}
 				responseError(e.GRPCStatus())
@@ -220,7 +221,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				if err != nil {
 					e := &cmderrors.InitFailedError{
 						Code:   codes.FailedPrecondition,
-						Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
+						Cause:  errors.New(i18n.Tr("Loading index file: %v", err)),
 						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 					}
 					responseError(e.GRPCStatus())
@@ -231,7 +232,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if err := pmb.LoadPackageIndex(URL); err != nil {
 				e := &cmderrors.InitFailedError{
 					Code:   codes.FailedPrecondition,
-					Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
+					Cause:  errors.New(i18n.Tr("Loading index file: %v", err)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 				}
 				responseError(e.GRPCStatus())
@@ -271,7 +272,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if latest == nil {
 				e := &cmderrors.InitFailedError{
 					Code:   codes.Internal,
-					Cause:  fmt.Errorf(tr("can't find latest release of tool %s", name)),
+					Cause:  errors.New(i18n.Tr("can't find latest release of tool %s", name)),
 					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
 				}
 				responseError(e.GRPCStatus())
@@ -341,7 +342,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	logrus.WithField("index", indexFile).Info("Loading libraries index file")
 	li, err := librariesindex.LoadIndex(indexFile)
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+		s := status.Newf(codes.FailedPrecondition, i18n.Tr("Loading index file: %v", err))
 		responseError(s)
 		li = librariesindex.EmptyIndex
 	}
@@ -370,23 +371,23 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 			if !libDir.IsDir() {
 				// Download library
-				taskCallback(&rpc.TaskProgress{Name: tr("Downloading library %s", libraryRef)})
+				taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Downloading library %s", libraryRef)})
 				libRelease, err := li.FindRelease(libraryRef.Library, libraryRef.Version)
 				if err != nil {
-					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
+					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Library %s not found", libraryRef)})
 					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
 					responseError(err.GRPCStatus())
 					continue
 				}
 				config, err := s.settings.DownloaderConfig()
 				if err != nil {
-					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
+					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
 					continue
 				}
 				if err := libRelease.Resource.Download(ctx, pme.DownloadDir, config, libRelease.String(), downloadCallback, ""); err != nil {
-					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
+					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
 					continue
@@ -394,9 +395,9 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				taskCallback(&rpc.TaskProgress{Completed: true})
 
 				// Install library
-				taskCallback(&rpc.TaskProgress{Name: tr("Installing library %s", libraryRef)})
+				taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Installing library %s", libraryRef)})
 				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir); err != nil {
-					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
+					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
 					continue
@@ -483,7 +484,7 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	// Create the index directory if it doesn't exist
 	if err := indexDir.MkdirAll(); err != nil {
 		resultCB(rpc.IndexUpdateReport_STATUS_FAILED)
-		return &cmderrors.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Could not create index directory"), Cause: err}
 	}
 
 	// Check if the index file is already up-to-date
@@ -559,8 +560,8 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		URL, err := url.Parse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
-			msg := fmt.Sprintf("%s: %v", tr("Unable to parse URL"), err)
-			downloadCB.Start(u, tr("Downloading index: %s", u))
+			msg := fmt.Sprintf("%s: %v", i18n.Tr("Unable to parse URL"), err)
+			downloadCB.Start(u, i18n.Tr("Downloading index: %s", u))
 			downloadCB.End(false, msg)
 			failed = true
 			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
@@ -577,8 +578,8 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 				path = paths.New(URL.Path[1:])
 			}
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
-				msg := fmt.Sprintf("%s: %v", tr("Invalid package index in %s", path), err)
-				downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
+				msg := fmt.Sprintf("%s: %v", i18n.Tr("Invalid package index in %s", path), err)
+				downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 				downloadCB.End(false, msg)
 				failed = true
 				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
@@ -592,8 +593,8 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		indexResource := resources.IndexResource{URL: URL}
 		indexFileName, err := indexResource.IndexFileName()
 		if err != nil {
-			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
-			downloadCB.End(false, tr("Invalid index URL: %s", err))
+			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
+			downloadCB.End(false, i18n.Tr("Invalid index URL: %s", err))
 			failed = true
 			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
@@ -609,8 +610,8 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 
 		config, err := s.settings.DownloaderConfig()
 		if err != nil {
-			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
-			downloadCB.End(false, tr("Invalid network configuration: %s", err))
+			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
+			downloadCB.End(false, i18n.Tr("Invalid network configuration: %s", err))
 			failed = true
 			continue
 		}
@@ -630,7 +631,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		Message: &rpc.UpdateIndexResponse_Result_{Result: result},
 	})
 	if failed {
-		return &cmderrors.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
+		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Some indexes could not be updated.")}
 	}
 	return nil
 }
@@ -657,7 +658,7 @@ func firstUpdate(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance
 		packageIndexFileName, err := (&resources.IndexResource{URL: URL}).IndexFileName()
 		if err != nil {
 			return &cmderrors.FailedDownloadError{
-				Message: tr("Error downloading index '%s'", URL),
+				Message: i18n.Tr("Error downloading index '%s'", URL),
 				Cause:   &cmderrors.InvalidURLError{}}
 		}
 		packageIndexFile := indexDir.Join(packageIndexFileName)

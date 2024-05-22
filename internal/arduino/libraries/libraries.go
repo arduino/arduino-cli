@@ -16,6 +16,7 @@
 package libraries
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
@@ -46,8 +47,6 @@ var ValidCategories = map[string]bool{
 	"Other":               true,
 	"Uncategorized":       true,
 }
-
-var tr = i18n.Tr
 
 // Library represents a library in the system
 type Library struct {
@@ -113,7 +112,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		var err error
 		headers, err = library.SourceHeaders()
 		if err != nil {
-			return nil, fmt.Errorf(tr("reading library headers: %w"), err)
+			return nil, fmt.Errorf("%s: %w", i18n.Tr("reading library headers"), err)
 		}
 	}
 
@@ -225,7 +224,7 @@ func (library *Library) SourceHeaders() ([]string, error) {
 	if library.sourceHeaders == nil {
 		cppHeaders, err := library.SourceDir.ReadDir()
 		if err != nil {
-			return nil, fmt.Errorf(tr("reading lib src dir: %s"), err)
+			return nil, errors.New(i18n.Tr("reading library source directory: %s", err))
 		}
 		headerExtensions := []string{}
 		for k := range globals.HeaderFilesValidExtensions {

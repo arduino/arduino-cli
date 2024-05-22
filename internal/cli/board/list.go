@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -41,8 +42,8 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var fqbn arguments.Fqbn
 	listCommand := &cobra.Command{
 		Use:     "list",
-		Short:   tr("List connected boards."),
-		Long:    tr("Detects and displays a list of boards connected to the current computer."),
+		Short:   i18n.Tr("List connected boards."),
+		Long:    i18n.Tr("Detects and displays a list of boards connected to the current computer."),
 		Example: "  " + os.Args[0] + " board list --discovery-timeout 10s",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -52,7 +53,7 @@ func initListCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	timeoutArg.AddToCommand(listCommand)
 	fqbn.AddToCommand(listCommand, srv)
-	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
+	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, i18n.Tr("Command keeps running and prints list of connected boards whenever there is a change."))
 	return listCommand
 }
 
@@ -76,13 +77,13 @@ func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, watch
 	discoveryErrors := list.GetWarnings()
 	var invalidFQBNErr *cmderrors.InvalidFQBNError
 	if errors.As(err, &invalidFQBNErr) {
-		feedback.Fatal(tr(err.Error()), feedback.ErrBadArgument)
+		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
 	if err != nil {
-		feedback.Warning(tr("Error detecting boards: %v", err))
+		feedback.Warning(i18n.Tr("Error detecting boards: %v", err))
 	}
 	for _, err := range discoveryErrors {
-		feedback.Warning(tr("Error starting discovery: %v", err))
+		feedback.Warning(i18n.Tr("Error starting discovery: %v", err))
 	}
 
 	feedback.PrintResult(listResult{result.NewDetectedPorts(ports)})
@@ -92,13 +93,13 @@ func watchList(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServi
 	stream, eventsChan := commands.BoardListWatchProxyToChan(ctx)
 	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: inst}, stream)
 	if err != nil {
-		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
+		feedback.Fatal(i18n.Tr("Error detecting boards: %v", err), feedback.ErrNetwork)
 	}
 
 	// This is done to avoid printing the header each time a new event is received
 	if feedback.GetFormat() == feedback.Text {
 		t := table.New()
-		t.SetHeader(tr("Port"), tr("Type"), tr("Event"), tr("Board Name"), tr("FQBN"), tr("Core"))
+		t.SetHeader(i18n.Tr("Port"), i18n.Tr("Type"), i18n.Tr("Event"), i18n.Tr("Board Name"), i18n.Tr("FQBN"), i18n.Tr("Core"))
 		feedback.Print(t.Render())
 	}
 
@@ -126,7 +127,7 @@ func (dr listResult) Data() interface{} {
 
 func (dr listResult) String() string {
 	if len(dr.Ports) == 0 {
-		return tr("No boards found.")
+		return i18n.Tr("No boards found.")
 	}
 
 	sort.Slice(dr.Ports, func(i, j int) bool {
@@ -136,7 +137,7 @@ func (dr listResult) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader(tr("Port"), tr("Protocol"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
+	t.SetHeader(i18n.Tr("Port"), i18n.Tr("Protocol"), i18n.Tr("Type"), i18n.Tr("Board Name"), i18n.Tr("FQBN"), i18n.Tr("Core"))
 	for _, detectedPort := range dr.Ports {
 		port := detectedPort.Port
 		protocol := port.Protocol
@@ -168,7 +169,7 @@ func (dr listResult) String() string {
 				protocol = ""
 			}
 		} else {
-			board := tr("Unknown")
+			board := i18n.Tr("Unknown")
 			fqbn := ""
 			coreName := ""
 			t.AddRow(address, protocol, protocolLabel, board, fqbn, coreName)
@@ -192,8 +193,8 @@ func (dr watchEventResult) String() string {
 	t := table.New()
 
 	event := map[string]string{
-		"add":    tr("Connected"),
-		"remove": tr("Disconnected"),
+		"add":    i18n.Tr("Connected"),
+		"remove": i18n.Tr("Disconnected"),
 	}[dr.Type]
 
 	address := fmt.Sprintf("%s://%s", dr.Port.Protocol, dr.Port.Address)

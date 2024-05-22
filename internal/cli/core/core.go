@@ -23,14 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand created a new `core` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	coreCommand := &cobra.Command{
 		Use:     "core",
-		Short:   tr("Arduino core operations."),
-		Long:    tr("Arduino core operations."),
+		Short:   i18n.Tr("Arduino core operations."),
+		Long:    i18n.Tr("Arduino core operations."),
 		Example: "  " + os.Args[0] + " core update-index",
 	}
 

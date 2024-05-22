@@ -26,8 +26,6 @@ import (
 	"github.com/arduino/go-win32-utils"
 )
 
-var tr = i18n.Tr
-
 // Settings contains the configuration of the Arduino CLI core service
 type Settings struct {
 	*configmap.Map
@@ -48,7 +46,7 @@ func NewSettings() *Settings {
 func getDefaultArduinoDataDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		feedback.Warning(tr("Unable to get user home dir: %v", err))
+		feedback.Warning(i18n.Tr("Unable to get user home dir: %v", err))
 		return "."
 	}
 
@@ -60,7 +58,7 @@ func getDefaultArduinoDataDir() string {
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
-			feedback.Warning(tr("Unable to get Local App Data Folder: %v", err))
+			feedback.Warning(i18n.Tr("Unable to get Local App Data Folder: %v", err))
 			return "."
 		}
 		return filepath.Join(localAppDataPath, "Arduino15")
@@ -73,7 +71,7 @@ func getDefaultArduinoDataDir() string {
 func getDefaultUserDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		feedback.Warning(tr("Unable to get user home dir: %v", err))
+		feedback.Warning(i18n.Tr("Unable to get user home dir: %v", err))
 		return "."
 	}
 
@@ -85,7 +83,7 @@ func getDefaultUserDir() string {
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
-			feedback.Warning(tr("Unable to get Documents Folder: %v", err))
+			feedback.Warning(i18n.Tr("Unable to get Documents Folder: %v", err))
 			return "."
 		}
 		return filepath.Join(documentsPath, "Arduino")

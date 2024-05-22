@@ -16,8 +16,9 @@
 package resources
 
 import (
-	"fmt"
+	"errors"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -35,7 +36,7 @@ func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, er
 func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 	archivePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return false, fmt.Errorf(tr("getting archive path: %s"), err)
+		return false, errors.New(i18n.Tr("getting archive path: %s", err))
 	}
 	return archivePath.Exist(), nil
 }

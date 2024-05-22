@@ -24,12 +24,10 @@ import (
 	"github.com/fatih/color"
 )
 
-var tr = i18n.Tr
-
 // NotifyNewVersionIsAvailable prints information about the new latestVersion
 func NotifyNewVersionIsAvailable(latestVersion string) {
 	msg := fmt.Sprintf("\n\n%s %s → %s\n%s",
-		color.YellowString(tr("A new release of Arduino CLI is available:")),
+		color.YellowString(i18n.Tr("A new release of Arduino CLI is available:")),
 		color.CyanString(version.VersionInfo.VersionString),
 		color.CyanString(latestVersion),
 		color.YellowString("https://arduino.github.io/arduino-cli/latest/installation/#latest-packages"))

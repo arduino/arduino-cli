@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -172,10 +173,10 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	}
 	if !skipSketchChecks {
 		if !importPath.Exist() {
-			return nil, &cmderrors.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
+			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return nil, &cmderrors.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 	}
 	toolProperties.SetPath("build.path", importPath)
@@ -202,7 +203,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	}
 
 	if !debugProperties.ContainsKey("executable") || debugProperties.Get("executable") == "" {
-		return nil, &cmderrors.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
+		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("Debugging not supported for board %s", req.GetFqbn())}
 	}
 
 	server := debugProperties.Get("server")

@@ -35,14 +35,14 @@ var (
 func NewCommand() *cobra.Command {
 	generateDocsCommand := &cobra.Command{
 		Use:     "generate-docs",
-		Short:   tr("Generates bash completion and command manpages."),
-		Long:    tr("Generates bash completion and command manpages."),
+		Short:   i18n.Tr("Generates bash completion and command manpages."),
+		Long:    i18n.Tr("Generates bash completion and command manpages."),
 		Example: "  " + os.Args[0] + " generate-docs bash-completions",
 		Hidden:  true,
 	}
 
 	generateDocsCommand.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
-		tr("Directory where to save generated files. Default is './docs', the directory must exist."))
+		i18n.Tr("Directory where to save generated files. Default is './docs', the directory must exist."))
 	generateDocsCommand.AddCommand(&cobra.Command{
 		Use:  "manpage",
 		Args: cobra.NoArgs,
@@ -77,7 +77,7 @@ func generateManPages(cmd *cobra.Command, args []string) {
 	}
 	logrus.WithField("outputDir", outputDir).Info("Generating manpages")
 	header := &doc.GenManHeader{
-		Title:   tr("ARDUINO COMMAND LINE MANUAL"),
+		Title:   i18n.Tr("ARDUINO COMMAND LINE MANUAL"),
 		Section: "1",
 	}
 	err := doc.GenManTree(cmd.Root(), header, outputDir)

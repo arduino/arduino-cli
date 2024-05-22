@@ -18,6 +18,7 @@ package feedback
 import (
 	"sync"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/cmaglie/pb"
 )
@@ -70,7 +71,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 		if end := curr.GetEnd(); end != nil {
 			msg := end.GetMessage()
 			if end.GetSuccess() && msg == "" {
-				msg = tr("downloaded")
+				msg = i18n.Tr("downloaded")
 			}
 			if started {
 				bar.FinishPrintOver(label + " " + msg)

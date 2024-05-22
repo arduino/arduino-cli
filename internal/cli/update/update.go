@@ -29,22 +29,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
 // NewCommand creates a new `update` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var showOutdated bool
 	updateCommand := &cobra.Command{
 		Use:     "update",
-		Short:   tr("Updates the index of cores and libraries"),
-		Long:    tr("Updates the index of cores and libraries to the latest versions."),
+		Short:   i18n.Tr("Updates the index of cores and libraries"),
+		Long:    i18n.Tr("Updates the index of cores and libraries to the latest versions."),
 		Example: "  " + os.Args[0] + " update",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			runUpdateCommand(cmd.Context(), srv, showOutdated)
 		},
 	}
-	updateCommand.Flags().BoolVar(&showOutdated, "show-outdated", false, tr("Show outdated cores and libraries after index update"))
+	updateCommand.Flags().BoolVar(&showOutdated, "show-outdated", false, i18n.Tr("Show outdated cores and libraries after index update"))
 	return updateCommand
 }
 
