@@ -94,7 +94,7 @@ message CompileRequest {
   // the variables placeholders exactly as defined in the platform.
   bool do_not_expand_build_properties = 29;
   // Search for precompiled cores in the given paths and use them if found.
-  // This search is performed before the standard build_cache directory.
+  // This search is performed after the standard build_cache directory.
   repeated string build_cache_extra_paths = 30;
 }
 

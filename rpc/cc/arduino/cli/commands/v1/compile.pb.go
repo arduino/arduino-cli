@@ -111,7 +111,7 @@ type CompileRequest struct {
 	// the variables placeholders exactly as defined in the platform.
 	DoNotExpandBuildProperties bool `protobuf:"varint,29,opt,name=do_not_expand_build_properties,json=doNotExpandBuildProperties,proto3" json:"do_not_expand_build_properties,omitempty"`
 	// Search for precompiled cores in the given paths and use them if found.
-	// This search is performed before the standard build_cache directory.
+	// This search is performed after the standard build_cache directory.
 	BuildCacheExtraPaths []string `protobuf:"bytes,30,rep,name=build_cache_extra_paths,json=buildCacheExtraPaths,proto3" json:"build_cache_extra_paths,omitempty"`
 }
 
