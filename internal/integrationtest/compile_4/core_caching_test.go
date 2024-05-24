@@ -44,6 +44,9 @@ func TestBuildCacheCoreWithExtraDirs(t *testing.T) {
 	require.NoError(t, err)
 
 	{
+		// Clean cache
+		require.NoError(t, defaultCache.RemoveAll())
+
 		// Compile sketch with empty cache
 		out, _, err := cli.Run("compile", "-v", "-b", "arduino:avr:uno", sketch.String())
 		require.NoError(t, err)
