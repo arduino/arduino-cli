@@ -15,7 +15,11 @@
 
 package configuration
 
-import "time"
+import (
+	"time"
+
+	"github.com/arduino/go-paths-helper"
+)
 
 // GetCompilationsBeforeBuildCachePurge returns the number of compilations before the build cache is purged.
 func (s *Settings) GetCompilationsBeforeBuildCachePurge() uint {
@@ -31,4 +35,25 @@ func (s *Settings) GetBuildCacheTTL() time.Duration {
 		return res
 	}
 	return s.Defaults.GetDuration("build_cache.ttl")
+}
+
+// GetBuildCachePath returns the path to the build cache.
+func (s *Settings) GetBuildCachePath() (*paths.Path, bool) {
+	p, ok, _ := s.GetStringOk("build_cache.path")
+	if !ok {
+		return nil, false
+	}
+	return paths.New(p), true
+}
+
+// GetBuildCacheExtraPaths returns the extra paths to the core build cache.
+// Those paths are visited before the main core build cache to check for cached items.
+func (s *Settings) GetBuildCacheExtraPaths() paths.PathList {
+	var res paths.PathList
+	if ps, ok, _ := s.GetStringSliceOk("build_cache.extra_paths"); ok {
+		for _, p := range ps {
+			res.Add(paths.New(p, "cores"))
+		}
+	}
+	return res
 }

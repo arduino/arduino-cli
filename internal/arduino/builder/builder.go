@@ -62,7 +62,8 @@ type Builder struct {
 	customBuildProperties []string
 
 	// core related
-	coreBuildCachePath *paths.Path
+	coreBuildCachePath       *paths.Path
+	extraCoreBuildCachePaths paths.PathList
 
 	logger *logger.BuilderLogger
 	clean  bool
@@ -121,6 +122,7 @@ func NewBuilder(
 	buildPath *paths.Path,
 	optimizeForDebug bool,
 	coreBuildCachePath *paths.Path,
+	extraCoreBuildCachePaths paths.PathList,
 	jobs int,
 	requestBuildProperties []string,
 	hardwareDirs, otherLibrariesDirs paths.PathList,
@@ -211,6 +213,7 @@ func NewBuilder(
 		jobs:                          jobs,
 		customBuildProperties:         customBuildPropertiesArgs,
 		coreBuildCachePath:            coreBuildCachePath,
+		extraCoreBuildCachePaths:      extraCoreBuildCachePaths,
 		logger:                        logger,
 		clean:                         clean,
 		sourceOverrides:               sourceOverrides,

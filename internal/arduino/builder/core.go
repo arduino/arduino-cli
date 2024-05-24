@@ -108,6 +108,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 			return true
 		}
 
+		// If there is an archived core in the current build cache, use it
 		if _, err := buildcache.New(b.coreBuildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
 			return nil, nil, errors.New(i18n.Tr("creating core cache folder: %s", err))
 		}
@@ -118,6 +119,19 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 				b.logger.Info(i18n.Tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
+		}
+
+		// Otherwise try the extra build cache paths to see if there is a precompiled core
+		// that can be used
+		for _, extraCoreBuildCachePath := range b.extraCoreBuildCachePaths {
+			extraTargetArchivedCore := extraCoreBuildCachePath.Join(archivedCoreName, "core.a")
+			if canUseArchivedCore(extraTargetArchivedCore) {
+				// use archived core
+				if b.logger.Verbose() {
+					b.logger.Info(i18n.Tr("Using precompiled core: %[1]s", extraTargetArchivedCore))
+				}
+				return extraTargetArchivedCore, variantObjectFiles, nil
+			}
 		}
 	}
 

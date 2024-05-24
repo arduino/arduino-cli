@@ -191,6 +191,12 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		}
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
+	var extraCoreBuildCachePaths paths.PathList
+	if len(req.GetBuildCacheExtraPaths()) == 0 {
+		extraCoreBuildCachePaths = s.settings.GetBuildCacheExtraPaths()
+	} else {
+		extraCoreBuildCachePaths = paths.NewPathList(req.GetBuildCacheExtraPaths()...)
+	}
 
 	if _, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform); err != nil {
 		return err
@@ -229,6 +235,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		buildPath,
 		req.GetOptimizeForDebug(),
 		coreBuildCachePath,
+		extraCoreBuildCachePaths,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
 		s.settings.HardwareDirectories(),
