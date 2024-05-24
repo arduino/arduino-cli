@@ -35,6 +35,8 @@
 - `updater` - configuration options related to Arduino CLI updates
   - `enable_notification` - set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`
 - `build_cache` configuration options related to the compilation cache
+  - `path` - the path to the build cache, default is `$TMP/arduino`.
+  - `extra_paths` - a list of paths to look for precompiled artifacts if not found on `build_cache.path` setting.
   - `compilations_before_purge` - interval, in number of compilations, at which the cache is purged, defaults to `10`.
     When `0` the cache is never purged.
   - `ttl` - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files

@@ -4,6 +4,12 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 1.0.0
 
+### `compile --build-cache-path` slightly changed directory format
+
+Now compiled cores are cached under the `cores` subdir of the path specified in `--build-cache-path`, previously it was
+saved under the `core` subdir. The new behaviour is coherent with the default cache directory `/tmp/arduino/cores/...`
+when the cache directory is not set by the user.
+
 ### Configuration file now supports only YAML format.
 
 The Arduino CLI configuration file now supports only the YAML format.

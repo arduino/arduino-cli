@@ -201,6 +201,9 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	} else {
 		extraCoreBuildCachePaths = paths.NewPathList(req.GetBuildCacheExtraPaths()...)
 	}
+	for i, p := range extraCoreBuildCachePaths {
+		extraCoreBuildCachePaths[i] = p.Join("cores")
+	}
 
 	if _, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform); err != nil {
 		return err
