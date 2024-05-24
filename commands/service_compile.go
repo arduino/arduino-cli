@@ -178,19 +178,23 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		s.settings.GetCompilationsBeforeBuildCachePurge(),
 		s.settings.GetBuildCacheTTL().Abs())
 
-	var coreBuildCachePath *paths.Path
-	if req.GetBuildCachePath() == "" {
-		coreBuildCachePath = paths.TempDir().Join("arduino", "cores")
-	} else {
-		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
+	var buildCachePath *paths.Path
+	if req.GetBuildCachePath() != "" {
+		p, err := paths.New(req.GetBuildCachePath()).Abs()
 		if err != nil {
 			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
 		}
-		if err := buildCachePath.MkdirAll(); err != nil {
-			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
-		}
-		coreBuildCachePath = buildCachePath.Join("core")
+		buildCachePath = p
+	} else if p, ok := s.settings.GetBuildCachePath(); ok {
+		buildCachePath = p
+	} else {
+		buildCachePath = paths.TempDir().Join("arduino")
 	}
+	if err := buildCachePath.MkdirAll(); err != nil {
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
+	}
+	coreBuildCachePath := buildCachePath.Join("cores")
+
 	var extraCoreBuildCachePaths paths.PathList
 	if len(req.GetBuildCacheExtraPaths()) == 0 {
 		extraCoreBuildCachePaths = s.settings.GetBuildCacheExtraPaths()
