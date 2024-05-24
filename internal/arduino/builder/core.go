@@ -89,28 +89,30 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 			b.buildProperties.Get("compiler.optimization_flags"),
 			realCoreFolder,
 		)
-		targetArchivedCore = b.coreBuildCachePath.Join(archivedCoreName, "core.a")
+
+		canUseArchivedCore := func(archivedCore *paths.Path) bool {
+			if b.onlyUpdateCompilationDatabase || b.clean {
+				return false
+			}
+			if isOlder, err := utils.DirContentIsOlderThan(realCoreFolder, archivedCore); err != nil || !isOlder {
+				// Recreate the archive if ANY of the core files (including platform.txt) has changed
+				return false
+			}
+			if targetCoreFolder == nil || realCoreFolder.EquivalentTo(targetCoreFolder) {
+				return true
+			}
+			if isOlder, err := utils.DirContentIsOlderThan(targetCoreFolder, archivedCore); err != nil || !isOlder {
+				// Recreate the archive if ANY of the build core files (including platform.txt) has changed
+				return false
+			}
+			return true
+		}
 
 		if _, err := buildcache.New(b.coreBuildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
 			return nil, nil, errors.New(i18n.Tr("creating core cache folder: %s", err))
 		}
-
-		var canUseArchivedCore bool
-		if b.onlyUpdateCompilationDatabase || b.clean {
-			canUseArchivedCore = false
-		} else if isOlder, err := utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
-			// Recreate the archive if ANY of the core files (including platform.txt) has changed
-			canUseArchivedCore = false
-		} else if targetCoreFolder == nil || realCoreFolder.EquivalentTo(targetCoreFolder) {
-			canUseArchivedCore = true
-		} else if isOlder, err := utils.DirContentIsOlderThan(targetCoreFolder, targetArchivedCore); err != nil || !isOlder {
-			// Recreate the archive if ANY of the build core files (including platform.txt) has changed
-			canUseArchivedCore = false
-		} else {
-			canUseArchivedCore = true
-		}
-
-		if canUseArchivedCore {
+		targetArchivedCore = b.coreBuildCachePath.Join(archivedCoreName, "core.a")
+		if canUseArchivedCore(targetArchivedCore) {
 			// use archived core
 			if b.logger.Verbose() {
 				b.logger.Info(i18n.Tr("Using precompiled core: %[1]s", targetArchivedCore))
