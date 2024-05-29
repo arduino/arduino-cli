@@ -49,9 +49,8 @@ func (s *Settings) GetBuildCachePath() (*paths.Path, bool) {
 // GetBuildCacheExtraPaths returns the extra paths to the build cache.
 // Those paths are visited to look for precompiled items if not found elsewhere.
 func (s *Settings) GetBuildCacheExtraPaths() paths.PathList {
-	var res paths.PathList
 	if p, ok, _ := s.GetStringSliceOk("build_cache.extra_paths"); ok {
 		return paths.NewPathList(p...)
 	}
-	return res
+	return nil
 }
