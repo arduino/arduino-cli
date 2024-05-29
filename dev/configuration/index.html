@@ -1594,6 +1594,8 @@
 </ul>
 </li>
 <li><code>build_cache</code> configuration options related to the compilation cache<ul>
+<li><code>path</code> - the path to the build cache, default is <code>$TMP/arduino</code>.</li>
+<li><code>extra_paths</code> - a list of paths to look for precompiled artifacts if not found on <code>build_cache.path</code> setting.</li>
 <li><code>compilations_before_purge</code> - interval, in number of compilations, at which the cache is purged, defaults to <code>10</code>.
   When <code>0</code> the cache is never purged.</li>
 <li><code>ttl</code> - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files

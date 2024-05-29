@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#compile-build-cache-path-slightly-changed-directory-format" class="md-nav__link">
+    compile --build-cache-path slightly changed directory format
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configuration-file-now-supports-only-yaml-format" class="md-nav__link">
     Configuration file now supports only YAML format.
   </a>
@@ -2574,6 +2581,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#compile-build-cache-path-slightly-changed-directory-format" class="md-nav__link">
+    compile --build-cache-path slightly changed directory format
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configuration-file-now-supports-only-yaml-format" class="md-nav__link">
     Configuration file now supports only YAML format.
   </a>
@@ -3812,6 +3826,10 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="100">1.0.0<a class="headerlink" href="#100" title="Permanent link">&para;</a></h2>
+<h3 id="compile-build-cache-path-slightly-changed-directory-format"><code>compile --build-cache-path</code> slightly changed directory format<a class="headerlink" href="#compile-build-cache-path-slightly-changed-directory-format" title="Permanent link">&para;</a></h3>
+<p>Now compiled cores are cached under the <code>cores</code> subdir of the path specified in <code>--build-cache-path</code>, previously it was
+saved under the <code>core</code> subdir. The new behaviour is coherent with the default cache directory <code>/tmp/arduino/cores/...</code>
+when the cache directory is not set by the user.</p>
 <h3 id="configuration-file-now-supports-only-yaml-format">Configuration file now supports only YAML format.<a class="headerlink" href="#configuration-file-now-supports-only-yaml-format" title="Permanent link">&para;</a></h3>
 <p>The Arduino CLI configuration file now supports only the YAML format.</p>
 <h3 id="grpc-setting-api-important-changes">gRPC Setting API important changes<a class="headerlink" href="#grpc-setting-api-important-changes" title="Permanent link">&para;</a></h3>
