@@ -52,6 +52,8 @@ func SetDefaults(settings *Settings) {
 	setDefaultValueAndKeyTypeSchema("sketch.always_export_binaries", false)
 	setDefaultValueAndKeyTypeSchema("build_cache.ttl", (time.Hour * 24 * 30).String())
 	setDefaultValueAndKeyTypeSchema("build_cache.compilations_before_purge", uint(10))
+	setKeyTypeSchema("build_cache.path", "")
+	setKeyTypeSchema("build_cache.extra_paths", []string{})
 
 	// daemon settings
 	setDefaultValueAndKeyTypeSchema("daemon.port", "50051")

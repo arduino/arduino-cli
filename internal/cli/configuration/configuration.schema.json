@@ -20,6 +20,17 @@
     "build_cache": {
       "description": "configuration options related to the compilation cache",
       "properties": {
+        "path": {
+          "description": "the path to the build cache, default is `$TMP/arduino`.",
+          "type": "string"
+        },
+        "extra_paths": {
+          "description": "a list of paths to look for precompiled artifacts if not found on `build_cache.path` setting.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "compilations_before_purge": {
           "description": "interval, in number of compilations, at which the cache is purged, defaults to `10`. When `0` the cache is never purged.",
           "type": "integer",
