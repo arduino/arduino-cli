@@ -117,7 +117,7 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 	res := &PlatformRelease{
 		Name:            in.GetName(),
 		Version:         in.GetVersion(),
-		Type:            in.GetType(),
+		Types:           in.GetTypes(),
 		Installed:       in.GetInstalled(),
 		Boards:          boards,
 		Help:            help,
@@ -132,7 +132,7 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 type PlatformRelease struct {
 	Name            string        `json:"name,omitempty"`
 	Version         string        `json:"version,omitempty"`
-	Type            []string      `json:"type,omitempty"`
+	Types           []string      `json:"types,omitempty"`
 	Installed       bool          `json:"installed,omitempty"`
 	Boards          []*Board      `json:"boards,omitempty"`
 	Help            *HelpResource `json:"help,omitempty"`

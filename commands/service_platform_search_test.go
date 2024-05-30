@@ -70,7 +70,7 @@ func TestPlatformSearch(t *testing.T) {
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.5",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -79,7 +79,7 @@ func TestPlatformSearch(t *testing.T) {
 				},
 				"1.0.6": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.6",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -110,7 +110,7 @@ func TestPlatformSearch(t *testing.T) {
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.5",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -119,7 +119,7 @@ func TestPlatformSearch(t *testing.T) {
 				},
 				"1.0.6": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.6",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -150,7 +150,7 @@ func TestPlatformSearch(t *testing.T) {
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.5",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -159,7 +159,7 @@ func TestPlatformSearch(t *testing.T) {
 				},
 				"1.0.6": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.6",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -190,7 +190,7 @@ func TestPlatformSearch(t *testing.T) {
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.5",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -199,7 +199,7 @@ func TestPlatformSearch(t *testing.T) {
 				},
 				"1.0.6": {
 					Name:       "RK002",
-					Type:       []string{"Contributed"},
+					Types:      []string{"Contributed"},
 					Installed:  false,
 					Version:    "1.0.6",
 					Boards:     []*rpc.Board{{Name: "RK002"}},
@@ -230,7 +230,7 @@ func TestPlatformSearch(t *testing.T) {
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.8.3": {
 					Name:      "Arduino AVR Boards",
-					Type:      []string{"Arduino"},
+					Types:     []string{"Arduino"},
 					Installed: false,
 					Version:   "1.8.3",
 					Boards: []*rpc.Board{
@@ -288,7 +288,7 @@ func TestPlatformSearch(t *testing.T) {
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.8.3": {
 					Name:      "Arduino AVR Boards",
-					Type:      []string{"Arduino"},
+					Types:     []string{"Arduino"},
 					Installed: false,
 					Version:   "1.8.3",
 					Boards: []*rpc.Board{
