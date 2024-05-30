@@ -181,6 +181,42 @@ func main() {
 
 The `yaml` option of the `--format` flag is no more supported. Use `--format json` if machine parsable output is needed.
 
+### gRPC: The `type` field has been renamed to `types` in the `cc.arduino.cli.commands.v1.PlatformRelease` message.
+
+Rebuilding the gRPC bindings from the proto files requires to rename all access to `type` field as `types`.
+
+By the way, the wire protocol is not affected by this change, existing clients should work fine without modification.
+
+### The `type` field has been renamed to `types` in the JSON output including a platform release.
+
+Since the `type` field may contain multiple values has been renamed to `types` to better express this aspect.
+
+Previously:
+
+```
+$ arduino-cli core list --json | jq '.platforms[4].releases."1.8.13"'
+{
+  "name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards",
+  "version": "1.8.13",
+  "type": [
+    "Arduino"
+  ],
+  ...
+```
+
+Now:
+
+```
+$ arduino-cli core list --json | jq '.platforms[4].releases."1.8.13"'
+{
+  "name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards",
+  "version": "1.8.13",
+  "types": [
+    "Arduino"
+  ],
+  ...
+```
+
 ### The gRPC `cc.arduino.cli.commands.v1.CompileRequest.export_binaries` changed type.
 
 Previously the field `export_binaries` was a `google.protobuf.BoolValue`. We used this type because it expresses this

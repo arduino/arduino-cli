@@ -129,7 +129,7 @@ message PlatformRelease {
   // Version of the platform release
   string version = 2;
   // Type of the platform.
-  repeated string type = 3;
+  repeated string types = 3;
   // True if the platform is installed
   bool installed = 4;
   // List of boards provided by the platform. If the platform is installed,

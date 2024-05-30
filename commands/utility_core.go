@@ -72,7 +72,7 @@ func platformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.PlatformR
 		Version:         platformRelease.Version.String(),
 		Installed:       platformRelease.IsInstalled(),
 		MissingMetadata: missingMetadata,
-		Type:            []string{platformRelease.Category},
+		Types:           []string{platformRelease.Category},
 		Deprecated:      platformRelease.Deprecated,
 		Compatible:      platformRelease.IsCompatible(),
 	}
