@@ -320,6 +320,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#grpc-the-type-field-has-been-renamed-to-types-in-the-ccarduinoclicommandsv1platformrelease-message" class="md-nav__link">
+    gRPC: The type field has been renamed to types in the cc.arduino.cli.commands.v1.PlatformRelease message.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-type-field-has-been-renamed-to-types-in-the-json-output-including-a-platform-release" class="md-nav__link">
+    The type field has been renamed to types in the JSON output including a platform release.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.CompileRequest.export_binaries changed type.
   </a>
@@ -2616,6 +2630,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#grpc-the-type-field-has-been-renamed-to-types-in-the-ccarduinoclicommandsv1platformrelease-message" class="md-nav__link">
+    gRPC: The type field has been renamed to types in the cc.arduino.cli.commands.v1.PlatformRelease message.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-type-field-has-been-renamed-to-types-in-the-json-output-including-a-platform-release" class="md-nav__link">
+    The type field has been renamed to types in the JSON output including a platform release.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" class="md-nav__link">
     The gRPC cc.arduino.cli.commands.v1.CompileRequest.export_binaries changed type.
   </a>
@@ -3985,6 +4013,31 @@ but complete, example:</p>
 </code></pre></div>
 <h3 id="yaml-output-format-is-no-more-supported">YAML output format is no more supported<a class="headerlink" href="#yaml-output-format-is-no-more-supported" title="Permanent link">&para;</a></h3>
 <p>The <code>yaml</code> option of the <code>--format</code> flag is no more supported. Use <code>--format json</code> if machine parsable output is needed.</p>
+<h3 id="grpc-the-type-field-has-been-renamed-to-types-in-the-ccarduinoclicommandsv1platformrelease-message">gRPC: The <code>type</code> field has been renamed to <code>types</code> in the <code>cc.arduino.cli.commands.v1.PlatformRelease</code> message.<a class="headerlink" href="#grpc-the-type-field-has-been-renamed-to-types-in-the-ccarduinoclicommandsv1platformrelease-message" title="Permanent link">&para;</a></h3>
+<p>Rebuilding the gRPC bindings from the proto files requires to rename all access to <code>type</code> field as <code>types</code>.</p>
+<p>By the way, the wire protocol is not affected by this change, existing clients should work fine without modification.</p>
+<h3 id="the-type-field-has-been-renamed-to-types-in-the-json-output-including-a-platform-release">The <code>type</code> field has been renamed to <code>types</code> in the JSON output including a platform release.<a class="headerlink" href="#the-type-field-has-been-renamed-to-types-in-the-json-output-including-a-platform-release" title="Permanent link">&para;</a></h3>
+<p>Since the <code>type</code> field may contain multiple values has been renamed to <code>types</code> to better express this aspect.</p>
+<p>Previously:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli core list --json | jq &#39;.platforms[4].releases.&quot;1.8.13&quot;&#39;
+{
+  &quot;name&quot;: &quot;Arduino SAMD (32-bits ARM Cortex-M0+) Boards&quot;,
+  &quot;version&quot;: &quot;1.8.13&quot;,
+  &quot;type&quot;: [
+    &quot;Arduino&quot;
+  ],
+  ...
+</code></pre></div>
+<p>Now:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli core list --json | jq &#39;.platforms[4].releases.&quot;1.8.13&quot;&#39;
+{
+  &quot;name&quot;: &quot;Arduino SAMD (32-bits ARM Cortex-M0+) Boards&quot;,
+  &quot;version&quot;: &quot;1.8.13&quot;,
+  &quot;types&quot;: [
+    &quot;Arduino&quot;
+  ],
+  ...
+</code></pre></div>
 <h3 id="the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type">The gRPC <code>cc.arduino.cli.commands.v1.CompileRequest.export_binaries</code> changed type.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1compilerequestexport_binaries-changed-type" title="Permanent link">&para;</a></h3>
 <p>Previously the field <code>export_binaries</code> was a <code>google.protobuf.BoolValue</code>. We used this type because it expresses this
 field's optional nature (that is, it could be <code>true</code>, <code>false</code>, and <code>null</code> if not set).</p>
