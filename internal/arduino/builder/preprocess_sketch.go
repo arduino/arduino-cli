@@ -32,10 +32,10 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	)
 	if result != nil {
 		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			b.logger.WriteStdout(result.Stdout())
+			b.logger.WriteStdout(result.Stdout)
 		}
-		b.logger.WriteStderr(result.Stderr())
-		b.diagnosticStore.Parse(result.Args(), result.Stderr())
+		b.logger.WriteStderr(result.Stderr)
+		b.diagnosticStore.Parse(result.Args, result.Stderr)
 	}
 
 	return err
