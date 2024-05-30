@@ -189,7 +189,7 @@ func NewBuilder(
 	}
 
 	logger := logger.New(stdout, stderr, verbose, warningsLevel)
-	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
+	libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, librariesManager,
 		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
 		actualPlatform, targetPlatform,
@@ -238,7 +238,7 @@ func NewBuilder(
 		),
 		diagnosticStore: diagnosticStore,
 		libsDetector: detector.NewSketchLibrariesDetector(
-			libsManager, libsResolver,
+			libsResolver,
 			useCachedLibrariesResolution,
 			onlyUpdateCompilationDatabase,
 			logger,

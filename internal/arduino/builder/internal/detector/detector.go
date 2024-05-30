@@ -49,7 +49,6 @@ type libraryResolutionResult struct {
 
 // SketchLibrariesDetector todo
 type SketchLibrariesDetector struct {
-	librariesManager              *librariesmanager.LibrariesManager
 	librariesResolver             *librariesresolver.Cpp
 	useCachedLibrariesResolution  bool
 	onlyUpdateCompilationDatabase bool
@@ -62,7 +61,6 @@ type SketchLibrariesDetector struct {
 
 // NewSketchLibrariesDetector todo
 func NewSketchLibrariesDetector(
-	lm *librariesmanager.LibrariesManager,
 	libsResolver *librariesresolver.Cpp,
 	useCachedLibrariesResolution bool,
 	onlyUpdateCompilationDatabase bool,
@@ -70,7 +68,6 @@ func NewSketchLibrariesDetector(
 	diagnosticStore *diagnostics.Store,
 ) *SketchLibrariesDetector {
 	return &SketchLibrariesDetector{
-		librariesManager:              lm,
 		librariesResolver:             libsResolver,
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
@@ -599,7 +596,7 @@ func LibrariesLoader(
 	librariesManager *librariesmanager.LibrariesManager,
 	builtInLibrariesDirs *paths.Path, libraryDirs, otherLibrariesDirs paths.PathList,
 	actualPlatform, targetPlatform *cores.PlatformRelease,
-) (*librariesmanager.LibrariesManager, *librariesresolver.Cpp, []byte, error) {
+) (*librariesresolver.Cpp, []byte, error) {
 	verboseOut := &bytes.Buffer{}
 	lm := librariesManager
 	if useCachedLibrariesResolution {
@@ -613,7 +610,7 @@ func LibrariesLoader(
 		builtInLibrariesFolders := builtInLibrariesDirs
 		if builtInLibrariesFolders != nil {
 			if err := builtInLibrariesFolders.ToAbs(); err != nil {
-				return nil, nil, nil, err
+				return nil, nil, err
 			}
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     builtInLibrariesFolders,
@@ -636,7 +633,7 @@ func LibrariesLoader(
 
 		librariesFolders := otherLibrariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
-			return nil, nil, nil, err
+			return nil, nil, err
 		}
 		for _, folder := range librariesFolders {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
@@ -668,7 +665,7 @@ func LibrariesLoader(
 
 	allLibs := lm.FindAllInstalled()
 	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
-	return lm, resolver, verboseOut.Bytes(), nil
+	return resolver, verboseOut.Bytes(), nil
 }
 
 type includeCacheEntry struct {
