@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -35,7 +36,7 @@ func PreprocessSketchWithArduinoPreprocessor(
 	ctx context.Context,
 	sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList,
 	lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
-) (*Result, error) {
+) (*runner.Result, error) {
 	verboseOut := &bytes.Buffer{}
 	normalOut := &bytes.Buffer{}
 	if err := buildPath.Join("preproc").MkdirAll(); err != nil {
@@ -45,8 +46,8 @@ func PreprocessSketchWithArduinoPreprocessor(
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
 	gccResult, err := GCC(ctx, sourceFile, targetFile, includeFolders, buildProperties)
-	verboseOut.Write(gccResult.Stdout())
-	verboseOut.Write(gccResult.Stderr())
+	verboseOut.Write(gccResult.Stdout)
+	verboseOut.Write(gccResult.Stderr)
 	if err != nil {
 		return nil, err
 	}
@@ -83,13 +84,13 @@ func PreprocessSketchWithArduinoPreprocessor(
 	commandStdOut, commandStdErr, err := command.RunAndCaptureOutput(ctx)
 	verboseOut.Write(commandStdErr)
 	if err != nil {
-		return &Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
+		return &runner.Result{Args: gccResult.Args, Stdout: verboseOut.Bytes(), Stderr: normalOut.Bytes()}, err
 	}
 	result := utils.NormalizeUTF8(commandStdOut)
 
 	destFile := buildPath.Join(sk.MainFile.Base() + ".cpp")
 	if err := destFile.WriteFile(result); err != nil {
-		return &Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
+		return &runner.Result{Args: gccResult.Args, Stdout: verboseOut.Bytes(), Stderr: normalOut.Bytes()}, err
 	}
-	return &Result{args: gccResult.Args(), stdout: verboseOut.Bytes(), stderr: normalOut.Bytes()}, err
+	return &runner.Result{Args: gccResult.Args, Stdout: verboseOut.Bytes(), Stderr: normalOut.Bytes()}, err
 }

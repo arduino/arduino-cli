@@ -29,6 +29,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
@@ -342,7 +343,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		}
 
 		var preprocErr error
-		var preprocFirstResult preprocessor.Result
+		var preprocFirstResult *runner.Result
 
 		var missingIncludeH string
 		if unchanged && cache.valid {
@@ -353,18 +354,18 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		} else {
 			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-				l.logger.WriteStdout(preprocFirstResult.Stdout())
+				l.logger.WriteStdout(preprocFirstResult.Stdout)
 			}
 			// Unwrap error and see if it is an ExitError.
 			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || preprocFirstResult.Stderr() == nil {
+			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || len(preprocFirstResult.Stderr) == 0 {
 				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return preprocErr
 			} else {
-				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr()))
+				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr))
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
@@ -380,11 +381,11 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		library := l.resolveLibrary(missingIncludeH, platformArch)
 		if library == nil {
 			// Library could not be resolved, show error
-			if preprocErr == nil || preprocFirstResult.Stderr() == nil {
+			if preprocErr == nil || len(preprocFirstResult.Stderr) == 0 {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				result, err := preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-					l.logger.WriteStdout(result.Stdout())
+					l.logger.WriteStdout(result.Stdout)
 				}
 				if err == nil {
 					// If there is a missing #include in the cache, but running
@@ -393,12 +394,12 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 					// deleted, so hopefully the next compilation will succeed.
 					return errors.New(i18n.Tr("Internal error in cache"))
 				}
-				l.diagnosticStore.Parse(result.Args(), result.Stderr())
-				l.logger.WriteStderr(result.Stderr())
+				l.diagnosticStore.Parse(result.Args, result.Stderr)
+				l.logger.WriteStderr(result.Stderr)
 				return err
 			}
-			l.diagnosticStore.Parse(preprocFirstResult.Args(), preprocFirstResult.Stderr())
-			l.logger.WriteStderr(preprocFirstResult.Stderr())
+			l.diagnosticStore.Parse(preprocFirstResult.Args, preprocFirstResult.Stderr)
+			l.logger.WriteStderr(preprocFirstResult.Stderr)
 			return preprocErr
 		}
 
