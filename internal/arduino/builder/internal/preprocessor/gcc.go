@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -35,7 +36,7 @@ func GCC(
 	ctx context.Context,
 	sourceFilePath, targetFilePath *paths.Path,
 	includes paths.PathList, buildProperties *properties.Map,
-) (Result, error) {
+) (*runner.Result, error) {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	gccBuildProperties.Merge(buildProperties)
@@ -60,14 +61,14 @@ func GCC(
 
 	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
 	if pattern == "" {
-		return Result{}, errors.New(i18n.Tr("%s pattern is missing", gccPreprocRecipeProperty))
+		return nil, errors.New(i18n.Tr("%s pattern is missing", gccPreprocRecipeProperty))
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
 	commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	args, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return Result{}, err
+		return nil, err
 	}
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
@@ -76,7 +77,7 @@ func GCC(
 
 	proc, err := paths.NewProcess(nil, args...)
 	if err != nil {
-		return Result{}, err
+		return nil, err
 	}
 
 	stdout := bytes.NewBuffer(nil)
@@ -103,13 +104,13 @@ func GCC(
 	fmt.Fprintln(stdout, strings.Join(args, " "))
 
 	if err := proc.Start(); err != nil {
-		return Result{}, err
+		return &runner.Result{}, err
 	}
 
 	// Wait for the process to finish
 	err = proc.WaitWithinContext(ctx)
 
-	return Result{args: proc.GetArgs(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
+	return &runner.Result{Args: proc.GetArgs(), Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 }
 
 type writerFunc func(p []byte) (n int, err error)
