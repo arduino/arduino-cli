@@ -51,6 +51,7 @@ type libraryResolutionResult struct {
 type SketchLibrariesDetector struct {
 	librariesResolver             *librariesresolver.Cpp
 	useCachedLibrariesResolution  bool
+	cache                         *includeCache
 	onlyUpdateCompilationDatabase bool
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
@@ -181,13 +182,12 @@ func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
 // and should be the empty string for the default include folders, like
 // the core or variant.
 func (l *SketchLibrariesDetector) appendIncludeFolder(
-	cache *includeCache,
 	sourceFilePath *paths.Path,
 	include string,
 	folder *paths.Path,
 ) {
 	l.includeFolders = append(l.includeFolders, folder)
-	cache.ExpectEntry(sourceFilePath, include, folder)
+	l.cache.ExpectEntry(sourceFilePath, include, folder)
 }
 
 // FindIncludes todo
@@ -243,11 +243,11 @@ func (l *SketchLibrariesDetector) findIncludes(
 	}
 
 	cachePath := buildPath.Join("includes.cache")
-	cache := readCache(cachePath)
+	l.cache = readCache(cachePath)
 
-	l.appendIncludeFolder(cache, nil, "", buildCorePath)
+	l.appendIncludeFolder(nil, "", buildCorePath)
 	if buildVariantPath != nil {
-		l.appendIncludeFolder(cache, nil, "", buildVariantPath)
+		l.appendIncludeFolder(nil, "", buildVariantPath)
 	}
 
 	sourceFileQueue := &uniqueSourceFileQueue{}
@@ -267,7 +267,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		for !sourceFileQueue.Empty() {
-			err := l.findIncludesUntilDone(ctx, cache, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
+			err := l.findIncludesUntilDone(ctx, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
 				return err
@@ -275,8 +275,8 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		// Finalize the cache
-		cache.ExpectEnd()
-		if err := writeCache(cache, cachePath); err != nil {
+		l.cache.ExpectEnd()
+		if err := l.cache.write(cachePath); err != nil {
 			return err
 		}
 	}
@@ -296,7 +296,6 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 func (l *SketchLibrariesDetector) findIncludesUntilDone(
 	ctx context.Context,
-	cache *includeCache,
 	sourceFileQueue *uniqueSourceFileQueue,
 	buildProperties *properties.Map,
 	librariesBuildPath *paths.Path,
@@ -327,7 +326,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 
 	first := true
 	for {
-		cache.ExpectFile(sourcePath)
+		l.cache.ExpectFile(sourcePath)
 
 		// Libraries may require the "utility" directory to be added to the include
 		// search path, but only for the source code of the library, so we temporary
@@ -342,8 +341,8 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		var preprocFirstResult *runner.Result
 
 		var missingIncludeH string
-		if unchanged && cache.valid {
-			missingIncludeH = cache.Next().Include
+		if unchanged && l.cache.valid {
+			missingIncludeH = l.cache.Next().Include
 			if first && l.logger.Verbose() {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
@@ -370,7 +369,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 
 		if missingIncludeH == "" {
 			// No missing includes found, we're done
-			cache.ExpectEntry(sourcePath, "", nil)
+			l.cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
@@ -403,7 +402,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		// include path and queue its source files for further
 		// include scanning
 		l.AppendImportedLibraries(library)
-		l.appendIncludeFolder(cache, sourcePath, missingIncludeH, library.SourceDir)
+		l.appendIncludeFolder(sourcePath, missingIncludeH, library.SourceDir)
 
 		if library.Precompiled && library.PrecompiledWithSources {
 			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
@@ -592,98 +591,4 @@ func (entry *includeCacheEntry) String() string {
 // Equals fixdoc
 func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
 	return entry.String() == other.String()
-}
-
-type includeCache struct {
-	// Are the cache contents valid so far?
-	valid bool
-	// Index into entries of the next entry to be processed. Unused
-	// when the cache is invalid.
-	next    int
-	entries []*includeCacheEntry
-}
-
-// Next Return the next cache entry. Should only be called when the cache is
-// valid and a next entry is available (the latter can be checked with
-// ExpectFile). Does not advance the cache.
-func (cache *includeCache) Next() *includeCacheEntry {
-	return cache.entries[cache.next]
-}
-
-// ExpectFile check that the next cache entry is about the given file. If it is
-// not, or no entry is available, the cache is invalidated. Does not
-// advance the cache.
-func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
-	if cache.valid && (cache.next >= len(cache.entries) || !cache.Next().Sourcefile.EqualsTo(sourcefile)) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
-	}
-}
-
-// ExpectEntry check that the next entry matches the given values. If so, advance
-// the cache. If not, the cache is invalidated. If the cache is
-// invalidated, or was already invalid, an entry with the given values
-// is appended.
-func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
-	entry := &includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
-	if cache.valid {
-		if cache.next < len(cache.entries) && cache.Next().Equals(entry) {
-			cache.next++
-		} else {
-			cache.valid = false
-			cache.entries = cache.entries[:cache.next]
-		}
-	}
-
-	if !cache.valid {
-		cache.entries = append(cache.entries, entry)
-	}
-}
-
-// ExpectEnd check that the cache is completely consumed. If not, the cache is
-// invalidated.
-func (cache *includeCache) ExpectEnd() {
-	if cache.valid && cache.next < len(cache.entries) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
-	}
-}
-
-// Read the cache from the given file
-func readCache(path *paths.Path) *includeCache {
-	bytes, err := path.ReadFile()
-	if err != nil {
-		// Return an empty, invalid cache
-		return &includeCache{}
-	}
-	result := &includeCache{}
-	err = json.Unmarshal(bytes, &result.entries)
-	if err != nil {
-		// Return an empty, invalid cache
-		return &includeCache{}
-	}
-	result.valid = true
-	return result
-}
-
-// Write the given cache to the given file if it is invalidated. If the
-// cache is still valid, just update the timestamps of the file.
-func writeCache(cache *includeCache, path *paths.Path) error {
-	// If the cache was still valid all the way, just touch its file
-	// (in case any source file changed without influencing the
-	// includes). If it was invalidated, overwrite the cache with
-	// the new contents.
-	if cache.valid {
-		path.Chtimes(time.Now(), time.Now())
-	} else {
-		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
-		if err != nil {
-			return err
-		}
-		err = path.WriteFile(bytes)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
