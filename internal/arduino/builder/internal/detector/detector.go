@@ -345,6 +345,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			if first && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
+			first = false
 		} else {
 			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
@@ -414,7 +415,6 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 					library.SourceDir, librariesBuildPath.Join(library.DirName), library.UtilityDir)
 			}
 		}
-		first = false
 	}
 }
 
