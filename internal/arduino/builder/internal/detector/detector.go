@@ -568,20 +568,3 @@ func LibrariesLoader(
 	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
-
-type includeCacheEntry struct {
-	Sourcefile  *paths.Path
-	Include     string
-	Includepath *paths.Path
-}
-
-// String fixdoc
-func (entry *includeCacheEntry) String() string {
-	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
-		entry.Sourcefile, entry.Include, entry.Includepath)
-}
-
-// Equals fixdoc
-func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
-	return entry.String() == other.String()
-}
