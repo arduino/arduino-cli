@@ -170,9 +170,8 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 	time.Sleep(100 * time.Millisecond)
 }
 
-// IncludeFolders fixdoc
+// IncludeFolders returns the list of include folders detected as needed.
 func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
-	// TODO should we do a deep copy?
 	return l.includeFolders
 }
 
