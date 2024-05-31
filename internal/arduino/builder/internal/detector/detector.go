@@ -51,7 +51,7 @@ type libraryResolutionResult struct {
 type SketchLibrariesDetector struct {
 	librariesResolver             *librariesresolver.Cpp
 	useCachedLibrariesResolution  bool
-	cache                         *includeCache
+	cache                         *detectorCache
 	onlyUpdateCompilationDatabase bool
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
@@ -71,6 +71,7 @@ func NewSketchLibrariesDetector(
 	return &SketchLibrariesDetector{
 		librariesResolver:             libsResolver,
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
+		cache:                         newDetectorCache(),
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
 		importedLibraries:             libraries.List{},
 		includeFolders:                paths.PathList{},
@@ -172,21 +173,10 @@ func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
 	return l.includeFolders
 }
 
-// appendIncludeFolder todo should rename this, probably after refactoring the
-// container_find_includes command.
-// Original comment:
-// Append the given folder to the include path and match or append it to
-// the cache. sourceFilePath and include indicate the source of this
-// include (e.g. what #include line in what file it was resolved from)
-// and should be the empty string for the default include folders, like
-// the core or variant.
-func (l *SketchLibrariesDetector) appendIncludeFolder(
-	sourceFilePath *paths.Path,
-	include string,
-	folder *paths.Path,
-) {
+// addIncludeFolder add the given folder to the include path.
+func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	l.includeFolders = append(l.includeFolders, folder)
-	l.cache.ExpectEntry(sourceFilePath, include, folder)
+	l.cache.Expect(&detectorCacheEntry{AddedIncludePath: folder})
 }
 
 // FindIncludes todo
@@ -242,11 +232,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 	}
 
 	cachePath := buildPath.Join("includes.cache")
-	l.cache = readCache(cachePath)
+	if err := l.cache.Load(cachePath); err != nil {
+		l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
+	}
 
-	l.appendIncludeFolder(nil, "", buildCorePath)
+	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
-		l.appendIncludeFolder(nil, "", buildVariantPath)
+		l.addIncludeFolder(buildVariantPath)
 	}
 
 	sourceFileQueue := &uniqueSourceFileQueue{}
@@ -266,7 +258,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		for !sourceFileQueue.Empty() {
-			err := l.findIncludesUntilDone(ctx, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
+			err := l.findMissingIncludesInCompilationUnit(ctx, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
 				return err
@@ -274,8 +266,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		// Finalize the cache
-		l.cache.ExpectEnd()
-		if err := l.cache.write(cachePath); err != nil {
+		if err := l.cache.Save(cachePath); err != nil {
 			return err
 		}
 	}
@@ -293,7 +284,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	return nil
 }
 
-func (l *SketchLibrariesDetector) findIncludesUntilDone(
+func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	ctx context.Context,
 	sourceFileQueue *uniqueSourceFileQueue,
 	buildProperties *properties.Map,
@@ -325,7 +316,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 
 	first := true
 	for {
-		l.cache.ExpectFile(sourcePath)
+		l.cache.Expect(&detectorCacheEntry{CompilingSourcePath: sourcePath})
 
 		// Libraries may require the "utility" directory to be added to the include
 		// search path, but only for the source code of the library, so we temporary
@@ -340,8 +331,8 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		var preprocFirstResult *runner.Result
 
 		var missingIncludeH string
-		if unchanged && l.cache.valid {
-			missingIncludeH = l.cache.Next().Include
+		if entry := l.cache.Peek(); unchanged && entry != nil && entry.MissingIncludeH != nil {
+			missingIncludeH = *entry.MissingIncludeH
 			if first && l.logger.Verbose() {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
@@ -367,9 +358,10 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			}
 		}
 
+		l.cache.Expect(&detectorCacheEntry{MissingIncludeH: &missingIncludeH})
+
 		if missingIncludeH == "" {
 			// No missing includes found, we're done
-			l.cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
@@ -402,7 +394,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		// include path and queue its source files for further
 		// include scanning
 		l.AppendImportedLibraries(library)
-		l.appendIncludeFolder(sourcePath, missingIncludeH, library.SourceDir)
+		l.addIncludeFolder(library.SourceDir)
 
 		if library.Precompiled && library.PrecompiledWithSources {
 			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
