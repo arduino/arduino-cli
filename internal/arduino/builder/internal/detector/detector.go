@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
-	"slices"
 	"strings"
 	"time"
 
@@ -262,7 +261,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err != nil {
 			return err
 		}
-		sourceFileQueue.push(mergedfile)
+		sourceFileQueue.Push(mergedfile)
 
 		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath)
 		srcSubfolderPath := sketchBuildPath.Join("src")
@@ -270,7 +269,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
 		}
 
-		for !sourceFileQueue.empty() {
+		for !sourceFileQueue.Empty() {
 			err := l.findIncludesUntilDone(ctx, cache, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
@@ -306,7 +305,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 	librariesBuildPath *paths.Path,
 	platformArch string,
 ) error {
-	sourceFile := sourceFileQueue.pop()
+	sourceFile := sourceFileQueue.Pop()
 	sourcePath := sourceFile.SourcePath()
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath()
@@ -446,7 +445,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 		if err != nil {
 			return err
 		}
-		sourceFileQueue.push(sourceFile)
+		sourceFileQueue.Push(sourceFile)
 	}
 
 	return nil
@@ -689,27 +688,4 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 		}
 	}
 	return nil
-}
-
-type uniqueSourceFileQueue []*sourceFile
-
-func (queue *uniqueSourceFileQueue) push(value *sourceFile) {
-	if !queue.contains(value) {
-		*queue = append(*queue, value)
-	}
-}
-
-func (queue uniqueSourceFileQueue) contains(target *sourceFile) bool {
-	return slices.ContainsFunc(queue, target.Equals)
-}
-
-func (queue *uniqueSourceFileQueue) pop() *sourceFile {
-	old := *queue
-	x := old[0]
-	*queue = old[1:]
-	return x
-}
-
-func (queue uniqueSourceFileQueue) empty() bool {
-	return len(queue) == 0
 }
