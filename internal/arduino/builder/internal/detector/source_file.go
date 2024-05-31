@@ -15,7 +15,11 @@
 
 package detector
 
-import "github.com/arduino/go-paths-helper"
+import (
+	"slices"
+
+	"github.com/arduino/go-paths-helper"
+)
 
 type sourceFile struct {
 	// Path to the source file within the sketch/library root folder
@@ -89,4 +93,32 @@ func (f *sourceFile) ObjectPath() *paths.Path {
 // DepfilePath return the full path to the dependency file.
 func (f *sourceFile) DepfilePath() *paths.Path {
 	return f.buildRoot.Join(f.relativePath.String() + ".d")
+}
+
+// uniqueSourceFileQueue is a queue of source files that does not allow duplicates.
+type uniqueSourceFileQueue []*sourceFile
+
+// Push adds a source file to the queue if it is not already present.
+func (queue *uniqueSourceFileQueue) Push(value *sourceFile) {
+	if !queue.Contains(value) {
+		*queue = append(*queue, value)
+	}
+}
+
+// Contains checks if the queue Contains a source file.
+func (queue uniqueSourceFileQueue) Contains(target *sourceFile) bool {
+	return slices.ContainsFunc(queue, target.Equals)
+}
+
+// Pop removes and returns the first element of the queue.
+func (queue *uniqueSourceFileQueue) Pop() *sourceFile {
+	old := *queue
+	x := old[0]
+	*queue = old[1:]
+	return x
+}
+
+// Empty returns true if the queue is Empty.
+func (queue uniqueSourceFileQueue) Empty() bool {
+	return len(queue) == 0
 }
