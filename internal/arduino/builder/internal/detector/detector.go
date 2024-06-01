@@ -321,7 +321,6 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 ) error {
 	sourceFile := sourceFileQueue.Pop()
 	sourcePath := sourceFile.SourcePath()
-	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath()
 	objPath := sourceFile.ObjectPath()
 
@@ -366,7 +365,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			}
 			first = false
 		} else {
-			preprocResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
+			preprocResult, preprocErr = preprocessor.GCC(ctx, sourcePath, paths.NullPath(), includeFolders, buildProperties)
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.WriteStdout(preprocResult.Stdout)
 			}
@@ -399,7 +398,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 
 			// If preprocess result came from cache, run the preprocessor to obtain the actual error to show
 			if preprocErr == nil || len(preprocResult.Stderr) == 0 {
-				preprocResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
+				preprocResult, preprocErr = preprocessor.GCC(ctx, sourcePath, paths.NullPath(), includeFolders, buildProperties)
 				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.WriteStdout(preprocResult.Stdout)
 				}
