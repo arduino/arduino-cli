@@ -122,7 +122,7 @@ func NewBuilder(
 	coreBuildCachePath *paths.Path,
 	extraCoreBuildCachePaths paths.PathList,
 	jobs int,
-	requestBuildProperties []string,
+	customBuildProperties []string,
 	hardwareDirs paths.PathList,
 	librariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
@@ -163,11 +163,11 @@ func NewBuilder(
 	}
 
 	// Add user provided custom build properties
-	customBuildProperties, err := properties.LoadFromSlice(requestBuildProperties)
-	if err != nil {
+	if p, err := properties.LoadFromSlice(customBuildProperties); err == nil {
+		buildProperties.Merge(p)
+	} else {
 		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
-	buildProperties.Merge(customBuildProperties)
 
 	sketchBuildPath, err := buildPath.Join("sketch").Abs()
 	if err != nil {
@@ -226,7 +226,7 @@ func NewBuilder(
 			hardwareDirs, librariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
-			requestBuildProperties,
+			customBuildProperties,
 			fqbn,
 			clean,
 			buildProperties.Get("compiler.optimization_flags"),
