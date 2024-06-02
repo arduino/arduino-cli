@@ -58,9 +58,6 @@ type Builder struct {
 	// Parallel processes
 	jobs int
 
-	// Custom build properties defined by user (line by line as "key=value" pairs)
-	customBuildProperties []string
-
 	// core related
 	coreBuildCachePath       *paths.Path
 	extraCoreBuildCachePaths paths.PathList
@@ -170,7 +167,6 @@ func NewBuilder(
 		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
 	buildProperties.Merge(customBuildProperties)
-	customBuildPropertiesArgs := append(requestBuildProperties, "build.warn_data_percentage=75")
 
 	sketchBuildPath, err := buildPath.Join("sketch").Abs()
 	if err != nil {
@@ -212,7 +208,6 @@ func NewBuilder(
 		coreBuildPath:                 coreBuildPath,
 		librariesBuildPath:            librariesBuildPath,
 		jobs:                          jobs,
-		customBuildProperties:         customBuildPropertiesArgs,
 		coreBuildCachePath:            coreBuildCachePath,
 		extraCoreBuildCachePaths:      extraCoreBuildCachePaths,
 		logger:                        logger,
@@ -230,7 +225,7 @@ func NewBuilder(
 			hardwareDirs, librariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
-			customBuildPropertiesArgs,
+			requestBuildProperties,
 			fqbn,
 			clean,
 			buildProperties.Get("compiler.optimization_flags"),
