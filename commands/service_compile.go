@@ -214,10 +214,6 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return err
 	}
 
-	actualPlatform := buildPlatform
-	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
-	otherLibrariesDirs.Add(s.settings.LibrariesDir())
-
 	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {
 		libsManager = lm
@@ -240,6 +236,11 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 			Message: &rpc.CompileResponse_Progress{Progress: p},
 		})
 	}
+
+	librariesDirs := paths.NewPathList(req.GetLibraries()...) // Array of collection of libraries directories
+	librariesDirs.Add(s.settings.LibrariesDir())
+	libraryDirs := paths.NewPathList(req.GetLibrary()...) // Array of single-library directories
+
 	sketchBuilder, err := builder.NewBuilder(
 		ctx,
 		sk,
@@ -251,16 +252,16 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
 		s.settings.HardwareDirectories(),
-		otherLibrariesDirs,
+		librariesDirs,
 		s.settings.IDEBuiltinLibrariesDir(),
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
 		req.GetCreateCompilationDatabaseOnly(),
-		targetPlatform, actualPlatform,
+		targetPlatform, buildPlatform,
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
-		paths.NewPathList(req.GetLibrary()...),
+		libraryDirs,
 		outStream, errStream, req.GetVerbose(), req.GetWarnings(),
 		progressCB,
 		pme.GetEnvVarsForSpawnedProcess(),
