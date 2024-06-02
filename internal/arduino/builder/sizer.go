@@ -199,14 +199,16 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 		return executableSectionsSize, errors.New(i18n.Tr("data section exceeds available space in board"))
 	}
 
+	warnDataPercentage := 75
 	if w := properties.Get("build.warn_data_percentage"); w != "" {
-		warnDataPercentage, err := strconv.Atoi(w)
-		if err != nil {
-			return executableSectionsSize, err
+		if p, err := strconv.Atoi(w); err == nil {
+			warnDataPercentage = p
+		} else {
+			b.logger.Warn(i18n.Tr("Invalid value for build.warn_data_percentage: %s", w))
 		}
-		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			b.logger.Warn(i18n.Tr("Low memory available, stability problems may occur."))
-		}
+	}
+	if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
+		b.logger.Warn(i18n.Tr("Low memory available, stability problems may occur."))
 	}
 
 	return executableSectionsSize, nil
