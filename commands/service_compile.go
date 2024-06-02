@@ -169,7 +169,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	if buildPathArg := req.GetBuildPath(); buildPathArg != "" {
 		buildPath = paths.New(req.GetBuildPath()).Canonical()
 		if in, _ := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
-			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
+			if sk.AdditionalFiles, err = removeBuildPathFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
 				return err
 			}
 		}
@@ -462,15 +462,15 @@ func maybePurgeBuildCache(compilationsBeforePurge uint, cacheTTL time.Duration) 
 	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
 }
 
-// removeBuildFromSketchFiles removes the files contained in the build directory from
+// removeBuildPathFromSketchFiles removes the files contained in the build directory from
 // the list of the sketch files
-func removeBuildFromSketchFiles(files paths.PathList, build *paths.Path) (paths.PathList, error) {
+func removeBuildPathFromSketchFiles(files paths.PathList, build *paths.Path) (paths.PathList, error) {
 	var res paths.PathList
 	ignored := false
 	for _, file := range files {
 		if isInside, _ := file.IsInsideDir(build); !isInside {
-			res = append(res, file)
-		} else if !ignored {
+			res.Add(file)
+		} else {
 			ignored = true
 		}
 	}
