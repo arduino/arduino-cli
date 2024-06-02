@@ -505,8 +505,11 @@ func findIncludeForOldCompilers(source string) string {
 func LibrariesLoader(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
-	builtInLibrariesDirs *paths.Path, libraryDirs, otherLibrariesDirs paths.PathList,
-	actualPlatform, targetPlatform *cores.PlatformRelease,
+	builtInLibrariesDir *paths.Path,
+	customLibraryDirs paths.PathList, // libraryDirs paths.PathList,
+	librariesDirs paths.PathList, // otherLibrariesDirs paths.PathList,
+	buildPlatform *cores.PlatformRelease,
+	targetPlatform *cores.PlatformRelease,
 ) (*librariesmanager.LibrariesManager, *librariesresolver.Cpp, []byte, error) {
 	verboseOut := &bytes.Buffer{}
 	lm := librariesManager
@@ -518,21 +521,20 @@ func LibrariesLoader(
 	if librariesManager == nil {
 		lmb := librariesmanager.NewBuilder()
 
-		builtInLibrariesFolders := builtInLibrariesDirs
-		if builtInLibrariesFolders != nil {
-			if err := builtInLibrariesFolders.ToAbs(); err != nil {
+		if builtInLibrariesDir != nil {
+			if err := builtInLibrariesDir.ToAbs(); err != nil {
 				return nil, nil, nil, err
 			}
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
-				Path:     builtInLibrariesFolders,
+				Path:     builtInLibrariesDir,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
-		if actualPlatform != targetPlatform {
+		if buildPlatform != targetPlatform {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
-				PlatformRelease: actualPlatform,
-				Path:            actualPlatform.GetLibrariesDir(),
+				PlatformRelease: buildPlatform,
+				Path:            buildPlatform.GetLibrariesDir(),
 				Location:        libraries.ReferencedPlatformBuiltIn,
 			})
 		}
@@ -542,7 +544,7 @@ func LibrariesLoader(
 			Location:        libraries.PlatformBuiltIn,
 		})
 
-		librariesFolders := otherLibrariesDirs
+		librariesFolders := librariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
 			return nil, nil, nil, err
 		}
@@ -553,7 +555,7 @@ func LibrariesLoader(
 			})
 		}
 
-		for _, dir := range libraryDirs {
+		for _, dir := range customLibraryDirs {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:            dir,
 				Location:        libraries.Unmanaged,
@@ -563,18 +565,12 @@ func LibrariesLoader(
 
 		newLm, libsLoadingWarnings := lmb.Build()
 		for _, status := range libsLoadingWarnings {
-			// With the refactoring of the initialization step of the CLI we changed how
-			// errors are returned when loading platforms and libraries, that meant returning a list of
-			// errors instead of a single one to enhance the experience for the user.
-			// I have no intention right now to start a refactoring of the legacy package too, so
-			// here's this shitty solution for now.
-			// When we're gonna refactor the legacy package this will be gone.
 			verboseOut.Write([]byte(status.Message()))
 		}
 		lm = newLm
 	}
 
 	allLibs := lm.FindAllInstalled()
-	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
+	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, buildPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }

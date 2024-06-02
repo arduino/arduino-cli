@@ -144,13 +144,11 @@ func NewBuilder(
 	}
 	if sk != nil {
 		buildProperties.SetPath("sketch_path", sk.FullPath)
+		buildProperties.Set("build.project_name", sk.MainFile.Base())
+		buildProperties.SetPath("build.source.path", sk.FullPath)
 	}
 	if buildPath != nil {
 		buildProperties.SetPath("build.path", buildPath)
-	}
-	if sk != nil {
-		buildProperties.Set("build.project_name", sk.MainFile.Base())
-		buildProperties.SetPath("build.source.path", sk.FullPath)
 	}
 	if optimizeForDebug {
 		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {
@@ -187,16 +185,20 @@ func NewBuilder(
 	}
 
 	log := logger.New(stdout, stderr, verbosity, warningsLevel)
-	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
-		useCachedLibrariesResolution, librariesManager,
-		builtInLibrariesDirs, customLibraryDirs, librariesDirs,
-		buildPlatform, targetPlatform,
+	libsManager, libsResolver, libsLoadingWarnings, err := detector.LibrariesLoader(
+		useCachedLibrariesResolution,
+		librariesManager,
+		builtInLibrariesDirs,
+		customLibraryDirs,
+		librariesDirs,
+		buildPlatform,
+		targetPlatform,
 	)
 	if err != nil {
 		return nil, err
 	}
 	if log.VerbosityLevel() == logger.VerbosityVerbose {
-		log.Warn(string(verboseOut))
+		log.Warn(string(libsLoadingWarnings))
 	}
 
 	diagnosticStore := diagnostics.NewStore()
@@ -223,8 +225,10 @@ func NewBuilder(
 		buildPlatform:                 buildPlatform,
 		toolEnv:                       toolEnv,
 		buildOptions: newBuildOptions(
-			hardwareDirs, librariesDirs,
-			builtInLibrariesDirs, buildPath,
+			hardwareDirs,
+			librariesDirs,
+			builtInLibrariesDirs,
+			buildPath,
 			sk,
 			customBuildProperties,
 			fqbn,
