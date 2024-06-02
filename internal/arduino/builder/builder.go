@@ -143,13 +143,11 @@ func NewBuilder(
 	}
 	if sk != nil {
 		buildProperties.SetPath("sketch_path", sk.FullPath)
+		buildProperties.Set("build.project_name", sk.MainFile.Base())
+		buildProperties.SetPath("build.source.path", sk.FullPath)
 	}
 	if buildPath != nil {
 		buildProperties.SetPath("build.path", buildPath)
-	}
-	if sk != nil {
-		buildProperties.Set("build.project_name", sk.MainFile.Base())
-		buildProperties.SetPath("build.source.path", sk.FullPath)
 	}
 	if optimizeForDebug {
 		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {
@@ -186,16 +184,20 @@ func NewBuilder(
 	}
 
 	logger := logger.New(stdout, stderr, verbose, warningsLevel)
-	libsResolver, verboseOut, err := detector.LibrariesLoader(
-		useCachedLibrariesResolution, librariesManager,
-		builtInLibrariesDirs, customLibraryDirs, librariesDirs,
-		buildPlatform, targetPlatform,
+	libsResolver, libsLoadingWarnings, err := detector.LibrariesLoader(
+		useCachedLibrariesResolution,
+		librariesManager,
+		builtInLibrariesDirs,
+		customLibraryDirs,
+		librariesDirs,
+		buildPlatform,
+		targetPlatform,
 	)
 	if err != nil {
 		return nil, err
 	}
 	if logger.Verbose() {
-		logger.Warn(string(verboseOut))
+		logger.Warn(string(libsLoadingWarnings))
 	}
 
 	diagnosticStore := diagnostics.NewStore()
@@ -222,8 +224,10 @@ func NewBuilder(
 		buildPlatform:                 buildPlatform,
 		toolEnv:                       toolEnv,
 		buildOptions: newBuildOptions(
-			hardwareDirs, librariesDirs,
-			builtInLibrariesDirs, buildPath,
+			hardwareDirs,
+			librariesDirs,
+			builtInLibrariesDirs,
+			buildPath,
 			sk,
 			customBuildProperties,
 			fqbn,
