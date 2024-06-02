@@ -164,7 +164,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 				b.logger.Info(i18n.Tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
 				b.logger.Info(i18n.Tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
-					b.actualPlatform,
+					b.buildPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
 				b.logger.Info(i18n.Tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
