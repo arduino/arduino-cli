@@ -89,7 +89,7 @@ type Builder struct {
 	lineOffset int
 
 	targetPlatform *cores.PlatformRelease
-	actualPlatform *cores.PlatformRelease
+	buildPlatform  *cores.PlatformRelease
 
 	buildArtifacts *buildArtifacts
 
@@ -126,18 +126,19 @@ func NewBuilder(
 	extraCoreBuildCachePaths paths.PathList,
 	jobs int,
 	requestBuildProperties []string,
-	hardwareDirs, otherLibrariesDirs paths.PathList,
+	hardwareDirs paths.PathList,
+	librariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
 	fqbn *fqbn.FQBN,
 	clean bool,
 	sourceOverrides map[string]string,
 	onlyUpdateCompilationDatabase bool,
-	targetPlatform, actualPlatform *cores.PlatformRelease,
+	targetPlatform, buildPlatform *cores.PlatformRelease,
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
-	libraryDirs paths.PathList,
+	customLibraryDirs paths.PathList,
 	stdout, stderr io.Writer, verbosity logger.Verbosity, warningsLevel string,
-	progresCB rpc.TaskProgressCB,
+	progressCB rpc.TaskProgressCB,
 	toolEnv []string,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
@@ -192,8 +193,8 @@ func NewBuilder(
 	log := logger.New(stdout, stderr, verbosity, warningsLevel)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, librariesManager,
-		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
-		actualPlatform, targetPlatform,
+		builtInLibrariesDirs, customLibraryDirs, librariesDirs,
+		buildPlatform, targetPlatform,
 	)
 	if err != nil {
 		return nil, err
@@ -220,14 +221,14 @@ func NewBuilder(
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
-		Progress:                      progress.New(progresCB),
+		Progress:                      progress.New(progressCB),
 		executableSectionsSize:        []ExecutableSectionSize{},
 		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
-		actualPlatform:                actualPlatform,
+		buildPlatform:                 buildPlatform,
 		toolEnv:                       toolEnv,
 		buildOptions: newBuildOptions(
-			hardwareDirs, otherLibrariesDirs,
+			hardwareDirs, librariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
 			customBuildPropertiesArgs,
