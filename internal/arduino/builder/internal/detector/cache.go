@@ -28,17 +28,17 @@ type detectorCache struct {
 }
 
 type detectorCacheEntry struct {
-	AddedIncludePath    *paths.Path `json:"added_include_path,omitempty"`
-	CompilingSourcePath *paths.Path `json:"compiling_source_path,omitempty"`
-	MissingIncludeH     *string     `json:"missing_include_h,omitempty"`
+	AddedIncludePath *paths.Path `json:"added_include_path,omitempty"`
+	Compile          *sourceFile `json:"compile,omitempty"`
+	MissingIncludeH  *string     `json:"missing_include_h,omitempty"`
 }
 
 func (e *detectorCacheEntry) String() string {
 	if e.AddedIncludePath != nil {
 		return "Added include path: " + e.AddedIncludePath.String()
 	}
-	if e.CompilingSourcePath != nil {
-		return "Compiling source path: " + e.CompilingSourcePath.String()
+	if e.Compile != nil {
+		return "Compiling: " + e.Compile.String()
 	}
 	if e.MissingIncludeH != nil {
 		if *e.MissingIncludeH == "" {
