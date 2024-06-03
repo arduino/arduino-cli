@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -78,6 +79,11 @@ func makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncl
 		ExtraIncludePath: extraIncludePath,
 	}
 	return res, nil
+}
+
+// ObjFileIsUpToDate checks if the compile object file is up to date.
+func (f *sourceFile) ObjFileIsUpToDate() (unchanged bool, err error) {
+	return utils.ObjFileIsUpToDate(f.SourcePath, f.ObjectPath, f.DepfilePath)
 }
 
 // uniqueSourceFileQueue is a queue of source files that does not allow duplicates.

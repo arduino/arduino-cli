@@ -321,8 +321,6 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 ) error {
 	sourceFile := sourceFileQueue.Pop()
 	sourcePath := sourceFile.SourcePath
-	depPath := sourceFile.DepfilePath
-	objPath := sourceFile.ObjectPath
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -336,7 +334,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := utils.ObjFileIsUpToDate(sourcePath, objPath, depPath)
+	unchanged, err := sourceFile.ObjFileIsUpToDate()
 	if err != nil {
 		return err
 	}
