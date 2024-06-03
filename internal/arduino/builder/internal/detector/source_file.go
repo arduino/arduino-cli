@@ -16,83 +16,68 @@
 package detector
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/arduino/go-paths-helper"
 )
 
 type sourceFile struct {
-	// Path to the source file within the sketch/library root folder
-	relativePath *paths.Path
+	// SourcePath is the path to the source file
+	SourcePath *paths.Path `json:"source_path"`
+
+	// ObjectPath is the path to the object file that will be generated
+	ObjectPath *paths.Path `json:"object_path"`
+
+	// DepfilePath is the path to the dependency file that will be generated
+	DepfilePath *paths.Path `json:"depfile_path"`
 
 	// ExtraIncludePath contains an extra include path that must be
 	// used to compile this source file.
 	// This is mainly used for source files that comes from old-style libraries
 	// (Arduino IDE <1.5) requiring an extra include path to the "utility" folder.
-	extraIncludePath *paths.Path
-
-	// The source root for the given origin, where its source files
-	// can be found. Prepending this to SourceFile.RelativePath will give
-	// the full path to that source file.
-	sourceRoot *paths.Path
-
-	// The build root for the given origin, where build products will
-	// be placed. Any directories inside SourceFile.RelativePath will be
-	// appended here.
-	buildRoot *paths.Path
+	ExtraIncludePath *paths.Path `json:"extra_include_path,omitempty"`
 }
 
-// Equals fixdoc
+func (f *sourceFile) String() string {
+	return fmt.Sprintf("SourcePath:%s SourceRoot:%s BuildRoot:%s ExtraInclude:%s",
+		f.SourcePath, f.ObjectPath, f.DepfilePath, f.ExtraIncludePath)
+}
+
+// Equals checks if a sourceFile is equal to another.
 func (f *sourceFile) Equals(g *sourceFile) bool {
-	return f.relativePath.EqualsTo(g.relativePath) &&
-		f.buildRoot.EqualsTo(g.buildRoot) &&
-		f.sourceRoot.EqualsTo(g.sourceRoot)
+	return f.SourcePath.EqualsTo(g.SourcePath) &&
+		f.ObjectPath.EqualsTo(g.ObjectPath) &&
+		f.DepfilePath.EqualsTo(g.DepfilePath) &&
+		((f.ExtraIncludePath == nil && g.ExtraIncludePath == nil) ||
+			(f.ExtraIncludePath != nil && g.ExtraIncludePath != nil && f.ExtraIncludePath.EqualsTo(g.ExtraIncludePath)))
 }
 
 // makeSourceFile create a sourceFile object for the given source file path.
 // The given sourceFilePath can be absolute, or relative within the sourceRoot root folder.
-func makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePath ...*paths.Path) (*sourceFile, error) {
-	res := &sourceFile{
-		buildRoot:  buildRoot,
-		sourceRoot: sourceRoot,
-	}
-
-	if len(extraIncludePath) > 1 {
+func makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePaths ...*paths.Path) (*sourceFile, error) {
+	if len(extraIncludePaths) > 1 {
 		panic("only one extra include path allowed")
 	}
-	if len(extraIncludePath) > 0 {
-		res.extraIncludePath = extraIncludePath[0]
+	var extraIncludePath *paths.Path
+	if len(extraIncludePaths) > 0 {
+		extraIncludePath = extraIncludePaths[0]
 	}
 
 	if sourceFilePath.IsAbs() {
 		var err error
-		sourceFilePath, err = res.sourceRoot.RelTo(sourceFilePath)
+		sourceFilePath, err = sourceRoot.RelTo(sourceFilePath)
 		if err != nil {
 			return nil, err
 		}
 	}
-	res.relativePath = sourceFilePath
+	res := &sourceFile{
+		SourcePath:       sourceRoot.JoinPath(sourceFilePath),
+		ObjectPath:       buildRoot.Join(sourceFilePath.String() + ".o"),
+		DepfilePath:      buildRoot.Join(sourceFilePath.String() + ".d"),
+		ExtraIncludePath: extraIncludePath,
+	}
 	return res, nil
-}
-
-// ExtraIncludePath returns the extra include path required to build the source file.
-func (f *sourceFile) ExtraIncludePath() *paths.Path {
-	return f.extraIncludePath
-}
-
-// SourcePath return the full path to the source file.
-func (f *sourceFile) SourcePath() *paths.Path {
-	return f.sourceRoot.JoinPath(f.relativePath)
-}
-
-// ObjectPath return the full path to the object file.
-func (f *sourceFile) ObjectPath() *paths.Path {
-	return f.buildRoot.Join(f.relativePath.String() + ".o")
-}
-
-// DepfilePath return the full path to the dependency file.
-func (f *sourceFile) DepfilePath() *paths.Path {
-	return f.buildRoot.Join(f.relativePath.String() + ".d")
 }
 
 // uniqueSourceFileQueue is a queue of source files that does not allow duplicates.

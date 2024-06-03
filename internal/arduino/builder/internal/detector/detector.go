@@ -320,9 +320,9 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	platformArch string,
 ) error {
 	sourceFile := sourceFileQueue.Pop()
-	sourcePath := sourceFile.SourcePath()
-	depPath := sourceFile.DepfilePath()
-	objPath := sourceFile.ObjectPath()
+	sourcePath := sourceFile.SourcePath
+	depPath := sourceFile.DepfilePath
+	objPath := sourceFile.ObjectPath
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -343,14 +343,14 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 
 	first := true
 	for {
-		l.cache.Expect(&detectorCacheEntry{CompilingSourcePath: sourcePath})
+		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile})
 
 		// Libraries may require the "utility" directory to be added to the include
 		// search path, but only for the source code of the library, so we temporary
 		// copy the current search path list and add the library' utility directory
 		// if needed.
 		includeFolders := l.includeFolders
-		if extraInclude := sourceFile.ExtraIncludePath(); extraInclude != nil {
+		if extraInclude := sourceFile.ExtraIncludePath; extraInclude != nil {
 			includeFolders = append(includeFolders, extraInclude)
 		}
 
