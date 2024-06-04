@@ -66,18 +66,14 @@ func PreprocessSketchWithArduinoPreprocessor(
 	}
 
 	commandLine := arduinoPreprocessorProperties.ExpandPropsInString(pattern)
-	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
-	if err != nil {
-		return nil, err
-	}
-
-	command, err := paths.NewProcess(nil, parts...)
+	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
+	command, err := paths.NewProcess(nil, args...)
 	if err != nil {
 		return nil, err
 	}
 	if runtime.GOOS == "windows" {
 		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)
-		command.SetDir(filepath.VolumeName(parts[0]) + "/")
+		command.SetDir(filepath.VolumeName(args[0]) + "/")
 	}
 
 	verboseOut.WriteString(commandLine)
