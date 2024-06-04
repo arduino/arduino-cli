@@ -66,10 +66,7 @@ func GCC(
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
 	commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
-	args, err := properties.SplitQuotedString(commandLine, `"'`, false)
-	if err != nil {
-		return nil, err
-	}
+	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
