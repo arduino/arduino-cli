@@ -41,7 +41,7 @@ import (
 
 // CompilerServerToStreams creates a gRPC CompileServer that sends the responses to the provided streams.
 // The returned callback function can be used to retrieve the builder result after the compilation is done.
-func CompilerServerToStreams(ctx context.Context, stdOut, stderr io.Writer) (server rpc.ArduinoCoreService_CompileServer, resultCB func() *rpc.BuilderResult) {
+func CompilerServerToStreams(ctx context.Context, stdOut, stderr io.Writer, progressCB rpc.TaskProgressCB) (server rpc.ArduinoCoreService_CompileServer, resultCB func() *rpc.BuilderResult) {
 	var builderResult *rpc.BuilderResult
 	stream := streamResponseToCallback(ctx, func(resp *rpc.CompileResponse) error {
 		if out := resp.GetOutStream(); len(out) > 0 {
@@ -56,6 +56,11 @@ func CompilerServerToStreams(ctx context.Context, stdOut, stderr io.Writer) (ser
 		}
 		if result := resp.GetResult(); result != nil {
 			builderResult = result
+		}
+		if progress := resp.GetProgress(); progress != nil {
+			if progressCB != nil {
+				progressCB(progress)
+			}
 		}
 		return nil
 	})
