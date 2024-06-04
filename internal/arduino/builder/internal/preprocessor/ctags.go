@@ -194,19 +194,15 @@ func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *prop
 	}
 
 	commandLine := ctagsBuildProperties.ExpandPropsInString(pattern)
-	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
-	if err != nil {
-		return nil, nil, err
-	}
-	proc, err := paths.NewProcess(nil, parts...)
+	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
+	proc, err := paths.NewProcess(nil, args...)
 	if err != nil {
 		return nil, nil, err
 	}
 	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
 
 	// Append ctags arguments to stderr
-	args := fmt.Sprintln(strings.Join(parts, " "))
-	stderr = append([]byte(args), stderr...)
+	stderr = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stderr...)
 	return stdout, stderr, err
 }
 

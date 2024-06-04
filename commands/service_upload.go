@@ -720,10 +720,7 @@ func runTool(ctx context.Context, recipeID string, props *properties.Map, outStr
 		return errors.New(i18n.Tr("no upload port provided"))
 	}
 	cmdLine := props.ExpandPropsInString(recipe)
-	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
-	if err != nil {
-		return errors.New(i18n.Tr("invalid recipe '%[1]s': %[2]s", recipe, err))
-	}
+	cmdArgs, _ := properties.SplitQuotedString(cmdLine, `"'`, false)
 
 	// Run Tool
 	logrus.WithField("phase", "upload").Tracef("Executing upload tool: %s", cmdLine)
