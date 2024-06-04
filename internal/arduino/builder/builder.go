@@ -492,10 +492,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
-	if err != nil {
-		return nil, err
-	}
+	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative
@@ -503,18 +500,18 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 	var relativePath string
 	if len(commandLine) > 30000 {
 		relativePath = buildProperties.Get("build.path")
-		for i, arg := range parts {
+		for i, arg := range args {
 			if _, err := os.Stat(arg); os.IsNotExist(err) {
 				continue
 			}
 			rel, err := filepath.Rel(relativePath, arg)
 			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
-				parts[i] = rel
+				args[i] = rel
 			}
 		}
 	}
 
-	command, err := paths.NewProcess(b.toolEnv, parts...)
+	command, err := paths.NewProcess(b.toolEnv, args...)
 	if err != nil {
 		return nil, err
 	}
