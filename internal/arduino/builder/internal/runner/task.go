@@ -15,9 +15,46 @@
 
 package runner
 
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/arduino/go-paths-helper"
+)
+
+// Task is a command to be executed
+type Task struct {
+	Args []string `json:"args"`
+}
+
+// NewTask creates a new Task
+func NewTask(args ...string) *Task {
+	return &Task{Args: args}
+}
+
+func (t *Task) String() string {
+	return strings.Join(t.Args, " ")
+}
+
 // Result contains the output of a command execution
 type Result struct {
 	Args   []string
 	Stdout []byte
 	Stderr []byte
+	Error  error
+}
+
+// Run executes the command and returns the result
+func (t *Task) Run(ctx context.Context) *Result {
+	proc, err := paths.NewProcess(nil, t.Args...)
+	if err != nil {
+		return &Result{Args: t.Args, Error: err}
+	}
+	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
+
+	// Append arguments to stdout
+	stdout = append([]byte(fmt.Sprintln(t)), stdout...)
+
+	return &Result{Args: proc.GetArgs(), Stdout: stdout, Stderr: stderr, Error: err}
 }
