@@ -52,20 +52,20 @@ func PreprocessSketchWithArduinoPreprocessor(
 		return nil, err
 	}
 
-	arduiniPreprocessorProperties := properties.NewMap()
-	arduiniPreprocessorProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
-	arduiniPreprocessorProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
-	arduiniPreprocessorProperties.Set("tools.arduino-preprocessor.pattern", `"{cmd.path}" "{source_file}" -- -std=gnu++11`)
-	arduiniPreprocessorProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
-	arduiniPreprocessorProperties.Merge(buildProperties)
-	arduiniPreprocessorProperties.Merge(arduiniPreprocessorProperties.SubTree("tools").SubTree("arduino-preprocessor"))
-	arduiniPreprocessorProperties.SetPath("source_file", targetFile)
-	pattern := arduiniPreprocessorProperties.Get("pattern")
+	arduinoPreprocessorProperties := properties.NewMap()
+	arduinoPreprocessorProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
+	arduinoPreprocessorProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
+	arduinoPreprocessorProperties.Set("tools.arduino-preprocessor.pattern", `"{cmd.path}" "{source_file}" -- -std=gnu++11`)
+	arduinoPreprocessorProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	arduinoPreprocessorProperties.Merge(buildProperties)
+	arduinoPreprocessorProperties.Merge(arduinoPreprocessorProperties.SubTree("tools").SubTree("arduino-preprocessor"))
+	arduinoPreprocessorProperties.SetPath("source_file", targetFile)
+	pattern := arduinoPreprocessorProperties.Get("pattern")
 	if pattern == "" {
 		return nil, errors.New(i18n.Tr("arduino-preprocessor pattern is missing"))
 	}
 
-	commandLine := arduiniPreprocessorProperties.ExpandPropsInString(pattern)
+	commandLine := arduinoPreprocessorProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
 		return nil, err
