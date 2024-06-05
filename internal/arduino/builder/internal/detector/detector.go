@@ -59,6 +59,7 @@ type SketchLibrariesDetector struct {
 	includeFolders                paths.PathList
 	logger                        *logger.BuilderLogger
 	diagnosticStore               *diagnostics.Store
+	preRunner                     *runner.Runner
 }
 
 // NewSketchLibrariesDetector todo
@@ -254,6 +255,18 @@ func (l *SketchLibrariesDetector) findIncludes(
 		l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
 	}
 
+	// Pre-run cache entries
+	l.preRunner = runner.New(ctx)
+	for _, entry := range l.cache.EntriesAhead() {
+		if entry.Compile != nil && entry.CompileTask != nil {
+			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
+			if !upToDate {
+				l.preRunner.Enqueue(entry.CompileTask)
+			}
+		}
+	}
+	defer l.preRunner.Cancel()
+
 	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
 		l.addIncludeFolder(buildVariantPath)
@@ -290,6 +303,15 @@ func (l *SketchLibrariesDetector) findIncludes(
 			if err != nil {
 				cachePath.Remove()
 				return err
+			}
+
+			// Create a new pre-runner if the previous one was cancelled
+			if l.preRunner == nil {
+				l.preRunner = runner.New(ctx)
+				// Push in the remainder of the queue
+				for _, sourceFile := range *sourceFileQueue {
+					l.preRunner.Enqueue(l.gccPreprocessTask(sourceFile, buildProperties))
+				}
 			}
 		}
 
@@ -354,9 +376,9 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 
 	first := true
 	for {
-		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile})
-
 		preprocTask := l.gccPreprocessTask(sourceFile, buildProperties)
+		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile, CompileTask: preprocTask})
+
 		var preprocErr error
 		var preprocResult *runner.Result
 
@@ -368,8 +390,27 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			}
 			first = false
 		} else {
-			preprocResult = preprocTask.Run(ctx)
-			preprocErr = preprocResult.Error
+			if l.preRunner != nil {
+				if r := l.preRunner.Results(preprocTask); r != nil {
+					preprocResult = r
+					preprocErr = preprocResult.Error
+				}
+			}
+			if preprocResult == nil {
+				// The pre-runner missed this task, maybe the cache is outdated
+				// or maybe the source code changed.
+
+				// Stop the pre-runner
+				if l.preRunner != nil {
+					preRunner := l.preRunner
+					l.preRunner = nil
+					go preRunner.Cancel()
+				}
+
+				// Run the actual preprocessor
+				preprocResult = preprocTask.Run(ctx)
+				preprocErr = preprocResult.Error
+			}
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.WriteStdout(preprocResult.Stdout)
 			}
