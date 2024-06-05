@@ -57,10 +57,10 @@ func PreprocessSketchWithCtags(
 
 	// Run GCC preprocessor
 	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	result, err := GCC(ctx, sourceFile, ctagsTarget, includes, buildProperties)
+	result := GCC(sourceFile, ctagsTarget, includes, buildProperties).Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
-	if err != nil {
+	if err := result.Error; err != nil {
 		if !onlyUpdateCompilationDatabase {
 			return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 		}
