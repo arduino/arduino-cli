@@ -284,6 +284,19 @@ func (l *SketchLibrariesDetector) findIncludes(
 	return nil
 }
 
+func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buildProperties *properties.Map) *runner.Task {
+	// Libraries may require the "utility" directory to be added to the include
+	// search path, but only for the source code of the library, so we temporary
+	// copy the current search path list and add the library' utility directory
+	// if needed.
+	includeFolders := l.includeFolders
+	if extraInclude := sourceFile.ExtraIncludePath; extraInclude != nil {
+		includeFolders = append(includeFolders, extraInclude)
+	}
+
+	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties)
+}
+
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	ctx context.Context,
 	sourceFileQueue *uniqueSourceFileQueue,
@@ -315,15 +328,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	for {
 		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile})
 
-		// Libraries may require the "utility" directory to be added to the include
-		// search path, but only for the source code of the library, so we temporary
-		// copy the current search path list and add the library' utility directory
-		// if needed.
-		includeFolders := l.includeFolders
-		if extraInclude := sourceFile.ExtraIncludePath; extraInclude != nil {
-			includeFolders = append(includeFolders, extraInclude)
-		}
-
+		preprocTask := l.gccPreprocessTask(sourceFile, buildProperties)
 		var preprocErr error
 		var preprocResult *runner.Result
 
@@ -335,7 +340,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			}
 			first = false
 		} else {
-			preprocResult, preprocErr = preprocessor.GCC(ctx, sourcePath, paths.NullPath(), includeFolders, buildProperties)
+			preprocResult = preprocTask.Run(ctx)
+			preprocErr = preprocResult.Error
 			if l.logger.Verbose() {
 				l.logger.WriteStdout(preprocResult.Stdout)
 			}
@@ -368,7 +374,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 
 			// If preprocess result came from cache, run the preprocessor to obtain the actual error to show
 			if preprocErr == nil || len(preprocResult.Stderr) == 0 {
-				preprocResult, preprocErr = preprocessor.GCC(ctx, sourcePath, paths.NullPath(), includeFolders, buildProperties)
+				preprocResult = preprocTask.Run(ctx)
+				preprocErr = preprocResult.Error
 				if l.logger.Verbose() {
 					l.logger.WriteStdout(preprocResult.Stdout)
 				}

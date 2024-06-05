@@ -16,15 +16,11 @@
 package preprocessor
 
 import (
-	"context"
-	"errors"
-	"fmt"
 	"strings"
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -32,10 +28,9 @@ import (
 // GCC performs a run of the gcc preprocess (macro/includes expansion). The function outputs the result
 // to targetFilePath. Returns the stdout/stderr of gcc if any.
 func GCC(
-	ctx context.Context,
 	sourceFilePath, targetFilePath *paths.Path,
 	includes paths.PathList, buildProperties *properties.Map,
-) (*runner.Result, error) {
+) *runner.Task {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	gccBuildProperties.Merge(buildProperties)
@@ -59,10 +54,6 @@ func GCC(
 	}
 
 	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
-	if pattern == "" {
-		return nil, errors.New(i18n.Tr("%s pattern is missing", gccPreprocRecipeProperty))
-	}
-
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
 	commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
@@ -70,15 +61,5 @@ func GCC(
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
 	args = f.Filter(args, f.NotEquals("-MMD"))
-
-	proc, err := paths.NewProcess(nil, args...)
-	if err != nil {
-		return nil, err
-	}
-	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
-
-	// Append gcc arguments to stdout
-	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)
-
-	return &runner.Result{Args: proc.GetArgs(), Stdout: stdout, Stderr: stderr}, err
+	return runner.NewTask(args...)
 }
