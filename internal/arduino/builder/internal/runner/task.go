@@ -16,21 +16,29 @@
 package runner
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
 // Task is a command to be executed
 type Task struct {
-	Args []string `json:"args"`
+	Args        []string `json:"args"`
+	LimitStderr int      `json:"-"`
 }
 
 // NewTask creates a new Task
 func NewTask(args ...string) *Task {
 	return &Task{Args: args}
+}
+
+// NewTaskWithLimitedStderr creates a new Task with a hard-limit on the stderr output
+func NewTaskWithLimitedStderr(limit int, args ...string) *Task {
+	return &Task{Args: args, LimitStderr: limit}
 }
 
 func (t *Task) String() string {
@@ -51,10 +59,45 @@ func (t *Task) Run(ctx context.Context) *Result {
 	if err != nil {
 		return &Result{Args: t.Args, Error: err}
 	}
-	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
+
+	stdout := bytes.NewBuffer(nil)
+	stderr := bytes.NewBuffer(nil)
+	proc.RedirectStdoutTo(stdout)
+
+	if t.LimitStderr > 0 {
+		innerCtx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		count := 0
+		stderrLimited := writerFunc(func(p []byte) (int, error) {
+			n, err := stderr.Write(p)
+			count += n
+			if count > t.LimitStderr {
+				fmt.Fprintln(stderr, i18n.Tr("Compiler error output has been truncated."))
+				cancel()
+			}
+			return n, err
+		})
+
+		ctx = innerCtx
+		proc.RedirectStderrTo(stderrLimited)
+	} else {
+		proc.RedirectStderrTo(stderr)
+	}
 
 	// Append arguments to stdout
-	stdout = append([]byte(fmt.Sprintln(t)), stdout...)
+	fmt.Fprintln(stdout, t.String())
 
-	return &Result{Args: proc.GetArgs(), Stdout: stdout, Stderr: stderr, Error: err}
+	// Execute command and wait for the process to finish
+	if err := proc.Start(); err != nil {
+		return &Result{Error: err}
+	}
+	err = proc.WaitWithinContext(ctx)
+	return &Result{Args: proc.GetArgs(), Stdout: stdout.Bytes(), Stderr: stderr.Bytes(), Error: err}
+}
+
+type writerFunc func(p []byte) (n int, err error)
+
+func (f writerFunc) Write(p []byte) (n int, err error) {
+	return f(p)
 }

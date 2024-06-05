@@ -45,11 +45,11 @@ func PreprocessSketchWithArduinoPreprocessor(
 
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
-	gccResult, err := GCC(ctx, sourceFile, targetFile, includeFolders, buildProperties)
+	gccResult := GCC(sourceFile, targetFile, includeFolders, buildProperties).Run(ctx)
 	verboseOut.Write(gccResult.Stdout)
 	verboseOut.Write(gccResult.Stderr)
-	if err != nil {
-		return nil, err
+	if gccResult.Error != nil {
+		return nil, gccResult.Error
 	}
 
 	arduinoPreprocessorProperties := properties.NewMap()
