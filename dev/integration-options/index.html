@@ -1456,8 +1456,8 @@
 compile, verify and upload sketches to Arduino boards and that’s capable of managing all the software and tools needed
 in the process. But don’t get fooled by its name: Arduino CLI can do much more than the average console application, as
 shown by <a href="https://github.com/arduino/arduino-ide">Arduino IDE 2.x</a> and <a href="https://cloud.arduino.cc/home">Arduino Cloud</a>, which rely on it for similar purposes but each one in a
-completely different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining
-how we designed the software so that it can be effectively leveraged under different scenarios.</p>
+completely different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining how
+we designed the software so that it can be effectively leveraged under different scenarios.</p>
 <h2 id="the-first-pillar-command-line-interface">The first pillar: command line interface<a class="headerlink" href="#the-first-pillar-command-line-interface" title="Permanent link">&para;</a></h2>
 <h3 id="console-applications-for-humans">Console applications for humans<a class="headerlink" href="#console-applications-for-humans" title="Permanent link">&para;</a></h3>
 <p>As you might expect, the first way to use the Arduino CLI is from a terminal and by a human, and user experience plays a
@@ -1564,15 +1564,14 @@ using the <code>jq</code> tools may look like:</p>
 }
 </code></pre></div>
 <p>Even if not related to software design, one last feature that’s worth mentioning is the availability of a one-line
-<a href="../installation/#use-the-install-script">installation script</a> that can be used to make the latest version of the Arduino CLI available on most systems with an
-HTTP client like curl or wget and a shell like bash.</p>
+<a href="../installation/#use-the-install-script">installation script</a> that can be used to make the latest version of the Arduino CLI available on most systems with an HTTP
+client like curl or wget and a shell like bash.</p>
 <p>For more information on Arduino CLI's command line interface, see the <a href="../commands/arduino-cli/">command reference</a>.</p>
 <h2 id="the-second-pillar-grpc-interface">The second pillar: gRPC interface<a class="headerlink" href="#the-second-pillar-grpc-interface" title="Permanent link">&para;</a></h2>
 <p><a href="https://grpc.io/">gRPC</a> is a high performance <a href="https://en.wikipedia.org/wiki/Remote_procedure_call">RPC</a> framework that can efficiently connect client and server applications. The Arduino
-CLI can act as a gRPC server (we call it <a href="../commands/arduino-cli_daemon/">daemon mode</a>), exposing a set of procedures that implement the very same set
-of features of the command line interface and waiting for clients to connect and use them. To give an idea, the
-following is some <a href="https://go.dev/">Golang</a> code capable of retrieving the version number of a remote running Arduino CLI server
-instance:</p>
+CLI can act as a gRPC server (we call it <a href="../commands/arduino-cli_daemon/">daemon mode</a>), exposing a set of procedures that implement the very same set of
+features of the command line interface and waiting for clients to connect and use them. To give an idea, the following is
+some <a href="https://go.dev/">Golang</a> code capable of retrieving the version number of a remote running Arduino CLI server instance:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// This file is part of arduino-cli.</span>
 <span class="c1">//</span>
 <span class="c1">// Copyright 2024 ARDUINO SA (http://www.arduino.cc/)</span>
@@ -1634,8 +1633,8 @@ a common Golang API, based on the gRPC protobuf definitions: a set of functions 
 offered by the Arduino CLI, so that when we provide a fix or a new feature, they are automatically available to both the
 command line and gRPC interfaces. The source modules implementing this API are implemented through the <code>commands</code>
 package, and it can be imported in other Golang programs to embed a full-fledged Arduino CLI. For example, this is how
-some backend services powering <a href="https://cloud.arduino.cc/home">Arduino Cloud</a> can compile sketches and manage libraries. Just to give you a taste of
-what it means to embed the Arduino CLI, here is how to search for a core using the API:</p>
+some backend services powering <a href="https://cloud.arduino.cc/home">Arduino Cloud</a> can compile sketches and manage libraries. Just to give you a taste of what
+it means to embed the Arduino CLI, here is how to search for a core using the API:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// This file is part of arduino-cli.</span>
 <span class="c1">//</span>
 <span class="c1">// Copyright 2024 ARDUINO SA (http://www.arduino.cc/)</span>
@@ -1715,7 +1714,8 @@ use and provide support for.</p>
 <p>You can start playing with the Arduino CLI right away. The code is open source and <a href="https://github.com/arduino/arduino-cli">the repo</a>
 contains <a href="https://github.com/arduino/arduino-cli/blob/master/rpc/internal/client_example">example code showing how to implement a gRPC client</a>. If you’re curious about how we
 designed the low level API, have a look at the <a href="https://github.com/arduino/arduino-cli/tree/master/commands">commands package</a> and don’t hesitate to leave feedback on the <a href="https://github.com/arduino/arduino-cli/issues">issue
-tracker</a> if you’ve got a use case that doesn’t fit one of the three pillars.</p>
+tracker</a>
+if you’ve got a use case that doesn’t fit one of the three pillars.</p>
                 
               
               
