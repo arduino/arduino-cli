@@ -28,7 +28,7 @@ import (
 func TestRunMultipleTask(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	r := runner.New(ctx)
+	r := runner.New(ctx, 0)
 	r.Enqueue(runner.NewTask("bash", "-c", "sleep 1 ; echo -n 0"))
 	r.Enqueue(runner.NewTask("bash", "-c", "sleep 2 ; echo -n 1"))
 	r.Enqueue(runner.NewTask("bash", "-c", "sleep 3 ; echo -n 2"))
