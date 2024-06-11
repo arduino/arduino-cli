@@ -322,6 +322,7 @@ func (b *Builder) preprocess() error {
 		b.librariesBuildPath,
 		b.buildProperties,
 		b.targetPlatform.Platform.Architecture,
+		b.jobs,
 	)
 	if err != nil {
 		return err

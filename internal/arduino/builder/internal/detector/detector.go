@@ -191,8 +191,9 @@ func (l *SketchLibrariesDetector) FindIncludes(
 	librariesBuildPath *paths.Path,
 	buildProperties *properties.Map,
 	platformArch string,
+	jobs int,
 ) error {
-	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch)
+	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch, jobs)
 	if err != nil && l.onlyUpdateCompilationDatabase {
 		l.logger.Info(
 			fmt.Sprintf(
@@ -216,6 +217,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	librariesBuildPath *paths.Path,
 	buildProperties *properties.Map,
 	platformArch string,
+	jobs int,
 ) error {
 	librariesResolutionCache := buildPath.Join("libraries.cache")
 	if l.useCachedLibrariesResolution && librariesResolutionCache.Exist() {
@@ -238,7 +240,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	}
 
 	// Pre-run cache entries
-	l.preRunner = runner.New(ctx)
+	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
 		if entry.Compile != nil && entry.CompileTask != nil {
 			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
@@ -279,7 +281,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 			// Create a new pre-runner if the previous one was cancelled
 			if l.preRunner == nil {
-				l.preRunner = runner.New(ctx)
+				l.preRunner = runner.New(ctx, jobs)
 				// Push in the remainder of the queue
 				for _, sourceFile := range *sourceFileQueue {
 					l.preRunner.Enqueue(l.gccPreprocessTask(sourceFile, buildProperties))

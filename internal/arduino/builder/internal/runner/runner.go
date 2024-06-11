@@ -41,7 +41,9 @@ func (cmd *enqueuedCommand) String() string {
 	return cmd.task.String()
 }
 
-func New(inCtx context.Context) *Runner {
+// New creates a new Runner with the given number of workers.
+// If workers is 0, the number of workers will be the number of available CPUs.
+func New(inCtx context.Context, workers int) *Runner {
 	ctx, cancel := context.WithCancel(inCtx)
 	queue := make(chan *enqueuedCommand, 1000)
 	r := &Runner{
@@ -52,7 +54,10 @@ func New(inCtx context.Context) *Runner {
 	}
 
 	// Spawn workers
-	for i := 0; i < runtime.NumCPU(); i++ {
+	if workers == 0 {
+		workers = runtime.NumCPU()
+	}
+	for i := 0; i < workers; i++ {
 		r.wg.Add(1)
 		go func() {
 			worker(ctx, queue)
