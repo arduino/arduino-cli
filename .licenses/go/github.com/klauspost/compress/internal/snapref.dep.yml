@@ -1,6 +1,6 @@
 ---
 name: github.com/klauspost/compress/internal/snapref
-version: v1.17.0
+version: v1.17.2
 type: go
 summary: Package snapref implements the Snappy compression format.
 homepage: https://pkg.go.dev/github.com/klauspost/compress/internal/snapref
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: compress@v1.17.0/LICENSE
+- sources: compress@v1.17.2/LICENSE
   text: |
     Copyright (c) 2012 The Go Authors. All rights reserved.
     Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -341,7 +341,7 @@ licenses:
     The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-- sources: compress@v1.17.0/README.md
+- sources: compress@v1.17.2/README.md
   text: This code is licensed under the same conditions as the original Go code. See
     LICENSE file.
 notices: []

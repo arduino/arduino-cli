@@ -1,12 +1,12 @@
 ---
 name: github.com/klauspost/compress/zstd
-version: v1.17.0
+version: v1.17.2
 type: go
 summary: Package zstd provides decompression of zstandard files.
 homepage: https://pkg.go.dev/github.com/klauspost/compress/zstd
 license: bsd-3-clause
 licenses:
-- sources: compress@v1.17.0/LICENSE
+- sources: compress@v1.17.2/LICENSE
   text: |
     Copyright (c) 2012 The Go Authors. All rights reserved.
     Copyright (c) 2019 Klaus Post. All rights reserved.
