@@ -21,7 +21,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/gofrs/uuid/v5 v5.2.0
-	github.com/leonelquinteros/gotext v1.4.0
+	github.com/leonelquinteros/gotext v1.6.1
 	github.com/mailru/easyjson v0.7.7
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
 	github.com/mattn/go-colorable v0.1.13
