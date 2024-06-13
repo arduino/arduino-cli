@@ -327,6 +327,14 @@ func (b *Builder) preprocess() error {
 	if err != nil {
 		return err
 	}
+	if b.libsDetector.IncludeFoldersChanged() && b.librariesBuildPath.Exist() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
+			b.logger.Info(i18n.Tr("The list of included libraries has been changed... rebuilding all libraries."))
+		}
+		if err := b.librariesBuildPath.RemoveAll(); err != nil {
+			return err
+		}
+	}
 	b.Progress.CompleteStep()
 
 	b.warnAboutArchIncompatibleLibraries(b.libsDetector.ImportedLibraries())
