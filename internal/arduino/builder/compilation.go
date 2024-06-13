@@ -119,20 +119,13 @@ func (b *Builder) compileFileWithRecipe(
 	includes []string,
 	recipe string,
 ) (*paths.Path, error) {
-	properties := b.buildProperties.Clone()
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
-	properties.Set("includes", strings.Join(includes, " "))
-	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
 		return nil, err
 	}
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
-
-	properties.SetPath("object_file", objectFile)
-	err = objectFile.Parent().MkdirAll()
-	if err != nil {
+	if err := objectFile.Parent().MkdirAll(); err != nil {
 		return nil, err
 	}
 
@@ -141,6 +134,11 @@ func (b *Builder) compileFileWithRecipe(
 		return nil, err
 	}
 
+	properties := b.buildProperties.Clone()
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
+	properties.Set("includes", strings.Join(includes, " "))
+	properties.SetPath("source_file", source)
+	properties.SetPath("object_file", objectFile)
 	command, err := b.prepareCommandForRecipe(properties, recipe, false)
 	if err != nil {
 		return nil, err
