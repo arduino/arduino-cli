@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -60,6 +61,7 @@ type SketchLibrariesDetector struct {
 	logger                        *logger.BuilderLogger
 	diagnosticStore               *diagnostics.Store
 	preRunner                     *runner.Runner
+	detectedChangeInLibraries     bool
 }
 
 // NewSketchLibrariesDetector todo
@@ -192,6 +194,12 @@ func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
 	return l.includeFolders
 }
 
+// IncludeFoldersChanged returns true if the include folders list changed
+// from the previous compile.
+func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
+	return l.detectedChangeInLibraries
+}
+
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	l.includeFolders = append(l.includeFolders, folder)
@@ -237,17 +245,21 @@ func (l *SketchLibrariesDetector) findIncludes(
 	platformArch string,
 	jobs int,
 ) error {
-	librariesResolutionCache := buildPath.Join("libraries.cache")
-	if l.useCachedLibrariesResolution && librariesResolutionCache.Exist() {
-		d, err := librariesResolutionCache.ReadFile()
+	librariesResolutionCachePath := buildPath.Join("libraries.cache")
+	var cachedIncludeFolders paths.PathList
+	if librariesResolutionCachePath.Exist() {
+		d, err := librariesResolutionCachePath.ReadFile()
 		if err != nil {
 			return err
 		}
-		if err := json.Unmarshal(d, &l.includeFolders); err != nil {
+		if err := json.Unmarshal(d, &cachedIncludeFolders); err != nil {
 			return err
 		}
+	}
+	if l.useCachedLibrariesResolution && librariesResolutionCachePath.Exist() {
+		l.includeFolders = cachedIncludeFolders
 		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			l.logger.Info("Using cached library discovery: " + librariesResolutionCache.String())
+			l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())
 		}
 		return nil
 	}
@@ -329,10 +341,12 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 	if d, err := json.Marshal(l.includeFolders); err != nil {
 		return err
-	} else if err := librariesResolutionCache.WriteFile(d); err != nil {
+	} else if err := librariesResolutionCachePath.WriteFile(d); err != nil {
 		return err
 	}
-
+	l.detectedChangeInLibraries = !slices.Equal(
+		cachedIncludeFolders.AsStrings(),
+		l.includeFolders.AsStrings())
 	return nil
 }
 
