@@ -148,7 +148,7 @@ jobs:
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: Output checksum
         run: |
           TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"
