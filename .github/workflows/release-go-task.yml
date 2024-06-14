@@ -298,10 +298,3 @@ jobs:
 
       - name: Upload release files on Arduino downloads servers
         run: aws s3 sync ${{ env.DIST_DIR }} s3://${{ secrets.DOWNLOADS_BUCKET }}${{ env.AWS_PLUGIN_TARGET }}
-
-      - name: Update Homebrew formula
-        if: steps.prerelease.outputs.IS_PRE != 'true'
-        uses: dawidd6/action-homebrew-bump-formula@v3
-        with:
-          token: ${{ secrets.ARDUINOBOT_GITHUB_TOKEN }}
-          formula: arduino-cli
