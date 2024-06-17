@@ -1,12 +1,12 @@
 ---
 name: github.com/cpuguy83/go-md2man/v2/md2man
-version: v2.0.3
+version: v2.0.4
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/cpuguy83/go-md2man/v2/md2man
 license: mit
 licenses:
-- sources: v2@v2.0.3/LICENSE.md
+- sources: v2@v2.0.4/LICENSE.md
   text: |
     The MIT License (MIT)
 
