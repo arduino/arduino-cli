@@ -76,8 +76,14 @@ func main() {
 		if parentPreRun != nil {
 			parentPreRun(cmd, args)
 		}
-		for _, warning := range configFileLoadingWarnings {
-			feedback.Warning(warning)
+
+		// In Text mode print the warnings about the configuration file
+		// only if we are inside the "config ..." command. In JSON mode always
+		// output the warning.
+		if feedback.GetFormat() != feedback.Text || (cmd.HasParent() && cmd.Parent().Name() == "config") {
+			for _, warning := range configFileLoadingWarnings {
+				feedback.Warning(fmt.Sprintf("%s: %s", i18n.Tr("Invalid value in configuration"), warning))
+			}
 		}
 	}
 
