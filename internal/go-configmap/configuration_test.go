@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/go-configmap"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 )
@@ -82,12 +81,12 @@ func TestApplyEnvVars(t *testing.T) {
 	c.Set("answer", 42)
 	c.Set("array", []string{})
 	c.InjectEnvVars([]string{"APP_FOO=app-bar", "APP_FOOZ_BAR=app-baz"}, "APP")
-	assert.Equal(t, "app-bar", c.Get("foo"))
-	assert.Equal(t, "app-baz", c.Get("fooz.bar"))
-	assert.Equal(t, 42, c.Get("answer"))
+	require.Equal(t, "app-bar", c.Get("foo"))
+	require.Equal(t, "app-baz", c.Get("fooz.bar"))
+	require.Equal(t, 42, c.Get("answer"))
 
-	c.InjectEnvVars([]string{"APP_ARRAY=element1 element2 element3"}, "APP")
-	require.Equal(t, []string{"element1", "element2", "element3"}, c.GetStringSlice("array"))
+	c.InjectEnvVars([]string{"APP_ARRAY=e1 e2 e3"}, "APP")
+	require.Equal(t, []string{"e1", "e2", "e3"}, c.GetStringSlice("array"))
 
 	// Test env containing array values with typed schema
 	{
