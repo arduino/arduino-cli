@@ -27,6 +27,17 @@ func (c *Map) SetFromCLIArgs(key string, args ...string) error {
 		return nil
 	}
 
+	// Some args might be coming from env vars that are specifying multiple values
+	// in a single string. We expand those cases by splitting every args with whitespace
+	// Example: args=["e1 e2", "e3"] -> args=["e1","e2","e3"]
+	argsExpantion := func(values []string) []string {
+		result := []string{}
+		for _, v := range values {
+			result = append(result, strings.Split(v, " ")...)
+		}
+		return result
+	}
+	args = argsExpantion(args)
 	// in case of schemaless configuration, we don't know the type of the setting
 	// we will save it as a string or array of strings
 	if len(c.schema) == 0 {
