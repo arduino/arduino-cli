@@ -21,6 +21,43 @@ import (
 	"strings"
 )
 
+func (c *Map) SetFromENV(key string, arg string) error {
+	// in case of schemaless configuration, we don't know the type of the setting
+	// we will save it as a string
+	if len(c.schema) == 0 {
+		c.Set(key, arg)
+		return nil
+	}
+
+	// Find the correct type for the given setting
+	valueType, ok := c.schema[key]
+	if !ok {
+		return fmt.Errorf("key not found: %s", key)
+	}
+
+	var value any
+	{
+		var conversionError error
+		switch valueType.String() {
+		case "uint":
+			value, conversionError = strconv.Atoi(arg)
+		case "bool":
+			value, conversionError = strconv.ParseBool(arg)
+		case "string":
+			value = arg
+		case "[]string":
+			value = strings.Split(arg, " ")
+		default:
+			return fmt.Errorf("unhandled type: %s", valueType)
+		}
+		if conversionError != nil {
+			return fmt.Errorf("error setting value: %v", conversionError)
+		}
+	}
+
+	return c.Set(key, value)
+}
+
 func (c *Map) SetFromCLIArgs(key string, args ...string) error {
 	if len(args) == 0 {
 		c.Delete(key)
@@ -101,7 +138,7 @@ func (c *Map) InjectEnvVars(env []string, prefix string) []error {
 		}
 
 		// Update the configuration value
-		if err := c.SetFromCLIArgs(key, envValue); err != nil {
+		if err := c.SetFromENV(key, envValue); err != nil {
 			errs = append(errs, err)
 		}
 	}

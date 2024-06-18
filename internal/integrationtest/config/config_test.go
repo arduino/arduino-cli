@@ -902,3 +902,32 @@ build.unk: 123
 	require.NoError(t, err)
 	require.Equal(t, "en", strings.TrimSpace(string(out)))
 }
+
+func TestConfigViaEnvVars(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// array of strings
+	out, _, err := cli.RunWithCustomEnv(
+		map[string]string{"ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS": "https://espressif.github.io/arduino-esp32/package_esp32_index.json https://arduino.esp8266.com/stable/package_esp8266com_index.json"},
+		"config", "get", "board_manager.additional_urls",
+	)
+	require.NoError(t, err)
+	require.Equal(t, "- https://espressif.github.io/arduino-esp32/package_esp32_index.json\n- https://arduino.esp8266.com/stable/package_esp8266com_index.json\n\n", string(out))
+
+	// boolean
+	out, _, err = cli.RunWithCustomEnv(
+		map[string]string{"ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL": "True"},
+		"config", "get", "library.enable_unsafe_install",
+	)
+	require.NoError(t, err)
+	require.Equal(t, "true\n\n", string(out))
+
+	// integer
+	out, _, err = cli.RunWithCustomEnv(
+		map[string]string{"ARDUINO_BUILD_CACHE_COMPILATIONS_BEFORE_PURGE": "20"},
+		"config", "get", "build_cache.compilations_before_purge",
+	)
+	require.NoError(t, err)
+	require.Equal(t, "20\n\n", string(out))
+}

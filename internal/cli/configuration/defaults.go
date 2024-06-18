@@ -84,7 +84,7 @@ func InjectEnvVars(settings *Settings) {
 	// Bind env aliases to keep backward compatibility
 	setIfEnvExists := func(key, env string) {
 		if v, ok := os.LookupEnv(env); ok {
-			settings.SetFromCLIArgs(key, v)
+			settings.SetFromENV(key, v)
 		}
 	}
 	setIfEnvExists("library.enable_unsafe_install", "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL")
