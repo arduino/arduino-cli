@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"sort"
@@ -136,7 +135,7 @@ func runMonitorCmd(
 	case sketch.GetDefaultFqbn() != "":
 		fqbn = sketch.GetDefaultFqbn()
 	default:
-		fqbn, _ = portArgs.DetectFQBN(ctx, inst, srv)
+		fqbn, _, _ = portArgs.DetectFQBN(ctx, inst, srv)
 	}
 
 	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(ctx, inst, srv, defaultPort, defaultProtocol)

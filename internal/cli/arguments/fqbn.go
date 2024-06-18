@@ -80,8 +80,8 @@ func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, in
 		if portArgs == nil || portArgs.address == "" {
 			feedback.FatalError(&cmderrors.MissingFQBNError{}, feedback.ErrGeneric)
 		}
-		fqbn, port := portArgs.DetectFQBN(ctx, instance, srv)
-		if fqbn == "" {
+		fqbn, port, err := portArgs.DetectFQBN(ctx, instance, srv)
+		if err != nil {
 			feedback.FatalError(&cmderrors.MissingFQBNError{}, feedback.ErrGeneric)
 		}
 		return fqbn, port
