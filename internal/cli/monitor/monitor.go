@@ -21,6 +21,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -33,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -122,6 +124,7 @@ func runMonitorCmd(
 	if inst == nil {
 		inst = instance.CreateAndInit(ctx, srv)
 	}
+
 	// Priority on how to retrieve the fqbn
 	// 1. from flag
 	// 2. from profile
@@ -143,7 +146,7 @@ func runMonitorCmd(
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
-	enumerateResp, err := srv.EnumerateMonitorPortSettings(ctx, &rpc.EnumerateMonitorPortSettingsRequest{
+	defaultSettings, err := srv.EnumerateMonitorPortSettings(ctx, &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     inst,
 		PortProtocol: portProtocol,
 		Fqbn:         fqbn,
@@ -152,12 +155,17 @@ func runMonitorCmd(
 		feedback.Fatal(i18n.Tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
 	}
 	if describe {
-		settings := make([]*result.MonitorPortSettingDescriptor, len(enumerateResp.GetSettings()))
-		for i, v := range enumerateResp.GetSettings() {
+		settings := make([]*result.MonitorPortSettingDescriptor, len(defaultSettings.GetSettings()))
+		for i, v := range defaultSettings.GetSettings() {
 			settings[i] = result.NewMonitorPortSettingDescriptor(v)
 		}
 		feedback.PrintResult(&detailsResult{Settings: settings})
 		return
+	}
+
+	actualConfigurationLabels := properties.NewMap()
+	for _, setting := range defaultSettings.GetSettings() {
+		actualConfigurationLabels.Set(setting.GetSettingId(), setting.GetValue())
 	}
 
 	configuration := &rpc.MonitorPortConfiguration{}
@@ -172,7 +180,7 @@ func runMonitorCmd(
 			}
 
 			var setting *rpc.MonitorPortSettingDescriptor
-			for _, s := range enumerateResp.GetSettings() {
+			for _, s := range defaultSettings.GetSettings() {
 				if k == "" {
 					if contains(s.GetEnumValues(), v) {
 						setting = s
@@ -195,10 +203,7 @@ func runMonitorCmd(
 				SettingId: setting.GetSettingId(),
 				Value:     v,
 			})
-			if !quiet {
-				feedback.Print(i18n.Tr("Monitor port settings:"))
-				feedback.Print(fmt.Sprintf("%s=%s", setting.GetSettingId(), v))
-			}
+			actualConfigurationLabels.Set(setting.GetSettingId(), v)
 		}
 	}
 
@@ -228,7 +233,6 @@ func runMonitorCmd(
 		}
 		ttyIn = io.TeeReader(ttyIn, ctrlCDetector)
 	}
-
 	monitorServer, portProxy := commands.MonitorServerToReadWriteCloser(ctx, &rpc.MonitorPortOpenRequest{
 		Instance:          inst,
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
@@ -237,6 +241,19 @@ func runMonitorCmd(
 	})
 	go func() {
 		if !quiet {
+			if fqbn != "" {
+				feedback.Print(i18n.Tr("Using default monitor configuration for board: %s", fqbn))
+			} else if portProtocol == "serial" {
+				feedback.Print(i18n.Tr("Using generic monitor configuration.\nWARNING: Your board may require different settings to work!\n"))
+			}
+			feedback.Print(i18n.Tr("Monitor port settings:"))
+			keys := actualConfigurationLabels.Keys()
+			slices.Sort(keys)
+			for _, k := range keys {
+				feedback.Printf("  %s=%s", k, actualConfigurationLabels.Get(k))
+			}
+			feedback.Print("")
+
 			feedback.Print(i18n.Tr("Connecting to %s. Press CTRL-C to exit.", portAddress))
 		}
 		if err := srv.Monitor(monitorServer); err != nil {
