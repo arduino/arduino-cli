@@ -90,13 +90,6 @@ func runMonitorCmd(
 		quiet = true
 	}
 
-	var (
-		inst                         *rpc.Instance
-		profile                      *rpc.SketchProfile
-		fqbn                         string
-		defaultPort, defaultProtocol string
-	)
-
 	// Flags takes maximum precedence over sketch.yaml
 	// If {--port --fqbn --profile} are set we ignore the profile.
 	// If both {--port --profile} are set we read the fqbn in the following order: profile -> default_fqbn -> discovery
@@ -111,9 +104,9 @@ func runMonitorCmd(
 		)
 	}
 	sketch := resp.GetSketch()
-	if sketch != nil {
-		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
-	}
+
+	var inst *rpc.Instance
+	var profile *rpc.SketchProfile
 	if fqbnArg.String() == "" {
 		if profileArg.Get() == "" {
 			inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sketch.GetDefaultProfile().GetName(), sketchPath)
@@ -130,6 +123,7 @@ func runMonitorCmd(
 	// 2. from profile
 	// 3. from default_fqbn specified in the sketch.yaml
 	// 4. try to detect from the port
+	var fqbn string
 	switch {
 	case fqbnArg.String() != "":
 		fqbn = fqbnArg.String()
@@ -141,6 +135,10 @@ func runMonitorCmd(
 		fqbn, _, _ = portArgs.DetectFQBN(ctx, inst, srv)
 	}
 
+	var defaultPort, defaultProtocol string
+	if sketch != nil {
+		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
+	}
 	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(ctx, inst, srv, defaultPort, defaultProtocol)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
