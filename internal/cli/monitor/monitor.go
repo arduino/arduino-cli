@@ -59,6 +59,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Long:  i18n.Tr("Open a communication port with a board."),
 		Example: "" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
+			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 -b arduino:avr:uno\n" +
+			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --config 115200\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
 		Run: func(cmd *cobra.Command, args []string) {
 			sketchPath := ""
