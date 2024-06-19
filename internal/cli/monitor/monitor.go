@@ -239,10 +239,12 @@ func runMonitorCmd(
 	})
 	go func() {
 		if !quiet {
-			if fqbn != "" {
-				feedback.Print(i18n.Tr("Using default monitor configuration for board: %s", fqbn))
-			} else if portProtocol == "serial" {
-				feedback.Print(i18n.Tr("Using generic monitor configuration.\nWARNING: Your board may require different settings to work!\n"))
+			if len(configs) == 0 {
+				if fqbn != "" {
+					feedback.Print(i18n.Tr("Using default monitor configuration for board: %s", fqbn))
+				} else if portProtocol == "serial" {
+					feedback.Print(i18n.Tr("Using generic monitor configuration.\nWARNING: Your board may require different settings to work!\n"))
+				}
 			}
 			feedback.Print(i18n.Tr("Monitor port settings:"))
 			keys := actualConfigurationLabels.Keys()
