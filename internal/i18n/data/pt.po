@@ -1411,6 +1411,10 @@ msgstr "Receita inválida em platform.txt"
 msgid "Invalid size regexp: %s"
 msgstr "Tamanho de regexp inválido: %s"
 
+#: main.go:85
+msgid "Invalid value in configuration"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:114
 msgid "Invalid version"
 msgstr "Versão inválida"

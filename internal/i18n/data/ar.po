@@ -1402,6 +1402,10 @@ msgstr "وصفة غير صالحة ضمن platform.txt"
 msgid "Invalid size regexp: %s"
 msgstr "size regexp غير صالح : %s"
 
+#: main.go:85
+msgid "Invalid value in configuration"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:114
 msgid "Invalid version"
 msgstr "نسخة غير صالحة"
