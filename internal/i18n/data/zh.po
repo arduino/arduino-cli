@@ -1361,6 +1361,10 @@ msgstr "platform.txt 中的方法无效"
 msgid "Invalid size regexp: %s"
 msgstr "无效的大小正则表达式：%s"
 
+#: main.go:85
+msgid "Invalid value in configuration"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:114
 msgid "Invalid version"
 msgstr "无效的版本"

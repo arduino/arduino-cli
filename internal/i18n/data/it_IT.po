@@ -1486,6 +1486,10 @@ msgstr "Scrittura non valida in platform.txt"
 msgid "Invalid size regexp: %s"
 msgstr "La dimensione della regexp non è valida: %s"
 
+#: main.go:85
+msgid "Invalid value in configuration"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:114
 msgid "Invalid version"
 msgstr "Versione non è valida"

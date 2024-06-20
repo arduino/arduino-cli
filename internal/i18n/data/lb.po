@@ -1357,6 +1357,10 @@ msgstr ""
 msgid "Invalid size regexp: %s"
 msgstr ""
 
+#: main.go:85
+msgid "Invalid value in configuration"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:114
 msgid "Invalid version"
 msgstr "Ongülteg Versioun"
