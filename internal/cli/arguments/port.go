@@ -18,12 +18,12 @@ package arguments
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -132,13 +132,13 @@ func (p *Port) GetSearchTimeout() time.Duration {
 // DetectFQBN tries to identify the board connected to the port and returns the
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
-func (p *Port) DetectFQBN(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) (string, *rpc.Port) {
+func (p *Port) DetectFQBN(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) (string, *rpc.Port, error) {
 	detectedPorts, err := srv.BoardList(ctx, &rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
-		feedback.Fatal(i18n.Tr("Error during FQBN detection: %v", err), feedback.ErrGeneric)
+		return "", nil, fmt.Errorf("%s: %w", i18n.Tr("Error during board detection"), err)
 	}
 	for _, detectedPort := range detectedPorts.GetPorts() {
 		port := detectedPort.GetPort()
@@ -149,14 +149,14 @@ func (p *Port) DetectFQBN(ctx context.Context, inst *rpc.Instance, srv rpc.Ardui
 			continue
 		}
 		if len(detectedPort.GetMatchingBoards()) > 1 {
-			feedback.FatalError(&cmderrors.MultipleBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
+			return "", nil, &cmderrors.MultipleBoardsDetectedError{Port: port}
 		}
 		if len(detectedPort.GetMatchingBoards()) == 0 {
-			feedback.FatalError(&cmderrors.NoBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
+			return "", nil, &cmderrors.NoBoardsDetectedError{Port: port}
 		}
-		return detectedPort.GetMatchingBoards()[0].GetFqbn(), port
+		return detectedPort.GetMatchingBoards()[0].GetFqbn(), port, nil
 	}
-	return "", nil
+	return "", nil, &cmderrors.NoBoardsDetectedError{Port: &rpc.Port{Address: p.address, Protocol: p.protocol}}
 }
 
 // IsPortFlagSet returns true if the port address is provided
