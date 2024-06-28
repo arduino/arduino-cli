@@ -2821,14 +2821,14 @@ following properties are automatically generated:</p>
 <p>If the platform supports pluggable discovery it may also declare a set of <code>upload_port.*</code> properties, these properties
 will be used to identify a board by the discovery process when plugged in.</p>
 <p>For example we could declare a series of <code>upload_port.vid</code> and <code>upload_port.pid</code> properties for the Uno like so:</p>
-<div class="highlight"><pre><span></span><code>uno.upload_port.vid.0=0x2341
-uno.upload_port.pid.0=0x0043
-uno.upload_port.vid.1=0x2341
-uno.upload_port.pid.1=0x0001
-uno.upload_port.vid.2=0x2A03
-uno.upload_port.pid.2=0x0043
-uno.upload_port.vid.3=0x2341
-uno.upload_port.pid.3=0x0243
+<div class="highlight"><pre><span></span><code>uno.upload_port.0.vid=0x2341
+uno.upload_port.0.pid=0x0043
+uno.upload_port.1.vid=0x2341
+uno.upload_port.1.pid=0x0001
+uno.upload_port.2.vid=0x2A03
+uno.upload_port.2.pid=0x0043
+uno.upload_port.3.vid=0x2341
+uno.upload_port.3.pid=0x0243
 </code></pre></div>
 <p>In this case we're using the board's USB VID/PID pair to identify it but <code>upload_port.*</code> properties can be anything that
 can help identify a certain board. For more detailed information see the
