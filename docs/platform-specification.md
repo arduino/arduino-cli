@@ -547,14 +547,14 @@ will be used to identify a board by the discovery process when plugged in.
 For example we could declare a series of `upload_port.vid` and `upload_port.pid` properties for the Uno like so:
 
 ```
-uno.upload_port.vid.0=0x2341
-uno.upload_port.pid.0=0x0043
-uno.upload_port.vid.1=0x2341
-uno.upload_port.pid.1=0x0001
-uno.upload_port.vid.2=0x2A03
-uno.upload_port.pid.2=0x0043
-uno.upload_port.vid.3=0x2341
-uno.upload_port.pid.3=0x0243
+uno.upload_port.0.vid=0x2341
+uno.upload_port.0.pid=0x0043
+uno.upload_port.1.vid=0x2341
+uno.upload_port.1.pid=0x0001
+uno.upload_port.2.vid=0x2A03
+uno.upload_port.2.pid=0x0043
+uno.upload_port.3.vid=0x2341
+uno.upload_port.3.pid=0x0243
 ```
 
 In this case we're using the board's USB VID/PID pair to identify it but `upload_port.*` properties can be anything that
