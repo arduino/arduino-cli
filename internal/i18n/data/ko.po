@@ -427,7 +427,7 @@ msgstr ""
 msgid "Configuration options for %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:74
+#: internal/cli/monitor/monitor.go:77
 msgid ""
 "Configure communication port settings. The format is "
 "<ID>=<value>[,<ID>=<value>]..."
@@ -445,7 +445,7 @@ msgstr ""
 msgid "Connected"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:241
+#: internal/cli/monitor/monitor.go:259
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr ""
 
@@ -527,7 +527,7 @@ msgstr ""
 msgid "Debugging not supported for board %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Default"
 msgstr "디폴트"
 
@@ -768,10 +768,6 @@ msgstr ""
 msgid "Error during Debug: %v"
 msgstr ""
 
-#: internal/cli/arguments/port.go:141
-msgid "Error during FQBN detection: %v"
-msgstr ""
-
 #: internal/cli/feedback/feedback.go:236 internal/cli/feedback/feedback.go:242
 msgid "Error during JSON encoding of the output: %v"
 msgstr ""
@@ -781,6 +777,10 @@ msgstr ""
 #: internal/cli/compile/compile.go:260 internal/cli/compile/compile.go:302
 #: internal/cli/upload/upload.go:96 internal/cli/upload/upload.go:125
 msgid "Error during Upload: %v"
+msgstr ""
+
+#: internal/cli/arguments/port.go:141
+msgid "Error during board detection"
 msgstr ""
 
 #: internal/cli/compile/compile.go:375
@@ -824,7 +824,7 @@ msgstr ""
 msgid "Error getting current directory for compilation database: %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:108
+#: internal/cli/monitor/monitor.go:104
 msgid ""
 "Error getting default port from `sketch.yaml`. Check if you're in the "
 "correct sketch folder or provide the --port flag: %s"
@@ -842,7 +842,7 @@ msgstr ""
 msgid "Error getting port metadata: %v"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:153
+#: internal/cli/monitor/monitor.go:155
 msgid "Error getting port settings details: %s"
 msgstr ""
 
@@ -964,7 +964,7 @@ msgstr ""
 msgid "Error serializing compilation database: %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:219
+#: internal/cli/monitor/monitor.go:223
 msgid "Error setting raw mode: %s"
 msgstr ""
 
@@ -1186,7 +1186,7 @@ msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "전역 변수는 %[1]s 바이트의 동적 메모리를 사용."
 
 #: internal/cli/board/details.go:216 internal/cli/core/list.go:117
-#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:297
+#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:315
 #: internal/cli/outdated/outdated.go:101
 msgid "ID"
 msgstr ""
@@ -1555,7 +1555,7 @@ msgstr ""
 msgid "Monitor '%s' not found"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:200
+#: internal/cli/monitor/monitor.go:251
 msgid "Monitor port settings:"
 msgstr ""
 
@@ -1653,7 +1653,7 @@ msgid ""
 "compact JSON output)."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:57 internal/cli/monitor/monitor.go:58
+#: internal/cli/monitor/monitor.go:58 internal/cli/monitor/monitor.go:59
 msgid "Open a communication port with a board."
 msgstr ""
 
@@ -1845,7 +1845,7 @@ msgstr ""
 msgid "Port"
 msgstr "포트"
 
-#: internal/cli/monitor/monitor.go:253 internal/cli/monitor/monitor.go:262
+#: internal/cli/monitor/monitor.go:271 internal/cli/monitor/monitor.go:280
 msgid "Port closed: %v"
 msgstr ""
 
@@ -1930,7 +1930,7 @@ msgstr ""
 msgid "Required tool:"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:75
+#: internal/cli/monitor/monitor.go:78
 msgid "Run in silent mode, show only monitor input and output."
 msgstr ""
 
@@ -2046,7 +2046,7 @@ msgstr ""
 msgid "Set a value for a field required to upload."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:72
+#: internal/cli/monitor/monitor.go:75
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr ""
 
@@ -2064,7 +2064,7 @@ msgstr ""
 msgid "Sets where to save the configuration file."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Setting"
 msgstr ""
 
@@ -2076,7 +2076,7 @@ msgstr ""
 msgid "Show all available core versions."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:73
+#: internal/cli/monitor/monitor.go:76
 msgid "Show all the settings of the communication port."
 msgstr ""
 
@@ -2316,7 +2316,7 @@ msgid ""
 "that can be upgraded. If nothing needs to be updated the output is empty."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:76
+#: internal/cli/monitor/monitor.go:79
 msgid "Timestamp each incoming line."
 msgstr ""
 
@@ -2539,6 +2539,16 @@ msgstr ""
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr ""
 
+#: internal/cli/monitor/monitor.go:246
+msgid "Using default monitor configuration for board: %s"
+msgstr ""
+
+#: internal/cli/monitor/monitor.go:248
+msgid ""
+"Using generic monitor configuration.\n"
+"WARNING: Your board may require different settings to work!\n"
+msgstr ""
+
 #: internal/arduino/builder/libraries.go:312
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
 msgstr "라이브러리 %[1]s를 버전 %[2]s 폴더: %[3]s %[4]s 에서 사용"
@@ -2569,7 +2579,7 @@ msgstr ""
 msgid "VERSION_NUMBER"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Values"
 msgstr ""
 
@@ -3064,11 +3074,11 @@ msgstr ""
 msgid "invalid pluggable monitor reference: %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:185
+#: internal/cli/monitor/monitor.go:192
 msgid "invalid port configuration value for %s: %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:193
+#: internal/cli/monitor/monitor.go:200
 msgid "invalid port configuration: %s"
 msgstr ""
 

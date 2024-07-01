@@ -447,7 +447,7 @@ msgstr "تمت كتابة ملف التهيئة في : %s"
 msgid "Configuration options for %s"
 msgstr "اعدادات الضبط ل %s"
 
-#: internal/cli/monitor/monitor.go:74
+#: internal/cli/monitor/monitor.go:77
 msgid ""
 "Configure communication port settings. The format is "
 "<ID>=<value>[,<ID>=<value>]..."
@@ -465,7 +465,7 @@ msgstr "جار تهيئة الاداة"
 msgid "Connected"
 msgstr "متصل"
 
-#: internal/cli/monitor/monitor.go:241
+#: internal/cli/monitor/monitor.go:259
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr ""
 
@@ -551,7 +551,7 @@ msgstr "مترجم التصحيح على سبيل المثال : %s"
 msgid "Debugging not supported for board %s"
 msgstr "تصحيح الاخطاء (Debugging) غير مدعوم للوحة %s"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Default"
 msgstr "إفتراضي"
 
@@ -799,10 +799,6 @@ msgstr "خطا اثناء تنزيل الاداة %s"
 msgid "Error during Debug: %v"
 msgstr "خطا اثناء التصحيح : %v"
 
-#: internal/cli/arguments/port.go:141
-msgid "Error during FQBN detection: %v"
-msgstr "خطا اثناء اكتشاف FBQN : %v"
-
 #: internal/cli/feedback/feedback.go:236 internal/cli/feedback/feedback.go:242
 msgid "Error during JSON encoding of the output: %v"
 msgstr "خطا اثناء ترميز JSON الخاص بالخرج : %v"
@@ -813,6 +809,10 @@ msgstr "خطا اثناء ترميز JSON الخاص بالخرج : %v"
 #: internal/cli/upload/upload.go:96 internal/cli/upload/upload.go:125
 msgid "Error during Upload: %v"
 msgstr "خطا اثناء الرفع : %v"
+
+#: internal/cli/arguments/port.go:141
+msgid "Error during board detection"
+msgstr ""
 
 #: internal/cli/compile/compile.go:375
 msgid "Error during build: %v"
@@ -855,7 +855,7 @@ msgstr "خطأ اثناء الحصول على معلومات اللوحة %v"
 msgid "Error getting current directory for compilation database: %s"
 msgstr "خطأ اثناء الحصول على المسار الحالي من اجل قاعدة بيانات الترجمة %s"
 
-#: internal/cli/monitor/monitor.go:108
+#: internal/cli/monitor/monitor.go:104
 msgid ""
 "Error getting default port from `sketch.yaml`. Check if you're in the "
 "correct sketch folder or provide the --port flag: %s"
@@ -873,7 +873,7 @@ msgstr "خطا اثناء جلب بيانات المكتبة : %v"
 msgid "Error getting port metadata: %v"
 msgstr "خطأ اثناء جلب البيانات الوصفية (metadata) للمنفذ : %v"
 
-#: internal/cli/monitor/monitor.go:153
+#: internal/cli/monitor/monitor.go:155
 msgid "Error getting port settings details: %s"
 msgstr ""
 "خطأ اثناء الحصول على بيانات اعدادات المنفذ (port settings details) : %s"
@@ -999,7 +999,7 @@ msgstr ""
 "تعذر القيام بسلسلة قاعدة بيانات الترجمة (Error serializing compilation "
 "database) : %s"
 
-#: internal/cli/monitor/monitor.go:219
+#: internal/cli/monitor/monitor.go:223
 msgid "Error setting raw mode: %s"
 msgstr ""
 
@@ -1224,7 +1224,7 @@ msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "المتغيرات العامة تستخدم  %[1]s بايت من الذاكرة المتغيرة."
 
 #: internal/cli/board/details.go:216 internal/cli/core/list.go:117
-#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:297
+#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:315
 #: internal/cli/outdated/outdated.go:101
 msgid "ID"
 msgstr "ID"
@@ -1610,7 +1610,7 @@ msgstr "مسار السكتش مفقود"
 msgid "Monitor '%s' not found"
 msgstr "المراقب '%s' غير موجود"
 
-#: internal/cli/monitor/monitor.go:200
+#: internal/cli/monitor/monitor.go:251
 msgid "Monitor port settings:"
 msgstr "اعدادات منفذ المراقبة "
 
@@ -1712,7 +1712,7 @@ msgstr ""
 "ازالة تفاصيل المكتبة في كل النسخ عدا اخر نسخة (يعطي اخراج json مضغوط بشكل "
 "اكبر)"
 
-#: internal/cli/monitor/monitor.go:57 internal/cli/monitor/monitor.go:58
+#: internal/cli/monitor/monitor.go:58 internal/cli/monitor/monitor.go:59
 msgid "Open a communication port with a board."
 msgstr "فتح منفذ تواصل مع اللوحة"
 
@@ -1921,7 +1921,7 @@ msgstr ""
 msgid "Port"
 msgstr "منفذ"
 
-#: internal/cli/monitor/monitor.go:253 internal/cli/monitor/monitor.go:262
+#: internal/cli/monitor/monitor.go:271 internal/cli/monitor/monitor.go:280
 msgid "Port closed: %v"
 msgstr "المنفذ %v مغلق"
 
@@ -2006,7 +2006,7 @@ msgstr "استبدال المنصة %[1]s بـ %[2]s"
 msgid "Required tool:"
 msgstr "الادوات المطلوبة :"
 
-#: internal/cli/monitor/monitor.go:75
+#: internal/cli/monitor/monitor.go:78
 msgid "Run in silent mode, show only monitor input and output."
 msgstr "التشغيل ضمن الوضع الصامت , يظهر فقط شاشة الادخال و الاخراج "
 
@@ -2122,7 +2122,7 @@ msgstr ""
 msgid "Set a value for a field required to upload."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:72
+#: internal/cli/monitor/monitor.go:75
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr ""
 
@@ -2140,7 +2140,7 @@ msgstr ""
 msgid "Sets where to save the configuration file."
 msgstr "تحديد مكان حفظ ملف الضبط"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Setting"
 msgstr "اعداد"
 
@@ -2152,7 +2152,7 @@ msgstr ""
 msgid "Show all available core versions."
 msgstr "اظهار كل النوى المتوفرة"
 
-#: internal/cli/monitor/monitor.go:73
+#: internal/cli/monitor/monitor.go:76
 msgid "Show all the settings of the communication port."
 msgstr "اظهار كل اعدادات منفذ التواصل"
 
@@ -2422,7 +2422,7 @@ msgstr ""
 "هذا الامر يظهر قائمة النوى و/أو المكتبات المثبتة التي يمكن ترقيتها. اذا لم "
 "يوجد اي شيء يحتاج للتحديث فالخرج سيكون فارغا"
 
-#: internal/cli/monitor/monitor.go:76
+#: internal/cli/monitor/monitor.go:79
 msgid "Timestamp each incoming line."
 msgstr ""
 
@@ -2649,6 +2649,16 @@ msgstr "يتم استخدام توابع المكتبة التي تم تخزين
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "يتم استخدام النواة '%[1]s' من منصة داخل الملف %[2]s "
 
+#: internal/cli/monitor/monitor.go:246
+msgid "Using default monitor configuration for board: %s"
+msgstr ""
+
+#: internal/cli/monitor/monitor.go:248
+msgid ""
+"Using generic monitor configuration.\n"
+"WARNING: Your board may require different settings to work!\n"
+msgstr ""
+
 #: internal/arduino/builder/libraries.go:312
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
 msgstr "استخدام المكتبة %[1]s الإصدار %[2]s في المجلد:  %[3]s %[4]s"
@@ -2679,7 +2689,7 @@ msgstr "النسخة"
 msgid "VERSION_NUMBER"
 msgstr "رقم النسخة"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Values"
 msgstr "القيم"
 
@@ -3183,11 +3193,11 @@ msgstr "عنوان url لفهرس المنصة غير صالح"
 msgid "invalid pluggable monitor reference: %s"
 msgstr "مرجع الشاشة القابلة للوصل غير صالح : %s"
 
-#: internal/cli/monitor/monitor.go:185
+#: internal/cli/monitor/monitor.go:192
 msgid "invalid port configuration value for %s: %s"
 msgstr "قيمة الضبط الخاصة بالمنفذ غير صالحة : %s:%s"
 
-#: internal/cli/monitor/monitor.go:193
+#: internal/cli/monitor/monitor.go:200
 msgid "invalid port configuration: %s"
 msgstr "اعدادات الضبط للمنفذ غير صالحة"
 

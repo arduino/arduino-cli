@@ -451,7 +451,7 @@ msgstr "%s‎Arquivo Config escrito para:‎"
 msgid "Configuration options for %s"
 msgstr "Opções de configuração para %s"
 
-#: internal/cli/monitor/monitor.go:74
+#: internal/cli/monitor/monitor.go:77
 msgid ""
 "Configure communication port settings. The format is "
 "<ID>=<value>[,<ID>=<value>]..."
@@ -471,7 +471,7 @@ msgstr "Configurando ferramenta."
 msgid "Connected"
 msgstr "Conectado"
 
-#: internal/cli/monitor/monitor.go:241
+#: internal/cli/monitor/monitor.go:259
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr "Conectando a %s. Pressione CTRL-C para sair."
 
@@ -559,7 +559,7 @@ msgstr "Depurar interpretador e.g.:%s"
 msgid "Debugging not supported for board %s"
 msgstr "Depuramento não é suportado para a placa %s"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Default"
 msgstr "Padrão"
 
@@ -804,10 +804,6 @@ msgstr "Erro ao baixar ferramenta %s"
 msgid "Error during Debug: %v"
 msgstr "Erro durante Depuramento: %v"
 
-#: internal/cli/arguments/port.go:141
-msgid "Error during FQBN detection: %v"
-msgstr "Erro durante detecção FQBN: %v"
-
 #: internal/cli/feedback/feedback.go:236 internal/cli/feedback/feedback.go:242
 msgid "Error during JSON encoding of the output: %v"
 msgstr "Erro durante codificação da saída JSON: %v"
@@ -818,6 +814,10 @@ msgstr "Erro durante codificação da saída JSON: %v"
 #: internal/cli/upload/upload.go:96 internal/cli/upload/upload.go:125
 msgid "Error during Upload: %v"
 msgstr "Erro durante envio: %v"
+
+#: internal/cli/arguments/port.go:141
+msgid "Error during board detection"
+msgstr ""
 
 #: internal/cli/compile/compile.go:375
 msgid "Error during build: %v"
@@ -861,7 +861,7 @@ msgid "Error getting current directory for compilation database: %s"
 msgstr ""
 "Erro ao obter o diretório atual para o banco de dados de compilação: %s"
 
-#: internal/cli/monitor/monitor.go:108
+#: internal/cli/monitor/monitor.go:104
 msgid ""
 "Error getting default port from `sketch.yaml`. Check if you're in the "
 "correct sketch folder or provide the --port flag: %s"
@@ -879,7 +879,7 @@ msgstr "Erro ao obter informações sobre as bibliotecas: %v"
 msgid "Error getting port metadata: %v"
 msgstr "Erro ao obter metadata da porta: %v"
 
-#: internal/cli/monitor/monitor.go:153
+#: internal/cli/monitor/monitor.go:155
 msgid "Error getting port settings details: %s"
 msgstr "Erro ao obter detalhes das configurações da porta: %s"
 
@@ -1001,7 +1001,7 @@ msgstr "Erro ao buscar por plataformas: %v"
 msgid "Error serializing compilation database: %s"
 msgstr "Erro ao serializar compilação do banco de dados: %s"
 
-#: internal/cli/monitor/monitor.go:219
+#: internal/cli/monitor/monitor.go:223
 msgid "Error setting raw mode: %s"
 msgstr ""
 
@@ -1233,7 +1233,7 @@ msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "Variáveis globais usam %[1]s bytes de memória dinâmica."
 
 #: internal/cli/board/details.go:216 internal/cli/core/list.go:117
-#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:297
+#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:315
 #: internal/cli/outdated/outdated.go:101
 msgid "ID"
 msgstr "ID"
@@ -1620,7 +1620,7 @@ msgstr "Caminho para esboço faltando"
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' não encontrado"
 
-#: internal/cli/monitor/monitor.go:200
+#: internal/cli/monitor/monitor.go:251
 msgid "Monitor port settings:"
 msgstr "Configurações da porta do monitor:"
 
@@ -1724,7 +1724,7 @@ msgstr ""
 "Esconder detalhes da biblioteca para todas as versões exceto a mais recente "
 "(produz uma saída JSON mais compacta)."
 
-#: internal/cli/monitor/monitor.go:57 internal/cli/monitor/monitor.go:58
+#: internal/cli/monitor/monitor.go:58 internal/cli/monitor/monitor.go:59
 msgid "Open a communication port with a board."
 msgstr "Abra uma porta de comunicação com a placa."
 
@@ -1938,7 +1938,7 @@ msgstr ""
 msgid "Port"
 msgstr "Porta"
 
-#: internal/cli/monitor/monitor.go:253 internal/cli/monitor/monitor.go:262
+#: internal/cli/monitor/monitor.go:271 internal/cli/monitor/monitor.go:280
 msgid "Port closed: %v"
 msgstr "Porta fechada: %v"
 
@@ -2023,7 +2023,7 @@ msgstr "Substituindo plataforma %[1]s com %[2]s"
 msgid "Required tool:"
 msgstr "Ferramenta necessária:"
 
-#: internal/cli/monitor/monitor.go:75
+#: internal/cli/monitor/monitor.go:78
 msgid "Run in silent mode, show only monitor input and output."
 msgstr ""
 "Execute no modo silencioso e mostre apenas a entrada e a saída do monitor."
@@ -2144,7 +2144,7 @@ msgstr ""
 msgid "Set a value for a field required to upload."
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:72
+#: internal/cli/monitor/monitor.go:75
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr ""
 
@@ -2162,7 +2162,7 @@ msgstr ""
 msgid "Sets where to save the configuration file."
 msgstr "Define onde o arquivo de configuração deve ser salvo."
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Setting"
 msgstr "Configuração"
 
@@ -2174,7 +2174,7 @@ msgstr ""
 msgid "Show all available core versions."
 msgstr "Mostre todas as versões de núcleo disponíveis."
 
-#: internal/cli/monitor/monitor.go:73
+#: internal/cli/monitor/monitor.go:76
 msgid "Show all the settings of the communication port."
 msgstr "Mostre todas as configurações da porta de comunicação."
 
@@ -2463,7 +2463,7 @@ msgstr ""
 "podem ser atualizadas. Se nada precisar ser atualizado, a saída do comando "
 "será vazia."
 
-#: internal/cli/monitor/monitor.go:76
+#: internal/cli/monitor/monitor.go:79
 msgid "Timestamp each incoming line."
 msgstr ""
 
@@ -2686,6 +2686,16 @@ msgstr ""
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr ""
 
+#: internal/cli/monitor/monitor.go:246
+msgid "Using default monitor configuration for board: %s"
+msgstr ""
+
+#: internal/cli/monitor/monitor.go:248
+msgid ""
+"Using generic monitor configuration.\n"
+"WARNING: Your board may require different settings to work!\n"
+msgstr ""
+
 #: internal/arduino/builder/libraries.go:312
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
 msgstr ""
@@ -2716,7 +2726,7 @@ msgstr ""
 msgid "VERSION_NUMBER"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Values"
 msgstr ""
 
@@ -3213,11 +3223,11 @@ msgstr ""
 msgid "invalid pluggable monitor reference: %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:185
+#: internal/cli/monitor/monitor.go:192
 msgid "invalid port configuration value for %s: %s"
 msgstr ""
 
-#: internal/cli/monitor/monitor.go:193
+#: internal/cli/monitor/monitor.go:200
 msgid "invalid port configuration: %s"
 msgstr ""
 
