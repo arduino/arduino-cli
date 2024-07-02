@@ -431,7 +431,7 @@ msgstr "配置文件写入：%s"
 msgid "Configuration options for %s"
 msgstr "%s 的配置选项"
 
-#: internal/cli/monitor/monitor.go:74
+#: internal/cli/monitor/monitor.go:77
 msgid ""
 "Configure communication port settings. The format is "
 "<ID>=<value>[,<ID>=<value>]..."
@@ -449,7 +449,7 @@ msgstr "配置工具。"
 msgid "Connected"
 msgstr "已连接"
 
-#: internal/cli/monitor/monitor.go:241
+#: internal/cli/monitor/monitor.go:259
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr ""
 
@@ -531,7 +531,7 @@ msgstr "调试解释器，例如：%s"
 msgid "Debugging not supported for board %s"
 msgstr "%s 开发板不支持调试"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Default"
 msgstr "默认"
 
@@ -772,10 +772,6 @@ msgstr "下载 %s 工具时出错"
 msgid "Error during Debug: %v"
 msgstr "调试时出错：%v"
 
-#: internal/cli/arguments/port.go:141
-msgid "Error during FQBN detection: %v"
-msgstr "检测 FQBN 时出错：%v"
-
 #: internal/cli/feedback/feedback.go:236 internal/cli/feedback/feedback.go:242
 msgid "Error during JSON encoding of the output: %v"
 msgstr "输出编码 JSON 过程时出错：%v"
@@ -786,6 +782,10 @@ msgstr "输出编码 JSON 过程时出错：%v"
 #: internal/cli/upload/upload.go:96 internal/cli/upload/upload.go:125
 msgid "Error during Upload: %v"
 msgstr "上传时出错：%v"
+
+#: internal/cli/arguments/port.go:141
+msgid "Error during board detection"
+msgstr ""
 
 #: internal/cli/compile/compile.go:375
 msgid "Error during build: %v"
@@ -828,7 +828,7 @@ msgstr "获取开发板详细信息时出错：%v"
 msgid "Error getting current directory for compilation database: %s"
 msgstr "获取编译数据库的当前目录时出错：%s"
 
-#: internal/cli/monitor/monitor.go:108
+#: internal/cli/monitor/monitor.go:104
 msgid ""
 "Error getting default port from `sketch.yaml`. Check if you're in the "
 "correct sketch folder or provide the --port flag: %s"
@@ -846,7 +846,7 @@ msgstr "获取库信息时出错：%v"
 msgid "Error getting port metadata: %v"
 msgstr "获取端口元数据出错：%v"
 
-#: internal/cli/monitor/monitor.go:153
+#: internal/cli/monitor/monitor.go:155
 msgid "Error getting port settings details: %s"
 msgstr "获取端口设置详细信息时出错：%s"
 
@@ -968,7 +968,7 @@ msgstr "搜索平台时出错：%v"
 msgid "Error serializing compilation database: %s"
 msgstr "序列化编译数据库时出错：%s"
 
-#: internal/cli/monitor/monitor.go:219
+#: internal/cli/monitor/monitor.go:223
 msgid "Error setting raw mode: %s"
 msgstr "原始的设置出错：%s"
 
@@ -1189,7 +1189,7 @@ msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "全局变量使用 %[1]s 字节的动态内存。"
 
 #: internal/cli/board/details.go:216 internal/cli/core/list.go:117
-#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:297
+#: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:315
 #: internal/cli/outdated/outdated.go:101
 msgid "ID"
 msgstr "ID"
@@ -1558,7 +1558,7 @@ msgstr "缺少项目路径"
 msgid "Monitor '%s' not found"
 msgstr "未找到 ‘%s’ 监视器"
 
-#: internal/cli/monitor/monitor.go:200
+#: internal/cli/monitor/monitor.go:251
 msgid "Monitor port settings:"
 msgstr "监视端口设置："
 
@@ -1658,7 +1658,7 @@ msgid ""
 "compact JSON output)."
 msgstr "省略库中除最新版本之外的所有版本（生成更紧凑的 JSON 输出）。"
 
-#: internal/cli/monitor/monitor.go:57 internal/cli/monitor/monitor.go:58
+#: internal/cli/monitor/monitor.go:58 internal/cli/monitor/monitor.go:59
 msgid "Open a communication port with a board."
 msgstr "开启开发板的通信端口。"
 
@@ -1852,7 +1852,7 @@ msgstr "请指定一个 FQBN。%[1]s 端口上的开发板与协议 %[2]s 不能
 msgid "Port"
 msgstr "端口"
 
-#: internal/cli/monitor/monitor.go:253 internal/cli/monitor/monitor.go:262
+#: internal/cli/monitor/monitor.go:271 internal/cli/monitor/monitor.go:280
 msgid "Port closed: %v"
 msgstr "端口关闭：%v"
 
@@ -1937,7 +1937,7 @@ msgstr "用 %[2]s 替换 %[1]s 平台"
 msgid "Required tool:"
 msgstr "需要的工具："
 
-#: internal/cli/monitor/monitor.go:75
+#: internal/cli/monitor/monitor.go:78
 msgid "Run in silent mode, show only monitor input and output."
 msgstr "以静默模式运行，仅显示监视器输入和输出。"
 
@@ -2092,7 +2092,7 @@ msgstr "服务器类型"
 msgid "Set a value for a field required to upload."
 msgstr "为上传所需的字段设置值。"
 
-#: internal/cli/monitor/monitor.go:72
+#: internal/cli/monitor/monitor.go:75
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr "将终端设置为原始模式（无缓冲）。"
 
@@ -2110,7 +2110,7 @@ msgstr "设置端口和 FQBN 的默认值。如果未指定端口、FQBN 或编�
 msgid "Sets where to save the configuration file."
 msgstr "设置保存配置文件的位置。"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Setting"
 msgstr "设置"
 
@@ -2122,7 +2122,7 @@ msgstr ""
 msgid "Show all available core versions."
 msgstr "显示所有可用的内核版本。"
 
-#: internal/cli/monitor/monitor.go:73
+#: internal/cli/monitor/monitor.go:76
 msgid "Show all the settings of the communication port."
 msgstr "显示通讯端口的所有设置。"
 
@@ -2368,7 +2368,7 @@ msgid ""
 "that can be upgraded. If nothing needs to be updated the output is empty."
 msgstr "此命令显示可升级的已安装内核和库或其一的列表。如果不需要更新任何内容，则输出为空。"
 
-#: internal/cli/monitor/monitor.go:76
+#: internal/cli/monitor/monitor.go:79
 msgid "Timestamp each incoming line."
 msgstr "显示时间戳。"
 
@@ -2593,6 +2593,16 @@ msgstr "使用缓存库文件依赖项：%[1]s"
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "使用平台的 ‘%[1]s’ 代码，在列出的文件夹中：%[2]s"
 
+#: internal/cli/monitor/monitor.go:246
+msgid "Using default monitor configuration for board: %s"
+msgstr ""
+
+#: internal/cli/monitor/monitor.go:248
+msgid ""
+"Using generic monitor configuration.\n"
+"WARNING: Your board may require different settings to work!\n"
+msgstr ""
+
 #: internal/arduino/builder/libraries.go:312
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
 msgstr "使用 %[2]s 版本的 %[1]s 库，在列出的文件夹中：%[3]s%[4]s"
@@ -2623,7 +2633,7 @@ msgstr "版本"
 msgid "VERSION_NUMBER"
 msgstr "版本号"
 
-#: internal/cli/monitor/monitor.go:297
+#: internal/cli/monitor/monitor.go:315
 msgid "Values"
 msgstr "值"
 
@@ -3117,11 +3127,11 @@ msgstr "无效的平台索引网址："
 msgid "invalid pluggable monitor reference: %s"
 msgstr "无效的热插拔监视器引用：%s"
 
-#: internal/cli/monitor/monitor.go:185
+#: internal/cli/monitor/monitor.go:192
 msgid "invalid port configuration value for %s: %s"
 msgstr "%s 的端口配置值无效：%s"
 
-#: internal/cli/monitor/monitor.go:193
+#: internal/cli/monitor/monitor.go:200
 msgid "invalid port configuration: %s"
 msgstr "无效的端口配置：%s"
 
