@@ -30,10 +30,10 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	)
 	if result != nil {
 		if b.logger.Verbose() {
-			b.logger.WriteStdout(result.Stdout())
+			b.logger.WriteStdout(result.Stdout)
 		}
-		b.logger.WriteStdout(result.Stderr())
-		b.diagnosticStore.Parse(result.Args(), result.Stderr())
+		b.logger.WriteStdout(result.Stderr)
+		b.diagnosticStore.Parse(result.Args, result.Stderr)
 	}
 
 	return err
