@@ -318,5 +318,6 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 		}
 	}()
 
+	<-stream.Context().Done()
 	return nil
 }
