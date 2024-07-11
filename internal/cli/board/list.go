@@ -91,10 +91,12 @@ func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, watch
 
 func watchList(ctx context.Context, inst *rpc.Instance, srv rpc.ArduinoCoreServiceServer) {
 	stream, eventsChan := commands.BoardListWatchProxyToChan(ctx)
-	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: inst}, stream)
-	if err != nil {
-		feedback.Fatal(i18n.Tr("Error detecting boards: %v", err), feedback.ErrNetwork)
-	}
+	go func() {
+		err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: inst}, stream)
+		if err != nil {
+			feedback.Fatal(i18n.Tr("Error detecting boards: %v", err), feedback.ErrNetwork)
+		}
+	}()
 
 	// This is done to avoid printing the header each time a new event is received
 	if feedback.GetFormat() == feedback.Text {

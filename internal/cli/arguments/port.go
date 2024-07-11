@@ -89,17 +89,14 @@ func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.Ardu
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithTimeout(ctx, p.timeout.Get())
 	defer cancel()
 
 	stream, watcher := commands.BoardListWatchProxyToChan(ctx)
-	err := srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: instance}, stream)
+	go func() {
+		_ = srv.BoardListWatch(&rpc.BoardListWatchRequest{Instance: instance}, stream)
+	}()
 
-	if err != nil {
-		return nil, err
-	}
-
-	deadline := time.After(p.timeout.Get())
 	for {
 		select {
 		case portEvent := <-watcher:
@@ -111,7 +108,7 @@ func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.Ardu
 				return port, nil
 			}
 
-		case <-deadline:
+		case <-ctx.Done():
 			// No matching port found
 			if protocol == "" {
 				return &rpc.Port{
