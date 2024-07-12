@@ -91,6 +91,24 @@ func TestArduinoCliDaemon(t *testing.T) {
 
 	testWatcher()
 	testWatcher()
+
+	{
+		// Test that the watcher stays open until the grpc call is canceled
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+		defer cancel()
+
+		start := time.Now()
+		watcher, err := grpcInst.BoardListWatch(ctx)
+		require.NoError(t, err)
+		for {
+			_, err := watcher.Recv()
+			if err != nil {
+				break
+			}
+		}
+		require.Greater(t, time.Since(start), 2*time.Second)
+	}
 }
 
 func TestDaemonAutoUpdateIndexOnFirstInit(t *testing.T) {
