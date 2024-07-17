@@ -58,10 +58,10 @@ func TestVersion(t *testing.T) {
 	// Checks if Application's value is arduino-cli
 	require.Equal(t, jsonMap["Application"], "arduino-cli")
 
-	// Checks if VersionString's value is git-snapshot, nightly or a valid semantic versioning
+	// Checks if VersionString's value is 1.0.0-snapshot, nightly or a valid semantic versioning
 	switch version := jsonMap["VersionString"]; version {
-	case "git-snapshot":
-		require.Contains(t, version, "git-snapshot")
+	case "1.0.0-snapshot":
+		require.Contains(t, version, "1.0.0-snapshot")
 	case "nightly":
 		require.Contains(t, version, "nightly")
 	default:

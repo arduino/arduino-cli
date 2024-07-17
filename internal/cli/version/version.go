@@ -48,7 +48,7 @@ func runVersionCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 	logrus.Info("Executing `arduino-cli version`")
 
 	info := version.VersionInfo
-	if strings.Contains(info.VersionString, "git-snapshot") || strings.Contains(info.VersionString, "nightly") {
+	if strings.Contains(info.VersionString, "1.0.0-snapshot") || strings.Contains(info.VersionString, "nightly") {
 		// We're using a development version, no need to check if there's a
 		// new release available
 		feedback.PrintResult(info)
