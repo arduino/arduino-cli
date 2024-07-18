@@ -61,7 +61,7 @@ func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, r
 // shouldCheckForUpdate return true if it actually makes sense to check for new updates,
 // false in all other cases.
 func (s *arduinoCoreServerImpl) shouldCheckForUpdate(currentVersion *semver.Version) bool {
-	if strings.Contains(currentVersion.String(), "1.0.0-snapshot") || strings.Contains(currentVersion.String(), "nightly") {
+	if strings.Contains(currentVersion.String(), "git-snapshot") || strings.Contains(currentVersion.String(), "nightly") {
 		// This is a dev build, no need to check for updates
 		return false
 	}

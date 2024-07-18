@@ -151,7 +151,7 @@ jobs:
         uses: actions/download-artifact@v3
       - name: Output checksum
         run: |
-          TAG="${{ needs.package-name-prefix.outputs.prefix }}1.0.0-snapshot"
+          TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"
           declare -a artifacts=($(ls -d */))
           for artifact in ${artifacts[@]}
           do
