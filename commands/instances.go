@@ -67,9 +67,6 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		userAgent = strings.Join(md.Get("user-agent"), " ")
 	}
-	if userAgent == "" {
-		userAgent = "gRPCClientUnknown/0.0.0"
-	}
 
 	// Setup downloads directory
 	downloadsDir := s.settings.DownloadsDir()
