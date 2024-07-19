@@ -16,7 +16,6 @@
 package commands
 
 import (
-	"context"
 	"errors"
 	"os"
 
@@ -63,14 +62,4 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 		return debugErr
 	}
 	return stream.Send(resp)
-}
-
-// GetDebugConfig return metadata about a debug session
-func (s *arduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
-	return GetDebugConfig(ctx, req)
-}
-
-// IsDebugSupported checks if debugging is supported for a given configuration
-func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
-	return IsDebugSupported(ctx, req)
 }

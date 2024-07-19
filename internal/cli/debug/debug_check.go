@@ -19,7 +19,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -61,7 +60,7 @@ func runDebugCheckCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer,
 		feedback.FatalError(err, feedback.ErrBadArgument)
 	}
 	fqbn := fqbnArg.String()
-	resp, err := commands.IsDebugSupported(ctx, &rpc.IsDebugSupportedRequest{
+	resp, err := srv.IsDebugSupported(ctx, &rpc.IsDebugSupportedRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		Port:        port,
