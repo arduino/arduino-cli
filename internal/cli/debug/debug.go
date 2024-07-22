@@ -142,7 +142,10 @@ func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args
 		if err != nil {
 			feedback.FatalError(err, feedback.ErrBadArgument)
 		}
-		if _, err := commands.Debug(ctx, debugConfigRequested, in, out, ctrlc); err != nil {
+
+		resultCB := func(dr *rpc.DebugResponse_Result) {}
+		stream := commands.DebugServerToStreams(ctx, debugConfigRequested, in, out, ctrlc, resultCB)
+		if err := srv.Debug(stream); err != nil {
 			errcode := feedback.ErrGeneric
 			if errors.Is(err, &cmderrors.MissingProgrammerError{}) {
 				errcode = feedback.ErrMissingProgrammer

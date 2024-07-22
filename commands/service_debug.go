@@ -16,11 +16,14 @@
 package commands
 
 import (
+	"context"
 	"errors"
 	"os"
+	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/metadata"
 
 	"fmt"
 	"io"
@@ -32,9 +35,68 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Debug returns a stream response that can be used to fetch data from the
-// target. The first message passed through the `Debug` request must
-// contain DebugRequest configuration params, not data.
+type debugServer struct {
+	ctx      context.Context
+	req      atomic.Pointer[rpc.GetDebugConfigRequest]
+	in       io.Reader
+	out      io.Writer
+	resultCB func(*rpc.DebugResponse_Result)
+}
+
+func (s *debugServer) Send(resp *rpc.DebugResponse) error {
+	if len(resp.GetData()) > 0 {
+		if _, err := s.out.Write(resp.GetData()); err != nil {
+			return err
+		}
+	}
+	if res := resp.GetResult(); res != nil {
+		s.resultCB(res)
+	}
+	return nil
+}
+
+func (s *debugServer) Recv() (r *rpc.DebugRequest, e error) {
+	if conf := s.req.Swap(nil); conf != nil {
+		return &rpc.DebugRequest{DebugRequest: conf}, nil
+	}
+	buff := make([]byte, 4096)
+	n, err := s.in.Read(buff)
+	if err != nil {
+		return nil, err
+	}
+	return &rpc.DebugRequest{Data: buff[:n]}, nil
+}
+
+func (s *debugServer) Context() context.Context     { return s.ctx }
+func (s *debugServer) RecvMsg(m any) error          { return nil }
+func (s *debugServer) SendHeader(metadata.MD) error { return nil }
+func (s *debugServer) SendMsg(m any) error          { return nil }
+func (s *debugServer) SetHeader(metadata.MD) error  { return nil }
+func (s *debugServer) SetTrailer(metadata.MD)       {}
+
+// DebugServerToStreams creates a debug server that proxies the data to the given io streams.
+// The GetDebugConfigRequest is used to configure the debbuger. sig is a channel that can be
+// used to send os.Interrupt to the debug process. resultCB is a callback function that will
+// receive the Debug result.
+func DebugServerToStreams(
+	ctx context.Context,
+	req *rpc.GetDebugConfigRequest,
+	in io.Reader, out io.Writer,
+	sig chan os.Signal,
+	resultCB func(*rpc.DebugResponse_Result),
+) rpc.ArduinoCoreService_DebugServer {
+	server := &debugServer{
+		ctx:      ctx,
+		in:       in,
+		out:      out,
+		resultCB: resultCB,
+	}
+	server.req.Store(req)
+	return server
+}
+
+// Debug starts a debugging session. The first message passed through the `Debug` request must
+// contain DebugRequest configuration params and no data.
 func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer) error {
 	// Utility functions
 	syncSend := NewSynchronizedSend(stream.Send)
