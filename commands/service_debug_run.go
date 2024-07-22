@@ -16,110 +16,16 @@
 package commands
 
 import (
-	"context"
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 )
-
-// Debug command launches a debug tool for a sketch.
-// It also implements streams routing:
-// gRPC In -> tool stdIn
-// grpc Out <- tool stdOut
-// grpc Out <- tool stdErr
-// It also implements tool process lifecycle management
-func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*rpc.DebugResponse, error) {
-
-	// Get debugging command line to run debugger
-	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
-	if err != nil {
-		return nil, err
-	}
-	defer release()
-
-	commandLine, err := getCommandLine(req, pme)
-	if err != nil {
-		return nil, err
-	}
-
-	for i, arg := range commandLine {
-		fmt.Printf("%2d: %s\n", i, arg)
-	}
-
-	// Run Tool
-	entry := logrus.NewEntry(logrus.StandardLogger())
-	for i, param := range commandLine {
-		entry = entry.WithField(fmt.Sprintf("param%d", i), param)
-	}
-	entry.Debug("Executing debugger")
-
-	cmd, err := paths.NewProcess(pme.GetEnvVarsForSpawnedProcess(), commandLine...)
-	if err != nil {
-		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("Cannot execute debug tool"), Cause: err}
-	}
-
-	// Get stdIn pipe from tool
-	in, err := cmd.StdinPipe()
-	if err != nil {
-		return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
-			Result: &rpc.DebugResponse_Result{Error: err.Error()},
-		}}, nil
-	}
-	defer in.Close()
-
-	// Merge tool StdOut and StdErr to stream them in the io.Writer passed stream
-	cmd.RedirectStdoutTo(out)
-	cmd.RedirectStderrTo(out)
-
-	// Start the debug command
-	if err := cmd.Start(); err != nil {
-		return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
-			Result: &rpc.DebugResponse_Result{Error: err.Error()},
-		}}, nil
-	}
-
-	if interrupt != nil {
-		go func() {
-			for {
-				sig, ok := <-interrupt
-				if !ok {
-					break
-				}
-				cmd.Signal(sig)
-			}
-		}()
-	}
-
-	go func() {
-		// Copy data from passed inStream into command stdIn
-		io.Copy(in, inStream)
-		// In any case, try process termination after a second to avoid leaving
-		// zombie process.
-		time.Sleep(time.Second)
-		cmd.Kill()
-	}()
-
-	// Wait for process to finish
-	if err := cmd.Wait(); err != nil {
-		return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
-			Result: &rpc.DebugResponse_Result{Error: err.Error()},
-		}}, nil
-	}
-	return &rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{
-		Result: &rpc.DebugResponse_Result{},
-	}}, nil
-}
 
 // getCommandLine compose a debug command represented by a core recipe
 func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {

@@ -21,12 +21,30 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+
+	"fmt"
+	"io"
+	"time"
+
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
+	paths "github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
 // contain DebugRequest configuration params, not data.
 func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer) error {
+	// Utility functions
+	syncSend := NewSynchronizedSend(stream.Send)
+	sendResult := func(res *rpc.DebugResponse_Result) error {
+		return syncSend.Send(&rpc.DebugResponse{Message: &rpc.DebugResponse_Result_{Result: res}})
+	}
+	sendData := func(data []byte) {
+		_ = syncSend.Send(&rpc.DebugResponse{Message: &rpc.DebugResponse_Data{Data: data}})
+	}
+
 	// Grab the first message
 	msg, err := stream.Recv()
 	if err != nil {
@@ -42,24 +60,59 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	// Launch debug recipe attaching stdin and out to grpc streaming
 	signalChan := make(chan os.Signal)
 	defer close(signalChan)
-	outStream := feedStreamTo(func(data []byte) {
-		stream.Send(&rpc.DebugResponse{Message: &rpc.DebugResponse_Data{
-			Data: data,
-		}})
+	outStream := feedStreamTo(sendData)
+	defer outStream.Close()
+	inStream := consumeStreamFrom(func() ([]byte, error) {
+		command, err := stream.Recv()
+		if command.GetSendInterrupt() {
+			signalChan <- os.Interrupt
+		}
+		return command.GetData(), err
 	})
-	resp, debugErr := Debug(stream.Context(), req,
-		consumeStreamFrom(func() ([]byte, error) {
-			command, err := stream.Recv()
-			if command.GetSendInterrupt() {
-				signalChan <- os.Interrupt
-			}
-			return command.GetData(), err
-		}),
-		outStream,
-		signalChan)
-	outStream.Close()
-	if debugErr != nil {
-		return debugErr
+
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return err
 	}
-	return stream.Send(resp)
+	defer release()
+
+	// Exec debugger
+	commandLine, err := getCommandLine(req, pme)
+	if err != nil {
+		return err
+	}
+	entry := logrus.NewEntry(logrus.StandardLogger())
+	for i, param := range commandLine {
+		entry = entry.WithField(fmt.Sprintf("param%d", i), param)
+	}
+	entry.Debug("Executing debugger")
+	cmd, err := paths.NewProcess(pme.GetEnvVarsForSpawnedProcess(), commandLine...)
+	if err != nil {
+		return &cmderrors.FailedDebugError{Message: i18n.Tr("Cannot execute debug tool"), Cause: err}
+	}
+	in, err := cmd.StdinPipe()
+	if err != nil {
+		return sendResult(&rpc.DebugResponse_Result{Error: err.Error()})
+	}
+	defer in.Close()
+	cmd.RedirectStdoutTo(io.Writer(outStream))
+	cmd.RedirectStderrTo(io.Writer(outStream))
+	if err := cmd.Start(); err != nil {
+		return sendResult(&rpc.DebugResponse_Result{Error: err.Error()})
+	}
+
+	go func() {
+		for sig := range signalChan {
+			cmd.Signal(sig)
+		}
+	}()
+	go func() {
+		io.Copy(in, inStream)
+		time.Sleep(time.Second)
+		cmd.Kill()
+	}()
+	if err := cmd.Wait(); err != nil {
+		return sendResult(&rpc.DebugResponse_Result{Error: err.Error()})
+	}
+	return sendResult(&rpc.DebugResponse_Result{})
 }
