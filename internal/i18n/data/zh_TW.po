@@ -238,7 +238,7 @@ msgstr "可用命令:"
 msgid "Binary file to upload."
 msgstr "要上傳的二進位檔"
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 #: internal/cli/board/listall.go:84 internal/cli/board/search.go:85
 msgid "Board Name"
 msgstr "開發板名"
@@ -441,7 +441,7 @@ msgstr "設定平台"
 msgid "Configuring tool."
 msgstr "設定工具"
 
-#: internal/cli/board/list.go:196
+#: internal/cli/board/list.go:198
 msgid "Connected"
 msgstr "已連接"
 
@@ -449,7 +449,7 @@ msgstr "已連接"
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr "連接 %s 中。按 CTRL-C 結束。"
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Core"
 msgstr "核心"
 
@@ -457,7 +457,7 @@ msgstr "核心"
 msgid "Could not connect via HTTP"
 msgstr "無法通過 HTTP 連接"
 
-#: commands/instances.go:487
+#: commands/instances.go:484
 msgid "Could not create index directory"
 msgstr "無法建立索引目錄"
 
@@ -592,7 +592,7 @@ msgstr "目錄用來保存生成檔。預設為 ./docs，本目錄必須存在"
 msgid "Disable completion description for shells that support it"
 msgstr "關閉 shell 的完成描述功能"
 
-#: internal/cli/board/list.go:197
+#: internal/cli/board/list.go:199
 msgid "Disconnected"
 msgstr "斷開連接"
 
@@ -633,13 +633,13 @@ msgstr "下載 %s"
 msgid "Downloading index signature: %s"
 msgstr "下載索引簽名: %s"
 
-#: commands/instances.go:564 commands/instances.go:582
-#: commands/instances.go:596 commands/instances.go:613
+#: commands/instances.go:561 commands/instances.go:579
+#: commands/instances.go:593 commands/instances.go:610
 #: internal/arduino/resources/index.go:82
 msgid "Downloading index: %s"
 msgstr "下載索引: %s"
 
-#: commands/instances.go:374
+#: commands/instances.go:371
 msgid "Downloading library %s"
 msgstr "下載程式庫 %s"
 
@@ -729,7 +729,7 @@ msgstr "建立 sketch 檔時出錯"
 msgid "Error creating sketch: %v"
 msgstr "建立 sketch 時出錯: %v"
 
-#: internal/cli/board/list.go:83 internal/cli/board/list.go:96
+#: internal/cli/board/list.go:83 internal/cli/board/list.go:97
 msgid "Error detecting boards: %v"
 msgstr "偵測開發板時出錯: %v"
 
@@ -742,7 +742,7 @@ msgstr "下載 %[1]s 出錯: %[2]v"
 msgid "Error downloading %s"
 msgstr "下載 %s 出錯"
 
-#: commands/instances.go:661 internal/arduino/resources/index.go:83
+#: commands/instances.go:658 internal/arduino/resources/index.go:83
 msgid "Error downloading index '%s'"
 msgstr "下載索引'%s'時出錯"
 
@@ -750,7 +750,7 @@ msgstr "下載索引'%s'時出錯"
 msgid "Error downloading index signature '%s'"
 msgstr "下載索引簽名 '%s' 出錯"
 
-#: commands/instances.go:384 commands/instances.go:390
+#: commands/instances.go:381 commands/instances.go:387
 msgid "Error downloading library %s"
 msgstr "下載程式庫 %s 出錯"
 
@@ -779,9 +779,9 @@ msgstr "輸出 JSON 編碼過程出錯：%v"
 msgid "Error during Upload: %v"
 msgstr "上傳時出錯: %v"
 
-#: internal/cli/arguments/port.go:141
+#: internal/cli/arguments/port.go:138
 msgid "Error during board detection"
-msgstr ""
+msgstr "開發板偵測時出現錯誤。"
 
 #: internal/cli/compile/compile.go:375
 msgid "Error during build: %v"
@@ -866,7 +866,7 @@ msgstr "安裝 Git 程式庫出錯: %v"
 msgid "Error installing Zip Library: %v"
 msgstr "安裝 Zip 程式庫出錯: %v"
 
-#: commands/instances.go:400
+#: commands/instances.go:397
 msgid "Error installing library %s"
 msgstr "安裝程式庫 %s 出錯"
 
@@ -1024,7 +1024,7 @@ msgstr "錯誤: %v 不支持命令說明"
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "錯誤: 無效原始碼覆蓋了資料檔: %v"
 
-#: internal/cli/board/list.go:102
+#: internal/cli/board/list.go:104
 msgid "Event"
 msgstr "事件"
 
@@ -1045,7 +1045,7 @@ msgid "Expected compiled sketch in directory %s, but is a file instead"
 msgstr "%s 目錄內應該有已編譯的 sketch，卻只有個檔案"
 
 #: internal/cli/board/attach.go:35 internal/cli/board/details.go:41
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 #: internal/cli/board/listall.go:84 internal/cli/board/search.go:85
 msgid "FQBN"
 msgstr "FQBN"
@@ -1066,11 +1066,11 @@ msgstr "燒錄失敗"
 msgid "Failed to burn bootloader"
 msgstr "燒錄 bootloader 失敗"
 
-#: commands/instances.go:90
+#: commands/instances.go:87
 msgid "Failed to create data directory"
 msgstr "建立資料目錄失敗"
 
-#: commands/instances.go:79
+#: commands/instances.go:76
 msgid "Failed to create downloads directory"
 msgstr "建立下載檔案夾失敗"
 
@@ -1234,7 +1234,7 @@ msgstr "已安裝 %s"
 msgid "Installing %s"
 msgstr "安裝 %s..."
 
-#: commands/instances.go:398
+#: commands/instances.go:395
 msgid "Installing library %s"
 msgstr "安裝程式庫 %s"
 
@@ -1275,7 +1275,7 @@ msgstr "無效的 TCP 位址：缺少連接埠"
 msgid "Invalid URL"
 msgstr "無效的網址"
 
-#: commands/instances.go:186
+#: commands/instances.go:183
 msgid "Invalid additional URL: %v"
 msgstr "無效的額外網址: %v"
 
@@ -1301,7 +1301,7 @@ msgstr "無效的資料大小正規表示式: %s"
 msgid "Invalid eeprom size regexp: %s"
 msgstr "無效的 eeprom 大小正規表示式: %s"
 
-#: commands/instances.go:597
+#: commands/instances.go:594
 msgid "Invalid index URL: %s"
 msgstr "無效的索引網址: 1%s"
 
@@ -1321,7 +1321,7 @@ msgstr "無效的程式庫"
 msgid "Invalid logging level: %s"
 msgstr "無效的日誌層級: %s"
 
-#: commands/instances.go:614
+#: commands/instances.go:611
 msgid "Invalid network configuration: %s"
 msgstr "網路設定無效: %s"
 
@@ -1333,7 +1333,7 @@ msgstr "無效的 '%[1]s' 網路代理 network.proxy: %[2]s"
 msgid "Invalid output format: %s"
 msgstr "無效的輸出格式: %s"
 
-#: commands/instances.go:581
+#: commands/instances.go:578
 msgid "Invalid package index in %s"
 msgstr "%s 內的套件索引無效"
 
@@ -1410,7 +1410,7 @@ msgstr "程式庫 %s 已是最新版"
 msgid "Library %s is not installed"
 msgstr "程式庫 %s 未安裝"
 
-#: commands/instances.go:377
+#: commands/instances.go:374
 msgid "Library %s not found"
 msgstr "未找到程式庫 %s "
 
@@ -1482,8 +1482,8 @@ msgstr "列出所有連接的開發板"
 msgid "Lists cores and libraries that can be upgraded"
 msgstr "列出可升級的核心和程式庫"
 
-#: commands/instances.go:224 commands/instances.go:235
-#: commands/instances.go:345
+#: commands/instances.go:221 commands/instances.go:232
+#: commands/instances.go:342
 msgid "Loading index file: %v"
 msgstr "載入索引檔: %v"
 
@@ -1576,7 +1576,7 @@ msgstr "名: “%s”"
 msgid "New upload port: %[1]s (%[2]s)"
 msgstr "新上傳連接埠: %[1]s (%[2]s)"
 
-#: internal/cli/board/list.go:130
+#: internal/cli/board/list.go:132
 msgid "No boards found."
 msgstr "沒找到開發板"
 
@@ -1844,7 +1844,7 @@ msgid ""
 " identified"
 msgstr "請指定一個 FQBN。%[1]s 連接埠以協議 %[2]s 的開發板無法識別"
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Port"
 msgstr "連接埠"
 
@@ -1909,7 +1909,7 @@ msgstr "燒錄器:"
 msgid "Property '%s' is undefined"
 msgstr "'%s' 屬性未定義"
 
-#: internal/cli/board/list.go:140
+#: internal/cli/board/list.go:142
 msgid "Protocol"
 msgstr "協議"
 
@@ -2259,7 +2259,7 @@ msgstr "跳過工具設定"
 msgid "Skipping: %[1]s"
 msgstr "跳過: %[1]s"
 
-#: commands/instances.go:634
+#: commands/instances.go:631
 msgid "Some indexes could not be updated."
 msgstr "有些索引無法更新"
 
@@ -2392,7 +2392,7 @@ msgstr "嘗試執行 %s"
 msgid "Turns on verbose mode."
 msgstr "開啟囉嗦模式"
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Type"
 msgstr "類型"
 
@@ -2426,7 +2426,7 @@ msgstr "無法取得用戶家目錄: %v"
 msgid "Unable to open file for logging: %s"
 msgstr "無法開啟檔案做日誌記錄: %s"
 
-#: commands/instances.go:563
+#: commands/instances.go:560
 msgid "Unable to parse URL"
 msgstr "無法解析網址"
 
@@ -2450,7 +2450,7 @@ msgstr "如不再需用到, 卸除一或多個核心及相依"
 msgid "Uninstalls one or more libraries."
 msgstr "卸載一或多個程式庫"
 
-#: internal/cli/board/list.go:172
+#: internal/cli/board/list.go:174
 msgid "Unknown"
 msgstr "未知的"
 
@@ -2582,13 +2582,15 @@ msgstr "使用檔案夾: %[2]s 裏面平台的核心 '%[1]s' "
 
 #: internal/cli/monitor/monitor.go:246
 msgid "Using default monitor configuration for board: %s"
-msgstr ""
+msgstr "使用 %s 開發板的監控設定。"
 
 #: internal/cli/monitor/monitor.go:248
 msgid ""
 "Using generic monitor configuration.\n"
 "WARNING: Your board may require different settings to work!\n"
 msgstr ""
+"使用一般監控設定。.\n"
+"警告: 您的開發板可能需要不同的設定才能適用!\n"
 
 #: internal/arduino/builder/libraries.go:312
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
@@ -2740,7 +2742,7 @@ msgstr "內建程式庫目錄未設定"
 msgid "can't find latest release of %s"
 msgstr "找不到最新版的 %s "
 
-#: commands/instances.go:275
+#: commands/instances.go:272
 msgid "can't find latest release of tool %s"
 msgstr "找不到最新版的工具 %s "
 
@@ -3396,7 +3398,7 @@ msgstr "已加入可插拔探索: %s"
 msgid "port"
 msgstr "連接埠"
 
-#: internal/cli/arguments/port.go:122
+#: internal/cli/arguments/port.go:119
 msgid "port not found: %[1]s %[2]s"
 msgstr "沒找到連接埠: %[1]s %[2]s"
 
