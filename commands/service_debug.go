@@ -19,8 +19,11 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
+	"runtime"
 	"sync/atomic"
 
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/grpc/metadata"
@@ -177,4 +180,83 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 		return sendResult(&rpc.DebugResponse_Result{Error: err.Error()})
 	}
 	return sendResult(&rpc.DebugResponse_Result{})
+}
+
+// getCommandLine compose a debug command represented by a core recipe
+func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
+	debugInfo, err := getDebugProperties(req, pme, false)
+	if err != nil {
+		return nil, err
+	}
+
+	cmdArgs := []string{}
+	add := func(s string) { cmdArgs = append(cmdArgs, s) }
+
+	// Add path to GDB Client to command line
+	var gdbPath *paths.Path
+	switch debugInfo.GetToolchain() {
+	case "gcc":
+		gdbexecutable := debugInfo.GetToolchainPrefix() + "-gdb"
+		if runtime.GOOS == "windows" {
+			gdbexecutable += ".exe"
+		}
+		gdbPath = paths.New(debugInfo.GetToolchainPath()).Join(gdbexecutable)
+	default:
+		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("Toolchain '%s' is not supported", debugInfo.GetToolchain())}
+	}
+	add(gdbPath.String())
+
+	// Set GDB interpreter (default value should be "console")
+	gdbInterpreter := req.GetInterpreter()
+	if gdbInterpreter == "" {
+		gdbInterpreter = "console"
+	}
+	add("--interpreter=" + gdbInterpreter)
+	if gdbInterpreter != "console" {
+		add("-ex")
+		add("set pagination off")
+	}
+
+	// Add extra GDB execution commands
+	add("-ex")
+	add("set remotetimeout 5")
+
+	// Extract path to GDB Server
+	switch debugInfo.GetServer() {
+	case "openocd":
+		var openocdConf rpc.DebugOpenOCDServerConfiguration
+		if err := debugInfo.GetServerConfiguration().UnmarshalTo(&openocdConf); err != nil {
+			return nil, err
+		}
+
+		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.GetServerPath())
+
+		if cfg := openocdConf.GetScriptsDir(); cfg != "" {
+			serverCmd += fmt.Sprintf(` -s "%s"`, cfg)
+		}
+
+		for _, script := range openocdConf.GetScripts() {
+			serverCmd += fmt.Sprintf(` --file "%s"`, script)
+		}
+
+		serverCmd += ` -c "gdb_port pipe"`
+		serverCmd += ` -c "telnet_port 0"`
+
+		add("-ex")
+		add(serverCmd)
+
+	default:
+		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("GDB server '%s' is not supported", debugInfo.GetServer())}
+	}
+
+	// Add executable
+	add(debugInfo.GetExecutable())
+
+	// Transform every path to forward slashes (on Windows some tools further
+	// escapes the command line so the backslash "\" gets in the way).
+	for i, param := range cmdArgs {
+		cmdArgs[i] = filepath.ToSlash(param)
+	}
+
+	return cmdArgs, nil
 }
