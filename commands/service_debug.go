@@ -46,14 +46,14 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	}
 
 	// Grab the first message
-	msg, err := stream.Recv()
+	debugConfReqMsg, err := stream.Recv()
 	if err != nil {
 		return err
 	}
 
 	// Ensure it's a config message and not data
-	req := msg.GetDebugRequest()
-	if req == nil {
+	debugConfReq := debugConfReqMsg.GetDebugRequest()
+	if debugConfReq == nil {
 		return errors.New(i18n.Tr("First message must contain debug request, not data"))
 	}
 
@@ -70,14 +70,14 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 		return command.GetData(), err
 	})
 
-	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	pme, release, err := instances.GetPackageManagerExplorer(debugConfReq.GetInstance())
 	if err != nil {
 		return err
 	}
 	defer release()
 
 	// Exec debugger
-	commandLine, err := getCommandLine(req, pme)
+	commandLine, err := getCommandLine(debugConfReq, pme)
 	if err != nil {
 		return err
 	}
