@@ -250,7 +250,7 @@ msgstr "Comandos disponibles:"
 msgid "Binary file to upload."
 msgstr "Archivo binario para cargar."
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 #: internal/cli/board/listall.go:84 internal/cli/board/search.go:85
 msgid "Board Name"
 msgstr "Nombre de la placa"
@@ -460,7 +460,7 @@ msgstr "Configurando plataforma."
 msgid "Configuring tool."
 msgstr ""
 
-#: internal/cli/board/list.go:196
+#: internal/cli/board/list.go:198
 msgid "Connected"
 msgstr "Conectado"
 
@@ -468,7 +468,7 @@ msgstr "Conectado"
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr ""
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Core"
 msgstr "Núcleo"
 
@@ -476,7 +476,7 @@ msgstr "Núcleo"
 msgid "Could not connect via HTTP"
 msgstr "No se pudo conectar vía HTTP"
 
-#: commands/instances.go:487
+#: commands/instances.go:484
 msgid "Could not create index directory"
 msgstr "No se ha podido crear el directorio índice."
 
@@ -616,7 +616,7 @@ msgstr ""
 msgid "Disable completion description for shells that support it"
 msgstr ""
 
-#: internal/cli/board/list.go:197
+#: internal/cli/board/list.go:199
 msgid "Disconnected"
 msgstr "Desconectado"
 
@@ -657,13 +657,13 @@ msgstr "Descargando %s"
 msgid "Downloading index signature: %s"
 msgstr ""
 
-#: commands/instances.go:564 commands/instances.go:582
-#: commands/instances.go:596 commands/instances.go:613
+#: commands/instances.go:561 commands/instances.go:579
+#: commands/instances.go:593 commands/instances.go:610
 #: internal/arduino/resources/index.go:82
 msgid "Downloading index: %s"
 msgstr "Descargando el índice: %s"
 
-#: commands/instances.go:374
+#: commands/instances.go:371
 msgid "Downloading library %s"
 msgstr "Descargando la librería %s"
 
@@ -755,7 +755,7 @@ msgstr "Error creando el archivo de sketch"
 msgid "Error creating sketch: %v"
 msgstr "Error creando el sketch: %v"
 
-#: internal/cli/board/list.go:83 internal/cli/board/list.go:96
+#: internal/cli/board/list.go:83 internal/cli/board/list.go:97
 msgid "Error detecting boards: %v"
 msgstr "Error detectando placas: %v"
 
@@ -768,7 +768,7 @@ msgstr "Error al descargar %[1]s: %[2]v"
 msgid "Error downloading %s"
 msgstr "Error descargando %s"
 
-#: commands/instances.go:661 internal/arduino/resources/index.go:83
+#: commands/instances.go:658 internal/arduino/resources/index.go:83
 msgid "Error downloading index '%s'"
 msgstr "Error descargando el índice '%s'"
 
@@ -776,7 +776,7 @@ msgstr "Error descargando el índice '%s'"
 msgid "Error downloading index signature '%s'"
 msgstr "Error descargando el índice de firmas '%s'"
 
-#: commands/instances.go:384 commands/instances.go:390
+#: commands/instances.go:381 commands/instances.go:387
 msgid "Error downloading library %s"
 msgstr "Error descargando la librería %s"
 
@@ -805,7 +805,7 @@ msgstr ""
 msgid "Error during Upload: %v"
 msgstr "Error durante la carga: %v"
 
-#: internal/cli/arguments/port.go:141
+#: internal/cli/arguments/port.go:138
 msgid "Error during board detection"
 msgstr ""
 
@@ -893,7 +893,7 @@ msgstr ""
 msgid "Error installing Zip Library: %v"
 msgstr ""
 
-#: commands/instances.go:400
+#: commands/instances.go:397
 msgid "Error installing library %s"
 msgstr ""
 
@@ -1051,7 +1051,7 @@ msgstr ""
 msgid "Error: invalid source code overrides data file: %v"
 msgstr ""
 
-#: internal/cli/board/list.go:102
+#: internal/cli/board/list.go:104
 msgid "Event"
 msgstr ""
 
@@ -1072,7 +1072,7 @@ msgid "Expected compiled sketch in directory %s, but is a file instead"
 msgstr ""
 
 #: internal/cli/board/attach.go:35 internal/cli/board/details.go:41
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 #: internal/cli/board/listall.go:84 internal/cli/board/search.go:85
 msgid "FQBN"
 msgstr "FQBN"
@@ -1093,11 +1093,11 @@ msgstr ""
 msgid "Failed to burn bootloader"
 msgstr ""
 
-#: commands/instances.go:90
+#: commands/instances.go:87
 msgid "Failed to create data directory"
 msgstr ""
 
-#: commands/instances.go:79
+#: commands/instances.go:76
 msgid "Failed to create downloads directory"
 msgstr ""
 
@@ -1263,7 +1263,7 @@ msgstr "Instalado %s"
 msgid "Installing %s"
 msgstr "Instalando %s"
 
-#: commands/instances.go:398
+#: commands/instances.go:395
 msgid "Installing library %s"
 msgstr "Instalando la librería %s"
 
@@ -1304,7 +1304,7 @@ msgstr ""
 msgid "Invalid URL"
 msgstr "URL inválida"
 
-#: commands/instances.go:186
+#: commands/instances.go:183
 msgid "Invalid additional URL: %v"
 msgstr "URL adicional inválida: %v"
 
@@ -1330,7 +1330,7 @@ msgstr ""
 msgid "Invalid eeprom size regexp: %s"
 msgstr ""
 
-#: commands/instances.go:597
+#: commands/instances.go:594
 msgid "Invalid index URL: %s"
 msgstr ""
 
@@ -1350,7 +1350,7 @@ msgstr "Librería inválida"
 msgid "Invalid logging level: %s"
 msgstr ""
 
-#: commands/instances.go:614
+#: commands/instances.go:611
 msgid "Invalid network configuration: %s"
 msgstr ""
 
@@ -1362,7 +1362,7 @@ msgstr ""
 msgid "Invalid output format: %s"
 msgstr ""
 
-#: commands/instances.go:581
+#: commands/instances.go:578
 msgid "Invalid package index in %s"
 msgstr ""
 
@@ -1440,7 +1440,7 @@ msgstr "La librería %s ya se encuentra en la versión más reciente"
 msgid "Library %s is not installed"
 msgstr "La librería %s no está instalada"
 
-#: commands/instances.go:377
+#: commands/instances.go:374
 msgid "Library %s not found"
 msgstr "Librería %s no encontrada"
 
@@ -1512,8 +1512,8 @@ msgstr "Enumera todas las placas conectadas."
 msgid "Lists cores and libraries that can be upgraded"
 msgstr ""
 
-#: commands/instances.go:224 commands/instances.go:235
-#: commands/instances.go:345
+#: commands/instances.go:221 commands/instances.go:232
+#: commands/instances.go:342
 msgid "Loading index file: %v"
 msgstr ""
 
@@ -1607,7 +1607,7 @@ msgstr "Nombre: \"%s\""
 msgid "New upload port: %[1]s (%[2]s)"
 msgstr ""
 
-#: internal/cli/board/list.go:130
+#: internal/cli/board/list.go:132
 msgid "No boards found."
 msgstr "No se encontraron placas."
 
@@ -1875,7 +1875,7 @@ msgid ""
 " identified"
 msgstr ""
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Port"
 msgstr "Puerto"
 
@@ -1940,7 +1940,7 @@ msgstr "Programadores:"
 msgid "Property '%s' is undefined"
 msgstr "La propiedad '%s' no está definida"
 
-#: internal/cli/board/list.go:140
+#: internal/cli/board/list.go:142
 msgid "Protocol"
 msgstr "Protocolo"
 
@@ -2264,7 +2264,7 @@ msgstr ""
 msgid "Skipping: %[1]s"
 msgstr ""
 
-#: commands/instances.go:634
+#: commands/instances.go:631
 msgid "Some indexes could not be updated."
 msgstr ""
 
@@ -2395,7 +2395,7 @@ msgstr ""
 msgid "Turns on verbose mode."
 msgstr "Habilitar el modo verbose."
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Type"
 msgstr "Tipo"
 
@@ -2429,7 +2429,7 @@ msgstr ""
 msgid "Unable to open file for logging: %s"
 msgstr "No es posible abrir el archivo para el logging: %s"
 
-#: commands/instances.go:563
+#: commands/instances.go:560
 msgid "Unable to parse URL"
 msgstr ""
 
@@ -2455,7 +2455,7 @@ msgstr ""
 msgid "Uninstalls one or more libraries."
 msgstr "Desinstalar una o más librerías."
 
-#: internal/cli/board/list.go:172
+#: internal/cli/board/list.go:174
 msgid "Unknown"
 msgstr ""
 
@@ -2746,7 +2746,7 @@ msgstr ""
 msgid "can't find latest release of %s"
 msgstr ""
 
-#: commands/instances.go:275
+#: commands/instances.go:272
 msgid "can't find latest release of tool %s"
 msgstr ""
 
@@ -3402,7 +3402,7 @@ msgstr ""
 msgid "port"
 msgstr ""
 
-#: internal/cli/arguments/port.go:122
+#: internal/cli/arguments/port.go:119
 msgid "port not found: %[1]s %[2]s"
 msgstr ""
 

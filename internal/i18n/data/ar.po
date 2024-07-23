@@ -252,7 +252,7 @@ msgstr "الاوامر المتوفرة"
 msgid "Binary file to upload."
 msgstr "الملف الثنائي (Binary file) الذي تريد رفعه"
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 #: internal/cli/board/listall.go:84 internal/cli/board/search.go:85
 msgid "Board Name"
 msgstr "اسم اللوحة"
@@ -461,7 +461,7 @@ msgstr "جار تهيئة المنصة"
 msgid "Configuring tool."
 msgstr "جار تهيئة الاداة"
 
-#: internal/cli/board/list.go:196
+#: internal/cli/board/list.go:198
 msgid "Connected"
 msgstr "متصل"
 
@@ -469,7 +469,7 @@ msgstr "متصل"
 msgid "Connecting to %s. Press CTRL-C to exit."
 msgstr ""
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Core"
 msgstr "النواة"
 
@@ -477,7 +477,7 @@ msgstr "النواة"
 msgid "Could not connect via HTTP"
 msgstr "تعذر الاتصال بواسطة HTTP"
 
-#: commands/instances.go:487
+#: commands/instances.go:484
 msgid "Could not create index directory"
 msgstr "تعذر انشاء فهرس داخل المسار"
 
@@ -618,7 +618,7 @@ msgstr ""
 msgid "Disable completion description for shells that support it"
 msgstr "الغاء تفعيل وصف الاكتمال في واجهات الاوامر التي تدعم ذلك"
 
-#: internal/cli/board/list.go:197
+#: internal/cli/board/list.go:199
 msgid "Disconnected"
 msgstr "قطع الاتصال"
 
@@ -661,13 +661,13 @@ msgstr "يتم تنزيل %s"
 msgid "Downloading index signature: %s"
 msgstr "جار تنزيل فهرس التوقيعات %s"
 
-#: commands/instances.go:564 commands/instances.go:582
-#: commands/instances.go:596 commands/instances.go:613
+#: commands/instances.go:561 commands/instances.go:579
+#: commands/instances.go:593 commands/instances.go:610
 #: internal/arduino/resources/index.go:82
 msgid "Downloading index: %s"
 msgstr "جار تنزيل الفهرس : %s"
 
-#: commands/instances.go:374
+#: commands/instances.go:371
 msgid "Downloading library %s"
 msgstr "جار تحميل المكتبة %s"
 
@@ -760,7 +760,7 @@ msgstr "خطا اثناء انشاء ارشيف المشروع"
 msgid "Error creating sketch: %v"
 msgstr "خطأ اثناء انشاء المشروع : %v"
 
-#: internal/cli/board/list.go:83 internal/cli/board/list.go:96
+#: internal/cli/board/list.go:83 internal/cli/board/list.go:97
 msgid "Error detecting boards: %v"
 msgstr "خطا اثناء البحث عن اللوحات : %v"
 
@@ -773,7 +773,7 @@ msgstr "خطا اثناء تحميل %[1]s : %[2]v"
 msgid "Error downloading %s"
 msgstr "خطأ اثناء تحميل %s"
 
-#: commands/instances.go:661 internal/arduino/resources/index.go:83
+#: commands/instances.go:658 internal/arduino/resources/index.go:83
 msgid "Error downloading index '%s'"
 msgstr "خطأ اثناء تحميل الفهرس '%s'"
 
@@ -781,7 +781,7 @@ msgstr "خطأ اثناء تحميل الفهرس '%s'"
 msgid "Error downloading index signature '%s'"
 msgstr "خطأ اثناء تحميل توقيع الفهرس : '%s'"
 
-#: commands/instances.go:384 commands/instances.go:390
+#: commands/instances.go:381 commands/instances.go:387
 msgid "Error downloading library %s"
 msgstr "خطأ اثناء تحميل المكتبة %s"
 
@@ -810,7 +810,7 @@ msgstr "خطا اثناء ترميز JSON الخاص بالخرج : %v"
 msgid "Error during Upload: %v"
 msgstr "خطا اثناء الرفع : %v"
 
-#: internal/cli/arguments/port.go:141
+#: internal/cli/arguments/port.go:138
 msgid "Error during board detection"
 msgstr ""
 
@@ -898,7 +898,7 @@ msgstr "خطأ اثناء تثبيت مكتبة GIT : %v"
 msgid "Error installing Zip Library: %v"
 msgstr "خطأ اثناء تثبيت مكتبة ZIP : %v"
 
-#: commands/instances.go:400
+#: commands/instances.go:397
 msgid "Error installing library %s"
 msgstr "خطأ اثناء تثبيت المكتبة %s"
 
@@ -1059,7 +1059,7 @@ msgstr "خطأ : وصف الامر غير مدعوم من قبل %v"
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "خطأ : كود مصدري خاطئ سيقوم بالكتابة فوق ملف البيانات : %v"
 
-#: internal/cli/board/list.go:102
+#: internal/cli/board/list.go:104
 msgid "Event"
 msgstr "الحدث"
 
@@ -1080,7 +1080,7 @@ msgid "Expected compiled sketch in directory %s, but is a file instead"
 msgstr "توقعت وجود المشروع المترجم في المسار %s . لكنني وجدت ملفا بدلا عن ذلك"
 
 #: internal/cli/board/attach.go:35 internal/cli/board/details.go:41
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 #: internal/cli/board/listall.go:84 internal/cli/board/search.go:85
 msgid "FQBN"
 msgstr "FQBN"
@@ -1101,11 +1101,11 @@ msgstr "فشل المبرمجة"
 msgid "Failed to burn bootloader"
 msgstr "فشل حرق محمل الاقلاع"
 
-#: commands/instances.go:90
+#: commands/instances.go:87
 msgid "Failed to create data directory"
 msgstr "فشل انشاء مسار البيانات"
 
-#: commands/instances.go:79
+#: commands/instances.go:76
 msgid "Failed to create downloads directory"
 msgstr "فشل انشاء مسار التنزيلات"
 
@@ -1277,7 +1277,7 @@ msgstr "تم تثبيت %s"
 msgid "Installing %s"
 msgstr "جار تثبيت %s"
 
-#: commands/instances.go:398
+#: commands/instances.go:395
 msgid "Installing library %s"
 msgstr "جار تثبيت المكتبة %s"
 
@@ -1320,7 +1320,7 @@ msgstr "عنوان TCP غير صالح لان المنفذ غير موجود"
 msgid "Invalid URL"
 msgstr "URL غير صالح"
 
-#: commands/instances.go:186
+#: commands/instances.go:183
 msgid "Invalid additional URL: %v"
 msgstr "URL الاضافي غير صالح : %v"
 
@@ -1346,7 +1346,7 @@ msgstr "data size regexp غير صالح : %s"
 msgid "Invalid eeprom size regexp: %s"
 msgstr "eeprom size regexp غير صالح %s"
 
-#: commands/instances.go:597
+#: commands/instances.go:594
 msgid "Invalid index URL: %s"
 msgstr ""
 
@@ -1366,7 +1366,7 @@ msgstr "مكتبة غير صالحة"
 msgid "Invalid logging level: %s"
 msgstr ""
 
-#: commands/instances.go:614
+#: commands/instances.go:611
 msgid "Invalid network configuration: %s"
 msgstr ""
 
@@ -1378,7 +1378,7 @@ msgstr "network.proxy غير صالح '%[1]s': %[2]s"
 msgid "Invalid output format: %s"
 msgstr "صيغة اخراج خاطئة : %s"
 
-#: commands/instances.go:581
+#: commands/instances.go:578
 msgid "Invalid package index in %s"
 msgstr "فهرس الحزمة غير صالح في %s"
 
@@ -1457,7 +1457,7 @@ msgstr "المكتبة %s مثبتة باخر اصدار مسبقا"
 msgid "Library %s is not installed"
 msgstr "المكتبة %s غير مثبتة"
 
-#: commands/instances.go:377
+#: commands/instances.go:374
 msgid "Library %s not found"
 msgstr "تعذر ايجاد المكتبة %s"
 
@@ -1537,8 +1537,8 @@ msgstr "انشاء قائمة بجميع اللوحات المتصلة"
 msgid "Lists cores and libraries that can be upgraded"
 msgstr "يحصي النوى و المكتبات التي يمكن ترقيتها"
 
-#: commands/instances.go:224 commands/instances.go:235
-#: commands/instances.go:345
+#: commands/instances.go:221 commands/instances.go:232
+#: commands/instances.go:342
 msgid "Loading index file: %v"
 msgstr "جار تحميل ملف الفهرس : %v"
 
@@ -1632,7 +1632,7 @@ msgstr "الاسم\"%s\""
 msgid "New upload port: %[1]s (%[2]s)"
 msgstr "منفذ التحميل الجديد: %[1]s(%[2]s)"
 
-#: internal/cli/board/list.go:130
+#: internal/cli/board/list.go:132
 msgid "No boards found."
 msgstr "لا يوجد اية لوحات"
 
@@ -1917,7 +1917,7 @@ msgstr ""
 "الرجاء تحديد FQBN . تعذر التعرف على اللوحة على المنفذ %[1]s ذات البروتوكول "
 "%[2]s "
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Port"
 msgstr "منفذ"
 
@@ -1982,7 +1982,7 @@ msgstr "المبرمجات : "
 msgid "Property '%s' is undefined"
 msgstr "الخاصية '%s' غير معرفة"
 
-#: internal/cli/board/list.go:140
+#: internal/cli/board/list.go:142
 msgid "Protocol"
 msgstr "البروتوكول"
 
@@ -2314,7 +2314,7 @@ msgstr "جار تخطي ضبط الاداة"
 msgid "Skipping: %[1]s"
 msgstr "جار تخطي : %[1]s"
 
-#: commands/instances.go:634
+#: commands/instances.go:631
 msgid "Some indexes could not be updated."
 msgstr "يمكن تحديث بعض الفهارس"
 
@@ -2459,7 +2459,7 @@ msgstr "جرب تشغيل %s"
 msgid "Turns on verbose mode."
 msgstr "يفعل الوضع المطول"
 
-#: internal/cli/board/list.go:102 internal/cli/board/list.go:140
+#: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Type"
 msgstr "نوع"
 
@@ -2494,7 +2494,7 @@ msgstr "تعذر ايجاد user home dir : %v"
 msgid "Unable to open file for logging: %s"
 msgstr "تعذر فتح ملف من اجل انشاء سجلات : %s"
 
-#: commands/instances.go:563
+#: commands/instances.go:560
 msgid "Unable to parse URL"
 msgstr "تعذر تقطيع عنوان URL"
 
@@ -2518,7 +2518,7 @@ msgstr "يلغي تثبيت نواة او اكثر مع ادواتها و توا
 msgid "Uninstalls one or more libraries."
 msgstr "يلغي تثبيت مكتبة او اكثر "
 
-#: internal/cli/board/list.go:172
+#: internal/cli/board/list.go:174
 msgid "Unknown"
 msgstr "غير معروف"
 
@@ -2814,7 +2814,7 @@ msgstr "مجلد المكتبات المدمجة غير محدد"
 msgid "can't find latest release of %s"
 msgstr "تعذر العثور على اخر اصدار من %s"
 
-#: commands/instances.go:275
+#: commands/instances.go:272
 msgid "can't find latest release of tool %s"
 msgstr "تعذر العثور على اخر اصدار من الاداة %s"
 
@@ -3484,7 +3484,7 @@ msgstr "تم اضافة الكشف عن الاشياء القابلة للوصل
 msgid "port"
 msgstr "المنفذ"
 
-#: internal/cli/arguments/port.go:122
+#: internal/cli/arguments/port.go:119
 msgid "port not found: %[1]s %[2]s"
 msgstr "تعذر ايجاد المنفذ : %[1]s %[2]s"
 
