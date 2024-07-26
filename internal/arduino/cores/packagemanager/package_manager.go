@@ -372,11 +372,16 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 
 	// Add runtime build properties
 	buildProperties.Merge(boardPlatformRelease.RuntimeProperties())
+	buildProperties.SetPath("build.board.platform.path", boardPlatformRelease.InstallDir)
+	buildProperties.SetPath("build.core.platform.path", corePlatformRelease.InstallDir)
 	buildProperties.SetPath("build.core.path", corePlatformRelease.InstallDir.Join("cores", core))
 	buildProperties.SetPath("build.system.path", corePlatformRelease.InstallDir.Join("system"))
 	buildProperties.Set("build.variant.path", "")
 	if variant != "" {
 		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
+	}
+	if buildProperties.GetBoolean("runtime.use_core_platform_path_for_runtime_platform_path") {
+		buildProperties.Set("runtime.platform.path", buildProperties.Get("build.core.platform.path"))
 	}
 
 	for _, tool := range pme.GetAllInstalledToolsReleases() {

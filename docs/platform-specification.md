@@ -83,8 +83,9 @@ suffixes are `.linux`, `.windows` and `.macosx`.
 
 The following automatically generated properties can be used globally in all configuration files:
 
-- `{runtime.platform.path}`: the absolute path of the [board platform](#platform-terminology) folder (i.e. the folder
-  containing boards.txt)
+- `{runtime.platform.path}`: is the absolute path of the [board platform](#platform-terminology) folder (i.e. the folder
+  containing boards.txt) unless `{runtime.use_core_platform_path_for_runtime_platform_path}` is set to `true` in this
+  case, the value is the absolute path of the referenced core platform.
 - `{runtime.hardware.path}`: the absolute path of the hardware folder (i.e. the folder containing the
   [board platform](#platform-terminology) folder)
 - `{runtime.ide.path}`: the absolute path of the Arduino IDE or Arduino CLI folder
@@ -113,8 +114,11 @@ The following automatically generated properties can be used globally in all con
 - `{extra.time.zone}`: local timezone offset without the DST component
 - `{extra.time.dst}`: local daylight savings time offset
 
-Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in
-`{runtime.ide.version}` (so 1.5.9 was `159`, not `10509`).
+Compatibility notes:
+
+- Versions before Arduino IDE 1.6.0 only used one digit per version number component in `{runtime.ide.version}` (so
+  1.5.9 was `159`, not `10509`).
+- `{runtime.use_core_platform_path_for_runtime_platform_path}` support is available from Arduino CLI >=1.0.4.
 
 ## platform.txt
 
@@ -534,6 +538,9 @@ This explains the presence of **{build.mcu}** or **{build.board}** in the platfo
 overwritten respectively by **{uno.build.mcu}** and **{uno.build.board}** when the Uno board is selected! Moreover the
 following properties are automatically generated:
 
+- `{build.board.platform.path}`: The path to the selected board's platform. (available since Arduino CLI >=1.0.4)
+- `{build.core.platform.path}`: The path to the core's platform. It may differ from the board's platform path because
+  the latter may reference a core from another platform. (available since Arduino CLI >=1.0.4)
 - `{build.core.path}`: The path to the selected board's core folder (inside the [core platform](#platform-terminology),
   for example hardware/arduino/avr/core/arduino)
 - `{build.system.path}`: The path to the [core platform](#platform-terminology)'s system folder if available (for

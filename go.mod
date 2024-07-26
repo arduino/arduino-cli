@@ -37,7 +37,7 @@ require (
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v2 v2.2.0
 	go.bug.st/relaxed-semver v0.12.0
-	go.bug.st/testifyjson v1.1.1
+	go.bug.st/testifyjson v1.2.0
 	golang.org/x/term v0.22.0
 	golang.org/x/text v0.16.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157
