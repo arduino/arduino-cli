@@ -18,6 +18,7 @@ package core_test
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -1301,5 +1302,52 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 			}
 		}
 		require.Contains(t, lines, []string{"incompatible_vendor:avr", "n/a", "Incompatible", "Boards"})
+	}
+}
+
+func TestReferencedCoreBuildAndRuntimeProperties(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	testSketchbook, err := paths.New("testdata", "sketchbook_with_extended_platform").Abs()
+	require.NoError(t, err)
+
+	// Install custom platform
+	err = testSketchbook.Join("hardware").CopyDirTo(cli.SketchbookDir().Join("hardware"))
+	require.NoError(t, err)
+
+	// Determine some useful paths
+	boardPlatformPath := cli.SketchbookDir().Join("hardware", "test", "avr").String()
+	corePlatformPath := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.6").String()
+	corePath := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.6", "cores", "arduino").String()
+
+	jsonEncode := func(in string) string {
+		enc, err := json.Marshal(in)
+		require.NoError(t, err)
+		return string(enc)
+	}
+
+	// Check runtime variables are populated correctly
+	{
+		outJson, _, err := cli.Run("board", "details", "-b", "test:avr:test", "--show-properties", "--json")
+		require.NoError(t, err)
+		out := requirejson.Parse(t, outJson).Query(".build_properties")
+		out.ArrayMustContain(jsonEncode("build.board.platform.path=" + boardPlatformPath))
+		out.ArrayMustContain(jsonEncode("build.core.platform.path=" + corePlatformPath))
+		out.ArrayMustContain(jsonEncode("build.core.path=" + corePath))
+		out.ArrayMustContain(jsonEncode("runtime.platform.path=" + boardPlatformPath))
+	}
+	{
+		outJson, _, err := cli.Run("board", "details", "-b", "test:avr:test2", "--show-properties", "--json")
+		require.NoError(t, err)
+		out := requirejson.Parse(t, outJson).Query(".build_properties")
+		out.ArrayMustContain(jsonEncode("build.board.platform.path=" + boardPlatformPath))
+		out.ArrayMustContain(jsonEncode("build.core.platform.path=" + corePlatformPath))
+		out.ArrayMustContain(jsonEncode("build.core.path=" + corePath))
+		// https://github.com/arduino/arduino-cli/issues/2616
+		out.ArrayMustContain(jsonEncode("runtime.platform.path=" + corePlatformPath))
 	}
 }
