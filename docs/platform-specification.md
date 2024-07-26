@@ -538,9 +538,9 @@ This explains the presence of **{build.mcu}** or **{build.board}** in the platfo
 overwritten respectively by **{uno.build.mcu}** and **{uno.build.board}** when the Uno board is selected! Moreover the
 following properties are automatically generated:
 
-- `{build.board.platform.path}`: The path to the selected board's platform.
+- `{build.board.platform.path}`: The path to the selected board's platform. (available since Arduino CLI >=1.0.4)
 - `{build.core.platform.path}`: The path to the core's platform. It may differ from the board's platform path because
-  the latter may reference a core from another platform.
+  the latter may reference a core from another platform. (available since Arduino CLI >=1.0.4)
 - `{build.core.path}`: The path to the selected board's core folder (inside the [core platform](#platform-terminology),
   for example hardware/arduino/avr/core/arduino)
 - `{build.system.path}`: The path to the [core platform](#platform-terminology)'s system folder if available (for
