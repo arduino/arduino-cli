@@ -530,6 +530,15 @@ breaking changes as needed.
   { "sketch_path": "/tmp/my_sketch" }
   ```
 
+### `config dump` no longer returns default configuration values
+
+Previously, the `config dump` CLI command returned the effective configuration, including both the values explicitly set
+via the configuration file and environment variables as well as the values provided by defaults.
+
+It now only returns the explicitly set configuration data.
+
+Use `config get <configuration key>` to get the effective value of the configuration
+
 ### The gRPC response `cc.arduino.cli.commands.v1.CompileResponse` has been changed.
 
 The `CompilerResponse` message has been refactored to made explicit which fields are intended for streaming the build
