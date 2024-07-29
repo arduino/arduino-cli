@@ -397,6 +397,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#config-dump-no-longer-returns-default-configuration-values" class="md-nav__link">
+    config dump no longer returns default configuration values
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-response-ccarduinoclicommandsv1compileresponse-has-been-changed" class="md-nav__link">
     The gRPC response cc.arduino.cli.commands.v1.CompileResponse has been changed.
   </a>
@@ -2707,6 +2714,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#config-dump-no-longer-returns-default-configuration-values" class="md-nav__link">
+    config dump no longer returns default configuration values
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-grpc-response-ccarduinoclicommandsv1compileresponse-has-been-changed" class="md-nav__link">
     The gRPC response cc.arduino.cli.commands.v1.CompileResponse has been changed.
   </a>
@@ -4313,10 +4327,15 @@ breaking changes as needed.</p>
 </code></pre></div>
 </li>
 </ul>
+<h3 id="config-dump-no-longer-returns-default-configuration-values"><code>config dump</code> no longer returns default configuration values<a class="headerlink" href="#config-dump-no-longer-returns-default-configuration-values" title="Permanent link">&para;</a></h3>
+<p>Previously, the <code>config dump</code> CLI command returned the effective configuration, including both the values explicitly set
+via the configuration file and environment variables as well as the values provided by defaults.</p>
+<p>It now only returns the explicitly set configuration data.</p>
+<p>Use <code>config get &lt;configuration key&gt;</code> to get the effective value of the configuration</p>
 <h3 id="the-grpc-response-ccarduinoclicommandsv1compileresponse-has-been-changed">The gRPC response <code>cc.arduino.cli.commands.v1.CompileResponse</code> has been changed.<a class="headerlink" href="#the-grpc-response-ccarduinoclicommandsv1compileresponse-has-been-changed" title="Permanent link">&para;</a></h3>
 <p>The <code>CompilerResponse</code> message has been refactored to made explicit which fields are intended for streaming the build
 process and which fields are part of the build result.</p>
-<p>The old <code>CompilerResposne</code>:</p>
+<p>The old <code>CompilerResponse</code>:</p>
 <div class="highlight"><pre><span></span><code>message CompileResponse {
   // The output of the compilation process (stream)
   bytes out_stream = 1;
