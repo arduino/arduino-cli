@@ -535,7 +535,7 @@ breaking changes as needed.
 The `CompilerResponse` message has been refactored to made explicit which fields are intended for streaming the build
 process and which fields are part of the build result.
 
-The old `CompilerResposne`:
+The old `CompilerResponse`:
 
 ```protoc
 message CompileResponse {
