@@ -16,6 +16,7 @@
 package configuration
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -23,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/go-configmap"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
 )
 
@@ -42,8 +44,15 @@ func NewSettings() *Settings {
 	return res
 }
 
+var userProvidedDefaultDataDir *string
+
 // getDefaultArduinoDataDir returns the full path to the default arduino folder
 func getDefaultArduinoDataDir() string {
+	// This is overridden by --config-dir flag
+	if userProvidedDefaultDataDir != nil {
+		return *userProvidedDefaultDataDir
+	}
+
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		feedback.Warning(i18n.Tr("Unable to get user home dir: %v", err))
@@ -96,6 +105,21 @@ func getDefaultUserDir() string {
 // argument '--config-file' (if specified), if empty looks for the ARDUINO_CONFIG_FILE env,
 // or looking in the current working dir
 func FindConfigFileInArgsFallbackOnEnv(args []string) string {
+	// Look for '--config-dir' argument
+	for i, arg := range args {
+		if arg == "--config-dir" {
+			if len(args) > i+1 {
+				absArgs, err := paths.New(args[i+1]).Abs()
+				if err != nil {
+					feedback.FatalError(fmt.Errorf("invalid --config-dir value: %w", err), feedback.ErrBadArgument)
+				}
+				configDir := absArgs.String()
+				userProvidedDefaultDataDir = &configDir
+				break
+			}
+		}
+	}
+
 	// Look for '--config-file' argument
 	for i, arg := range args {
 		if arg == "--config-file" {
