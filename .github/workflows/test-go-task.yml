@@ -117,7 +117,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: ${{ env.COVERAGE_ARTIFACT }}-test-integration-${{ matrix.operating-system }}
+          name: ${{ env.COVERAGE_ARTIFACT }}-test-integration-${{ matrix.operating-system }}-${{ matrix.tests }}
           path: |
             ./coverage_integration_*.txt
 
