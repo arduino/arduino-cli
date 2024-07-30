@@ -114,10 +114,10 @@ jobs:
           mv coverage_integration.txt coverage_integration_${{ matrix.operating-system }}_${{ matrix.tests }}.txt
 
       - name: Upload coverage data to workflow artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: ${{ env.COVERAGE_ARTIFACT }}
+          name: ${{ env.COVERAGE_ARTIFACT }}-test-integration-${{ matrix.operating-system }}
           path: |
             ./coverage_integration_*.txt
 
@@ -157,10 +157,10 @@ jobs:
 
       - name: Upload coverage data to workflow artifact
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: ${{ env.COVERAGE_ARTIFACT }}
+          name: ${{ env.COVERAGE_ARTIFACT }}-test-${{ matrix.operating-system }}
           path: |
             ./coverage_unit.txt
 
@@ -182,9 +182,10 @@ jobs:
         run: go install github.com/wadey/gocovmerge@b5bfa59
 
       - name: Download coverage data artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: ${{ env.COVERAGE_ARTIFACT }}
+          pattern: ${{ env.COVERAGE_ARTIFACT }}-*
+          merge-multiple: true
 
       - name: Merge all code coverage artifacts
         run: gocovmerge coverage*.txt > coverage.txt
