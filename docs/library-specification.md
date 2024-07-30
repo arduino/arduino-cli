@@ -9,9 +9,8 @@ This new library format is intended to be used in tandem with **Library Manager*
 The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy
 to use graphical interface in the
 [Arduino IDE](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#using-the-library-manager)/[Arduino IDE 2.0](https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-installing-a-library#installing-a-library)
-and
-[Arduino Web Editor](https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11)
-as well as [`arduino-cli lib`](commands/arduino-cli_lib.md).
+and [Arduino Cloud Editor](https://docs.arduino.cc/arduino-cloud/guides/editor/#library-manager) as well as
+[`arduino-cli lib`](commands/arduino-cli_lib.md).
 
 More information about how Library Manager works is available
 [here](https://github.com/arduino/library-registry/blob/main/FAQ.md#readme).
