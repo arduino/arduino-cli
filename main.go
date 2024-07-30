@@ -38,7 +38,7 @@ func main() {
 	logrus.SetOutput(io.Discard)
 
 	// Search for the configuration file in the command line arguments and in the environment
-	configFile := configuration.FindConfigFileInArgsFallbackOnEnv(os.Args)
+	configFile := configuration.FindConfigFlagsInArgsOrFallbackOnEnv(os.Args)
 	ctx := config.SetConfigFile(context.Background(), configFile)
 
 	// Create a new ArduinoCoreServer

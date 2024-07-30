@@ -101,10 +101,10 @@ func getDefaultUserDir() string {
 	}
 }
 
-// FindConfigFileInArgsFallbackOnEnv returns the config file path using the
+// FindConfigFlagsInArgsOrFallbackOnEnv returns the config file path using the
 // argument '--config-file' (if specified), if empty looks for the ARDUINO_CONFIG_FILE env,
 // or looking in the current working dir
-func FindConfigFileInArgsFallbackOnEnv(args []string) string {
+func FindConfigFlagsInArgsOrFallbackOnEnv(args []string) string {
 	// Look for '--config-dir' argument
 	for i, arg := range args {
 		if arg == "--config-dir" {
