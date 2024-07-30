@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,4 +63,12 @@ func TestFindConfigFile(t *testing.T) {
 	// when both env and flag are specified flag takes precedence
 	configFile = FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-file", "flag/path"})
 	require.Equal(t, "flag/path", configFile)
+}
+
+func TestFindConfigDir(t *testing.T) {
+	// Check behaviour with --config-dir
+	expected, err := paths.New("anotherpath", "arduino-cli.yaml").Abs()
+	require.NoError(t, err)
+	configFile := FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-dir", "anotherpath"})
+	require.Equal(t, expected.String(), configFile)
 }
