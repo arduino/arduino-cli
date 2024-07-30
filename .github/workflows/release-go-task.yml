@@ -157,7 +157,7 @@ jobs:
         working-directory: ${{ env.DIST_DIR }}
         # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         run: |
-          # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
+          # GitHub's upload/download-artifact actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
           chmod +x "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/${{ env.PROJECT_NAME }}"
           TAG=${{ needs.create-release-artifacts.outputs.version }}
