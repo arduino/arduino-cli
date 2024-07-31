@@ -282,19 +282,13 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 	if err != nil {
 		return err
 	}
-	defer release()
 	dm := pme.DiscoveryManager()
 
 	watcher, err := dm.Watch()
+	release()
 	if err != nil {
 		return err
 	}
-
-	go func() {
-		<-stream.Context().Done()
-		logrus.Trace("closed watch")
-		watcher.Close()
-	}()
 
 	go func() {
 		for event := range watcher.Feed() {
@@ -319,5 +313,7 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 	}()
 
 	<-stream.Context().Done()
+	logrus.Trace("closed watch")
+	watcher.Close()
 	return nil
 }
