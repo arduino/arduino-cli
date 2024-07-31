@@ -118,7 +118,7 @@ jobs:
       - name: Remove unneeded artifact
         uses: geekyeggo/delete-artifact@v5
         with:
-          name: ${{ env.CONFIGURATIONS_ARTIFACT }}
+          name: ${{ env.CONFIGURATIONS_ARTIFACT }}-*
 
       - name: Merge label configuration files
         run: |
