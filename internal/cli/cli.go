@@ -181,9 +181,12 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.PersistentFlags().StringSliceVar(&additionalUrls, "additional-urls", defaultAdditionalURLs, i18n.Tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().BoolVar(&noColor, "no-color", defaultOutputNoColor, "Disable colored output.")
 
-	// We are not using cobra to parse this flag, because we manually parse it in main.go.
-	// Just leaving it here so cobra will not complain about it.
-	cmd.PersistentFlags().String("config-file", "", i18n.Tr("The custom config file (if not specified the default will be used)."))
+	// We are not using cobra to parse the following flags, because we manually parse them in main.go.
+	// Just leaving it here so cobra will output help usage and not complain about them.
+	cmd.PersistentFlags().String("config-file", "",
+		i18n.Tr("The custom config file (if not specified the default will be used)."))
+	cmd.PersistentFlags().String("config-dir", "",
+		i18n.Tr("Sets the default data directory (Arduino CLI will look for configuration file in this directory)."))
 	return cmd
 }
 

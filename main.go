@@ -37,12 +37,12 @@ func main() {
 	// Disable logging until it is setup in the arduino-cli pre-run
 	logrus.SetOutput(io.Discard)
 
+	// Search for the configuration file in the command line arguments and in the environment
+	configFile := configuration.FindConfigFlagsInArgsOrFallbackOnEnv(os.Args)
+	ctx := config.SetConfigFile(context.Background(), configFile)
+
 	// Create a new ArduinoCoreServer
 	srv := commands.NewArduinoCoreServer()
-
-	// Search for the configuration file in the command line arguments and in the environment
-	configFile := configuration.FindConfigFileInArgsFallbackOnEnv(os.Args)
-	ctx := config.SetConfigFile(context.Background(), configFile)
 
 	// Read the settings from the configuration file
 	openReq := &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"}

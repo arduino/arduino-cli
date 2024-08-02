@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,23 +44,31 @@ func TestInit(t *testing.T) {
 
 func TestFindConfigFile(t *testing.T) {
 	defaultConfigFile := filepath.Join(getDefaultArduinoDataDir(), "arduino-cli.yaml")
-	configFile := FindConfigFileInArgsFallbackOnEnv([]string{"--config-file"})
+	configFile := FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-file"})
 	require.Equal(t, defaultConfigFile, configFile)
 
-	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "some/path/to/config"})
+	configFile = FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-file", "some/path/to/config"})
 	require.Equal(t, "some/path/to/config", configFile)
 
-	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
+	configFile = FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
 	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
 
-	configFile = FindConfigFileInArgsFallbackOnEnv([]string{})
+	configFile = FindConfigFlagsInArgsOrFallbackOnEnv([]string{})
 	require.Equal(t, defaultConfigFile, configFile)
 
 	t.Setenv("ARDUINO_CONFIG_FILE", "some/path/to/config")
-	configFile = FindConfigFileInArgsFallbackOnEnv([]string{})
+	configFile = FindConfigFlagsInArgsOrFallbackOnEnv([]string{})
 	require.Equal(t, "some/path/to/config", configFile)
 
 	// when both env and flag are specified flag takes precedence
-	configFile = FindConfigFileInArgsFallbackOnEnv([]string{"--config-file", "flag/path"})
+	configFile = FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-file", "flag/path"})
 	require.Equal(t, "flag/path", configFile)
+}
+
+func TestFindConfigDir(t *testing.T) {
+	// Check behaviour with --config-dir
+	expected, err := paths.New("anotherpath", "arduino-cli.yaml").Abs()
+	require.NoError(t, err)
+	configFile := FindConfigFlagsInArgsOrFallbackOnEnv([]string{"--config-dir", "anotherpath"})
+	require.Equal(t, expected.String(), configFile)
 }
