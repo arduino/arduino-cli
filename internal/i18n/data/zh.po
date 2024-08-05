@@ -71,7 +71,7 @@ msgstr "%s 模式丢失"
 msgid "'%s' has an invalid signature"
 msgstr "‘%s’ 的签名无效"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:443
+#: internal/arduino/cores/packagemanager/package_manager.go:448
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -1321,7 +1321,7 @@ msgstr "无效的 %s 条目"
 msgid "Invalid library"
 msgstr "无效的库"
 
-#: internal/cli/cli.go:262
+#: internal/cli/cli.go:265
 msgid "Invalid logging level: %s"
 msgstr ""
 
@@ -1333,7 +1333,7 @@ msgstr ""
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "无效的 ‘%[1]s’ 网络代理: %[2]s"
 
-#: internal/cli/cli.go:219
+#: internal/cli/cli.go:222
 msgid "Invalid output format: %s"
 msgstr "无效的输出格式：%s"
 
@@ -2100,6 +2100,12 @@ msgstr "将终端设置为原始模式（无缓冲）。"
 msgid "Sets a setting value."
 msgstr "设置一个值。"
 
+#: internal/cli/cli.go:189
+msgid ""
+"Sets the default data directory (Arduino CLI will look for configuration "
+"file in this directory)."
+msgstr ""
+
 #: internal/cli/board/attach.go:37
 msgid ""
 "Sets the default values for port and FQBN. If no port, FQBN or programmer "
@@ -2288,7 +2294,7 @@ msgstr "守护进程将监听的 TCP 端口"
 msgid "The command output format, can be: %s"
 msgstr ""
 
-#: internal/cli/cli.go:186
+#: internal/cli/cli.go:187
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "自定义配置文件（如果未指定，将使用默认值）。"
 
@@ -2422,20 +2428,20 @@ msgid ""
 "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
 msgstr "无法缓存构建的内核，请告知 %[1]s 维护者关注 %[2]s"
 
-#: internal/cli/configuration/configuration.go:86
+#: internal/cli/configuration/configuration.go:95
 msgid "Unable to get Documents Folder: %v"
 msgstr "无法获取文档文件夹：%v"
 
-#: internal/cli/configuration/configuration.go:61
+#: internal/cli/configuration/configuration.go:70
 msgid "Unable to get Local App Data Folder: %v"
 msgstr "无法获取本地应用程序数据文件夹：%v"
 
-#: internal/cli/configuration/configuration.go:49
-#: internal/cli/configuration/configuration.go:74
+#: internal/cli/configuration/configuration.go:58
+#: internal/cli/configuration/configuration.go:83
 msgid "Unable to get user home dir: %v"
 msgstr "无法获取用户主目录：%v"
 
-#: internal/cli/cli.go:249
+#: internal/cli/cli.go:252
 msgid "Unable to open file for logging: %s"
 msgstr "无法打开文件进行日志记录：%s"
 
@@ -2869,7 +2875,7 @@ msgstr "未找到 %s discovery"
 msgid "discovery %s not installed"
 msgstr "%s discovery 未安装"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:741
+#: internal/arduino/cores/packagemanager/package_manager.go:746
 msgid "discovery release not found: %s"
 msgstr "未找到 discovery 版本：%s"
 
@@ -3204,8 +3210,8 @@ msgstr "正在加载 %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "正在加载开发板：%s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:496
-#: internal/arduino/cores/packagemanager/package_manager.go:511
+#: internal/arduino/cores/packagemanager/package_manager.go:501
+#: internal/arduino/cores/packagemanager/package_manager.go:516
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "正在加载 %[1]s json 索引文件：%[2]s"
 
@@ -3258,7 +3264,7 @@ msgstr "缺少 ‘%s’ 指令"
 msgid "missing checksum for: %s"
 msgstr "缺少校验码：%s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:457
+#: internal/arduino/cores/packagemanager/package_manager.go:462
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "缺少 %[2]s 开发板引用的 %[1]s 软件包 "
 
@@ -3266,11 +3272,11 @@ msgstr "缺少 %[2]s 开发板引用的 %[1]s 软件包 "
 msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr "缺少软件包索引%s，无法保证未来的更新"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:462
+#: internal/arduino/cores/packagemanager/package_manager.go:467
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少 %[1]s 平台：%[2]s 被开发板 %[3]s 引用"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:467
+#: internal/arduino/cores/packagemanager/package_manager.go:472
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少平台 %[1]s 发行版本：%[2]s 被开发板 %[3]s 引用"
 
@@ -3278,7 +3284,7 @@ msgstr "缺少平台 %[1]s 发行版本：%[2]s 被开发板 %[3]s 引用"
 msgid "missing signature"
 msgstr "缺少签名"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:752
+#: internal/arduino/cores/packagemanager/package_manager.go:757
 msgid "monitor release not found: %s"
 msgstr "未找到公开监视器：%s"
 
@@ -3361,7 +3367,7 @@ msgstr "打开目标文件：%s"
 msgid "package %s not found"
 msgstr "未找到 %s 软件包 "
 
-#: internal/arduino/cores/packagemanager/package_manager.go:525
+#: internal/arduino/cores/packagemanager/package_manager.go:530
 msgid "package '%s' not found"
 msgstr "未找到 ‘%s’ 软件包 "
 
@@ -3476,7 +3482,7 @@ msgstr "阅读项目文件"
 msgid "recipe not found '%s'"
 msgstr "未找到 ‘%s’ 方法"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:601
+#: internal/arduino/cores/packagemanager/package_manager.go:606
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "找不到 %[2]s 工具的 %[1]s 发行版本"
 
@@ -3581,7 +3587,7 @@ msgstr "%s 工具不是由软件包管理器管理的"
 msgid "tool %s not found"
 msgstr "未找到 %s 工具"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:551
+#: internal/arduino/cores/packagemanager/package_manager.go:556
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "在 ‘%[2]s’ 软件包中找不到 ‘%[1]s’ 工具"
 
@@ -3589,8 +3595,8 @@ msgstr "在 ‘%[2]s’ 软件包中找不到 ‘%[1]s’ 工具"
 msgid "tool not installed"
 msgstr "工具未安装"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:730
-#: internal/arduino/cores/packagemanager/package_manager.go:836
+#: internal/arduino/cores/packagemanager/package_manager.go:735
+#: internal/arduino/cores/packagemanager/package_manager.go:841
 msgid "tool release not found: %s"
 msgstr "找不到发行工具：%s"
 
