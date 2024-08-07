@@ -178,7 +178,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	var extraCoreBuildCachePaths paths.PathList
 	if buildPath == nil {
 		var buildCachePath *paths.Path
-		if p := req.GetBuildCachePath(); p != "" {
+		if p := req.GetBuildCachePath(); p != "" { //nolint:staticcheck
 			buildCachePath = paths.New(p)
 		} else {
 			buildCachePath = s.settings.GetBuildCachePath()
