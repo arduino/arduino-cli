@@ -196,10 +196,8 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 				return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
 			}
 			buildCachePath = p
-		} else if p, ok := s.settings.GetBuildCachePath(); ok {
-			buildCachePath = p
 		} else {
-			buildCachePath = paths.TempDir().Join("arduino")
+			buildCachePath = s.settings.GetBuildCachePath()
 		}
 		if err := buildCachePath.MkdirAll(); err != nil {
 			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
