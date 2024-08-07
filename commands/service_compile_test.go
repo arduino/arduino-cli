@@ -24,8 +24,8 @@ import (
 )
 
 func TestGenBuildPath(t *testing.T) {
-	want := paths.TempDir().Join("arduino", "sketches", "ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
 	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
+	want := srv.settings.GetBuildCachePath().Join("sketches", "ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
 	act := srv.getDefaultSketchBuildPath(&sketch.Sketch{FullPath: paths.New("foo")}, nil)
 	assert.True(t, act.EquivalentTo(want))
 	assert.Equal(t, "ACBD18DB4CC2F85CEDEF654FCCC4A4D8", (&sketch.Sketch{FullPath: paths.New("foo")}).Hash())
