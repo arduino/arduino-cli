@@ -38,12 +38,11 @@ func (s *Settings) GetBuildCacheTTL() time.Duration {
 }
 
 // GetBuildCachePath returns the path to the build cache.
-func (s *Settings) GetBuildCachePath() (*paths.Path, bool) {
-	p, ok, _ := s.GetStringOk("build_cache.path")
-	if !ok {
-		return nil, false
+func (s *Settings) GetBuildCachePath() *paths.Path {
+	if p, ok, _ := s.GetStringOk("build_cache.path"); ok {
+		return paths.New(p)
 	}
-	return paths.New(p), true
+	return paths.New(s.Defaults.GetString("build_cache.path"))
 }
 
 // GetBuildCacheExtraPaths returns the extra paths to the build cache.
