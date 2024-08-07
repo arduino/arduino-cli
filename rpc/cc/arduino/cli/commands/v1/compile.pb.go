@@ -53,7 +53,8 @@ type CompileRequest struct {
 	ShowProperties bool `protobuf:"varint,4,opt,name=show_properties,json=showProperties,proto3" json:"show_properties,omitempty"`
 	// Print preprocessed code to stdout instead of compiling.
 	Preprocess bool `protobuf:"varint,5,opt,name=preprocess,proto3" json:"preprocess,omitempty"`
-	// Builds of 'core.a' are saved into this path to be cached and reused.
+	// Builds of core and sketches are saved into this path to be cached and
+	// reused.
 	BuildCachePath string `protobuf:"bytes,6,opt,name=build_cache_path,json=buildCachePath,proto3" json:"build_cache_path,omitempty"`
 	// Path to use to store the files used for the compilation. If omitted,
 	// a directory will be created in the operating system's default temporary

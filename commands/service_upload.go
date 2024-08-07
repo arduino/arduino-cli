@@ -189,7 +189,7 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		})
 	})
 	defer errStream.Close()
-	updatedPort, err := runProgramAction(
+	updatedPort, err := s.runProgramAction(
 		stream.Context(),
 		pme,
 		sk,
@@ -262,7 +262,7 @@ func (s *arduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 	}, streamAdapter)
 }
 
-func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
+func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
 	importFile, importDir, fqbnIn string, userPort *rpc.Port,
 	programmerID string,
@@ -443,7 +443,7 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	}
 
 	if !burnBootloader {
-		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk)
+		importPath, sketchName, err := s.determineBuildPathAndSketchName(importFile, importDir, sk)
 		if err != nil {
 			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Error finding build artifacts"), Cause: err}
 		}
@@ -746,7 +746,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	return nil
 }
 
-func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sketch) (*paths.Path, string, error) {
+func (s *arduinoCoreServerImpl) determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sketch) (*paths.Path, string, error) {
 	// In general, compiling a sketch will produce a set of files that are
 	// named as the sketch but have different extensions, for example Sketch.ino
 	// may produce: Sketch.ino.bin; Sketch.ino.hex; Sketch.ino.zip; etc...
@@ -799,7 +799,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 
 	// Case 4: only sketch specified. In this case we use the generated build path
 	// and the given sketch name.
-	return sk.DefaultBuildPath(), sk.Name + sk.MainFile.Ext(), nil
+	return s.getDefaultSketchBuildPath(sk, nil), sk.Name + sk.MainFile.Ext(), nil
 }
 
 func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {

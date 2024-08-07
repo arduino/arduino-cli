@@ -36,7 +36,8 @@ message CompileRequest {
   bool show_properties = 4;
   // Print preprocessed code to stdout instead of compiling.
   bool preprocess = 5;
-  // Builds of 'core.a' are saved into this path to be cached and reused.
+  // Builds of core and sketches are saved into this path to be cached and
+  // reused.
   string build_cache_path = 6;
   // Path to use to store the files used for the compilation. If omitted,
   // a directory will be created in the operating system's default temporary

@@ -45,7 +45,7 @@ func (s *arduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.Get
 		return nil, err
 	}
 	defer release()
-	return getDebugProperties(req, pme, false)
+	return s.getDebugProperties(req, pme, false)
 }
 
 // IsDebugSupported checks if the given board/programmer configuration supports debugging.
@@ -65,7 +65,7 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 		Programmer:      req.GetProgrammer(),
 		DebugProperties: req.GetDebugProperties(),
 	}
-	expectedOutput, err := getDebugProperties(configRequest, pme, true)
+	expectedOutput, err := s.getDebugProperties(configRequest, pme, true)
 	var x *cmderrors.FailedDebugError
 	if errors.As(err, &x) {
 		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
@@ -81,7 +81,7 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 		checkFQBN := minimumFQBN.Clone()
 		checkFQBN.Configs.Remove(config)
 		configRequest.Fqbn = checkFQBN.String()
-		checkOutput, err := getDebugProperties(configRequest, pme, true)
+		checkOutput, err := s.getDebugProperties(configRequest, pme, true)
 		if err == nil && reflect.DeepEqual(expectedOutput, checkOutput) {
 			minimumFQBN.Configs.Remove(config)
 		}
@@ -92,7 +92,7 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 	}, nil
 }
 
-func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer, skipSketchChecks bool) (*rpc.GetDebugConfigResponse, error) {
+func (s *arduinoCoreServerImpl) getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer, skipSketchChecks bool) (*rpc.GetDebugConfigResponse, error) {
 	var (
 		sketchName             string
 		sketchDefaultFQBN      string
@@ -111,7 +111,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		}
 		sketchName = sk.Name
 		sketchDefaultFQBN = sk.GetDefaultFQBN()
-		sketchDefaultBuildPath = sk.DefaultBuildPath()
+		sketchDefaultBuildPath = s.getDefaultSketchBuildPath(sk, nil)
 	} else {
 		// Use placeholder sketch data
 		sketchName = "Sketch"

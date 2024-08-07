@@ -66,15 +66,16 @@ func TestGetCommandLine(t *testing.T) {
 	pme, release := pm.NewExplorer()
 	defer release()
 
+	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
 	{
 		// Check programmer not found
 		req.Programmer = "not-existent"
-		_, err := getCommandLine(req, pme)
+		_, err := srv.getDebugCommandLine(req, pme)
 		require.Error(t, err)
 	}
 
 	req.Programmer = "edbg"
-	command, err := getCommandLine(req, pme)
+	command, err := srv.getDebugCommandLine(req, pme)
 	require.Nil(t, err)
 	commandToTest := strings.Join(command, " ")
 	require.Equal(t, filepath.FromSlash(goldCommand), filepath.FromSlash(commandToTest))
@@ -97,7 +98,7 @@ func TestGetCommandLine(t *testing.T) {
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/mkr1000/openocd_scripts/arduino_zero.cfg\"", customHardware) +
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" %s/build/arduino-test.samd.mkr1000/hello.ino.elf", sketchPath)
 
-	command2, err := getCommandLine(req2, pme)
+	command2, err := srv.getDebugCommandLine(req2, pme)
 	assert.Nil(t, err)
 	commandToTest2 := strings.Join(command2, " ")
 	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))
