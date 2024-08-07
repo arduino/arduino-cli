@@ -18,32 +18,38 @@ package commands
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"sync/atomic"
-
-	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/internal/i18n"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/metadata"
-
-	"fmt"
-	"io"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/djherbis/buffer"
+	"github.com/djherbis/nio/v3"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 )
 
 type debugServer struct {
 	ctx      context.Context
 	req      atomic.Pointer[rpc.GetDebugConfigRequest]
 	in       io.Reader
+	inSignal bool
+	inData   bool
+	inEvent  *sync.Cond
+	inLock   sync.Mutex
 	out      io.Writer
 	resultCB func(*rpc.DebugResponse_Result)
+	done     chan bool
 }
 
 func (s *debugServer) Send(resp *rpc.DebugResponse) error {
@@ -54,6 +60,7 @@ func (s *debugServer) Send(resp *rpc.DebugResponse) error {
 	}
 	if res := resp.GetResult(); res != nil {
 		s.resultCB(res)
+		s.close()
 	}
 	return nil
 }
@@ -62,12 +69,33 @@ func (s *debugServer) Recv() (r *rpc.DebugRequest, e error) {
 	if conf := s.req.Swap(nil); conf != nil {
 		return &rpc.DebugRequest{DebugRequest: conf}, nil
 	}
-	buff := make([]byte, 4096)
-	n, err := s.in.Read(buff)
-	if err != nil {
-		return nil, err
+
+	s.inEvent.L.Lock()
+	for !s.inSignal && !s.inData {
+		s.inEvent.Wait()
 	}
-	return &rpc.DebugRequest{Data: buff[:n]}, nil
+	defer s.inEvent.L.Unlock()
+
+	if s.inSignal {
+		s.inSignal = false
+		return &rpc.DebugRequest{SendInterrupt: true}, nil
+	}
+
+	if s.inData {
+		s.inData = false
+		buff := make([]byte, 4096)
+		n, err := s.in.Read(buff)
+		if err != nil {
+			return nil, err
+		}
+		return &rpc.DebugRequest{Data: buff[:n]}, nil
+	}
+
+	panic("invalid state in debug")
+}
+
+func (s *debugServer) close() {
+	close(s.done)
 }
 
 func (s *debugServer) Context() context.Context     { return s.ctx }
@@ -80,7 +108,7 @@ func (s *debugServer) SetTrailer(metadata.MD)       {}
 // DebugServerToStreams creates a debug server that proxies the data to the given io streams.
 // The GetDebugConfigRequest is used to configure the debbuger. sig is a channel that can be
 // used to send os.Interrupt to the debug process. resultCB is a callback function that will
-// receive the Debug result.
+// receive the Debug result and closes the debug server.
 func DebugServerToStreams(
 	ctx context.Context,
 	req *rpc.GetDebugConfigRequest,
@@ -93,8 +121,45 @@ func DebugServerToStreams(
 		in:       in,
 		out:      out,
 		resultCB: resultCB,
+		done:     make(chan bool),
 	}
+	serverIn, clientOut := nio.Pipe(buffer.New(32 * 1024))
+	server.in = serverIn
+	server.inEvent = sync.NewCond(&server.inLock)
 	server.req.Store(req)
+	go func() {
+		for {
+			select {
+			case <-sig:
+				server.inEvent.L.Lock()
+				server.inSignal = true
+				server.inEvent.Broadcast()
+				server.inEvent.L.Unlock()
+			case <-server.done:
+				return
+			}
+		}
+	}()
+	go func() {
+		defer clientOut.Close()
+		buff := make([]byte, 4096)
+		for {
+			n, readErr := in.Read(buff)
+
+			server.inEvent.L.Lock()
+			var writeErr error
+			if readErr == nil {
+				_, writeErr = clientOut.Write(buff[:n])
+			}
+			server.inData = true
+			server.inEvent.Broadcast()
+			server.inEvent.L.Unlock()
+			if readErr != nil || writeErr != nil {
+				// exit on error
+				return
+			}
+		}
+	}()
 	return server
 }
 
@@ -128,11 +193,18 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	outStream := feedStreamTo(sendData)
 	defer outStream.Close()
 	inStream := consumeStreamFrom(func() ([]byte, error) {
-		command, err := stream.Recv()
-		if command.GetSendInterrupt() {
-			signalChan <- os.Interrupt
+		for {
+			req, err := stream.Recv()
+			if err != nil {
+				return nil, err
+			}
+			if req.GetSendInterrupt() {
+				signalChan <- os.Interrupt
+			}
+			if data := req.GetData(); len(data) > 0 {
+				return data, nil
+			}
 		}
-		return command.GetData(), err
 	})
 
 	pme, release, err := instances.GetPackageManagerExplorer(debugConfReq.GetInstance())
