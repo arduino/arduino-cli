@@ -86,6 +86,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			if cmd.Flag("build-cache-path").Changed {
+				feedback.Warning(i18n.Tr("The flag --build-cache-path has been deprecated. Please use just --build-path alone or configure the build cache path in the Arduino CLI settings."))
+			}
 			runCompileCommand(cmd, args, srv)
 		},
 	}
@@ -96,6 +99,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	showPropertiesArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, i18n.Tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", i18n.Tr("Builds of cores and sketches are saved into this path to be cached and reused."))
+	compileCommand.Flag("build-cache-path").Hidden = true // deprecated
 	compileCommand.Flags().StringVar(&exportDir, "output-dir", "", i18n.Tr("Save build artifacts in this directory."))
 	compileCommand.Flags().StringVar(&buildPath, "build-path", "",
 		i18n.Tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))

@@ -38,7 +38,7 @@ message CompileRequest {
   bool preprocess = 5;
   // Builds of core and sketches are saved into this path to be cached and
   // reused.
-  string build_cache_path = 6;
+  string build_cache_path = 6 [ deprecated = true ];
   // Path to use to store the files used for the compilation. If omitted,
   // a directory will be created in the operating system's default temporary
   // path.
