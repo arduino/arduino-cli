@@ -214,7 +214,7 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	defer release()
 
 	// Exec debugger
-	commandLine, err := getCommandLine(debugConfReq, pme)
+	commandLine, err := s.getDebugCommandLine(debugConfReq, pme)
 	if err != nil {
 		return err
 	}
@@ -254,9 +254,9 @@ func (s *arduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer)
 	return sendResult(&rpc.DebugResponse_Result{})
 }
 
-// getCommandLine compose a debug command represented by a core recipe
-func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
-	debugInfo, err := getDebugProperties(req, pme, false)
+// getDebugCommandLine compose a debug command represented by a core recipe
+func (s *arduinoCoreServerImpl) getDebugCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
+	debugInfo, err := s.getDebugProperties(req, pme, false)
 	if err != nil {
 		return nil, err
 	}

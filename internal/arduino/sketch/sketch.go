@@ -279,12 +279,6 @@ func (e *InvalidSketchFolderNameError) Error() string {
 	return i18n.Tr("no valid sketch found in %[1]s: missing %[2]s", e.SketchFolder, e.SketchFile)
 }
 
-// DefaultBuildPath generates the default build directory for a given sketch.
-// The build path is in a temporary directory and is unique for each sketch.
-func (s *Sketch) DefaultBuildPath() *paths.Path {
-	return paths.TempDir().Join("arduino", "sketches", s.Hash())
-}
-
 // Hash generate a unique hash for the given sketch.
 func (s *Sketch) Hash() string {
 	path := s.FullPath.String()

@@ -71,6 +71,8 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 	fqbn, err := cores.ParseFQBN("arduino:samd:mkr1000")
 	require.NoError(t, err)
 
+	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
+
 	tests := []test{
 		// 00: error: no data passed in
 		{"", "", nil, nil, "<nil>", ""},
@@ -81,7 +83,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 03: error: used both importPath and importFile
 		{"testdata/upload/build_path_2/Blink.ino.hex", "testdata/upload/build_path_2", nil, nil, "<nil>", ""},
 		// 04: only sketch without FQBN
-		{"", "", blonk, nil, blonk.DefaultBuildPath().String(), "Blonk.ino"},
+		{"", "", blonk, nil, srv.getDefaultSketchBuildPath(blonk, nil).String(), "Blonk.ino"},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
 		{"testdata/upload/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/upload/build_path_2", "Blink.ino"},
 		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
@@ -97,7 +99,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 11: error: used both importPath and importFile
 		{"testdata/upload/build_path_2/Blink.ino.hex", "testdata/upload/build_path_2", nil, fqbn, "<nil>", ""},
 		// 12: use sketch to determine project name and sketch+fqbn to determine build path
-		{"", "", blonk, fqbn, blonk.DefaultBuildPath().String(), "Blonk.ino"},
+		{"", "", blonk, fqbn, srv.getDefaultSketchBuildPath(blonk, nil).String(), "Blonk.ino"},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
 		{"testdata/upload/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/upload/build_path_2", "Blink.ino"},
 		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn
@@ -111,7 +113,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
-			buildPath, sketchName, err := determineBuildPathAndSketchName(test.importFile, test.importDir, test.sketch)
+			buildPath, sketchName, err := srv.determineBuildPathAndSketchName(test.importFile, test.importDir, test.sketch)
 			if test.resBuildPath == "<nil>" {
 				require.Error(t, err)
 				require.Nil(t, buildPath)
@@ -183,10 +185,11 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	pme, release := pm.NewExplorer()
 	defer release()
 
+	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
-		_, err := runProgramAction(
+		_, err := srv.runProgramAction(
 			context.Background(),
 			pme,
 			nil,                     // sketch

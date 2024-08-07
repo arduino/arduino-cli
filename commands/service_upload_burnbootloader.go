@@ -72,7 +72,7 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 	}
 	defer release()
 
-	if _, err := runProgramAction(
+	if _, err := s.runProgramAction(
 		stream.Context(),
 		pme,
 		nil, // sketch

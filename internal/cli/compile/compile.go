@@ -95,7 +95,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, i18n.Tr("Create and print a profile configuration from the build."))
 	showPropertiesArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, i18n.Tr("Print preprocessed code to stdout instead of compiling."))
-	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", i18n.Tr("Builds of 'core.a' are saved into this path to be cached and reused."))
+	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", i18n.Tr("Builds of cores and sketches are saved into this path to be cached and reused."))
 	compileCommand.Flags().StringVar(&exportDir, "output-dir", "", i18n.Tr("Save build artifacts in this directory."))
 	compileCommand.Flags().StringVar(&buildPath, "build-path", "",
 		i18n.Tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))

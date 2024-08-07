@@ -160,9 +160,8 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return errors.New(i18n.Tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
 
-	// Generate or retrieve build path
+	// Retrieve build path from user arguments
 	var buildPath *paths.Path
-	isDefaultBuildPath := false
 	if buildPathArg := req.GetBuildPath(); buildPathArg != "" {
 		buildPath = paths.New(req.GetBuildPath()).Canonical()
 		if in, _ := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
@@ -171,33 +170,21 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 			}
 		}
 	}
-	if buildPath == nil {
-		buildPath = sk.DefaultBuildPath()
-		isDefaultBuildPath = true
-	}
-	if err = buildPath.MkdirAll(); err != nil {
-		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build directory"), Cause: err}
-	}
 
+	// If no build path has been set by the user:
+	// - set up the build cache directory
+	// - set the sketch build path inside the build cache directory.
 	var coreBuildCachePath *paths.Path
 	var extraCoreBuildCachePaths paths.PathList
-	if isDefaultBuildPath {
-		buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
-		// cache is purged after compilation to not remove entries that might be required
-
-		defer maybePurgeBuildCache(
-			s.settings.GetCompilationsBeforeBuildCachePurge(),
-			s.settings.GetBuildCacheTTL().Abs())
-
+	if buildPath == nil {
 		var buildCachePath *paths.Path
-		if req.GetBuildCachePath() != "" {
-			p, err := paths.New(req.GetBuildCachePath()).Abs()
-			if err != nil {
-				return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
-			}
-			buildCachePath = p
+		if p := req.GetBuildCachePath(); p != "" {
+			buildCachePath = paths.New(p)
 		} else {
 			buildCachePath = s.settings.GetBuildCachePath()
+		}
+		if err := buildCachePath.ToAbs(); err != nil {
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
 		}
 		if err := buildCachePath.MkdirAll(); err != nil {
 			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
@@ -212,6 +199,17 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		for i, p := range extraCoreBuildCachePaths {
 			extraCoreBuildCachePaths[i] = p.Join("cores")
 		}
+
+		buildPath = s.getDefaultSketchBuildPath(sk, buildCachePath)
+		buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
+
+		// cache is purged after compilation to not remove entries that might be required
+		defer maybePurgeBuildCache(
+			s.settings.GetCompilationsBeforeBuildCachePurge(),
+			s.settings.GetBuildCacheTTL().Abs())
+	}
+	if err = buildPath.MkdirAll(); err != nil {
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build directory"), Cause: err}
 	}
 
 	if _, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform); err != nil {
@@ -418,6 +416,16 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 	return nil
+}
+
+// getDefaultSketchBuildPath generates the default build directory for a given sketch.
+// The sketch build path is inside the build cache path and is unique for each sketch.
+// If overriddenBuildCachePath is nil the build cache path is taken from the settings.
+func (s *arduinoCoreServerImpl) getDefaultSketchBuildPath(sk *sketch.Sketch, overriddenBuildCachePath *paths.Path) *paths.Path {
+	if overriddenBuildCachePath == nil {
+		overriddenBuildCachePath = s.settings.GetBuildCachePath()
+	}
+	return overriddenBuildCachePath.Join("sketches", sk.Hash())
 }
 
 // maybePurgeBuildCache runs the build files cache purge if the policy conditions are met.
