@@ -1,9 +1,10 @@
 ---
-name: github.com/ProtonMail/go-crypto/bitcurves
+name: github.com/ProtonMail/go-crypto/openpgp/internal/ecc/curve25519
 version: v1.1.0-alpha.5-proton
 type: go
-summary: 
-homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/bitcurves
+summary: Package curve25519 implements custom field operations without clamping for
+  forwarding.
+homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/internal/ecc/curve25519
 license: other
 licenses:
 - sources: go-crypto@v1.1.0-alpha.5-proton/LICENSE

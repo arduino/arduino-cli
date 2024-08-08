@@ -1,9 +1,9 @@
 ---
-name: github.com/ProtonMail/go-crypto/bitcurves
+name: github.com/ProtonMail/go-crypto/openpgp/internal/ecc/curve25519/field
 version: v1.1.0-alpha.5-proton
 type: go
-summary: 
-homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/bitcurves
+summary: Package field implements fast arithmetic modulo 2^255-19.
+homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/internal/ecc/curve25519/field
 license: other
 licenses:
 - sources: go-crypto@v1.1.0-alpha.5-proton/LICENSE

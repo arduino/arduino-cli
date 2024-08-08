@@ -1,12 +1,12 @@
 ---
 name: github.com/ulikunitz/xz/internal/hash
-version: v0.5.11
+version: v0.5.12
 type: go
 summary: Package hash provides rolling hashes.
 homepage: https://pkg.go.dev/github.com/ulikunitz/xz/internal/hash
 license: bsd-3-clause
 licenses:
-- sources: xz@v0.5.11/LICENSE
+- sources: xz@v0.5.12/LICENSE
   text: |
     Copyright (c) 2014-2022  Ulrich Kunitz
     All rights reserved.

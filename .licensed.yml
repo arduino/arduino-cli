@@ -27,9 +27,12 @@ reviewed:
     - github.com/ProtonMail/go-crypto/openpgp/errors
     - github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
     - github.com/ProtonMail/go-crypto/openpgp/internal/ecc
+    - github.com/ProtonMail/go-crypto/openpgp/internal/ecc/curve25519
+    - github.com/ProtonMail/go-crypto/openpgp/internal/ecc/curve25519/field
     - github.com/ProtonMail/go-crypto/openpgp/internal/encoding
     - github.com/ProtonMail/go-crypto/openpgp/packet
     - github.com/ProtonMail/go-crypto/openpgp/s2k
+    - github.com/ProtonMail/go-crypto/openpgp/symmetric
     - github.com/ProtonMail/go-crypto/openpgp/x25519
     - github.com/ProtonMail/go-crypto/openpgp/x448
     - github.com/cloudflare/circl/dh/x25519
