@@ -80,9 +80,9 @@ jobs:
       fail-fast: false
       matrix:
         operating-system:
-          - ubuntu-latest
           - windows-latest
           - macos-latest
+          - ubuntu-latest
         tests: ${{ fromJSON(needs.tests-collector.outputs.tests-data) }}
 
     runs-on: ${{ matrix.operating-system }}
@@ -127,9 +127,9 @@ jobs:
       fail-fast: false
       matrix:
         operating-system:
-          - ubuntu-latest
           - windows-latest
           - macos-latest
+          - ubuntu-latest
 
     runs-on: ${{ matrix.operating-system }}
 
