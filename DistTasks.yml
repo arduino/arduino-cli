@@ -19,7 +19,7 @@ version: "3"
 
 vars:
   CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
-  GO_VERSION: "1.21.6"
+  GO_VERSION: "1.22.5"
 
 tasks:
   Windows_32bit:
