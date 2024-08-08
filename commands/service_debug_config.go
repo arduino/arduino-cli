@@ -38,7 +38,7 @@ import (
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
-func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
+func (s *arduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.G
 }
 
 // IsDebugSupported checks if the given board/programmer configuration supports debugging.
-func IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
+func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.IsDebugSupportedRequest) (*rpc.IsDebugSupportedResponse, error) {
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 	if err != nil {
 		return nil, err
