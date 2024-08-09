@@ -125,15 +125,17 @@ func compileWithSimpleSketch(t *testing.T, env *integrationtest.Environment, cli
 
 func compileWithCachePurgeNeeded(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// create directories that must be purged
-	baseDir := paths.TempDir().Join("arduino", "sketches")
+	out, _, err := cli.Run("config", "get", "build_cache.path")
+	require.NoError(t, err)
+	cacheDir := paths.New(strings.TrimSpace(string(out))).Join("sketches")
 
 	// purge case: last used file too old
-	oldDir1 := baseDir.Join("test_old_sketch_1")
+	oldDir1 := cacheDir.Join("test_old_sketch_1")
 	require.NoError(t, oldDir1.MkdirAll())
 	require.NoError(t, oldDir1.Join(".last-used").WriteFile([]byte{}))
 	require.NoError(t, oldDir1.Join(".last-used").Chtimes(time.Now(), time.Unix(0, 0)))
 	// no purge case: last used file not existing
-	missingFileDir := baseDir.Join("test_sketch_2")
+	missingFileDir := cacheDir.Join("test_sketch_2")
 	require.NoError(t, missingFileDir.MkdirAll())
 
 	defer oldDir1.RemoveAll()
@@ -172,12 +174,13 @@ func compileWithSimpleSketchCustomEnv(t *testing.T, env *integrationtest.Environ
 	require.NoError(t, err)
 	require.NotEmpty(t, compileOutput["compiler_out"])
 	require.Empty(t, compileOutput["compiler_err"])
+	builderResult := compileOutput["builder_result"].(map[string]any)
+	buildDir := paths.New(builderResult["build_path"].(string))
 
 	// Verifies expected binaries have been built
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.eep").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.elf").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.hex").String())
@@ -427,11 +430,16 @@ func compileWithOutputDirFlag(t *testing.T, env *integrationtest.Environment, cl
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--output-dir", outputDir.String())
 	require.NoError(t, err)
 
+	// Get default build cache dir
+	out, _, err := cli.Run("config", "get", "build_cache.path")
+	require.NoError(t, err)
+	buildCache := paths.New(strings.TrimSpace(string(out)))
+
 	// Verifies expected binaries have been built
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
+	buildDir := buildCache.Join("sketches", sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.eep").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.elf").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.hex").String())
@@ -1008,14 +1016,15 @@ func compileWithInvalidBuildOptionJson(t *testing.T, env *integrationtest.Enviro
 	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
-	// Get the build directory
-	md5 := md5.Sum(([]byte(sketchPath.String())))
-	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
-	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
-
-	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
+	out, _, err := cli.Run("compile", "-b", fqbn, sketchPath.String(), "--json")
 	require.NoError(t, err)
+	var builderOutput struct {
+		BuilderResult struct {
+			BuildPath string `json:"build_path"`
+		} `json:"builder_result"`
+	}
+	require.NoError(t, json.Unmarshal(out, &builderOutput))
+	buildDir := paths.New(builderOutput.BuilderResult.BuildPath)
 
 	// Breaks the build.options.json file
 	buildOptionsJson := buildDir.Join("build.options.json")
