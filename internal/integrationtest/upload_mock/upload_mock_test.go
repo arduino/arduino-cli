@@ -655,7 +655,17 @@ func TestUploadSketch(t *testing.T) {
 	sketchPath := cli.SketchbookDir().Join(sketchName)
 	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
-	buildDir := generateBuildDir(sketchPath, t)
+
+	out, _, err := cli.Run("config", "get", "build_cache.path")
+	require.NoError(t, err)
+	cacheDir := paths.New(strings.TrimSpace(string(out)))
+
+	md5 := md5.Sum(([]byte(sketchPath.String())))
+	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
+	buildDir := cacheDir.Join("sketches", sketchPathMd5)
+	require.NoError(t, buildDir.MkdirAll())
+	require.NoError(t, buildDir.ToAbs())
+
 	t.Cleanup(func() { buildDir.RemoveAll() })
 
 	for i, _test := range testParameters {
@@ -716,15 +726,6 @@ func TestUploadSketch(t *testing.T) {
 			require.Contains(t, strings.ReplaceAll(string(stdout), "\\", "/"), expectedOut)
 		})
 	}
-}
-
-func generateBuildDir(sketchPath *paths.Path, t *testing.T) *paths.Path {
-	md5 := md5.Sum(([]byte(sketchPath.String())))
-	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
-	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
-	require.NoError(t, buildDir.MkdirAll())
-	require.NoError(t, buildDir.ToAbs())
-	return buildDir
 }
 
 func TestUploadWithInputDirFlag(t *testing.T) {

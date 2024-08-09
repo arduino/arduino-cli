@@ -25,12 +25,16 @@ import (
 
 // CheckFlagsConflicts is a helper function useful to report errors when more than one conflicting flag is used
 func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
+	var used []string
 	for _, flagName := range flagNames {
-		if !command.Flag(flagName).Changed {
-			return
+		if command.Flag(flagName).Changed {
+			used = append(used, flagName)
 		}
 	}
-	flags := "--" + strings.Join(flagNames, ", --")
+	if len(used) <= 1 {
+		return
+	}
+	flags := "--" + strings.Join(used, ", --")
 	msg := i18n.Tr("Can't use the following flags together: %s", flags)
 	feedback.Fatal(msg, feedback.ErrBadArgument)
 }

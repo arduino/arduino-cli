@@ -101,6 +101,18 @@ func getDefaultUserDir() string {
 	}
 }
 
+// getDefaultBuildCacheDir returns the full path to the default build cache folder
+func getDefaultBuildCacheDir() string {
+	var cacheDir *paths.Path
+	if p, err := os.UserCacheDir(); err == nil {
+		cacheDir = paths.New(p)
+	} else {
+		// fallback to /tmp
+		cacheDir = paths.TempDir()
+	}
+	return cacheDir.Join("arduino").String()
+}
+
 // FindConfigFlagsInArgsOrFallbackOnEnv returns the config file path using the
 // argument '--config-file' (if specified), if empty looks for the ARDUINO_CONFIG_FILE env,
 // or looking in the current working dir

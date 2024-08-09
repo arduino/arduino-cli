@@ -45,7 +45,6 @@ var (
 	importFile string
 	programmer arguments.Programmer
 	dryRun     bool
-	tr         = i18n.Tr
 )
 
 // NewCommand created a new `upload` command
@@ -60,7 +59,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " upload -p 192.168.10.1 -b arduino:avr:uno --upload-field password=abc",
 		Args: cobra.MaximumNArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
-			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
+			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir", "build-path")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			runUploadCommand(cmd.Context(), srv, args, uploadFields)
@@ -70,6 +69,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	fqbnArg.AddToCommand(uploadCommand, srv)
 	portArgs.AddToCommand(uploadCommand, srv)
 	profileArg.AddToCommand(uploadCommand, srv)
+	uploadCommand.Flags().StringVarP(&importDir, "build-path", "", "", i18n.Tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", i18n.Tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", i18n.Tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
