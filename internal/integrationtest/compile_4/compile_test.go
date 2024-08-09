@@ -929,11 +929,15 @@ func TestBuildCaching(t *testing.T) {
 		// Find cached core and save timestamp
 		pathList, err := buildCachePath.ReadDirRecursiveFiltered(nil, paths.FilterPrefixes("core.a"))
 		require.NoError(t, err)
-		require.Len(t, pathList, 1)
+		require.Len(t, pathList, 2)
 		cachedCoreFile := pathList[0]
-		lastUsedPath := cachedCoreFile.Parent().Join(".last-used")
-		require.True(t, lastUsedPath.Exist())
+		require.True(t, cachedCoreFile.Parent().Join(".last-used").Exist())
 		coreStatBefore, err := cachedCoreFile.Stat()
+		require.NoError(t, err)
+
+		sketchCoreFile := pathList[1]
+		require.True(t, sketchCoreFile.Parent().Parent().Join(".last-used").Exist())
+		sketchStatBefore, err := sketchCoreFile.Stat()
 		require.NoError(t, err)
 
 		// Run build again and check timestamp is unchanged
@@ -942,6 +946,9 @@ func TestBuildCaching(t *testing.T) {
 		coreStatAfterRebuild, err := cachedCoreFile.Stat()
 		require.NoError(t, err)
 		require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
+		sketchStatAfterRebuild, err := sketchCoreFile.Stat()
+		require.NoError(t, err)
+		require.Equal(t, sketchStatBefore.ModTime(), sketchStatAfterRebuild.ModTime())
 
 		// Touch a file of the core and check if the builder invalidate the cache
 		time.Sleep(time.Second)
