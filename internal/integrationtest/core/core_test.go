@@ -16,8 +16,6 @@
 package core_test
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -277,13 +275,17 @@ func TestCoreInstallEsp32(t *testing.T) {
 	sketchPath := cli.SketchbookDir().Join(sketchName)
 	_, _, err = cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
-	_, _, err = cli.Run("compile", "-b", "esp32:esp32:esp32", sketchPath.String())
+	out, _, err := cli.Run("compile", "-b", "esp32:esp32:esp32", sketchPath.String(), "--json")
 	require.NoError(t, err)
+	var builderOutput struct {
+		BuilderResult struct {
+			BuildPath string `json:"build_path"`
+		} `json:"builder_result"`
+	}
+	require.NoError(t, json.Unmarshal(out, &builderOutput))
+	buildDir := paths.New(builderOutput.BuilderResult.BuildPath)
+
 	// prevent regressions for https://github.com/arduino/arduino-cli/issues/163
-	md5 := md5.Sum(([]byte(sketchPath.String())))
-	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
-	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.partitions.bin").String())
 }
 
