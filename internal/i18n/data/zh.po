@@ -71,7 +71,7 @@ msgstr "%s 模式丢失"
 msgid "'%s' has an invalid signature"
 msgstr "‘%s’ 的签名无效"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:443
+#: internal/arduino/cores/packagemanager/package_manager.go:448
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -325,7 +325,7 @@ msgstr "无法新建临时文件"
 msgid "Cannot delete the key %[1]s: %[2]v"
 msgstr "无法删除位于%[2]v的%[1]s"
 
-#: commands/service_debug_run.go:69
+#: commands/service_debug.go:228
 msgid "Cannot execute debug tool"
 msgstr "无法运行调试工具"
 
@@ -368,7 +368,7 @@ msgstr "类别：%s"
 msgid "Check dependencies status for the specified library."
 msgstr "检查指定库的依赖状态。"
 
-#: internal/cli/debug/debug_check.go:42
+#: internal/cli/debug/debug_check.go:41
 msgid "Check if the given board/programmer combination supports debugging."
 msgstr "请提供给定的开发板/编程器组合以检查是否支持调试。"
 
@@ -427,7 +427,7 @@ msgstr "配置文件已经存在，使用 --overwrite 弃用现有的配置文�
 msgid "Config file written to: %s"
 msgstr "配置文件写入：%s"
 
-#: internal/cli/debug/debug.go:238
+#: internal/cli/debug/debug.go:241
 msgid "Configuration options for %s"
 msgstr "%s 的配置选项"
 
@@ -501,7 +501,7 @@ msgid ""
 "Library Manager."
 msgstr "目前，Build Profiles 只支持通过 Arduino Library Manager 提供的库。"
 
-#: internal/cli/debug/debug.go:254
+#: internal/cli/debug/debug.go:257
 msgid "Custom configuration for %s:"
 msgstr "%s的个性化设置："
 
@@ -523,7 +523,7 @@ msgid ""
 "Debug Arduino sketches. (this command opens an interactive gdb session)"
 msgstr "调试 Arduino 项目（此命令打开交互式 gdb 会话）"
 
-#: internal/cli/debug/debug.go:66 internal/cli/debug/debug_check.go:51
+#: internal/cli/debug/debug.go:66 internal/cli/debug/debug_check.go:50
 msgid "Debug interpreter e.g.: %s"
 msgstr "调试解释器，例如：%s"
 
@@ -768,7 +768,7 @@ msgstr "下载 %s 平台时出错"
 msgid "Error downloading tool %s"
 msgstr "下载 %s 工具时出错"
 
-#: internal/cli/debug/debug.go:150 internal/cli/debug/debug.go:183
+#: internal/cli/debug/debug.go:153 internal/cli/debug/debug.go:186
 msgid "Error during Debug: %v"
 msgstr "调试时出错：%v"
 
@@ -1040,7 +1040,7 @@ msgstr "%s 库的示例"
 msgid "Examples:"
 msgstr "示例："
 
-#: internal/cli/debug/debug.go:221
+#: internal/cli/debug/debug.go:224
 msgid "Executable to debug"
 msgstr "可执行调试"
 
@@ -1108,7 +1108,7 @@ msgid ""
 "defined: %s"
 msgstr "固件加密或签名需要定义以下所有属性：%s"
 
-#: commands/service_debug.go:40
+#: commands/service_debug.go:187
 msgid "First message must contain debug request, not data"
 msgstr "第一条消息必须包含调试请求，而不是数据"
 
@@ -1149,7 +1149,7 @@ msgstr "找到%d平台有符合的 \"%s\": %s"
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "完全合格开发板名，例如：arduino:avr:uno"
 
-#: commands/service_debug_run.go:188
+#: commands/service_debug.go:321
 msgid "GDB server '%s' is not supported"
 msgstr "不支持 GDB 服务器 ‘%s’"
 
@@ -1321,7 +1321,7 @@ msgstr "无效的 %s 条目"
 msgid "Invalid library"
 msgstr "无效的库"
 
-#: internal/cli/cli.go:262
+#: internal/cli/cli.go:265
 msgid "Invalid logging level: %s"
 msgstr ""
 
@@ -1333,7 +1333,7 @@ msgstr ""
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "无效的 ‘%[1]s’ 网络代理: %[2]s"
 
-#: internal/cli/cli.go:219
+#: internal/cli/cli.go:222
 msgid "Invalid output format: %s"
 msgstr "无效的输出格式：%s"
 
@@ -1958,7 +1958,7 @@ msgstr "运行 pre_uninstall 命令。"
 msgid "SEARCH_TERM"
 msgstr "搜索_条件"
 
-#: internal/cli/debug/debug.go:226
+#: internal/cli/debug/debug.go:229
 msgid "SVD file path"
 msgstr "SVD 文件路径"
 
@@ -2076,7 +2076,7 @@ msgstr "搜索与查询匹配的一个或多个库文件。"
 msgid "Sentence: %s"
 msgstr "句子：%s"
 
-#: internal/cli/debug/debug.go:234
+#: internal/cli/debug/debug.go:237
 msgid "Server path"
 msgstr "服务器路径"
 
@@ -2084,7 +2084,7 @@ msgstr "服务器路径"
 msgid "Server responded with: %s"
 msgstr "服务器响应：%s"
 
-#: internal/cli/debug/debug.go:233
+#: internal/cli/debug/debug.go:236
 msgid "Server type"
 msgstr "服务器类型"
 
@@ -2099,6 +2099,12 @@ msgstr "将终端设置为原始模式（无缓冲）。"
 #: internal/cli/config/set.go:34 internal/cli/config/set.go:35
 msgid "Sets a setting value."
 msgstr "设置一个值。"
+
+#: internal/cli/cli.go:189
+msgid ""
+"Sets the default data directory (Arduino CLI will look for configuration "
+"file in this directory)."
+msgstr ""
 
 #: internal/cli/board/attach.go:37
 msgid ""
@@ -2288,7 +2294,7 @@ msgstr "守护进程将监听的 TCP 端口"
 msgid "The command output format, can be: %s"
 msgstr ""
 
-#: internal/cli/cli.go:186
+#: internal/cli/cli.go:187
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "自定义配置文件（如果未指定，将使用默认值）。"
 
@@ -2296,11 +2302,11 @@ msgstr "自定义配置文件（如果未指定，将使用默认值）。"
 msgid "The flag --debug-file must be used with --debug."
 msgstr "参数 --debug-file 必须与 --debug 一起使用。"
 
-#: internal/cli/debug/debug_check.go:89
+#: internal/cli/debug/debug_check.go:88
 msgid "The given board/programmer configuration does NOT support debugging."
 msgstr "给定的开发板/编程器配置不支持调试。"
 
-#: internal/cli/debug/debug_check.go:87
+#: internal/cli/debug/debug_check.go:86
 msgid "The given board/programmer configuration supports debugging."
 msgstr "给定的开发板/编程器配置支持调试。"
 
@@ -2381,19 +2387,19 @@ msgstr "%s 工具已经安装"
 msgid "Tool %s uninstalled"
 msgstr "%s 工具已经卸载"
 
-#: commands/service_debug_run.go:144
+#: commands/service_debug.go:277
 msgid "Toolchain '%s' is not supported"
 msgstr "不支持 ‘%s’ 工具链"
 
-#: internal/cli/debug/debug.go:223
+#: internal/cli/debug/debug.go:226
 msgid "Toolchain path"
 msgstr "工具链路径"
 
-#: internal/cli/debug/debug.go:224
+#: internal/cli/debug/debug.go:227
 msgid "Toolchain prefix"
 msgstr "工具链前缀"
 
-#: internal/cli/debug/debug.go:222
+#: internal/cli/debug/debug.go:225
 msgid "Toolchain type"
 msgstr "工具链类型"
 
@@ -2422,20 +2428,20 @@ msgid ""
 "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
 msgstr "无法缓存构建的内核，请告知 %[1]s 维护者关注 %[2]s"
 
-#: internal/cli/configuration/configuration.go:86
+#: internal/cli/configuration/configuration.go:95
 msgid "Unable to get Documents Folder: %v"
 msgstr "无法获取文档文件夹：%v"
 
-#: internal/cli/configuration/configuration.go:61
+#: internal/cli/configuration/configuration.go:70
 msgid "Unable to get Local App Data Folder: %v"
 msgstr "无法获取本地应用程序数据文件夹：%v"
 
-#: internal/cli/configuration/configuration.go:49
-#: internal/cli/configuration/configuration.go:74
+#: internal/cli/configuration/configuration.go:58
+#: internal/cli/configuration/configuration.go:83
 msgid "Unable to get user home dir: %v"
 msgstr "无法获取用户主目录：%v"
 
-#: internal/cli/cli.go:249
+#: internal/cli/cli.go:252
 msgid "Unable to open file for logging: %s"
 msgstr "无法打开文件进行日志记录：%s"
 
@@ -2869,7 +2875,7 @@ msgstr "未找到 %s discovery"
 msgid "discovery %s not installed"
 msgstr "%s discovery 未安装"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:741
+#: internal/arduino/cores/packagemanager/package_manager.go:746
 msgid "discovery release not found: %s"
 msgstr "未找到 discovery 版本：%s"
 
@@ -3204,8 +3210,8 @@ msgstr "正在加载 %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "正在加载开发板：%s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:496
-#: internal/arduino/cores/packagemanager/package_manager.go:511
+#: internal/arduino/cores/packagemanager/package_manager.go:501
+#: internal/arduino/cores/packagemanager/package_manager.go:516
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "正在加载 %[1]s json 索引文件：%[2]s"
 
@@ -3258,7 +3264,7 @@ msgstr "缺少 ‘%s’ 指令"
 msgid "missing checksum for: %s"
 msgstr "缺少校验码：%s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:457
+#: internal/arduino/cores/packagemanager/package_manager.go:462
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "缺少 %[2]s 开发板引用的 %[1]s 软件包 "
 
@@ -3266,11 +3272,11 @@ msgstr "缺少 %[2]s 开发板引用的 %[1]s 软件包 "
 msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr "缺少软件包索引%s，无法保证未来的更新"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:462
+#: internal/arduino/cores/packagemanager/package_manager.go:467
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少 %[1]s 平台：%[2]s 被开发板 %[3]s 引用"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:467
+#: internal/arduino/cores/packagemanager/package_manager.go:472
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少平台 %[1]s 发行版本：%[2]s 被开发板 %[3]s 引用"
 
@@ -3278,7 +3284,7 @@ msgstr "缺少平台 %[1]s 发行版本：%[2]s 被开发板 %[3]s 引用"
 msgid "missing signature"
 msgstr "缺少签名"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:752
+#: internal/arduino/cores/packagemanager/package_manager.go:757
 msgid "monitor release not found: %s"
 msgstr "未找到公开监视器：%s"
 
@@ -3361,7 +3367,7 @@ msgstr "打开目标文件：%s"
 msgid "package %s not found"
 msgstr "未找到 %s 软件包 "
 
-#: internal/arduino/cores/packagemanager/package_manager.go:525
+#: internal/arduino/cores/packagemanager/package_manager.go:530
 msgid "package '%s' not found"
 msgstr "未找到 ‘%s’ 软件包 "
 
@@ -3476,7 +3482,7 @@ msgstr "阅读项目文件"
 msgid "recipe not found '%s'"
 msgstr "未找到 ‘%s’ 方法"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:601
+#: internal/arduino/cores/packagemanager/package_manager.go:606
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "找不到 %[2]s 工具的 %[1]s 发行版本"
 
@@ -3581,7 +3587,7 @@ msgstr "%s 工具不是由软件包管理器管理的"
 msgid "tool %s not found"
 msgstr "未找到 %s 工具"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:551
+#: internal/arduino/cores/packagemanager/package_manager.go:556
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "在 ‘%[2]s’ 软件包中找不到 ‘%[1]s’ 工具"
 
@@ -3589,8 +3595,8 @@ msgstr "在 ‘%[2]s’ 软件包中找不到 ‘%[1]s’ 工具"
 msgid "tool not installed"
 msgstr "工具未安装"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:730
-#: internal/arduino/cores/packagemanager/package_manager.go:836
+#: internal/arduino/cores/packagemanager/package_manager.go:735
+#: internal/arduino/cores/packagemanager/package_manager.go:841
 msgid "tool release not found: %s"
 msgstr "找不到发行工具：%s"
 

@@ -71,7 +71,7 @@ msgstr "%s النسق مفقود"
 msgid "'%s' has an invalid signature"
 msgstr "'%s' لديه توقيع غير صحيح"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:443
+#: internal/arduino/cores/packagemanager/package_manager.go:448
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -337,7 +337,7 @@ msgstr "تعذر انشاء ملف temp"
 msgid "Cannot delete the key %[1]s: %[2]v"
 msgstr "تعذر حذف المفتاح %[1]s:%[2]v"
 
-#: commands/service_debug_run.go:69
+#: commands/service_debug.go:228
 msgid "Cannot execute debug tool"
 msgstr "تعذر تشغيل اداة debug"
 
@@ -380,7 +380,7 @@ msgstr "الفئة : %s"
 msgid "Check dependencies status for the specified library."
 msgstr "التحقق من حالة التبعيات (dependencies) للمكتبة المختارة"
 
-#: internal/cli/debug/debug_check.go:42
+#: internal/cli/debug/debug_check.go:41
 msgid "Check if the given board/programmer combination supports debugging."
 msgstr ""
 
@@ -443,7 +443,7 @@ msgstr ""
 msgid "Config file written to: %s"
 msgstr "تمت كتابة ملف التهيئة في : %s"
 
-#: internal/cli/debug/debug.go:238
+#: internal/cli/debug/debug.go:241
 msgid "Configuration options for %s"
 msgstr "اعدادات الضبط ل %s"
 
@@ -521,7 +521,7 @@ msgstr ""
 "في الوقت الحالي , بروفايلات البناء (Build Profiles) تدعم حصرا المكتبات "
 "المتوافرة في مدير المكتبات للاردوينو (Arduino Library Manager)"
 
-#: internal/cli/debug/debug.go:254
+#: internal/cli/debug/debug.go:257
 msgid "Custom configuration for %s:"
 msgstr ""
 
@@ -543,7 +543,7 @@ msgid ""
 "Debug Arduino sketches. (this command opens an interactive gdb session)"
 msgstr "تصحيح اخطاء مشاريع الاردوينو (يفتح هذا الامر جلسة gdb تفاعلية)"
 
-#: internal/cli/debug/debug.go:66 internal/cli/debug/debug_check.go:51
+#: internal/cli/debug/debug.go:66 internal/cli/debug/debug_check.go:50
 msgid "Debug interpreter e.g.: %s"
 msgstr "مترجم التصحيح على سبيل المثال : %s"
 
@@ -795,7 +795,7 @@ msgstr "خطأ اثناء تنزيل المنصة %s"
 msgid "Error downloading tool %s"
 msgstr "خطا اثناء تنزيل الاداة %s"
 
-#: internal/cli/debug/debug.go:150 internal/cli/debug/debug.go:183
+#: internal/cli/debug/debug.go:153 internal/cli/debug/debug.go:186
 msgid "Error during Debug: %v"
 msgstr "خطا اثناء التصحيح : %v"
 
@@ -1071,7 +1071,7 @@ msgstr "الامثلة للمكتبة %s"
 msgid "Examples:"
 msgstr "الامثلة : "
 
-#: internal/cli/debug/debug.go:221
+#: internal/cli/debug/debug.go:224
 msgid "Executable to debug"
 msgstr "الملف التنفيذي الذي سيتم تصحيحه (Executable to debug)"
 
@@ -1139,7 +1139,7 @@ msgid ""
 "defined: %s"
 msgstr "تشفير البرنامج الثابت او توقيعه يحتاج تحديد الخصائص التالية"
 
-#: commands/service_debug.go:40
+#: commands/service_debug.go:187
 msgid "First message must contain debug request, not data"
 msgstr "اول رسالة يجب ان تحوي على طلب التصحيح و ليس البيانات"
 
@@ -1182,7 +1182,7 @@ msgstr ""
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "اسم اللوحة المؤهلة بالكامل FQBN مثال : arduino:avr:uno"
 
-#: commands/service_debug_run.go:188
+#: commands/service_debug.go:321
 msgid "GDB server '%s' is not supported"
 msgstr "سيرفر GDB '%s' غير مدعوم"
 
@@ -1362,7 +1362,7 @@ msgstr "عنصر عير صالح %s"
 msgid "Invalid library"
 msgstr "مكتبة غير صالحة"
 
-#: internal/cli/cli.go:262
+#: internal/cli/cli.go:265
 msgid "Invalid logging level: %s"
 msgstr ""
 
@@ -1374,7 +1374,7 @@ msgstr ""
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "network.proxy غير صالح '%[1]s': %[2]s"
 
-#: internal/cli/cli.go:219
+#: internal/cli/cli.go:222
 msgid "Invalid output format: %s"
 msgstr "صيغة اخراج خاطئة : %s"
 
@@ -2027,7 +2027,7 @@ msgstr ""
 msgid "SEARCH_TERM"
 msgstr ""
 
-#: internal/cli/debug/debug.go:226
+#: internal/cli/debug/debug.go:229
 msgid "SVD file path"
 msgstr ""
 
@@ -2106,7 +2106,7 @@ msgstr ""
 msgid "Sentence: %s"
 msgstr "الجملة : %s"
 
-#: internal/cli/debug/debug.go:234
+#: internal/cli/debug/debug.go:237
 msgid "Server path"
 msgstr ""
 
@@ -2114,7 +2114,7 @@ msgstr ""
 msgid "Server responded with: %s"
 msgstr "استجابة السيرفر : %s"
 
-#: internal/cli/debug/debug.go:233
+#: internal/cli/debug/debug.go:236
 msgid "Server type"
 msgstr ""
 
@@ -2129,6 +2129,12 @@ msgstr ""
 #: internal/cli/config/set.go:34 internal/cli/config/set.go:35
 msgid "Sets a setting value."
 msgstr "تحديد قيمة للاعداد"
+
+#: internal/cli/cli.go:189
+msgid ""
+"Sets the default data directory (Arduino CLI will look for configuration "
+"file in this directory)."
+msgstr ""
 
 #: internal/cli/board/attach.go:37
 msgid ""
@@ -2331,7 +2337,7 @@ msgstr "منفذ TCP  الذي سيستمع اليه الناطر"
 msgid "The command output format, can be: %s"
 msgstr ""
 
-#: internal/cli/cli.go:186
+#: internal/cli/cli.go:187
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "ملف التهيئة المخصص (اذا لم يتم تحديده سيتم استخدام الملف الافتراضي)"
 
@@ -2339,11 +2345,11 @@ msgstr "ملف التهيئة المخصص (اذا لم يتم تحديده سي
 msgid "The flag --debug-file must be used with --debug."
 msgstr "يجب استخدام العلامة debug-file-- مع debug--"
 
-#: internal/cli/debug/debug_check.go:89
+#: internal/cli/debug/debug_check.go:88
 msgid "The given board/programmer configuration does NOT support debugging."
 msgstr ""
 
-#: internal/cli/debug/debug_check.go:87
+#: internal/cli/debug/debug_check.go:86
 msgid "The given board/programmer configuration supports debugging."
 msgstr ""
 
@@ -2435,19 +2441,19 @@ msgstr "الاداة %s مثبتة مسبقا"
 msgid "Tool %s uninstalled"
 msgstr "تم الغاء تثبيت الاداة %s"
 
-#: commands/service_debug_run.go:144
+#: commands/service_debug.go:277
 msgid "Toolchain '%s' is not supported"
 msgstr "مجموعة الادوات '%s' غير مدعومة"
 
-#: internal/cli/debug/debug.go:223
+#: internal/cli/debug/debug.go:226
 msgid "Toolchain path"
 msgstr "مسار مجموعة الادوات"
 
-#: internal/cli/debug/debug.go:224
+#: internal/cli/debug/debug.go:227
 msgid "Toolchain prefix"
 msgstr "بادئة مجموعة الادوات "
 
-#: internal/cli/debug/debug.go:222
+#: internal/cli/debug/debug.go:225
 msgid "Toolchain type"
 msgstr "نوع مجموعة الادوات"
 
@@ -2477,20 +2483,20 @@ msgid ""
 msgstr ""
 "تعذر تخزين نواة البناء مؤقتا , الرجاء اخبار المحافظين %[1]s لمتابعة %[2]s"
 
-#: internal/cli/configuration/configuration.go:86
+#: internal/cli/configuration/configuration.go:95
 msgid "Unable to get Documents Folder: %v"
 msgstr "تعذر ايجاد مجلد Documents : %v"
 
-#: internal/cli/configuration/configuration.go:61
+#: internal/cli/configuration/configuration.go:70
 msgid "Unable to get Local App Data Folder: %v"
 msgstr "تعذر ايجاد مجلد Local App Data : %v"
 
-#: internal/cli/configuration/configuration.go:49
-#: internal/cli/configuration/configuration.go:74
+#: internal/cli/configuration/configuration.go:58
+#: internal/cli/configuration/configuration.go:83
 msgid "Unable to get user home dir: %v"
 msgstr "تعذر ايجاد user home dir : %v"
 
-#: internal/cli/cli.go:249
+#: internal/cli/cli.go:252
 msgid "Unable to open file for logging: %s"
 msgstr "تعذر فتح ملف من اجل انشاء سجلات : %s"
 
@@ -2934,7 +2940,7 @@ msgstr "المستكشف %s غير موجود"
 msgid "discovery %s not installed"
 msgstr "تعذر تثبيت المستكشف %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:741
+#: internal/arduino/cores/packagemanager/package_manager.go:746
 msgid "discovery release not found: %s"
 msgstr "تعذر ايجاد اصدار المستكشف %s"
 
@@ -3273,8 +3279,8 @@ msgstr "جار تحميل %[1]s:%[2]s"
 msgid "loading boards: %s"
 msgstr "جار تحميل اللوحات : %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:496
-#: internal/arduino/cores/packagemanager/package_manager.go:511
+#: internal/arduino/cores/packagemanager/package_manager.go:501
+#: internal/arduino/cores/packagemanager/package_manager.go:516
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "جار تحميل ملف json index %[1]s : %[2]s"
 
@@ -3327,7 +3333,7 @@ msgstr "يوجد directive \"عبارة برمجية بداخل الكود ال�
 msgid "missing checksum for: %s"
 msgstr "المجموع الاختباري (checksum) لـ %s مفقود"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:457
+#: internal/arduino/cores/packagemanager/package_manager.go:462
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "تعذر العثور على الحزمة %[1]s التي التي تشير اليها اللوحة %[2]s "
 
@@ -3336,12 +3342,12 @@ msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr ""
 "يوجد حزمة مفقودة من الفهرس %s , لا يمكن ضمان التحديثات المستقبلية بسبب ذلك"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:462
+#: internal/arduino/cores/packagemanager/package_manager.go:467
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "تعذر العثور على المنصة %[1]s : %[2]s التي التي تشير اليها اللوحة  %[3]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:467
+#: internal/arduino/cores/packagemanager/package_manager.go:472
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "تعذر العثور على المنصة اصدار (platform release) %[1]s : %[2]s التي التي تشير"
@@ -3351,7 +3357,7 @@ msgstr ""
 msgid "missing signature"
 msgstr "هناك توقيع غير موجود"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:752
+#: internal/arduino/cores/packagemanager/package_manager.go:757
 msgid "monitor release not found: %s"
 msgstr "تعذر ايجاد اصدار المراقب : %s"
 
@@ -3436,7 +3442,7 @@ msgstr "جار فتح الملف الهدف : %s"
 msgid "package %s not found"
 msgstr "الحزمة %sغير موجودة "
 
-#: internal/arduino/cores/packagemanager/package_manager.go:525
+#: internal/arduino/cores/packagemanager/package_manager.go:530
 msgid "package '%s' not found"
 msgstr "الحزمة '%s' غير موجودة"
 
@@ -3551,7 +3557,7 @@ msgstr "جاري قرأت ملفات المذكرة"
 msgid "recipe not found '%s'"
 msgstr "تعذر ايجاد الوصفة '%s'"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:601
+#: internal/arduino/cores/packagemanager/package_manager.go:606
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "تعذر ايجاد الاصدار %[1]s للاداة %[2]s"
 
@@ -3656,7 +3662,7 @@ msgstr "الاداة %s لا تتم ادارتها من قبل مدير الحز
 msgid "tool %s not found"
 msgstr "الاداة %s غير موجودة"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:551
+#: internal/arduino/cores/packagemanager/package_manager.go:556
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "الاداة '%[1]s' غير موجودة ضمن الحزمة '%[2]s'"
 
@@ -3664,8 +3670,8 @@ msgstr "الاداة '%[1]s' غير موجودة ضمن الحزمة '%[2]s'"
 msgid "tool not installed"
 msgstr "الاداة غير مثبتة"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:730
-#: internal/arduino/cores/packagemanager/package_manager.go:836
+#: internal/arduino/cores/packagemanager/package_manager.go:735
+#: internal/arduino/cores/packagemanager/package_manager.go:841
 msgid "tool release not found: %s"
 msgstr "اصدار الاداة غير موجود : %s"
 
