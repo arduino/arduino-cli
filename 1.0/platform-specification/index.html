@@ -2451,8 +2451,9 @@ suffixes are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>
 <h4 id="global-predefined-properties">Global Predefined properties<a class="headerlink" href="#global-predefined-properties" title="Permanent link">&para;</a></h4>
 <p>The following automatically generated properties can be used globally in all configuration files:</p>
 <ul>
-<li><code>{runtime.platform.path}</code>: the absolute path of the <a href="#platform-terminology">board platform</a> folder (i.e. the folder
-  containing boards.txt)</li>
+<li><code>{runtime.platform.path}</code>: is the absolute path of the <a href="#platform-terminology">board platform</a> folder (i.e. the folder
+  containing boards.txt) unless <code>{runtime.use_core_platform_path_for_runtime_platform_path}</code> is set to <code>true</code> in this
+  case, the value is the absolute path of the referenced core platform.</li>
 <li><code>{runtime.hardware.path}</code>: the absolute path of the hardware folder (i.e. the folder containing the
   <a href="#platform-terminology">board platform</a> folder)</li>
 <li><code>{runtime.ide.path}</code>: the absolute path of the Arduino IDE or Arduino CLI folder</li>
@@ -2481,8 +2482,12 @@ suffixes are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>
 <li><code>{extra.time.zone}</code>: local timezone offset without the DST component</li>
 <li><code>{extra.time.dst}</code>: local daylight savings time offset</li>
 </ul>
-<p>Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in
-<code>{runtime.ide.version}</code> (so 1.5.9 was <code>159</code>, not <code>10509</code>).</p>
+<p>Compatibility notes:</p>
+<ul>
+<li>Versions before Arduino IDE 1.6.0 only used one digit per version number component in <code>{runtime.ide.version}</code> (so
+  1.5.9 was <code>159</code>, not <code>10509</code>).</li>
+<li><code>{runtime.use_core_platform_path_for_runtime_platform_path}</code> support is available from Arduino CLI &gt;=1.0.4.</li>
+</ul>
 <h2 id="platformtxt">platform.txt<a class="headerlink" href="#platformtxt" title="Permanent link">&para;</a></h2>
 <p>The platform.txt file contains information about a platform's specific aspects (compilers command line flags, paths,
 system libraries, etc.).</p>
@@ -2811,6 +2816,9 @@ uno.build.variant       =&gt;   build.variant
 overwritten respectively by <strong>{uno.build.mcu}</strong> and <strong>{uno.build.board}</strong> when the Uno board is selected! Moreover the
 following properties are automatically generated:</p>
 <ul>
+<li><code>{build.board.platform.path}</code>: The path to the selected board's platform. (available since Arduino CLI &gt;=1.0.4)</li>
+<li><code>{build.core.platform.path}</code>: The path to the core's platform. It may differ from the board's platform path because
+  the latter may reference a core from another platform. (available since Arduino CLI &gt;=1.0.4)</li>
 <li><code>{build.core.path}</code>: The path to the selected board's core folder (inside the <a href="#platform-terminology">core platform</a>,
   for example hardware/arduino/avr/core/arduino)</li>
 <li><code>{build.system.path}</code>: The path to the <a href="#platform-terminology">core platform</a>'s system folder if available (for
