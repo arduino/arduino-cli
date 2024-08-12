@@ -70,7 +70,7 @@ msgstr "%spadrão está faltando"
 msgid "'%s' has an invalid signature"
 msgstr "%s‎tem uma assinatura inválida‎"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:443
+#: internal/arduino/cores/packagemanager/package_manager.go:448
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -338,7 +338,7 @@ msgstr "Não é possível criar arquivo temporário"
 msgid "Cannot delete the key %[1]s: %[2]v"
 msgstr "Não é possível deletar a chave %[1]s:%[2]v"
 
-#: commands/service_debug_run.go:69
+#: commands/service_debug.go:228
 msgid "Cannot execute debug tool"
 msgstr "Não é possível executar ferramenta de depuração"
 
@@ -381,7 +381,7 @@ msgstr "Categoria: %s"
 msgid "Check dependencies status for the specified library."
 msgstr "Verifique o estado das dependências para a biblioteca especificada."
 
-#: internal/cli/debug/debug_check.go:42
+#: internal/cli/debug/debug_check.go:41
 msgid "Check if the given board/programmer combination supports debugging."
 msgstr ""
 "Verifique se a combinação placa/programador fornecida suporta depuração."
@@ -447,7 +447,7 @@ msgstr ""
 msgid "Config file written to: %s"
 msgstr "%s‎Arquivo Config escrito para:‎"
 
-#: internal/cli/debug/debug.go:238
+#: internal/cli/debug/debug.go:241
 msgid "Configuration options for %s"
 msgstr "Opções de configuração para %s"
 
@@ -527,7 +527,7 @@ msgstr ""
 "Atualmente, os Perfis de Build só suportam bibliotecas disponíveis através "
 "do Gerenciador de Bibliotecas Arduino."
 
-#: internal/cli/debug/debug.go:254
+#: internal/cli/debug/debug.go:257
 msgid "Custom configuration for %s:"
 msgstr "Configuração personalizada para %s:"
 
@@ -551,7 +551,7 @@ msgstr ""
 "Depurar esboços Arduino (esse comando abre uma sessão interativa com o "
 "depurador gdb)."
 
-#: internal/cli/debug/debug.go:66 internal/cli/debug/debug_check.go:51
+#: internal/cli/debug/debug.go:66 internal/cli/debug/debug_check.go:50
 msgid "Debug interpreter e.g.: %s"
 msgstr "Depurar interpretador e.g.:%s"
 
@@ -800,7 +800,7 @@ msgstr "Erro ao baixar plataforma %s"
 msgid "Error downloading tool %s"
 msgstr "Erro ao baixar ferramenta %s"
 
-#: internal/cli/debug/debug.go:150 internal/cli/debug/debug.go:183
+#: internal/cli/debug/debug.go:153 internal/cli/debug/debug.go:186
 msgid "Error during Debug: %v"
 msgstr "Erro durante Depuramento: %v"
 
@@ -1073,7 +1073,7 @@ msgstr "Exemplos para biblioteca %s"
 msgid "Examples:"
 msgstr "Exemplos:"
 
-#: internal/cli/debug/debug.go:221
+#: internal/cli/debug/debug.go:224
 msgid "Executable to debug"
 msgstr "Executável para depurar"
 
@@ -1145,7 +1145,7 @@ msgstr ""
 "Encriptação/assinatura de firmware requer que todas as propriedades a seguir"
 " sejam definidas: %s"
 
-#: commands/service_debug.go:40
+#: commands/service_debug.go:187
 msgid "First message must contain debug request, not data"
 msgstr ""
 "A primeira mensagem deve conter uma requisição de depuração, e não dados."
@@ -1191,7 +1191,7 @@ msgstr ""
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "Nome de Placa Completamente Qualificada. E.g.: arduino:avr:uno"
 
-#: commands/service_debug_run.go:188
+#: commands/service_debug.go:321
 msgid "GDB server '%s' is not supported"
 msgstr "Servidor GDB '%s' não é suportado"
 
@@ -1371,7 +1371,7 @@ msgstr "Item inválido %s"
 msgid "Invalid library"
 msgstr "Biblioteca inválida"
 
-#: internal/cli/cli.go:262
+#: internal/cli/cli.go:265
 msgid "Invalid logging level: %s"
 msgstr ""
 
@@ -1383,7 +1383,7 @@ msgstr ""
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "network.proxy inválido: '%[1]s':%[2]s"
 
-#: internal/cli/cli.go:219
+#: internal/cli/cli.go:222
 msgid "Invalid output format: %s"
 msgstr "Formato de saída inválido: %s"
 
@@ -2045,7 +2045,7 @@ msgstr ""
 msgid "SEARCH_TERM"
 msgstr ""
 
-#: internal/cli/debug/debug.go:226
+#: internal/cli/debug/debug.go:229
 msgid "SVD file path"
 msgstr ""
 
@@ -2128,7 +2128,7 @@ msgstr ""
 msgid "Sentence: %s"
 msgstr "Sentença: %s"
 
-#: internal/cli/debug/debug.go:234
+#: internal/cli/debug/debug.go:237
 msgid "Server path"
 msgstr ""
 
@@ -2136,7 +2136,7 @@ msgstr ""
 msgid "Server responded with: %s"
 msgstr "Servidor respondeu com: %s"
 
-#: internal/cli/debug/debug.go:233
+#: internal/cli/debug/debug.go:236
 msgid "Server type"
 msgstr ""
 
@@ -2151,6 +2151,12 @@ msgstr ""
 #: internal/cli/config/set.go:34 internal/cli/config/set.go:35
 msgid "Sets a setting value."
 msgstr "Define um valor de configuração."
+
+#: internal/cli/cli.go:189
+msgid ""
+"Sets the default data directory (Arduino CLI will look for configuration "
+"file in this directory)."
+msgstr ""
 
 #: internal/cli/board/attach.go:37
 msgid ""
@@ -2365,7 +2371,7 @@ msgstr "O daemon da porta TCP irá ouvir em"
 msgid "The command output format, can be: %s"
 msgstr ""
 
-#: internal/cli/cli.go:186
+#: internal/cli/cli.go:187
 msgid "The custom config file (if not specified the default will be used)."
 msgstr ""
 "O arquivo de configuração customizado (caso não seja definido, o padrão vai "
@@ -2375,11 +2381,11 @@ msgstr ""
 msgid "The flag --debug-file must be used with --debug."
 msgstr "A flag --debug-file deve ser usada junto de --debug."
 
-#: internal/cli/debug/debug_check.go:89
+#: internal/cli/debug/debug_check.go:88
 msgid "The given board/programmer configuration does NOT support debugging."
 msgstr ""
 
-#: internal/cli/debug/debug_check.go:87
+#: internal/cli/debug/debug_check.go:86
 msgid "The given board/programmer configuration supports debugging."
 msgstr ""
 
@@ -2476,19 +2482,19 @@ msgstr "Ferramenta %s já está instalada"
 msgid "Tool %s uninstalled"
 msgstr ""
 
-#: commands/service_debug_run.go:144
+#: commands/service_debug.go:277
 msgid "Toolchain '%s' is not supported"
 msgstr ""
 
-#: internal/cli/debug/debug.go:223
+#: internal/cli/debug/debug.go:226
 msgid "Toolchain path"
 msgstr ""
 
-#: internal/cli/debug/debug.go:224
+#: internal/cli/debug/debug.go:227
 msgid "Toolchain prefix"
 msgstr ""
 
-#: internal/cli/debug/debug.go:222
+#: internal/cli/debug/debug.go:225
 msgid "Toolchain type"
 msgstr ""
 
@@ -2517,20 +2523,20 @@ msgid ""
 "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
 msgstr ""
 
-#: internal/cli/configuration/configuration.go:86
+#: internal/cli/configuration/configuration.go:95
 msgid "Unable to get Documents Folder: %v"
 msgstr ""
 
-#: internal/cli/configuration/configuration.go:61
+#: internal/cli/configuration/configuration.go:70
 msgid "Unable to get Local App Data Folder: %v"
 msgstr ""
 
-#: internal/cli/configuration/configuration.go:49
-#: internal/cli/configuration/configuration.go:74
+#: internal/cli/configuration/configuration.go:58
+#: internal/cli/configuration/configuration.go:83
 msgid "Unable to get user home dir: %v"
 msgstr ""
 
-#: internal/cli/cli.go:249
+#: internal/cli/cli.go:252
 msgid "Unable to open file for logging: %s"
 msgstr ""
 
@@ -2965,7 +2971,7 @@ msgstr ""
 msgid "discovery %s not installed"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:741
+#: internal/arduino/cores/packagemanager/package_manager.go:746
 msgid "discovery release not found: %s"
 msgstr ""
 
@@ -3300,8 +3306,8 @@ msgstr ""
 msgid "loading boards: %s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:496
-#: internal/arduino/cores/packagemanager/package_manager.go:511
+#: internal/arduino/cores/packagemanager/package_manager.go:501
+#: internal/arduino/cores/packagemanager/package_manager.go:516
 msgid "loading json index file %[1]s: %[2]s"
 msgstr ""
 
@@ -3354,7 +3360,7 @@ msgstr ""
 msgid "missing checksum for: %s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:457
+#: internal/arduino/cores/packagemanager/package_manager.go:462
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr ""
 
@@ -3362,11 +3368,11 @@ msgstr ""
 msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:462
+#: internal/arduino/cores/packagemanager/package_manager.go:467
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:467
+#: internal/arduino/cores/packagemanager/package_manager.go:472
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 
@@ -3374,7 +3380,7 @@ msgstr ""
 msgid "missing signature"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:752
+#: internal/arduino/cores/packagemanager/package_manager.go:757
 msgid "monitor release not found: %s"
 msgstr ""
 
@@ -3457,7 +3463,7 @@ msgstr ""
 msgid "package %s not found"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:525
+#: internal/arduino/cores/packagemanager/package_manager.go:530
 msgid "package '%s' not found"
 msgstr ""
 
@@ -3572,7 +3578,7 @@ msgstr ""
 msgid "recipe not found '%s'"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:601
+#: internal/arduino/cores/packagemanager/package_manager.go:606
 msgid "release %[1]s not found for tool %[2]s"
 msgstr ""
 
@@ -3677,7 +3683,7 @@ msgstr ""
 msgid "tool %s not found"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:551
+#: internal/arduino/cores/packagemanager/package_manager.go:556
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr ""
 
@@ -3685,8 +3691,8 @@ msgstr ""
 msgid "tool not installed"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/package_manager.go:730
-#: internal/arduino/cores/packagemanager/package_manager.go:836
+#: internal/arduino/cores/packagemanager/package_manager.go:735
+#: internal/arduino/cores/packagemanager/package_manager.go:841
 msgid "tool release not found: %s"
 msgstr ""
 
