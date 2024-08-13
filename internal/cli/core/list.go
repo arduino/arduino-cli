@@ -88,9 +88,9 @@ func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 }
 
 func newCoreListResult(in []*rpc.PlatformSummary, updatableOnly bool) *coreListResult {
-	res := &coreListResult{updatableOnly: updatableOnly}
-	for _, platformSummary := range in {
-		res.Platforms = append(res.Platforms, result.NewPlatformSummary(platformSummary))
+	res := &coreListResult{updatableOnly: updatableOnly, Platforms: make([]*result.PlatformSummary, len(in))}
+	for i, platformSummary := range in {
+		res.Platforms[i] = result.NewPlatformSummary(platformSummary)
 	}
 	return res
 }

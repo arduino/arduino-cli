@@ -1174,6 +1174,7 @@ func TestCoreListWhenNoPlatformAreInstalled(t *testing.T) {
 	stdout, _, err := cli.Run("core", "list", "--json")
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.platforms | length`, `0`)
+	requirejson.Query(t, stdout, `.platforms | select(.!=null)`, `[]`)
 
 	stdout, _, err = cli.Run("core", "list")
 	require.NoError(t, err)
