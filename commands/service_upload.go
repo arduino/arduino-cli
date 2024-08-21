@@ -256,6 +256,7 @@ func (s *arduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
 		UserFields: req.GetUserFields(),
+		DryRun:     req.GetDryRun(),
 	}, streamAdapter)
 }
 
