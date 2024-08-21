@@ -36,15 +36,16 @@ import (
 )
 
 var (
-	fqbnArg    arguments.Fqbn
-	portArgs   arguments.Port
-	profileArg arguments.Profile
-	verbose    bool
-	verify     bool
-	importDir  string
-	importFile string
-	programmer arguments.Programmer
-	dryRun     bool
+	fqbnArg          arguments.Fqbn
+	portArgs         arguments.Port
+	profileArg       arguments.Profile
+	verbose          bool
+	verify           bool
+	importDir        string
+	importFile       string
+	programmer       arguments.Programmer
+	dryRun           bool
+	uploadProperties []string
 )
 
 // NewCommand created a new `upload` command
@@ -71,6 +72,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	profileArg.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", i18n.Tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", i18n.Tr("Binary file to upload."))
+	uploadCommand.Flags().StringArrayVar(&uploadProperties, "upload-property", []string{},
+		i18n.Tr("Override an upload property with a custom value. Can be used multiple times for multiple properties."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Optional, turns on verbose mode."))
 	programmer.AddToCommand(uploadCommand, srv)
@@ -184,17 +187,18 @@ func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 
 	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{
-		Instance:   inst,
-		Fqbn:       fqbn,
-		SketchPath: path,
-		Port:       port,
-		Verbose:    verbose,
-		Verify:     verify,
-		ImportFile: importFile,
-		ImportDir:  importDir,
-		Programmer: prog,
-		DryRun:     dryRun,
-		UserFields: fields,
+		Instance:         inst,
+		Fqbn:             fqbn,
+		SketchPath:       path,
+		Port:             port,
+		Verbose:          verbose,
+		Verify:           verify,
+		ImportFile:       importFile,
+		ImportDir:        importDir,
+		Programmer:       prog,
+		DryRun:           dryRun,
+		UserFields:       fields,
+		UploadProperties: uploadProperties,
 	}
 	stream, streamResp := commands.UploadToServerStreams(ctx, stdOut, stdErr)
 	if err := srv.Upload(req, stream); err != nil {
