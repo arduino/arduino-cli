@@ -205,6 +205,7 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		errStream,
 		req.GetDryRun(),
 		req.GetUserFields(),
+		req.GetUploadProperties(),
 	)
 	if err != nil {
 		return err
@@ -246,17 +247,18 @@ func (s *arduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 		return &cmderrors.MissingProgrammerError{}
 	}
 	return s.Upload(&rpc.UploadRequest{
-		Instance:   req.GetInstance(),
-		SketchPath: req.GetSketchPath(),
-		ImportFile: req.GetImportFile(),
-		ImportDir:  req.GetImportDir(),
-		Fqbn:       req.GetFqbn(),
-		Port:       req.GetPort(),
-		Programmer: req.GetProgrammer(),
-		Verbose:    req.GetVerbose(),
-		Verify:     req.GetVerify(),
-		UserFields: req.GetUserFields(),
-		DryRun:     req.GetDryRun(),
+		Instance:         req.GetInstance(),
+		SketchPath:       req.GetSketchPath(),
+		ImportFile:       req.GetImportFile(),
+		ImportDir:        req.GetImportDir(),
+		Fqbn:             req.GetFqbn(),
+		Port:             req.GetPort(),
+		Programmer:       req.GetProgrammer(),
+		Verbose:          req.GetVerbose(),
+		Verify:           req.GetVerify(),
+		UserFields:       req.GetUserFields(),
+		DryRun:           req.GetDryRun(),
+		UploadProperties: req.GetUploadProperties(),
 	}, streamAdapter)
 }
 
@@ -267,6 +269,7 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
 	dryRun bool, userFields map[string]string,
+	requestUploadProperties []string,
 ) (*rpc.Port, error) {
 	port := rpc.DiscoveryPortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
@@ -376,6 +379,13 @@ func runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
 	uploadProperties.Merge(uploadProperties.SubTree("tools." + uploadToolID))
 	if programmer != nil {
 		uploadProperties.Merge(programmer.Properties)
+	}
+
+	// Add user provided custom upload properties
+	if p, err := properties.LoadFromSlice(requestUploadProperties); err == nil {
+		uploadProperties.Merge(p)
+	} else {
+		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
 
 	// Certain tools require the user to provide custom fields at run time,
