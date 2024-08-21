@@ -45,7 +45,6 @@ var (
 	importFile string
 	programmer arguments.Programmer
 	dryRun     bool
-	tr         = i18n.Tr
 )
 
 // NewCommand created a new `upload` command

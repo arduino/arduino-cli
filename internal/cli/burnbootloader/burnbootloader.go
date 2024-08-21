@@ -38,7 +38,6 @@ var (
 	verify     bool
 	programmer arguments.Programmer
 	dryRun     bool
-	tr         = i18n.Tr
 )
 
 // NewCommand created a new `burn-bootloader` command
