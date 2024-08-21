@@ -42,7 +42,7 @@ message CompileRequest {
   // a directory will be created in the operating system's default temporary
   // path.
   string build_path = 7;
-  // List of custom build properties separated by commas.
+  // List of custom build properties.
   repeated string build_properties = 8;
   // Used to tell gcc which warning level to use. The level names are: "none",
   // "default", "more" and "all".
