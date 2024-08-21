@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"slices"
 	"strconv"
@@ -55,13 +56,14 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 	}
 	defer release()
 	configRequest := &rpc.GetDebugConfigRequest{
-		Instance:    req.GetInstance(),
-		Fqbn:        req.GetFqbn(),
-		SketchPath:  "",
-		Port:        req.GetPort(),
-		Interpreter: req.GetInterpreter(),
-		ImportDir:   "",
-		Programmer:  req.GetProgrammer(),
+		Instance:        req.GetInstance(),
+		Fqbn:            req.GetFqbn(),
+		SketchPath:      "",
+		Port:            req.GetPort(),
+		Interpreter:     req.GetInterpreter(),
+		ImportDir:       "",
+		Programmer:      req.GetProgrammer(),
+		DebugProperties: req.GetDebugProperties(),
 	}
 	expectedOutput, err := getDebugProperties(configRequest, pme, true)
 	var x *cmderrors.FailedDebugError
@@ -200,6 +202,13 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		for k, v := range toolProperties.SubTree(debugAdditionalConfig).AsMap() {
 			debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 		}
+	}
+
+	// Add user provided custom debug properties
+	if p, err := properties.LoadFromSlice(req.GetDebugProperties()); err == nil {
+		debugProperties.Merge(p)
+	} else {
+		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
 
 	if !debugProperties.ContainsKey("executable") || debugProperties.Get("executable") == "" {

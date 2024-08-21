@@ -31,27 +31,32 @@ import (
 
 func newDebugCheckCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
-		fqbnArg     arguments.Fqbn
-		portArgs    arguments.Port
-		interpreter string
-		programmer  arguments.Programmer
+		fqbnArg         arguments.Fqbn
+		portArgs        arguments.Port
+		interpreter     string
+		programmer      arguments.Programmer
+		debugProperties []string
 	)
 	debugCheckCommand := &cobra.Command{
 		Use:     "check",
 		Short:   i18n.Tr("Check if the given board/programmer combination supports debugging."),
 		Example: "  " + os.Args[0] + " debug check -b arduino:samd:mkr1000 -P atmel_ice",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCheckCommand(cmd.Context(), srv, &portArgs, &fqbnArg, interpreter, &programmer)
+			runDebugCheckCommand(cmd.Context(), srv, &portArgs, &fqbnArg, interpreter, &programmer, debugProperties)
 		},
 	}
 	fqbnArg.AddToCommand(debugCheckCommand, srv)
 	portArgs.AddToCommand(debugCheckCommand, srv)
 	programmer.AddToCommand(debugCheckCommand, srv)
 	debugCheckCommand.Flags().StringVar(&interpreter, "interpreter", "console", i18n.Tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
+	debugCheckCommand.Flags().StringArrayVar(&debugProperties, "debug-property", []string{},
+		i18n.Tr("Override an debug property with a custom value. Can be used multiple times for multiple properties."))
 	return debugCheckCommand
 }
 
-func runDebugCheckCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, portArgs *arguments.Port, fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer) {
+func runDebugCheckCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, portArgs *arguments.Port,
+	fqbnArg *arguments.Fqbn, interpreter string, programmerArg *arguments.Programmer, debugProperties []string,
+) {
 	instance := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli debug`")
 
@@ -61,11 +66,12 @@ func runDebugCheckCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer,
 	}
 	fqbn := fqbnArg.String()
 	resp, err := srv.IsDebugSupported(ctx, &rpc.IsDebugSupportedRequest{
-		Instance:    instance,
-		Fqbn:        fqbn,
-		Port:        port,
-		Interpreter: interpreter,
-		Programmer:  programmerArg.String(ctx, instance, srv, fqbn),
+		Instance:        instance,
+		Fqbn:            fqbn,
+		Port:            port,
+		Interpreter:     interpreter,
+		Programmer:      programmerArg.String(ctx, instance, srv, fqbn),
+		DebugProperties: debugProperties,
 	})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
