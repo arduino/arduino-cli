@@ -34,6 +34,7 @@ func TestFlavorCompatibility(t *testing.T) {
 	linuxArm := &os{"linux", "arm"}
 	linuxArmbe := &os{"linux", "armbe"}
 	linuxArm64 := &os{"linux", "arm64"}
+	linuxRiscv64 := &os{"linux", "riscv64"}
 	darwin32 := &os{"darwin", "386"}
 	darwin64 := &os{"darwin", "amd64"}
 	darwinArm64 := &os{"darwin", "arm64"}
@@ -47,6 +48,7 @@ func TestFlavorCompatibility(t *testing.T) {
 		linuxArm,
 		linuxArmbe,
 		linuxArm64,
+		linuxRiscv64,
 		darwin32,
 		darwin64,
 		darwinArm64,
@@ -82,6 +84,7 @@ func TestFlavorCompatibility(t *testing.T) {
 		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linux64}, []*os{linux64}},
 		{&Flavor{OS: "aarch64-linux-gnu"}, []*os{linuxArm64}, []*os{linuxArm64}},
 		{&Flavor{OS: "arm64-linux-gnu"}, []*os{linuxArm64}, []*os{linuxArm64}},
+		{&Flavor{OS: "riscv64-linux-gnu"}, []*os{linuxRiscv64}, []*os{linuxRiscv64}},
 	}
 
 	checkCompatible := func(test *test, os *os) {

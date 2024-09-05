@@ -129,6 +129,7 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 var (
 	regexpLinuxArm   = regexp.MustCompile("arm.*-linux-gnueabihf")
 	regexpLinuxArm64 = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
+	regexpLinuxRiscv64 = regexp.MustCompile("riscv64-linux-gnu")
 	regexpLinux64    = regexp.MustCompile("x86_64-.*linux-gnu")
 	regexpLinux32    = regexp.MustCompile("i[3456]86-.*linux-gnu")
 	regexpWindows32  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
@@ -151,6 +152,8 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 		return regexpLinuxArm.MatchString(f.OS)
 	case "linux,arm64":
 		return regexpLinuxArm64.MatchString(f.OS)
+	case "linux,riscv64":
+		return regexpLinuxRiscv64.MatchString(f.OS)
 	case "linux,amd64":
 		return regexpLinux64.MatchString(f.OS)
 	case "linux,386":
