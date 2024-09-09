@@ -7314,7 +7314,7 @@ a platform and all its available releases.</p>
 <td>build_properties</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td>List of custom build properties separated by commas.</td>
+<td>List of custom build properties.</td>
 </tr>
 <tr>
 <td>warnings</td>
@@ -8087,6 +8087,12 @@ error.</p>
 <td></td>
 <td>The programmer to use for debugging.</td>
 </tr>
+<tr>
+<td>debug_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom debug properties.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse"></a></p>
@@ -8236,6 +8242,12 @@ error.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The programmer to use for debugging.</td>
+</tr>
+<tr>
+<td>debug_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom debug properties.</td>
 </tr>
 </tbody>
 </table>
@@ -10502,6 +10514,12 @@ Any missing field will be kept at the default value.</p>
 <td>repeated</td>
 <td>User provided fields usually used by upload tools that need authentication or in any case fields that can be customized by the user at upload time and cannot be known previously. For more info: <a href="https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields">https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields</a></td>
 </tr>
+<tr>
+<td>upload_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom upload properties.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry"></a></p>
@@ -10734,6 +10752,12 @@ Any missing field will be kept at the default value.</p>
 <td>repeated</td>
 <td>User provided fields usually used by upload tools that need authentication or in any case fields that can be customized by the user at upload time and cannot be known previously. For more info: <a href="https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields">https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields</a></td>
 </tr>
+<tr>
+<td>upload_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom upload properties.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry"></a></p>
@@ -10891,6 +10915,12 @@ Any missing field will be kept at the default value.</p>
 <td><a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry">UploadUsingProgrammerRequest.UserFieldsEntry</a></td>
 <td>repeated</td>
 <td>User provided fields usually used by upload tools that need authentication or in any case fields that can be customized by the user at upload time and cannot be known previously. For more info: <a href="https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields">https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields</a></td>
+</tr>
+<tr>
+<td>upload_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom upload properties.</td>
 </tr>
 </tbody>
 </table>

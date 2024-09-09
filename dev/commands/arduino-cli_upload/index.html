@@ -1460,19 +1460,20 @@
   arduino-cli upload -p 192.168.10.1 -b arduino:avr:uno --upload-field password=abc
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>      --board-options strings        List of board options separated by commas. Or can be used multiple times for multiple options.
-      --discovery-timeout duration   Max time to wait for port discovery, e.g.: 30s, 1m (default 1s)
-  -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
-  -h, --help                         help for upload
-      --input-dir string             Directory containing binaries to upload.
-  -i, --input-file string            Binary file to upload.
-  -p, --port string                  Upload port address, e.g.: COM3 or /dev/ttyACM2
-  -m, --profile string               Sketch profile to use
-  -P, --programmer string            Programmer to use, e.g: atmel_ice
-  -l, --protocol string              Upload port protocol, e.g: serial
-  -F, --upload-field key=value       Set a value for a field required to upload.
-  -v, --verbose                      Optional, turns on verbose mode.
-  -t, --verify                       Verify uploaded binary after the upload.
+<div class="highlight"><pre><span></span><code>      --board-options strings         List of board options separated by commas. Or can be used multiple times for multiple options.
+      --discovery-timeout duration    Max time to wait for port discovery, e.g.: 30s, 1m (default 1s)
+  -b, --fqbn string                   Fully Qualified Board Name, e.g.: arduino:avr:uno
+  -h, --help                          help for upload
+      --input-dir string              Directory containing binaries to upload.
+  -i, --input-file string             Binary file to upload.
+  -p, --port string                   Upload port address, e.g.: COM3 or /dev/ttyACM2
+  -m, --profile string                Sketch profile to use
+  -P, --programmer string             Programmer to use, e.g: atmel_ice
+  -l, --protocol string               Upload port protocol, e.g: serial
+  -F, --upload-field key=value        Set a value for a field required to upload.
+      --upload-property stringArray   Override an upload property with a custom value. Can be used multiple times for multiple properties.
+  -v, --verbose                       Optional, turns on verbose mode.
+  -t, --verify                        Verify uploaded binary after the upload.
 </code></pre></div>
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.
