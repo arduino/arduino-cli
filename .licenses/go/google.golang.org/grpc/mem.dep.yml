@@ -1,10 +1,10 @@
 ---
-name: google.golang.org/grpc/attributes
+name: google.golang.org/grpc/mem
 version: v1.66.0
 type: go
-summary: Package attributes defines a generic key/value store used in various gRPC
-  components.
-homepage: https://pkg.go.dev/google.golang.org/grpc/attributes
+summary: Package mem provides utilities that facilitate memory reuse in byte slices
+  that are used as buffers.
+homepage: https://pkg.go.dev/google.golang.org/grpc/mem
 license: apache-2.0
 licenses:
 - sources: grpc@v1.66.0/LICENSE
