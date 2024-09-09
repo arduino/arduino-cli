@@ -59,7 +59,7 @@ type CompileRequest struct {
 	// a directory will be created in the operating system's default temporary
 	// path.
 	BuildPath string `protobuf:"bytes,7,opt,name=build_path,json=buildPath,proto3" json:"build_path,omitempty"`
-	// List of custom build properties separated by commas.
+	// List of custom build properties.
 	BuildProperties []string `protobuf:"bytes,8,rep,name=build_properties,json=buildProperties,proto3" json:"build_properties,omitempty"`
 	// Used to tell gcc which warning level to use. The level names are: "none",
 	// "default", "more" and "all".

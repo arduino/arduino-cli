@@ -60,6 +60,8 @@ message UploadRequest {
   // For more info:
   // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
   map<string, string> user_fields = 11;
+  // List of custom upload properties.
+  repeated string upload_properties = 12;
 }
 
 message UploadResponse {
@@ -116,6 +118,8 @@ message UploadUsingProgrammerRequest {
   // For more info:
   // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
   map<string, string> user_fields = 11;
+  // List of custom upload properties.
+  repeated string upload_properties = 12;
 }
 
 message UploadUsingProgrammerResponse {
@@ -150,6 +154,8 @@ message BurnBootloaderRequest {
   // For more info:
   // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
   map<string, string> user_fields = 11;
+  // List of custom upload properties.
+  repeated string upload_properties = 12;
 }
 
 message BurnBootloaderResponse {

@@ -71,6 +71,8 @@ message IsDebugSupportedRequest {
   string interpreter = 4;
   // The programmer to use for debugging.
   string programmer = 5;
+  // List of custom debug properties.
+  repeated string debug_properties = 6;
 }
 
 message IsDebugSupportedResponse {
@@ -103,6 +105,8 @@ message GetDebugConfigRequest {
   string import_dir = 8;
   // The programmer to use for debugging.
   string programmer = 9;
+  // List of custom debug properties.
+  repeated string debug_properties = 10;
 }
 
 message GetDebugConfigResponse {

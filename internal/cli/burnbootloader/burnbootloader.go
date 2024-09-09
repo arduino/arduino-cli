@@ -32,13 +32,13 @@ import (
 )
 
 var (
-	fqbn       arguments.Fqbn
-	port       arguments.Port
-	verbose    bool
-	verify     bool
-	programmer arguments.Programmer
-	dryRun     bool
-	tr         = i18n.Tr
+	fqbn             arguments.Fqbn
+	port             arguments.Port
+	verbose          bool
+	verify           bool
+	programmer       arguments.Programmer
+	dryRun           bool
+	uploadProperties []string
 )
 
 // NewCommand created a new `burn-bootloader` command
@@ -57,6 +57,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	fqbn.AddToCommand(burnBootloaderCommand, srv)
 	port.AddToCommand(burnBootloaderCommand, srv)
 	programmer.AddToCommand(burnBootloaderCommand, srv)
+	burnBootloaderCommand.Flags().StringArrayVar(&uploadProperties, "upload-property", []string{},
+		i18n.Tr("Override an upload property with a custom value. Can be used multiple times for multiple properties."))
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Turns on verbose mode."))
 	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, i18n.Tr("Do not perform the actual upload, just log out actions"))
@@ -79,13 +81,14 @@ func runBootloaderCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer)
 	stdOut, stdErr, res := feedback.OutputStreams()
 	stream := commands.BurnBootloaderToServerStreams(ctx, stdOut, stdErr)
 	if err := srv.BurnBootloader(&rpc.BurnBootloaderRequest{
-		Instance:   instance,
-		Fqbn:       fqbn.String(),
-		Port:       discoveryPort,
-		Verbose:    verbose,
-		Verify:     verify,
-		Programmer: programmer.String(ctx, instance, srv, fqbn.String()),
-		DryRun:     dryRun,
+		Instance:         instance,
+		Fqbn:             fqbn.String(),
+		Port:             discoveryPort,
+		Verbose:          verbose,
+		Verify:           verify,
+		Programmer:       programmer.String(ctx, instance, srv, fqbn.String()),
+		UploadProperties: uploadProperties,
+		DryRun:           dryRun,
 	}, stream); err != nil {
 		errcode := feedback.ErrGeneric
 		if errors.Is(err, &cmderrors.ProgrammerRequiredForUploadError{}) {

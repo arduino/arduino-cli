@@ -38,13 +38,14 @@ import (
 // NewCommand created a new `upload` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var (
-		fqbnArg     arguments.Fqbn
-		portArgs    arguments.Port
-		profileArg  arguments.Profile
-		interpreter string
-		importDir   string
-		printInfo   bool
-		programmer  arguments.Programmer
+		fqbnArg         arguments.Fqbn
+		portArgs        arguments.Port
+		profileArg      arguments.Profile
+		interpreter     string
+		importDir       string
+		printInfo       bool
+		programmer      arguments.Programmer
+		debugProperties []string
 	)
 
 	debugCommand := &cobra.Command{
@@ -54,7 +55,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDebugCommand(cmd.Context(), srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg)
+			runDebugCommand(cmd.Context(), srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg, debugProperties)
 		},
 	}
 
@@ -66,12 +67,15 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", i18n.Tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", i18n.Tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, i18n.Tr("Show metadata about the debug session instead of starting the debugger."))
+	debugCommand.Flags().StringArrayVar(&debugProperties, "debug-property", []string{},
+		i18n.Tr("Override an debug property with a custom value. Can be used multiple times for multiple properties."))
 
 	return debugCommand
 }
 
 func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, portArgs *arguments.Port, fqbnArg *arguments.Fqbn,
-	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile) {
+	interpreter string, importDir string, programmer *arguments.Programmer, printInfo bool, profileArg *arguments.Profile,
+	debugProperties []string) {
 	logrus.Info("Executing `arduino-cli debug`")
 
 	path := ""
@@ -111,13 +115,14 @@ func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args
 	}
 
 	debugConfigRequested := &rpc.GetDebugConfigRequest{
-		Instance:    inst,
-		Fqbn:        fqbn,
-		SketchPath:  sketchPath.String(),
-		Port:        port,
-		Interpreter: interpreter,
-		ImportDir:   importDir,
-		Programmer:  prog,
+		Instance:        inst,
+		Fqbn:            fqbn,
+		SketchPath:      sketchPath.String(),
+		Port:            port,
+		Interpreter:     interpreter,
+		ImportDir:       importDir,
+		Programmer:      prog,
+		DebugProperties: debugProperties,
 	}
 
 	if printInfo {
