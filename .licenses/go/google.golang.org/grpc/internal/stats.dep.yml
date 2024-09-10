@@ -1,10 +1,9 @@
 ---
-name: google.golang.org/grpc/attributes
+name: google.golang.org/grpc/internal/stats
 version: v1.66.0
 type: go
-summary: Package attributes defines a generic key/value store used in various gRPC
-  components.
-homepage: https://pkg.go.dev/google.golang.org/grpc/attributes
+summary: Package stats provides internal stats related functionality.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/stats
 license: apache-2.0
 licenses:
 - sources: grpc@v1.66.0/LICENSE
