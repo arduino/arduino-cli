@@ -127,18 +127,19 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 }
 
 var (
-	regexpLinuxArm   = regexp.MustCompile("arm.*-linux-gnueabihf")
-	regexpLinuxArm64 = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
-	regexpLinux64    = regexp.MustCompile("x86_64-.*linux-gnu")
-	regexpLinux32    = regexp.MustCompile("i[3456]86-.*linux-gnu")
-	regexpWindows32  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
-	regexpWindows64  = regexp.MustCompile("(amd64|x86_64)-.*(mingw32|cygwin)")
-	regexpMac64      = regexp.MustCompile("x86_64-apple-darwin.*")
-	regexpMac32      = regexp.MustCompile("i[3456]86-apple-darwin.*")
-	regexpMacArm64   = regexp.MustCompile("arm64-apple-darwin.*")
-	regexpFreeBSDArm = regexp.MustCompile("arm.*-freebsd[0-9]*")
-	regexpFreeBSD32  = regexp.MustCompile("i?[3456]86-freebsd[0-9]*")
-	regexpFreeBSD64  = regexp.MustCompile("amd64-freebsd[0-9]*")
+	regexpLinuxArm     = regexp.MustCompile("arm.*-linux-gnueabihf")
+	regexpLinuxArm64   = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
+	regexpLinuxRiscv64 = regexp.MustCompile("riscv64-linux-gnu")
+	regexpLinux64      = regexp.MustCompile("x86_64-.*linux-gnu")
+	regexpLinux32      = regexp.MustCompile("i[3456]86-.*linux-gnu")
+	regexpWindows32    = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
+	regexpWindows64    = regexp.MustCompile("(amd64|x86_64)-.*(mingw32|cygwin)")
+	regexpMac64        = regexp.MustCompile("x86_64-apple-darwin.*")
+	regexpMac32        = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpMacArm64     = regexp.MustCompile("arm64-apple-darwin.*")
+	regexpFreeBSDArm   = regexp.MustCompile("arm.*-freebsd[0-9]*")
+	regexpFreeBSD32    = regexp.MustCompile("i?[3456]86-freebsd[0-9]*")
+	regexpFreeBSD64    = regexp.MustCompile("amd64-freebsd[0-9]*")
 )
 
 func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
@@ -151,6 +152,8 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 		return regexpLinuxArm.MatchString(f.OS)
 	case "linux,arm64":
 		return regexpLinuxArm64.MatchString(f.OS)
+	case "linux,riscv64":
+		return regexpLinuxRiscv64.MatchString(f.OS)
 	case "linux,amd64":
 		return regexpLinux64.MatchString(f.OS)
 	case "linux,386":
