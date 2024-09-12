@@ -16,6 +16,7 @@
 package librariesmanager
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"os"
@@ -201,30 +202,81 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 
 	librariesDir.scanned = true
 
-	var libDirs paths.PathList
-	if librariesDir.IsSingleLibrary {
-		libDirs.Add(librariesDir.Path)
-	} else {
-		d, err := librariesDir.Path.ReadDir()
-		if os.IsNotExist(err) {
-			return statuses
-		}
+	var loadedLibs []*libraries.Library
+	if cacheFilePath := librariesDir.Path.Join("libraries-loader-cache"); cacheFilePath.Exist() {
+		logrus.WithField("file", cacheFilePath).Info("Using library cache")
+
+		// Load lib cache
+		cache, err := cacheFilePath.Open()
 		if err != nil {
-			s := status.New(codes.FailedPrecondition, i18n.Tr("reading dir %[1]s: %[2]s", librariesDir.Path, err))
+			s := status.Newf(codes.FailedPrecondition, "reading lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
 		}
-		d.FilterDirs()
-		d.FilterOutHiddenFiles()
-		libDirs = d
+		defer cache.Close()
+		var n int32
+		if err := binary.Read(cache, binary.NativeEndian, &n); err != nil {
+			s := status.Newf(codes.FailedPrecondition, "reading lib cache %[1]s: %[2]s", cacheFilePath, err)
+			return append(statuses, s)
+		}
+		loadedLibs = make([]*libraries.Library, n)
+		for i := range loadedLibs {
+			var lib libraries.Library
+			if err := lib.UnmarshalBinary(cache); err != nil {
+				s := status.Newf(codes.FailedPrecondition, "reading lib cache %[1]s: %[2]s", cacheFilePath, err)
+				return append(statuses, s)
+			}
+			loadedLibs[i] = &lib
+		}
+	} else {
+		var libDirs paths.PathList
+		if librariesDir.IsSingleLibrary {
+			libDirs.Add(librariesDir.Path)
+		} else {
+			d, err := librariesDir.Path.ReadDir()
+			if os.IsNotExist(err) {
+				return statuses
+			}
+			if err != nil {
+				s := status.Newf(codes.FailedPrecondition, i18n.Tr("reading dir %[1]s: %[2]s", librariesDir.Path, err))
+				return append(statuses, s)
+			}
+			d.FilterDirs()
+			d.FilterOutHiddenFiles()
+			libDirs = d
+		}
+
+		for _, libDir := range libDirs {
+			library, err := libraries.Load(libDir, librariesDir.Location)
+			if err != nil {
+				s := status.Newf(codes.Internal, i18n.Tr("loading library from %[1]s: %[2]s", libDir, err))
+				statuses = append(statuses, s)
+				continue
+			}
+			loadedLibs = append(loadedLibs, library)
+		}
+
+		// Write lib cache
+		cache, err := cacheFilePath.Create()
+		if err != nil {
+			s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
+			return append(statuses, s)
+		}
+		defer cache.Close()
+		if err := binary.Write(cache, binary.NativeEndian, int32(len(loadedLibs))); err != nil {
+			cacheFilePath.Remove()
+			s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
+			return append(statuses, s)
+		}
+		for _, lib := range loadedLibs {
+			if _, err := cache.Write(lib.MarshalBinary()); err != nil {
+				cacheFilePath.Remove()
+				s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
+				return append(statuses, s)
+			}
+		}
 	}
 
-	for _, libDir := range libDirs {
-		library, err := libraries.Load(libDir, librariesDir.Location)
-		if err != nil {
-			s := status.New(codes.Internal, i18n.Tr("loading library from %[1]s: %[2]s", libDir, err))
-			statuses = append(statuses, s)
-			continue
-		}
+	for _, library := range loadedLibs {
 		library.ContainerPlatform = librariesDir.PlatformRelease
 		alternatives := lm.libraries[library.Name]
 		alternatives.Add(library)
