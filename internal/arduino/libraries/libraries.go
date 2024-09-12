@@ -16,8 +16,11 @@
 package libraries
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
@@ -88,6 +91,234 @@ func (library *Library) String() string {
 		return library.Name
 	}
 	return library.Name + "@" + library.Version.String()
+}
+
+func (library *Library) MarshalBinary() []byte {
+	buffer := bytes.NewBuffer(make([]byte, 0, 4096))
+	writeString := func(in string) {
+		inBytes := []byte(in)
+		binary.Write(buffer, binary.NativeEndian, uint16(len(inBytes)))
+		buffer.Write(inBytes)
+	}
+	writeStringArray := func(in []string) {
+		binary.Write(buffer, binary.NativeEndian, uint16(len(in)))
+		for _, i := range in {
+			writeString(i)
+		}
+	}
+	writeMap := func(in map[string]bool) {
+		binary.Write(buffer, binary.NativeEndian, uint16(len(in)))
+		for k, v := range in {
+			writeString(k)
+			binary.Write(buffer, binary.NativeEndian, v)
+		}
+	}
+	writePath := func(in *paths.Path) {
+		if in == nil {
+			writeString("")
+		} else {
+			writeString(in.String())
+		}
+	}
+	writeString(library.Name)
+	writeString(library.Author)
+	writeString(library.Maintainer)
+	writeString(library.Sentence)
+	writeString(library.Paragraph)
+	writeString(library.Website)
+	writeString(library.Category)
+	writeStringArray(library.Architectures)
+	writeStringArray(library.Types)
+	writePath(library.InstallDir)
+	writeString(library.DirName)
+	writePath(library.SourceDir)
+	writePath(library.UtilityDir)
+	binary.Write(buffer, binary.NativeEndian, int32(library.Location))
+	// library.ContainerPlatform      *cores.PlatformRelease `json:""`
+	binary.Write(buffer, binary.NativeEndian, int32(library.Layout))
+	binary.Write(buffer, binary.NativeEndian, library.DotALinkage)
+	binary.Write(buffer, binary.NativeEndian, library.Precompiled)
+	binary.Write(buffer, binary.NativeEndian, library.PrecompiledWithSources)
+	writeString(library.LDflags)
+	binary.Write(buffer, binary.NativeEndian, library.IsLegacy)
+	binary.Write(buffer, binary.NativeEndian, library.InDevelopment)
+	writeString(library.Version.String())
+	writeString(library.License)
+	//writeStringArray(library.Properties.AsSlice())
+	writeStringArray(library.Examples.AsStrings())
+	writeStringArray(library.declaredHeaders)
+	writeStringArray(library.sourceHeaders)
+	writeMap(library.CompatibleWith)
+	return buffer.Bytes()
+}
+
+func (library *Library) UnmarshalBinary(in io.Reader) error {
+	readString := func() (string, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return "", err
+		}
+		res := make([]byte, len)
+		if _, err := in.Read(res); err != nil {
+			return "", err
+		}
+		return string(res), nil
+	}
+	readStringArray := func() ([]string, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		res := make([]string, len)
+		for i := range res {
+			var err error
+			res[i], err = readString()
+			if err != nil {
+				return nil, err
+			}
+		}
+		return res, nil
+	}
+	readMap := func() (map[string]bool, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		res := map[string]bool{}
+		for i := uint16(0); i < len; i++ {
+			k, err := readString()
+			if err != nil {
+				return nil, err
+			}
+			var v bool
+			if err := binary.Read(in, binary.NativeEndian, &v); err != nil {
+				return nil, err
+			}
+			res[k] = v
+		}
+		return res, nil
+	}
+	var err error
+	library.Name, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Author, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Maintainer, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Sentence, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Paragraph, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Website, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Category, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Architectures, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.Types, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	installDir, err := readString()
+	if err != nil {
+		return err
+	}
+	library.InstallDir = paths.New(installDir)
+	library.DirName, err = readString()
+	if err != nil {
+		return err
+	}
+	sourceDir, err := readString()
+	library.SourceDir = paths.New(sourceDir)
+	if err != nil {
+		return err
+	}
+	utilityDir, err := readString()
+	if err != nil {
+		return err
+	}
+	library.UtilityDir = paths.New(utilityDir)
+	var location int32
+	if err := binary.Read(in, binary.NativeEndian, &location); err != nil {
+		return err
+	}
+	library.Location = LibraryLocation(location)
+	// library.ContainerPlatform      *cores.PlatformRelease `json:""`
+	var layout int32
+	if err := binary.Read(in, binary.NativeEndian, &layout); err != nil {
+		return err
+	}
+	library.Layout = LibraryLayout(layout)
+	if err := binary.Read(in, binary.NativeEndian, &library.DotALinkage); err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.Precompiled); err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.PrecompiledWithSources); err != nil {
+		return err
+	}
+	library.LDflags, err = readString()
+	if err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.IsLegacy); err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.InDevelopment); err != nil {
+		return err
+	}
+	version, err := readString()
+	if err != nil {
+		return err
+	}
+	library.Version = semver.MustParse(version)
+	library.License, err = readString()
+	if err != nil {
+		return err
+	}
+	// props, err := readStringArray()
+	// if err != nil {
+	// 	return err
+	// }
+	// library.Properties, err = properties.LoadFromSlice(props)
+	// if err != nil {
+	// 	return err
+	// }
+	examples, err := readStringArray()
+	if err != nil {
+		return err
+	}
+	library.Examples = paths.NewPathList(examples...)
+	library.declaredHeaders, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.sourceHeaders, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.CompatibleWith, err = readMap()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // ToRPCLibrary converts this library into an rpc.Library
