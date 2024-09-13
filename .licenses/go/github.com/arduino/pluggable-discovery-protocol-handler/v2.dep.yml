@@ -1,6 +1,6 @@
 ---
 name: github.com/arduino/pluggable-discovery-protocol-handler/v2
-version: v2.2.0
+version: v2.2.1
 type: go
 summary: Package discovery is a library for handling the Arduino Pluggable-Discovery
   protocol (https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#pluggable-discovery-api-via-stdinstdout)
