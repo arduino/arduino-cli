@@ -93,63 +93,132 @@ func (library *Library) String() string {
 	return library.Name + "@" + library.Version.String()
 }
 
-func (library *Library) MarshalBinary() []byte {
+func (library *Library) MarshalBinary() ([]byte, error) {
 	buffer := bytes.NewBuffer(make([]byte, 0, 4096))
-	writeString := func(in string) {
+	writeString := func(in string) error {
 		inBytes := []byte(in)
-		binary.Write(buffer, binary.NativeEndian, uint16(len(inBytes)))
-		buffer.Write(inBytes)
+		if err := binary.Write(buffer, binary.NativeEndian, uint16(len(inBytes))); err != nil {
+			return err
+		}
+		_, err := buffer.Write(inBytes)
+		return err
 	}
-	writeStringArray := func(in []string) {
-		binary.Write(buffer, binary.NativeEndian, uint16(len(in)))
+	writeStringArray := func(in []string) error {
+		if err := binary.Write(buffer, binary.NativeEndian, uint16(len(in))); err != nil {
+			return err
+		}
 		for _, i := range in {
-			writeString(i)
+			if err := writeString(i); err != nil {
+				return err
+			}
 		}
+		return nil
 	}
-	writeMap := func(in map[string]bool) {
-		binary.Write(buffer, binary.NativeEndian, uint16(len(in)))
+	writeMap := func(in map[string]bool) error {
+		if err := binary.Write(buffer, binary.NativeEndian, uint16(len(in))); err != nil {
+			return err
+		}
 		for k, v := range in {
-			writeString(k)
-			binary.Write(buffer, binary.NativeEndian, v)
+			if err := writeString(k); err != nil {
+				return err
+			}
+			if err := binary.Write(buffer, binary.NativeEndian, v); err != nil {
+				return err
+			}
 		}
+		return nil
 	}
-	writePath := func(in *paths.Path) {
+	writePath := func(in *paths.Path) error {
 		if in == nil {
-			writeString("")
+			return writeString("")
 		} else {
-			writeString(in.String())
+			return writeString(in.String())
 		}
 	}
-	writeString(library.Name)
-	writeString(library.Author)
-	writeString(library.Maintainer)
-	writeString(library.Sentence)
-	writeString(library.Paragraph)
-	writeString(library.Website)
-	writeString(library.Category)
-	writeStringArray(library.Architectures)
-	writeStringArray(library.Types)
-	writePath(library.InstallDir)
-	writeString(library.DirName)
-	writePath(library.SourceDir)
-	writePath(library.UtilityDir)
-	binary.Write(buffer, binary.NativeEndian, int32(library.Location))
+	if err := writeString(library.Name); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Author); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Maintainer); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Sentence); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Paragraph); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Website); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Category); err != nil {
+		return nil, err
+	}
+	if err := writeStringArray(library.Architectures); err != nil {
+		return nil, err
+	}
+	if err := writeStringArray(library.Types); err != nil {
+		return nil, err
+	}
+	if err := writePath(library.InstallDir); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.DirName); err != nil {
+		return nil, err
+	}
+	if err := writePath(library.SourceDir); err != nil {
+		return nil, err
+	}
+	if err := writePath(library.UtilityDir); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, binary.NativeEndian, int32(library.Location)); err != nil {
+		return nil, err
+	}
 	// library.ContainerPlatform      *cores.PlatformRelease `json:""`
-	binary.Write(buffer, binary.NativeEndian, int32(library.Layout))
-	binary.Write(buffer, binary.NativeEndian, library.DotALinkage)
-	binary.Write(buffer, binary.NativeEndian, library.Precompiled)
-	binary.Write(buffer, binary.NativeEndian, library.PrecompiledWithSources)
-	writeString(library.LDflags)
-	binary.Write(buffer, binary.NativeEndian, library.IsLegacy)
-	binary.Write(buffer, binary.NativeEndian, library.InDevelopment)
-	writeString(library.Version.String())
-	writeString(library.License)
+	if err := binary.Write(buffer, binary.NativeEndian, int32(library.Layout)); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, binary.NativeEndian, library.DotALinkage); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, binary.NativeEndian, library.Precompiled); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, binary.NativeEndian, library.PrecompiledWithSources); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.LDflags); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, binary.NativeEndian, library.IsLegacy); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buffer, binary.NativeEndian, library.InDevelopment); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.Version.String()); err != nil {
+		return nil, err
+	}
+	if err := writeString(library.License); err != nil {
+		return nil, err
+	}
 	//writeStringArray(library.Properties.AsSlice())
-	writeStringArray(library.Examples.AsStrings())
-	writeStringArray(library.declaredHeaders)
-	writeStringArray(library.sourceHeaders)
-	writeMap(library.CompatibleWith)
-	return buffer.Bytes()
+	if err := writeStringArray(library.Examples.AsStrings()); err != nil {
+		return nil, err
+	}
+	if err := writeStringArray(library.declaredHeaders); err != nil {
+		return nil, err
+	}
+	if err := writeStringArray(library.sourceHeaders); err != nil {
+		return nil, err
+	}
+	if err := writeMap(library.CompatibleWith); err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
 }
 
 func (library *Library) UnmarshalBinary(in io.Reader) error {

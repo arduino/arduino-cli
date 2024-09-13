@@ -268,7 +268,11 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			return append(statuses, s)
 		}
 		for _, lib := range loadedLibs {
-			if _, err := cache.Write(lib.MarshalBinary()); err != nil {
+			data, err := lib.MarshalBinary()
+			if err != nil {
+				panic("could not encode lib data for: " + lib.InstallDir.String())
+			}
+			if _, err := cache.Write(data); err != nil {
 				cacheFilePath.Remove()
 				s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
 				return append(statuses, s)
