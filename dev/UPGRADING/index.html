@@ -277,6 +277,53 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#104" class="md-nav__link">
+    1.0.4
+  </a>
+  
+    <nav class="md-nav" aria-label="1.0.4">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-build-cache-path-specified-with-compile-build-cache-path-or-build_cachepath-now-affects-also-sketches" class="md-nav__link">
+    The build cache path specified with compile --build-cache-path or build_cache.path now affects also sketches.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-full-build-of-the-sketch-is-performed-if-a-build-path-is-specified-in-compile-build-path" class="md-nav__link">
+    A full build of the sketch is performed if a build path is specified in compile --build-path ....
+  </a>
+  
+    <nav class="md-nav" aria-label="A full build of the sketch is performed if a build path is specified in compile --build-path ....">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compile-build-cache-path-is-deprecated" class="md-nav__link">
+    compile --build-cache-path is deprecated.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-default-build_cachepath-has-been-moved-from-the-temp-folder-to-the-users-cache-folder" class="md-nav__link">
+    The default build_cache.path has been moved from the temp folder to the user's cache folder.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#100" class="md-nav__link">
     1.0.0
   </a>
@@ -2594,6 +2641,53 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#104" class="md-nav__link">
+    1.0.4
+  </a>
+  
+    <nav class="md-nav" aria-label="1.0.4">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-build-cache-path-specified-with-compile-build-cache-path-or-build_cachepath-now-affects-also-sketches" class="md-nav__link">
+    The build cache path specified with compile --build-cache-path or build_cache.path now affects also sketches.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-full-build-of-the-sketch-is-performed-if-a-build-path-is-specified-in-compile-build-path" class="md-nav__link">
+    A full build of the sketch is performed if a build path is specified in compile --build-path ....
+  </a>
+  
+    <nav class="md-nav" aria-label="A full build of the sketch is performed if a build path is specified in compile --build-path ....">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compile-build-cache-path-is-deprecated" class="md-nav__link">
+    compile --build-cache-path is deprecated.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-default-build_cachepath-has-been-moved-from-the-temp-folder-to-the-users-cache-folder" class="md-nav__link">
+    The default build_cache.path has been moved from the temp folder to the user's cache folder.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#100" class="md-nav__link">
     1.0.0
   </a>
@@ -3866,7 +3960,22 @@
                 
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
-<p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<p>Here you can find a list of migration guides to handle breaking changes, deprecations, and bugfixes that may cause
+problems between releases of the CLI.</p>
+<h2 id="104">1.0.4<a class="headerlink" href="#104" title="Permanent link">&para;</a></h2>
+<h3 id="the-build-cache-path-specified-with-compile-build-cache-path-or-build_cachepath-now-affects-also-sketches">The build cache path specified with <code>compile --build-cache-path</code> or <code>build_cache.path</code> now affects also sketches.<a class="headerlink" href="#the-build-cache-path-specified-with-compile-build-cache-path-or-build_cachepath-now-affects-also-sketches" title="Permanent link">&para;</a></h3>
+<p>Previously the specified build cache path only affected cores and it was ignored for sketches. This is now fixed and
+both cores and sketches are cached in the given directory.</p>
+<h3 id="a-full-build-of-the-sketch-is-performed-if-a-build-path-is-specified-in-compile-build-path">A full build of the sketch is performed if a build path is specified in <code>compile --build-path ...</code>.<a class="headerlink" href="#a-full-build-of-the-sketch-is-performed-if-a-build-path-is-specified-in-compile-build-path" title="Permanent link">&para;</a></h3>
+<p>Previously if a build path was specified a cached core could have been used from the global build cache path resulting
+in a partial build inside the given build path.</p>
+<p>Now if a build path is specified, the global build cache path is ignored and the full build is done in the given build
+path.</p>
+<h4 id="compile-build-cache-path-is-deprecated"><code>compile --build-cache-path</code> is deprecated.<a class="headerlink" href="#compile-build-cache-path-is-deprecated" title="Permanent link">&para;</a></h4>
+<p>The change above, makes the <code>compile --build-cache-path</code> flag useless. It is kept just for backward compatibility.</p>
+<h3 id="the-default-build_cachepath-has-been-moved-from-the-temp-folder-to-the-users-cache-folder">The default <code>build_cache.path</code> has been moved from the temp folder to the user's cache folder.<a class="headerlink" href="#the-default-build_cachepath-has-been-moved-from-the-temp-folder-to-the-users-cache-folder" title="Permanent link">&para;</a></h3>
+<p>Previously the <code>build_cache.path</code> was in <code>$TMP/arduino</code>. Now it has been moved to the specific OS user's cache folder,
+for example in Linux it happens to be <code>$HOME/.cache/arduino</code>.</p>
 <h2 id="100">1.0.0<a class="headerlink" href="#100" title="Permanent link">&para;</a></h2>
 <h3 id="compile-build-cache-path-slightly-changed-directory-format"><code>compile --build-cache-path</code> slightly changed directory format<a class="headerlink" href="#compile-build-cache-path-slightly-changed-directory-format" title="Permanent link">&para;</a></h3>
 <p>Now compiled cores are cached under the <code>cores</code> subdir of the path specified in <code>--build-cache-path</code>, previously it was
