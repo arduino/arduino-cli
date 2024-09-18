@@ -54,6 +54,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		Long:    i18n.Tr("Debug Arduino sketches. (this command opens an interactive gdb session)"),
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			arguments.CheckFlagsConflicts(cmd, "input-dir", "build-path")
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			runDebugCommand(cmd.Context(), srv, args, &portArgs, &fqbnArg, interpreter, importDir, &programmer, printInfo, &profileArg, debugProperties)
 		},
@@ -65,6 +68,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	programmer.AddToCommand(debugCommand, srv)
 	profileArg.AddToCommand(debugCommand, srv)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", i18n.Tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
+	debugCommand.Flags().StringVarP(&importDir, "build-path", "", "", i18n.Tr("Directory containing binaries for debug."))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", i18n.Tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, i18n.Tr("Show metadata about the debug session instead of starting the debugger."))
 	debugCommand.Flags().StringArrayVar(&debugProperties, "debug-property", []string{},

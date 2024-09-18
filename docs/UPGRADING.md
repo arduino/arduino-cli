@@ -1,6 +1,31 @@
 # Upgrading
 
-Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
+Here you can find a list of migration guides to handle breaking changes, deprecations, and bugfixes that may cause
+problems between releases of the CLI.
+
+## 1.0.4
+
+### The build cache path specified with `compile --build-cache-path` or `build_cache.path` now affects also sketches.
+
+Previously the specified build cache path only affected cores and it was ignored for sketches. This is now fixed and
+both cores and sketches are cached in the given directory.
+
+### A full build of the sketch is performed if a build path is specified in `compile --build-path ...`.
+
+Previously if a build path was specified a cached core could have been used from the global build cache path resulting
+in a partial build inside the given build path.
+
+Now if a build path is specified, the global build cache path is ignored and the full build is done in the given build
+path.
+
+#### `compile --build-cache-path` is deprecated.
+
+The change above, makes the `compile --build-cache-path` flag useless. It is kept just for backward compatibility.
+
+### The default `build_cache.path` has been moved from the temp folder to the user's cache folder.
+
+Previously the `build_cache.path` was in `$TMP/arduino`. Now it has been moved to the specific OS user's cache folder,
+for example in Linux it happens to be `$HOME/.cache/arduino`.
 
 ## 1.0.0
 

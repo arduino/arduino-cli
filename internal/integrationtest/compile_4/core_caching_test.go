@@ -16,6 +16,7 @@
 package compile_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -31,8 +32,12 @@ func TestBuildCacheCoreWithExtraDirs(t *testing.T) {
 	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 
+	// Get default cache path
+	out, _, err := cli.Run("config", "get", "build_cache.path")
+	require.NoError(t, err)
+	defaultCache := paths.New(strings.TrimSpace(string(out)))
+
 	// Main core cache
-	defaultCache := paths.TempDir().Join("arduino")
 	cache1, err := paths.MkTempDir("", "core_cache")
 	require.NoError(t, err)
 	t.Cleanup(func() { cache1.RemoveAll() })
