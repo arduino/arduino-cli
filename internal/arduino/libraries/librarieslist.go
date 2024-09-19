@@ -16,6 +16,9 @@
 package libraries
 
 import (
+	"encoding/binary"
+	"fmt"
+	"io"
 	"sort"
 
 	semver "go.bug.st/relaxed-semver"
@@ -39,6 +42,35 @@ func (list *List) Add(libs ...*Library) {
 	for _, lib := range libs {
 		*list = append(*list, lib)
 	}
+}
+
+func (list *List) UnmarshalBinary(in io.Reader) error {
+	var n int32
+	if err := binary.Read(in, binary.NativeEndian, &n); err != nil {
+		return err
+	}
+	res := make([]*Library, n)
+	for i := range res {
+		var lib Library
+		if err := lib.UnmarshalBinary(in); err != nil {
+			return err
+		}
+		res[i] = &lib
+	}
+	*list = res
+	return nil
+}
+
+func (list *List) MarshalBinary(out io.Writer) error {
+	if err := binary.Write(out, binary.NativeEndian, int32(len(*list))); err != nil {
+		return err
+	}
+	for _, lib := range *list {
+		if err := lib.MarshalBinary(out); err != nil {
+			return fmt.Errorf("could not encode lib data of %s: %w", lib.InstallDir.String(), err)
+		}
+	}
+	return nil
 }
 
 // Remove removes the given library from the list

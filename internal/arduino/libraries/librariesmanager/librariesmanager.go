@@ -16,7 +16,6 @@
 package librariesmanager
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"os"
@@ -202,7 +201,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 
 	librariesDir.scanned = true
 
-	var loadedLibs []*libraries.Library
+	var loadedLibs libraries.List
 	if cacheFilePath := librariesDir.Path.Join("libraries-loader-cache"); cacheFilePath.Exist() {
 		logrus.WithField("file", cacheFilePath).Info("Using library cache")
 
@@ -213,19 +212,10 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			return append(statuses, s)
 		}
 		defer cache.Close()
-		var n int32
-		if err := binary.Read(cache, binary.NativeEndian, &n); err != nil {
+
+		if err := loadedLibs.UnmarshalBinary(cache); err != nil {
 			s := status.Newf(codes.FailedPrecondition, "reading lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
-		}
-		loadedLibs = make([]*libraries.Library, n)
-		for i := range loadedLibs {
-			var lib libraries.Library
-			if err := lib.UnmarshalBinary(cache); err != nil {
-				s := status.Newf(codes.FailedPrecondition, "reading lib cache %[1]s: %[2]s", cacheFilePath, err)
-				return append(statuses, s)
-			}
-			loadedLibs[i] = &lib
 		}
 	} else {
 		var libDirs paths.PathList
@@ -258,25 +248,15 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 		// Write lib cache
 		cache, err := cacheFilePath.Create()
 		if err != nil {
-			s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
+			s := status.Newf(codes.FailedPrecondition, "creating lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
 		}
-		defer cache.Close()
-		if err := binary.Write(cache, binary.NativeEndian, int32(len(loadedLibs))); err != nil {
+		err = loadedLibs.MarshalBinary(cache)
+		cache.Close()
+		if err != nil {
 			cacheFilePath.Remove()
 			s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
-		}
-		for _, lib := range loadedLibs {
-			data, err := lib.MarshalBinary()
-			if err != nil {
-				panic("could not encode lib data for: " + lib.InstallDir.String())
-			}
-			if _, err := cache.Write(data); err != nil {
-				cacheFilePath.Remove()
-				s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
-				return append(statuses, s)
-			}
 		}
 	}
 
