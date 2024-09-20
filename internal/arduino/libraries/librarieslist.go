@@ -21,6 +21,7 @@ import (
 	"io"
 	"sort"
 
+	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -44,7 +45,7 @@ func (list *List) Add(libs ...*Library) {
 	}
 }
 
-func (list *List) UnmarshalBinary(in io.Reader) error {
+func (list *List) UnmarshalBinary(in io.Reader, prefix *paths.Path) error {
 	var n int32
 	if err := binary.Read(in, binary.NativeEndian, &n); err != nil {
 		return err
@@ -52,7 +53,7 @@ func (list *List) UnmarshalBinary(in io.Reader) error {
 	res := make([]*Library, n)
 	for i := range res {
 		var lib Library
-		if err := lib.UnmarshalBinary(in); err != nil {
+		if err := lib.UnmarshalBinary(in, prefix); err != nil {
 			return err
 		}
 		res[i] = &lib
@@ -61,12 +62,12 @@ func (list *List) UnmarshalBinary(in io.Reader) error {
 	return nil
 }
 
-func (list *List) MarshalBinary(out io.Writer) error {
+func (list *List) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	if err := binary.Write(out, binary.NativeEndian, int32(len(*list))); err != nil {
 		return err
 	}
 	for _, lib := range *list {
-		if err := lib.MarshalBinary(out); err != nil {
+		if err := lib.MarshalBinary(out, prefix); err != nil {
 			return fmt.Errorf("could not encode lib data of %s: %w", lib.InstallDir.String(), err)
 		}
 	}

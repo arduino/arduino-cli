@@ -92,7 +92,7 @@ func (library *Library) String() string {
 	return library.Name + "@" + library.Version.String()
 }
 
-func (library *Library) MarshalBinary(out io.Writer) error {
+func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	writeString := func(in string) error {
 		inBytes := []byte(in)
 		if err := binary.Write(out, binary.NativeEndian, uint16(len(inBytes))); err != nil {
@@ -129,9 +129,22 @@ func (library *Library) MarshalBinary(out io.Writer) error {
 	writePath := func(in *paths.Path) error {
 		if in == nil {
 			return writeString("")
+		} else if p, err := in.RelFrom(prefix); err != nil {
+			return err
 		} else {
-			return writeString(in.String())
+			return writeString(p.String())
 		}
+	}
+	writePathList := func(in []*paths.Path) error {
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+			return err
+		}
+		for _, p := range in {
+			if err := writePath(p); err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 	if err := writeString(library.Name); err != nil {
 		return err
@@ -204,7 +217,7 @@ func (library *Library) MarshalBinary(out io.Writer) error {
 		return err
 	}
 	//writeStringArray(library.Properties.AsSlice())
-	if err := writeStringArray(library.Examples.AsStrings()); err != nil {
+	if err := writePathList(library.Examples); err != nil {
 		return err
 	}
 	if err := writeStringArray(library.declaredHeaders); err != nil {
@@ -219,7 +232,7 @@ func (library *Library) MarshalBinary(out io.Writer) error {
 	return nil
 }
 
-func (library *Library) UnmarshalBinary(in io.Reader) error {
+func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error {
 	readString := func() (string, error) {
 		var len uint16
 		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
@@ -265,6 +278,30 @@ func (library *Library) UnmarshalBinary(in io.Reader) error {
 		}
 		return res, nil
 	}
+	readPath := func() (*paths.Path, error) {
+		if p, err := readString(); err != nil {
+			return nil, err
+		} else if p == "" {
+			return nil, nil
+		} else {
+			return prefix.Join(p), nil
+		}
+	}
+	readPathList := func() (paths.PathList, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		list := paths.NewPathList()
+		for range len {
+			if p, err := readPath(); err != nil {
+				return nil, err
+			} else {
+				list.Add(p)
+			}
+		}
+		return list, nil
+	}
 	var err error
 	library.Name, err = readString()
 	if err != nil {
@@ -302,25 +339,22 @@ func (library *Library) UnmarshalBinary(in io.Reader) error {
 	if err != nil {
 		return err
 	}
-	installDir, err := readString()
+	library.InstallDir, err = readPath()
 	if err != nil {
 		return err
 	}
-	library.InstallDir = paths.New(installDir)
 	library.DirName, err = readString()
 	if err != nil {
 		return err
 	}
-	sourceDir, err := readString()
-	library.SourceDir = paths.New(sourceDir)
+	library.SourceDir, err = readPath()
 	if err != nil {
 		return err
 	}
-	utilityDir, err := readString()
+	library.UtilityDir, err = readPath()
 	if err != nil {
 		return err
 	}
-	library.UtilityDir = paths.New(utilityDir)
 	var location int32
 	if err := binary.Read(in, binary.NativeEndian, &location); err != nil {
 		return err
@@ -368,11 +402,10 @@ func (library *Library) UnmarshalBinary(in io.Reader) error {
 	// if err != nil {
 	// 	return err
 	// }
-	examples, err := readStringArray()
+	library.Examples, err = readPathList()
 	if err != nil {
 		return err
 	}
-	library.Examples = paths.NewPathList(examples...)
 	library.declaredHeaders, err = readStringArray()
 	if err != nil {
 		return err
