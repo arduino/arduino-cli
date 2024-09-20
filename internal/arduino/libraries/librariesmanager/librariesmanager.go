@@ -213,7 +213,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 		}
 		defer cache.Close()
 
-		if err := loadedLibs.UnmarshalBinary(cache); err != nil {
+		if err := loadedLibs.UnmarshalBinary(cache, librariesDir.Path); err != nil {
 			s := status.Newf(codes.FailedPrecondition, "reading lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
 		}
@@ -251,7 +251,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			s := status.Newf(codes.FailedPrecondition, "creating lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
 		}
-		err = loadedLibs.MarshalBinary(cache)
+		err = loadedLibs.MarshalBinary(cache, librariesDir.Path)
 		cache.Close()
 		if err != nil {
 			cacheFilePath.Remove()
