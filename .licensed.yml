@@ -12,6 +12,15 @@ apps:
   - source_path: commands/daemon/term_example/
   - source_path: docsgen/
 
+reviewed:
+  go:
+    - github.com/klauspost/compress
+    - github.com/klauspost/compress/fse
+    - github.com/klauspost/compress/huff0
+    - github.com/klauspost/compress/internal/cpuinfo
+    - github.com/klauspost/compress/internal/snapref
+    - github.com/klauspost/compress/zstd
+
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:
   # The following are based on: https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses

@@ -21,7 +21,7 @@ import (
 	"os"
 
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/codeclysm/extract/v3"
+	"github.com/codeclysm/extract/v4"
 	"go.bug.st/cleanup"
 )
 

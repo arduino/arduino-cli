@@ -1,12 +1,12 @@
 ---
 name: github.com/h2non/filetype/types
-version: v1.0.8
+version: v1.1.3
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/h2non/filetype/types
 license: mit
 licenses:
-- sources: filetype@v1.0.8/LICENSE
+- sources: filetype@v1.1.3/LICENSE
   text: |
     The MIT License
 
@@ -32,6 +32,6 @@ licenses:
     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.
-- sources: filetype@v1.0.8/README.md
+- sources: filetype@v1.1.3/README.md
   text: MIT - Tomas Aparicio
 notices: []

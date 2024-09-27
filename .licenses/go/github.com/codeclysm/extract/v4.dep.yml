@@ -1,10 +1,10 @@
 ---
-name: github.com/codeclysm/extract/v3
-version: v3.0.2
+name: github.com/codeclysm/extract/v4
+version: v4.0.0
 type: go
 summary: Package extract allows to extract archives in zip, tar.gz or tar.bz2 formats
   easily.
-homepage: https://pkg.go.dev/github.com/codeclysm/extract/v3
+homepage: https://pkg.go.dev/github.com/codeclysm/extract/v4
 license: mit
 licenses:
 - sources: LICENSE

@@ -1,6 +1,6 @@
 ---
 name: github.com/h2non/filetype
-version: v1.0.8
+version: v1.1.3
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/h2non/filetype
