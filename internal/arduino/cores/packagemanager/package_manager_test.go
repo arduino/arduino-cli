@@ -567,6 +567,52 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	require.Equal(t, bossac18.InstallDir.String(), uploadProperties.Get("runtime.tools.bossac.path"))
 }
 
+func TestIndexMerger(t *testing.T) {
+	t.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
+	pmb := NewBuilder(
+		dataDir1,
+		dataDir1.Join("packages"),
+		nil,
+		dataDir1.Join("staging"),
+		dataDir1,
+		"test",
+		downloader.GetDefaultConfig(),
+	)
+
+	loadIndex := func(addr string) {
+		res, err := url.Parse(addr)
+		require.NoError(t, err)
+		require.NoError(t, pmb.LoadPackageIndex(res))
+	}
+	loadIndex("https://test.com/package_with_regular_dfu_util_index.json") // this is not downloaded, it just picks the "local cached" file package_test_index.json
+	loadIndex("https://test.com/package_with_empty_dfu_util_index.json")   // this is not downloaded, it just picks the "local cached" file package_test_index.json
+
+	// We ignore the errors returned since they might not be necessarily blocking
+	// but just warnings for the user, like in the case a board is not loaded
+	// because of malformed menus
+	pmb.LoadHardware()
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	dfu_util := pme.GetTool("arduino:dfu-util")
+	require.NotNil(t, dfu_util)
+	dfu_release := dfu_util.GetOrCreateRelease(semver.ParseRelaxed("0.11.0-arduino5"))
+	require.NotNil(t, dfu_release)
+	require.Len(t, dfu_release.Flavors, 6)
+
+	test_tool := pme.GetTool("arduino:test-tool")
+	require.NotNil(t, test_tool)
+	test_tool_release := test_tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+	require.NotNil(t, test_tool_release)
+	// Check that the new entry has been added
+	require.Len(t, test_tool_release.Flavors, 2)
+	require.Equal(t, test_tool_release.Flavors[1].OS, "arm-linux-gnueabihf")
+	require.Equal(t, test_tool_release.Flavors[1].Resource.URL, "http://downloads.arduino.cc/tools/dfu-util-0.11-arduino5-linux_arm.tar.gz")
+	// Check that the invalid entry did not replace existing one
+	require.NotEqual(t, test_tool_release.Flavors[0].Resource.URL, "INVALID")
+}
+
 func TestIdentifyBoard(t *testing.T) {
 	pmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
