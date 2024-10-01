@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
@@ -348,15 +349,18 @@ func (inToolRelease indexToolRelease) extractToolIn(outPackage *cores.Package) {
 	outTool := outPackage.GetOrCreateTool(inToolRelease.Name)
 
 	outToolRelease := outTool.GetOrCreateRelease(inToolRelease.Version)
-	outToolRelease.Flavors = inToolRelease.extractFlavours()
+	outToolRelease.Flavors = inToolRelease.extractAndMergeFlavours(outToolRelease.Flavors)
 }
 
-// extractFlavours extracts a map[OS]Flavor object from an indexToolRelease entry.
-func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavor {
-	ret := make([]*cores.Flavor, len(inToolRelease.Systems))
-	for i, flavour := range inToolRelease.Systems {
+// extractAndMergeFlavours extracts flavors objects from an indexToolRelease
+// and adds them to the given flavors array if missing. It returns the updated array.
+func (inToolRelease indexToolRelease) extractAndMergeFlavours(in []*cores.Flavor) []*cores.Flavor {
+	for _, flavour := range inToolRelease.Systems {
+		if slices.ContainsFunc(in, func(f *cores.Flavor) bool { return f.OS == flavour.OS }) {
+			continue
+		}
 		size, _ := flavour.Size.Int64()
-		ret[i] = &cores.Flavor{
+		in = append(in, &cores.Flavor{
 			OS: flavour.OS,
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: flavour.ArchiveFileName,
@@ -365,9 +369,9 @@ func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavor {
 				URL:             flavour.URL,
 				CachePath:       "packages",
 			},
-		}
+		})
 	}
-	return ret
+	return in
 }
 
 // LoadIndex reads a package_index.json from a file and returns the corresponding Index structure.
