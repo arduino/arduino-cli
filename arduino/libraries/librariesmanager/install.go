@@ -28,7 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/codeclysm/extract/v3"
+	"github.com/codeclysm/extract/v4"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	semver "go.bug.st/relaxed-semver"

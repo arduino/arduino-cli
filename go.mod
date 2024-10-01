@@ -1,18 +1,20 @@
 module github.com/arduino/arduino-cli
 
-go 1.21
+go 1.22
+
+toolchain go1.22.3
 
 // We must use this fork until https://github.com/mailru/easyjson/pull/372 is merged
 replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371
-	github.com/arduino/go-paths-helper v1.11.0
+	github.com/arduino/go-paths-helper v1.12.1
 	github.com/arduino/go-properties-orderedmap v1.8.0
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v1.0.0
 	github.com/cmaglie/pb v1.0.27
-	github.com/codeclysm/extract/v3 v3.1.1
+	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.15.0
@@ -30,7 +32,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v2 v2.1.1
@@ -85,7 +87,7 @@ require (
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/ulikunitz/xz v0.5.11 // indirect
+	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
@@ -95,7 +97,7 @@ require (
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

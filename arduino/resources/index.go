@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/security"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/codeclysm/extract/v3"
+	"github.com/codeclysm/extract/v4"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )

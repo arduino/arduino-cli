@@ -1,6 +1,6 @@
 ---
 name: github.com/arduino/go-paths-helper
-version: v1.11.0
+version: v1.12.1
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/arduino/go-paths-helper
