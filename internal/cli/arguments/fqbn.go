@@ -71,7 +71,7 @@ func (f *Fqbn) Set(fqbn string) {
 //   - the port is not found, in this case nil is returned
 //   - the FQBN autodetection fail, in this case the function prints an error and
 //     terminates the execution
-func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultFQBN, defaultAddress, defaultProtocol string) (string, *rpc.Port) {
+func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultFQBN, defaultAddress, defaultProtocol string, profile *rpc.SketchProfile) (string, *rpc.Port) {
 	fqbn := fqbnArg.String()
 	if fqbn == "" {
 		fqbn = defaultFQBN
@@ -87,6 +87,12 @@ func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, in
 		return fqbn, port
 	}
 
+	if profile.GetPort() != "" {
+		defaultAddress = profile.GetPort()
+	}
+	if profile.GetProtocol() != "" {
+		defaultProtocol = profile.GetProtocol()
+	}
 	port, err := portArgs.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol)
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
