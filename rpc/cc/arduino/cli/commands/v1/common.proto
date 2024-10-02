@@ -213,4 +213,8 @@ message SketchProfile {
   string fqbn = 2;
   // Programmer used by the profile
   string programmer = 3;
+  // Default Port in this profile
+  string port = 4;
+  // Default Protocol in this profile
+  string protocol = 5;
 }

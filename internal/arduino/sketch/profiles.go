@@ -103,6 +103,8 @@ type Profile struct {
 	Name       string
 	Notes      string                   `yaml:"notes"`
 	FQBN       string                   `yaml:"fqbn"`
+	Port       string                   `yaml:"port"`
+	Protocol   string                   `yaml:"protocol"`
 	Programmer string                   `yaml:"programmer"`
 	Platforms  ProfileRequiredPlatforms `yaml:"platforms"`
 	Libraries  ProfileRequiredLibraries `yaml:"libraries"`
@@ -114,6 +116,8 @@ func (p *Profile) ToRpc() *rpc.SketchProfile {
 		Name:       p.Name,
 		Fqbn:       p.FQBN,
 		Programmer: p.Programmer,
+		Port:       p.Port,
+		Protocol:   p.Protocol,
 	}
 }
 
@@ -126,6 +130,12 @@ func (p *Profile) AsYaml() string {
 	res += fmt.Sprintf("    fqbn: %s\n", p.FQBN)
 	if p.Programmer != "" {
 		res += fmt.Sprintf("    programmer: %s\n", p.Programmer)
+	}
+	if p.Port != "" {
+		res += fmt.Sprintf("    port: %s\n", p.Port)
+	}
+	if p.Protocol != "" {
+		res += fmt.Sprintf("    protocol: %s\n", p.Protocol)
 	}
 	res += p.Platforms.AsYaml()
 	res += p.Libraries.AsYaml()
