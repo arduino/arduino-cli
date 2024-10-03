@@ -17,6 +17,7 @@ package monitor
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"errors"
 	"io"
@@ -163,50 +164,52 @@ func runMonitorCmd(
 		return
 	}
 
-	actualConfigurationLabels := properties.NewMap()
-	for _, setting := range defaultSettings.GetSettings() {
-		actualConfigurationLabels.Set(setting.GetSettingId(), setting.GetValue())
-	}
-
-	configuration := &rpc.MonitorPortConfiguration{}
-	if len(configs) > 0 {
-		for _, config := range configs {
-			split := strings.SplitN(config, "=", 2)
-			k := ""
-			v := config
-			if len(split) == 2 {
-				k = split[0]
-				v = split[1]
-			}
-
-			var setting *rpc.MonitorPortSettingDescriptor
-			for _, s := range defaultSettings.GetSettings() {
-				if k == "" {
-					if contains(s.GetEnumValues(), v) {
-						setting = s
-						break
+	// This utility finds the settings descriptor from key/value or only from key.
+	// It fails fatal if the key or value are invalid.
+	searchSettingDescriptor := func(k, v string) *rpc.MonitorPortSettingDescriptor {
+		for _, s := range defaultSettings.GetSettings() {
+			if k == "" {
+				if contains(s.GetEnumValues(), v) {
+					return s
+				}
+			} else {
+				if strings.EqualFold(s.GetSettingId(), k) {
+					if !contains(s.GetEnumValues(), v) {
+						feedback.Fatal(i18n.Tr("invalid port configuration value for %s: %s", k, v), feedback.ErrBadArgument)
 					}
-				} else {
-					if strings.EqualFold(s.GetSettingId(), k) {
-						if !contains(s.GetEnumValues(), v) {
-							feedback.Fatal(i18n.Tr("invalid port configuration value for %s: %s", k, v), feedback.ErrBadArgument)
-						}
-						setting = s
-						break
-					}
+					return s
 				}
 			}
-			if setting == nil {
-				feedback.Fatal(i18n.Tr("invalid port configuration: %s", config), feedback.ErrBadArgument)
-			}
-			configuration.Settings = append(configuration.GetSettings(), &rpc.MonitorPortSetting{
-				SettingId: setting.GetSettingId(),
-				Value:     v,
-			})
-			actualConfigurationLabels.Set(setting.GetSettingId(), v)
 		}
+		feedback.Fatal(i18n.Tr("invalid port configuration: %s=%s", k, v), feedback.ErrBadArgument)
+		return nil
 	}
 
+	// Build configuration by layering
+	layeredPortConfig := properties.NewMap()
+	setConfig := func(k, v string) {
+		settingDesc := searchSettingDescriptor(k, v)
+		layeredPortConfig.Set(settingDesc.GetSettingId(), v)
+	}
+
+	// Layer 1: apply configuration from sketch profile...
+	profileConfig := profile.GetPortConfig()
+	if profileConfig == nil {
+		// ...or from sketch default...
+		profileConfig = sketch.GetDefaultPortConfig()
+	}
+	for _, setting := range profileConfig.GetSettings() {
+		setConfig(setting.SettingId, setting.Value)
+	}
+
+	// Layer 2: apply configuration from command line...
+	for _, config := range configs {
+		if split := strings.SplitN(config, "=", 2); len(split) == 2 {
+			setConfig(split[0], split[1])
+		} else {
+			setConfig("", config)
+		}
+	}
 	ttyIn, ttyOut, err := feedback.InteractiveStreams()
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
@@ -233,15 +236,24 @@ func runMonitorCmd(
 		}
 		ttyIn = io.TeeReader(ttyIn, ctrlCDetector)
 	}
+	var portConfiguration []*rpc.MonitorPortSetting
+	for k, v := range layeredPortConfig.AsMap() {
+		portConfiguration = append(portConfiguration, &rpc.MonitorPortSetting{
+			SettingId: k,
+			Value:     v,
+		})
+	}
 	monitorServer, portProxy := commands.MonitorServerToReadWriteCloser(ctx, &rpc.MonitorPortOpenRequest{
-		Instance:          inst,
-		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
-		Fqbn:              fqbn,
-		PortConfiguration: configuration,
+		Instance: inst,
+		Port:     &rpc.Port{Address: portAddress, Protocol: portProtocol},
+		Fqbn:     fqbn,
+		PortConfiguration: &rpc.MonitorPortConfiguration{
+			Settings: portConfiguration,
+		},
 	})
 	go func() {
 		if !quiet {
-			if len(configs) == 0 {
+			if layeredPortConfig.Size() == 0 {
 				if fqbn != "" {
 					feedback.Print(i18n.Tr("Using default monitor configuration for board: %s", fqbn))
 				} else if portProtocol == "serial" {
@@ -249,10 +261,16 @@ func runMonitorCmd(
 				}
 			}
 			feedback.Print(i18n.Tr("Monitor port settings:"))
-			keys := actualConfigurationLabels.Keys()
-			slices.Sort(keys)
-			for _, k := range keys {
-				feedback.Printf("  %s=%s", k, actualConfigurationLabels.Get(k))
+			slices.SortFunc(defaultSettings.GetSettings(), func(a, b *rpc.MonitorPortSettingDescriptor) int {
+				return cmp.Compare(a.GetSettingId(), b.GetSettingId())
+			})
+			for _, defaultSetting := range defaultSettings.GetSettings() {
+				k := defaultSetting.GetSettingId()
+				v, ok := layeredPortConfig.GetOk(k)
+				if !ok {
+					v = defaultSetting.GetValue()
+				}
+				feedback.Printf("  %s=%s", k, v)
 			}
 			feedback.Print("")
 
