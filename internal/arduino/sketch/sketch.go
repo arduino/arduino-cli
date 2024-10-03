@@ -289,6 +289,16 @@ func (s *Sketch) Hash() string {
 // ToRpc converts this Sketch into a rpc.LoadSketchResponse
 func (s *Sketch) ToRpc() *rpc.Sketch {
 	defaultPort, defaultProtocol := s.GetDefaultPortAddressAndProtocol()
+	var defaultPortConfig *rpc.MonitorPortConfiguration
+	if len(s.Project.DefaultPortConfig) > 0 {
+		defaultPortConfig = &rpc.MonitorPortConfiguration{}
+		for k, v := range s.Project.DefaultPortConfig {
+			defaultPortConfig.Settings = append(defaultPortConfig.Settings, &rpc.MonitorPortSetting{
+				SettingId: k,
+				Value:     v,
+			})
+		}
+	}
 	res := &rpc.Sketch{
 		MainFile:          s.MainFile.String(),
 		LocationPath:      s.FullPath.String(),
@@ -297,6 +307,7 @@ func (s *Sketch) ToRpc() *rpc.Sketch {
 		RootFolderFiles:   s.RootFolderFiles.AsStrings(),
 		DefaultFqbn:       s.GetDefaultFQBN(),
 		DefaultPort:       defaultPort,
+		DefaultPortConfig: defaultPortConfig,
 		DefaultProtocol:   defaultProtocol,
 		DefaultProgrammer: s.GetDefaultProgrammer(),
 		Profiles:          f.Map(s.Project.Profiles, (*Profile).ToRpc),

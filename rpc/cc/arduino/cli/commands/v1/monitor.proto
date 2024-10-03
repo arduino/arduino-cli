@@ -51,11 +51,6 @@ message MonitorPortOpenRequest {
   MonitorPortConfiguration port_configuration = 4;
 }
 
-message MonitorPortConfiguration {
-  // The port configuration parameters
-  repeated MonitorPortSetting settings = 1;
-}
-
 message MonitorResponse {
   oneof message {
     // Eventual errors dealing with monitor port
@@ -70,11 +65,6 @@ message MonitorResponse {
     // succesfully opened
     bool success = 4;
   }
-}
-
-message MonitorPortSetting {
-  string setting_id = 1;
-  string value = 2;
 }
 
 message EnumerateMonitorPortSettingsRequest {
