@@ -249,6 +249,9 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
 			return nil, err
 		}
+		if len == 0 {
+			return nil, nil
+		}
 		res := make([]string, len)
 		for i := range res {
 			var err error
