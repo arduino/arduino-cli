@@ -17,6 +17,7 @@ package libraries
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -45,7 +46,18 @@ func (list *List) Add(libs ...*Library) {
 	}
 }
 
+func (list *List) binaryMagicNumber() uint32 {
+	return 0xAD000001
+}
+
 func (list *List) UnmarshalBinary(in io.Reader, prefix *paths.Path) error {
+	var magic uint32
+	if err := binary.Read(in, binary.NativeEndian, &magic); err != nil {
+		return err
+	}
+	if magic != list.binaryMagicNumber() {
+		return errors.New("invalid cache version")
+	}
 	var n int32
 	if err := binary.Read(in, binary.NativeEndian, &n); err != nil {
 		return err
@@ -63,6 +75,9 @@ func (list *List) UnmarshalBinary(in io.Reader, prefix *paths.Path) error {
 }
 
 func (list *List) MarshalBinary(out io.Writer, prefix *paths.Path) error {
+	if err := binary.Write(out, binary.NativeEndian, list.binaryMagicNumber()); err != nil {
+		return err
+	}
 	if err := binary.Write(out, binary.NativeEndian, int32(len(*list))); err != nil {
 		return err
 	}
