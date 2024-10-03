@@ -287,7 +287,7 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 			return nil, err
 		}
 		res := map[string]bool{}
-		for i := uint16(0); i < len; i++ {
+		for range len {
 			k, err := readString()
 			if err != nil {
 				return nil, err
