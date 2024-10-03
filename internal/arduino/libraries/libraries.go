@@ -127,6 +127,22 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 		}
 		return nil
 	}
+	writeProperties := func(in *properties.Map) error {
+		keys := in.Keys()
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(keys))); err != nil {
+			return err
+		}
+		for _, k := range keys {
+			v := in.Get(k)
+			if err := writeString(k); err != nil {
+				return err
+			}
+			if err := writeString(v); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	writePath := func(in *paths.Path) error {
 		if in == nil {
 			return writeString("")
@@ -217,7 +233,6 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	if err := writeString(library.License); err != nil {
 		return err
 	}
-	//writeStringArray(library.Properties.AsSlice())
 	if err := writePathList(library.Examples); err != nil {
 		return err
 	}
@@ -230,6 +245,10 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	if err := writeMap(library.CompatibleWith); err != nil {
 		return err
 	}
+	if err := writeProperties(library.Properties); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -305,6 +324,23 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 			}
 		}
 		return list, nil
+	}
+	readProperties := func() (*properties.Map, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		props := properties.NewMap()
+		for range len {
+			if k, err := readString(); err != nil {
+				return nil, err
+			} else if v, err := readString(); err != nil {
+				return nil, err
+			} else {
+				props.Set(k, v)
+			}
+		}
+		return props, nil
 	}
 	var err error
 	library.Name, err = readString()
@@ -398,14 +434,6 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 	if err != nil {
 		return err
 	}
-	// props, err := readStringArray()
-	// if err != nil {
-	// 	return err
-	// }
-	// library.Properties, err = properties.LoadFromSlice(props)
-	// if err != nil {
-	// 	return err
-	// }
 	library.Examples, err = readPathList()
 	if err != nil {
 		return err
@@ -419,6 +447,10 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 		return err
 	}
 	library.CompatibleWith, err = readMap()
+	if err != nil {
+		return err
+	}
+	library.Properties, err = readProperties()
 	if err != nil {
 		return err
 	}
