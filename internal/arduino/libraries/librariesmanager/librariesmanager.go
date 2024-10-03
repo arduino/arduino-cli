@@ -251,6 +251,11 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			s := status.Newf(codes.FailedPrecondition, "creating lib cache %[1]s: %[2]s", cacheFilePath, err)
 			return append(statuses, s)
 		}
+		// Preload source files and header
+		for _, lib := range loadedLibs {
+			lib.SourceHeaders()
+		}
+		// Write the cache
 		err = loadedLibs.MarshalBinary(cache, librariesDir.Path)
 		cache.Close()
 		if err != nil {
