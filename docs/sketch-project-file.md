@@ -15,6 +15,7 @@ Each profile will define:
 - A possible core platform name and version, that is a dependency of the target core platform (with the 3rd party
   platform index URL if needed)
 - The libraries used in the sketch (including their version)
+- The port and protocol to upload the sketch and monitor the board
 
 The format of the file is the following:
 
@@ -33,7 +34,11 @@ profiles:
       - <LIB_NAME> (<LIB_VERSION>)
       - <LIB_NAME> (<LIB_VERSION>)
       - <LIB_NAME> (<LIB_VERSION>)
-
+    port: <PORT_NAME>
+    port_config:
+      <PORT_SETTING_NAME>: <PORT_SETTING_VALUE>
+      ...
+    protocol: <PORT_PROTOCOL>
   ...more profiles here...
 ```
 
@@ -53,6 +58,15 @@ otherwise below). The available fields are:
 - `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
 - `<USER_NOTES>` is a free text string available to the developer to add comments. This field is optional.
 - `<PROGRAMMER>` is the programmer that will be used. This field is optional.
+
+The following fields are available since Arduino CLI 1.1.0:
+
+- `<PORT_NAME>` is the port that will be used to upload and monitor the board (unless explicitly set otherwise). This
+  field is optional.
+- `port_config` section with `<PORT_SETTING_NAME>` and `<PORT_SETTING_VALUE>` defines the port settings that will be
+  used in the `monitor` command. Typically is used to set the baudrate for the serial port (for example
+  `baudrate: 115200`) but any setting/value can be specified. Multiple settings can be set. These fields are optional.
+- `<PORT_PROTOCOL>` is the protocol for the port used to upload and monitor the board. This field is optional.
 
 A complete example of a sketch project file may be the following:
 
@@ -76,6 +90,9 @@ profiles:
       - VitconMQTT (1.0.1)
       - Arduino_ConnectionHandler (0.6.4)
       - TinyDHT sensor library (1.1.0)
+    port: /dev/ttyACM0
+    port_config:
+      baudrate: 115200
 
   tiny:
     notes: testing the very limit of the AVR platform, it will be very unstable
@@ -139,6 +156,8 @@ particular:
 - The `default_fqbn` key sets the default value for the `--fqbn` flag
 - The `default_programmer` key sets the default value for the `--programmer` flag
 - The `default_port` key sets the default value for the `--port` flag
+- The `default_port_config` key sets the default values for the `--config` flag in the `monitor` command (available
+  since Arduino CLI 1.1.0)
 - The `default_protocol` key sets the default value for the `--protocol` flag
 - The `default_profile` key sets the default value for the `--profile` flag
 
@@ -148,6 +167,8 @@ For example:
 default_fqbn: arduino:samd:mkr1000
 default_programmer: atmel_ice
 default_port: /dev/ttyACM0
+default_port_config:
+  baudrate: 115200
 default_protocol: serial
 default_profile: myprofile
 ```
@@ -155,4 +176,5 @@ default_profile: myprofile
 With this configuration set, it is not necessary to specify the `--fqbn`, `--programmer`, `--port`, `--protocol` or
 `--profile` flags to the [`arduino-cli compile`](commands/arduino-cli_compile.md),
 [`arduino-cli upload`](commands/arduino-cli_upload.md) or [`arduino-cli debug`](commands/arduino-cli_debug.md) commands
-when compiling, uploading or debugging the sketch.
+when compiling, uploading or debugging the sketch. Moreover in the `monitor` command it is not necessary to specify the
+`--config baudrate=115200` to communicate with the monitor port of the board.
