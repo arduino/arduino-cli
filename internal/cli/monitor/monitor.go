@@ -142,7 +142,7 @@ func runMonitorCmd(
 	if sketch != nil {
 		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
 	}
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(ctx, inst, srv, defaultPort, defaultProtocol)
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(ctx, inst, srv, defaultPort, defaultProtocol, profile)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

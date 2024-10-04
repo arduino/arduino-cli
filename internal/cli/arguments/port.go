@@ -57,12 +57,12 @@ func (p *Port) AddToCommand(cmd *cobra.Command, srv rpc.ArduinoCoreServiceServer
 // This method allows will bypass the discoveries if:
 // - a nil instance is passed: in this case the plain port and protocol arguments are returned (even if empty)
 // - a protocol is specified: in this case the discoveries are not needed to autodetect the protocol.
-func (p *Port) GetPortAddressAndProtocol(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string) (string, string, error) {
+func (p *Port) GetPortAddressAndProtocol(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string, profile *rpc.SketchProfile) (string, string, error) {
 	if p.protocol != "" || instance == nil {
 		return p.address, p.protocol, nil
 	}
 
-	port, err := p.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol)
+	port, err := p.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol, profile)
 	if err != nil {
 		return "", "", err
 	}
@@ -71,7 +71,13 @@ func (p *Port) GetPortAddressAndProtocol(ctx context.Context, instance *rpc.Inst
 
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
-func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string) (*rpc.Port, error) {
+func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string, profile *rpc.SketchProfile) (*rpc.Port, error) {
+	if profile.GetPort() != "" {
+		defaultAddress = profile.GetPort()
+	}
+	if profile.GetProtocol() != "" {
+		defaultProtocol = profile.GetProtocol()
+	}
 	address := p.address
 	protocol := p.protocol
 	if address == "" && (defaultAddress != "" || defaultProtocol != "") {

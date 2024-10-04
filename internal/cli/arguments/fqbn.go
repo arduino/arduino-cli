@@ -87,13 +87,7 @@ func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, in
 		return fqbn, port
 	}
 
-	if profile.GetPort() != "" {
-		defaultAddress = profile.GetPort()
-	}
-	if profile.GetProtocol() != "" {
-		defaultProtocol = profile.GetProtocol()
-	}
-	port, err := portArgs.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol)
+	port, err := portArgs.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol, profile)
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
 	}

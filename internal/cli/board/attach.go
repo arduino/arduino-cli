@@ -59,7 +59,7 @@ func initAttachCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 func runAttachCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, path string, port *arguments.Port, fqbn string, programmer *arguments.Programmer) {
 	sketchPath := arguments.InitSketchPath(path)
 
-	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(ctx, nil, srv, "", "")
+	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(ctx, nil, srv, "", "", nil)
 	newDefaults, err := srv.SetSketchDefaults(ctx, &rpc.SetSketchDefaultsRequest{
 		SketchPath:          sketchPath.String(),
 		DefaultFqbn:         fqbn,
