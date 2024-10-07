@@ -1,6 +1,6 @@
 ---
 name: github.com/ProtonMail/go-crypto/eax
-version: v1.1.0-alpha.5-proton
+version: v1.1.0-beta.0-proton
 type: go
 summary: 'Package eax provides an implementation of the EAX (encrypt-authenticate-translate)
   mode of operation, as described in Bellare, Rogaway, and Wagner "THE EAX MODE OF
@@ -9,7 +9,7 @@ summary: 'Package eax provides an implementation of the EAX (encrypt-authenticat
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/eax
 license: other
 licenses:
-- sources: go-crypto@v1.1.0-alpha.5-proton/LICENSE
+- sources: go-crypto@v1.1.0-beta.0-proton/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -38,7 +38,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: go-crypto@v1.1.0-alpha.5-proton/PATENTS
+- sources: go-crypto@v1.1.0-beta.0-proton/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 

@@ -1,6 +1,6 @@
 ---
 name: github.com/ProtonMail/go-crypto/openpgp/s2k
-version: v1.1.0-alpha.5-proton
+version: v1.1.0-beta.0-proton
 type: go
 summary: Package s2k implements the various OpenPGP string-to-key transforms as specified
   in RFC 4800 section 3.7.1, and Argon2 specified in draft-ietf-openpgp-crypto-refresh-08
@@ -8,7 +8,7 @@ summary: Package s2k implements the various OpenPGP string-to-key transforms as 
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/s2k
 license: other
 licenses:
-- sources: go-crypto@v1.1.0-alpha.5-proton/LICENSE
+- sources: go-crypto@v1.1.0-beta.0-proton/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -37,7 +37,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: go-crypto@v1.1.0-alpha.5-proton/PATENTS
+- sources: go-crypto@v1.1.0-beta.0-proton/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
