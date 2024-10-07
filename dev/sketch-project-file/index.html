@@ -1432,6 +1432,7 @@ multiple profiles.</p>
 <li>A possible core platform name and version, that is a dependency of the target core platform (with the 3rd party
   platform index URL if needed)</li>
 <li>The libraries used in the sketch (including their version)</li>
+<li>The port and protocol to upload the sketch and monitor the board</li>
 </ul>
 <p>The format of the file is the following:</p>
 <div class="highlight"><pre><span></span><code>profiles:
@@ -1448,7 +1449,11 @@ multiple profiles.</p>
       - &lt;LIB_NAME&gt; (&lt;LIB_VERSION&gt;)
       - &lt;LIB_NAME&gt; (&lt;LIB_VERSION&gt;)
       - &lt;LIB_NAME&gt; (&lt;LIB_VERSION&gt;)
-
+    port: &lt;PORT_NAME&gt;
+    port_config:
+      &lt;PORT_SETTING_NAME&gt;: &lt;PORT_SETTING_VALUE&gt;
+      ...
+    protocol: &lt;PORT_PROTOCOL&gt;
   ...more profiles here...
 </code></pre></div>
 <p>There is an optional <code>profiles:</code> section containing all the profiles. Each field in a profile is mandatory (unless noted
@@ -1467,6 +1472,15 @@ otherwise below). The available fields are:</p>
 <li><code>&lt;LIB_VERSION&gt;</code> is the version required for the library, for example, <code>1.0.0</code>.</li>
 <li><code>&lt;USER_NOTES&gt;</code> is a free text string available to the developer to add comments. This field is optional.</li>
 <li><code>&lt;PROGRAMMER&gt;</code> is the programmer that will be used. This field is optional.</li>
+</ul>
+<p>The following fields are available since Arduino CLI 1.1.0:</p>
+<ul>
+<li><code>&lt;PORT_NAME&gt;</code> is the port that will be used to upload and monitor the board (unless explicitly set otherwise). This
+  field is optional.</li>
+<li><code>port_config</code> section with <code>&lt;PORT_SETTING_NAME&gt;</code> and <code>&lt;PORT_SETTING_VALUE&gt;</code> defines the port settings that will be
+  used in the <code>monitor</code> command. Typically is used to set the baudrate for the serial port (for example
+  <code>baudrate: 115200</code>) but any setting/value can be specified. Multiple settings can be set. These fields are optional.</li>
+<li><code>&lt;PORT_PROTOCOL&gt;</code> is the protocol for the port used to upload and monitor the board. This field is optional.</li>
 </ul>
 <p>A complete example of a sketch project file may be the following:</p>
 <div class="highlight"><pre><span></span><code>profiles:
@@ -1488,6 +1502,9 @@ otherwise below). The available fields are:</p>
       - VitconMQTT (1.0.1)
       - Arduino_ConnectionHandler (0.6.4)
       - TinyDHT sensor library (1.1.0)
+    port: /dev/ttyACM0
+    port_config:
+      baudrate: 115200
 
   tiny:
     notes: testing the very limit of the AVR platform, it will be very unstable
@@ -1538,6 +1555,8 @@ particular:</p>
 <li>The <code>default_fqbn</code> key sets the default value for the <code>--fqbn</code> flag</li>
 <li>The <code>default_programmer</code> key sets the default value for the <code>--programmer</code> flag</li>
 <li>The <code>default_port</code> key sets the default value for the <code>--port</code> flag</li>
+<li>The <code>default_port_config</code> key sets the default values for the <code>--config</code> flag in the <code>monitor</code> command (available
+  since Arduino CLI 1.1.0)</li>
 <li>The <code>default_protocol</code> key sets the default value for the <code>--protocol</code> flag</li>
 <li>The <code>default_profile</code> key sets the default value for the <code>--profile</code> flag</li>
 </ul>
@@ -1545,13 +1564,16 @@ particular:</p>
 <div class="highlight"><pre><span></span><code>default_fqbn: arduino:samd:mkr1000
 default_programmer: atmel_ice
 default_port: /dev/ttyACM0
+default_port_config:
+  baudrate: 115200
 default_protocol: serial
 default_profile: myprofile
 </code></pre></div>
 <p>With this configuration set, it is not necessary to specify the <code>--fqbn</code>, <code>--programmer</code>, <code>--port</code>, <code>--protocol</code> or
 <code>--profile</code> flags to the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a>,
 <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a> or <a href="../commands/arduino-cli_debug/"><code>arduino-cli debug</code></a> commands
-when compiling, uploading or debugging the sketch.</p>
+when compiling, uploading or debugging the sketch. Moreover in the <code>monitor</code> command it is not necessary to specify the
+<code>--config baudrate=115200</code> to communicate with the monitor port of the board.</p>
                 
               
               
