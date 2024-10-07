@@ -394,5 +394,29 @@ yun.serial.disableDTR=true
 			require.Contains(t, string(stdout), "Configuration parity = none")
 			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
 		})
+
+		t.Run("WithFQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:yun", "-m", "uno", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyPROF")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-installed AVR core (not patched by this test)
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 19200")
+			require.Contains(t, string(stdout), "Configuration bits = 8")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("WithConfigFlag", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-c", "odd", "-m", "uno", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyPROF")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-installed AVR core (not patched by this test)
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 19200")
+			require.Contains(t, string(stdout), "Configuration bits = 8")
+			require.Contains(t, string(stdout), "Configuration parity = odd")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
 	})
 }
