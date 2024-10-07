@@ -931,3 +931,16 @@ func TestConfigViaEnvVars(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "20\n\n", string(out))
 }
+
+func TestI18N(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	out, _, err := cli.RunWithCustomEnv(map[string]string{"LC_ALL": "it"})
+	require.NoError(t, err)
+	require.Contains(t, string(out), "Comandi disponibili")
+
+	out, _, err = cli.RunWithCustomEnv(map[string]string{"LC_ALL": "en"})
+	require.NoError(t, err)
+	require.Contains(t, string(out), "Available Commands")
+}
