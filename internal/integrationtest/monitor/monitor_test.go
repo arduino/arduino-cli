@@ -125,6 +125,8 @@ yun.serial.disableDTR=true
 	sketchWithPort := getSketchPath("SketchWithDefaultPort")
 	sketchWithFQBN := getSketchPath("SketchWithDefaultFQBN")
 	sketchWithPortAndFQBN := getSketchPath("SketchWithDefaultPortAndFQBN")
+	sketchWithPortAndConfig := getSketchPath("SketchWithDefaultPortAndConfig")
+	sketchWithPortAndConfigAndProfile := getSketchPath("SketchWithDefaultPortAndConfigAndProfile")
 
 	t.Run("NoFlags", func(t *testing.T) {
 		t.Run("NoDefaultPortNoDefaultFQBN", func(t *testing.T) {
@@ -160,6 +162,30 @@ yun.serial.disableDTR=true
 			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
 			require.Error(t, err)
 			require.Contains(t, string(stderr), "not an FQBN: broken_fqbn")
+		})
+
+		t.Run("WithDefaultPortAndConfig", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", sketchWithPortAndConfig)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 57600")
+			require.Contains(t, string(stdout), "Configuration bits = 9")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("WithDefaultPortAndConfigAndProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 57600")
+			require.Contains(t, string(stdout), "Configuration bits = 9")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
 		})
 	})
 
@@ -202,6 +228,30 @@ yun.serial.disableDTR=true
 			require.Error(t, err)
 			require.Contains(t, string(stderr), "not an FQBN: broken_fqbn")
 		})
+
+		t.Run("WithDefaultPortAndConfig", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", sketchWithPortAndConfig)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 57600")
+			require.Contains(t, string(stdout), "Configuration bits = 9")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("WithDefaultPortAndConfigAndProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 57600")
+			require.Contains(t, string(stdout), "Configuration bits = 9")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
 	})
 
 	t.Run("WithFQBNFlag", func(t *testing.T) {
@@ -237,8 +287,27 @@ yun.serial.disableDTR=true
 			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
 			require.NoError(t, err)
 			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
-			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-downloaded platform that is not patched for test
 			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultPortAndConfig", func(t *testing.T) {
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", "--profile", "profile1", sketchWithPortAndConfig)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "Profile 'profile1' not found")
+			require.Contains(t, string(stderr), "Unknown FQBN: unknown package arduino")
+		})
+
+		t.Run("WithDefaultPortAndConfigAndProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", "--profile", "uno", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyPROF")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-downloaded platform that is not patched for test
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 19200")
+			require.Contains(t, string(stdout), "Configuration bits = 8")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
 		})
 	})
 
@@ -275,12 +344,74 @@ yun.serial.disableDTR=true
 			require.Contains(t, string(stdout), "Configuration dtr = on")
 		})
 
-		t.Run("IgnoreProfile", func(t *testing.T) {
-			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
+		t.Run("WithDefaultPortAndConfig", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketchWithPortAndConfig)
 			require.NoError(t, err)
 			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
 			require.Contains(t, string(stdout), "Configuration rts = off")
 			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 57600")
+			require.Contains(t, string(stdout), "Configuration bits = 9")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("WithDefaultPortAndConfigAndProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 57600")
+			require.Contains(t, string(stdout), "Configuration bits = 9")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("IgnoreProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-downloaded platform that is not patched for test
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+	})
+
+	t.Run("WithProfileFlags", func(t *testing.T) {
+		t.Run("NoOtherArgs", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-m", "uno", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyPROF")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-installed AVR core (not patched by this test)
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 19200")
+			require.Contains(t, string(stdout), "Configuration bits = 8")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("WithFQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:yun", "-m", "uno", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyPROF")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-installed AVR core (not patched by this test)
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 19200")
+			require.Contains(t, string(stdout), "Configuration bits = 8")
+			require.Contains(t, string(stdout), "Configuration parity = none")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
+		})
+
+		t.Run("WithConfigFlag", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-c", "odd", "-m", "uno", "--raw", sketchWithPortAndConfigAndProfile)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyPROF")
+			require.Contains(t, string(stdout), "Configuration rts = on") // This is taken from profile-installed AVR core (not patched by this test)
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+			require.Contains(t, string(stdout), "Configuration baudrate = 19200")
+			require.Contains(t, string(stdout), "Configuration bits = 8")
+			require.Contains(t, string(stdout), "Configuration parity = odd")
+			require.Contains(t, string(stdout), "Configuration stop_bits = 1")
 		})
 	})
 }

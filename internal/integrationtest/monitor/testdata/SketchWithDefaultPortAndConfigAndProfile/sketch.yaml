@@ -1,0 +1,13 @@
+profiles:
+  uno:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    port: /dev/ttyPROF
+    port_config:
+      baudrate: 19200
+
+default_port: /dev/ttyDEF
+default_port_config:
+  baudrate: 57600
+  bits: 9

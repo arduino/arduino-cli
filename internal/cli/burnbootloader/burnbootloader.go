@@ -73,7 +73,7 @@ func runBootloaderCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer)
 	logrus.Info("Executing `arduino-cli burn-bootloader`")
 
 	// We don't need a Sketch to upload a board's bootloader
-	discoveryPort, err := port.GetPort(ctx, instance, srv, "", "")
+	discoveryPort, err := port.GetPort(ctx, instance, srv, "", "", nil)
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}

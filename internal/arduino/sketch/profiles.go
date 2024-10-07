@@ -34,12 +34,13 @@ import (
 
 // projectRaw is a support struct used only to unmarshal the yaml
 type projectRaw struct {
-	ProfilesRaw       yaml.Node `yaml:"profiles"`
-	DefaultProfile    string    `yaml:"default_profile"`
-	DefaultFqbn       string    `yaml:"default_fqbn"`
-	DefaultPort       string    `yaml:"default_port,omitempty"`
-	DefaultProtocol   string    `yaml:"default_protocol,omitempty"`
-	DefaultProgrammer string    `yaml:"default_programmer,omitempty"`
+	ProfilesRaw       yaml.Node         `yaml:"profiles"`
+	DefaultProfile    string            `yaml:"default_profile"`
+	DefaultFqbn       string            `yaml:"default_fqbn"`
+	DefaultPort       string            `yaml:"default_port,omitempty"`
+	DefaultPortConfig map[string]string `yaml:"default_port_config,omitempty"`
+	DefaultProtocol   string            `yaml:"default_protocol,omitempty"`
+	DefaultProgrammer string            `yaml:"default_programmer,omitempty"`
 }
 
 // Project represents the sketch project file
@@ -48,6 +49,7 @@ type Project struct {
 	DefaultProfile    string
 	DefaultFqbn       string
 	DefaultPort       string
+	DefaultPortConfig map[string]string
 	DefaultProtocol   string
 	DefaultProgrammer string
 }
@@ -69,6 +71,12 @@ func (p *Project) AsYaml() string {
 	}
 	if p.DefaultPort != "" {
 		res += fmt.Sprintf("default_port: %s\n", p.DefaultPort)
+	}
+	if len(p.DefaultPortConfig) > 0 {
+		res += "default_port_config:\n"
+		for k, v := range p.DefaultPortConfig {
+			res += fmt.Sprintf("  %s: %s\n", k, v)
+		}
 	}
 	if p.DefaultProtocol != "" {
 		res += fmt.Sprintf("default_protocol: %s\n", p.DefaultProtocol)
@@ -103,6 +111,9 @@ type Profile struct {
 	Name       string
 	Notes      string                   `yaml:"notes"`
 	FQBN       string                   `yaml:"fqbn"`
+	Port       string                   `yaml:"port"`
+	PortConfig map[string]string        `yaml:"port_config"`
+	Protocol   string                   `yaml:"protocol"`
 	Programmer string                   `yaml:"programmer"`
 	Platforms  ProfileRequiredPlatforms `yaml:"platforms"`
 	Libraries  ProfileRequiredLibraries `yaml:"libraries"`
@@ -110,10 +121,23 @@ type Profile struct {
 
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
+	var portConfig *rpc.MonitorPortConfiguration
+	if len(p.PortConfig) > 0 {
+		portConfig = &rpc.MonitorPortConfiguration{}
+		for k, v := range p.PortConfig {
+			portConfig.Settings = append(portConfig.Settings, &rpc.MonitorPortSetting{
+				SettingId: k,
+				Value:     v,
+			})
+		}
+	}
 	return &rpc.SketchProfile{
 		Name:       p.Name,
 		Fqbn:       p.FQBN,
 		Programmer: p.Programmer,
+		Port:       p.Port,
+		PortConfig: portConfig,
+		Protocol:   p.Protocol,
 	}
 }
 
@@ -126,6 +150,18 @@ func (p *Profile) AsYaml() string {
 	res += fmt.Sprintf("    fqbn: %s\n", p.FQBN)
 	if p.Programmer != "" {
 		res += fmt.Sprintf("    programmer: %s\n", p.Programmer)
+	}
+	if p.Port != "" {
+		res += fmt.Sprintf("    port: %s\n", p.Port)
+	}
+	if p.Protocol != "" {
+		res += fmt.Sprintf("    protocol: %s\n", p.Protocol)
+	}
+	if len(p.PortConfig) > 0 {
+		res += "     port_config:\n"
+		for k, v := range p.PortConfig {
+			res += fmt.Sprintf("       %s: %s\n", k, v)
+		}
 	}
 	res += p.Platforms.AsYaml()
 	res += p.Libraries.AsYaml()
@@ -291,6 +327,7 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 		DefaultProfile:    raw.DefaultProfile,
 		DefaultFqbn:       raw.DefaultFqbn,
 		DefaultPort:       raw.DefaultPort,
+		DefaultPortConfig: raw.DefaultPortConfig,
 		DefaultProtocol:   raw.DefaultProtocol,
 		DefaultProgrammer: raw.DefaultProgrammer,
 	}, nil

@@ -108,7 +108,7 @@ func runDebugCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(ctx, portArgs, fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
+	fqbn, port := arguments.CalculateFQBNAndPort(ctx, portArgs, fqbnArg, inst, srv, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol(), profile)
 
 	prog := profile.GetProgrammer()
 	if prog == "" || programmer.GetProgrammer() != "" {

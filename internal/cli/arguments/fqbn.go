@@ -64,6 +64,7 @@ func (f *Fqbn) Set(fqbn string) {
 // parameters provided by the user.
 // This determine the FQBN based on:
 // - the value of the FQBN flag if explicitly specified, otherwise
+// - the FQBN of the selected profile if available, otherwise
 // - the default FQBN value in sketch.yaml (`default_fqbn` key) if available, otherwise
 // - it tries to autodetect the board connected to the given port flags
 // If all above methods fails, it returns the empty string.
@@ -71,8 +72,11 @@ func (f *Fqbn) Set(fqbn string) {
 //   - the port is not found, in this case nil is returned
 //   - the FQBN autodetection fail, in this case the function prints an error and
 //     terminates the execution
-func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultFQBN, defaultAddress, defaultProtocol string) (string, *rpc.Port) {
+func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultFQBN, defaultAddress, defaultProtocol string, profile *rpc.SketchProfile) (string, *rpc.Port) {
 	fqbn := fqbnArg.String()
+	if fqbn == "" {
+		fqbn = profile.GetFqbn()
+	}
 	if fqbn == "" {
 		fqbn = defaultFQBN
 	}
@@ -87,7 +91,7 @@ func CalculateFQBNAndPort(ctx context.Context, portArgs *Port, fqbnArg *Fqbn, in
 		return fqbn, port
 	}
 
-	port, err := portArgs.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol)
+	port, err := portArgs.GetPort(ctx, instance, srv, defaultAddress, defaultProtocol, profile)
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
 	}

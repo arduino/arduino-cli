@@ -60,7 +60,7 @@ func runDebugCheckCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer,
 	instance := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli debug`")
 
-	port, err := portArgs.GetPort(ctx, instance, srv, "", "")
+	port, err := portArgs.GetPort(ctx, instance, srv, "", "", nil)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrBadArgument)
 	}
