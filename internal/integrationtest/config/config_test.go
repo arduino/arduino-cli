@@ -882,25 +882,25 @@ build.unk: 123
 	t.Cleanup(func() { unkwnownConfig.Remove() })
 
 	// Run "config get" with a configuration containing an unknown key
-	out, _, err := cli.Run("config", "get", "locale", "--config-file", unkwnownConfig.String())
+	out, _, err := cli.Run("config", "get", "daemon.port", "--config-file", unkwnownConfig.String())
 	require.NoError(t, err)
-	require.Equal(t, "en", strings.TrimSpace(string(out)))
+	require.Equal(t, `"50051"`, strings.TrimSpace(string(out)))
 
-	// Run "config get" with a configuration containing an invalid key
+	// Run "config get" with a configuration containing an invalid value
 	invalidConfig := paths.New(filepath.Join(tmp, "invalid.yaml"))
-	invalidConfig.WriteFile([]byte(`locale: 123`))
+	invalidConfig.WriteFile([]byte(`daemon.port: 123`))
 	t.Cleanup(func() { invalidConfig.Remove() })
-	out, _, err = cli.Run("config", "get", "locale", "--config-file", invalidConfig.String())
+	out, _, err = cli.Run("config", "get", "daemon.port", "--config-file", invalidConfig.String())
 	require.NoError(t, err)
-	require.Equal(t, "en", strings.TrimSpace(string(out)))
+	require.Equal(t, `"50051"`, strings.TrimSpace(string(out)))
 
 	// Run "config get" with a configuration containing a null array
 	nullArrayConfig := paths.New(filepath.Join(tmp, "null_array.yaml"))
 	nullArrayConfig.WriteFile([]byte(`board_manager.additional_urls:`))
 	t.Cleanup(func() { nullArrayConfig.Remove() })
-	out, _, err = cli.Run("config", "get", "locale", "--config-file", invalidConfig.String())
+	out, _, err = cli.Run("config", "get", "daemon.port", "--config-file", nullArrayConfig.String())
 	require.NoError(t, err)
-	require.Equal(t, "en", strings.TrimSpace(string(out)))
+	require.Equal(t, `"50051"`, strings.TrimSpace(string(out)))
 }
 
 func TestConfigViaEnvVars(t *testing.T) {
