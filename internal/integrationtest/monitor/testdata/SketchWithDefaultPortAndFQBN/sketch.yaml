@@ -1,5 +1,8 @@
-default_port: /dev/ttyDEF
-default_fqbn: arduino:avr:yun
 profiles:
   profile1:
     fqbn: "broken_fqbn"
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_port: /dev/ttyDEF
+default_fqbn: arduino:avr:yun
