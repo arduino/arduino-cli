@@ -1,6 +1,7 @@
 ignore:
   - rpc/**
   - i18n/cmd/**
+  - internal/integrationtest/**
 
 coverage:
   status:
@@ -8,4 +9,4 @@ coverage:
       default:
         target: 30%
     patch: off
-    changes: off
+    changes: false
