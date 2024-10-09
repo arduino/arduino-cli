@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
@@ -148,6 +149,10 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	writePath := func(in *paths.Path) error {
 		if in == nil {
 			return writeString("")
+		} else if inside, err := in.IsInsideDir(prefix); err != nil {
+			return err
+		} else if !inside {
+			return writeString(in.String())
 		} else if p, err := in.RelFrom(prefix); err != nil {
 			return err
 		} else {
@@ -308,6 +313,8 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 			return nil, err
 		} else if p == "" {
 			return nil, nil
+		} else if filepath.IsAbs(p) {
+			return paths.New(p), nil
 		} else {
 			return prefix.Join(p), nil
 		}
