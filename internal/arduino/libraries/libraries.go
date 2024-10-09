@@ -127,7 +127,10 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 		return nil
 	}
 	writeProperties := func(in *properties.Map) error {
-		keys := in.Keys()
+		var keys []string
+		if in != nil {
+			keys = in.Keys()
+		}
 		if err := binary.Write(out, binary.NativeEndian, uint16(len(keys))); err != nil {
 			return err
 		}
