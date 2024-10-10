@@ -35,7 +35,6 @@ import (
 )
 
 var (
-	tr           = i18n.Tr
 	daemonize    bool
 	debug        bool
 	debugFile    string
