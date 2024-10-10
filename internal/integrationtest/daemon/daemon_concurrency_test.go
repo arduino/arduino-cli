@@ -124,4 +124,9 @@ func TestInitAndMonitorConcurrency(t *testing.T) {
 	require.LessOrEqual(t, time.Since(start), 4*time.Second)
 	cancel()
 	monitorCompleted.Wait()
+
+	// Allow some time for the mocked-monitor process to terminate (otherwise the
+	// test will fail on Windows when the cleanup function tries to remove the
+	// executable).
+	time.Sleep(2 * time.Second)
 }
