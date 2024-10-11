@@ -125,8 +125,8 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	if err != nil {
 		return err
 	}
-	defer release()
 	monitor, boardSettings, err := findMonitorAndSettingsForProtocolAndBoard(pme, openReq.GetPort().GetProtocol(), openReq.GetFqbn())
+	release()
 	if err != nil {
 		return err
 	}
