@@ -34,15 +34,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	daemonize    bool
-	debug        bool
-	debugFile    string
-	debugFilters []string
-)
-
 // NewCommand created a new `daemon` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *cobra.Command {
+	var daemonize bool
+	var debug bool
+	var debugFile string
+	var debugFiltersArg []string
 	var daemonPort string
 	daemonCommand := &cobra.Command{
 		Use:     "daemon",
@@ -65,7 +62,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runDaemonCommand(srv, daemonPort)
+			runDaemonCommand(srv, daemonPort, debugFile, debug, daemonize, debugFiltersArg)
 		},
 	}
 	defaultDaemonPort := settings.GetDaemon().GetPort()
@@ -82,13 +79,13 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	daemonCommand.Flags().StringVar(&debugFile,
 		"debug-file", "",
 		i18n.Tr("Append debug logging to the specified file"))
-	daemonCommand.Flags().StringSliceVar(&debugFilters,
+	daemonCommand.Flags().StringSliceVar(&debugFiltersArg,
 		"debug-filter", []string{},
 		i18n.Tr("Display only the provided gRPC calls"))
 	return daemonCommand
 }
 
-func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort string) {
+func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort, debugFile string, debug, daemonize bool, debugFiltersArg []string) {
 	logrus.Info("Executing `arduino-cli daemon`")
 
 	gRPCOptions := []grpc.ServerOption{}
@@ -113,6 +110,7 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort string) {
 				debugStdOut = out
 			}
 		}
+		debugFilters = debugFiltersArg
 		gRPCOptions = append(gRPCOptions,
 			grpc.UnaryInterceptor(unaryLoggerInterceptor),
 			grpc.StreamInterceptor(streamLoggerInterceptor),

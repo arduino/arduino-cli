@@ -28,6 +28,7 @@ import (
 
 var debugStdOut io.Writer
 var debugSeq uint32
+var debugFilters []string
 
 func log(isRequest bool, seq uint32, msg interface{}) {
 	prefix := fmt.Sprint(seq, " |  ")
