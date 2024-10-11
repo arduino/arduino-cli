@@ -41,6 +41,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	var debugFile string
 	var debugFiltersArg []string
 	var daemonPort string
+	var maxGRPCRecvMsgSize int
 	daemonCommand := &cobra.Command{
 		Use:     "daemon",
 		Short:   i18n.Tr("Run the Arduino CLI as a gRPC daemon."),
@@ -60,9 +61,14 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 					panic("Failed to set default value for directories.builtin.libraries: " + err.Error())
 				}
 			}
+
+			// Validate the maxGRPCRecvMsgSize flag
+			if maxGRPCRecvMsgSize < 1024 {
+				feedback.Fatal(i18n.Tr("%s must be >= 1024", "--max-grpc-recv-message-size"), feedback.ErrBadArgument)
+			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runDaemonCommand(srv, daemonPort, debugFile, debug, daemonize, debugFiltersArg)
+			runDaemonCommand(srv, daemonPort, debugFile, debug, daemonize, debugFiltersArg, maxGRPCRecvMsgSize)
 		},
 	}
 	defaultDaemonPort := settings.GetDaemon().GetPort()
@@ -82,10 +88,13 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	daemonCommand.Flags().StringSliceVar(&debugFiltersArg,
 		"debug-filter", []string{},
 		i18n.Tr("Display only the provided gRPC calls"))
+	daemonCommand.Flags().IntVar(&maxGRPCRecvMsgSize,
+		"max-grpc-recv-message-size", 16*1024*1024,
+		i18n.Tr("Sets the maximum message size in bytes the daemon can receive"))
 	return daemonCommand
 }
 
-func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort, debugFile string, debug, daemonize bool, debugFiltersArg []string) {
+func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort, debugFile string, debug, daemonize bool, debugFiltersArg []string, maxGRPCRecvMsgSize int) {
 	logrus.Info("Executing `arduino-cli daemon`")
 
 	gRPCOptions := []grpc.ServerOption{}
@@ -116,6 +125,7 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort, debugFile st
 			grpc.StreamInterceptor(streamLoggerInterceptor),
 		)
 	}
+	gRPCOptions = append(gRPCOptions, grpc.MaxRecvMsgSize(maxGRPCRecvMsgSize))
 	s := grpc.NewServer(gRPCOptions...)
 
 	// register the commands service
