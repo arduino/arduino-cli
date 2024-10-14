@@ -352,7 +352,10 @@ func (b *Builder) logIfVerbose(warn bool, msg string) {
 
 // Build fixdoc
 func (b *Builder) Build() error {
-	b.Progress.AddSubSteps(6 /** preprocess **/ + 21 /** build **/)
+	b.Progress.AddSubSteps(6 + // preprocess
+		18 + // build
+		1, // size
+	)
 	defer b.Progress.RemoveSubSteps()
 
 	if err := b.preprocess(); err != nil {
@@ -362,15 +365,10 @@ func (b *Builder) Build() error {
 	buildErr := b.build()
 
 	b.libsDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
-	b.Progress.CompleteStep()
-
 	b.printUsedLibraries(b.libsDetector.ImportedLibraries())
-	b.Progress.CompleteStep()
-
 	if buildErr != nil {
 		return buildErr
 	}
-	b.Progress.CompleteStep()
 
 	if err := b.size(); err != nil {
 		return err

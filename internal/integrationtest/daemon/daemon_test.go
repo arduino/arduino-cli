@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -194,13 +193,15 @@ func TestDaemonCompileOptions(t *testing.T) {
 		if msg.GetErrStream() != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}
-		analyzer.Process(msg.GetProgress())
+		if pr := msg.GetProgress(); pr != nil {
+			fmt.Printf("COMPILE PROGRESS> %v\n", pr)
+			analyzer.Process(pr)
+		}
 	}
+
 	// https://github.com/arduino/arduino-cli/issues/2016
-	// assert that the task progress is increasing and doesn't contain multiple 100% values
-	results := analyzer.Results[""]
-	require.True(t, results[len(results)-1].GetCompleted(), fmt.Sprintf("latest percent value: %v", results[len(results)-1].GetPercent()))
-	require.IsNonDecreasing(t, f.Map(results, (*commands.TaskProgress).GetPercent))
+	// https://github.com/arduino/arduino-cli/issues/2711
+	analyzer.Check(t)
 }
 
 func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {

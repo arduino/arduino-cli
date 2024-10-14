@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/stretchr/testify/require"
+	"go.bug.st/f"
 )
 
 // TaskProgressAnalyzer analyzes TaskProgress messages for consistency
@@ -43,4 +45,14 @@ func (a *TaskProgressAnalyzer) Process(progress *commands.TaskProgress) {
 
 	taskName := progress.GetName()
 	a.Results[taskName] = append(a.Results[taskName], progress)
+}
+
+func (a *TaskProgressAnalyzer) Check(t *testing.T) {
+	for task, results := range a.Results {
+		require.Equal(t, 1, f.Count(results, (*commands.TaskProgress).GetCompleted), "Got multiple 'completed' messages on task %s", task)
+		l := len(results)
+		require.True(t, results[l-1].GetCompleted(), "Last message is not 'completed' on task: %s", task)
+		require.Equal(t, results[l-1].GetPercent(), float32(100), "Last message is not 100% on task: %s", task)
+		require.IsNonDecreasing(t, f.Map(results, (*commands.TaskProgress).GetPercent), "Percentages are not increasing on task: %s", task)
+	}
 }
