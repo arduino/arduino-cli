@@ -32,13 +32,14 @@ import (
 func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
 	logrus.Debugf("Checking previous results for %v (result = %v, dep = %v)", sourceFile, objectFile, dependencyFile)
 	if objectFile == nil || dependencyFile == nil {
-		logrus.Debugf("Not found: nil")
+		logrus.Debugf("Object file or dependency file not provided")
 		return false, nil
 	}
 
 	sourceFile = sourceFile.Clean()
 	sourceFileStat, err := sourceFile.Stat()
 	if err != nil {
+		logrus.Debugf("Could not stat source file: %s", err)
 		return false, err
 	}
 
@@ -46,9 +47,10 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	objectFileStat, err := objectFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", objectFile)
+			logrus.Debugf("Object file not found: %v", objectFile)
 			return false, nil
 		}
+		logrus.Debugf("Could not stat object file: %s", err)
 		return false, err
 	}
 
@@ -56,9 +58,10 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	dependencyFileStat, err := dependencyFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", dependencyFile)
+			logrus.Debugf("Dependency file not found: %v", dependencyFile)
 			return false, nil
 		}
+		logrus.Debugf("Could not stat dependency file: %s", err)
 		return false, err
 	}
 
@@ -73,6 +76,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 
 	rows, err := dependencyFile.ReadFileAsLines()
 	if err != nil {
+		logrus.Debugf("Could not read dependency file: %s", dependencyFile)
 		return false, err
 	}
 
@@ -92,7 +96,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	}
 	objFileInDepFile := firstRow[:len(firstRow)-1]
 	if objFileInDepFile != objectFile.String() {
-		logrus.Debugf("Depfile is about different file: %v", objFileInDepFile)
+		logrus.Debugf("Depfile is about different object file: %v", objFileInDepFile)
 		return false, nil
 	}
 
@@ -103,6 +107,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	// If we don't do this check it might happen that trying to compile a source file
 	// that has the same name but a different path wouldn't recreate the object file.
 	if sourceFile.String() != strings.Trim(rows[1], " ") {
+		logrus.Debugf("Depfile is about different source file: %v", strings.Trim(rows[1], " "))
 		return false, nil
 	}
 
