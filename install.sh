@@ -10,6 +10,7 @@ PROJECT_NAME="arduino-cli"
 # BINDIR represents the local bin location, defaults to ./bin.
 EFFECTIVE_BINDIR=""
 DEFAULT_BINDIR="$PWD/bin"
+TEMPDIR="${TMPDIR:-${TEMP:-${TMP:-/tmp}}}"
 
 fail() {
   echo "$1"
@@ -137,7 +138,7 @@ downloadFile() {
   esac
   DOWNLOAD_URL="${DOWNLOAD_URL_PREFIX}${APPLICATION_DIST}"
 
-  INSTALLATION_TMP_FILE="/tmp/$APPLICATION_DIST"
+  INSTALLATION_TMP_FILE="${TEMPDIR}/$APPLICATION_DIST"
   echo "Downloading $DOWNLOAD_URL"
   httpStatusCode=$(getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE")
   if [ "$httpStatusCode" -ne 200 ]; then
@@ -186,7 +187,7 @@ downloadFile() {
 }
 
 installFile() {
-  INSTALLATION_TMP_DIR="/tmp/$PROJECT_NAME"
+  INSTALLATION_TMP_DIR="${TEMPDIR}/$PROJECT_NAME"
   mkdir -p "$INSTALLATION_TMP_DIR"
   if [ "$OS" = "Windows" ]; then
     unzip -d "$INSTALLATION_TMP_DIR" "$INSTALLATION_TMP_FILE"
