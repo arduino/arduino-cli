@@ -82,9 +82,11 @@ jobs:
     strategy:
       matrix:
         artifact:
-          - name: darwin_amd64
+          - artifact-suffix: macOS_64bit
+            name: darwin_amd64
             path: "macOS_64bit.tar.gz"
-          - name: darwin_arm64
+          - artifact-suffix: macOS_ARM64
+            name: darwin_arm64
             path: "macOS_ARM64.tar.gz"
 
     steps:
@@ -94,9 +96,13 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: ${{ env.ARTIFACT_NAME }}-*
-          merge-multiple: true
+          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.artifact.artifact-suffix }}
           path: ${{ env.DIST_DIR }}
+
+      - name: Remove non-notarized artifact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.artifact.artifact-suffix }}
 
       - name: Import Code-Signing Certificates
         env:
@@ -167,11 +173,11 @@ jobs:
           -C ../../ LICENSE.txt
           echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
 
-      - name: Upload artifact
+      - name: Upload notarized artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: ${{ env.ARTIFACT_NAME }}-notarized-${{ matrix.artifact.name }}
+          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.artifact.artifact-suffix }}
           path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
   create-windows-installer:
