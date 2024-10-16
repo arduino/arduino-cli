@@ -17,6 +17,7 @@ package utils
 
 import (
 	"os"
+	"runtime"
 	"strings"
 	"unicode"
 
@@ -74,63 +75,79 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 		return false, nil
 	}
 
-	rows, err := dependencyFile.ReadFileAsLines()
+	depFileData, err := dependencyFile.ReadFile()
 	if err != nil {
 		logrus.Debugf("Could not read dependency file: %s", dependencyFile)
 		return false, err
 	}
 
-	rows = f.Map(rows, removeEndingBackSlash)
-	rows = f.Map(rows, strings.TrimSpace)
-	rows = f.Map(rows, unescapeDep)
-	rows = f.Filter(rows, f.NotEquals(""))
+	checkDepFile := func(depFile string) (bool, error) {
+		rows := strings.Split(strings.Replace(depFile, "\r\n", "\n", -1), "\n")
+		rows = f.Map(rows, removeEndingBackSlash)
+		rows = f.Map(rows, strings.TrimSpace)
+		rows = f.Map(rows, unescapeDep)
+		rows = f.Filter(rows, f.NotEquals(""))
 
-	if len(rows) == 0 {
+		if len(rows) == 0 {
+			return true, nil
+		}
+
+		firstRow := rows[0]
+		if !strings.HasSuffix(firstRow, ":") {
+			logrus.Debugf("No colon in first line of depfile")
+			return false, nil
+		}
+		objFileInDepFile := firstRow[:len(firstRow)-1]
+		if objFileInDepFile != objectFile.String() {
+			logrus.Debugf("Depfile is about different object file: %v", objFileInDepFile)
+			return false, nil
+		}
+
+		// The first line of the depfile contains the path to the object file to generate.
+		// The second line of the depfile contains the path to the source file.
+		// All subsequent lines contain the header files necessary to compile the object file.
+
+		// If we don't do this check it might happen that trying to compile a source file
+		// that has the same name but a different path wouldn't recreate the object file.
+		if sourceFile.String() != strings.Trim(rows[1], " ") {
+			logrus.Debugf("Depfile is about different source file: %v", strings.Trim(rows[1], " "))
+			return false, nil
+		}
+
+		rows = rows[1:]
+		for _, row := range rows {
+			depStat, err := os.Stat(row)
+			if err != nil && !os.IsNotExist(err) {
+				// There is probably a parsing error of the dep file
+				// Ignore the error and trigger a full rebuild anyway
+				logrus.WithError(err).Debugf("Failed to read: %v", row)
+				return false, nil
+			}
+			if os.IsNotExist(err) {
+				logrus.Debugf("Not found: %v", row)
+				return false, nil
+			}
+			if depStat.ModTime().After(objectFileStat.ModTime()) {
+				logrus.Debugf("%v newer than %v", row, objectFile)
+				return false, nil
+			}
+		}
+
 		return true, nil
 	}
 
-	firstRow := rows[0]
-	if !strings.HasSuffix(firstRow, ":") {
-		logrus.Debugf("No colon in first line of depfile")
-		return false, nil
-	}
-	objFileInDepFile := firstRow[:len(firstRow)-1]
-	if objFileInDepFile != objectFile.String() {
-		logrus.Debugf("Depfile is about different object file: %v", objFileInDepFile)
-		return false, nil
-	}
-
-	// The first line of the depfile contains the path to the object file to generate.
-	// The second line of the depfile contains the path to the source file.
-	// All subsequent lines contain the header files necessary to compile the object file.
-
-	// If we don't do this check it might happen that trying to compile a source file
-	// that has the same name but a different path wouldn't recreate the object file.
-	if sourceFile.String() != strings.Trim(rows[1], " ") {
-		logrus.Debugf("Depfile is about different source file: %v", strings.Trim(rows[1], " "))
-		return false, nil
-	}
-
-	rows = rows[1:]
-	for _, row := range rows {
-		depStat, err := os.Stat(row)
-		if err != nil && !os.IsNotExist(err) {
-			// There is probably a parsing error of the dep file
-			// Ignore the error and trigger a full rebuild anyway
-			logrus.WithError(err).Debugf("Failed to read: %v", row)
-			return false, nil
+	if runtime.GOOS == "windows" {
+		// This is required because on Windows we don't know which encoding is used
+		// by gcc to write the dep file (it could be UTF-8 or any of the Windows
+		// ANSI mappings).
+		if decoded, err := convertAnsiBytesToString(depFileData); err == nil {
+			if upToDate, err := checkDepFile(decoded); err == nil && upToDate {
+				return upToDate, nil
+			}
 		}
-		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", row)
-			return false, nil
-		}
-		if depStat.ModTime().After(objectFileStat.ModTime()) {
-			logrus.Debugf("%v newer than %v", row, objectFile)
-			return false, nil
-		}
+		// Fallback to UTF-8...
 	}
-
-	return true, nil
+	return checkDepFile(string(depFileData))
 }
 
 func removeEndingBackSlash(s string) string {
