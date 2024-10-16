@@ -20,6 +20,9 @@ import (
 )
 
 func convertAnsiBytesToString(data []byte) (string, error) {
+	if len(data) == 0 {
+		return "", nil
+	}
 	dataSize := int32(len(data))
 	size, err := windows.MultiByteToWideChar(windows.GetACP(), 0, &data[0], dataSize, nil, 0)
 	if err != nil {
