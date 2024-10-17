@@ -286,6 +286,42 @@ func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
 	}
 }
 
+// InstallMockedAvrdude will replace the already installed avrdude with a mocked one.
+func (cli *ArduinoCLI) InstallMockedAvrdude(t *testing.T) {
+	fmt.Println(color.BlueString("<<< Install mocked avrdude"))
+
+	// Build mocked serial-discovery
+	mockDir := FindRepositoryRootPath(t).Join("internal", "mock_avrdude")
+	gobuild, err := paths.NewProcess(nil, "go", "build")
+	require.NoError(t, err)
+	gobuild.SetDirFromPath(mockDir)
+	require.NoError(t, gobuild.Run(), "Building mocked avrdude")
+	ext := ""
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
+	mockBin := mockDir.Join("mock_avrdude" + ext)
+	require.True(t, mockBin.Exist())
+	fmt.Println(color.HiBlackString("    Build of mocked avrdude succeeded."))
+
+	// Install it replacing the current avrdudes
+	dataDir := cli.DataDir()
+	require.NotNil(t, dataDir, "data dir missing")
+
+	avrdudes, err := dataDir.Join("packages", "arduino", "tools", "avrdude").ReadDirRecursiveFiltered(
+		nil, paths.AndFilter(
+			paths.FilterNames("avrdude"+ext),
+			paths.FilterOutDirectories(),
+		),
+	)
+	require.NoError(t, err, "scanning data dir for avrdude(s)")
+	require.NotEmpty(t, avrdudes, "no avrdude(s) found in data dir")
+	for _, avrdude := range avrdudes {
+		require.NoError(t, mockBin.CopyTo(avrdude), "installing mocked avrdude to %s", avrdude)
+		fmt.Println(color.HiBlackString("    Mocked avrdude installed in " + avrdude.String()))
+	}
+}
+
 // RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
 func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) ([]byte, []byte, error) {
 	var stdoutBuf, stderrBuf bytes.Buffer
@@ -641,4 +677,20 @@ func (inst *ArduinoCLIInstance) Monitor(ctx context.Context, port *commands.Port
 		},
 	})
 	return monitorClient, err
+}
+
+// Upload calls the "Upload" gRPC method.
+func (inst *ArduinoCLIInstance) Upload(ctx context.Context, fqbn, sketchPath, port, protocol string) (commands.ArduinoCoreService_UploadClient, error) {
+	uploadCl, err := inst.cli.daemonClient.Upload(ctx, &commands.UploadRequest{
+		Instance:   inst.instance,
+		Fqbn:       fqbn,
+		SketchPath: sketchPath,
+		Verbose:    true,
+		Port: &commands.Port{
+			Address:  port,
+			Protocol: protocol,
+		},
+	})
+	logCallf(">>> Upload(%v %v port/protocol=%s/%s)\n", fqbn, sketchPath, port, protocol)
+	return uploadCl, err
 }

@@ -573,18 +573,18 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	// Run recipes for upload
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
-		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
+		if err := runTool(uploadCtx, "erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed chip erase"), Cause: err}
 		}
-		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
+		if err := runTool(uploadCtx, "bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed to burn bootloader"), Cause: err}
 		}
 	} else if programmer != nil {
-		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
+		if err := runTool(uploadCtx, "program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed programming"), Cause: err}
 		}
 	} else {
-		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
+		if err := runTool(uploadCtx, "upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed uploading"), Cause: err}
 		}
 	}
@@ -702,7 +702,12 @@ func detectUploadPort(
 	}
 }
 
-func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {
+func runTool(ctx context.Context, recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {
+	// if ctx is already canceled just exit
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	recipe, ok := props.GetOk(recipeID)
 	if !ok {
 		return errors.New(i18n.Tr("recipe not found '%s'", recipeID))
@@ -738,6 +743,17 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if err := cmd.Start(); err != nil {
 		return errors.New(i18n.Tr("cannot execute upload tool: %s", err))
 	}
+
+	// If the ctx is canceled, kill the running command
+	completed := make(chan struct{})
+	defer close(completed)
+	go func() {
+		select {
+		case <-ctx.Done():
+			_ = cmd.Kill()
+		case <-completed:
+		}
+	}()
 
 	if err := cmd.Wait(); err != nil {
 		return errors.New(i18n.Tr("uploading error: %s", err))
