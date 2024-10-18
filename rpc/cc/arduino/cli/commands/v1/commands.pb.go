@@ -37,6 +37,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Represent the reason why an instance initialization failed.
 type FailedInstanceInitReason int32
 
 const (
@@ -100,6 +101,7 @@ func (FailedInstanceInitReason) EnumDescriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_commands_proto_rawDescGZIP(), []int{0}
 }
 
+// The status of the index update
 type IndexUpdateReport_Status int32
 
 const (
@@ -390,10 +392,12 @@ type isInitResponse_Message interface {
 }
 
 type InitResponse_InitProgress struct {
+	// The progress
 	InitProgress *InitResponse_Progress `protobuf:"bytes,1,opt,name=init_progress,json=initProgress,proto3,oneof"`
 }
 
 type InitResponse_Error struct {
+	// The error in case the instance initialization failed.
 	Error *status.Status `protobuf:"bytes,2,opt,name=error,proto3,oneof"`
 }
 

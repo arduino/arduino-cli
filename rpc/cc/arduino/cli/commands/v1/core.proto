@@ -61,6 +61,7 @@ message PlatformLoadingError {}
 message PlatformDownloadRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Vendor name of the platform (e.g., `arduino`).
   string platform_package = 2;
   // Architecture name of the platform (e.g., `avr`).
   string architecture = 3;

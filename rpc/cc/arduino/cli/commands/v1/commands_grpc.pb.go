@@ -190,6 +190,7 @@ type ArduinoCoreServiceClient interface {
 	ConfigurationSave(ctx context.Context, in *ConfigurationSaveRequest, opts ...grpc.CallOption) (*ConfigurationSaveResponse, error)
 	// Read the settings from a YAML file
 	ConfigurationOpen(ctx context.Context, in *ConfigurationOpenRequest, opts ...grpc.CallOption) (*ConfigurationOpenResponse, error)
+	// Get the current configuration
 	ConfigurationGet(ctx context.Context, in *ConfigurationGetRequest, opts ...grpc.CallOption) (*ConfigurationGetResponse, error)
 	// Enumerate all the keys/values pairs available in the configuration
 	SettingsEnumerate(ctx context.Context, in *SettingsEnumerateRequest, opts ...grpc.CallOption) (*SettingsEnumerateResponse, error)
@@ -978,6 +979,7 @@ type ArduinoCoreServiceServer interface {
 	ConfigurationSave(context.Context, *ConfigurationSaveRequest) (*ConfigurationSaveResponse, error)
 	// Read the settings from a YAML file
 	ConfigurationOpen(context.Context, *ConfigurationOpenRequest) (*ConfigurationOpenResponse, error)
+	// Get the current configuration
 	ConfigurationGet(context.Context, *ConfigurationGetRequest) (*ConfigurationGetResponse, error)
 	// Enumerate all the keys/values pairs available in the configuration
 	SettingsEnumerate(context.Context, *SettingsEnumerateRequest) (*SettingsEnumerateResponse, error)
