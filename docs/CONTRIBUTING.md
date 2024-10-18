@@ -79,13 +79,7 @@ If you want to run integration tests you will also need:
 
 If you're working on the gRPC interface you will also have to:
 
-- download and install the [protoc][6] compiler (use the version required to match the generated code, please note that
-  the latest releases does not follow semantic versioning anymore so, for example, the version 5.26.1 must be searched
-  as 26.1 dropping the major number)
-- install `protoc-gen-go` using: `go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2` (use the version
-  required to match the generated code)
-- install `protoc-gen-go-grpc` using: `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0` (use the version
-  required to match the generated code)
+- download and install [buf][6] our tool to compile and generate proto files
 
 ### Building the source code
 
@@ -337,7 +331,7 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [1]: https://go.dev/doc/install
 [2]: https://taskfile.dev/#/installation
 [3]: https://www.python.org/downloads/
-[6]: https://github.com/protocolbuffers/protobuf/releases
+[6]: https://buf.build/docs/installation/
 [7]: https://pages.github.com/
 [9]: https://www.mkdocs.org/
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml

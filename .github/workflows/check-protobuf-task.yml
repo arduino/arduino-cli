@@ -53,21 +53,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Go
-        uses: actions/setup-go@v5
+      - uses: bufbuild/buf-action@v1
         with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install protoc compiler
-        uses: arduino/setup-protoc@v3
-        with:
-          version: v26.1
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Go deps
-        run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
+          setup_only: true
 
       - name: Install Task
         uses: arduino/setup-task@v2
@@ -90,43 +78,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install buf (protoc linter)
+      # used by the protobuf breaking change detector
+      - name: Fetch main branch
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@v1.20.0
-          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking@v1.20.0
-          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-lint@v1.20.0
+          git fetch origin master
 
-      - name: Install Task
-        uses: arduino/setup-task@v2
+      - uses: bufbuild/buf-action@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
-      - name: Lint protocol buffers
-        run: task protoc:check
-
-  check-formatting:
-    needs: run-determination
-    if: needs.run-determination.outputs.result == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
-      - name: Format protocol buffers
-        run: task protoc:format
-
-      - name: Check formatting
-        run: git diff --color --exit-code
+          pr_comment: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+          lint: ${{ github.event_name == 'pull_request' }}
+          format: ${{ github.event_name == 'pull_request' }}
+          breaking: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'buf skip breaking') }}
+          breaking_against: ".git#branch=origin/master,subdir=rpc"

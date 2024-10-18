@@ -36,13 +36,13 @@ message Configuration {
     string downloads = 3;
     // The directory where the built-in resources are installed
     optional Builtin builtin = 4;
-  };
+  }
   message Network {
     // Extra user-agent information to be appended in network requests
     optional string extra_user_agent = 1;
     // The proxy to use for network requests
     optional string proxy = 2;
-  };
+  }
   message Sketch {
     // Set to true to always export binaries to the sketch directory
     bool always_export_binaries = 1;
@@ -83,17 +83,28 @@ message Configuration {
     bool enable_notification = 1;
   }
 
+  // The configuration for the instance
   Directories directories = 1;
+  // The network configuration
   Network network = 2;
+  // The sketch configuration
   Sketch sketch = 3;
+  // The build cache configuration
   BuildCache build_cache = 4;
+  // The board manager configuration
   BoardManager board_manager = 5;
+  // The daemon configuration
   Daemon daemon = 6;
+  // The output configuration
   Output output = 7;
+  // The logging configuration
   Logging logging = 8;
+  // The library configuration
   Library library = 9;
+  // The updater configuration
   Updater updater = 10;
 
+  // The language locale
   optional string locale = 100;
 }
 
