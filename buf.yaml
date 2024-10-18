@@ -7,6 +7,11 @@ breaking:
 lint:
   use:
     - STANDARD
+    - COMMENT_ENUM
+    - COMMENT_ENUM_VALUE
+    - COMMENT_FIELD
+    - COMMENT_RPC
+    - COMMENT_SERVICE
   ignore_only:
     ENUM_ZERO_VALUE_SUFFIX:
       - rpc/cc/arduino/cli/commands/v1/lib.proto
