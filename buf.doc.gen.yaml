@@ -1,0 +1,10 @@
+version: v2
+plugins:
+  # Local plugin used to generate docs
+  # go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
+  - local: protoc-gen-doc
+    out: ./docs/rpc
+    opt:
+      - markdown,commands.md
+inputs:
+  - directory: ./rpc
