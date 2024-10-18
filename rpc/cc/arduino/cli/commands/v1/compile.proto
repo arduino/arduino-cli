@@ -18,10 +18,10 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 message CompileRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -38,7 +38,7 @@ message CompileRequest {
   bool preprocess = 5;
   // Builds of core and sketches are saved into this path to be cached and
   // reused.
-  string build_cache_path = 6 [ deprecated = true ];
+  string build_cache_path = 6 [deprecated = true];
   // Path to use to store the files used for the compilation. If omitted,
   // a directory will be created in the operating system's default temporary
   // path.
