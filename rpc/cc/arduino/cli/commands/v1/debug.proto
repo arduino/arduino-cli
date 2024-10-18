@@ -18,11 +18,11 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/port.proto";
 import "google/protobuf/any.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 // The top-level message sent by the client for the `Debug` method.
 // Multiple `DebugRequest` messages can be sent but the first message

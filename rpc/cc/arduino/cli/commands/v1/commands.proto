@@ -18,19 +18,18 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
-import "google/rpc/status.proto";
-
-import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/board.proto";
+import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/compile.proto";
 import "cc/arduino/cli/commands/v1/core.proto";
 import "cc/arduino/cli/commands/v1/debug.proto";
-import "cc/arduino/cli/commands/v1/monitor.proto";
-import "cc/arduino/cli/commands/v1/upload.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
+import "cc/arduino/cli/commands/v1/monitor.proto";
 import "cc/arduino/cli/commands/v1/settings.proto";
+import "cc/arduino/cli/commands/v1/upload.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 // The main Arduino Platform service API
 service ArduinoCoreService {
@@ -48,8 +47,7 @@ service ArduinoCoreService {
   rpc UpdateIndex(UpdateIndexRequest) returns (stream UpdateIndexResponse) {}
 
   // Update libraries index
-  rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest)
-      returns (stream UpdateLibrariesIndexResponse) {}
+  rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest) returns (stream UpdateLibrariesIndexResponse) {}
 
   // Get the version of Arduino CLI in use.
   rpc Version(VersionRequest) returns (VersionResponse) {}
@@ -66,8 +64,7 @@ service ArduinoCoreService {
   // Sets the sketch default FQBN and Port Address/Protocol in
   // the sketch project file (sketch.yaml). These metadata can be retrieved
   // using LoadSketch.
-  rpc SetSketchDefaults(SetSketchDefaultsRequest)
-      returns (SetSketchDefaultsResponse) {}
+  rpc SetSketchDefaults(SetSketchDefaultsRequest) returns (SetSketchDefaultsResponse) {}
 
   // BOARD COMMANDS
   // --------------
@@ -85,87 +82,69 @@ service ArduinoCoreService {
   rpc BoardSearch(BoardSearchRequest) returns (BoardSearchResponse);
 
   // List boards connection and disconnected events.
-  rpc BoardListWatch(BoardListWatchRequest)
-      returns (stream BoardListWatchResponse);
+  rpc BoardListWatch(BoardListWatchRequest) returns (stream BoardListWatchResponse);
 
   // Compile an Arduino sketch.
   rpc Compile(CompileRequest) returns (stream CompileResponse);
 
   // Download and install a platform and its tool dependencies.
-  rpc PlatformInstall(PlatformInstallRequest)
-      returns (stream PlatformInstallResponse);
+  rpc PlatformInstall(PlatformInstallRequest) returns (stream PlatformInstallResponse);
 
   // Download a platform and its tool dependencies to the `staging/packages`
   // subdirectory of the data directory.
-  rpc PlatformDownload(PlatformDownloadRequest)
-      returns (stream PlatformDownloadResponse);
+  rpc PlatformDownload(PlatformDownloadRequest) returns (stream PlatformDownloadResponse);
 
   // Uninstall a platform as well as its tool dependencies that are not used by
   // other installed platforms.
-  rpc PlatformUninstall(PlatformUninstallRequest)
-      returns (stream PlatformUninstallResponse);
+  rpc PlatformUninstall(PlatformUninstallRequest) returns (stream PlatformUninstallResponse);
 
   // Upgrade an installed platform to the latest version.
-  rpc PlatformUpgrade(PlatformUpgradeRequest)
-      returns (stream PlatformUpgradeResponse);
+  rpc PlatformUpgrade(PlatformUpgradeRequest) returns (stream PlatformUpgradeResponse);
 
   // Upload a compiled sketch to a board.
   rpc Upload(UploadRequest) returns (stream UploadResponse);
 
   // Upload a compiled sketch to a board using a programmer.
-  rpc UploadUsingProgrammer(UploadUsingProgrammerRequest)
-      returns (stream UploadUsingProgrammerResponse);
+  rpc UploadUsingProgrammer(UploadUsingProgrammerRequest) returns (stream UploadUsingProgrammerResponse);
 
   // Returns the list of users fields necessary to upload to that board
   // using the specified protocol.
-  rpc SupportedUserFields(SupportedUserFieldsRequest)
-      returns (SupportedUserFieldsResponse);
+  rpc SupportedUserFields(SupportedUserFieldsRequest) returns (SupportedUserFieldsResponse);
 
   // List programmers available for a board.
-  rpc ListProgrammersAvailableForUpload(
-      ListProgrammersAvailableForUploadRequest)
-      returns (ListProgrammersAvailableForUploadResponse);
+  rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadRequest) returns (ListProgrammersAvailableForUploadResponse);
 
   // Burn bootloader to a board.
-  rpc BurnBootloader(BurnBootloaderRequest)
-      returns (stream BurnBootloaderResponse);
+  rpc BurnBootloader(BurnBootloaderRequest) returns (stream BurnBootloaderResponse);
 
   // Search for a platform in the platforms indexes.
   rpc PlatformSearch(PlatformSearchRequest) returns (PlatformSearchResponse);
 
   // Download the archive file of an Arduino library in the libraries index to
   // the staging directory.
-  rpc LibraryDownload(LibraryDownloadRequest)
-      returns (stream LibraryDownloadResponse);
+  rpc LibraryDownload(LibraryDownloadRequest) returns (stream LibraryDownloadResponse);
 
   // Download and install an Arduino library from the libraries index.
-  rpc LibraryInstall(LibraryInstallRequest)
-      returns (stream LibraryInstallResponse);
+  rpc LibraryInstall(LibraryInstallRequest) returns (stream LibraryInstallResponse);
 
   // Upgrade a library to the newest version available.
-  rpc LibraryUpgrade(LibraryUpgradeRequest)
-      returns (stream LibraryUpgradeResponse);
+  rpc LibraryUpgrade(LibraryUpgradeRequest) returns (stream LibraryUpgradeResponse);
 
   // Install a library from a Zip File
-  rpc ZipLibraryInstall(ZipLibraryInstallRequest)
-      returns (stream ZipLibraryInstallResponse);
+  rpc ZipLibraryInstall(ZipLibraryInstallRequest) returns (stream ZipLibraryInstallResponse);
 
   // Download and install a library from a git url
-  rpc GitLibraryInstall(GitLibraryInstallRequest)
-      returns (stream GitLibraryInstallResponse);
+  rpc GitLibraryInstall(GitLibraryInstallRequest) returns (stream GitLibraryInstallResponse);
 
   // Uninstall an Arduino library.
-  rpc LibraryUninstall(LibraryUninstallRequest)
-      returns (stream LibraryUninstallResponse);
+  rpc LibraryUninstall(LibraryUninstallRequest) returns (stream LibraryUninstallResponse);
 
   // Upgrade all installed Arduino libraries to the newest version available.
-  rpc LibraryUpgradeAll(LibraryUpgradeAllRequest)
-      returns (stream LibraryUpgradeAllResponse);
+  rpc LibraryUpgradeAll(LibraryUpgradeAllRequest) returns (stream LibraryUpgradeAllResponse);
 
   // List the recursive dependencies of a library, as defined by the `depends`
   // field of the library.properties files.
-  rpc LibraryResolveDependencies(LibraryResolveDependenciesRequest)
-      returns (LibraryResolveDependenciesResponse);
+  rpc LibraryResolveDependencies(LibraryResolveDependenciesRequest) returns (LibraryResolveDependenciesResponse);
 
   // Search the Arduino libraries index for libraries.
   rpc LibrarySearch(LibrarySearchRequest) returns (LibrarySearchResponse);
@@ -177,49 +156,39 @@ service ArduinoCoreService {
   rpc Monitor(stream MonitorRequest) returns (stream MonitorResponse);
 
   // Returns the parameters that can be set in the MonitorRequest calls
-  rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest)
-      returns (EnumerateMonitorPortSettingsResponse);
+  rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest) returns (EnumerateMonitorPortSettingsResponse);
 
   // Start a debug session and communicate with the debugger tool.
   rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
 
   // Determine if debugging is suported given a specific configuration.
-  rpc IsDebugSupported(IsDebugSupportedRequest)
-      returns (IsDebugSupportedResponse) {}
+  rpc IsDebugSupported(IsDebugSupportedRequest) returns (IsDebugSupportedResponse) {}
 
   // Query the debugger information given a specific configuration.
   rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
 
   // Check for updates to the Arduino CLI.
-  rpc CheckForArduinoCLIUpdates(CheckForArduinoCLIUpdatesRequest)
-      returns (CheckForArduinoCLIUpdatesResponse);
+  rpc CheckForArduinoCLIUpdates(CheckForArduinoCLIUpdatesRequest) returns (CheckForArduinoCLIUpdatesResponse);
 
   // Clean the download cache directory (where archives are downloaded).
-  rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest)
-      returns (CleanDownloadCacheDirectoryResponse);
+  rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest) returns (CleanDownloadCacheDirectoryResponse);
 
   // Writes the settings currently stored in memory in a YAML file
-  rpc ConfigurationSave(ConfigurationSaveRequest)
-      returns (ConfigurationSaveResponse);
+  rpc ConfigurationSave(ConfigurationSaveRequest) returns (ConfigurationSaveResponse);
 
   // Read the settings from a YAML file
-  rpc ConfigurationOpen(ConfigurationOpenRequest)
-      returns (ConfigurationOpenResponse);
+  rpc ConfigurationOpen(ConfigurationOpenRequest) returns (ConfigurationOpenResponse);
 
-  rpc ConfigurationGet(ConfigurationGetRequest)
-      returns (ConfigurationGetResponse);
+  rpc ConfigurationGet(ConfigurationGetRequest) returns (ConfigurationGetResponse);
 
   // Enumerate all the keys/values pairs available in the configuration
-  rpc SettingsEnumerate(SettingsEnumerateRequest)
-      returns (SettingsEnumerateResponse);
+  rpc SettingsEnumerate(SettingsEnumerateRequest) returns (SettingsEnumerateResponse);
 
   // Get a single configuration value
-  rpc SettingsGetValue(SettingsGetValueRequest)
-      returns (SettingsGetValueResponse);
+  rpc SettingsGetValue(SettingsGetValueRequest) returns (SettingsGetValueResponse);
 
   // Set a single configuration value
-  rpc SettingsSetValue(SettingsSetValueRequest)
-      returns (SettingsSetValueResponse);
+  rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse);
 }
 
 message CreateRequest {}
