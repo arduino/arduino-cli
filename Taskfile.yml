@@ -243,7 +243,8 @@ tasks:
   protoc:docs:
     desc: Generate docs for protobuf definitions
     cmds:
-      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/cc/arduino/cli/commands/v1/*.proto'
+      - |
+        buf generate --template buf.doc.gen.yaml
 
   docs:include-configuration-json-schema:
     desc: Copy configuration JSON schema to make it available in documentation
