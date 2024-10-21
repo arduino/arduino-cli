@@ -133,8 +133,11 @@ message BuilderResult {
 }
 
 message ExecutableSectionSize {
+  // The name of the section.
   string name = 1;
+  // The used size of the section in bytes.
   int64 size = 2;
+  // The maximum size of the section in bytes.
   int64 max_size = 3;
 }
 

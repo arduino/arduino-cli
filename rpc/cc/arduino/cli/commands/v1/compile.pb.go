@@ -592,9 +592,12 @@ type ExecutableSectionSize struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name    string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Size    int64  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	MaxSize int64  `protobuf:"varint,3,opt,name=max_size,json=maxSize,proto3" json:"max_size,omitempty"`
+	// The name of the section.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The used size of the section in bytes.
+	Size int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	// The maximum size of the section in bytes.
+	MaxSize int64 `protobuf:"varint,3,opt,name=max_size,json=maxSize,proto3" json:"max_size,omitempty"`
 }
 
 func (x *ExecutableSectionSize) Reset() {

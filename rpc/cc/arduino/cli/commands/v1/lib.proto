@@ -60,6 +60,7 @@ message LibraryInstallRequest {
   LibraryInstallLocation install_location = 6;
 }
 
+// Represent a library installation location.
 enum LibraryInstallLocation {
   // In the `libraries` subdirectory of the user directory (sketchbook). This is
   // the default if not specified.
@@ -183,6 +184,7 @@ message LibrarySearchRequest {
   string search_args = 3;
 }
 
+// Represent the result of the library search.
 enum LibrarySearchStatus {
   // No search results were found.
   LIBRARY_SEARCH_STATUS_FAILED = 0;
@@ -355,6 +357,7 @@ message Library {
   bool in_development = 29;
 }
 
+// Represent the library layout.
 enum LibraryLayout {
   // Library is in the 1.0 Arduino library format.
   LIBRARY_LAYOUT_FLAT = 0;
@@ -362,6 +365,7 @@ enum LibraryLayout {
   LIBRARY_LAYOUT_RECURSIVE = 1;
 }
 
+// Represent the location of the library.
 enum LibraryLocation {
   // In the configured 'builtin.libraries' directory.
   LIBRARY_LOCATION_BUILTIN = 0;

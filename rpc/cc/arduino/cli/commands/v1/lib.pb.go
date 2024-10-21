@@ -36,6 +36,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Represent a library installation location.
 type LibraryInstallLocation int32
 
 const (
@@ -85,6 +86,7 @@ func (LibraryInstallLocation) EnumDescriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_lib_proto_rawDescGZIP(), []int{0}
 }
 
+// Represent the result of the library search.
 type LibrarySearchStatus int32
 
 const (
@@ -133,6 +135,7 @@ func (LibrarySearchStatus) EnumDescriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_lib_proto_rawDescGZIP(), []int{1}
 }
 
+// Represent the library layout.
 type LibraryLayout int32
 
 const (
@@ -181,6 +184,7 @@ func (LibraryLayout) EnumDescriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_lib_proto_rawDescGZIP(), []int{2}
 }
 
+// Represent the location of the library.
 type LibraryLocation int32
 
 const (

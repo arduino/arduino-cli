@@ -168,16 +168,21 @@ message BurnBootloaderResponse {
 }
 
 message ListProgrammersAvailableForUploadRequest {
+  // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
   string fqbn = 2;
 }
 
 message ListProgrammersAvailableForUploadResponse {
+  // List of programmers supported by the board.
   repeated Programmer programmers = 1;
 }
 
 message SupportedUserFieldsRequest {
+  // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
   string fqbn = 2;
   // Protocol that will be used to upload, this information is
   // necessary to pick the right upload tool for the board specified

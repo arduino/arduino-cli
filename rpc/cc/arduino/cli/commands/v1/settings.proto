@@ -83,17 +83,28 @@ message Configuration {
     bool enable_notification = 1;
   }
 
+  // The directories configuration.
   Directories directories = 1;
+  // The network configuration.
   Network network = 2;
+  // The sketch configuration.
   Sketch sketch = 3;
+  // The build cache configuration.
   BuildCache build_cache = 4;
+  // The board manager configuration.
   BoardManager board_manager = 5;
+  // The daemon configuration.
   Daemon daemon = 6;
+  // The console output configuration.
   Output output = 7;
+  // The logging configuration.
   Logging logging = 8;
+  // The library configuration.
   Library library = 9;
+  // The updater configuration.
   Updater updater = 10;
 
+  // The language locale to use.
   optional string locale = 100;
 }
 

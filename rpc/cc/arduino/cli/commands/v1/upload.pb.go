@@ -838,8 +838,10 @@ type ListProgrammersAvailableForUploadRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Arduino Core Service instance from the `Init` response.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Fqbn     string    `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
 }
 
 func (x *ListProgrammersAvailableForUploadRequest) Reset() {
@@ -893,6 +895,7 @@ type ListProgrammersAvailableForUploadResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// List of programmers supported by the board.
 	Programmers []*Programmer `protobuf:"bytes,1,rep,name=programmers,proto3" json:"programmers,omitempty"`
 }
 
@@ -940,8 +943,10 @@ type SupportedUserFieldsRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Arduino Core Service instance from the `Init` response.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Fqbn     string    `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
 	// Protocol that will be used to upload, this information is
 	// necessary to pick the right upload tool for the board specified
 	// with the FQBN.

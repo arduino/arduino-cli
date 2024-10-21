@@ -179,6 +179,7 @@ service ArduinoCoreService {
   // Read the settings from a YAML file
   rpc ConfigurationOpen(ConfigurationOpenRequest) returns (ConfigurationOpenResponse);
 
+  // Get the current configuration
   rpc ConfigurationGet(ConfigurationGetRequest) returns (ConfigurationGetResponse);
 
   // Enumerate all the keys/values pairs available in the configuration
@@ -201,7 +202,7 @@ message CreateResponse {
 message InitRequest {
   // An Arduino Core instance.
   Instance instance = 1;
-  // Profile to use
+  // Profile to use.
   string profile = 2;
   // The path where the sketch is stored
   string sketch_path = 3;
@@ -215,13 +216,16 @@ message InitResponse {
     TaskProgress task_progress = 2;
   }
   oneof message {
+    // The initialization progress.
     Progress init_progress = 1;
+    // The error in case the initialization failed.
     google.rpc.Status error = 2;
     // Selected profile information
     SketchProfile profile = 3;
   }
 }
 
+// Represent the reason why an instance initialization failed.
 enum FailedInstanceInitReason {
   // FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized
   FAILED_INSTANCE_INIT_REASON_UNSPECIFIED = 0;
@@ -297,6 +301,7 @@ message UpdateLibrariesIndexResponse {
 }
 
 message IndexUpdateReport {
+  // The status represents the result of the index update.
   enum Status {
     // The status of the index update is unspecified.
     STATUS_UNSPECIFIED = 0;

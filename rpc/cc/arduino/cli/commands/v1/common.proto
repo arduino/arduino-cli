@@ -27,8 +27,11 @@ message Instance {
 
 message DownloadProgress {
   oneof message {
+    // Sent when a download is started.
     DownloadProgressStart start = 1;
+    // Progress updates for a download.
     DownloadProgressUpdate update = 2;
+    // Sent when a download is finished or failed.
     DownloadProgressEnd end = 3;
   }
 }
@@ -214,7 +217,9 @@ message MonitorPortConfiguration {
 }
 
 message MonitorPortSetting {
+  // The setting identifier
   string setting_id = 1;
+  // The setting value
   string value = 2;
 }
 

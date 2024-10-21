@@ -283,8 +283,9 @@ type PlatformDownloadRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Arduino Core Service instance from the `Init` response.
-	Instance        *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	PlatformPackage string    `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Vendor name of the platform (e.g., `arduino`).
+	PlatformPackage string `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
 	// Architecture name of the platform (e.g., `avr`).
 	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
 	// Platform version to download.

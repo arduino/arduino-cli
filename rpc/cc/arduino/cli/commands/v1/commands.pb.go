@@ -37,6 +37,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Represent the reason why an instance initialization failed.
 type FailedInstanceInitReason int32
 
 const (
@@ -100,6 +101,7 @@ func (FailedInstanceInitReason) EnumDescriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_commands_proto_rawDescGZIP(), []int{0}
 }
 
+// The status represents the result of the index update.
 type IndexUpdateReport_Status int32
 
 const (
@@ -253,7 +255,7 @@ type InitRequest struct {
 
 	// An Arduino Core instance.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	// Profile to use
+	// Profile to use.
 	Profile string `protobuf:"bytes,2,opt,name=profile,proto3" json:"profile,omitempty"`
 	// The path where the sketch is stored
 	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
@@ -390,10 +392,12 @@ type isInitResponse_Message interface {
 }
 
 type InitResponse_InitProgress struct {
+	// The initialization progress.
 	InitProgress *InitResponse_Progress `protobuf:"bytes,1,opt,name=init_progress,json=initProgress,proto3,oneof"`
 }
 
 type InitResponse_Error struct {
+	// The error in case the initialization failed.
 	Error *status.Status `protobuf:"bytes,2,opt,name=error,proto3,oneof"`
 }
 

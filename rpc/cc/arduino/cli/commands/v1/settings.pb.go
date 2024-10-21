@@ -43,17 +43,28 @@ type Configuration struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Directories  *Configuration_Directories  `protobuf:"bytes,1,opt,name=directories,proto3" json:"directories,omitempty"`
-	Network      *Configuration_Network      `protobuf:"bytes,2,opt,name=network,proto3" json:"network,omitempty"`
-	Sketch       *Configuration_Sketch       `protobuf:"bytes,3,opt,name=sketch,proto3" json:"sketch,omitempty"`
-	BuildCache   *Configuration_BuildCache   `protobuf:"bytes,4,opt,name=build_cache,json=buildCache,proto3" json:"build_cache,omitempty"`
+	// The directories configuration.
+	Directories *Configuration_Directories `protobuf:"bytes,1,opt,name=directories,proto3" json:"directories,omitempty"`
+	// The network configuration.
+	Network *Configuration_Network `protobuf:"bytes,2,opt,name=network,proto3" json:"network,omitempty"`
+	// The sketch configuration.
+	Sketch *Configuration_Sketch `protobuf:"bytes,3,opt,name=sketch,proto3" json:"sketch,omitempty"`
+	// The build cache configuration.
+	BuildCache *Configuration_BuildCache `protobuf:"bytes,4,opt,name=build_cache,json=buildCache,proto3" json:"build_cache,omitempty"`
+	// The board manager configuration.
 	BoardManager *Configuration_BoardManager `protobuf:"bytes,5,opt,name=board_manager,json=boardManager,proto3" json:"board_manager,omitempty"`
-	Daemon       *Configuration_Daemon       `protobuf:"bytes,6,opt,name=daemon,proto3" json:"daemon,omitempty"`
-	Output       *Configuration_Output       `protobuf:"bytes,7,opt,name=output,proto3" json:"output,omitempty"`
-	Logging      *Configuration_Logging      `protobuf:"bytes,8,opt,name=logging,proto3" json:"logging,omitempty"`
-	Library      *Configuration_Library      `protobuf:"bytes,9,opt,name=library,proto3" json:"library,omitempty"`
-	Updater      *Configuration_Updater      `protobuf:"bytes,10,opt,name=updater,proto3" json:"updater,omitempty"`
-	Locale       *string                     `protobuf:"bytes,100,opt,name=locale,proto3,oneof" json:"locale,omitempty"`
+	// The daemon configuration.
+	Daemon *Configuration_Daemon `protobuf:"bytes,6,opt,name=daemon,proto3" json:"daemon,omitempty"`
+	// The console output configuration.
+	Output *Configuration_Output `protobuf:"bytes,7,opt,name=output,proto3" json:"output,omitempty"`
+	// The logging configuration.
+	Logging *Configuration_Logging `protobuf:"bytes,8,opt,name=logging,proto3" json:"logging,omitempty"`
+	// The library configuration.
+	Library *Configuration_Library `protobuf:"bytes,9,opt,name=library,proto3" json:"library,omitempty"`
+	// The updater configuration.
+	Updater *Configuration_Updater `protobuf:"bytes,10,opt,name=updater,proto3" json:"updater,omitempty"`
+	// The language locale to use.
+	Locale *string `protobuf:"bytes,100,opt,name=locale,proto3,oneof" json:"locale,omitempty"`
 }
 
 func (x *Configuration) Reset() {

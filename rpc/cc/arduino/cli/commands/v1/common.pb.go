@@ -162,14 +162,17 @@ type isDownloadProgress_Message interface {
 }
 
 type DownloadProgress_Start struct {
+	// Sent when a download is started.
 	Start *DownloadProgressStart `protobuf:"bytes,1,opt,name=start,proto3,oneof"`
 }
 
 type DownloadProgress_Update struct {
+	// Progress updates for a download.
 	Update *DownloadProgressUpdate `protobuf:"bytes,2,opt,name=update,proto3,oneof"`
 }
 
 type DownloadProgress_End struct {
+	// Sent when a download is finished or failed.
 	End *DownloadProgressEnd `protobuf:"bytes,3,opt,name=end,proto3,oneof"`
 }
 
@@ -1289,8 +1292,10 @@ type MonitorPortSetting struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The setting identifier
 	SettingId string `protobuf:"bytes,1,opt,name=setting_id,json=settingId,proto3" json:"setting_id,omitempty"`
-	Value     string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	// The setting value
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (x *MonitorPortSetting) Reset() {
