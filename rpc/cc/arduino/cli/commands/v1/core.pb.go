@@ -50,13 +50,13 @@ type PlatformInstallRequest struct {
 	// Platform version to install.
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	// Set to true to not run (eventual) post install scripts for trusted
-	// platforms
+	// platforms.
 	SkipPostInstall bool `protobuf:"varint,5,opt,name=skip_post_install,json=skipPostInstall,proto3" json:"skip_post_install,omitempty"`
 	// Set to true to skip installation if a different version of the platform
 	// is already installed.
 	NoOverwrite bool `protobuf:"varint,6,opt,name=no_overwrite,json=noOverwrite,proto3" json:"no_overwrite,omitempty"`
 	// Set to true to not run (eventual) pre uninstall scripts for trusted
-	// platforms when performing platform upgrades
+	// platforms when performing platform upgrades.
 	SkipPreUninstall bool `protobuf:"varint,7,opt,name=skip_pre_uninstall,json=skipPreUninstall,proto3" json:"skip_pre_uninstall,omitempty"`
 }
 
@@ -447,7 +447,7 @@ type PlatformUninstallRequest struct {
 	// Architecture name of the platform (e.g., `avr`).
 	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
 	// Set to true to not run (eventual) pre uninstall scripts for trusted
-	// platforms
+	// platforms.
 	SkipPreUninstall bool `protobuf:"varint,4,opt,name=skip_pre_uninstall,json=skipPreUninstall,proto3" json:"skip_pre_uninstall,omitempty"`
 }
 
@@ -646,10 +646,10 @@ type PlatformUpgradeRequest struct {
 	// Architecture name of the platform (e.g., `avr`).
 	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
 	// Set to true to not run (eventual) post install scripts for trusted
-	// platforms
+	// platforms.
 	SkipPostInstall bool `protobuf:"varint,4,opt,name=skip_post_install,json=skipPostInstall,proto3" json:"skip_post_install,omitempty"`
 	// Set to true to not run (eventual) pre uninstall scripts for trusted
-	// platforms when performing platform upgrades
+	// platforms when performing platform upgrades.
 	SkipPreUninstall bool `protobuf:"varint,5,opt,name=skip_pre_uninstall,json=skipPreUninstall,proto3" json:"skip_pre_uninstall,omitempty"`
 }
 

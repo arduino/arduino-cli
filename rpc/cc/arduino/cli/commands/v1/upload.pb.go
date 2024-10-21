@@ -285,7 +285,7 @@ type UploadResponse_ErrStream struct {
 }
 
 type UploadResponse_Result struct {
-	// The upload result
+	// The upload result.
 	Result *UploadResult `protobuf:"bytes,3,opt,name=result,proto3,oneof"`
 }
 
@@ -1011,14 +1011,14 @@ type UserField struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Id of the tool that supports this field
+	// Id of the tool that supports this field.
 	ToolId string `protobuf:"bytes,1,opt,name=tool_id,json=toolId,proto3" json:"tool_id,omitempty"`
-	// Name used internally to store and retrieve this field
+	// Name used internally to store and retrieve this field.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Label is the text shown to the user when they need to input this field
+	// Label is the text shown to the user when they need to input this field.
 	Label string `protobuf:"bytes,3,opt,name=label,proto3" json:"label,omitempty"`
 	// True if the value of the field must not be shown when typing, for example
-	// when the user inputs a network password
+	// when the user inputs a network password.
 	Secret bool `protobuf:"varint,4,opt,name=secret,proto3" json:"secret,omitempty"`
 }
 

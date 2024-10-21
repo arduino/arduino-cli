@@ -301,10 +301,10 @@ type DownloadProgressEnd struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// True if the download is successful
+	// True if the download is successful.
 	Success bool `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	// Info or error message, depending on the value of 'success'. Some examples:
-	// "File xxx already downloaded" or "Connection timeout"
+	// "File xxx already downloaded" or "Connection timeout".
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 }
 
@@ -365,7 +365,7 @@ type TaskProgress struct {
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	// Whether the task is complete.
 	Completed bool `protobuf:"varint,3,opt,name=completed,proto3" json:"completed,omitempty"`
-	// Amount in percent of the task completion (optional)
+	// Amount in percent of the task completion (optional).
 	Percent float32 `protobuf:"fixed32,4,opt,name=percent,proto3" json:"percent,omitempty"`
 }
 
@@ -434,11 +434,11 @@ type Programmer struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Platform name
+	// Platform name.
 	Platform string `protobuf:"bytes,1,opt,name=platform,proto3" json:"platform,omitempty"`
-	// Programmer ID
+	// Programmer ID.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// Programmer name
+	// Programmer name.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 }
 
@@ -542,9 +542,9 @@ type Platform struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Generic information about a platform
+	// Generic information about a platform.
 	Metadata *PlatformMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	// Information about a specific release of a platform
+	// Information about a specific release of a platform.
 	Release *PlatformRelease `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
 }
 
@@ -601,11 +601,11 @@ type PlatformSummary struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Generic information about a platform
+	// Generic information about a platform.
 	Metadata *PlatformMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	// Maps version to the corresponding PlatformRelease
+	// Maps version to the corresponding PlatformRelease.
 	Releases map[string]*PlatformRelease `protobuf:"bytes,2,rep,name=releases,proto3" json:"releases,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// The installed version of the platform, or empty string if none installed
+	// The installed version of the platform, or empty string if none installed.
 	InstalledVersion string `protobuf:"bytes,3,opt,name=installed_version,json=installedVersion,proto3" json:"installed_version,omitempty"`
 	// The latest available version of the platform that can be installable, or
 	// empty if none available.
@@ -689,11 +689,11 @@ type PlatformMetadata struct {
 	// Email of the maintainer of the platform's package.
 	Email string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
 	// If true this Platform has been installed manually in the user' sketchbook
-	// hardware folder
+	// hardware folder.
 	ManuallyInstalled bool `protobuf:"varint,5,opt,name=manually_installed,json=manuallyInstalled,proto3" json:"manually_installed,omitempty"`
-	// True if the latest release of this Platform has been deprecated
+	// True if the latest release of this Platform has been deprecated.
 	Deprecated bool `protobuf:"varint,6,opt,name=deprecated,proto3" json:"deprecated,omitempty"`
-	// If true the platform is indexed
+	// If true the platform is indexed.
 	Indexed bool `protobuf:"varint,7,opt,name=indexed,proto3" json:"indexed,omitempty"`
 }
 
@@ -786,11 +786,11 @@ type PlatformRelease struct {
 
 	// Name used to identify the platform to humans (e.g., "Arduino AVR Boards").
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Version of the platform release
+	// Version of the platform release.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	// Type of the platform.
 	Types []string `protobuf:"bytes,3,rep,name=types,proto3" json:"types,omitempty"`
-	// True if the platform is installed
+	// True if the platform is installed.
 	Installed bool `protobuf:"varint,4,opt,name=installed,proto3" json:"installed,omitempty"`
 	// List of boards provided by the platform. If the platform is installed,
 	// this is the boards listed in the platform's boards.txt. If the platform is
@@ -807,7 +807,7 @@ type PlatformRelease struct {
 	// may need to be reinstalled. This should be evaluated only when the
 	// PlatformRelease is `Installed` otherwise is an undefined behaviour.
 	MissingMetadata bool `protobuf:"varint,7,opt,name=missing_metadata,json=missingMetadata,proto3" json:"missing_metadata,omitempty"`
-	// True this release is deprecated
+	// True this release is deprecated.
 	Deprecated bool `protobuf:"varint,8,opt,name=deprecated,proto3" json:"deprecated,omitempty"`
 	// True if the platform dependencies are available for the current OS/ARCH.
 	// This also means that the platform is installable.
@@ -918,9 +918,9 @@ type InstalledPlatformReference struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Version of the platform.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	// Installation directory of the platform
+	// Installation directory of the platform.
 	InstallDir string `protobuf:"bytes,3,opt,name=install_dir,json=installDir,proto3" json:"install_dir,omitempty"`
-	// 3rd party platform URL
+	// 3rd party platform URL.
 	PackageUrl string `protobuf:"bytes,4,opt,name=package_url,json=packageUrl,proto3" json:"package_url,omitempty"`
 }
 
@@ -1096,30 +1096,30 @@ type Sketch struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Absolute path to a main sketch files
+	// Absolute path to a main sketch files.
 	MainFile string `protobuf:"bytes,1,opt,name=main_file,json=mainFile,proto3" json:"main_file,omitempty"`
-	// Absolute path to folder that contains main_file
+	// Absolute path to folder that contains main_file.
 	LocationPath string `protobuf:"bytes,2,opt,name=location_path,json=locationPath,proto3" json:"location_path,omitempty"`
-	// List of absolute paths to other sketch files
+	// List of absolute paths to other sketch files.
 	OtherSketchFiles []string `protobuf:"bytes,3,rep,name=other_sketch_files,json=otherSketchFiles,proto3" json:"other_sketch_files,omitempty"`
-	// List of absolute paths to additional sketch files
+	// List of absolute paths to additional sketch files.
 	AdditionalFiles []string `protobuf:"bytes,4,rep,name=additional_files,json=additionalFiles,proto3" json:"additional_files,omitempty"`
 	// List of absolute paths to supported files in the sketch root folder, main
-	// file excluded
+	// file excluded.
 	RootFolderFiles []string `protobuf:"bytes,5,rep,name=root_folder_files,json=rootFolderFiles,proto3" json:"root_folder_files,omitempty"`
-	// Default FQBN set in project file (sketch.yaml)
+	// Default FQBN set in project file (sketch.yaml).
 	DefaultFqbn string `protobuf:"bytes,6,opt,name=default_fqbn,json=defaultFqbn,proto3" json:"default_fqbn,omitempty"`
-	// Default Port set in project file (sketch.yaml)
+	// Default Port set in project file (sketch.yaml).
 	DefaultPort string `protobuf:"bytes,7,opt,name=default_port,json=defaultPort,proto3" json:"default_port,omitempty"`
-	// Default Protocol set in project file (sketch.yaml)
+	// Default Protocol set in project file (sketch.yaml).
 	DefaultProtocol string `protobuf:"bytes,8,opt,name=default_protocol,json=defaultProtocol,proto3" json:"default_protocol,omitempty"`
-	// List of profiles present in the project file (sketch.yaml)
+	// List of profiles present in the project file (sketch.yaml).
 	Profiles []*SketchProfile `protobuf:"bytes,9,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	// Default profile set in the project file (sketch.yaml)
+	// Default profile set in the project file (sketch.yaml).
 	DefaultProfile *SketchProfile `protobuf:"bytes,10,opt,name=default_profile,json=defaultProfile,proto3" json:"default_profile,omitempty"`
-	// Default Programmer set in project file (sketch.yaml)
+	// Default Programmer set in project file (sketch.yaml).
 	DefaultProgrammer string `protobuf:"bytes,11,opt,name=default_programmer,json=defaultProgrammer,proto3" json:"default_programmer,omitempty"`
-	// Default Port configuration set in project file (sketch.yaml)
+	// Default Port configuration set in project file (sketch.yaml).
 	DefaultPortConfig *MonitorPortConfiguration `protobuf:"bytes,12,opt,name=default_port_config,json=defaultPortConfig,proto3" json:"default_port_config,omitempty"`
 }
 
@@ -1244,7 +1244,7 @@ type MonitorPortConfiguration struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The port configuration parameters
+	// The port configuration parameters.
 	Settings []*MonitorPortSetting `protobuf:"bytes,1,rep,name=settings,proto3" json:"settings,omitempty"`
 }
 
@@ -1292,9 +1292,9 @@ type MonitorPortSetting struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The setting identifier
+	// The setting identifier.
 	SettingId string `protobuf:"bytes,1,opt,name=setting_id,json=settingId,proto3" json:"setting_id,omitempty"`
-	// The setting value
+	// The setting value.
 	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -1349,17 +1349,17 @@ type SketchProfile struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Name of the profile
+	// Name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// FQBN used by the profile
+	// FQBN used by the profile.
 	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	// Programmer used by the profile
+	// Programmer used by the profile.
 	Programmer string `protobuf:"bytes,3,opt,name=programmer,proto3" json:"programmer,omitempty"`
-	// Default Port in this profile
+	// Default Port in this profile.
 	Port string `protobuf:"bytes,4,opt,name=port,proto3" json:"port,omitempty"`
-	// Default Port configuration set in project file (sketch.yaml)
+	// Default Port configuration set in project file (sketch.yaml).
 	PortConfig *MonitorPortConfiguration `protobuf:"bytes,5,opt,name=port_config,json=portConfig,proto3" json:"port_config,omitempty"`
-	// Default Protocol in this profile
+	// Default Protocol in this profile.
 	Protocol string `protobuf:"bytes,6,opt,name=protocol,proto3" json:"protocol,omitempty"`
 }
 

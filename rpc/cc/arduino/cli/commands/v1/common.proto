@@ -51,10 +51,10 @@ message DownloadProgressUpdate {
 }
 
 message DownloadProgressEnd {
-  // True if the download is successful
+  // True if the download is successful.
   bool success = 1;
   // Info or error message, depending on the value of 'success'. Some examples:
-  // "File xxx already downloaded" or "Connection timeout"
+  // "File xxx already downloaded" or "Connection timeout".
   string message = 2;
 }
 
@@ -65,16 +65,16 @@ message TaskProgress {
   string message = 2;
   // Whether the task is complete.
   bool completed = 3;
-  // Amount in percent of the task completion (optional)
+  // Amount in percent of the task completion (optional).
   float percent = 4;
 }
 
 message Programmer {
-  // Platform name
+  // Platform name.
   string platform = 1;
-  // Programmer ID
+  // Programmer ID.
   string id = 2;
-  // Programmer name
+  // Programmer name.
   string name = 3;
 }
 
@@ -85,20 +85,20 @@ message MissingProgrammerError {}
 // Platform is a structure containing all the information about a single
 // platform release.
 message Platform {
-  // Generic information about a platform
+  // Generic information about a platform.
   PlatformMetadata metadata = 1;
-  // Information about a specific release of a platform
+  // Information about a specific release of a platform.
   PlatformRelease release = 2;
 }
 
 // PlatformSummary is a structure containing all the information about
 // a platform and all its available releases.
 message PlatformSummary {
-  // Generic information about a platform
+  // Generic information about a platform.
   PlatformMetadata metadata = 1;
-  // Maps version to the corresponding PlatformRelease
+  // Maps version to the corresponding PlatformRelease.
   map<string, PlatformRelease> releases = 2;
-  // The installed version of the platform, or empty string if none installed
+  // The installed version of the platform, or empty string if none installed.
   string installed_version = 3;
   // The latest available version of the platform that can be installable, or
   // empty if none available.
@@ -118,11 +118,11 @@ message PlatformMetadata {
   // Email of the maintainer of the platform's package.
   string email = 4;
   // If true this Platform has been installed manually in the user' sketchbook
-  // hardware folder
+  // hardware folder.
   bool manually_installed = 5;
-  // True if the latest release of this Platform has been deprecated
+  // True if the latest release of this Platform has been deprecated.
   bool deprecated = 6;
-  // If true the platform is indexed
+  // If true the platform is indexed.
   bool indexed = 7;
 }
 
@@ -130,11 +130,11 @@ message PlatformMetadata {
 message PlatformRelease {
   // Name used to identify the platform to humans (e.g., "Arduino AVR Boards").
   string name = 1;
-  // Version of the platform release
+  // Version of the platform release.
   string version = 2;
   // Type of the platform.
   repeated string types = 3;
-  // True if the platform is installed
+  // True if the platform is installed.
   bool installed = 4;
   // List of boards provided by the platform. If the platform is installed,
   // this is the boards listed in the platform's boards.txt. If the platform is
@@ -151,7 +151,7 @@ message PlatformRelease {
   // may need to be reinstalled. This should be evaluated only when the
   // PlatformRelease is `Installed` otherwise is an undefined behaviour.
   bool missing_metadata = 7;
-  // True this release is deprecated
+  // True this release is deprecated.
   bool deprecated = 8;
   // True if the platform dependencies are available for the current OS/ARCH.
   // This also means that the platform is installable.
@@ -163,9 +163,9 @@ message InstalledPlatformReference {
   string id = 1;
   // Version of the platform.
   string version = 2;
-  // Installation directory of the platform
+  // Installation directory of the platform.
   string install_dir = 3;
-  // 3rd party platform URL
+  // 3rd party platform URL.
   string package_url = 4;
 }
 
@@ -184,56 +184,56 @@ message HelpResources {
 }
 
 message Sketch {
-  // Absolute path to a main sketch files
+  // Absolute path to a main sketch files.
   string main_file = 1;
-  // Absolute path to folder that contains main_file
+  // Absolute path to folder that contains main_file.
   string location_path = 2;
-  // List of absolute paths to other sketch files
+  // List of absolute paths to other sketch files.
   repeated string other_sketch_files = 3;
-  // List of absolute paths to additional sketch files
+  // List of absolute paths to additional sketch files.
   repeated string additional_files = 4;
   // List of absolute paths to supported files in the sketch root folder, main
-  // file excluded
+  // file excluded.
   repeated string root_folder_files = 5;
-  // Default FQBN set in project file (sketch.yaml)
+  // Default FQBN set in project file (sketch.yaml).
   string default_fqbn = 6;
-  // Default Port set in project file (sketch.yaml)
+  // Default Port set in project file (sketch.yaml).
   string default_port = 7;
-  // Default Protocol set in project file (sketch.yaml)
+  // Default Protocol set in project file (sketch.yaml).
   string default_protocol = 8;
-  // List of profiles present in the project file (sketch.yaml)
+  // List of profiles present in the project file (sketch.yaml).
   repeated SketchProfile profiles = 9;
-  // Default profile set in the project file (sketch.yaml)
+  // Default profile set in the project file (sketch.yaml).
   SketchProfile default_profile = 10;
-  // Default Programmer set in project file (sketch.yaml)
+  // Default Programmer set in project file (sketch.yaml).
   string default_programmer = 11;
-  // Default Port configuration set in project file (sketch.yaml)
+  // Default Port configuration set in project file (sketch.yaml).
   MonitorPortConfiguration default_port_config = 12;
 }
 
 message MonitorPortConfiguration {
-  // The port configuration parameters
+  // The port configuration parameters.
   repeated MonitorPortSetting settings = 1;
 }
 
 message MonitorPortSetting {
-  // The setting identifier
+  // The setting identifier.
   string setting_id = 1;
-  // The setting value
+  // The setting value.
   string value = 2;
 }
 
 message SketchProfile {
-  // Name of the profile
+  // Name of the profile.
   string name = 1;
-  // FQBN used by the profile
+  // FQBN used by the profile.
   string fqbn = 2;
-  // Programmer used by the profile
+  // Programmer used by the profile.
   string programmer = 3;
-  // Default Port in this profile
+  // Default Port in this profile.
   string port = 4;
-  // Default Port configuration set in project file (sketch.yaml)
+  // Default Port configuration set in project file (sketch.yaml).
   MonitorPortConfiguration port_config = 5;
-  // Default Protocol in this profile
+  // Default Protocol in this profile.
   string protocol = 6;
 }

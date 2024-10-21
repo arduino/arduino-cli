@@ -31,34 +31,34 @@ import "google/rpc/status.proto";
 
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
-// The main Arduino Platform service API
+// The main Arduino Platform service API.
 service ArduinoCoreService {
-  // Create a new Arduino Core instance
+  // Create a new Arduino Core instance.
   rpc Create(CreateRequest) returns (CreateResponse) {}
 
   // Initializes an existing Arduino Core instance by loading platforms and
-  // libraries
+  // libraries.
   rpc Init(InitRequest) returns (stream InitResponse) {}
 
-  // Destroy an instance of the Arduino Core Service
+  // Destroy an instance of the Arduino Core Service.
   rpc Destroy(DestroyRequest) returns (DestroyResponse) {}
 
-  // Update package index of the Arduino Core Service
+  // Update package index of the Arduino Core Service.
   rpc UpdateIndex(UpdateIndexRequest) returns (stream UpdateIndexResponse) {}
 
-  // Update libraries index
+  // Update libraries index.
   rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest) returns (stream UpdateLibrariesIndexResponse) {}
 
   // Get the version of Arduino CLI in use.
   rpc Version(VersionRequest) returns (VersionResponse) {}
 
-  // Create a new Sketch
+  // Create a new Sketch.
   rpc NewSketch(NewSketchRequest) returns (NewSketchResponse) {}
 
-  // Returns all files composing a Sketch
+  // Returns all files composing a Sketch.
   rpc LoadSketch(LoadSketchRequest) returns (LoadSketchResponse) {}
 
-  // Creates a zip file containing all files of specified Sketch
+  // Creates a zip file containing all files of specified Sketch.
   rpc ArchiveSketch(ArchiveSketchRequest) returns (ArchiveSketchResponse) {}
 
   // Sets the sketch default FQBN and Port Address/Protocol in
@@ -66,10 +66,7 @@ service ArduinoCoreService {
   // using LoadSketch.
   rpc SetSketchDefaults(SetSketchDefaultsRequest) returns (SetSketchDefaultsResponse) {}
 
-  // BOARD COMMANDS
-  // --------------
-
-  // Requests details about a board
+  // Requests details about a board.
   rpc BoardDetails(BoardDetailsRequest) returns (BoardDetailsResponse);
 
   // List the boards currently connected to the computer.
@@ -130,10 +127,10 @@ service ArduinoCoreService {
   // Upgrade a library to the newest version available.
   rpc LibraryUpgrade(LibraryUpgradeRequest) returns (stream LibraryUpgradeResponse);
 
-  // Install a library from a Zip File
+  // Install a library from a Zip File.
   rpc ZipLibraryInstall(ZipLibraryInstallRequest) returns (stream ZipLibraryInstallResponse);
 
-  // Download and install a library from a git url
+  // Download and install a library from a git url.
   rpc GitLibraryInstall(GitLibraryInstallRequest) returns (stream GitLibraryInstallResponse);
 
   // Uninstall an Arduino library.
@@ -152,10 +149,10 @@ service ArduinoCoreService {
   // List the installed libraries.
   rpc LibraryList(LibraryListRequest) returns (LibraryListResponse);
 
-  // Open a monitor connection to a board port
+  // Open a monitor connection to a board port.
   rpc Monitor(stream MonitorRequest) returns (stream MonitorResponse);
 
-  // Returns the parameters that can be set in the MonitorRequest calls
+  // Returns the parameters that can be set in the MonitorRequest calls.
   rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest) returns (EnumerateMonitorPortSettingsResponse);
 
   // Start a debug session and communicate with the debugger tool.
@@ -173,22 +170,22 @@ service ArduinoCoreService {
   // Clean the download cache directory (where archives are downloaded).
   rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest) returns (CleanDownloadCacheDirectoryResponse);
 
-  // Writes the settings currently stored in memory in a YAML file
+  // Writes the settings currently stored in memory in a YAML file.
   rpc ConfigurationSave(ConfigurationSaveRequest) returns (ConfigurationSaveResponse);
 
-  // Read the settings from a YAML file
+  // Read the settings from a YAML file.
   rpc ConfigurationOpen(ConfigurationOpenRequest) returns (ConfigurationOpenResponse);
 
-  // Get the current configuration
+  // Get the current configuration.
   rpc ConfigurationGet(ConfigurationGetRequest) returns (ConfigurationGetResponse);
 
-  // Enumerate all the keys/values pairs available in the configuration
+  // Enumerate all the keys/values pairs available in the configuration.
   rpc SettingsEnumerate(SettingsEnumerateRequest) returns (SettingsEnumerateResponse);
 
-  // Get a single configuration value
+  // Get a single configuration value.
   rpc SettingsGetValue(SettingsGetValueRequest) returns (SettingsGetValueResponse);
 
-  // Set a single configuration value
+  // Set a single configuration value.
   rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse);
 }
 
@@ -204,7 +201,7 @@ message InitRequest {
   Instance instance = 1;
   // Profile to use.
   string profile = 2;
-  // The path where the sketch is stored
+  // The path where the sketch is stored.
   string sketch_path = 3;
 }
 
@@ -220,32 +217,32 @@ message InitResponse {
     Progress init_progress = 1;
     // The error in case the initialization failed.
     google.rpc.Status error = 2;
-    // Selected profile information
+    // Selected profile information.
     SketchProfile profile = 3;
   }
 }
 
 // Represent the reason why an instance initialization failed.
 enum FailedInstanceInitReason {
-  // FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized
+  // FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized.
   FAILED_INSTANCE_INIT_REASON_UNSPECIFIED = 0;
-  // INVALID_INDEX_URL a package index url is malformed
+  // INVALID_INDEX_URL a package index url is malformed.
   FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL = 1;
   // FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR failure encountered while
-  // loading an index
+  // loading an index.
   FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR = 2;
   // FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR failure encountered while
-  // loading a tool
+  // loading a tool.
   FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR = 3;
   // FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR failure encountered while
-  // downloading an index
+  // downloading an index.
   FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR = 4;
 }
 
 message FailedInstanceInitError {
-  // specific cause of the error
+  // specific cause of the error.
   FailedInstanceInitReason reason = 1;
-  // explanation of the error
+  // explanation of the error.
   string message = 2;
 }
 
@@ -329,75 +326,75 @@ message VersionResponse {
 }
 
 message NewSketchRequest {
-  // New sketch name
+  // New sketch name.
   string sketch_name = 2;
   // Optional: create a Sketch in this directory
   // (used as "Sketchbook" directory).
   // Default Sketchbook directory "directories.User" is used if sketch_dir is
   // empty.
   string sketch_dir = 3;
-  // Specificies if an existing .ino sketch should be overwritten
+  // Specificies if an existing .ino sketch should be overwritten.
   bool overwrite = 4;
 
   reserved 1;
 }
 
 message NewSketchResponse {
-  // Absolute path to a main sketch file
+  // Absolute path to a main sketch file.
   string main_file = 1;
 }
 
 message LoadSketchRequest {
-  // Absolute path to single sketch file or a sketch folder
+  // Absolute path to single sketch file or a sketch folder.
   string sketch_path = 2;
 
   reserved 1;
 }
 
 message LoadSketchResponse {
-  // The loaded sketch
+  // The loaded sketch.
   Sketch sketch = 1;
 }
 
 message ArchiveSketchRequest {
-  // Absolute path to Sketch file or folder containing Sketch file
+  // Absolute path to Sketch file or folder containing Sketch file.
   string sketch_path = 1;
   // Absolute path to archive that will be created or folder that will contain
-  // it
+  // it.
   string archive_path = 2;
-  // Specifies if build directory should be included in the archive
+  // Specifies if build directory should be included in the archive.
   bool include_build_dir = 3;
-  // Allows to override an already existing archive
+  // Allows to override an already existing archive.
   bool overwrite = 4;
 }
 
 message ArchiveSketchResponse {}
 
 message SetSketchDefaultsRequest {
-  // Absolute path to Sketch file or folder containing Sketch file
+  // Absolute path to Sketch file or folder containing Sketch file.
   string sketch_path = 1;
-  // The desired value for default_fqbn in project file (sketch.yaml)
+  // The desired value for default_fqbn in project file (sketch.yaml).
   string default_fqbn = 2;
-  // The desired value for default_port in project file (sketch.yaml)
+  // The desired value for default_port in project file (sketch.yaml).
   string default_port_address = 3;
-  // The desired value for default_protocol in project file (sketch.yaml)
+  // The desired value for default_protocol in project file (sketch.yaml).
   string default_port_protocol = 4;
-  // The desired value for default_programmer in project file (sketch.yaml)
+  // The desired value for default_programmer in project file (sketch.yaml).
   string default_programmer = 5;
 }
 
 message SetSketchDefaultsResponse {
   // The value of default_fqnn that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_fqbn = 1;
   // The value of default_port that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_port_address = 2;
   // The value of default_protocol that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_port_protocol = 3;
   // The value of default_programmer that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_programmer = 4;
 }
 

@@ -90,32 +90,32 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// The main Arduino Platform service API
+// The main Arduino Platform service API.
 type ArduinoCoreServiceClient interface {
-	// Create a new Arduino Core instance
+	// Create a new Arduino Core instance.
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	// Initializes an existing Arduino Core instance by loading platforms and
-	// libraries
+	// libraries.
 	Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InitResponse], error)
-	// Destroy an instance of the Arduino Core Service
+	// Destroy an instance of the Arduino Core Service.
 	Destroy(ctx context.Context, in *DestroyRequest, opts ...grpc.CallOption) (*DestroyResponse, error)
-	// Update package index of the Arduino Core Service
+	// Update package index of the Arduino Core Service.
 	UpdateIndex(ctx context.Context, in *UpdateIndexRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UpdateIndexResponse], error)
-	// Update libraries index
+	// Update libraries index.
 	UpdateLibrariesIndex(ctx context.Context, in *UpdateLibrariesIndexRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UpdateLibrariesIndexResponse], error)
 	// Get the version of Arduino CLI in use.
 	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionResponse, error)
-	// Create a new Sketch
+	// Create a new Sketch.
 	NewSketch(ctx context.Context, in *NewSketchRequest, opts ...grpc.CallOption) (*NewSketchResponse, error)
-	// Returns all files composing a Sketch
+	// Returns all files composing a Sketch.
 	LoadSketch(ctx context.Context, in *LoadSketchRequest, opts ...grpc.CallOption) (*LoadSketchResponse, error)
-	// Creates a zip file containing all files of specified Sketch
+	// Creates a zip file containing all files of specified Sketch.
 	ArchiveSketch(ctx context.Context, in *ArchiveSketchRequest, opts ...grpc.CallOption) (*ArchiveSketchResponse, error)
 	// Sets the sketch default FQBN and Port Address/Protocol in
 	// the sketch project file (sketch.yaml). These metadata can be retrieved
 	// using LoadSketch.
 	SetSketchDefaults(ctx context.Context, in *SetSketchDefaultsRequest, opts ...grpc.CallOption) (*SetSketchDefaultsResponse, error)
-	// Requests details about a board
+	// Requests details about a board.
 	BoardDetails(ctx context.Context, in *BoardDetailsRequest, opts ...grpc.CallOption) (*BoardDetailsResponse, error)
 	// List the boards currently connected to the computer.
 	BoardList(ctx context.Context, in *BoardListRequest, opts ...grpc.CallOption) (*BoardListResponse, error)
@@ -157,9 +157,9 @@ type ArduinoCoreServiceClient interface {
 	LibraryInstall(ctx context.Context, in *LibraryInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryInstallResponse], error)
 	// Upgrade a library to the newest version available.
 	LibraryUpgrade(ctx context.Context, in *LibraryUpgradeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryUpgradeResponse], error)
-	// Install a library from a Zip File
+	// Install a library from a Zip File.
 	ZipLibraryInstall(ctx context.Context, in *ZipLibraryInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ZipLibraryInstallResponse], error)
-	// Download and install a library from a git url
+	// Download and install a library from a git url.
 	GitLibraryInstall(ctx context.Context, in *GitLibraryInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GitLibraryInstallResponse], error)
 	// Uninstall an Arduino library.
 	LibraryUninstall(ctx context.Context, in *LibraryUninstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryUninstallResponse], error)
@@ -172,9 +172,9 @@ type ArduinoCoreServiceClient interface {
 	LibrarySearch(ctx context.Context, in *LibrarySearchRequest, opts ...grpc.CallOption) (*LibrarySearchResponse, error)
 	// List the installed libraries.
 	LibraryList(ctx context.Context, in *LibraryListRequest, opts ...grpc.CallOption) (*LibraryListResponse, error)
-	// Open a monitor connection to a board port
+	// Open a monitor connection to a board port.
 	Monitor(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MonitorRequest, MonitorResponse], error)
-	// Returns the parameters that can be set in the MonitorRequest calls
+	// Returns the parameters that can be set in the MonitorRequest calls.
 	EnumerateMonitorPortSettings(ctx context.Context, in *EnumerateMonitorPortSettingsRequest, opts ...grpc.CallOption) (*EnumerateMonitorPortSettingsResponse, error)
 	// Start a debug session and communicate with the debugger tool.
 	Debug(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[DebugRequest, DebugResponse], error)
@@ -186,17 +186,17 @@ type ArduinoCoreServiceClient interface {
 	CheckForArduinoCLIUpdates(ctx context.Context, in *CheckForArduinoCLIUpdatesRequest, opts ...grpc.CallOption) (*CheckForArduinoCLIUpdatesResponse, error)
 	// Clean the download cache directory (where archives are downloaded).
 	CleanDownloadCacheDirectory(ctx context.Context, in *CleanDownloadCacheDirectoryRequest, opts ...grpc.CallOption) (*CleanDownloadCacheDirectoryResponse, error)
-	// Writes the settings currently stored in memory in a YAML file
+	// Writes the settings currently stored in memory in a YAML file.
 	ConfigurationSave(ctx context.Context, in *ConfigurationSaveRequest, opts ...grpc.CallOption) (*ConfigurationSaveResponse, error)
-	// Read the settings from a YAML file
+	// Read the settings from a YAML file.
 	ConfigurationOpen(ctx context.Context, in *ConfigurationOpenRequest, opts ...grpc.CallOption) (*ConfigurationOpenResponse, error)
-	// Get the current configuration
+	// Get the current configuration.
 	ConfigurationGet(ctx context.Context, in *ConfigurationGetRequest, opts ...grpc.CallOption) (*ConfigurationGetResponse, error)
-	// Enumerate all the keys/values pairs available in the configuration
+	// Enumerate all the keys/values pairs available in the configuration.
 	SettingsEnumerate(ctx context.Context, in *SettingsEnumerateRequest, opts ...grpc.CallOption) (*SettingsEnumerateResponse, error)
-	// Get a single configuration value
+	// Get a single configuration value.
 	SettingsGetValue(ctx context.Context, in *SettingsGetValueRequest, opts ...grpc.CallOption) (*SettingsGetValueResponse, error)
-	// Set a single configuration value
+	// Set a single configuration value.
 	SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error)
 }
 
@@ -879,32 +879,32 @@ func (c *arduinoCoreServiceClient) SettingsSetValue(ctx context.Context, in *Set
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility.
 //
-// The main Arduino Platform service API
+// The main Arduino Platform service API.
 type ArduinoCoreServiceServer interface {
-	// Create a new Arduino Core instance
+	// Create a new Arduino Core instance.
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	// Initializes an existing Arduino Core instance by loading platforms and
-	// libraries
+	// libraries.
 	Init(*InitRequest, grpc.ServerStreamingServer[InitResponse]) error
-	// Destroy an instance of the Arduino Core Service
+	// Destroy an instance of the Arduino Core Service.
 	Destroy(context.Context, *DestroyRequest) (*DestroyResponse, error)
-	// Update package index of the Arduino Core Service
+	// Update package index of the Arduino Core Service.
 	UpdateIndex(*UpdateIndexRequest, grpc.ServerStreamingServer[UpdateIndexResponse]) error
-	// Update libraries index
+	// Update libraries index.
 	UpdateLibrariesIndex(*UpdateLibrariesIndexRequest, grpc.ServerStreamingServer[UpdateLibrariesIndexResponse]) error
 	// Get the version of Arduino CLI in use.
 	Version(context.Context, *VersionRequest) (*VersionResponse, error)
-	// Create a new Sketch
+	// Create a new Sketch.
 	NewSketch(context.Context, *NewSketchRequest) (*NewSketchResponse, error)
-	// Returns all files composing a Sketch
+	// Returns all files composing a Sketch.
 	LoadSketch(context.Context, *LoadSketchRequest) (*LoadSketchResponse, error)
-	// Creates a zip file containing all files of specified Sketch
+	// Creates a zip file containing all files of specified Sketch.
 	ArchiveSketch(context.Context, *ArchiveSketchRequest) (*ArchiveSketchResponse, error)
 	// Sets the sketch default FQBN and Port Address/Protocol in
 	// the sketch project file (sketch.yaml). These metadata can be retrieved
 	// using LoadSketch.
 	SetSketchDefaults(context.Context, *SetSketchDefaultsRequest) (*SetSketchDefaultsResponse, error)
-	// Requests details about a board
+	// Requests details about a board.
 	BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error)
 	// List the boards currently connected to the computer.
 	BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error)
@@ -946,9 +946,9 @@ type ArduinoCoreServiceServer interface {
 	LibraryInstall(*LibraryInstallRequest, grpc.ServerStreamingServer[LibraryInstallResponse]) error
 	// Upgrade a library to the newest version available.
 	LibraryUpgrade(*LibraryUpgradeRequest, grpc.ServerStreamingServer[LibraryUpgradeResponse]) error
-	// Install a library from a Zip File
+	// Install a library from a Zip File.
 	ZipLibraryInstall(*ZipLibraryInstallRequest, grpc.ServerStreamingServer[ZipLibraryInstallResponse]) error
-	// Download and install a library from a git url
+	// Download and install a library from a git url.
 	GitLibraryInstall(*GitLibraryInstallRequest, grpc.ServerStreamingServer[GitLibraryInstallResponse]) error
 	// Uninstall an Arduino library.
 	LibraryUninstall(*LibraryUninstallRequest, grpc.ServerStreamingServer[LibraryUninstallResponse]) error
@@ -961,9 +961,9 @@ type ArduinoCoreServiceServer interface {
 	LibrarySearch(context.Context, *LibrarySearchRequest) (*LibrarySearchResponse, error)
 	// List the installed libraries.
 	LibraryList(context.Context, *LibraryListRequest) (*LibraryListResponse, error)
-	// Open a monitor connection to a board port
+	// Open a monitor connection to a board port.
 	Monitor(grpc.BidiStreamingServer[MonitorRequest, MonitorResponse]) error
-	// Returns the parameters that can be set in the MonitorRequest calls
+	// Returns the parameters that can be set in the MonitorRequest calls.
 	EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error)
 	// Start a debug session and communicate with the debugger tool.
 	Debug(grpc.BidiStreamingServer[DebugRequest, DebugResponse]) error
@@ -975,17 +975,17 @@ type ArduinoCoreServiceServer interface {
 	CheckForArduinoCLIUpdates(context.Context, *CheckForArduinoCLIUpdatesRequest) (*CheckForArduinoCLIUpdatesResponse, error)
 	// Clean the download cache directory (where archives are downloaded).
 	CleanDownloadCacheDirectory(context.Context, *CleanDownloadCacheDirectoryRequest) (*CleanDownloadCacheDirectoryResponse, error)
-	// Writes the settings currently stored in memory in a YAML file
+	// Writes the settings currently stored in memory in a YAML file.
 	ConfigurationSave(context.Context, *ConfigurationSaveRequest) (*ConfigurationSaveResponse, error)
-	// Read the settings from a YAML file
+	// Read the settings from a YAML file.
 	ConfigurationOpen(context.Context, *ConfigurationOpenRequest) (*ConfigurationOpenResponse, error)
-	// Get the current configuration
+	// Get the current configuration.
 	ConfigurationGet(context.Context, *ConfigurationGetRequest) (*ConfigurationGetResponse, error)
-	// Enumerate all the keys/values pairs available in the configuration
+	// Enumerate all the keys/values pairs available in the configuration.
 	SettingsEnumerate(context.Context, *SettingsEnumerateRequest) (*SettingsEnumerateResponse, error)
-	// Get a single configuration value
+	// Get a single configuration value.
 	SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error)
-	// Set a single configuration value
+	// Set a single configuration value.
 	SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }

@@ -25,15 +25,15 @@ option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/
 
 message MonitorRequest {
   oneof message {
-    // Open request, it must be the first incoming message
+    // Open request, it must be the first incoming message.
     MonitorPortOpenRequest open_request = 1;
-    // Data to send to the port
+    // Data to send to the port.
     bytes tx_data = 2;
-    // Port configuration, contains settings of the port to be changed
+    // Port configuration, contains settings of the port to be changed.
     MonitorPortConfiguration updated_configuration = 3;
     // Close message, set to true to gracefully close a port (this ensure
     // that the gRPC streaming call is closed by the daemon AFTER the port
-    // has been successfully closed)
+    // has been successfully closed).
     bool close = 4;
   }
 }
@@ -41,28 +41,28 @@ message MonitorRequest {
 message MonitorPortOpenRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // Port to open, must be filled only on the first request
+  // Port to open, must be filled only on the first request.
   Port port = 2;
   // The board FQBN we are trying to connect to. This is optional, and  it's
   // needed to disambiguate if more than one platform provides the pluggable
   // monitor for a given port protocol.
   string fqbn = 3;
-  // Port configuration, optional, contains settings of the port to be applied
+  // Port configuration, optional, contains settings of the port to be applied.
   MonitorPortConfiguration port_configuration = 4;
 }
 
 message MonitorResponse {
   oneof message {
-    // Eventual errors dealing with monitor port
+    // Eventual errors dealing with monitor port.
     string error = 1;
-    // Data received from the port
+    // Data received from the port.
     bytes rx_data = 2;
     // Settings applied to the port, may be returned after a port is opened (to
     // report the default settings) or after a new port_configuration is sent
-    // (to report the new settings applied)
+    // (to report the new settings applied).
     MonitorPortConfiguration applied_settings = 3;
     // A message with this field set to true is sent as soon as the port is
-    // succesfully opened
+    // succesfully opened.
     bool success = 4;
   }
 }
@@ -85,14 +85,14 @@ message EnumerateMonitorPortSettingsResponse {
 }
 
 message MonitorPortSettingDescriptor {
-  // The setting identifier
+  // The setting identifier.
   string setting_id = 1;
-  // A human-readable label of the setting (to be displayed on the GUI)
+  // A human-readable label of the setting (to be displayed on the GUI).
   string label = 2;
-  // The setting type (at the moment only "enum" is avaiable)
+  // The setting type (at the moment only "enum" is avaiable).
   string type = 3;
-  // The values allowed on "enum" types
+  // The values allowed on "enum" types.
   repeated string enum_values = 4;
-  // The selected or default value
+  // The selected or default value.
   string value = 5;
 }

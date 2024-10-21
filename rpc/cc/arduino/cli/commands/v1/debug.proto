@@ -40,7 +40,7 @@ message DebugRequest {
   // The data to be sent to the target being monitored.
   bytes data = 2;
 
-  // Set this to true to send and Interrupt signal to the debugger process
+  // Set this to true to send and Interrupt signal to the debugger process.
   bool send_interrupt = 3;
 }
 
@@ -76,7 +76,7 @@ message IsDebugSupportedRequest {
 }
 
 message IsDebugSupportedResponse {
-  // True if debugging is supported
+  // True if debugging is supported.
   bool debugging_supported = 1;
   // This is the same FQBN given in the IsDebugSupportedRequest but cleaned
   // up of the board options that do not affect the debugger configuration.
@@ -110,43 +110,43 @@ message GetDebugConfigRequest {
 }
 
 message GetDebugConfigResponse {
-  // The executable binary to debug
+  // The executable binary to debug.
   string executable = 1;
-  // The toolchain type used for the build (for example "gcc")
+  // The toolchain type used for the build (for example "gcc").
   string toolchain = 2;
-  // The toolchain directory
+  // The toolchain directory.
   string toolchain_path = 3;
-  // The toolchain architecture prefix (for example "arm-none-eabi")
+  // The toolchain architecture prefix (for example "arm-none-eabi").
   string toolchain_prefix = 4;
   // The GDB server type used to connect to the programmer/board (for example
-  // "openocd")
+  // "openocd").
   string server = 5;
-  // The GDB server directory
+  // The GDB server directory.
   string server_path = 6;
-  // Extra configuration parameters wrt toolchain
+  // Extra configuration parameters wrt toolchain.
   google.protobuf.Any toolchain_configuration = 7;
-  // Extra configuration parameters wrt GDB server
+  // Extra configuration parameters wrt GDB server.
   google.protobuf.Any server_configuration = 8;
   // Custom debugger configurations (not handled directly by Arduino CLI but
   // provided for 3rd party plugins/debuggers). The map keys identifies which
   // 3rd party plugin/debugger is referred, the map string values contains a
   // JSON configuration for it.
   map<string, string> custom_configs = 9;
-  // the SVD file to use
+  // the SVD file to use.
   string svd_file = 10;
-  // The programmer specified in the request
+  // The programmer specified in the request.
   string programmer = 11;
 }
 
-// Configurations specific for the 'gcc' toolchain
+// Configurations specific for the 'gcc' toolchain.
 message DebugGCCToolchainConfiguration {}
 
-// Configuration specific for the 'openocd` server
+// Configuration specific for the 'openocd` server.
 message DebugOpenOCDServerConfiguration {
-  // path to openocd
+  // Path to openocd.
   string path = 1;
-  // path to openocd scripts
+  // Path to openocd scripts.
   string scripts_dir = 2;
-  // list of scripts to execute by openocd
+  // List of scripts to execute by openocd.
   repeated string scripts = 3;
 }

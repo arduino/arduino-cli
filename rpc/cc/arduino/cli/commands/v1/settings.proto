@@ -25,61 +25,61 @@ option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/
 message Configuration {
   message Directories {
     message Builtin {
-      // The directory where the built-in libraries are installed
+      // The directory where the built-in libraries are installed.
       optional string libraries = 1;
     }
-    // Data directory
+    // Data directory.
     string data = 1;
-    // User directory
+    // User directory.
     string user = 2;
-    // Downloads directory
+    // Downloads directory.
     string downloads = 3;
-    // The directory where the built-in resources are installed
+    // The directory where the built-in resources are installed.
     optional Builtin builtin = 4;
   }
   message Network {
-    // Extra user-agent information to be appended in network requests
+    // Extra user-agent information to be appended in network requests.
     optional string extra_user_agent = 1;
-    // The proxy to use for network requests
+    // The proxy to use for network requests.
     optional string proxy = 2;
   }
   message Sketch {
-    // Set to true to always export binaries to the sketch directory
+    // Set to true to always export binaries to the sketch directory.
     bool always_export_binaries = 1;
   }
   message BuildCache {
-    // The minimum number of compilations before the cache is purged
+    // The minimum number of compilations before the cache is purged.
     uint64 compilations_before_purge = 1;
-    // Time to live of the cache in seconds
+    // Time to live of the cache in seconds.
     uint64 ttl_secs = 2;
   }
   message BoardManager {
-    // Additional URLs to be used for the board manager
+    // Additional URLs to be used for the board manager.
     repeated string additional_urls = 1;
   }
   message Daemon {
-    // The TCP port of the daemon
+    // The TCP port of the daemon.
     string port = 1;
   }
   message Output {
-    // Set to true to disable coloring of the output
+    // Set to true to disable coloring of the output.
     bool no_color = 1;
   }
   message Logging {
-    // The logging level
+    // The logging level.
     string level = 1;
-    // The logging format
+    // The logging format.
     string format = 2;
-    // The logging file
+    // The logging file.
     optional string file = 3;
   }
   message Library {
     // Set to true to enable library installation from zip archives or git
-    // repositories
+    // repositories.
     bool enable_unsafe_install = 1;
   }
   message Updater {
-    // Set to true to enable notifications for updates
+    // Set to true to enable notifications for updates.
     bool enable_notification = 1;
   }
 
@@ -111,54 +111,54 @@ message Configuration {
 message ConfigurationGetRequest {}
 
 message ConfigurationGetResponse {
-  // The current configuration
+  // The current configuration.
   Configuration configuration = 1;
 }
 
 message ConfigurationSaveRequest {
-  // The format of the encoded settings, allowed values are "json" and "yaml"
+  // The format of the encoded settings, allowed values are "json" and "yaml".
   string settings_format = 1;
 }
 
 message ConfigurationSaveResponse {
-  // The encoded settings
+  // The encoded settings.
   string encoded_settings = 1;
 }
 
 message ConfigurationOpenRequest {
-  // The encoded settings
+  // The encoded settings.
   string encoded_settings = 1;
-  // The format of the encoded settings, allowed values are "json" and "yaml"
+  // The format of the encoded settings, allowed values are "json" and "yaml".
   string settings_format = 2;
 }
 
 message ConfigurationOpenResponse {
   // Warnings that occurred while opening the configuration (e.g. unknown keys,
-  // or invalid values)
+  // or invalid values).
   repeated string warnings = 1;
 }
 
 message SettingsGetValueRequest {
-  // The key to get
+  // The key to get.
   string key = 1;
   // The format of the encoded_value (default is "json", allowed values are
-  // "json" and "yaml)
+  // "json" and "yaml).
   string value_format = 2;
 }
 
 message SettingsGetValueResponse {
-  // The value of the key (encoded)
+  // The value of the key (encoded).
   string encoded_value = 1;
 }
 
 message SettingsSetValueRequest {
-  // The key to change
+  // The key to change.
   string key = 1;
   // The new value (encoded), no objects, only scalar or array of scalars are
   // allowed.
   string encoded_value = 2;
   // The format of the encoded_value (default is "json", allowed values are
-  // "json", "yaml" and "cli")
+  // "json", "yaml" and "cli").
   string value_format = 3;
 }
 
@@ -168,12 +168,12 @@ message SettingsEnumerateRequest {}
 
 message SettingsEnumerateResponse {
   message Entry {
-    // The key
+    // The key.
     string key = 1;
-    // The key type
+    // The key type.
     string type = 2;
   }
 
-  // The list of key/value pairs
+  // The list of key/value pairs.
   repeated Entry entries = 1;
 }

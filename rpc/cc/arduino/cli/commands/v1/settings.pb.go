@@ -219,7 +219,7 @@ type ConfigurationGetResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The current configuration
+	// The current configuration.
 	Configuration *Configuration `protobuf:"bytes,1,opt,name=configuration,proto3" json:"configuration,omitempty"`
 }
 
@@ -267,7 +267,7 @@ type ConfigurationSaveRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The format of the encoded settings, allowed values are "json" and "yaml"
+	// The format of the encoded settings, allowed values are "json" and "yaml".
 	SettingsFormat string `protobuf:"bytes,1,opt,name=settings_format,json=settingsFormat,proto3" json:"settings_format,omitempty"`
 }
 
@@ -315,7 +315,7 @@ type ConfigurationSaveResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The encoded settings
+	// The encoded settings.
 	EncodedSettings string `protobuf:"bytes,1,opt,name=encoded_settings,json=encodedSettings,proto3" json:"encoded_settings,omitempty"`
 }
 
@@ -363,9 +363,9 @@ type ConfigurationOpenRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The encoded settings
+	// The encoded settings.
 	EncodedSettings string `protobuf:"bytes,1,opt,name=encoded_settings,json=encodedSettings,proto3" json:"encoded_settings,omitempty"`
-	// The format of the encoded settings, allowed values are "json" and "yaml"
+	// The format of the encoded settings, allowed values are "json" and "yaml".
 	SettingsFormat string `protobuf:"bytes,2,opt,name=settings_format,json=settingsFormat,proto3" json:"settings_format,omitempty"`
 }
 
@@ -421,7 +421,7 @@ type ConfigurationOpenResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Warnings that occurred while opening the configuration (e.g. unknown keys,
-	// or invalid values)
+	// or invalid values).
 	Warnings []string `protobuf:"bytes,1,rep,name=warnings,proto3" json:"warnings,omitempty"`
 }
 
@@ -469,10 +469,10 @@ type SettingsGetValueRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key to get
+	// The key to get.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// The format of the encoded_value (default is "json", allowed values are
-	// "json" and "yaml)
+	// "json" and "yaml).
 	ValueFormat string `protobuf:"bytes,2,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
 }
 
@@ -527,7 +527,7 @@ type SettingsGetValueResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The value of the key (encoded)
+	// The value of the key (encoded).
 	EncodedValue string `protobuf:"bytes,1,opt,name=encoded_value,json=encodedValue,proto3" json:"encoded_value,omitempty"`
 }
 
@@ -575,13 +575,13 @@ type SettingsSetValueRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key to change
+	// The key to change.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// The new value (encoded), no objects, only scalar or array of scalars are
 	// allowed.
 	EncodedValue string `protobuf:"bytes,2,opt,name=encoded_value,json=encodedValue,proto3" json:"encoded_value,omitempty"`
 	// The format of the encoded_value (default is "json", allowed values are
-	// "json", "yaml" and "cli")
+	// "json", "yaml" and "cli").
 	ValueFormat string `protobuf:"bytes,3,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
 }
 
@@ -719,7 +719,7 @@ type SettingsEnumerateResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The list of key/value pairs
+	// The list of key/value pairs.
 	Entries []*SettingsEnumerateResponse_Entry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
 }
 
@@ -767,13 +767,13 @@ type Configuration_Directories struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Data directory
+	// Data directory.
 	Data string `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	// User directory
+	// User directory.
 	User string `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	// Downloads directory
+	// Downloads directory.
 	Downloads string `protobuf:"bytes,3,opt,name=downloads,proto3" json:"downloads,omitempty"`
-	// The directory where the built-in resources are installed
+	// The directory where the built-in resources are installed.
 	Builtin *Configuration_Directories_Builtin `protobuf:"bytes,4,opt,name=builtin,proto3,oneof" json:"builtin,omitempty"`
 }
 
@@ -842,9 +842,9 @@ type Configuration_Network struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Extra user-agent information to be appended in network requests
+	// Extra user-agent information to be appended in network requests.
 	ExtraUserAgent *string `protobuf:"bytes,1,opt,name=extra_user_agent,json=extraUserAgent,proto3,oneof" json:"extra_user_agent,omitempty"`
-	// The proxy to use for network requests
+	// The proxy to use for network requests.
 	Proxy *string `protobuf:"bytes,2,opt,name=proxy,proto3,oneof" json:"proxy,omitempty"`
 }
 
@@ -899,7 +899,7 @@ type Configuration_Sketch struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Set to true to always export binaries to the sketch directory
+	// Set to true to always export binaries to the sketch directory.
 	AlwaysExportBinaries bool `protobuf:"varint,1,opt,name=always_export_binaries,json=alwaysExportBinaries,proto3" json:"always_export_binaries,omitempty"`
 }
 
@@ -947,9 +947,9 @@ type Configuration_BuildCache struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The minimum number of compilations before the cache is purged
+	// The minimum number of compilations before the cache is purged.
 	CompilationsBeforePurge uint64 `protobuf:"varint,1,opt,name=compilations_before_purge,json=compilationsBeforePurge,proto3" json:"compilations_before_purge,omitempty"`
-	// Time to live of the cache in seconds
+	// Time to live of the cache in seconds.
 	TtlSecs uint64 `protobuf:"varint,2,opt,name=ttl_secs,json=ttlSecs,proto3" json:"ttl_secs,omitempty"`
 }
 
@@ -1004,7 +1004,7 @@ type Configuration_BoardManager struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Additional URLs to be used for the board manager
+	// Additional URLs to be used for the board manager.
 	AdditionalUrls []string `protobuf:"bytes,1,rep,name=additional_urls,json=additionalUrls,proto3" json:"additional_urls,omitempty"`
 }
 
@@ -1052,7 +1052,7 @@ type Configuration_Daemon struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The TCP port of the daemon
+	// The TCP port of the daemon.
 	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
 }
 
@@ -1100,7 +1100,7 @@ type Configuration_Output struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Set to true to disable coloring of the output
+	// Set to true to disable coloring of the output.
 	NoColor bool `protobuf:"varint,1,opt,name=no_color,json=noColor,proto3" json:"no_color,omitempty"`
 }
 
@@ -1148,11 +1148,11 @@ type Configuration_Logging struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The logging level
+	// The logging level.
 	Level string `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
-	// The logging format
+	// The logging format.
 	Format string `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
-	// The logging file
+	// The logging file.
 	File *string `protobuf:"bytes,3,opt,name=file,proto3,oneof" json:"file,omitempty"`
 }
 
@@ -1215,7 +1215,7 @@ type Configuration_Library struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Set to true to enable library installation from zip archives or git
-	// repositories
+	// repositories.
 	EnableUnsafeInstall bool `protobuf:"varint,1,opt,name=enable_unsafe_install,json=enableUnsafeInstall,proto3" json:"enable_unsafe_install,omitempty"`
 }
 
@@ -1263,7 +1263,7 @@ type Configuration_Updater struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Set to true to enable notifications for updates
+	// Set to true to enable notifications for updates.
 	EnableNotification bool `protobuf:"varint,1,opt,name=enable_notification,json=enableNotification,proto3" json:"enable_notification,omitempty"`
 }
 
@@ -1311,7 +1311,7 @@ type Configuration_Directories_Builtin struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The directory where the built-in libraries are installed
+	// The directory where the built-in libraries are installed.
 	Libraries *string `protobuf:"bytes,1,opt,name=libraries,proto3,oneof" json:"libraries,omitempty"`
 }
 
@@ -1359,9 +1359,9 @@ type SettingsEnumerateResponse_Entry struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key
+	// The key.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// The key type
+	// The key type.
 	Type string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 }
 

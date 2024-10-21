@@ -41,18 +41,18 @@ const (
 type FailedInstanceInitReason int32
 
 const (
-	// FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized
+	// FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized.
 	FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_UNSPECIFIED FailedInstanceInitReason = 0
-	// INVALID_INDEX_URL a package index url is malformed
+	// INVALID_INDEX_URL a package index url is malformed.
 	FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL FailedInstanceInitReason = 1
 	// FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR failure encountered while
-	// loading an index
+	// loading an index.
 	FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR FailedInstanceInitReason = 2
 	// FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR failure encountered while
-	// loading a tool
+	// loading a tool.
 	FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR FailedInstanceInitReason = 3
 	// FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR failure encountered while
-	// downloading an index
+	// downloading an index.
 	FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR FailedInstanceInitReason = 4
 )
 
@@ -257,7 +257,7 @@ type InitRequest struct {
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	// Profile to use.
 	Profile string `protobuf:"bytes,2,opt,name=profile,proto3" json:"profile,omitempty"`
-	// The path where the sketch is stored
+	// The path where the sketch is stored.
 	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
 }
 
@@ -402,7 +402,7 @@ type InitResponse_Error struct {
 }
 
 type InitResponse_Profile struct {
-	// Selected profile information
+	// Selected profile information.
 	Profile *SketchProfile `protobuf:"bytes,3,opt,name=profile,proto3,oneof"`
 }
 
@@ -417,9 +417,9 @@ type FailedInstanceInitError struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// specific cause of the error
+	// specific cause of the error.
 	Reason FailedInstanceInitReason `protobuf:"varint,1,opt,name=reason,proto3,enum=cc.arduino.cli.commands.v1.FailedInstanceInitReason" json:"reason,omitempty"`
-	// explanation of the error
+	// explanation of the error.
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 }
 
@@ -994,14 +994,14 @@ type NewSketchRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// New sketch name
+	// New sketch name.
 	SketchName string `protobuf:"bytes,2,opt,name=sketch_name,json=sketchName,proto3" json:"sketch_name,omitempty"`
 	// Optional: create a Sketch in this directory
 	// (used as "Sketchbook" directory).
 	// Default Sketchbook directory "directories.User" is used if sketch_dir is
 	// empty.
 	SketchDir string `protobuf:"bytes,3,opt,name=sketch_dir,json=sketchDir,proto3" json:"sketch_dir,omitempty"`
-	// Specificies if an existing .ino sketch should be overwritten
+	// Specificies if an existing .ino sketch should be overwritten.
 	Overwrite bool `protobuf:"varint,4,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
 }
 
@@ -1063,7 +1063,7 @@ type NewSketchResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Absolute path to a main sketch file
+	// Absolute path to a main sketch file.
 	MainFile string `protobuf:"bytes,1,opt,name=main_file,json=mainFile,proto3" json:"main_file,omitempty"`
 }
 
@@ -1111,7 +1111,7 @@ type LoadSketchRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Absolute path to single sketch file or a sketch folder
+	// Absolute path to single sketch file or a sketch folder.
 	SketchPath string `protobuf:"bytes,2,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
 }
 
@@ -1159,7 +1159,7 @@ type LoadSketchResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The loaded sketch
+	// The loaded sketch.
 	Sketch *Sketch `protobuf:"bytes,1,opt,name=sketch,proto3" json:"sketch,omitempty"`
 }
 
@@ -1207,14 +1207,14 @@ type ArchiveSketchRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Absolute path to Sketch file or folder containing Sketch file
+	// Absolute path to Sketch file or folder containing Sketch file.
 	SketchPath string `protobuf:"bytes,1,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
 	// Absolute path to archive that will be created or folder that will contain
-	// it
+	// it.
 	ArchivePath string `protobuf:"bytes,2,opt,name=archive_path,json=archivePath,proto3" json:"archive_path,omitempty"`
-	// Specifies if build directory should be included in the archive
+	// Specifies if build directory should be included in the archive.
 	IncludeBuildDir bool `protobuf:"varint,3,opt,name=include_build_dir,json=includeBuildDir,proto3" json:"include_build_dir,omitempty"`
-	// Allows to override an already existing archive
+	// Allows to override an already existing archive.
 	Overwrite bool `protobuf:"varint,4,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
 }
 
@@ -1321,15 +1321,15 @@ type SetSketchDefaultsRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Absolute path to Sketch file or folder containing Sketch file
+	// Absolute path to Sketch file or folder containing Sketch file.
 	SketchPath string `protobuf:"bytes,1,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
-	// The desired value for default_fqbn in project file (sketch.yaml)
+	// The desired value for default_fqbn in project file (sketch.yaml).
 	DefaultFqbn string `protobuf:"bytes,2,opt,name=default_fqbn,json=defaultFqbn,proto3" json:"default_fqbn,omitempty"`
-	// The desired value for default_port in project file (sketch.yaml)
+	// The desired value for default_port in project file (sketch.yaml).
 	DefaultPortAddress string `protobuf:"bytes,3,opt,name=default_port_address,json=defaultPortAddress,proto3" json:"default_port_address,omitempty"`
-	// The desired value for default_protocol in project file (sketch.yaml)
+	// The desired value for default_protocol in project file (sketch.yaml).
 	DefaultPortProtocol string `protobuf:"bytes,4,opt,name=default_port_protocol,json=defaultPortProtocol,proto3" json:"default_port_protocol,omitempty"`
-	// The desired value for default_programmer in project file (sketch.yaml)
+	// The desired value for default_programmer in project file (sketch.yaml).
 	DefaultProgrammer string `protobuf:"bytes,5,opt,name=default_programmer,json=defaultProgrammer,proto3" json:"default_programmer,omitempty"`
 }
 
@@ -1406,16 +1406,16 @@ type SetSketchDefaultsResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The value of default_fqnn that has been written in project file
-	// (sketch.yaml)
+	// (sketch.yaml).
 	DefaultFqbn string `protobuf:"bytes,1,opt,name=default_fqbn,json=defaultFqbn,proto3" json:"default_fqbn,omitempty"`
 	// The value of default_port that has been written in project file
-	// (sketch.yaml)
+	// (sketch.yaml).
 	DefaultPortAddress string `protobuf:"bytes,2,opt,name=default_port_address,json=defaultPortAddress,proto3" json:"default_port_address,omitempty"`
 	// The value of default_protocol that has been written in project file
-	// (sketch.yaml)
+	// (sketch.yaml).
 	DefaultPortProtocol string `protobuf:"bytes,3,opt,name=default_port_protocol,json=defaultPortProtocol,proto3" json:"default_port_protocol,omitempty"`
 	// The value of default_programmer that has been written in project file
-	// (sketch.yaml)
+	// (sketch.yaml).
 	DefaultProgrammer string `protobuf:"bytes,4,opt,name=default_programmer,json=defaultProgrammer,proto3" json:"default_programmer,omitempty"`
 }
 

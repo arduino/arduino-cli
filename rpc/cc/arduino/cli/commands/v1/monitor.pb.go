@@ -122,24 +122,24 @@ type isMonitorRequest_Message interface {
 }
 
 type MonitorRequest_OpenRequest struct {
-	// Open request, it must be the first incoming message
+	// Open request, it must be the first incoming message.
 	OpenRequest *MonitorPortOpenRequest `protobuf:"bytes,1,opt,name=open_request,json=openRequest,proto3,oneof"`
 }
 
 type MonitorRequest_TxData struct {
-	// Data to send to the port
+	// Data to send to the port.
 	TxData []byte `protobuf:"bytes,2,opt,name=tx_data,json=txData,proto3,oneof"`
 }
 
 type MonitorRequest_UpdatedConfiguration struct {
-	// Port configuration, contains settings of the port to be changed
+	// Port configuration, contains settings of the port to be changed.
 	UpdatedConfiguration *MonitorPortConfiguration `protobuf:"bytes,3,opt,name=updated_configuration,json=updatedConfiguration,proto3,oneof"`
 }
 
 type MonitorRequest_Close struct {
 	// Close message, set to true to gracefully close a port (this ensure
 	// that the gRPC streaming call is closed by the daemon AFTER the port
-	// has been successfully closed)
+	// has been successfully closed).
 	Close bool `protobuf:"varint,4,opt,name=close,proto3,oneof"`
 }
 
@@ -158,13 +158,13 @@ type MonitorPortOpenRequest struct {
 
 	// Arduino Core Service instance from the `Init` response.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	// Port to open, must be filled only on the first request
+	// Port to open, must be filled only on the first request.
 	Port *Port `protobuf:"bytes,2,opt,name=port,proto3" json:"port,omitempty"`
 	// The board FQBN we are trying to connect to. This is optional, and  it's
 	// needed to disambiguate if more than one platform provides the pluggable
 	// monitor for a given port protocol.
 	Fqbn string `protobuf:"bytes,3,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	// Port configuration, optional, contains settings of the port to be applied
+	// Port configuration, optional, contains settings of the port to be applied.
 	PortConfiguration *MonitorPortConfiguration `protobuf:"bytes,4,opt,name=port_configuration,json=portConfiguration,proto3" json:"port_configuration,omitempty"`
 }
 
@@ -314,25 +314,25 @@ type isMonitorResponse_Message interface {
 }
 
 type MonitorResponse_Error struct {
-	// Eventual errors dealing with monitor port
+	// Eventual errors dealing with monitor port.
 	Error string `protobuf:"bytes,1,opt,name=error,proto3,oneof"`
 }
 
 type MonitorResponse_RxData struct {
-	// Data received from the port
+	// Data received from the port.
 	RxData []byte `protobuf:"bytes,2,opt,name=rx_data,json=rxData,proto3,oneof"`
 }
 
 type MonitorResponse_AppliedSettings struct {
 	// Settings applied to the port, may be returned after a port is opened (to
 	// report the default settings) or after a new port_configuration is sent
-	// (to report the new settings applied)
+	// (to report the new settings applied).
 	AppliedSettings *MonitorPortConfiguration `protobuf:"bytes,3,opt,name=applied_settings,json=appliedSettings,proto3,oneof"`
 }
 
 type MonitorResponse_Success struct {
 	// A message with this field set to true is sent as soon as the port is
-	// succesfully opened
+	// succesfully opened.
 	Success bool `protobuf:"varint,4,opt,name=success,proto3,oneof"`
 }
 
@@ -466,15 +466,15 @@ type MonitorPortSettingDescriptor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The setting identifier
+	// The setting identifier.
 	SettingId string `protobuf:"bytes,1,opt,name=setting_id,json=settingId,proto3" json:"setting_id,omitempty"`
-	// A human-readable label of the setting (to be displayed on the GUI)
+	// A human-readable label of the setting (to be displayed on the GUI).
 	Label string `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
-	// The setting type (at the moment only "enum" is avaiable)
+	// The setting type (at the moment only "enum" is avaiable).
 	Type string `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	// The values allowed on "enum" types
+	// The values allowed on "enum" types.
 	EnumValues []string `protobuf:"bytes,4,rep,name=enum_values,json=enumValues,proto3" json:"enum_values,omitempty"`
-	// The selected or default value
+	// The selected or default value.
 	Value string `protobuf:"bytes,5,opt,name=value,proto3" json:"value,omitempty"`
 }
 

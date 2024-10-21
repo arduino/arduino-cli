@@ -58,19 +58,19 @@ message BoardDetailsResponse {
   repeated ToolsDependencies tools_dependencies = 10;
   // The board's custom configuration options.
   repeated ConfigOption config_options = 11;
-  // List of programmers supported by the board
+  // List of programmers supported by the board.
   repeated Programmer programmers = 13;
   reserved 14;
   // Identifying information for the board (e.g., USB VID/PID).
   repeated BoardIdentificationProperties identification_properties = 15;
-  // Board build properties used for compiling
+  // Board build properties used for compiling.
   repeated string build_properties = 16;
-  // Default programmer for the board
+  // Default programmer for the board.
   string default_programmer_id = 17;
 }
 
 message BoardIdentificationProperties {
-  // A set of properties that must all be matched to identify the board
+  // A set of properties that must all be matched to identify the board.
   map<string, string> properties = 1;
 }
 
@@ -157,7 +157,7 @@ message ConfigValue {
 message BoardListRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // Search for boards for the given time (in milliseconds)
+  // Search for boards for the given time (in milliseconds).
   int64 timeout = 2;
   // The fully qualified board name of the board you want information about
   // (e.g., `arduino:avr:uno`).
@@ -174,7 +174,7 @@ message BoardListResponse {
 message DetectedPort {
   // The possible boards attached to the port.
   repeated BoardListItem matching_boards = 1;
-  // The port details
+  // The port details.
   Port port = 2;
 }
 
@@ -183,7 +183,7 @@ message BoardListAllRequest {
   Instance instance = 1;
   // The search query to filter the board list by.
   repeated string search_args = 2;
-  // Set to true to get also the boards marked as "hidden" in the platform
+  // Set to true to get also the boards marked as "hidden" in the platform.
   bool include_hidden_boards = 3;
 }
 
@@ -198,11 +198,11 @@ message BoardListWatchRequest {
 }
 
 message BoardListWatchResponse {
-  // Event type as received from the serial discovery tool
+  // Event type as received from the serial discovery tool.
   string event_type = 1;
-  // Information about the port
+  // Information about the port.
   DetectedPort port = 2;
-  // Eventual errors when detecting connected boards
+  // Eventual errors when detecting connected boards.
   string error = 3;
 }
 
@@ -211,9 +211,9 @@ message BoardListItem {
   string name = 1;
   // The fully qualified board name. Used to identify the board to a machine.
   string fqbn = 2;
-  // If the board is marked as "hidden" in the platform
+  // If the board is marked as "hidden" in the platform.
   bool is_hidden = 3;
-  // Platform this board belongs to
+  // Platform this board belongs to.
   Platform platform = 6;
 }
 
@@ -223,7 +223,7 @@ message BoardSearchRequest {
   // The search query to filter the board list by.
   string search_args = 2;
   // Set to true to get also the boards marked as "hidden" in installed
-  // platforms
+  // platforms.
   bool include_hidden_boards = 3;
 }
 

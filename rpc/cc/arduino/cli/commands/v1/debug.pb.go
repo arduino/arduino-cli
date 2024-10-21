@@ -53,7 +53,7 @@ type DebugRequest struct {
 	DebugRequest *GetDebugConfigRequest `protobuf:"bytes,1,opt,name=debug_request,json=debugRequest,proto3" json:"debug_request,omitempty"`
 	// The data to be sent to the target being monitored.
 	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	// Set this to true to send and Interrupt signal to the debugger process
+	// Set this to true to send and Interrupt signal to the debugger process.
 	SendInterrupt bool `protobuf:"varint,3,opt,name=send_interrupt,json=sendInterrupt,proto3" json:"send_interrupt,omitempty"`
 }
 
@@ -294,7 +294,7 @@ type IsDebugSupportedResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// True if debugging is supported
+	// True if debugging is supported.
 	DebuggingSupported bool `protobuf:"varint,1,opt,name=debugging_supported,json=debuggingSupported,proto3" json:"debugging_supported,omitempty"`
 	// This is the same FQBN given in the IsDebugSupportedRequest but cleaned
 	// up of the board options that do not affect the debugger configuration.
@@ -470,31 +470,31 @@ type GetDebugConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The executable binary to debug
+	// The executable binary to debug.
 	Executable string `protobuf:"bytes,1,opt,name=executable,proto3" json:"executable,omitempty"`
-	// The toolchain type used for the build (for example "gcc")
+	// The toolchain type used for the build (for example "gcc").
 	Toolchain string `protobuf:"bytes,2,opt,name=toolchain,proto3" json:"toolchain,omitempty"`
-	// The toolchain directory
+	// The toolchain directory.
 	ToolchainPath string `protobuf:"bytes,3,opt,name=toolchain_path,json=toolchainPath,proto3" json:"toolchain_path,omitempty"`
-	// The toolchain architecture prefix (for example "arm-none-eabi")
+	// The toolchain architecture prefix (for example "arm-none-eabi").
 	ToolchainPrefix string `protobuf:"bytes,4,opt,name=toolchain_prefix,json=toolchainPrefix,proto3" json:"toolchain_prefix,omitempty"`
 	// The GDB server type used to connect to the programmer/board (for example
-	// "openocd")
+	// "openocd").
 	Server string `protobuf:"bytes,5,opt,name=server,proto3" json:"server,omitempty"`
-	// The GDB server directory
+	// The GDB server directory.
 	ServerPath string `protobuf:"bytes,6,opt,name=server_path,json=serverPath,proto3" json:"server_path,omitempty"`
-	// Extra configuration parameters wrt toolchain
+	// Extra configuration parameters wrt toolchain.
 	ToolchainConfiguration *anypb.Any `protobuf:"bytes,7,opt,name=toolchain_configuration,json=toolchainConfiguration,proto3" json:"toolchain_configuration,omitempty"`
-	// Extra configuration parameters wrt GDB server
+	// Extra configuration parameters wrt GDB server.
 	ServerConfiguration *anypb.Any `protobuf:"bytes,8,opt,name=server_configuration,json=serverConfiguration,proto3" json:"server_configuration,omitempty"`
 	// Custom debugger configurations (not handled directly by Arduino CLI but
 	// provided for 3rd party plugins/debuggers). The map keys identifies which
 	// 3rd party plugin/debugger is referred, the map string values contains a
 	// JSON configuration for it.
 	CustomConfigs map[string]string `protobuf:"bytes,9,rep,name=custom_configs,json=customConfigs,proto3" json:"custom_configs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// the SVD file to use
+	// the SVD file to use.
 	SvdFile string `protobuf:"bytes,10,opt,name=svd_file,json=svdFile,proto3" json:"svd_file,omitempty"`
-	// The programmer specified in the request
+	// The programmer specified in the request.
 	Programmer string `protobuf:"bytes,11,opt,name=programmer,proto3" json:"programmer,omitempty"`
 }
 
@@ -607,7 +607,7 @@ func (x *GetDebugConfigResponse) GetProgrammer() string {
 	return ""
 }
 
-// Configurations specific for the 'gcc' toolchain
+// Configurations specific for the 'gcc' toolchain.
 type DebugGCCToolchainConfiguration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -646,17 +646,17 @@ func (*DebugGCCToolchainConfiguration) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_debug_proto_rawDescGZIP(), []int{6}
 }
 
-// Configuration specific for the 'openocd` server
+// Configuration specific for the 'openocd` server.
 type DebugOpenOCDServerConfiguration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// path to openocd
+	// Path to openocd.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	// path to openocd scripts
+	// Path to openocd scripts.
 	ScriptsDir string `protobuf:"bytes,2,opt,name=scripts_dir,json=scriptsDir,proto3" json:"scripts_dir,omitempty"`
-	// list of scripts to execute by openocd
+	// List of scripts to execute by openocd.
 	Scripts []string `protobuf:"bytes,3,rep,name=scripts,proto3" json:"scripts,omitempty"`
 }
 

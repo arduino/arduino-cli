@@ -83,7 +83,7 @@ type CompileRequest struct {
 	// exist.
 	ExportDir string `protobuf:"bytes,18,opt,name=export_dir,json=exportDir,proto3" json:"export_dir,omitempty"`
 	// Optional: cleanup the build folder and do not use any previously cached
-	// build
+	// build.
 	Clean bool `protobuf:"varint,19,opt,name=clean,proto3" json:"clean,omitempty"`
 	// When set to `true` only the compilation database will be produced and no
 	// actual build will be performed.
@@ -99,11 +99,11 @@ type CompileRequest struct {
 	// A list of paths to single libraries root directory.
 	Library []string `protobuf:"bytes,24,rep,name=library,proto3" json:"library,omitempty"`
 	// The path where to search for the custom signing key name and the encrypt
-	// key name
+	// key name.
 	KeysKeychain string `protobuf:"bytes,25,opt,name=keys_keychain,json=keysKeychain,proto3" json:"keys_keychain,omitempty"`
-	// The name of the custom key to use for signing during the compile process
+	// The name of the custom key to use for signing during the compile process.
 	SignKey string `protobuf:"bytes,26,opt,name=sign_key,json=signKey,proto3" json:"sign_key,omitempty"`
-	// The name of the custom key to use for encrypting during the compile process
+	// The name of the custom key to use for encrypting during the compile process.
 	EncryptKey string `protobuf:"bytes,27,opt,name=encrypt_key,json=encryptKey,proto3" json:"encrypt_key,omitempty"`
 	// If set to true the build will skip the library discovery process and will
 	// use the same libraries of latest build. Enabling this flag may produce a
@@ -420,22 +420,22 @@ type isCompileResponse_Message interface {
 }
 
 type CompileResponse_OutStream struct {
-	// The output of the compilation process (stream)
+	// The output of the compilation process (stream).
 	OutStream []byte `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3,oneof"`
 }
 
 type CompileResponse_ErrStream struct {
-	// The error output of the compilation process (stream)
+	// The error output of the compilation process (stream).
 	ErrStream []byte `protobuf:"bytes,2,opt,name=err_stream,json=errStream,proto3,oneof"`
 }
 
 type CompileResponse_Progress struct {
-	// Completions reports of the compilation process (stream)
+	// Completions reports of the compilation process (stream).
 	Progress *TaskProgress `protobuf:"bytes,3,opt,name=progress,proto3,oneof"`
 }
 
 type CompileResponse_Result struct {
-	// The compilation result
+	// The compilation result.
 	Result *BuilderResult `protobuf:"bytes,4,opt,name=result,proto3,oneof"`
 }
 
@@ -490,19 +490,19 @@ type BuilderResult struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The compiler build path
+	// The compiler build path.
 	BuildPath string `protobuf:"bytes,1,opt,name=build_path,json=buildPath,proto3" json:"build_path,omitempty"`
-	// The libraries used in the build
+	// The libraries used in the build.
 	UsedLibraries []*Library `protobuf:"bytes,2,rep,name=used_libraries,json=usedLibraries,proto3" json:"used_libraries,omitempty"`
-	// The size of the executable split by sections
+	// The size of the executable split by sections.
 	ExecutableSectionsSize []*ExecutableSectionSize `protobuf:"bytes,3,rep,name=executable_sections_size,json=executableSectionsSize,proto3" json:"executable_sections_size,omitempty"`
-	// The platform where the board is defined
+	// The platform where the board is defined.
 	BoardPlatform *InstalledPlatformReference `protobuf:"bytes,4,opt,name=board_platform,json=boardPlatform,proto3" json:"board_platform,omitempty"`
-	// The platform used for the build (if referenced from the board platform)
+	// The platform used for the build (if referenced from the board platform).
 	BuildPlatform *InstalledPlatformReference `protobuf:"bytes,5,opt,name=build_platform,json=buildPlatform,proto3" json:"build_platform,omitempty"`
-	// Build properties used for compiling
+	// Build properties used for compiling.
 	BuildProperties []string `protobuf:"bytes,7,rep,name=build_properties,json=buildProperties,proto3" json:"build_properties,omitempty"`
-	// Compiler errors and warnings
+	// Compiler errors and warnings.
 	Diagnostics []*CompileDiagnostic `protobuf:"bytes,8,rep,name=diagnostics,proto3" json:"diagnostics,omitempty"`
 }
 
@@ -658,21 +658,21 @@ type CompileDiagnostic struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Severity of the diagnostic
+	// Severity of the diagnostic.
 	Severity string `protobuf:"bytes,1,opt,name=severity,proto3" json:"severity,omitempty"`
-	// The explanation of the diagnostic (it may be multiple preformatted lines)
+	// The explanation of the diagnostic (it may be multiple preformatted lines).
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	// The file containing the diagnostic
+	// The file containing the diagnostic.
 	File string `protobuf:"bytes,3,opt,name=file,proto3" json:"file,omitempty"`
-	// The line of the diagnostic if available (starts from 1)
+	// The line of the diagnostic if available (starts from 1).
 	Line int64 `protobuf:"varint,4,opt,name=line,proto3" json:"line,omitempty"`
-	// The column of the diagnostic if available (starts from 1)
+	// The column of the diagnostic if available (starts from 1).
 	Column int64 `protobuf:"varint,5,opt,name=column,proto3" json:"column,omitempty"`
 	// The context where this diagnostic is found (it may be multiple files that
 	// represents a chain of includes, or a text describing where the diagnostic
-	// is found)
+	// is found).
 	Context []*CompileDiagnosticContext `protobuf:"bytes,6,rep,name=context,proto3" json:"context,omitempty"`
-	// Annotations or suggestions to the diagnostic made by the compiler
+	// Annotations or suggestions to the diagnostic made by the compiler.
 	Notes []*CompileDiagnosticNote `protobuf:"bytes,7,rep,name=notes,proto3" json:"notes,omitempty"`
 }
 
@@ -762,13 +762,13 @@ type CompileDiagnosticContext struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The message describing the context reference
+	// The message describing the context reference.
 	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	// The file of the context reference
+	// The file of the context reference.
 	File string `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
-	// The line of the context reference
+	// The line of the context reference.
 	Line int64 `protobuf:"varint,3,opt,name=line,proto3" json:"line,omitempty"`
-	// The column of the context reference
+	// The column of the context reference.
 	Column int64 `protobuf:"varint,4,opt,name=column,proto3" json:"column,omitempty"`
 }
 
@@ -837,13 +837,13 @@ type CompileDiagnosticNote struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The message describing the compiler note
+	// The message describing the compiler note.
 	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	// The file of the compiler note
+	// The file of the compiler note.
 	File string `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
-	// The line of the compiler note
+	// The line of the compiler note.
 	Line int64 `protobuf:"varint,3,opt,name=line,proto3" json:"line,omitempty"`
-	// The column of the compiler note
+	// The column of the compiler note.
 	Column int64 `protobuf:"varint,4,opt,name=column,proto3" json:"column,omitempty"`
 }
 

@@ -70,7 +70,7 @@ message UploadResponse {
     bytes out_stream = 1;
     // The error output of the upload process.
     bytes err_stream = 2;
-    // The upload result
+    // The upload result.
     UploadResult result = 3;
   }
 }
@@ -191,14 +191,14 @@ message SupportedUserFieldsRequest {
 }
 
 message UserField {
-  // Id of the tool that supports this field
+  // Id of the tool that supports this field.
   string tool_id = 1;
-  // Name used internally to store and retrieve this field
+  // Name used internally to store and retrieve this field.
   string name = 2;
-  // Label is the text shown to the user when they need to input this field
+  // Label is the text shown to the user when they need to input this field.
   string label = 3;
   // True if the value of the field must not be shown when typing, for example
-  // when the user inputs a network password
+  // when the user inputs a network password.
   bool secret = 4;
 }
 
