@@ -1561,6 +1561,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#monitorportconfiguration" class="md-nav__link">
+    MonitorPortConfiguration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitorportsetting" class="md-nav__link">
+    MonitorPortSetting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platform" class="md-nav__link">
     Platform
   </a>
@@ -2235,22 +2249,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#monitorportconfiguration" class="md-nav__link">
-    MonitorPortConfiguration
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#monitorportopenrequest" class="md-nav__link">
     MonitorPortOpenRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#monitorportsetting" class="md-nav__link">
-    MonitorPortSetting
   </a>
   
 </li>
@@ -3359,6 +3359,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#monitorportconfiguration" class="md-nav__link">
+    MonitorPortConfiguration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitorportsetting" class="md-nav__link">
+    MonitorPortSetting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platform" class="md-nav__link">
     Platform
   </a>
@@ -4033,22 +4047,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#monitorportconfiguration" class="md-nav__link">
-    MonitorPortConfiguration
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#monitorportopenrequest" class="md-nav__link">
     MonitorPortOpenRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#monitorportsetting" class="md-nav__link">
-    MonitorPortSetting
   </a>
   
 </li>
@@ -4516,6 +4516,8 @@
     - <a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a>
     - <a href="#cc.arduino.cli.commands.v1.Instance">Instance</a>
     - <a href="#cc.arduino.cli.commands.v1.MissingProgrammerError">MissingProgrammerError</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a>
     - <a href="#cc.arduino.cli.commands.v1.Platform">Platform</a>
     - <a href="#cc.arduino.cli.commands.v1.PlatformMetadata">PlatformMetadata</a>
     - <a href="#cc.arduino.cli.commands.v1.PlatformRelease">PlatformRelease</a>
@@ -4618,9 +4620,7 @@
 <li><a href="#cc/arduino/cli/commands/v1/monitor.proto">cc/arduino/cli/commands/v1/monitor.proto</a>
     - <a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsRequest">EnumerateMonitorPortSettingsRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse">EnumerateMonitorPortSettingsResponse</a>
-    - <a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortOpenRequest">MonitorPortOpenRequest</a>
-    - <a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortSettingDescriptor">MonitorPortSettingDescriptor</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorRequest">MonitorRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorResponse">MonitorResponse</a></li>
@@ -6661,6 +6661,52 @@
 <h3 id="missingprogrammererror">MissingProgrammerError<a class="headerlink" href="#missingprogrammererror" title="Permanent link">&para;</a></h3>
 <p>MissingProgrammerError is a status error detail that is returned when
 the operation can not be completed due to a missing programmer argument.</p>
+<p><a name="cc.arduino.cli.commands.v1.MonitorPortConfiguration"></a></p>
+<h3 id="monitorportconfiguration">MonitorPortConfiguration<a class="headerlink" href="#monitorportconfiguration" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>settings</td>
+<td><a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a></td>
+<td>repeated</td>
+<td>The port configuration parameters</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.MonitorPortSetting"></a></p>
+<h3 id="monitorportsetting">MonitorPortSetting<a class="headerlink" href="#monitorportsetting" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setting_id</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.Platform"></a></p>
 <h3 id="platform">Platform<a class="headerlink" href="#platform" title="Permanent link">&para;</a></h3>
 <p>Platform is a structure containing all the information about a single
@@ -6992,6 +7038,12 @@ a platform and all its available releases.</p>
 <td></td>
 <td>Default Programmer set in project file (sketch.yaml)</td>
 </tr>
+<tr>
+<td>default_port_config</td>
+<td><a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a></td>
+<td></td>
+<td>Default Port configuration set in project file (sketch.yaml)</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.SketchProfile"></a></p>
@@ -7023,6 +7075,24 @@ a platform and all its available releases.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Programmer used by the profile</td>
+</tr>
+<tr>
+<td>port</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default Port in this profile</td>
+</tr>
+<tr>
+<td>port_config</td>
+<td><a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a></td>
+<td></td>
+<td>Default Port configuration set in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>protocol</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default Protocol in this profile</td>
 </tr>
 </tbody>
 </table>
@@ -7302,7 +7372,7 @@ a platform and all its available releases.</p>
 <td>build_cache_path</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td>Builds of &#39;core.a&#39; are saved into this path to be cached and reused.</td>
+<td><strong>Deprecated.</strong> Builds of core and sketches are saved into this path to be cached and reused.</td>
 </tr>
 <tr>
 <td>build_path</td>
@@ -7314,7 +7384,7 @@ a platform and all its available releases.</p>
 <td>build_properties</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td>List of custom build properties separated by commas.</td>
+<td>List of custom build properties.</td>
 </tr>
 <tr>
 <td>warnings</td>
@@ -8087,6 +8157,12 @@ error.</p>
 <td></td>
 <td>The programmer to use for debugging.</td>
 </tr>
+<tr>
+<td>debug_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom debug properties.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse"></a></p>
@@ -8236,6 +8312,12 @@ error.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The programmer to use for debugging.</td>
+</tr>
+<tr>
+<td>debug_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom debug properties.</td>
 </tr>
 </tbody>
 </table>
@@ -9569,26 +9651,6 @@ error.</p>
 </tr>
 </tbody>
 </table>
-<p><a name="cc.arduino.cli.commands.v1.MonitorPortConfiguration"></a></p>
-<h3 id="monitorportconfiguration">MonitorPortConfiguration<a class="headerlink" href="#monitorportconfiguration" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>settings</td>
-<td><a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a></td>
-<td>repeated</td>
-<td>The port configuration parameters</td>
-</tr>
-</tbody>
-</table>
 <p><a name="cc.arduino.cli.commands.v1.MonitorPortOpenRequest"></a></p>
 <h3 id="monitorportopenrequest">MonitorPortOpenRequest<a class="headerlink" href="#monitorportopenrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -9624,32 +9686,6 @@ error.</p>
 <td><a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a></td>
 <td></td>
 <td>Port configuration, optional, contains settings of the port to be applied</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.MonitorPortSetting"></a></p>
-<h3 id="monitorportsetting">MonitorPortSetting<a class="headerlink" href="#monitorportsetting" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>setting_id</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>value</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -10502,6 +10538,12 @@ Any missing field will be kept at the default value.</p>
 <td>repeated</td>
 <td>User provided fields usually used by upload tools that need authentication or in any case fields that can be customized by the user at upload time and cannot be known previously. For more info: <a href="https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields">https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields</a></td>
 </tr>
+<tr>
+<td>upload_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom upload properties.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry"></a></p>
@@ -10734,6 +10776,12 @@ Any missing field will be kept at the default value.</p>
 <td>repeated</td>
 <td>User provided fields usually used by upload tools that need authentication or in any case fields that can be customized by the user at upload time and cannot be known previously. For more info: <a href="https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields">https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields</a></td>
 </tr>
+<tr>
+<td>upload_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom upload properties.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry"></a></p>
@@ -10891,6 +10939,12 @@ Any missing field will be kept at the default value.</p>
 <td><a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry">UploadUsingProgrammerRequest.UserFieldsEntry</a></td>
 <td>repeated</td>
 <td>User provided fields usually used by upload tools that need authentication or in any case fields that can be customized by the user at upload time and cannot be known previously. For more info: <a href="https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields">https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields</a></td>
+</tr>
+<tr>
+<td>upload_properties</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of custom upload properties.</td>
 </tr>
 </tbody>
 </table>
