@@ -18,9 +18,9 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
 import "cc/arduino/cli/commands/v1/common.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 message PlatformInstallRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -32,13 +32,13 @@ message PlatformInstallRequest {
   // Platform version to install.
   string version = 4;
   // Set to true to not run (eventual) post install scripts for trusted
-  // platforms
+  // platforms.
   bool skip_post_install = 5;
   // Set to true to skip installation if a different version of the platform
   // is already installed.
   bool no_overwrite = 6;
   // Set to true to not run (eventual) pre uninstall scripts for trusted
-  // platforms when performing platform upgrades
+  // platforms when performing platform upgrades.
   bool skip_pre_uninstall = 7;
 }
 
@@ -61,6 +61,7 @@ message PlatformLoadingError {}
 message PlatformDownloadRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Vendor name of the platform (e.g., `arduino`).
   string platform_package = 2;
   // Architecture name of the platform (e.g., `avr`).
   string architecture = 3;
@@ -88,7 +89,7 @@ message PlatformUninstallRequest {
   // Architecture name of the platform (e.g., `avr`).
   string architecture = 3;
   // Set to true to not run (eventual) pre uninstall scripts for trusted
-  // platforms
+  // platforms.
   bool skip_pre_uninstall = 4;
 }
 
@@ -116,10 +117,10 @@ message PlatformUpgradeRequest {
   // Architecture name of the platform (e.g., `avr`).
   string architecture = 3;
   // Set to true to not run (eventual) post install scripts for trusted
-  // platforms
+  // platforms.
   bool skip_post_install = 4;
   // Set to true to not run (eventual) pre uninstall scripts for trusted
-  // platforms when performing platform upgrades
+  // platforms when performing platform upgrades.
   bool skip_pre_uninstall = 5;
 }
 

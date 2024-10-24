@@ -232,16 +232,19 @@ tasks:
       - protoc:check
       - protoc:format
       - protoc:compile
+      - protoc:breaking-change-detection
 
   protoc:compile:
     desc: Compile protobuf definitions
     cmds:
-      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=./rpc --go_opt=paths=source_relative --go-grpc_out=./rpc --go-grpc_opt=paths=source_relative ./rpc/cc/arduino/cli/commands/v1/*.proto'
+      - buf dep update
+      - buf generate
 
   protoc:docs:
     desc: Generate docs for protobuf definitions
     cmds:
-      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/cc/arduino/cli/commands/v1/*.proto'
+      - |
+        buf generate --template buf.doc.gen.yaml
 
   docs:include-configuration-json-schema:
     desc: Copy configuration JSON schema to make it available in documentation
@@ -251,7 +254,7 @@ tasks:
   protoc:check:
     desc: Perform linting of the protobuf definitions
     cmds:
-      - buf lint rpc
+      - buf lint
 
   protoc:collect:
     desc: Create a zip file containing all .proto files in DIST_DIR
@@ -263,7 +266,12 @@ tasks:
   protoc:format:
     desc: Perform formatting of the protobuf definitions
     cmds:
-      - clang-format -i rpc/cc/arduino/cli/*/*/*.proto
+      - buf format --write --exit-code
+
+  protoc:breaking-change-detection:
+    desc: Detect protobuf breaking changes
+    cmds:
+      - buf breaking --against '.git#branch=origin/master,subdir=rpc'
 
   build:
     desc: Build the project

@@ -18,10 +18,10 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/port.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 message UploadRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -70,7 +70,7 @@ message UploadResponse {
     bytes out_stream = 1;
     // The error output of the upload process.
     bytes err_stream = 2;
-    // The upload result
+    // The upload result.
     UploadResult result = 3;
   }
 }
@@ -168,16 +168,21 @@ message BurnBootloaderResponse {
 }
 
 message ListProgrammersAvailableForUploadRequest {
+  // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
   string fqbn = 2;
 }
 
 message ListProgrammersAvailableForUploadResponse {
+  // List of programmers supported by the board.
   repeated Programmer programmers = 1;
 }
 
 message SupportedUserFieldsRequest {
+  // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
   string fqbn = 2;
   // Protocol that will be used to upload, this information is
   // necessary to pick the right upload tool for the board specified
@@ -186,14 +191,14 @@ message SupportedUserFieldsRequest {
 }
 
 message UserField {
-  // Id of the tool that supports this field
+  // Id of the tool that supports this field.
   string tool_id = 1;
-  // Name used internally to store and retrieve this field
+  // Name used internally to store and retrieve this field.
   string name = 2;
-  // Label is the text shown to the user when they need to input this field
+  // Label is the text shown to the user when they need to input this field.
   string label = 3;
   // True if the value of the field must not be shown when typing, for example
-  // when the user inputs a network password
+  // when the user inputs a network password.
   bool secret = 4;
 }
 

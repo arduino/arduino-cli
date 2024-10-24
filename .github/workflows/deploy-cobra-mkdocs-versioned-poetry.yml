@@ -64,10 +64,9 @@ jobs:
       - name: Install Go dependencies
         run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
 
-      - name: Install protoc compiler
-        uses: arduino/setup-protoc@v3
+      - uses: bufbuild/buf-action@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          setup_only: true
 
       - name: Install Python
         uses: actions/setup-python@v5

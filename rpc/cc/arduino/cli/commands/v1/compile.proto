@@ -18,10 +18,10 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 message CompileRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -38,7 +38,7 @@ message CompileRequest {
   bool preprocess = 5;
   // Builds of core and sketches are saved into this path to be cached and
   // reused.
-  string build_cache_path = 6 [ deprecated = true ];
+  string build_cache_path = 6 [deprecated = true];
   // Path to use to store the files used for the compilation. If omitted,
   // a directory will be created in the operating system's default temporary
   // path.
@@ -64,7 +64,7 @@ message CompileRequest {
   // exist.
   string export_dir = 18;
   // Optional: cleanup the build folder and do not use any previously cached
-  // build
+  // build.
   bool clean = 19;
   // When set to `true` only the compilation database will be produced and no
   // actual build will be performed.
@@ -80,11 +80,11 @@ message CompileRequest {
   // A list of paths to single libraries root directory.
   repeated string library = 24;
   // The path where to search for the custom signing key name and the encrypt
-  // key name
+  // key name.
   string keys_keychain = 25;
-  // The name of the custom key to use for signing during the compile process
+  // The name of the custom key to use for signing during the compile process.
   string sign_key = 26;
-  // The name of the custom key to use for encrypting during the compile process
+  // The name of the custom key to use for encrypting during the compile process.
   string encrypt_key = 27;
   // If set to true the build will skip the library discovery process and will
   // use the same libraries of latest build. Enabling this flag may produce a
@@ -102,13 +102,13 @@ message CompileRequest {
 
 message CompileResponse {
   oneof message {
-    // The output of the compilation process (stream)
+    // The output of the compilation process (stream).
     bytes out_stream = 1;
-    // The error output of the compilation process (stream)
+    // The error output of the compilation process (stream).
     bytes err_stream = 2;
-    // Completions reports of the compilation process (stream)
+    // Completions reports of the compilation process (stream).
     TaskProgress progress = 3;
-    // The compilation result
+    // The compilation result.
     BuilderResult result = 4;
   }
 }
@@ -116,65 +116,68 @@ message CompileResponse {
 message InstanceNeedsReinitializationError {}
 
 message BuilderResult {
-  // The compiler build path
+  // The compiler build path.
   string build_path = 1;
-  // The libraries used in the build
+  // The libraries used in the build.
   repeated Library used_libraries = 2;
-  // The size of the executable split by sections
+  // The size of the executable split by sections.
   repeated ExecutableSectionSize executable_sections_size = 3;
-  // The platform where the board is defined
+  // The platform where the board is defined.
   InstalledPlatformReference board_platform = 4;
-  // The platform used for the build (if referenced from the board platform)
+  // The platform used for the build (if referenced from the board platform).
   InstalledPlatformReference build_platform = 5;
-  // Build properties used for compiling
+  // Build properties used for compiling.
   repeated string build_properties = 7;
-  // Compiler errors and warnings
+  // Compiler errors and warnings.
   repeated CompileDiagnostic diagnostics = 8;
 }
 
 message ExecutableSectionSize {
+  // The name of the section.
   string name = 1;
+  // The used size of the section in bytes.
   int64 size = 2;
+  // The maximum size of the section in bytes.
   int64 max_size = 3;
 }
 
 message CompileDiagnostic {
-  // Severity of the diagnostic
+  // Severity of the diagnostic.
   string severity = 1;
-  // The explanation of the diagnostic (it may be multiple preformatted lines)
+  // The explanation of the diagnostic (it may be multiple preformatted lines).
   string message = 2;
-  // The file containing the diagnostic
+  // The file containing the diagnostic.
   string file = 3;
-  // The line of the diagnostic if available (starts from 1)
+  // The line of the diagnostic if available (starts from 1).
   int64 line = 4;
-  // The column of the diagnostic if available (starts from 1)
+  // The column of the diagnostic if available (starts from 1).
   int64 column = 5;
   // The context where this diagnostic is found (it may be multiple files that
   // represents a chain of includes, or a text describing where the diagnostic
-  // is found)
+  // is found).
   repeated CompileDiagnosticContext context = 6;
-  // Annotations or suggestions to the diagnostic made by the compiler
+  // Annotations or suggestions to the diagnostic made by the compiler.
   repeated CompileDiagnosticNote notes = 7;
 }
 
 message CompileDiagnosticContext {
-  // The message describing the context reference
+  // The message describing the context reference.
   string message = 1;
-  // The file of the context reference
+  // The file of the context reference.
   string file = 2;
-  // The line of the context reference
+  // The line of the context reference.
   int64 line = 3;
-  // The column of the context reference
+  // The column of the context reference.
   int64 column = 4;
 }
 
 message CompileDiagnosticNote {
-  // The message describing the compiler note
+  // The message describing the compiler note.
   string message = 1;
-  // The file of the compiler note
+  // The file of the compiler note.
   string file = 2;
-  // The line of the compiler note
+  // The line of the compiler note.
   int64 line = 3;
-  // The column of the compiler note
+  // The column of the compiler note.
   int64 column = 4;
 }

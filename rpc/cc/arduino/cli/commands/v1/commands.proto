@@ -18,61 +18,55 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
-import "google/rpc/status.proto";
-
-import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/board.proto";
+import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/compile.proto";
 import "cc/arduino/cli/commands/v1/core.proto";
 import "cc/arduino/cli/commands/v1/debug.proto";
-import "cc/arduino/cli/commands/v1/monitor.proto";
-import "cc/arduino/cli/commands/v1/upload.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
+import "cc/arduino/cli/commands/v1/monitor.proto";
 import "cc/arduino/cli/commands/v1/settings.proto";
+import "cc/arduino/cli/commands/v1/upload.proto";
+import "google/rpc/status.proto";
 
-// The main Arduino Platform service API
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+// The main Arduino Platform service API.
 service ArduinoCoreService {
-  // Create a new Arduino Core instance
+  // Create a new Arduino Core instance.
   rpc Create(CreateRequest) returns (CreateResponse) {}
 
   // Initializes an existing Arduino Core instance by loading platforms and
-  // libraries
+  // libraries.
   rpc Init(InitRequest) returns (stream InitResponse) {}
 
-  // Destroy an instance of the Arduino Core Service
+  // Destroy an instance of the Arduino Core Service.
   rpc Destroy(DestroyRequest) returns (DestroyResponse) {}
 
-  // Update package index of the Arduino Core Service
+  // Update package index of the Arduino Core Service.
   rpc UpdateIndex(UpdateIndexRequest) returns (stream UpdateIndexResponse) {}
 
-  // Update libraries index
-  rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest)
-      returns (stream UpdateLibrariesIndexResponse) {}
+  // Update libraries index.
+  rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest) returns (stream UpdateLibrariesIndexResponse) {}
 
   // Get the version of Arduino CLI in use.
   rpc Version(VersionRequest) returns (VersionResponse) {}
 
-  // Create a new Sketch
+  // Create a new Sketch.
   rpc NewSketch(NewSketchRequest) returns (NewSketchResponse) {}
 
-  // Returns all files composing a Sketch
+  // Returns all files composing a Sketch.
   rpc LoadSketch(LoadSketchRequest) returns (LoadSketchResponse) {}
 
-  // Creates a zip file containing all files of specified Sketch
+  // Creates a zip file containing all files of specified Sketch.
   rpc ArchiveSketch(ArchiveSketchRequest) returns (ArchiveSketchResponse) {}
 
   // Sets the sketch default FQBN and Port Address/Protocol in
   // the sketch project file (sketch.yaml). These metadata can be retrieved
   // using LoadSketch.
-  rpc SetSketchDefaults(SetSketchDefaultsRequest)
-      returns (SetSketchDefaultsResponse) {}
+  rpc SetSketchDefaults(SetSketchDefaultsRequest) returns (SetSketchDefaultsResponse) {}
 
-  // BOARD COMMANDS
-  // --------------
-
-  // Requests details about a board
+  // Requests details about a board.
   rpc BoardDetails(BoardDetailsRequest) returns (BoardDetailsResponse);
 
   // List the boards currently connected to the computer.
@@ -85,87 +79,69 @@ service ArduinoCoreService {
   rpc BoardSearch(BoardSearchRequest) returns (BoardSearchResponse);
 
   // List boards connection and disconnected events.
-  rpc BoardListWatch(BoardListWatchRequest)
-      returns (stream BoardListWatchResponse);
+  rpc BoardListWatch(BoardListWatchRequest) returns (stream BoardListWatchResponse);
 
   // Compile an Arduino sketch.
   rpc Compile(CompileRequest) returns (stream CompileResponse);
 
   // Download and install a platform and its tool dependencies.
-  rpc PlatformInstall(PlatformInstallRequest)
-      returns (stream PlatformInstallResponse);
+  rpc PlatformInstall(PlatformInstallRequest) returns (stream PlatformInstallResponse);
 
   // Download a platform and its tool dependencies to the `staging/packages`
   // subdirectory of the data directory.
-  rpc PlatformDownload(PlatformDownloadRequest)
-      returns (stream PlatformDownloadResponse);
+  rpc PlatformDownload(PlatformDownloadRequest) returns (stream PlatformDownloadResponse);
 
   // Uninstall a platform as well as its tool dependencies that are not used by
   // other installed platforms.
-  rpc PlatformUninstall(PlatformUninstallRequest)
-      returns (stream PlatformUninstallResponse);
+  rpc PlatformUninstall(PlatformUninstallRequest) returns (stream PlatformUninstallResponse);
 
   // Upgrade an installed platform to the latest version.
-  rpc PlatformUpgrade(PlatformUpgradeRequest)
-      returns (stream PlatformUpgradeResponse);
+  rpc PlatformUpgrade(PlatformUpgradeRequest) returns (stream PlatformUpgradeResponse);
 
   // Upload a compiled sketch to a board.
   rpc Upload(UploadRequest) returns (stream UploadResponse);
 
   // Upload a compiled sketch to a board using a programmer.
-  rpc UploadUsingProgrammer(UploadUsingProgrammerRequest)
-      returns (stream UploadUsingProgrammerResponse);
+  rpc UploadUsingProgrammer(UploadUsingProgrammerRequest) returns (stream UploadUsingProgrammerResponse);
 
   // Returns the list of users fields necessary to upload to that board
   // using the specified protocol.
-  rpc SupportedUserFields(SupportedUserFieldsRequest)
-      returns (SupportedUserFieldsResponse);
+  rpc SupportedUserFields(SupportedUserFieldsRequest) returns (SupportedUserFieldsResponse);
 
   // List programmers available for a board.
-  rpc ListProgrammersAvailableForUpload(
-      ListProgrammersAvailableForUploadRequest)
-      returns (ListProgrammersAvailableForUploadResponse);
+  rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadRequest) returns (ListProgrammersAvailableForUploadResponse);
 
   // Burn bootloader to a board.
-  rpc BurnBootloader(BurnBootloaderRequest)
-      returns (stream BurnBootloaderResponse);
+  rpc BurnBootloader(BurnBootloaderRequest) returns (stream BurnBootloaderResponse);
 
   // Search for a platform in the platforms indexes.
   rpc PlatformSearch(PlatformSearchRequest) returns (PlatformSearchResponse);
 
   // Download the archive file of an Arduino library in the libraries index to
   // the staging directory.
-  rpc LibraryDownload(LibraryDownloadRequest)
-      returns (stream LibraryDownloadResponse);
+  rpc LibraryDownload(LibraryDownloadRequest) returns (stream LibraryDownloadResponse);
 
   // Download and install an Arduino library from the libraries index.
-  rpc LibraryInstall(LibraryInstallRequest)
-      returns (stream LibraryInstallResponse);
+  rpc LibraryInstall(LibraryInstallRequest) returns (stream LibraryInstallResponse);
 
   // Upgrade a library to the newest version available.
-  rpc LibraryUpgrade(LibraryUpgradeRequest)
-      returns (stream LibraryUpgradeResponse);
+  rpc LibraryUpgrade(LibraryUpgradeRequest) returns (stream LibraryUpgradeResponse);
 
-  // Install a library from a Zip File
-  rpc ZipLibraryInstall(ZipLibraryInstallRequest)
-      returns (stream ZipLibraryInstallResponse);
+  // Install a library from a Zip File.
+  rpc ZipLibraryInstall(ZipLibraryInstallRequest) returns (stream ZipLibraryInstallResponse);
 
-  // Download and install a library from a git url
-  rpc GitLibraryInstall(GitLibraryInstallRequest)
-      returns (stream GitLibraryInstallResponse);
+  // Download and install a library from a git url.
+  rpc GitLibraryInstall(GitLibraryInstallRequest) returns (stream GitLibraryInstallResponse);
 
   // Uninstall an Arduino library.
-  rpc LibraryUninstall(LibraryUninstallRequest)
-      returns (stream LibraryUninstallResponse);
+  rpc LibraryUninstall(LibraryUninstallRequest) returns (stream LibraryUninstallResponse);
 
   // Upgrade all installed Arduino libraries to the newest version available.
-  rpc LibraryUpgradeAll(LibraryUpgradeAllRequest)
-      returns (stream LibraryUpgradeAllResponse);
+  rpc LibraryUpgradeAll(LibraryUpgradeAllRequest) returns (stream LibraryUpgradeAllResponse);
 
   // List the recursive dependencies of a library, as defined by the `depends`
   // field of the library.properties files.
-  rpc LibraryResolveDependencies(LibraryResolveDependenciesRequest)
-      returns (LibraryResolveDependenciesResponse);
+  rpc LibraryResolveDependencies(LibraryResolveDependenciesRequest) returns (LibraryResolveDependenciesResponse);
 
   // Search the Arduino libraries index for libraries.
   rpc LibrarySearch(LibrarySearchRequest) returns (LibrarySearchResponse);
@@ -173,53 +149,44 @@ service ArduinoCoreService {
   // List the installed libraries.
   rpc LibraryList(LibraryListRequest) returns (LibraryListResponse);
 
-  // Open a monitor connection to a board port
+  // Open a monitor connection to a board port.
   rpc Monitor(stream MonitorRequest) returns (stream MonitorResponse);
 
-  // Returns the parameters that can be set in the MonitorRequest calls
-  rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest)
-      returns (EnumerateMonitorPortSettingsResponse);
+  // Returns the parameters that can be set in the MonitorRequest calls.
+  rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest) returns (EnumerateMonitorPortSettingsResponse);
 
   // Start a debug session and communicate with the debugger tool.
   rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
 
   // Determine if debugging is suported given a specific configuration.
-  rpc IsDebugSupported(IsDebugSupportedRequest)
-      returns (IsDebugSupportedResponse) {}
+  rpc IsDebugSupported(IsDebugSupportedRequest) returns (IsDebugSupportedResponse) {}
 
   // Query the debugger information given a specific configuration.
   rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
 
   // Check for updates to the Arduino CLI.
-  rpc CheckForArduinoCLIUpdates(CheckForArduinoCLIUpdatesRequest)
-      returns (CheckForArduinoCLIUpdatesResponse);
+  rpc CheckForArduinoCLIUpdates(CheckForArduinoCLIUpdatesRequest) returns (CheckForArduinoCLIUpdatesResponse);
 
   // Clean the download cache directory (where archives are downloaded).
-  rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest)
-      returns (CleanDownloadCacheDirectoryResponse);
+  rpc CleanDownloadCacheDirectory(CleanDownloadCacheDirectoryRequest) returns (CleanDownloadCacheDirectoryResponse);
 
-  // Writes the settings currently stored in memory in a YAML file
-  rpc ConfigurationSave(ConfigurationSaveRequest)
-      returns (ConfigurationSaveResponse);
+  // Writes the settings currently stored in memory in a YAML file.
+  rpc ConfigurationSave(ConfigurationSaveRequest) returns (ConfigurationSaveResponse);
 
-  // Read the settings from a YAML file
-  rpc ConfigurationOpen(ConfigurationOpenRequest)
-      returns (ConfigurationOpenResponse);
+  // Read the settings from a YAML file.
+  rpc ConfigurationOpen(ConfigurationOpenRequest) returns (ConfigurationOpenResponse);
 
-  rpc ConfigurationGet(ConfigurationGetRequest)
-      returns (ConfigurationGetResponse);
+  // Get the current configuration.
+  rpc ConfigurationGet(ConfigurationGetRequest) returns (ConfigurationGetResponse);
 
-  // Enumerate all the keys/values pairs available in the configuration
-  rpc SettingsEnumerate(SettingsEnumerateRequest)
-      returns (SettingsEnumerateResponse);
+  // Enumerate all the keys/values pairs available in the configuration.
+  rpc SettingsEnumerate(SettingsEnumerateRequest) returns (SettingsEnumerateResponse);
 
-  // Get a single configuration value
-  rpc SettingsGetValue(SettingsGetValueRequest)
-      returns (SettingsGetValueResponse);
+  // Get a single configuration value.
+  rpc SettingsGetValue(SettingsGetValueRequest) returns (SettingsGetValueResponse);
 
-  // Set a single configuration value
-  rpc SettingsSetValue(SettingsSetValueRequest)
-      returns (SettingsSetValueResponse);
+  // Set a single configuration value.
+  rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse);
 }
 
 message CreateRequest {}
@@ -232,9 +199,9 @@ message CreateResponse {
 message InitRequest {
   // An Arduino Core instance.
   Instance instance = 1;
-  // Profile to use
+  // Profile to use.
   string profile = 2;
-  // The path where the sketch is stored
+  // The path where the sketch is stored.
   string sketch_path = 3;
 }
 
@@ -246,33 +213,36 @@ message InitResponse {
     TaskProgress task_progress = 2;
   }
   oneof message {
+    // The initialization progress.
     Progress init_progress = 1;
+    // The error in case the initialization failed.
     google.rpc.Status error = 2;
-    // Selected profile information
+    // Selected profile information.
     SketchProfile profile = 3;
   }
 }
 
+// Represent the reason why an instance initialization failed.
 enum FailedInstanceInitReason {
-  // FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized
+  // FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized.
   FAILED_INSTANCE_INIT_REASON_UNSPECIFIED = 0;
-  // INVALID_INDEX_URL a package index url is malformed
+  // INVALID_INDEX_URL a package index url is malformed.
   FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL = 1;
   // FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR failure encountered while
-  // loading an index
+  // loading an index.
   FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR = 2;
   // FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR failure encountered while
-  // loading a tool
+  // loading a tool.
   FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR = 3;
   // FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR failure encountered while
-  // downloading an index
+  // downloading an index.
   FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR = 4;
 }
 
 message FailedInstanceInitError {
-  // specific cause of the error
+  // specific cause of the error.
   FailedInstanceInitReason reason = 1;
-  // explanation of the error
+  // explanation of the error.
   string message = 2;
 }
 
@@ -328,6 +298,7 @@ message UpdateLibrariesIndexResponse {
 }
 
 message IndexUpdateReport {
+  // The status represents the result of the index update.
   enum Status {
     // The status of the index update is unspecified.
     STATUS_UNSPECIFIED = 0;
@@ -355,75 +326,75 @@ message VersionResponse {
 }
 
 message NewSketchRequest {
-  // New sketch name
+  // New sketch name.
   string sketch_name = 2;
   // Optional: create a Sketch in this directory
   // (used as "Sketchbook" directory).
   // Default Sketchbook directory "directories.User" is used if sketch_dir is
   // empty.
   string sketch_dir = 3;
-  // Specificies if an existing .ino sketch should be overwritten
+  // Specificies if an existing .ino sketch should be overwritten.
   bool overwrite = 4;
 
   reserved 1;
 }
 
 message NewSketchResponse {
-  // Absolute path to a main sketch file
+  // Absolute path to a main sketch file.
   string main_file = 1;
 }
 
 message LoadSketchRequest {
-  // Absolute path to single sketch file or a sketch folder
+  // Absolute path to single sketch file or a sketch folder.
   string sketch_path = 2;
 
   reserved 1;
 }
 
 message LoadSketchResponse {
-  // The loaded sketch
+  // The loaded sketch.
   Sketch sketch = 1;
 }
 
 message ArchiveSketchRequest {
-  // Absolute path to Sketch file or folder containing Sketch file
+  // Absolute path to Sketch file or folder containing Sketch file.
   string sketch_path = 1;
   // Absolute path to archive that will be created or folder that will contain
-  // it
+  // it.
   string archive_path = 2;
-  // Specifies if build directory should be included in the archive
+  // Specifies if build directory should be included in the archive.
   bool include_build_dir = 3;
-  // Allows to override an already existing archive
+  // Allows to override an already existing archive.
   bool overwrite = 4;
 }
 
 message ArchiveSketchResponse {}
 
 message SetSketchDefaultsRequest {
-  // Absolute path to Sketch file or folder containing Sketch file
+  // Absolute path to Sketch file or folder containing Sketch file.
   string sketch_path = 1;
-  // The desired value for default_fqbn in project file (sketch.yaml)
+  // The desired value for default_fqbn in project file (sketch.yaml).
   string default_fqbn = 2;
-  // The desired value for default_port in project file (sketch.yaml)
+  // The desired value for default_port in project file (sketch.yaml).
   string default_port_address = 3;
-  // The desired value for default_protocol in project file (sketch.yaml)
+  // The desired value for default_protocol in project file (sketch.yaml).
   string default_port_protocol = 4;
-  // The desired value for default_programmer in project file (sketch.yaml)
+  // The desired value for default_programmer in project file (sketch.yaml).
   string default_programmer = 5;
 }
 
 message SetSketchDefaultsResponse {
   // The value of default_fqnn that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_fqbn = 1;
   // The value of default_port that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_port_address = 2;
   // The value of default_protocol that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_port_protocol = 3;
   // The value of default_programmer that has been written in project file
-  // (sketch.yaml)
+  // (sketch.yaml).
   string default_programmer = 4;
 }
 
