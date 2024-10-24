@@ -19,7 +19,6 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/version"
 )
@@ -27,12 +26,7 @@ import (
 // NewArduinoCoreServer returns an implementation of the ArduinoCoreService gRPC service
 // that uses the provided version string.
 func NewArduinoCoreServer() rpc.ArduinoCoreServiceServer {
-	settings := configuration.NewSettings()
-
-	// Setup i18n
-	i18n.Init(settings.Locale())
-
-	return &arduinoCoreServerImpl{settings: settings}
+	return &arduinoCoreServerImpl{settings: configuration.NewSettings()}
 }
 
 type arduinoCoreServerImpl struct {

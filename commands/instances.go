@@ -419,7 +419,9 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	// Refreshes the locale used, this will change the
 	// language of the CLI if the locale is different
 	// after started.
-	i18n.Init(s.settings.GetString("locale"))
+	if locale, ok, _ := s.settings.GetStringOk("locale"); ok {
+		i18n.Init(locale)
+	}
 
 	return nil
 }
