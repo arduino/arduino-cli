@@ -155,15 +155,9 @@ downloadFile() {
       echo "Trying to find a release using the GitHub API."
 
       LATEST_RELEASE_URL="https://api.github.com/repos/${PROJECT_OWNER}/$PROJECT_NAME/releases/tags/$TAG"
-      if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-        HTTP_RESPONSE=$(curl -sL --write-out 'HTTPSTATUS:%{http_code}' "$LATEST_RELEASE_URL")
-        HTTP_STATUS_CODE=$(echo "$HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-        BODY=$(echo "$HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
-      elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-        TMP_FILE=$(mktemp)
-        BODY=$(wget --server-response --content-on-error -q -O - "$LATEST_RELEASE_URL" 2>"$TMP_FILE" || true)
-        HTTP_STATUS_CODE=$(awk '/^  HTTP/{print $2}' "$TMP_FILE")
-      fi
+      TMP_BODY_FILE=$(mktemp)
+      HTTP_STATUS_CODE=$(getFile "$LATEST_RELEASE_URL" "$TMP_BODY_FILE")
+      BODY=$(cat "$TMP_BODY_FILE")
       if [ "$HTTP_STATUS_CODE" != 200 ]; then
         echo "Request failed with HTTP status code $HTTP_STATUS_CODE"
         fail "Body: $BODY"
