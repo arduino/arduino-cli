@@ -107,6 +107,7 @@ getFile() {
     TMP_FILE=$(mktemp)
     wget --server-response --content-on-error -q -O "$GETFILE_FILE_PATH" "$GETFILE_URL" 2>"$TMP_FILE"
     GETFILE_HTTP_STATUS_CODE=$(awk '/^  HTTP/{print $2}' "$TMP_FILE")
+    rm -f "$TMP_FILE"
   fi
   echo "$GETFILE_HTTP_STATUS_CODE"
 }
@@ -158,6 +159,7 @@ downloadFile() {
       TMP_BODY_FILE=$(mktemp)
       HTTP_STATUS_CODE=$(getFile "$LATEST_RELEASE_URL" "$TMP_BODY_FILE")
       BODY=$(cat "$TMP_BODY_FILE")
+      rm -f "$TMP_BODY_FILE"
       if [ "$HTTP_STATUS_CODE" != 200 ]; then
         echo "Request failed with HTTP status code $HTTP_STATUS_CODE"
         fail "Body: $BODY"
