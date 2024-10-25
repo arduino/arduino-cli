@@ -1,0 +1,19 @@
+version: v2
+deps:
+  - buf.build/googleapis/googleapis:e7f8d366f5264595bcc4cd4139af9973
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - STANDARD
+    - COMMENT_ENUM
+    - COMMENT_ENUM_VALUE
+    - COMMENT_FIELD
+    - COMMENT_RPC
+    - COMMENT_SERVICE
+  ignore_only:
+    ENUM_ZERO_VALUE_SUFFIX:
+      - rpc/cc/arduino/cli/commands/v1/lib.proto
+modules:
+  - path: rpc

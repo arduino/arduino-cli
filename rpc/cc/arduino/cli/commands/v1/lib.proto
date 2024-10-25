@@ -18,9 +18,9 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
-
 import "cc/arduino/cli/commands/v1/common.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 message LibraryDownloadRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -56,10 +56,11 @@ message LibraryInstallRequest {
   // Set to true to skip installation if a different version of the library or
   // one of its dependencies is already installed, defaults to false.
   bool no_overwrite = 5;
-  // Install the library and dependencies in the specified location
+  // Install the library and dependencies in the specified location.
   LibraryInstallLocation install_location = 6;
 }
 
+// Represent a library installation location.
 enum LibraryInstallLocation {
   // In the `libraries` subdirectory of the user directory (sketchbook). This is
   // the default if not specified.
@@ -183,6 +184,7 @@ message LibrarySearchRequest {
   string search_args = 3;
 }
 
+// Represent the result of the library search.
 enum LibrarySearchStatus {
   // No search results were found.
   LIBRARY_SEARCH_STATUS_FAILED = 0;
@@ -271,7 +273,7 @@ message LibraryListRequest {
   // Whether to list only libraries for which there is a newer version than
   // the installed version available in the libraries index.
   bool updatable = 3;
-  // If set filters out the libraries not matching name
+  // If set filters out the libraries not matching name.
   string name = 4;
   // By setting this field all duplicate libraries are filtered out leaving
   // only the libraries that will be used to compile for the specified board
@@ -342,12 +344,12 @@ message Library {
   LibraryLocation location = 24;
   // The library format type.
   LibraryLayout layout = 25;
-  // The example sketches provided by the library
+  // The example sketches provided by the library.
   repeated string examples = 26;
   // Value of the `includes` field in library.properties or, if missing, the
   // list of include files available on the library source root directory.
   repeated string provides_includes = 27;
-  // Map of FQBNs that specifies if library is compatible with this library
+  // Map of FQBNs that specifies if library is compatible with this library.
   map<string, bool> compatible_with = 28;
   // This value is set to true if the library is in development and should not
   // be treated as read-only. This status is determined by the presence of a
@@ -355,6 +357,7 @@ message Library {
   bool in_development = 29;
 }
 
+// Represent the library layout.
 enum LibraryLayout {
   // Library is in the 1.0 Arduino library format.
   LIBRARY_LAYOUT_FLAT = 0;
@@ -362,6 +365,7 @@ enum LibraryLayout {
   LIBRARY_LAYOUT_RECURSIVE = 1;
 }
 
+// Represent the location of the library.
 enum LibraryLocation {
   // In the configured 'builtin.libraries' directory.
   LIBRARY_LOCATION_BUILTIN = 0;
@@ -380,7 +384,7 @@ enum LibraryLocation {
 message ZipLibraryInstallRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // Path to the archived library
+  // Path to the archived library.
   string path = 2;
   // Set to true to overwrite an already installed library with the same name.
   // Defaults to false.
@@ -402,7 +406,7 @@ message ZipLibraryInstallResponse {
 message GitLibraryInstallRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // URL to the repository containing the library
+  // URL to the repository containing the library.
   string url = 2;
   // Set to true to overwrite an already installed library with the same name.
   // Defaults to false.
