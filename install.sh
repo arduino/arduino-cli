@@ -102,7 +102,7 @@ getFile() {
   GETFILE_URL="$1"
   GETFILE_FILE_PATH="$2"
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-    GETFILE_HTTP_STATUS_CODE=$(curl -s -w '%{http_code}' -L "$GETFILE_URL" -o "$GETFILE_FILE_PATH")
+    GETFILE_HTTP_STATUS_CODE=$(curl --silent --show-error --write-out '%{http_code}' --location "$GETFILE_URL" -o "$GETFILE_FILE_PATH")
   elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
     TMP_FILE=$(mktemp)
     wget --server-response --content-on-error -q -O "$GETFILE_FILE_PATH" "$GETFILE_URL" 2>"$TMP_FILE"
