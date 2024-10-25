@@ -18,7 +18,7 @@ require (
 	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
-	github.com/fatih/color v1.17.0
+	github.com/fatih/color v1.18.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/gofrs/uuid/v5 v5.3.0
 	github.com/leonelquinteros/gotext v1.4.0
