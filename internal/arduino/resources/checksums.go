@@ -31,6 +31,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 // TestLocalArchiveChecksum test if the checksum of the local archive match the checksum of the DownloadResource
@@ -82,20 +83,21 @@ func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bo
 }
 
 // TestLocalArchiveSize test if the local archive size match the DownloadResource size
-func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, error) {
+func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) error {
 	filePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return false, errors.New(i18n.Tr("getting archive path: %s", err))
+		return errors.New(i18n.Tr("getting archive path: %s", err))
 	}
 	info, err := filePath.Stat()
 	if err != nil {
-		return false, errors.New(i18n.Tr("getting archive info: %s", err))
+		return errors.New(i18n.Tr("getting archive info: %s", err))
 	}
+	// If the size do not match, just report a warning and continue
+	// (the checksum is sufficient to ensure the integrity of the archive)
 	if info.Size() != r.Size {
-		return false, fmt.Errorf("%s: %d != %d", i18n.Tr("fetched archive size differs from size specified in index"), info.Size(), r.Size)
+		logrus.Warningf("%s: %d != %d", i18n.Tr("fetched archive size differs from size specified in index"), info.Size(), r.Size)
 	}
-
-	return true, nil
+	return nil
 }
 
 // TestLocalArchiveIntegrity checks for integrity of the local archive.
@@ -106,10 +108,8 @@ func (r *DownloadResource) TestLocalArchiveIntegrity(downloadDir *paths.Path) (b
 		return false, nil
 	}
 
-	if ok, err := r.TestLocalArchiveSize(downloadDir); err != nil {
+	if err := r.TestLocalArchiveSize(downloadDir); err != nil {
 		return false, errors.New(i18n.Tr("testing archive size: %s", err))
-	} else if !ok {
-		return false, nil
 	}
 
 	ok, err := r.TestLocalArchiveChecksum(downloadDir)

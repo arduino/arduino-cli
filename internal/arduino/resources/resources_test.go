@@ -82,6 +82,10 @@ func TestDownloadAndChecksums(t *testing.T) {
 	require.NoError(t, err)
 	downloadAndTestChecksum()
 
+	require.NoError(t, r.TestLocalArchiveSize(tmp))
+	r.Size = 500
+	require.NoError(t, r.TestLocalArchiveSize(tmp))
+
 	r.Checksum = ""
 	_, err = r.TestLocalArchiveChecksum(tmp)
 	require.Error(t, err)
