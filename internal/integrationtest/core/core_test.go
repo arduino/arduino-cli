@@ -1354,3 +1354,15 @@ func TestReferencedCoreBuildAndRuntimeProperties(t *testing.T) {
 		out.ArrayMustContain(jsonEncode("runtime.platform.path=" + corePlatformPath))
 	}
 }
+
+func TestCoreInstallWithWrongArchiveSize(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/2332
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("--additional-urls", "https://raw.githubusercontent.com/geolink/opentracker-arduino-board/bf6158ebab0402db217bfb02ea61461ddc6f2940/package_opentracker_index.json", "core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("--additional-urls", "https://raw.githubusercontent.com/geolink/opentracker-arduino-board/bf6158ebab0402db217bfb02ea61461ddc6f2940/package_opentracker_index.json", "core", "install", "opentracker:sam@1.0.5")
+	require.NoError(t, err)
+}
