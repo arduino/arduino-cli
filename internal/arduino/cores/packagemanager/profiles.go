@@ -132,7 +132,7 @@ func (pmb *Builder) installMissingProfilePlatform(ctx context.Context, platformR
 
 	// Perform install
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing platform %s", tmpPlatformRelease)})
-	if err := tmpPme.InstallPlatformInDirectory(tmpPlatformRelease, destDir); err != nil {
+	if err := tmpPme.InstallPlatformInDirectory(tmpPlatformRelease, destDir, resources.IntegrityCheckFull); err != nil {
 		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error installing platform %s", tmpPlatformRelease)})
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing platform %s", tmpPlatformRelease), Cause: err}
 	}
@@ -183,7 +183,7 @@ func (pmb *Builder) installMissingProfileTool(ctx context.Context, toolRelease *
 
 	// Install tool
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing tool %s", toolRelease)})
-	if err := toolResource.Install(pmb.DownloadDir, tmp, destDir); err != nil {
+	if err := toolResource.Install(pmb.DownloadDir, tmp, destDir, resources.IntegrityCheckFull); err != nil {
 		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error installing tool %s", toolRelease)})
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing tool %s", toolRelease), Cause: err}
 	}
