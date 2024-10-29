@@ -44,7 +44,7 @@ func TestInstallPlatform(t *testing.T) {
 			Size:            157,
 		}
 
-		require.NoError(t, r.Install(downloadDir, tempPath, destDir))
+		require.NoError(t, r.Install(downloadDir, tempPath, destDir, IntegrityCheckFull))
 	})
 
 	tests := []struct {
@@ -82,7 +82,7 @@ func TestInstallPlatform(t *testing.T) {
 			require.NoError(t, err)
 			require.NoError(t, os.WriteFile(path.Join(downloadDir.String(), testFileName), origin, 0644))
 
-			err = test.downloadResource.Install(downloadDir, tempPath, destDir)
+			err = test.downloadResource.Install(downloadDir, tempPath, destDir, IntegrityCheckFull)
 			require.Error(t, err)
 			require.Contains(t, err.Error(), test.error)
 		})

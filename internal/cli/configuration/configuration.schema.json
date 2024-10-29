@@ -13,6 +13,10 @@
             "type": "string",
             "format": "uri"
           }
+        },
+        "enable_unsafe_install": {
+          "description": "set to `true` to allow installation of packages that do not pass the checksum test. This is considered an unsafe installation method and should be used only for development purposes.",
+          "type": "boolean"
         }
       },
       "type": "object"
