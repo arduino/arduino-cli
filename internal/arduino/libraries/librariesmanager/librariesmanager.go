@@ -245,23 +245,24 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			loadedLibs = append(loadedLibs, library)
 		}
 
-		// Write lib cache
-		cache, err := cacheFilePath.Create()
-		if err != nil {
-			s := status.Newf(codes.FailedPrecondition, "creating lib cache %[1]s: %[2]s", cacheFilePath, err)
-			return append(statuses, s)
-		}
 		// Preload source files and header
 		for _, lib := range loadedLibs {
 			lib.SourceHeaders()
 		}
-		// Write the cache
-		err = loadedLibs.MarshalBinary(cache, librariesDir.Path)
-		cache.Close()
-		if err != nil {
-			cacheFilePath.Remove()
-			s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
-			return append(statuses, s)
+		if librariesDir.Location != libraries.Unmanaged {
+			// Write lib cache
+			cache, err := cacheFilePath.Create()
+			if err != nil {
+				s := status.Newf(codes.FailedPrecondition, "creating lib cache %[1]s: %[2]s", cacheFilePath, err)
+				return append(statuses, s)
+			}
+			err = loadedLibs.MarshalBinary(cache, librariesDir.Path)
+			cache.Close()
+			if err != nil {
+				cacheFilePath.Remove()
+				s := status.Newf(codes.FailedPrecondition, "writing lib cache %[1]s: %[2]s", cacheFilePath, err)
+				return append(statuses, s)
+			}
 		}
 	}
 
