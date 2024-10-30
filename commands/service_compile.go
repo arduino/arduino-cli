@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/builder"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
@@ -77,9 +78,17 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		exportBinaries = *e
 	}
 
-	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
-	if err != nil {
+	var pme *packagemanager.Explorer
+	var release func()
+	if _pme, _release, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
 		return err
+	} else {
+		pme = _pme
+		release = func() {
+			_release()
+			// Release once if called multiple times
+			_release = func() {}
+		}
 	}
 	defer release()
 
@@ -358,6 +367,10 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 				targetBoard.String(), "'build.board'", sketchBuilder.GetBuildProperties().Get("build.board")) + "\n"))
 	}
 
+	// Release package manager
+	release()
+
+	// Perform the actual build
 	if err := sketchBuilder.Build(); err != nil {
 		return &cmderrors.CompileFailedError{Message: err.Error()}
 	}
