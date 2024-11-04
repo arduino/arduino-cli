@@ -201,8 +201,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: ${{ env.ARTIFACT_NAME }}-*
-          merge-multiple: true
+          name: ${{ env.ARTIFACT_NAME }}-Windows_64bit
           path: ${{ env.DIST_DIR }}
 
       - name: Prepare PATH
