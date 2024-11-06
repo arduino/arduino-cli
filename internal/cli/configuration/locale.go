@@ -16,5 +16,8 @@
 package configuration
 
 func (s *Settings) Locale() string {
+	if locale, ok, err := s.GetStringOk("locale"); ok && err == nil {
+		return locale
+	}
 	return s.Defaults.GetString("locale")
 }
