@@ -16,16 +16,17 @@
 package i18n
 
 import (
-	"fmt"
 	"strings"
 	"syscall"
 	"unsafe"
+
+	"github.com/sirupsen/logrus"
 )
 
 func getLocaleIdentifier() string {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("failed to get windows user locale", r)
+			logrus.WithField("error", r).Errorf("Failed to get windows user locale")
 		}
 	}()
 
