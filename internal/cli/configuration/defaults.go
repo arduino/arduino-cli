@@ -73,7 +73,7 @@ func SetDefaults(settings *Settings) {
 	setKeyTypeSchema("network.user_agent_ext", "")
 
 	// locale
-	setDefaultValueAndKeyTypeSchema("locale", "en")
+	setKeyTypeSchema("locale", "")
 }
 
 // InjectEnvVars change settings based on the environment variables values

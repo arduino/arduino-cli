@@ -62,7 +62,6 @@ func TestGetAll(t *testing.T) {
 			"user": `+defaultUserDir.GetEncodedValue()+`
 		},
 		"library": {},
-		"locale": "en",
 		"logging": {
 			"format": "text",
 			"level": "info"
