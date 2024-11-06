@@ -30,6 +30,10 @@ func getLocaleIdentifier() string {
 		}
 	}()
 
+	if loc := getLocaleIdentifierFromEnv(); loc != "" {
+		return loc
+	}
+
 	dll := syscall.MustLoadDLL("kernel32")
 	defer dll.Release()
 	proc := dll.MustFindProc("GetUserDefaultLocaleName")
