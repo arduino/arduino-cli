@@ -28,7 +28,7 @@ var po *gotext.Po
 var contents embed.FS
 
 func init() {
-	po = new(gotext.Po)
+	po = gotext.NewPo()
 }
 
 func supportedLocales() []string {
@@ -75,6 +75,6 @@ func setLocale(locale string) {
 	if err != nil {
 		panic("Error reading embedded i18n data: " + err.Error())
 	}
-	po = new(gotext.Po)
+	po = gotext.NewPo()
 	po.Parse(poFile)
 }
