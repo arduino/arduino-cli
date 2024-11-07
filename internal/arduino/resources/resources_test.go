@@ -131,29 +131,45 @@ func TestIndexDownloadAndSignatureWithinArchive(t *testing.T) {
 	require.NoError(t, err)
 	defer ln.Close()
 	go server.Serve(ln)
+	defer server.Close()
 
-	validIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/valid/package_index.tar.bz2")
-	require.NoError(t, err)
-	idxResource := &IndexResource{URL: validIdxURL}
-	destDir, err := paths.MkTempDir("", "")
-	require.NoError(t, err)
-	defer destDir.RemoveAll()
-	err = idxResource.Download(ctx, destDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
-	require.NoError(t, err)
-	require.True(t, destDir.Join("package_index.json").Exist())
-	require.True(t, destDir.Join("package_index.json.sig").Exist())
-
-	invalidIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/invalid/package_index.tar.bz2")
-	require.NoError(t, err)
-	invIdxResource := &IndexResource{URL: invalidIdxURL}
-	invDestDir, err := paths.MkTempDir("", "")
-	require.NoError(t, err)
-	defer invDestDir.RemoveAll()
-	err = invIdxResource.Download(ctx, invDestDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "invalid signature")
-	require.False(t, invDestDir.Join("package_index.json").Exist())
-	require.False(t, invDestDir.Join("package_index.json.sig").Exist())
+	{
+		validIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/valid_signature_in_the_future/package_index.tar.bz2")
+		require.NoError(t, err)
+		idxResource := &IndexResource{URL: validIdxURL}
+		destDir, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		defer destDir.RemoveAll()
+		err = idxResource.Download(ctx, destDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
+		require.NoError(t, err)
+		require.True(t, destDir.Join("package_index.json").Exist())
+		require.True(t, destDir.Join("package_index.json.sig").Exist())
+	}
+	{
+		validIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/valid/package_index.tar.bz2")
+		require.NoError(t, err)
+		idxResource := &IndexResource{URL: validIdxURL}
+		destDir, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		defer destDir.RemoveAll()
+		err = idxResource.Download(ctx, destDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
+		require.NoError(t, err)
+		require.True(t, destDir.Join("package_index.json").Exist())
+		require.True(t, destDir.Join("package_index.json.sig").Exist())
+	}
+	{
+		invalidIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/invalid/package_index.tar.bz2")
+		require.NoError(t, err)
+		invIdxResource := &IndexResource{URL: invalidIdxURL}
+		invDestDir, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		defer invDestDir.RemoveAll()
+		err = invIdxResource.Download(ctx, invDestDir, func(curr *rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "invalid signature")
+		require.False(t, invDestDir.Join("package_index.json").Exist())
+		require.False(t, invDestDir.Join("package_index.json.sig").Exist())
+	}
 }
 
 func TestIndexFileName(t *testing.T) {
