@@ -16,6 +16,7 @@
 package security
 
 import (
+	"bytes"
 	"embed"
 	"errors"
 	"io"
@@ -71,16 +72,14 @@ func VerifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoK
 	if err != nil {
 		return false, nil, errors.New(i18n.Tr("retrieving Arduino public keys: %s", err))
 	}
-	target, err := targetPath.Open()
+	target, err := targetPath.ReadFile()
 	if err != nil {
 		return false, nil, errors.New(i18n.Tr("opening target file: %s", err))
 	}
-	defer target.Close()
-	signature, err := signaturePath.Open()
+	signature, err := signaturePath.ReadFile()
 	if err != nil {
 		return false, nil, errors.New(i18n.Tr("opening signature file: %s", err))
 	}
-	defer signature.Close()
-	signer, err := openpgp.CheckDetachedSignature(keyRing, target, signature, nil)
+	signer, err := openpgp.CheckDetachedSignature(keyRing, bytes.NewBuffer(target), bytes.NewBuffer(signature), nil)
 	return (signer != nil && err == nil), signer, err
 }
