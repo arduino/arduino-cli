@@ -21,10 +21,14 @@ import (
 	"errors"
 	"io"
 	"os"
+	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
+	pgperrors "github.com/ProtonMail/go-crypto/openpgp/errors"
+	"github.com/ProtonMail/go-crypto/openpgp/packet"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 //go:embed keys/*
@@ -81,5 +85,21 @@ func VerifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoK
 		return false, nil, errors.New(i18n.Tr("opening signature file: %s", err))
 	}
 	signer, err := openpgp.CheckDetachedSignature(keyRing, bytes.NewBuffer(target), bytes.NewBuffer(signature), nil)
+
+	// Some users reported spurious "expired signature" errors. After some investigation
+	// we found that all of them had a wrong system date set on their machine, with
+	// a date set in the past.
+	// Even if the error says that the signature is "expired", it's actually a
+	// signature that is not yet valid (it will be in the future).
+	// Since we could not trust the system clock, we recheck the signature with a date set
+	// in the future, so we may avoid to display a difficult to understand error to the user.
+	year2100 := time.Date(2100, 0, 0, 0, 0, 0, 0, time.UTC)
+	if errors.Is(err, pgperrors.ErrSignatureExpired) && time.Now().Before(year2100) {
+		logrus.Warn("Ignoring expired signature")
+		signer, err = openpgp.CheckDetachedSignature(keyRing, bytes.NewBuffer(target), bytes.NewBuffer(signature), &packet.Config{
+			Time: func() time.Time { return year2100 },
+		})
+	}
+
 	return (signer != nil && err == nil), signer, err
 }
