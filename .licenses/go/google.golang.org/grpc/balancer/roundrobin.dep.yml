@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/balancer/roundrobin
-version: v1.67.1
+version: v1.68.0
 type: go
 summary: Package roundrobin defines a roundrobin balancer.
 homepage: https://pkg.go.dev/google.golang.org/grpc/balancer/roundrobin
 license: apache-2.0
 licenses:
-- sources: grpc@v1.67.1/LICENSE
+- sources: grpc@v1.68.0/LICENSE
   text: |2
 
                                      Apache License
