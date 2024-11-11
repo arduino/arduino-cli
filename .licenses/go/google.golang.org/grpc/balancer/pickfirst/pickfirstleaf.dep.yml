@@ -1,9 +1,10 @@
 ---
-name: google.golang.org/grpc/keepalive
+name: google.golang.org/grpc/balancer/pickfirst/pickfirstleaf
 version: v1.68.0
 type: go
-summary: Package keepalive defines configurable parameters for point-to-point healthcheck.
-homepage: https://pkg.go.dev/google.golang.org/grpc/keepalive
+summary: Package pickfirstleaf contains the pick_first load balancing policy which
+  will be the universal leaf policy after dualstack changes are implemented.
+homepage: https://pkg.go.dev/google.golang.org/grpc/balancer/pickfirst/pickfirstleaf
 license: apache-2.0
 licenses:
 - sources: grpc@v1.68.0/LICENSE
