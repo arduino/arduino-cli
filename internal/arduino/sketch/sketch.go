@@ -152,7 +152,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		}
 		libDirs.FilterDirs()
 		for _, libDir := range libDirs {
-			lib, err := libraries.Load(libDir, libraries.Unmanaged)
+			lib, err := libraries.Load(libDir, libraries.Sketch)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", i18n.Tr("reading sketch libraries"), err)
 			}

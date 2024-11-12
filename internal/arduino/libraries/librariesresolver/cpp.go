@@ -207,9 +207,12 @@ func ComputePriority(lib *libraries.Library, header, arch string) int {
 		priority += 2
 	case libraries.User:
 		priority += 3
+	case libraries.Sketch:
+		// Bonus for sketch libraries, those libraries get a better priority than others
+		priority += 10000
 	case libraries.Unmanaged:
 		// Bonus for libraries specified via --libraries flags, those libraries gets the highest priority
-		priority += 10000
+		priority += 20000
 	default:
 		panic(fmt.Sprintf("Invalid library location: %d", lib.Location))
 	}
