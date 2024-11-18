@@ -239,3 +239,14 @@ func (library *Library) SourceHeaders() ([]string, error) {
 	}
 	return library.sourceHeaders, nil
 }
+
+// DependencyHelper returns the path to the dependency helper file.
+func (library *Library) DependencyHelper() *paths.Path {
+	if c := library.SourceDir.Join("arduino_deps.c"); c.Exist() {
+		return c
+	}
+	if cpp := library.SourceDir.Join("arduino_deps.cpp"); cpp.Exist() {
+		return cpp
+	}
+	return nil
+}
