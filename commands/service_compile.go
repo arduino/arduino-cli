@@ -22,6 +22,7 @@ import (
 	"io"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -81,6 +82,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	if err != nil {
 		return err
 	}
+	release = sync.OnceFunc(release)
 	defer release()
 
 	if pme.Dirty() {
@@ -358,6 +360,10 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 				targetBoard.String(), "'build.board'", sketchBuilder.GetBuildProperties().Get("build.board")) + "\n"))
 	}
 
+	// Release package manager
+	release()
+
+	// Perform the actual build
 	if err := sketchBuilder.Build(); err != nil {
 		return &cmderrors.CompileFailedError{Message: err.Error()}
 	}
