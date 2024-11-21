@@ -258,10 +258,10 @@ tasks:
 
   protoc:collect:
     desc: Create a zip file containing all .proto files in DIST_DIR
-    dir: rpc
     cmds:
-      - mkdir --parents ../{{.DIST_DIR}}
-      - zip -r ../{{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_proto.zip  * -i \*.proto
+      - mkdir --parents {{.DIST_DIR}}
+      - buf export . -o {{.DIST_DIR}}/proto
+      - cd {{.DIST_DIR}}/proto && zip -r ../{{.PROJECT_NAME}}_{{.VERSION}}_proto.zip .
 
   protoc:format:
     desc: Perform formatting of the protobuf definitions

@@ -127,6 +127,11 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
+      - name: Install buf
+        uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
       - name: Build
         run: |
           PACKAGE_NAME_PREFIX=${{ needs.package-name-prefix.outputs.prefix }}
