@@ -22,13 +22,13 @@ import (
 	"io"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/builder"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
-	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
@@ -78,18 +78,11 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		exportBinaries = *e
 	}
 
-	var pme *packagemanager.Explorer
-	var release func()
-	if _pme, _release, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
 		return err
-	} else {
-		pme = _pme
-		release = func() {
-			_release()
-			// Release once if called multiple times
-			_release = func() {}
-		}
 	}
+	release = sync.OnceFunc(release)
 	defer release()
 
 	if pme.Dirty() {
