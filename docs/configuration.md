@@ -9,7 +9,7 @@
   - `downloads` - directory used to stage downloaded archives during Boards/Library Manager installations.
   - `user` - the equivalent of the Arduino IDE's ["sketchbook" directory][sketchbook directory]. Library Manager
     installations are made to the `libraries` subdirectory of the user directory. Users can manually install 3rd party
-    platforms in the `hardware` subdirecotry of the user directory.
+    platforms in the `hardware` subdirectory of the user directory.
   - `builtin.libraries` - the libraries in this directory will be available to all platforms without the need for the
     user to install them, but with the lowest priority over other installed libraries with the same name, it's the
     equivalent of the Arduino IDE's bundled libraries directory.

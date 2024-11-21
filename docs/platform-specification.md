@@ -52,7 +52,7 @@ In this latter case the version is omitted.
 We can also see that the vendor "arduino" has two supported architectures (AVR and SAM), while "foo" and "bar" have only
 AVR.
 
-### Notes about the choosing the architecture name
+### Notes about choosing the architecture name
 
 Architecture values are case sensitive (e.g. `AVR` != `avr`).
 
