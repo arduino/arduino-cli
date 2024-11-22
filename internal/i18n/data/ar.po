@@ -3,7 +3,7 @@
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # Mark Asaad, 2022
 # Osama Breman, 2023
-# طارق عبد الفتاح, 2023
+# طارق عبد الفتاح <tariq.ok.tariq@gmail.com>, 2023
 # Ahmed Gaafar, 2024
 # 
 msgid ""
@@ -313,11 +313,11 @@ msgstr "لا يمكن استخدام العلامات التالية مع بعض
 msgid "Can't write debug log: %s"
 msgstr "تعذر كتابة سجل مصحح الاخطاء : %s"
 
-#: commands/service_compile.go:187 commands/service_compile.go:190
+#: commands/service_compile.go:189 commands/service_compile.go:192
 msgid "Cannot create build cache directory"
 msgstr "تعذر انشاء مجلد لل \"build cache\""
 
-#: commands/service_compile.go:212
+#: commands/service_compile.go:214
 msgid "Cannot create build directory"
 msgstr "تعذر انشاء مسار البناء"
 
@@ -738,7 +738,7 @@ msgstr "خطأ اثناء تنظيف الكاش : %v"
 msgid "Error converting path to absolute: %v"
 msgstr "تعذر تحويل المسار الى مطلق : %v"
 
-#: commands/service_compile.go:405
+#: commands/service_compile.go:411
 msgid "Error copying output file %s"
 msgstr "خطا اثناء نسخ ملف الخرج %s"
 
@@ -752,7 +752,7 @@ msgstr "خطأ في أنشاء ملف التعريفات:%v"
 msgid "Error creating instance: %v"
 msgstr "خطا اثناء انشاء النسخة %v"
 
-#: commands/service_compile.go:389
+#: commands/service_compile.go:395
 msgid "Error creating output dir"
 msgstr "خطا اثناء انشاء مسار الخرج"
 
@@ -865,7 +865,7 @@ msgid ""
 "correct sketch folder or provide the --port flag: %s"
 msgstr ""
 
-#: commands/service_compile.go:328 commands/service_library_list.go:115
+#: commands/service_compile.go:330 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "خطأ  اثناء الحصول على المعلومات للمكتبة %s"
 
@@ -954,7 +954,7 @@ msgstr "خطا اثناء فتح الكود المصدر الذي يتجاوز �
 msgid "Error parsing --show-properties flag: %v"
 msgstr "تعذر تقطيع علامة show-properties-- : %v"
 
-#: commands/service_compile.go:398
+#: commands/service_compile.go:404
 msgid "Error reading build directory"
 msgstr "خطا اثناء قراءة مسار البناء"
 
@@ -1137,7 +1137,7 @@ msgstr "تعذر الرفع"
 msgid "File:"
 msgstr "الملف : "
 
-#: commands/service_compile.go:160
+#: commands/service_compile.go:162
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1338,7 +1338,7 @@ msgstr ""
 msgid "Invalid argument passed: %v"
 msgstr "تم اعطاء وسيط غير صالح %v"
 
-#: commands/service_compile.go:272
+#: commands/service_compile.go:274
 msgid "Invalid build properties"
 msgstr "خصائص البناء غير صالحة"
 
@@ -2269,7 +2269,7 @@ msgstr "عرض رقم نسخة Arduino CLI"
 msgid "Size (bytes):"
 msgstr "الحجم (بالبايت) :"
 
-#: commands/service_compile.go:276
+#: commands/service_compile.go:278
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2670,7 +2670,7 @@ msgstr "المنصة المستخدمة"
 msgid "Used: %[1]s"
 msgstr "مستخدم : %[1]s"
 
-#: commands/service_compile.go:351
+#: commands/service_compile.go:353
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "يتم استخدام اللوحة '%[1]s' من منصة داخل المجلد %[2]s"
 
@@ -2678,7 +2678,7 @@ msgstr "يتم استخدام اللوحة '%[1]s' من منصة داخل الم
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "يتم استخدام توابع المكتبة التي تم تخزينها مؤقتا من اجل الملف : %[1]s"
 
-#: commands/service_compile.go:352
+#: commands/service_compile.go:354
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "يتم استخدام النواة '%[1]s' من منصة داخل الملف %[2]s "
 
@@ -2769,7 +2769,7 @@ msgstr ""
 msgid "Waiting for upload port..."
 msgstr "يتم انتظار منفذ الرفع (upload port) ... "
 
-#: commands/service_compile.go:357
+#: commands/service_compile.go:359
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -3455,11 +3455,11 @@ msgstr "جار فتح ملف الارشيف : %s"
 msgid "opening boards.txt"
 msgstr "جار فتح  boards.txt"
 
-#: internal/arduino/security/signatures.go:81
+#: internal/arduino/security/signatures.go:82
 msgid "opening signature file: %s"
 msgstr "جار فتح ملف التوقيع : %s"
 
-#: internal/arduino/security/signatures.go:76
+#: internal/arduino/security/signatures.go:78
 msgid "opening target file: %s"
 msgstr "جار فتح الملف الهدف : %s"
 
@@ -3498,7 +3498,7 @@ msgstr "المنصة %s غير مثبتة"
 msgid "platform is not available for your OS"
 msgstr "المنصة غير متاحة لنظام التشغيل الخاص بك"
 
-#: commands/service_compile.go:126
+#: commands/service_compile.go:128
 #: internal/arduino/cores/packagemanager/install_uninstall.go:179
 #: internal/arduino/cores/packagemanager/install_uninstall.go:283
 #: internal/arduino/cores/packagemanager/loader.go:420
@@ -3609,7 +3609,7 @@ msgstr "جار ازالة ملفات المنصة %s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "تعذر ايجاد النسخة المطلوبة %[1]s من اجل المنصة %[2]s"
 
-#: internal/arduino/security/signatures.go:72
+#: internal/arduino/security/signatures.go:74
 msgid "retrieving Arduino public keys: %s"
 msgstr "جار ازالة المفاتيح العامة للاردوينو : %s"
 
@@ -3621,6 +3621,10 @@ msgstr "جاري فحص امثلة المذكرة"
 #: internal/arduino/resources/install.go:74
 msgid "searching package root dir: %s"
 msgstr "جار البحث عن المجلد الاصلي لـ %s"
+
+#: internal/arduino/security/signatures.go:87
+msgid "signature expired: is your system clock set correctly?"
+msgstr ""
 
 #: commands/service_sketch_new.go:78
 msgid "sketch name cannot be empty"

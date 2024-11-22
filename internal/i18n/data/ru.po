@@ -317,11 +317,11 @@ msgstr "Невозможно использовать следующие фла�
 msgid "Can't write debug log: %s"
 msgstr "Не удается записать журнал отладки: %s"
 
-#: commands/service_compile.go:187 commands/service_compile.go:190
+#: commands/service_compile.go:189 commands/service_compile.go:192
 msgid "Cannot create build cache directory"
 msgstr "Не удается создать каталог кэша сборки"
 
-#: commands/service_compile.go:212
+#: commands/service_compile.go:214
 msgid "Cannot create build directory"
 msgstr "Не удается создать каталог для сборки"
 
@@ -750,7 +750,7 @@ msgstr "Ошибка при очистке кэшей: %v"
 msgid "Error converting path to absolute: %v"
 msgstr "Ошибка преобразования пути в абсолютный: %v"
 
-#: commands/service_compile.go:405
+#: commands/service_compile.go:411
 msgid "Error copying output file %s"
 msgstr "Ошибка при копировании выходного файла %s"
 
@@ -764,7 +764,7 @@ msgstr "Ошибка при создании конфигурации: %v"
 msgid "Error creating instance: %v"
 msgstr "Ошибка при создании экземпляра: %v"
 
-#: commands/service_compile.go:389
+#: commands/service_compile.go:395
 msgid "Error creating output dir"
 msgstr "Ошибка создания каталога вывода"
 
@@ -879,7 +879,7 @@ msgstr ""
 "Ошибка при получении порта по умолчанию из `sketch.yaml`. Проверьте, "
 "правильно ли вы указали папку sketch, или укажите флаг --port: %s"
 
-#: commands/service_compile.go:328 commands/service_library_list.go:115
+#: commands/service_compile.go:330 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "Ошибка при получении информации для библиотеки %s"
 
@@ -967,7 +967,7 @@ msgstr "Ошибка при открытии исходного кода пер�
 msgid "Error parsing --show-properties flag: %v"
 msgstr "Ошибка разбора флага --show-properties: %v"
 
-#: commands/service_compile.go:398
+#: commands/service_compile.go:404
 msgid "Error reading build directory"
 msgstr "Ошибка при чтении каталога сборки"
 
@@ -1149,7 +1149,7 @@ msgstr "Не удалась загрузка"
 msgid "File:"
 msgstr "Файл:"
 
-#: commands/service_compile.go:160
+#: commands/service_compile.go:162
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1361,7 +1361,7 @@ msgstr "Неверный архив: файл %[1]s не найден в арх�
 msgid "Invalid argument passed: %v"
 msgstr "Передан недопустимый аргумент: %v"
 
-#: commands/service_compile.go:272
+#: commands/service_compile.go:274
 msgid "Invalid build properties"
 msgstr "Неверные свойства сборки"
 
@@ -2362,7 +2362,7 @@ msgstr "Показывает номер версии Arduino CLI."
 msgid "Size (bytes):"
 msgstr "Размер (байт):"
 
-#: commands/service_compile.go:276
+#: commands/service_compile.go:278
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2781,7 +2781,7 @@ msgstr "Использована платформа"
 msgid "Used: %[1]s"
 msgstr "Используется: %[1]s"
 
-#: commands/service_compile.go:351
+#: commands/service_compile.go:353
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "использование платы '%[1]s' из платформы в каталоге: %[2]s"
 
@@ -2789,7 +2789,7 @@ msgstr "использование платы '%[1]s' из платформы в
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "Использование кэшированных библиотечных зависимостей для файла: %[1]s"
 
-#: commands/service_compile.go:352
+#: commands/service_compile.go:354
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "Использование ядра '%[1]s' из платформы в каталоге: %[2]s"
 
@@ -2884,7 +2884,7 @@ msgstr ""
 msgid "Waiting for upload port..."
 msgstr "Ожидание порта загрузки..."
 
-#: commands/service_compile.go:357
+#: commands/service_compile.go:359
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -3567,11 +3567,11 @@ msgstr "открытие файла архива: %s"
 msgid "opening boards.txt"
 msgstr "открытие boards.txt"
 
-#: internal/arduino/security/signatures.go:81
+#: internal/arduino/security/signatures.go:82
 msgid "opening signature file: %s"
 msgstr "открывается файл сигнатуры:"
 
-#: internal/arduino/security/signatures.go:76
+#: internal/arduino/security/signatures.go:78
 msgid "opening target file: %s"
 msgstr "открывается целевой файл: %s"
 
@@ -3610,7 +3610,7 @@ msgstr "платформа %s не установлена"
 msgid "platform is not available for your OS"
 msgstr "платформа не доступна для вашей ОС"
 
-#: commands/service_compile.go:126
+#: commands/service_compile.go:128
 #: internal/arduino/cores/packagemanager/install_uninstall.go:179
 #: internal/arduino/cores/packagemanager/install_uninstall.go:283
 #: internal/arduino/cores/packagemanager/loader.go:420
@@ -3721,7 +3721,7 @@ msgstr "удаление файлов платформы: %s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "не найдена необходимая версия %[1]s для платформы %[2]s"
 
-#: internal/arduino/security/signatures.go:72
+#: internal/arduino/security/signatures.go:74
 msgid "retrieving Arduino public keys: %s"
 msgstr "получение открытых ключей Arduino: %s"
 
@@ -3733,6 +3733,10 @@ msgstr "сканирование примеров скетчей"
 #: internal/arduino/resources/install.go:74
 msgid "searching package root dir: %s"
 msgstr "поиск корневого каталога пакета: %s"
+
+#: internal/arduino/security/signatures.go:87
+msgid "signature expired: is your system clock set correctly?"
+msgstr ""
 
 #: commands/service_sketch_new.go:78
 msgid "sketch name cannot be empty"

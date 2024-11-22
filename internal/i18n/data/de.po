@@ -322,11 +322,11 @@ msgstr "Die folgenden Flags können nicht gemeinsam verwendet werden: %s"
 msgid "Can't write debug log: %s"
 msgstr "Debug-Log kann icht geschrieben werden: %s"
 
-#: commands/service_compile.go:187 commands/service_compile.go:190
+#: commands/service_compile.go:189 commands/service_compile.go:192
 msgid "Cannot create build cache directory"
 msgstr "Cache-Verzeichnis kann nicht angelegt werden"
 
-#: commands/service_compile.go:212
+#: commands/service_compile.go:214
 msgid "Cannot create build directory"
 msgstr "Build-Verzeichnis kann nicht angelegt werden"
 
@@ -762,7 +762,7 @@ msgstr "Fehler beim bereinigen des Caches: %v"
 msgid "Error converting path to absolute: %v"
 msgstr "Fehler beim konvertieren des Pfads zum Absolutpfad: %v"
 
-#: commands/service_compile.go:405
+#: commands/service_compile.go:411
 msgid "Error copying output file %s"
 msgstr "Fehler beim Kopieren der Ausgabedatei %s"
 
@@ -776,7 +776,7 @@ msgstr "Fehler beim Erstellen der Konfiguration: %v"
 msgid "Error creating instance: %v"
 msgstr "Fehler beim Erstellen der Instanz: %v"
 
-#: commands/service_compile.go:389
+#: commands/service_compile.go:395
 msgid "Error creating output dir"
 msgstr "Fehler beim Erstellen des Ausgabeverzeichnisses"
 
@@ -892,7 +892,7 @@ msgstr ""
 "Fehler beim ermitteln des Standard-Ports aus 'sketch.yaml' Prüfe, ob di im "
 "richtigen Sketch-Verzeichnis bist oder verwende das --port Attribut: %s"
 
-#: commands/service_compile.go:328 commands/service_library_list.go:115
+#: commands/service_compile.go:330 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "Fehler beim Abrufen von Informationen für die Bibliothek %s"
 
@@ -980,7 +980,7 @@ msgstr "Fehler, öffnen der Quellcodes überschreibt die Datendatei: %v"
 msgid "Error parsing --show-properties flag: %v"
 msgstr "Fehler bei der Auswertung des --show-Property Attributs: %v"
 
-#: commands/service_compile.go:398
+#: commands/service_compile.go:404
 msgid "Error reading build directory"
 msgstr "Fehler bel Lesen des Build-Verzechnisses"
 
@@ -1166,7 +1166,7 @@ msgstr "Fehlgeschlagenes Hochladen"
 msgid "File:"
 msgstr "Datei:"
 
-#: commands/service_compile.go:160
+#: commands/service_compile.go:162
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1378,7 +1378,7 @@ msgstr "Ungültiges Archiv: Datei %[1]s nicht im Archiv %[2]s gefunden"
 msgid "Invalid argument passed: %v"
 msgstr "Ungültiges Argument übergeben: %v"
 
-#: commands/service_compile.go:272
+#: commands/service_compile.go:274
 msgid "Invalid build properties"
 msgstr "Ungültige Build-Eigenschaften"
 
@@ -2364,7 +2364,7 @@ msgstr "Zeigt die Versionsnummer des Arduino CLI an."
 msgid "Size (bytes):"
 msgstr "Größe (Bytes):"
 
-#: commands/service_compile.go:276
+#: commands/service_compile.go:278
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2797,7 +2797,7 @@ msgstr "Verwendete Plattform"
 msgid "Used: %[1]s"
 msgstr "Benutzt: %[1]s"
 
-#: commands/service_compile.go:351
+#: commands/service_compile.go:353
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "Verwende das Board '%[1]s' von der Plattform im Ordner: %[2]s"
 
@@ -2807,7 +2807,7 @@ msgstr ""
 "Verwendung von zwischengespeicherten Bibliotheksabhängigkeiten für die "
 "Datei: %[1]s"
 
-#: commands/service_compile.go:352
+#: commands/service_compile.go:354
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "Verwendung des Kerns '%[1]s' von Platform im Ordner: %[2]s"
 
@@ -2906,7 +2906,7 @@ msgstr ""
 msgid "Waiting for upload port..."
 msgstr "Warten auf Upload-Port ..."
 
-#: commands/service_compile.go:357
+#: commands/service_compile.go:359
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -3602,11 +3602,11 @@ msgstr "Archivdatei öffnen: %s"
 msgid "opening boards.txt"
 msgstr "boards.txt wird geöffnet"
 
-#: internal/arduino/security/signatures.go:81
+#: internal/arduino/security/signatures.go:82
 msgid "opening signature file: %s"
 msgstr "Öffne Signaturdatei: %s"
 
-#: internal/arduino/security/signatures.go:76
+#: internal/arduino/security/signatures.go:78
 msgid "opening target file: %s"
 msgstr "Öffne Zieldatei: %s"
 
@@ -3645,7 +3645,7 @@ msgstr "Plattform %s ist nicht installiert"
 msgid "platform is not available for your OS"
 msgstr "Plattform ist für dieses Betriebssystem nicht verfügbar"
 
-#: commands/service_compile.go:126
+#: commands/service_compile.go:128
 #: internal/arduino/cores/packagemanager/install_uninstall.go:179
 #: internal/arduino/cores/packagemanager/install_uninstall.go:283
 #: internal/arduino/cores/packagemanager/loader.go:420
@@ -3756,7 +3756,7 @@ msgstr "Entferne die Plattformdateien: %s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "Erforderliche Version %[1]s für Plattform %[2]s nicht gefunden "
 
-#: internal/arduino/security/signatures.go:72
+#: internal/arduino/security/signatures.go:74
 msgid "retrieving Arduino public keys: %s"
 msgstr "Abrufen der öffentlichen Arduino-Schlüssel: %s"
 
@@ -3768,6 +3768,10 @@ msgstr "Sketch-Beispiele durchsuchen"
 #: internal/arduino/resources/install.go:74
 msgid "searching package root dir: %s"
 msgstr "Suche im Stammverzeichnis des Pakets: %s"
+
+#: internal/arduino/security/signatures.go:87
+msgid "signature expired: is your system clock set correctly?"
+msgstr ""
 
 #: commands/service_sketch_new.go:78
 msgid "sketch name cannot be empty"

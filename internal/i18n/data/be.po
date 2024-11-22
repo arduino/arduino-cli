@@ -315,11 +315,11 @@ msgstr "Не атрымалася ўжываць наступныя птушкі
 msgid "Can't write debug log: %s"
 msgstr "Не атрымалася запісаць часопіс адладкі: %s"
 
-#: commands/service_compile.go:187 commands/service_compile.go:190
+#: commands/service_compile.go:189 commands/service_compile.go:192
 msgid "Cannot create build cache directory"
 msgstr "Не атрымалася стварыць каталог кэша зборкі"
 
-#: commands/service_compile.go:212
+#: commands/service_compile.go:214
 msgid "Cannot create build directory"
 msgstr "Не атрымалася стварыць каталог зборкі"
 
@@ -747,7 +747,7 @@ msgstr "Памылка пры ачысткі кэшу: %v"
 msgid "Error converting path to absolute: %v"
 msgstr "Памылка пры пераўтварэнні шляху ў абсалютны: %v"
 
-#: commands/service_compile.go:405
+#: commands/service_compile.go:411
 msgid "Error copying output file %s"
 msgstr "Памылка пры капіяванні выхаднога файла %s"
 
@@ -761,7 +761,7 @@ msgstr "Памылка пры стварэнні канфігурацыі: %v"
 msgid "Error creating instance: %v"
 msgstr "Памылка пры стварэнні асобніка: %v"
 
-#: commands/service_compile.go:389
+#: commands/service_compile.go:395
 msgid "Error creating output dir"
 msgstr "Памылка пры стварэнні выходнага каталогу"
 
@@ -877,7 +877,7 @@ msgstr ""
 "Памылка пры атрыманні першапачатковага порта з ' sketch.yaml`.\n"
 "Праверце, ці правільна вы паказалі каталог сцэнара, ці пакажыце аргумент --port:"
 
-#: commands/service_compile.go:328 commands/service_library_list.go:115
+#: commands/service_compile.go:330 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "Памылка пры атрыманні інфармацыі для бібліятэкі %s"
 
@@ -966,7 +966,7 @@ msgstr ""
 msgid "Error parsing --show-properties flag: %v"
 msgstr "Памылка пры разборы аргумента --show-properties: %v"
 
-#: commands/service_compile.go:398
+#: commands/service_compile.go:404
 msgid "Error reading build directory"
 msgstr "Памылка пры чытанні каталога зборкі"
 
@@ -1156,7 +1156,7 @@ msgstr "Не атрымалася выгрузіць"
 msgid "File:"
 msgstr "Файл:"
 
-#: commands/service_compile.go:160
+#: commands/service_compile.go:162
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1367,7 +1367,7 @@ msgstr "Хібны архіў: файл %[1]s не знойдзены ў арх�
 msgid "Invalid argument passed: %v"
 msgstr "Перададзены хібны аргумент: %v"
 
-#: commands/service_compile.go:272
+#: commands/service_compile.go:274
 msgid "Invalid build properties"
 msgstr "Хібныя ўласцівасці зборкі"
 
@@ -2351,7 +2351,7 @@ msgstr "Паказвае нумар версіі Arduino CLI."
 msgid "Size (bytes):"
 msgstr "Памер (у байтах):"
 
-#: commands/service_compile.go:276
+#: commands/service_compile.go:278
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2768,7 +2768,7 @@ msgstr "Ужытая платформа"
 msgid "Used: %[1]s"
 msgstr "Ужыта: %[1]s"
 
-#: commands/service_compile.go:351
+#: commands/service_compile.go:353
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "Ужыванне платы '%[1]s' з платформы ў каталог: %[2]s"
 
@@ -2776,7 +2776,7 @@ msgstr "Ужыванне платы '%[1]s' з платформы ў катал�
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "Ужыванне кэшаванай бібліятэкі залежнасцяў для файла: %[1]s"
 
-#: commands/service_compile.go:352
+#: commands/service_compile.go:354
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "Ужыванне ядра '%[1]s' з платформы ў каталог: %[2]s"
 
@@ -2872,7 +2872,7 @@ msgstr ""
 msgid "Waiting for upload port..."
 msgstr "Чаканне порта выгрузкі..."
 
-#: commands/service_compile.go:357
+#: commands/service_compile.go:359
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -3556,11 +3556,11 @@ msgstr "адкрыццё файла архіва: %s"
 msgid "opening boards.txt"
 msgstr "адкрыццё boards.txt"
 
-#: internal/arduino/security/signatures.go:81
+#: internal/arduino/security/signatures.go:82
 msgid "opening signature file: %s"
 msgstr "адкрыццё файла сігнатуры: %s"
 
-#: internal/arduino/security/signatures.go:76
+#: internal/arduino/security/signatures.go:78
 msgid "opening target file: %s"
 msgstr "адкрыццё мэтавага файлау: %s"
 
@@ -3599,7 +3599,7 @@ msgstr "платформа %s не ўсталяваная"
 msgid "platform is not available for your OS"
 msgstr "платформа недаступная для вашай аперацыйнай сістэмы"
 
-#: commands/service_compile.go:126
+#: commands/service_compile.go:128
 #: internal/arduino/cores/packagemanager/install_uninstall.go:179
 #: internal/arduino/cores/packagemanager/install_uninstall.go:283
 #: internal/arduino/cores/packagemanager/loader.go:420
@@ -3710,7 +3710,7 @@ msgstr "выдаленне файлаў платформы: %s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "неабходная версія %[1]s для платформы %[2]s не знойдзена"
 
-#: internal/arduino/security/signatures.go:72
+#: internal/arduino/security/signatures.go:74
 msgid "retrieving Arduino public keys: %s"
 msgstr "выманне адкрытых ключоў Arduino: %s"
 
@@ -3722,6 +3722,10 @@ msgstr "чытанне прыкладаў сцэнара"
 #: internal/arduino/resources/install.go:74
 msgid "searching package root dir: %s"
 msgstr "пошук у каранёвым каталогу пакета: %s"
+
+#: internal/arduino/security/signatures.go:87
+msgid "signature expired: is your system clock set correctly?"
+msgstr ""
 
 #: commands/service_sketch_new.go:78
 msgid "sketch name cannot be empty"
