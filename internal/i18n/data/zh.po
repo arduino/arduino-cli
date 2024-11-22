@@ -303,11 +303,11 @@ msgstr "不能同时使用以下参数：%s"
 msgid "Can't write debug log: %s"
 msgstr "无法写入调试日志：%s"
 
-#: commands/service_compile.go:187 commands/service_compile.go:190
+#: commands/service_compile.go:189 commands/service_compile.go:192
 msgid "Cannot create build cache directory"
 msgstr "无法新建构建缓存目录"
 
-#: commands/service_compile.go:212
+#: commands/service_compile.go:214
 msgid "Cannot create build directory"
 msgstr "无法新建构建目录"
 
@@ -713,7 +713,7 @@ msgstr "清理缓存出错：%v"
 msgid "Error converting path to absolute: %v"
 msgstr "将路径转换为绝对路径时出错：%v"
 
-#: commands/service_compile.go:405
+#: commands/service_compile.go:411
 msgid "Error copying output file %s"
 msgstr "复制输出 %s 文件时出错"
 
@@ -727,7 +727,7 @@ msgstr ""
 msgid "Error creating instance: %v"
 msgstr "新建实例时出错：%v"
 
-#: commands/service_compile.go:389
+#: commands/service_compile.go:395
 msgid "Error creating output dir"
 msgstr "新建输出目录时出错"
 
@@ -840,7 +840,7 @@ msgid ""
 "correct sketch folder or provide the --port flag: %s"
 msgstr "从 `sketch.yaml` 获取默认端口时出错。检查是否在正确的 sketch 文件夹中，或提供 --port 标志： "
 
-#: commands/service_compile.go:328 commands/service_library_list.go:115
+#: commands/service_compile.go:330 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "获取 %s 库的信息时出错"
 
@@ -928,7 +928,7 @@ msgstr "打开源代码覆盖数据文件时出错：%v"
 msgid "Error parsing --show-properties flag: %v"
 msgstr "解析 --show-properties 参数时出错：%v"
 
-#: commands/service_compile.go:398
+#: commands/service_compile.go:404
 msgid "Error reading build directory"
 msgstr "读取构建目录时出错"
 
@@ -1108,7 +1108,7 @@ msgstr "上传失败"
 msgid "File:"
 msgstr "文件："
 
-#: commands/service_compile.go:160
+#: commands/service_compile.go:162
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1299,7 +1299,7 @@ msgstr ""
 msgid "Invalid argument passed: %v"
 msgstr "传递的参数无效：%v"
 
-#: commands/service_compile.go:272
+#: commands/service_compile.go:274
 msgid "Invalid build properties"
 msgstr "无效的构建属性"
 
@@ -2234,7 +2234,7 @@ msgstr "显示 Arduino CLI 的版本号。"
 msgid "Size (bytes):"
 msgstr "大小（字节）："
 
-#: commands/service_compile.go:276
+#: commands/service_compile.go:278
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2616,7 +2616,7 @@ msgstr "已使用的平台"
 msgid "Used: %[1]s"
 msgstr "使用：%[1]s"
 
-#: commands/service_compile.go:351
+#: commands/service_compile.go:353
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "使用平台的 ‘%[1]s’ 开发板，在列出的文件夹中：%[2]s"
 
@@ -2624,7 +2624,7 @@ msgstr "使用平台的 ‘%[1]s’ 开发板，在列出的文件夹中：%[2]s
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "使用缓存库文件依赖项：%[1]s"
 
-#: commands/service_compile.go:352
+#: commands/service_compile.go:354
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "使用平台的 ‘%[1]s’ 代码，在列出的文件夹中：%[2]s"
 
@@ -2713,7 +2713,7 @@ msgstr "警告：%[1]s 库声称在 %[2]s 体系结构上运行，可能与当�
 msgid "Waiting for upload port..."
 msgstr "正在等待上传端口。。。"
 
-#: commands/service_compile.go:357
+#: commands/service_compile.go:359
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr "警告：%[1]s 开发板未定义 %[2]s 首选项。自动设置为：%[3]s"
@@ -3382,11 +3382,11 @@ msgstr "正在打开存档文件：%s"
 msgid "opening boards.txt"
 msgstr "正在打开 boards.txt"
 
-#: internal/arduino/security/signatures.go:81
+#: internal/arduino/security/signatures.go:82
 msgid "opening signature file: %s"
 msgstr "打开签名文件：%s"
 
-#: internal/arduino/security/signatures.go:76
+#: internal/arduino/security/signatures.go:78
 msgid "opening target file: %s"
 msgstr "打开目标文件：%s"
 
@@ -3425,7 +3425,7 @@ msgstr "%s 平台未安装"
 msgid "platform is not available for your OS"
 msgstr "该平台不适用于您的操作系统"
 
-#: commands/service_compile.go:126
+#: commands/service_compile.go:128
 #: internal/arduino/cores/packagemanager/install_uninstall.go:179
 #: internal/arduino/cores/packagemanager/install_uninstall.go:283
 #: internal/arduino/cores/packagemanager/loader.go:420
@@ -3536,7 +3536,7 @@ msgstr "正在删除平台文件：%s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "找不到 %[2]s 平台所需的 %[1]s 版本"
 
-#: internal/arduino/security/signatures.go:72
+#: internal/arduino/security/signatures.go:74
 msgid "retrieving Arduino public keys: %s"
 msgstr "正在检索Arduino密钥：%s"
 
@@ -3548,6 +3548,10 @@ msgstr "扫描项目示例"
 #: internal/arduino/resources/install.go:74
 msgid "searching package root dir: %s"
 msgstr "正在搜索软件包根目录：%s"
+
+#: internal/arduino/security/signatures.go:87
+msgid "signature expired: is your system clock set correctly?"
+msgstr ""
 
 #: commands/service_sketch_new.go:78
 msgid "sketch name cannot be empty"
