@@ -312,7 +312,8 @@ The `properties` associated to a port can be used to identify the board attached
   "candidate" board attached to that port.
 
 Some port `properties` may not be precise enough to uniquely identify a board, in that case more boards may match the
-same set of `properties`, that's why we called it "candidate".
+same set of `properties`, that's why we called it "candidate". The board identification properties should be used only
+if they allows to match the board model beyond any doubt.
 
 Let's see an example to clarify things a bit, let's suppose that we have the following `properties` coming from the
 serial discovery:
@@ -391,6 +392,13 @@ myboard.upload_port.1.apples=40
 
 will match on both `pears=20, apples=30` and `pears=30, apples=40` but not `pears=20, apples=40`, in that sense each
 "set" of identification properties is independent from each other and cannot be mixed for port matching.
+
+#### An important note about `vid` and `pid`
+
+The board identification properties should be used only if they allows to match the board model beyond any doubt.
+Sometimes a board do not expose a unique vid/pid combination, this is the case for example if a USB-2-serial converter
+chip is used (like the omnipresent FT232 or CH340): those chips exposes their specific vid/pid that will be the same for
+all the other boards using the same chip. In such cases the board identification properties should NOT be used.
 
 #### Identification of board options
 

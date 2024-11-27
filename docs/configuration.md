@@ -8,7 +8,8 @@
   - `data` - directory used to store Boards/Library Manager index files and Boards Manager platform installations.
   - `downloads` - directory used to stage downloaded archives during Boards/Library Manager installations.
   - `user` - the equivalent of the Arduino IDE's ["sketchbook" directory][sketchbook directory]. Library Manager
-    installations are made to the `libraries` subdirectory of the user directory.
+    installations are made to the `libraries` subdirectory of the user directory. Users can manually install 3rd party
+    platforms in the `hardware` subdirectory of the user directory.
   - `builtin.libraries` - the libraries in this directory will be available to all platforms without the need for the
     user to install them, but with the lowest priority over other installed libraries with the same name, it's the
     equivalent of the Arduino IDE's bundled libraries directory.
@@ -44,6 +45,25 @@
     [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
 - `network` - configuration options related to the network connection.
   - `proxy` - URL of the proxy server.
+
+### Default directories
+
+The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
+configuration file.
+
+- The `directories.data` default is OS-dependent:
+
+  - on Linux (and other Unix-based OS) is: `{HOME}/.arduino15`
+  - on Windows is: `{HOME}/AppData/Local/Arduino15`
+  - on MacOS is: `{HOME}/Library/Arduino15`
+
+- The `directories.download` default is `{directories.data}/staging`. If the value of `{directories.data}` is changed in
+  the configuration the user-specified value will be used.
+
+- The `directories.user` default is OS-dependent:
+  - on Linux (and other Unix-based OS) is: `{HOME}/Arduino`
+  - on Windows is: `{DOCUMENTS}/Arduino`
+  - on MacOS is: `{HOME}/Documents/Arduino`
 
 ## Configuration methods
 

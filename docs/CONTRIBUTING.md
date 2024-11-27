@@ -321,8 +321,8 @@ changes in the generated code.
 ### Additional settings
 
 If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
-test suite, please start the commit message with the string **[skip ci]** to skip the build and give that slot to someone
-else who does need it.
+test suite, please start the commit message with the string **[skip ci]** to skip the build and give that slot to
+someone else who does need it.
 
 If your PR doesn't need to be included in the changelog, please start the commit message and PR title with the string
 **[skip changelog]**

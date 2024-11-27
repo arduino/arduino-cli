@@ -5,31 +5,65 @@ Platforms add support for new boards to the Arduino development software. They a
 [Boards Manager](package_index_json-specification.md) or manual installation to the _hardware_ folder of Arduino's
 sketchbook folder (AKA "user directory").<br> A platform may consist of as little as a single configuration file.
 
-## Hardware Folders structure
+## Platform installation directories
 
-The new hardware folders have a hierarchical structure organized in two levels:
+If the platforms are installed using the Board Manager the installation directory location will be as follow:
 
-- the first level is the vendor/maintainer
-- the second level is the supported architecture
+`{directories.data}/packages/{VENDOR_NAME}/hardware/{ARCHITECTURE}/{VERSION}/...`
 
-A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called
-"arduino", "yyyyy" and "xxxxx":
+- `{directories.data}` is the data directory as specified in the
+  [configuration file](configuration.md#default-directories).
+- `{VENDOR_NAME}` is the identifier of the vendor/maintainer of the platform.
+- `{ARCHITECTURE}` is the architecture of the CPU used in the platform.
+- `{VERSION}` is the platform version.
+
+Alternatively, a platform may be manually installed by the user inside the Sketchbook/user directory as follows:
+
+`{directories.user}/hardware/{VENDOR_NAME}/{ARCHITECTURE}/...`
+
+- `{directories.user}` is the user directory as specified in the
+  [configuration file](configuration.md#default-directories).
+- `{VENDOR_NAME}` is the identifier of the vendor/maintainer of the platform.
+- `{ARCHITECTURE}` is the architecture of the CPU used in the platform.
+
+A vendor/maintainer may have multiple supported architectures.
+
+Let's see an example, below we have a bunch of platforms downloaded from three hardware vendors `arduino`, `adafruit`
+and `esp32`, and installed using the Board Manager:
 
 ```
-hardware/arduino/avr/...     - Arduino - AVR Boards
-hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
-hardware/yyyyy/avr/...       - Yyy - AVR
-hardware/xxxxx/avr/...       - Xxx - AVR
+{directories.data}/packages/arduino/hardware/avr/1.8.6/...
+{directories.data}/packages/arduino/hardware/esp32/2.0.18-arduino.5/...
+{directories.data}/packages/arduino/hardware/nrf52/1.4.5/...
+{directories.data}/packages/adafruit/hardware/nrf52/1.6.1/...
+{directories.data}/packages/esp32/hardware/esp32/3.0.7/...
 ```
 
-The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.
+In this example three architectures have been installed from the vendor `arduino` (`avr`, `esp32` and `nrf52`), and one
+from `adafruit` and `esp32` (`nrf52` and `esp32` respectively). Note that the vendor `esp32` has the same name as the
+architecture `esp32`.
+
+If the user manually installed the same platforms, they should have unpacked them in the following directories:
+
+```
+{directories.user}/hardware/arduino/avr/...
+{directories.user}/hardware/arduino/esp32/...
+{directories.user}/hardware/arduino/nrf52/...
+{directories.user}/hardware/adafruit/nrf52/...
+{directories.user}/hardware/esp32/esp32/...
+```
+
+In this latter case the version must be omitted.
+
+### Notes about choosing the architecture name
 
 Architecture values are case sensitive (e.g. `AVR` != `avr`).
 
-If possible, follow existing architecture name conventions when creating hardware packages. Use the vendor folder name
-to differentiate your package. The architecture folder name is used to determine library compatibility and to permit
-referencing resources from another core of the same architecture, so use of a non-standard architecture name can have a
-harmful effect.
+Platform developers should follow the existing architecture name conventions when creating hardware packages, if you
+need to differentiate your package use the vendor/maintainer folder name to do so.
+
+The architecture name is used to determine the libraries compatibility and to permit referencing resources from another
+platform of the same architecture. Use of a non-standard architecture name can have a harmful effect.
 
 ## Architecture configurations
 
