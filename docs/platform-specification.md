@@ -40,7 +40,7 @@ and `esp32`, and installed using the Board Manager:
 ```
 
 In this example three architectures have been installed from the vendor `arduino` (`avr`, `esp32` and `nrf52`), and one
-from `adafruit` and `esp32` (`nrf52` and `esp32` respectively). Note that the vendor `esp32` has the same name of the
+from `adafruit` and `esp32` (`nrf52` and `esp32` respectively). Note that the vendor `esp32` has the same name as the
 architecture `esp32`.
 
 If the user manually installed the same platforms, they should have unpacked them in the following directories:
