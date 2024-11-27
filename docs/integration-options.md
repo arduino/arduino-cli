@@ -4,8 +4,8 @@ The Arduino CLI is an open source Command Line Application written in [Golang] t
 compile, verify and upload sketches to Arduino boards and that’s capable of managing all the software and tools needed
 in the process. But don’t get fooled by its name: Arduino CLI can do much more than the average console application, as
 shown by [Arduino IDE 2.x][arduino ide 2.x] and [Arduino Cloud], which rely on it for similar purposes but each one in a
-completely different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining how
-we designed the software so that it can be effectively leveraged under different scenarios.
+completely different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining
+how we designed the software so that it can be effectively leveraged under different scenarios.
 
 ## The first pillar: command line interface
 
@@ -132,17 +132,18 @@ $ arduino-cli lib search FlashStorage --format json | jq .libraries[0].latest
 ```
 
 Even if not related to software design, one last feature that’s worth mentioning is the availability of a one-line
-[installation script] that can be used to make the latest version of the Arduino CLI available on most systems with an HTTP
-client like curl or wget and a shell like bash.
+[installation script] that can be used to make the latest version of the Arduino CLI available on most systems with an
+HTTP client like curl or wget and a shell like bash.
 
 For more information on Arduino CLI's command line interface, see the [command reference].
 
 ## The second pillar: gRPC interface
 
 [gRPC] is a high performance [RPC] framework that can efficiently connect client and server applications. The Arduino
-CLI can act as a gRPC server (we call it [daemon mode]), exposing a set of procedures that implement the very same set of
-features of the command line interface and waiting for clients to connect and use them. To give an idea, the following is
-some [Golang] code capable of retrieving the version number of a remote running Arduino CLI server instance:
+CLI can act as a gRPC server (we call it [daemon mode]), exposing a set of procedures that implement the very same set
+of features of the command line interface and waiting for clients to connect and use them. To give an idea, the
+following is some [Golang] code capable of retrieving the version number of a remote running Arduino CLI server
+instance:
 
 ```go
 // This file is part of arduino-cli.
@@ -210,8 +211,8 @@ a common Golang API, based on the gRPC protobuf definitions: a set of functions 
 offered by the Arduino CLI, so that when we provide a fix or a new feature, they are automatically available to both the
 command line and gRPC interfaces. The source modules implementing this API are implemented through the `commands`
 package, and it can be imported in other Golang programs to embed a full-fledged Arduino CLI. For example, this is how
-some backend services powering [Arduino Cloud] can compile sketches and manage libraries. Just to give you a taste of what
-it means to embed the Arduino CLI, here is how to search for a core using the API:
+some backend services powering [Arduino Cloud] can compile sketches and manage libraries. Just to give you a taste of
+what it means to embed the Arduino CLI, here is how to search for a core using the API:
 
 ```go
 // This file is part of arduino-cli.
@@ -296,8 +297,7 @@ use and provide support for.
 You can start playing with the Arduino CLI right away. The code is open source and [the repo][arduino cli repository]
 contains [example code showing how to implement a gRPC client][grpc client example]. If you’re curious about how we
 designed the low level API, have a look at the [commands package] and don’t hesitate to leave feedback on the [issue
-tracker]
-if you’ve got a use case that doesn’t fit one of the three pillars.
+tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 
 [golang]: https://go.dev/
 [arduino ide 2.x]: https://github.com/arduino/arduino-ide
