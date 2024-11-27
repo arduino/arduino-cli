@@ -137,6 +137,27 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t,
 		"properties.Map{\n  \"cpu\": \"atmega\",\n  \"speed\": \"1000\",\n  \"extra\": \"core=arduino\",\n}",
 		f.Configs.Dump())
+
+	// Check invalid characters in config keys
+	_, err = fqbn.Parse("arduino:avr:uno:cpu@=atmega")
+	require.Error(t, err)
+	_, err = fqbn.Parse("arduino:avr:uno:cpu@atmega")
+	require.Error(t, err)
+	_, err = fqbn.Parse("arduino:avr:uno:cpu=atmega,speed@=1000")
+	require.Error(t, err)
+	_, err = fqbn.Parse("arduino:avr:uno:cpu=atmega,speed@1000")
+	require.Error(t, err)
+
+	// Check invalid characters in config values
+	_, err = fqbn.Parse("arduino:avr:uno:cpu=atmega@")
+	require.Error(t, err)
+	_, err = fqbn.Parse("arduino:avr:uno:cpu=atmega@extra")
+	require.Error(t, err)
+	_, err = fqbn.Parse("arduino:avr:uno:cpu=atmega,speed=1000@")
+	require.Error(t, err)
+	_, err = fqbn.Parse("arduino:avr:uno:cpu=atmega,speed=1000@extra")
+	require.Error(t, err)
+
 }
 
 func TestMatch(t *testing.T) {
@@ -186,4 +207,22 @@ func TestValidCharacters(t *testing.T) {
 		_, err := fqbn.Parse(validFqbn)
 		require.Error(t, err)
 	}
+}
+
+func TestMustParse(t *testing.T) {
+	require.NotPanics(t, func() { fqbn.MustParse("arduino:avr:uno") })
+	require.Panics(t, func() { fqbn.MustParse("ard=uino:avr=:u=no") })
+}
+
+func TestClone(t *testing.T) {
+	a, err := fqbn.Parse("arduino:avr:uno:opt1=1,opt2=2")
+	require.NoError(t, err)
+	b := a.Clone()
+	require.True(t, b.Match(a))
+	require.True(t, a.Match(b))
+
+	c, err := fqbn.Parse("arduino:avr:uno:opt1=1,opt2=2,opt3=3")
+	require.NoError(t, err)
+	require.True(t, c.Match(a))
+	require.False(t, a.Match(c))
 }
