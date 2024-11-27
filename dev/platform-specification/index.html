@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hardware-folders-structure" class="md-skip">
+        <a href="#platform-installation-directories" class="md-skip">
           Skip to content
         </a>
       
@@ -1192,9 +1192,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hardware-folders-structure" class="md-nav__link">
-    Hardware Folders structure
+  <a href="#platform-installation-directories" class="md-nav__link">
+    Platform installation directories
   </a>
+  
+    <nav class="md-nav" aria-label="Platform installation directories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#notes-about-choosing-the-architecture-name" class="md-nav__link">
+    Notes about choosing the architecture name
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1853,9 +1866,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hardware-folders-structure" class="md-nav__link">
-    Hardware Folders structure
+  <a href="#platform-installation-directories" class="md-nav__link">
+    Platform installation directories
   </a>
+  
+    <nav class="md-nav" aria-label="Platform installation directories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#notes-about-choosing-the-architecture-name" class="md-nav__link">
+    Notes about choosing the architecture name
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2396,25 +2422,50 @@
 <p>Platforms add support for new boards to the Arduino development software. They are installable either via
 <a href="../package_index_json-specification/">Boards Manager</a> or manual installation to the <em>hardware</em> folder of Arduino's
 sketchbook folder (AKA "user directory").<br> A platform may consist of as little as a single configuration file.</p>
-<h2 id="hardware-folders-structure">Hardware Folders structure<a class="headerlink" href="#hardware-folders-structure" title="Permanent link">&para;</a></h2>
-<p>The new hardware folders have a hierarchical structure organized in two levels:</p>
+<h2 id="platform-installation-directories">Platform installation directories<a class="headerlink" href="#platform-installation-directories" title="Permanent link">&para;</a></h2>
+<p>If the platforms are installed using the Board Manager the installation directory location will be as follow:</p>
+<p><code>{directories.data}/packages/{VENDOR_NAME}/hardware/{ARCHITECTURE}/{VERSION}/...</code></p>
 <ul>
-<li>the first level is the vendor/maintainer</li>
-<li>the second level is the supported architecture</li>
+<li><code>{directories.data}</code> is the data directory as specified in the
+  <a href="../configuration/#default-directories">configuration file</a>.</li>
+<li><code>{VENDOR_NAME}</code> is the identifier of the vendor/maintainer of the platform.</li>
+<li><code>{ARCHITECTURE}</code> is the architecture of the CPU used in the platform.</li>
+<li><code>{VERSION}</code> is the platform version.</li>
 </ul>
-<p>A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called
-"arduino", "yyyyy" and "xxxxx":</p>
-<div class="highlight"><pre><span></span><code>hardware/arduino/avr/...     - Arduino - AVR Boards
-hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
-hardware/yyyyy/avr/...       - Yyy - AVR
-hardware/xxxxx/avr/...       - Xxx - AVR
+<p>Alternatively, a platform may be manually installed by the user inside the Sketchbook/user directory as follows:</p>
+<p><code>{directories.user}/hardware/{VENDOR_NAME}/{ARCHITECTURE}/...</code></p>
+<ul>
+<li><code>{directories.user}</code> is the user directory as specified in the
+  <a href="../configuration/#default-directories">configuration file</a>.</li>
+<li><code>{VENDOR_NAME}</code> is the identifier of the vendor/maintainer of the platform.</li>
+<li><code>{ARCHITECTURE}</code> is the architecture of the CPU used in the platform.</li>
+</ul>
+<p>A vendor/maintainer may have multiple supported architectures.</p>
+<p>Let's see an example, below we have a bunch of platforms downloaded from three hardware vendors <code>arduino</code>, <code>adafruit</code>
+and <code>esp32</code>, and installed using the Board Manager:</p>
+<div class="highlight"><pre><span></span><code>{directories.data}/packages/arduino/hardware/avr/1.8.6/...
+{directories.data}/packages/arduino/hardware/esp32/2.0.18-arduino.5/...
+{directories.data}/packages/arduino/hardware/nrf52/1.4.5/...
+{directories.data}/packages/adafruit/hardware/nrf52/1.6.1/...
+{directories.data}/packages/esp32/hardware/esp32/3.0.7/...
 </code></pre></div>
-<p>The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.</p>
+<p>In this example three architectures have been installed from the vendor <code>arduino</code> (<code>avr</code>, <code>esp32</code> and <code>nrf52</code>), and one
+from <code>adafruit</code> and <code>esp32</code> (<code>nrf52</code> and <code>esp32</code> respectively). Note that the vendor <code>esp32</code> has the same name as the
+architecture <code>esp32</code>.</p>
+<p>If the user manually installed the same platforms, they should have unpacked them in the following directories:</p>
+<div class="highlight"><pre><span></span><code>{directories.user}/hardware/arduino/avr/...
+{directories.user}/hardware/arduino/esp32/...
+{directories.user}/hardware/arduino/nrf52/...
+{directories.user}/hardware/adafruit/nrf52/...
+{directories.user}/hardware/esp32/esp32/...
+</code></pre></div>
+<p>In this latter case the version must be omitted.</p>
+<h3 id="notes-about-choosing-the-architecture-name">Notes about choosing the architecture name<a class="headerlink" href="#notes-about-choosing-the-architecture-name" title="Permanent link">&para;</a></h3>
 <p>Architecture values are case sensitive (e.g. <code>AVR</code> != <code>avr</code>).</p>
-<p>If possible, follow existing architecture name conventions when creating hardware packages. Use the vendor folder name
-to differentiate your package. The architecture folder name is used to determine library compatibility and to permit
-referencing resources from another core of the same architecture, so use of a non-standard architecture name can have a
-harmful effect.</p>
+<p>Platform developers should follow the existing architecture name conventions when creating hardware packages, if you
+need to differentiate your package use the vendor/maintainer folder name to do so.</p>
+<p>The architecture name is used to determine the libraries compatibility and to permit referencing resources from another
+platform of the same architecture. Use of a non-standard architecture name can have a harmful effect.</p>
 <h2 id="architecture-configurations">Architecture configurations<a class="headerlink" href="#architecture-configurations" title="Permanent link">&para;</a></h2>
 <p>Each architecture must be configured through a set of configuration files:</p>
 <ul>

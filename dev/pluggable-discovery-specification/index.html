@@ -1284,6 +1284,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#an-important-note-about-vid-and-pid" class="md-nav__link">
+    An important note about vid and pid
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#identification-of-board-options" class="md-nav__link">
     Identification of board options
   </a>
@@ -1497,6 +1504,13 @@
   
     <nav class="md-nav" aria-label="Board identification">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#an-important-note-about-vid-and-pid" class="md-nav__link">
+    An important note about vid and pid
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#identification-of-board-options" class="md-nav__link">
@@ -1771,7 +1785,8 @@ process has been stopped and no further commands can be received.</p>
   "candidate" board attached to that port.</li>
 </ul>
 <p>Some port <code>properties</code> may not be precise enough to uniquely identify a board, in that case more boards may match the
-same set of <code>properties</code>, that's why we called it "candidate".</p>
+same set of <code>properties</code>, that's why we called it "candidate". The board identification properties should be used only
+if they allows to match the board model beyond any doubt.</p>
 <p>Let's see an example to clarify things a bit, let's suppose that we have the following <code>properties</code> coming from the
 serial discovery:</p>
 <div class="highlight"><pre><span></span><code>  &quot;port&quot;: {
@@ -1835,6 +1850,11 @@ myboard.upload_port.1.apples=40
 </code></pre></div>
 <p>will match on both <code>pears=20, apples=30</code> and <code>pears=30, apples=40</code> but not <code>pears=20, apples=40</code>, in that sense each
 "set" of identification properties is independent from each other and cannot be mixed for port matching.</p>
+<h4 id="an-important-note-about-vid-and-pid">An important note about <code>vid</code> and <code>pid</code><a class="headerlink" href="#an-important-note-about-vid-and-pid" title="Permanent link">&para;</a></h4>
+<p>The board identification properties should be used only if they allows to match the board model beyond any doubt.
+Sometimes a board do not expose a unique vid/pid combination, this is the case for example if a USB-2-serial converter
+chip is used (like the omnipresent FT232 or CH340): those chips exposes their specific vid/pid that will be the same for
+all the other boards using the same chip. In such cases the board identification properties should NOT be used.</p>
 <h4 id="identification-of-board-options">Identification of board options<a class="headerlink" href="#identification-of-board-options" title="Permanent link">&para;</a></h4>
 <p><a href="../platform-specification/#custom-board-options">Custom board options</a> can also be identified.</p>
 <p>Identification property values are associated with a custom board option by the board definition in
