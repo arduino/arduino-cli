@@ -19,8 +19,8 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
+	"github.com/arduino/arduino-cli/internal/version"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/arduino-cli/version"
 )
 
 // NewArduinoCoreServer returns an implementation of the ArduinoCoreService gRPC service

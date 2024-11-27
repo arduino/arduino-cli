@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
-	"github.com/arduino/arduino-cli/version"
+	"github.com/arduino/arduino-cli/internal/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
