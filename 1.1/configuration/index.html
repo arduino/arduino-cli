@@ -1106,6 +1106,19 @@
     Configuration keys
   </a>
   
+    <nav class="md-nav" aria-label="Configuration keys">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-directories" class="md-nav__link">
+    Default directories
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1431,6 +1444,19 @@
     Configuration keys
   </a>
   
+    <nav class="md-nav" aria-label="Configuration keys">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-directories" class="md-nav__link">
+    Default directories
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1553,7 +1579,8 @@
 <li><code>data</code> - directory used to store Boards/Library Manager index files and Boards Manager platform installations.</li>
 <li><code>downloads</code> - directory used to stage downloaded archives during Boards/Library Manager installations.</li>
 <li><code>user</code> - the equivalent of the Arduino IDE's <a href="../sketch-specification/#sketchbook">"sketchbook" directory</a>. Library Manager
-  installations are made to the <code>libraries</code> subdirectory of the user directory.</li>
+  installations are made to the <code>libraries</code> subdirectory of the user directory. Users can manually install 3rd party
+  platforms in the <code>hardware</code> subdirectory of the user directory.</li>
 <li><code>builtin.libraries</code> - the libraries in this directory will be available to all platforms without the need for the
   user to install them, but with the lowest priority over other installed libraries with the same name, it's the
   equivalent of the Arduino IDE's bundled libraries directory.</li>
@@ -1605,6 +1632,31 @@
 </li>
 <li><code>network</code> - configuration options related to the network connection.<ul>
 <li><code>proxy</code> - URL of the proxy server.</li>
+</ul>
+</li>
+</ul>
+<h3 id="default-directories">Default directories<a class="headerlink" href="#default-directories" title="Permanent link">&para;</a></h3>
+<p>The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
+configuration file.</p>
+<ul>
+<li>
+<p>The <code>directories.data</code> default is OS-dependent:</p>
+<ul>
+<li>on Linux (and other Unix-based OS) is: <code>{HOME}/.arduino15</code></li>
+<li>on Windows is: <code>{HOME}/AppData/Local/Arduino15</code></li>
+<li>on MacOS is: <code>{HOME}/Library/Arduino15</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>The <code>directories.download</code> default is <code>{directories.data}/staging</code>. If the value of <code>{directories.data}</code> is changed in
+  the configuration the user-specified value will be used.</li>
+</ul>
+<ul>
+<li>The <code>directories.user</code> default is OS-dependent:<ul>
+<li>on Linux (and other Unix-based OS) is: <code>{HOME}/Arduino</code></li>
+<li>on Windows is: <code>{DOCUMENTS}/Arduino</code></li>
+<li>on MacOS is: <code>{HOME}/Documents/Arduino</code></li>
 </ul>
 </li>
 </ul>
