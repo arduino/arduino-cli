@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package cores
+package fqbn
 
 import (
 	"errors"
@@ -24,35 +24,35 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 )
 
-// FQBN represents a Board with a specific configuration
+// FQBN represents an Fully Qualified Board Name string
 type FQBN struct {
-	Package      string
-	PlatformArch string
+	Packager     string
+	Architecture string
 	BoardID      string
 	Configs      *properties.Map
 }
 
-// MustParseFQBN extract an FQBN object from the input string
+// MustParse parse an FQBN string from the input string
 // or panics if the input is not a valid FQBN.
-func MustParseFQBN(fqbnIn string) *FQBN {
-	res, err := ParseFQBN(fqbnIn)
+func MustParse(fqbnIn string) *FQBN {
+	res, err := Parse(fqbnIn)
 	if err != nil {
 		panic(err)
 	}
 	return res
 }
 
-// ParseFQBN extract an FQBN object from the input string
-func ParseFQBN(fqbnIn string) (*FQBN, error) {
-	// Split fqbn
+// Parse parses an FQBN string from the input string
+func Parse(fqbnIn string) (*FQBN, error) {
+	// Split fqbn parts
 	fqbnParts := strings.Split(fqbnIn, ":")
 	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
 		return nil, errors.New(i18n.Tr("not an FQBN: %s", fqbnIn))
 	}
 
 	fqbn := &FQBN{
-		Package:      fqbnParts[0],
-		PlatformArch: fqbnParts[1],
+		Packager:     fqbnParts[0],
+		Architecture: fqbnParts[1],
 		BoardID:      fqbnParts[2],
 		Configs:      properties.NewMap(),
 	}
@@ -91,6 +91,40 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 	return fqbn, nil
 }
 
+// Clone returns a copy of this FQBN.
+func (fqbn *FQBN) Clone() *FQBN {
+	return &FQBN{
+		Packager:     fqbn.Packager,
+		Architecture: fqbn.Architecture,
+		BoardID:      fqbn.BoardID,
+		Configs:      fqbn.Configs.Clone(),
+	}
+}
+
+// Match checks if the target FQBN equals to this one.
+// The core parts are checked for exact equality while board options are loosely
+// matched: the set of boards options of the target must be fully contained within
+// the one of the receiver and their values must be equal.
+func (fqbn *FQBN) Match(target *FQBN) bool {
+	if fqbn.StringWithoutConfig() != target.StringWithoutConfig() {
+		return false
+	}
+
+	for neededKey, neededValue := range target.Configs.AsMap() {
+		targetValue, hasKey := fqbn.Configs.GetOk(neededKey)
+		if !hasKey || targetValue != neededValue {
+			return false
+		}
+	}
+	return true
+}
+
+// StringWithoutConfig returns the FQBN without the Config part
+func (fqbn *FQBN) StringWithoutConfig() string {
+	return fqbn.Packager + ":" + fqbn.Architecture + ":" + fqbn.BoardID
+}
+
+// String returns the FQBN as a string
 func (fqbn *FQBN) String() string {
 	res := fqbn.StringWithoutConfig()
 	if fqbn.Configs.Size() > 0 {
@@ -101,39 +135,4 @@ func (fqbn *FQBN) String() string {
 		}
 	}
 	return res
-}
-
-// Clone returns a copy of this FQBN.
-func (fqbn *FQBN) Clone() *FQBN {
-	return &FQBN{
-		Package:      fqbn.Package,
-		PlatformArch: fqbn.PlatformArch,
-		BoardID:      fqbn.BoardID,
-		Configs:      fqbn.Configs.Clone(),
-	}
-}
-
-// Match check if the target FQBN corresponds to the receiver one.
-// The core parts are checked for exact equality while board options are loosely
-// matched: the set of boards options of the target must be fully contained within
-// the one of the receiver and their values must be equal.
-func (fqbn *FQBN) Match(target *FQBN) bool {
-	if fqbn.StringWithoutConfig() != target.StringWithoutConfig() {
-		return false
-	}
-
-	searchedProperties := target.Configs.Clone()
-	actualConfigs := fqbn.Configs.AsMap()
-	for neededKey, neededValue := range searchedProperties.AsMap() {
-		targetValue, hasKey := actualConfigs[neededKey]
-		if !hasKey || targetValue != neededValue {
-			return false
-		}
-	}
-	return true
-}
-
-// StringWithoutConfig returns the FQBN without the Config part
-func (fqbn *FQBN) StringWithoutConfig() string {
-	return fqbn.Package + ":" + fqbn.PlatformArch + ":" + fqbn.BoardID
 }

@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/arduino/go-timeutils"
@@ -290,7 +291,7 @@ func (pme *Explorer) FindBoardsWithID(id string) []*cores.Board {
 
 // FindBoardWithFQBN returns the board identified by the fqbn, or an error
 func (pme *Explorer) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
 		return nil, errors.New(i18n.Tr("parsing fqbn: %s", err))
 	}
@@ -318,22 +319,22 @@ func (pme *Explorer) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
 //
 // In case of error the partial results found in the meantime are
 // returned together with the error.
-func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
+func (pme *Explorer) ResolveFQBN(fqbn *fqbn.FQBN) (
 	*cores.Package, *cores.PlatformRelease, *cores.Board,
 	*properties.Map, *cores.PlatformRelease, error) {
 
 	// Find package
-	targetPackage := pme.packages[fqbn.Package]
+	targetPackage := pme.packages[fqbn.Packager]
 	if targetPackage == nil {
 		return nil, nil, nil, nil, nil,
-			errors.New(i18n.Tr("unknown package %s", fqbn.Package))
+			errors.New(i18n.Tr("unknown package %s", fqbn.Packager))
 	}
 
 	// Find platform
-	platform := targetPackage.Platforms[fqbn.PlatformArch]
+	platform := targetPackage.Platforms[fqbn.Architecture]
 	if platform == nil {
 		return targetPackage, nil, nil, nil, nil,
-			errors.New(i18n.Tr("unknown platform %s:%s", targetPackage, fqbn.PlatformArch))
+			errors.New(i18n.Tr("unknown platform %s:%s", targetPackage, fqbn.Architecture))
 	}
 	boardPlatformRelease := pme.GetInstalledPlatformRelease(platform)
 	if boardPlatformRelease == nil {
@@ -429,7 +430,7 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	return targetPackage, boardPlatformRelease, board, buildProperties, corePlatformRelease, nil
 }
 
-func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *properties.Map, boardPlatformRelease *cores.PlatformRelease, fqbn *cores.FQBN) (string, *cores.PlatformRelease, string, *cores.PlatformRelease, error) {
+func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *properties.Map, boardPlatformRelease *cores.PlatformRelease, fqbn *fqbn.FQBN) (string, *cores.PlatformRelease, string, *cores.PlatformRelease, error) {
 	core := boardBuildProperties.ExpandPropsInString(boardBuildProperties.Get("build.core"))
 	referredCore := ""
 	if split := strings.Split(core, ":"); len(split) > 1 {
@@ -461,15 +462,15 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 			return "", nil, "", nil,
 				errors.New(i18n.Tr("missing package %[1]s referenced by board %[2]s", referredPackageName, fqbn))
 		}
-		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
+		referredPlatform := referredPackage.Platforms[fqbn.Architecture]
 		if referredPlatform == nil {
 			return "", nil, "", nil,
-				errors.New(i18n.Tr("missing platform %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.PlatformArch, fqbn))
+				errors.New(i18n.Tr("missing platform %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.Architecture, fqbn))
 		}
 		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
 		if referredPlatformRelease == nil {
 			return "", nil, "", nil,
-				errors.New(i18n.Tr("missing platform release %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.PlatformArch, fqbn))
+				errors.New(i18n.Tr("missing platform release %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.Architecture, fqbn))
 		}
 	}
 
@@ -890,7 +891,7 @@ func (pme *Explorer) FindMonitorDependency(discovery *cores.MonitorDependency) *
 
 // NormalizeFQBN return a normalized copy of the given FQBN, that is the same
 // FQBN but with the unneeded or invalid options removed.
-func (pme *Explorer) NormalizeFQBN(fqbn *cores.FQBN) (*cores.FQBN, error) {
+func (pme *Explorer) NormalizeFQBN(fqbn *fqbn.FQBN) (*fqbn.FQBN, error) {
 	_, _, board, _, _, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, err

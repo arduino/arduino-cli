@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
@@ -69,7 +70,7 @@ func TestResolveFQBN(t *testing.T) {
 
 	t.Run("NormalizeFQBN", func(t *testing.T) {
 		testNormalization := func(in, expected string) {
-			fqbn, err := cores.ParseFQBN(in)
+			fqbn, err := fqbn.Parse(in)
 			require.Nil(t, err)
 			require.NotNil(t, fqbn)
 			normalized, err := pme.NormalizeFQBN(fqbn)
@@ -92,7 +93,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesArduinoUno", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("arduino:avr:uno")
+		fqbn, err := fqbn.Parse("arduino:avr:uno")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -113,7 +114,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesArduinoMega", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("arduino:avr:mega")
+		fqbn, err := fqbn.Parse("arduino:avr:mega")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -129,7 +130,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesArduinoMegaWithNonDefaultCpuOption", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("arduino:avr:mega:cpu=atmega1280")
+		fqbn, err := fqbn.Parse("arduino:avr:mega:cpu=atmega1280")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -147,7 +148,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesArduinoMegaWithDefaultCpuOption", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("arduino:avr:mega:cpu=atmega2560")
+		fqbn, err := fqbn.Parse("arduino:avr:mega:cpu=atmega2560")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -167,7 +168,7 @@ func TestResolveFQBN(t *testing.T) {
 
 	t.Run("BoardAndBuildPropertiesForReferencedArduinoUno", func(t *testing.T) {
 		// Test a board referenced from the main AVR arduino platform
-		fqbn, err := cores.ParseFQBN("referenced:avr:uno")
+		fqbn, err := fqbn.Parse("referenced:avr:uno")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -185,7 +186,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesForArduinoDue", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("arduino:sam:arduino_due_x")
+		fqbn, err := fqbn.Parse("arduino:sam:arduino_due_x")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -200,7 +201,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesForCustomArduinoYun", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("my_avr_platform:avr:custom_yun")
+		fqbn, err := fqbn.Parse("my_avr_platform:avr:custom_yun")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -216,7 +217,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("BoardAndBuildPropertiesForWatterotCore", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("watterott:avr:attiny841:core=spencekonde,info=info")
+		fqbn, err := fqbn.Parse("watterott:avr:attiny841:core=spencekonde,info=info")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -234,7 +235,7 @@ func TestResolveFQBN(t *testing.T) {
 	t.Run("BoardAndBuildPropertiesForReferencedFeatherM0", func(t *testing.T) {
 		// Test a board referenced from the Adafruit SAMD core (this tests
 		// deriving where the package and core name are different)
-		fqbn, err := cores.ParseFQBN("referenced:samd:feather_m0")
+		fqbn, err := fqbn.Parse("referenced:samd:feather_m0")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -253,7 +254,7 @@ func TestResolveFQBN(t *testing.T) {
 
 	t.Run("BoardAndBuildPropertiesForNonExistentPackage", func(t *testing.T) {
 		// Test a board referenced from a non-existent package
-		fqbn, err := cores.ParseFQBN("referenced:avr:dummy_invalid_package")
+		fqbn, err := fqbn.Parse("referenced:avr:dummy_invalid_package")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -270,7 +271,7 @@ func TestResolveFQBN(t *testing.T) {
 
 	t.Run("BoardAndBuildPropertiesForNonExistentArchitecture", func(t *testing.T) {
 		// Test a board referenced from a non-existent platform/architecture
-		fqbn, err := cores.ParseFQBN("referenced:avr:dummy_invalid_platform")
+		fqbn, err := fqbn.Parse("referenced:avr:dummy_invalid_platform")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -288,7 +289,7 @@ func TestResolveFQBN(t *testing.T) {
 	t.Run("BoardAndBuildPropertiesForNonExistentCore", func(t *testing.T) {
 		// Test a board referenced from a non-existent core
 		// Note that ResolveFQBN does not actually check this currently
-		fqbn, err := cores.ParseFQBN("referenced:avr:dummy_invalid_core")
+		fqbn, err := fqbn.Parse("referenced:avr:dummy_invalid_core")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -306,7 +307,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("AddBuildBoardPropertyIfMissing", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("my_avr_platform:avr:mymega")
+		fqbn, err := fqbn.Parse("my_avr_platform:avr:mymega")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -324,7 +325,7 @@ func TestResolveFQBN(t *testing.T) {
 	})
 
 	t.Run("AddBuildBoardPropertyIfNotMissing", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("my_avr_platform:avr:mymega:cpu=atmega1280")
+		fqbn, err := fqbn.Parse("my_avr_platform:avr:mymega:cpu=atmega1280")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
 		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
@@ -813,7 +814,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	defer release()
 
 	{
-		fqbn, err := cores.ParseFQBN("esp32:esp32:esp32")
+		fqbn, err := fqbn.Parse("esp32:esp32:esp32")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, platformRelease, board, _, _, err := pme.ResolveFQBN(fqbn)
@@ -836,7 +837,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		require.Equal(t, "{network_cmd} -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
 	}
 	{
-		fqbn, err := cores.ParseFQBN("esp8266:esp8266:generic")
+		fqbn, err := fqbn.Parse("esp8266:esp8266:generic")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, platformRelease, board, _, _, err := pme.ResolveFQBN(fqbn)
@@ -858,7 +859,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		require.Equal(t, "\"{network_cmd}\" -I \"{runtime.platform.path}/tools/espota.py\" -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
 	}
 	{
-		fqbn, err := cores.ParseFQBN("arduino:avr:uno")
+		fqbn, err := fqbn.Parse("arduino:avr:uno")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, platformRelease, board, _, _, err := pme.ResolveFQBN(fqbn)
@@ -888,7 +889,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 
 	// build.core test suite
 	t.Run("CoreWithoutSubstitutions", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test")
+		fqbn, err := fqbn.Parse("test2:avr:test")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -897,7 +898,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "cores", "arduino"))
 	})
 	t.Run("CoreWithSubstitutions", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test2")
+		fqbn, err := fqbn.Parse("test2:avr:test2")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -907,7 +908,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "cores", "arduino"))
 	})
 	t.Run("CoreWithSubstitutionsAndDefaultOption", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test3")
+		fqbn, err := fqbn.Parse("test2:avr:test3")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -917,7 +918,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "cores", "arduino"))
 	})
 	t.Run("CoreWithSubstitutionsAndNonDefaultOption", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test3:core=referenced")
+		fqbn, err := fqbn.Parse("test2:avr:test3:core=referenced")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -929,7 +930,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 
 	// build.variant test suite
 	t.Run("VariantWithoutSubstitutions", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test4")
+		fqbn, err := fqbn.Parse("test2:avr:test4")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -938,7 +939,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "variants", "standard"))
 	})
 	t.Run("VariantWithSubstitutions", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test5")
+		fqbn, err := fqbn.Parse("test2:avr:test5")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -948,7 +949,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "variants", "standard"))
 	})
 	t.Run("VariantWithSubstitutionsAndDefaultOption", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test6")
+		fqbn, err := fqbn.Parse("test2:avr:test6")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
@@ -958,7 +959,7 @@ func TestVariantAndCoreSelection(t *testing.T) {
 		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "variants", "standard"))
 	})
 	t.Run("VariantWithSubstitutionsAndNonDefaultOption", func(t *testing.T) {
-		fqbn, err := cores.ParseFQBN("test2:avr:test6:variant=referenced")
+		fqbn, err := fqbn.Parse("test2:avr:test6:variant=referenced")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
 		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
