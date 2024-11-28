@@ -22,8 +22,8 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/inventory"
+	"github.com/arduino/arduino-cli/internal/version"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/arduino-cli/version"
 	semver "go.bug.st/relaxed-semver"
 )
 

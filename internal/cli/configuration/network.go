@@ -25,7 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/i18n"
-	"github.com/arduino/arduino-cli/version"
+	"github.com/arduino/arduino-cli/internal/version"
 	"go.bug.st/downloader/v2"
 )
 
