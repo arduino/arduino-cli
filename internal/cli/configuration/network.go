@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -58,6 +59,11 @@ func (settings *Settings) ExtraUserAgent() string {
 	return settings.GetString("network.user_agent_ext")
 }
 
+func (settings *Settings) ConnectionTimeout() time.Duration {
+	timeout := settings.GetInt("network.connection_timeout")
+	return time.Duration(timeout) * time.Second
+}
+
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
 func (settings *Settings) NetworkProxy() (*url.URL, error) {
 	if proxyConfig, ok, _ := settings.GetStringOk("network.proxy"); !ok {
@@ -82,6 +88,7 @@ func (settings *Settings) NewHttpClient() (*http.Client, error) {
 			},
 			userAgent: settings.UserAgent(),
 		},
+		Timeout: settings.ConnectionTimeout(),
 	}, nil
 }
 

@@ -45,6 +45,7 @@
     [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
 - `network` - configuration options related to the network connection.
   - `proxy` - URL of the proxy server.
+  - `connection_timeout` - connection timeout in seconds, defaults to `0` which will wait indefinitely.
 
 ### Default directories
 
