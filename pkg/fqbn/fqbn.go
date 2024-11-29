@@ -42,6 +42,9 @@ func MustParse(fqbnIn string) *FQBN {
 	return res
 }
 
+var fqbnValidationRegex = regexp.MustCompile(`^[a-zA-Z0-9_.-]*$`)
+var valueValidationRegex = regexp.MustCompile(`^[a-zA-Z0-9=_.-]*$`)
+
 // Parse parses an FQBN string from the input string
 func Parse(fqbnIn string) (*FQBN, error) {
 	// Split fqbn parts
@@ -60,7 +63,6 @@ func Parse(fqbnIn string) (*FQBN, error) {
 		return nil, errors.New(i18n.Tr("empty board identifier"))
 	}
 	// Check if the fqbn contains invalid characters
-	fqbnValidationRegex := regexp.MustCompile(`^[a-zA-Z0-9_.-]*$`)
 	for i := 0; i < 3; i++ {
 		if !fqbnValidationRegex.MatchString(fqbnParts[i]) {
 			return nil, errors.New(i18n.Tr("fqbn's field %s contains an invalid character", fqbnParts[i]))
@@ -81,7 +83,6 @@ func Parse(fqbnIn string) (*FQBN, error) {
 				return nil, errors.New(i18n.Tr("config key %s contains an invalid character", k))
 			}
 			// The config value can also contain the = symbol
-			valueValidationRegex := regexp.MustCompile(`^[a-zA-Z0-9=_.-]*$`)
 			if !valueValidationRegex.MatchString(v) {
 				return nil, errors.New(i18n.Tr("config value %s contains an invalid character", v))
 			}
