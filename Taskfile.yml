@@ -309,24 +309,24 @@ tasks:
   i18n:update:
     desc: Updates i18n files
     cmds:
-      - go run ./internal/i18n/cmd/main.go catalog generate . > ./internal/i18n/data/en.po
+      - go run ./internal/locales/cmd/main.go catalog generate . > ./internal/locales/data/en.po
 
   i18n:pull:
     desc: Pull i18n files from transifex
     cmds:
-      - go run ./internal/i18n/cmd/main.go transifex pull ./internal/i18n/data
+      - go run ./internal/locales/cmd/main.go transifex pull ./internal/locales/data
 
   i18n:push:
     desc: Push i18n files to transifex
     cmds:
-      - go run ./internal/i18n/cmd/main.go transifex push ./internal/i18n/data
+      - go run ./internal/locales/cmd/main.go transifex push ./internal/locales/data
 
   i18n:check:
     desc: Check if the i18n message catalog was updated
     cmds:
       - task: i18n:pull
-      - git add -N ./internal/i18n/data
-      - git diff --exit-code ./internal/i18n/data
+      - git add -N ./internal/locales/data
+      - git diff --exit-code ./internal/locales/data
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
   website:check:

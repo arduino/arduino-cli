@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -127,7 +128,7 @@ func NewBuilder(
 	requestBuildProperties []string,
 	hardwareDirs, otherLibrariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
-	fqbn *cores.FQBN,
+	fqbn *fqbn.FQBN,
 	clean bool,
 	sourceOverrides map[string]string,
 	onlyUpdateCompilationDatabase bool,

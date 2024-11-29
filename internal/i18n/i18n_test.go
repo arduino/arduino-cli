@@ -25,8 +25,9 @@ import (
 )
 
 func setPo(poFile string) {
-	po = gotext.NewPo()
-	po.Parse([]byte(poFile))
+	dict := gotext.NewPo()
+	dict.Parse([]byte(poFile))
+	SetLocale(dict)
 }
 
 func TestPoTranslation(t *testing.T) {
@@ -39,7 +40,7 @@ func TestPoTranslation(t *testing.T) {
 }
 
 func TestNoLocaleSet(t *testing.T) {
-	po = gotext.NewPo()
+	locale = gotext.NewPo()
 	require.Equal(t, "test-key", Tr("test-key"))
 }
 

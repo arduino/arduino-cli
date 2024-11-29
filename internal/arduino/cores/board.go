@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	"github.com/arduino/go-properties-orderedmap"
 )
 
@@ -124,7 +125,7 @@ func (b *Board) GetConfigOptionValues(option string) *properties.Map {
 
 // GetBuildProperties returns the build properties and the build
 // platform for the Board with the configuration passed as parameter.
-func (b *Board) GetBuildProperties(fqbn *FQBN) (*properties.Map, error) {
+func (b *Board) GetBuildProperties(fqbn *fqbn.FQBN) (*properties.Map, error) {
 	b.buildConfigOptionsStructures()
 
 	// Override default configs with user configs
@@ -161,7 +162,7 @@ func (b *Board) GetBuildProperties(fqbn *FQBN) (*properties.Map, error) {
 // "cpu=atmega2560".
 // FIXME: deprecated, use GetBuildProperties instead
 func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.Map, error) {
-	fqbn, err := ParseFQBN(b.String() + ":" + config)
+	fqbn, err := fqbn.Parse(b.String() + ":" + config)
 	if err != nil {
 		return nil, errors.New(i18n.Tr("parsing fqbn: %s", err))
 	}

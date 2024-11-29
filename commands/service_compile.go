@@ -28,13 +28,13 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/builder"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -116,7 +116,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return &cmderrors.MissingFQBNError{}
 	}
 
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
 		return &cmderrors.InvalidFQBNError{Cause: err}
 	}
@@ -124,7 +124,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	if err != nil {
 		if targetPlatform == nil {
 			return &cmderrors.PlatformNotFoundError{
-				Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+				Platform: fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture),
 				Cause:    errors.New(i18n.Tr("platform not installed")),
 			}
 		}

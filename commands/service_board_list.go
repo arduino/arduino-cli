@@ -30,11 +30,11 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
@@ -148,7 +148,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *conf
 	// first query installed cores through the Package Manager
 	logrus.Debug("Querying installed cores for board identification...")
 	for _, board := range pme.IdentifyBoard(port.Properties) {
-		fqbn, err := cores.ParseFQBN(board.FQBN())
+		fqbn, err := fqbn.Parse(board.FQBN())
 		if err != nil {
 			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
@@ -210,10 +210,10 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 	}
 	defer release()
 
-	var fqbnFilter *cores.FQBN
+	var fqbnFilter *fqbn.FQBN
 	if f := req.GetFqbn(); f != "" {
 		var err error
-		fqbnFilter, err = cores.ParseFQBN(f)
+		fqbnFilter, err = fqbn.Parse(f)
 		if err != nil {
 			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
@@ -247,9 +247,9 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 	}, nil
 }
 
-func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
+func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *fqbn.FQBN) bool {
 	for _, detectedBoard := range b.GetMatchingBoards() {
-		detectedFqbn, err := cores.ParseFQBN(detectedBoard.GetFqbn())
+		detectedFqbn, err := fqbn.Parse(detectedBoard.GetFqbn())
 		if err != nil {
 			continue
 		}

@@ -13,23 +13,18 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package i18n
+package main
 
 import (
+	"fmt"
 	"os"
-	"strings"
+
+	"github.com/arduino/arduino-cli/internal/locales/cmd/commands"
 )
 
-func getLocaleIdentifierFromOS() string {
-	return getLocaleIdentifier()
-}
-
-func getLocaleIdentifierFromEnv() string {
-	locale := os.Getenv("LC_ALL")
-
-	if locale == "" {
-		locale = os.Getenv("LANG")
+func main() {
+	if err := commands.Execute(); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
-
-	return strings.Split(locale, ".")[0]
 }

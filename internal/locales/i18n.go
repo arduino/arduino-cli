@@ -13,27 +13,27 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-//go:build darwin && cgo
+package locales
 
-package i18n
-
-/*
-#cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework Foundation
-#import <Foundation/Foundation.h>
-
-const char* getLocaleIdentifier() {
-    NSString *cs = [[NSLocale currentLocale] localeIdentifier];
-    const char *cstr = [cs UTF8String];
-    return cstr;
-}
-
-*/
-import "C"
-
-func getLocaleIdentifier() string {
-	if envLocale := getLocaleIdentifierFromEnv(); envLocale != "" {
-		return envLocale
+// Init initializes the i18n module, setting the locale according to this order of preference:
+// 1. Locale specified via the function call
+// 2. OS Locale
+// 3. en (default)
+func Init(configLocale string) {
+	locales := supportedLocales()
+	if configLocale != "" {
+		if locale := findMatchingLocale(configLocale, locales); locale != "" {
+			setLocale(locale)
+			return
+		}
 	}
-	return C.GoString(C.getLocaleIdentifier())
+
+	if osLocale := getLocaleIdentifierFromOS(); osLocale != "" {
+		if locale := findMatchingLocale(osLocale, locales); locale != "" {
+			setLocale(locale)
+			return
+		}
+	}
+
+	setLocale("en")
 }

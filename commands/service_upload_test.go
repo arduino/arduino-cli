@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -60,7 +61,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		importFile    string
 		importDir     string
 		sketch        *sketch.Sketch
-		fqbn          *cores.FQBN
+		fqbn          *fqbn.FQBN
 		resBuildPath  string
 		resSketchName string
 	}
@@ -68,7 +69,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 	blonk, err := sketch.New(paths.New("testdata/upload/Blonk"))
 	require.NoError(t, err)
 
-	fqbn, err := cores.ParseFQBN("arduino:samd:mkr1000")
+	fqbn, err := fqbn.Parse("arduino:samd:mkr1000")
 	require.NoError(t, err)
 
 	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)

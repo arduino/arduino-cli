@@ -13,26 +13,38 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package i18n
+package locales
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	"strings"
+	"syscall"
+	"unsafe"
 )
 
-func TestLocaleMatch(t *testing.T) {
-	supportedLocales := []string{
-		"en",
-		"pt_BR",
-		"it_IT",
-		"es_CO",
-		"es_ES",
+func getLocaleIdentifier() string {
+	defer func() {
+		if r := recover(); r != nil {
+			// ignore error and do not panic
+		}
+	}()
+
+	if loc := getLocaleIdentifierFromEnv(); loc != "" {
+		return loc
 	}
 
-	require.Equal(t, "pt_BR", findMatchingLocale("pt", supportedLocales), "Language match")
-	require.Equal(t, "pt_BR", findMatchingLocale("pt_BR", supportedLocales), "Exact match")
-	require.Equal(t, "pt_BR", findMatchingLocale("pt_PT", supportedLocales), "Language match with country")
-	require.Equal(t, "", findMatchingLocale("es", supportedLocales), "Multiple languages match")
-	require.Equal(t, "", findMatchingLocale("zn_CH", supportedLocales), "Not supported")
+	dll := syscall.MustLoadDLL("kernel32")
+	defer dll.Release()
+	proc := dll.MustFindProc("GetUserDefaultLocaleName")
+
+	localeNameMaxLen := 85
+	buffer := make([]uint16, localeNameMaxLen)
+	len, _, err := proc.Call(uintptr(unsafe.Pointer(&buffer[0])), uintptr(localeNameMaxLen))
+
+	if len == 0 {
+		panic(err)
+	}
+
+	locale := syscall.UTF16ToString(buffer)
+
+	return strings.ReplaceAll(locale, "-", "_")
 }

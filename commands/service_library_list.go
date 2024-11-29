@@ -21,12 +21,12 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -59,7 +59,7 @@ func (s *arduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 	var allLibs []*installedLib
 	if fqbnString := req.GetFqbn(); fqbnString != "" {
 		allLibs = listLibraries(lme, li, req.GetUpdatable(), true)
-		fqbn, err := cores.ParseFQBN(req.GetFqbn())
+		fqbn, err := fqbn.Parse(req.GetFqbn())
 		if err != nil {
 			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
@@ -77,8 +77,8 @@ func (s *arduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 				}
 			}
 			if latest, has := filteredRes[lib.Library.Name]; has {
-				latestPriority := librariesresolver.ComputePriority(latest.Library, "", fqbn.PlatformArch)
-				libPriority := librariesresolver.ComputePriority(lib.Library, "", fqbn.PlatformArch)
+				latestPriority := librariesresolver.ComputePriority(latest.Library, "", fqbn.Architecture)
+				libPriority := librariesresolver.ComputePriority(lib.Library, "", fqbn.Architecture)
 				if latestPriority >= libPriority {
 					// Pick library with the best priority
 					continue
@@ -87,7 +87,7 @@ func (s *arduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 
 			// Check if library is compatible with board specified by FBQN
 			lib.Library.CompatibleWith = map[string]bool{
-				fqbnString: lib.Library.IsCompatibleWith(fqbn.PlatformArch),
+				fqbnString: lib.Library.IsCompatibleWith(fqbn.Architecture),
 			}
 
 			filteredRes[lib.Library.Name] = lib

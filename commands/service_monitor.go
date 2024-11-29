@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	pluggableMonitor "github.com/arduino/arduino-cli/internal/arduino/monitor"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/djherbis/buffer"
@@ -237,7 +238,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	return nil
 }
 
-func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, *properties.Map, error) {
+func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbnIn string) (*pluggableMonitor.PluggableMonitor, *properties.Map, error) {
 	if protocol == "" {
 		return nil, nil, &cmderrors.MissingPortProtocolError{}
 	}
@@ -246,8 +247,8 @@ func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, pro
 	boardSettings := properties.NewMap()
 
 	// If a board is specified search the monitor in the board package first
-	if fqbn != "" {
-		fqbn, err := cores.ParseFQBN(fqbn)
+	if fqbnIn != "" {
+		fqbn, err := fqbn.Parse(fqbnIn)
 		if err != nil {
 			return nil, nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}

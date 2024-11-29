@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -36,7 +37,7 @@ func (s *arduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Co
 	if fqbnIn == "" {
 		return nil, &cmderrors.MissingFQBNError{}
 	}
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
 		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}

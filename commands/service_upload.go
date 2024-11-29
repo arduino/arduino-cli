@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -53,7 +54,7 @@ func (s *arduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rp
 	}
 	defer release()
 
-	fqbn, err := cores.ParseFQBN(req.GetFqbn())
+	fqbn, err := fqbn.Parse(req.GetFqbn())
 	if err != nil {
 		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
@@ -61,7 +62,7 @@ func (s *arduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rp
 	_, platformRelease, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 	if platformRelease == nil {
 		return nil, &cmderrors.PlatformNotFoundError{
-			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+			Platform: fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture),
 			Cause:    err,
 		}
 	} else if err != nil {
@@ -282,7 +283,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		return nil, &cmderrors.MissingProgrammerError{}
 	}
 
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
 		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
@@ -292,7 +293,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if boardPlatform == nil {
 		return nil, &cmderrors.PlatformNotFoundError{
-			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+			Platform: fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture),
 			Cause:    err,
 		}
 	} else if err != nil {

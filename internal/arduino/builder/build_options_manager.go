@@ -22,9 +22,9 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
@@ -51,7 +51,7 @@ func newBuildOptions(
 	builtInLibrariesDirs, buildPath *paths.Path,
 	sketch *sketch.Sketch,
 	customBuildProperties []string,
-	fqbn *cores.FQBN,
+	fqbn *fqbn.FQBN,
 	clean bool,
 	compilerOptimizationFlags string,
 	runtimePlatformPath, buildCorePath *paths.Path,

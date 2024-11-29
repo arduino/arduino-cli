@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/internal/locales"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -67,7 +68,7 @@ func main() {
 	config := resp.GetConfiguration()
 
 	// Setup i18n
-	i18n.Init(config.GetLocale())
+	locales.Init(config.GetLocale())
 
 	// Setup command line parser with the server and settings
 	arduinoCmd := cli.NewCommand(srv)

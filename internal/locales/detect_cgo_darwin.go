@@ -13,18 +13,27 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+//go:build darwin && cgo
 
-import (
-	"fmt"
-	"os"
+package locales
 
-	"github.com/arduino/arduino-cli/internal/i18n/cmd/commands"
-)
+/*
+#cgo CFLAGS: -x objective-c
+#cgo LDFLAGS: -framework Foundation
+#import <Foundation/Foundation.h>
 
-func main() {
-	if err := commands.Execute(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+const char* getLocaleIdentifier() {
+    NSString *cs = [[NSLocale currentLocale] localeIdentifier];
+    const char *cstr = [cs UTF8String];
+    return cstr;
+}
+
+*/
+import "C"
+
+func getLocaleIdentifier() string {
+	if envLocale := getLocaleIdentifierFromEnv(); envLocale != "" {
+		return envLocale
 	}
+	return C.GoString(C.getLocaleIdentifier())
 }

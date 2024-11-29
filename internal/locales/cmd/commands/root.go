@@ -13,30 +13,25 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package i18n
+package commands
 
-import "fmt"
+import (
+	"github.com/arduino/arduino-cli/internal/locales/cmd/commands/catalog"
+	"github.com/arduino/arduino-cli/internal/locales/cmd/commands/transifex"
+	"github.com/spf13/cobra"
+)
 
-type Locale interface {
-	Get(msg string, args ...interface{}) string
+var i18nCommand = &cobra.Command{
+	Use:   "i18n",
+	Short: "i18n",
 }
 
-type nullLocale struct{}
-
-func (n nullLocale) Parse([]byte) {}
-
-func (n nullLocale) Get(msg string, args ...interface{}) string {
-	return fmt.Sprintf(msg, args...)
+func init() {
+	i18nCommand.AddCommand(catalog.Command)
+	i18nCommand.AddCommand(transifex.Command)
 }
 
-var locale Locale = &nullLocale{}
-
-func SetLocale(l Locale) {
-	locale = l
-}
-
-// Tr returns msg translated to the selected locale
-// the msg argument must be a literal string
-func Tr(msg string, args ...interface{}) string {
-	return locale.Get(msg, args...)
+// Execute executes the i18n command
+func Execute() error {
+	return i18nCommand.Execute()
 }
