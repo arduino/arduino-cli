@@ -19,14 +19,12 @@ import (
 	"strings"
 	"syscall"
 	"unsafe"
-
-	"github.com/sirupsen/logrus"
 )
 
 func getLocaleIdentifier() string {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.WithField("error", r).Errorf("Failed to get windows user locale")
+			// ignore error and do not panic
 		}
 	}()
 
