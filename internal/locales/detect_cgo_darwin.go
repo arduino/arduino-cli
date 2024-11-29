@@ -15,7 +15,7 @@
 
 //go:build darwin && cgo
 
-package i18n
+package locales
 
 /*
 #cgo CFLAGS: -x objective-c

@@ -13,10 +13,26 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-//go:build darwin && !cgo
+package locales
 
-package i18n
+import (
+	"testing"
 
-func getLocaleIdentifier() string {
-	return getLocaleIdentifierFromEnv()
+	"github.com/stretchr/testify/require"
+)
+
+func TestLocaleMatch(t *testing.T) {
+	supportedLocales := []string{
+		"en",
+		"pt_BR",
+		"it_IT",
+		"es_CO",
+		"es_ES",
+	}
+
+	require.Equal(t, "pt_BR", findMatchingLocale("pt", supportedLocales), "Language match")
+	require.Equal(t, "pt_BR", findMatchingLocale("pt_BR", supportedLocales), "Exact match")
+	require.Equal(t, "pt_BR", findMatchingLocale("pt_PT", supportedLocales), "Language match with country")
+	require.Equal(t, "", findMatchingLocale("es", supportedLocales), "Multiple languages match")
+	require.Equal(t, "", findMatchingLocale("zn_CH", supportedLocales), "Not supported")
 }

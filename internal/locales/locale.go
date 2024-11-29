@@ -13,23 +13,18 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package i18n
+package locales
 
 import (
 	"embed"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/leonelquinteros/gotext"
 )
 
-var po *gotext.Po
-
 //go:embed data/*.po
 var contents embed.FS
-
-func init() {
-	po = gotext.NewPo()
-}
 
 func supportedLocales() []string {
 	var locales []string
@@ -75,6 +70,7 @@ func setLocale(locale string) {
 	if err != nil {
 		panic("Error reading embedded i18n data: " + err.Error())
 	}
-	po = gotext.NewPo()
-	po.Parse(poFile)
+	dict := gotext.NewPo()
+	dict.Parse(poFile)
+	i18n.SetLocale(dict)
 }

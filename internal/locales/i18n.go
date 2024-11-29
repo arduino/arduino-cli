@@ -13,38 +13,27 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package i18n
+package locales
 
-import (
-	"strings"
-	"syscall"
-	"unsafe"
-)
-
-func getLocaleIdentifier() string {
-	defer func() {
-		if r := recover(); r != nil {
-			// ignore error and do not panic
+// Init initializes the i18n module, setting the locale according to this order of preference:
+// 1. Locale specified via the function call
+// 2. OS Locale
+// 3. en (default)
+func Init(configLocale string) {
+	locales := supportedLocales()
+	if configLocale != "" {
+		if locale := findMatchingLocale(configLocale, locales); locale != "" {
+			setLocale(locale)
+			return
 		}
-	}()
-
-	if loc := getLocaleIdentifierFromEnv(); loc != "" {
-		return loc
 	}
 
-	dll := syscall.MustLoadDLL("kernel32")
-	defer dll.Release()
-	proc := dll.MustFindProc("GetUserDefaultLocaleName")
-
-	localeNameMaxLen := 85
-	buffer := make([]uint16, localeNameMaxLen)
-	len, _, err := proc.Call(uintptr(unsafe.Pointer(&buffer[0])), uintptr(localeNameMaxLen))
-
-	if len == 0 {
-		panic(err)
+	if osLocale := getLocaleIdentifierFromOS(); osLocale != "" {
+		if locale := findMatchingLocale(osLocale, locales); locale != "" {
+			setLocale(locale)
+			return
+		}
 	}
 
-	locale := syscall.UTF16ToString(buffer)
-
-	return strings.ReplaceAll(locale, "-", "_")
+	setLocale("en")
 }

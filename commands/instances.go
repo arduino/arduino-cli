@@ -38,6 +38,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/internal/locales"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -420,7 +421,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	// language of the CLI if the locale is different
 	// after started.
 	if locale, ok, _ := s.settings.GetStringOk("locale"); ok {
-		i18n.Init(locale)
+		locales.Init(locale)
 	}
 
 	return nil

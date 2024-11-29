@@ -13,25 +13,36 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package commands
+package catalog
 
 import (
-	"github.com/arduino/arduino-cli/internal/i18n/cmd/commands/catalog"
-	"github.com/arduino/arduino-cli/internal/i18n/cmd/commands/transifex"
+	"os"
+	"path/filepath"
+
+	"github.com/arduino/arduino-cli/internal/locales/cmd/ast"
 	"github.com/spf13/cobra"
 )
 
-var i18nCommand = &cobra.Command{
-	Use:   "i18n",
-	Short: "i18n",
+var generateCatalogCommand = &cobra.Command{
+	Use:   "generate [input folder]",
+	Short: "generates the en catalog from source files",
+	Args:  cobra.MinimumNArgs(1),
+	Run:   generateCatalog,
 }
 
-func init() {
-	i18nCommand.AddCommand(catalog.Command)
-	i18nCommand.AddCommand(transifex.Command)
-}
+func generateCatalog(cmd *cobra.Command, args []string) {
 
-// Execute executes the i18n command
-func Execute() error {
-	return i18nCommand.Execute()
+	folder := args[0]
+	files := []string{}
+	filepath.Walk(folder, func(name string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() || filepath.Ext(name) != ".go" {
+			return nil
+		}
+
+		files = append(files, name)
+		return nil
+	})
+
+	catalog := ast.GenerateCatalog(files)
+	catalog.Write(os.Stdout)
 }

@@ -13,18 +13,10 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+//go:build darwin && !cgo
 
-import (
-	"fmt"
-	"os"
+package locales
 
-	"github.com/arduino/arduino-cli/internal/i18n/cmd/commands"
-)
-
-func main() {
-	if err := commands.Execute(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+func getLocaleIdentifier() string {
+	return getLocaleIdentifierFromEnv()
 }

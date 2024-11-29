@@ -13,36 +13,23 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package catalog
+package locales
 
 import (
 	"os"
-	"path/filepath"
-
-	"github.com/arduino/arduino-cli/internal/i18n/cmd/ast"
-	"github.com/spf13/cobra"
+	"strings"
 )
 
-var generateCatalogCommand = &cobra.Command{
-	Use:   "generate [input folder]",
-	Short: "generates the en catalog from source files",
-	Args:  cobra.MinimumNArgs(1),
-	Run:   generateCatalog,
+func getLocaleIdentifierFromOS() string {
+	return getLocaleIdentifier()
 }
 
-func generateCatalog(cmd *cobra.Command, args []string) {
+func getLocaleIdentifierFromEnv() string {
+	locale := os.Getenv("LC_ALL")
 
-	folder := args[0]
-	files := []string{}
-	filepath.Walk(folder, func(name string, info os.FileInfo, err error) error {
-		if err != nil || info.IsDir() || filepath.Ext(name) != ".go" {
-			return nil
-		}
+	if locale == "" {
+		locale = os.Getenv("LANG")
+	}
 
-		files = append(files, name)
-		return nil
-	})
-
-	catalog := ast.GenerateCatalog(files)
-	catalog.Write(os.Stdout)
+	return strings.Split(locale, ".")[0]
 }
