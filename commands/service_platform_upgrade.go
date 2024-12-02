@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -75,7 +76,11 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 			Package:              req.GetPlatformPackage(),
 			PlatformArchitecture: req.GetArchitecture(),
 		}
-		platform, err := pme.DownloadAndInstallPlatformUpgrades(ctx, ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall())
+		checks := resources.IntegrityCheckFull
+		if s.settings.BoardManagerEnableUnsafeInstall() {
+			checks = resources.IntegrityCheckNone
+		}
+		platform, err := pme.DownloadAndInstallPlatformUpgrades(ctx, ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall(), checks)
 		if err != nil {
 			return platform, err
 		}

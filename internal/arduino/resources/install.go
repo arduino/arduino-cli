@@ -26,18 +26,27 @@ import (
 	"go.bug.st/cleanup"
 )
 
+type IntegrityCheckMode int
+
+const (
+	IntegrityCheckFull IntegrityCheckMode = iota
+	IntegrityCheckNone
+)
+
 // Install installs the resource in three steps:
 // - the archive is unpacked in a temporary subdir of tempPath
 // - there should be only one root dir in the unpacked content
 // - the only root dir is moved/renamed to/as the destination directory
 // Note that tempPath and destDir must be on the same filesystem partition
 // otherwise the last step will fail.
-func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.Path) error {
-	// Check the integrity of the package
-	if ok, err := release.TestLocalArchiveIntegrity(downloadDir); err != nil {
-		return errors.New(i18n.Tr("testing local archive integrity: %s", err))
-	} else if !ok {
-		return errors.New(i18n.Tr("checking local archive integrity"))
+func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.Path, checks IntegrityCheckMode) error {
+	if checks != IntegrityCheckNone {
+		// Check the integrity of the package
+		if ok, err := release.TestLocalArchiveIntegrity(downloadDir); err != nil {
+			return errors.New(i18n.Tr("testing local archive integrity: %s", err))
+		} else if !ok {
+			return errors.New(i18n.Tr("checking local archive integrity"))
+		}
 	}
 
 	// Create a temporary dir to extract package

@@ -2,6 +2,8 @@
 
 - `board_manager`
   - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
+  - `enable_unsafe_install` - set to `true` to allow installation of packages that do not pass the checksum test. This
+    is considered an unsafe installation method and should be used only for development purposes.
 - `daemon` - options related to running Arduino CLI as a [gRPC] server.
   - `port` - TCP port used for gRPC client connections.
 - `directories` - directories used by Arduino CLI.
