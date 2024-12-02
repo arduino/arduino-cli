@@ -63,6 +63,13 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		return append(merr, errors.New(i18n.Tr("%s is not a directory", path)))
 	}
 
+	// If the hardware directory is inside, or equals, the sketchbook/hardware directory
+	// it's not a managed package, otherwise it is.
+	managed := true
+	if userInstalled, err := path.IsInsideDir(pm.userPackagesDir.Parent()); err == nil && userInstalled {
+		managed = false
+	}
+
 	// Scan subdirs
 	packagersPaths, err := path.ReadDir()
 	if err != nil {
@@ -85,42 +92,38 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 
 	for _, packagerPath := range packagersPaths {
 		packager := packagerPath.Base()
-
 		// Skip tools, they're not packages and don't contain Platforms
 		if packager == "tools" {
 			pm.log.Infof("Excluding directory: %s", packagerPath)
 			continue
 		}
+		targetPackage := pm.packages.GetOrCreatePackage(packager)
 
 		// Follow symlinks
-		err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
-		if err != nil {
+		// (for example: .arduino15/packages/arduino/ could point to a dev directory)
+		if err := packagerPath.FollowSymLink(); err != nil {
 			merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("following symlink %s", path), err))
 			continue
 		}
 
 		// There are two possible package directory structures:
-		// - PACKAGER/ARCHITECTURE-1/boards.txt...                   (ex: arduino/avr/...)
-		//   PACKAGER/ARCHITECTURE-2/boards.txt...                   (ex: arduino/sam/...)
-		//   PACKAGER/ARCHITECTURE-3/boards.txt...                   (ex: arduino/samd/...)
-		// or
-		// - PACKAGER/hardware/ARCHITECTURE-1/VERSION/boards.txt...  (ex: arduino/hardware/avr/1.6.15/...)
-		//   PACKAGER/hardware/ARCHITECTURE-2/VERSION/boards.txt...  (ex: arduino/hardware/sam/1.6.6/...)
-		//   PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
-		//   PACKAGER/tools/...                                      (ex: arduino/tools/...)
-		// in the latter case we just move into "hardware" directory and continue
-		var architectureParentPath *paths.Path
-		hardwareSubdirPath := packagerPath.Join("hardware") // ex: .arduino15/packages/arduino/hardware
-		if hardwareSubdirPath.IsDir() {
-			// we found the "hardware" directory move down into that
-			architectureParentPath = hardwareSubdirPath // ex: .arduino15/packages/arduino/
+		if managed {
+			// 1. Inside the Boards Manager .arduino15/packages directory:
+			//    PACKAGER/hardware/ARCHITECTURE-1/VERSION/boards.txt...  (ex: arduino/hardware/avr/1.6.15/...)
+			//    PACKAGER/hardware/ARCHITECTURE-2/VERSION/boards.txt...  (ex: arduino/hardware/sam/1.6.6/...)
+			//    PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
+			//    PACKAGER/tools/...                                      (ex: arduino/tools/...)
+			if p := packagerPath.Join("hardware"); p.IsDir() {
+				merr = append(merr, pm.loadPlatforms(targetPackage, p, managed)...)
+			}
 		} else {
-			// we are already at the correct level
-			architectureParentPath = packagerPath
+			// 2. Inside the sketchbook/hardware directory:
+			//    PACKAGER/ARCHITECTURE-1/boards.txt...                   (ex: arduino/avr/...)
+			//    PACKAGER/ARCHITECTURE-2/boards.txt...                   (ex: arduino/sam/...)
+			//    PACKAGER/ARCHITECTURE-3/boards.txt...                   (ex: arduino/samd/...)
+			// ex: .arduino15/packages/arduino/hardware/...
+			merr = append(merr, pm.loadPlatforms(targetPackage, packagerPath, managed)...)
 		}
-
-		targetPackage := pm.packages.GetOrCreatePackage(packager)
-		merr = append(merr, pm.loadPlatforms(targetPackage, architectureParentPath)...)
 
 		// Check if we have tools to load, the directory structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
@@ -141,8 +144,8 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
 // A list of gRPC Status error is returned for each Platform failed to load.
-func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) []error {
-	pm.log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
+func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path, managed bool) []error {
+	pm.log.Infof("Loading package %s from: %s (managed=%v)", targetPackage.Name, packageDir, managed)
 
 	var merr []error
 
@@ -162,7 +165,7 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 		if targetArchitecture == "tools" {
 			continue
 		}
-		if err := pm.loadPlatform(targetPackage, targetArchitecture, platformPath); err != nil {
+		if err := pm.loadPlatform(targetPackage, targetArchitecture, platformPath, managed); err != nil {
 			merr = append(merr, err)
 		}
 	}
@@ -173,46 +176,18 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 // loadPlatform loads a single platform and all its installed releases given a platformPath.
 // platformPath must be a directory.
 // Returns a gRPC Status error in case of failures.
-func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path) error {
+func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path, managed bool) error {
 	// This is not a platform
 	if platformPath.IsNotDir() {
 		return errors.New(i18n.Tr("path is not a platform directory: %s", platformPath))
 	}
 
 	// There are two possible platform directory structures:
-	// - ARCHITECTURE/boards.txt
-	// - ARCHITECTURE/VERSION/boards.txt
-	// We identify them by checking where is the bords.txt file
-	possibleBoardTxtPath := platformPath.Join("boards.txt")
-	if exist, err := possibleBoardTxtPath.ExistCheck(); err != nil {
-		return fmt.Errorf("%s: %w", i18n.Tr("looking for boards.txt in %s", possibleBoardTxtPath), err)
-	} else if exist {
-		// case: ARCHITECTURE/boards.txt
+	if managed {
+		// 1. Inside the Boards Manager .arduino15/packages/PACKAGER/hardware/ARCHITECTURE directory:
+		// - ARCHITECTURE/VERSION/boards.txt
 
-		platformTxtPath := platformPath.Join("platform.txt")
-		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.Tr("loading platform.txt"), err)
-		}
-
-		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
-		version, err := semver.Parse(versionString)
-		if err != nil {
-			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
-		}
-
-		platform := targetPackage.GetOrCreatePlatform(architecture)
-		platform.ManuallyInstalled = true
-		release := platform.GetOrCreateRelease(version)
-		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
-			return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
-		}
-		pm.log.WithField("platform", release).Infof("Loaded platform")
-
-	} else {
-		// case: ARCHITECTURE/VERSION/boards.txt
 		// let's dive into VERSION directories
-
 		versionDirs, err := platformPath.ReadDir()
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Tr("reading directory %s", platformPath), err)
@@ -237,6 +212,29 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 			}
 			pm.log.WithField("platform", release).Infof("Loaded platform")
 		}
+	} else {
+		// 2. Inside the sketchbook/hardware/PACKAGER/ARCHITECTURE directory:
+		// - ARCHITECTURE/boards.txt
+
+		// Determine platform version from the platform.txt metadata
+		platformTxtPath := platformPath.Join("platform.txt")
+		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
+		if err != nil {
+			return fmt.Errorf("%s: %w", i18n.Tr("loading platform.txt"), err)
+		}
+
+		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
+		version, err := semver.Parse(versionString)
+		if err != nil {
+			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
+		}
+
+		platform := targetPackage.GetOrCreatePlatform(architecture)
+		release := platform.GetOrCreateRelease(version)
+		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
+			return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
+		}
+		pm.log.WithField("platform", release).Infof("Loaded platform")
 	}
 
 	return nil
