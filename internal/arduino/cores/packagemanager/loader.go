@@ -228,21 +228,19 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 }
 
 func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
-	platform.InstallDir = path
-
 	// If the installed.json file is found load it, this is done to handle the
 	// case in which the platform's index and its url have been deleted locally,
 	// if we don't load it some information about the platform is lost
 	installedJSONPath := path.Join("installed.json")
-	platform.Timestamps.AddFile(installedJSONPath)
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
 			return errors.New(i18n.Tr("loading %[1]s: %[2]s", installedJSONPath, err))
 		}
 	}
 
-	// TODO: why CLONE?
-	platform.Properties = platform.Properties.Clone()
+	platform.InstallDir = path
+	platform.Timestamps.AddFile(installedJSONPath)
+	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
 
 	// Create platform properties
 	platformTxtPath := path.Join("platform.txt")
