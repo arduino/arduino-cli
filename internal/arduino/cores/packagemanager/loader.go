@@ -227,99 +227,99 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 	return nil
 }
 
-func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
+func (pm *Builder) loadPlatformRelease(platformRelease *cores.PlatformRelease, platformPath *paths.Path) error {
 	// If the installed.json file is found load it, this is done to handle the
 	// case in which the platform's index and its url have been deleted locally,
 	// if we don't load it some information about the platform is lost
-	installedJSONPath := path.Join("installed.json")
+	installedJSONPath := platformPath.Join("installed.json")
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
 			return errors.New(i18n.Tr("loading %[1]s: %[2]s", installedJSONPath, err))
 		}
 	}
 
-	platform.InstallDir = path
-	platform.Timestamps.AddFile(installedJSONPath)
-	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
+	platformRelease.InstallDir = platformPath
+	platformRelease.Timestamps.AddFile(installedJSONPath)
+	platformRelease.Properties = platformRelease.Properties.Clone() // TODO: why CLONE?
 
 	// Create platform properties
-	platformTxtPath := path.Join("platform.txt")
-	platform.Timestamps.AddFile(platformTxtPath)
+	platformTxtPath := platformPath.Join("platform.txt")
+	platformRelease.Timestamps.AddFile(platformTxtPath)
 	if p, err := properties.SafeLoadFromPath(platformTxtPath); err == nil {
-		platform.Properties.Merge(p)
+		platformRelease.Properties.Merge(p)
 	} else {
 		return errors.New(i18n.Tr("loading %[1]s: %[2]s", platformTxtPath, err))
 	}
 
-	platformTxtLocalPath := path.Join("platform.local.txt")
-	platform.Timestamps.AddFile(platformTxtLocalPath)
+	platformTxtLocalPath := platformPath.Join("platform.local.txt")
+	platformRelease.Timestamps.AddFile(platformTxtLocalPath)
 	if p, err := properties.SafeLoadFromPath(platformTxtLocalPath); err == nil {
-		platform.Properties.Merge(p)
+		platformRelease.Properties.Merge(p)
 	} else {
 		return errors.New(i18n.Tr("loading %[1]s: %[2]s", platformTxtLocalPath, err))
 	}
 
-	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 || platform.Properties.SubTree("pluggable_monitor").Size() > 0 {
-		platform.PluggableDiscoveryAware = true
+	if platformRelease.Properties.SubTree("pluggable_discovery").Size() > 0 || platformRelease.Properties.SubTree("pluggable_monitor").Size() > 0 {
+		platformRelease.PluggableDiscoveryAware = true
 	} else {
-		platform.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
-		platform.Properties.Set("pluggable_discovery.required.1", "builtin:mdns-discovery")
-		platform.Properties.Set("pluggable_monitor.required.serial", "builtin:serial-monitor")
+		platformRelease.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
+		platformRelease.Properties.Set("pluggable_discovery.required.1", "builtin:mdns-discovery")
+		platformRelease.Properties.Set("pluggable_monitor.required.serial", "builtin:serial-monitor")
 	}
 
-	if platform.Name == "" {
-		if name, ok := platform.Properties.GetOk("name"); ok {
-			platform.Name = name
+	if platformRelease.Name == "" {
+		if name, ok := platformRelease.Properties.GetOk("name"); ok {
+			platformRelease.Name = name
 		} else {
 			// If the platform.txt file doesn't exist for this platform and it's not in any
 			// package index there is no way of retrieving its name, so we build one using
 			// the available information, that is the packager name and the architecture.
-			platform.Name = fmt.Sprintf("%s-%s", platform.Platform.Package.Name, platform.Platform.Architecture)
+			platformRelease.Name = fmt.Sprintf("%s-%s", platformRelease.Platform.Package.Name, platformRelease.Platform.Architecture)
 		}
 	}
 
 	// Create programmers properties
-	programmersTxtPath := path.Join("programmers.txt")
-	platform.Timestamps.AddFile(programmersTxtPath)
+	programmersTxtPath := platformPath.Join("programmers.txt")
+	platformRelease.Timestamps.AddFile(programmersTxtPath)
 	if programmersProperties, err := properties.SafeLoadFromPath(programmersTxtPath); err == nil {
 		for programmerID, programmerProps := range programmersProperties.FirstLevelOf() {
-			if !platform.PluggableDiscoveryAware {
+			if !platformRelease.PluggableDiscoveryAware {
 				convertUploadToolsToPluggableDiscovery(programmerProps)
 			}
-			platform.Programmers[programmerID] = pm.loadProgrammer(programmerProps)
-			platform.Programmers[programmerID].PlatformRelease = platform
+			platformRelease.Programmers[programmerID] = pm.loadProgrammer(programmerProps)
+			platformRelease.Programmers[programmerID].PlatformRelease = platformRelease
 		}
 	} else {
 		return err
 	}
 
-	if err := pm.loadBoards(platform); err != nil {
+	if err := pm.loadBoards(platformRelease); err != nil {
 		return errors.New(i18n.Tr("loading boards: %s", err))
 	}
 
-	if !platform.PluggableDiscoveryAware {
-		convertLegacyPlatformToPluggableDiscovery(platform)
+	if !platformRelease.PluggableDiscoveryAware {
+		convertLegacyPlatformToPluggableDiscovery(platformRelease)
 	}
 
 	// Build pluggable monitor references
-	platform.Monitors = map[string]*cores.MonitorDependency{}
-	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
+	platformRelease.Monitors = map[string]*cores.MonitorDependency{}
+	for protocol, ref := range platformRelease.Properties.SubTree("pluggable_monitor.required").AsMap() {
 		split := strings.Split(ref, ":")
 		if len(split) != 2 {
 			return errors.New(i18n.Tr("invalid pluggable monitor reference: %s", ref))
 		}
 		pm.log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
-		platform.Monitors[protocol] = &cores.MonitorDependency{
+		platformRelease.Monitors[protocol] = &cores.MonitorDependency{
 			Packager: split[0],
 			Name:     split[1],
 		}
 	}
 
 	// Support for pluggable monitors in debugging/development environments
-	platform.MonitorsDevRecipes = map[string]string{}
-	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
+	platformRelease.MonitorsDevRecipes = map[string]string{}
+	for protocol, recipe := range platformRelease.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
 		pm.log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
-		platform.MonitorsDevRecipes[protocol] = recipe
+		platformRelease.MonitorsDevRecipes[protocol] = recipe
 	}
 
 	return nil
