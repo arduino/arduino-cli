@@ -22,7 +22,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -216,19 +215,7 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 		// 2. Inside the sketchbook/hardware/PACKAGER/ARCHITECTURE directory:
 		// - ARCHITECTURE/boards.txt
 
-		// Determine platform version from the platform.txt metadata
-		platformTxtPath := platformPath.Join("platform.txt")
-		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.Tr("loading platform.txt"), err)
-		}
-
-		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
-		version, err := semver.Parse(versionString)
-		if err != nil {
-			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
-		}
-
+		version := semver.MustParse("")
 		platform := targetPackage.GetOrCreatePlatform(architecture)
 		release := platform.GetOrCreateRelease(version)
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
