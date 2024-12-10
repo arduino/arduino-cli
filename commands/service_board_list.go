@@ -139,7 +139,7 @@ func identifyViaCloudAPI(props *properties.Map, settings *configuration.Settings
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
-func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
+func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *configuration.Settings, skipCloudAPI bool) ([]*rpc.BoardListItem, error) {
 	boards := []*rpc.BoardListItem{}
 	if port.Properties == nil {
 		return boards, nil
@@ -170,7 +170,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *conf
 
 	// if installed cores didn't recognize the board, try querying
 	// the builder API if the board is a USB device port
-	if len(boards) == 0 {
+	if len(boards) == 0 && !skipCloudAPI {
 		items, err := identifyViaCloudAPI(port.Properties, settings)
 		if err != nil {
 			// this is bad, but keep going
@@ -225,7 +225,7 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 
 	ports := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
-		boards, err := identify(pme, port, s.settings)
+		boards, err := identify(pme, port, s.settings, req.GetSkipCloudApiForBoardDetection())
 		if err != nil {
 			warnings = append(warnings, err.Error())
 		}
@@ -298,7 +298,7 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 
 			boardsError := ""
 			if event.Type == "add" {
-				boards, err := identify(pme, event.Port, s.settings)
+				boards, err := identify(pme, event.Port, s.settings, req.GetSkipCloudApiForBoardDetection())
 				if err != nil {
 					boardsError = err.Error()
 				}
