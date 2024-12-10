@@ -215,9 +215,11 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 		// 2. Inside the sketchbook/hardware/PACKAGER/ARCHITECTURE directory:
 		// - ARCHITECTURE/boards.txt
 
-		version := semver.MustParse("")
 		platform := targetPackage.GetOrCreatePlatform(architecture)
-		release := platform.GetOrCreateRelease(version)
+		if !platform.Indexed {
+			platform.ManuallyInstalled = true
+		}
+		release := platform.GetOrCreateRelease(nil)
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 			return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
 		}

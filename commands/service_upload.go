@@ -362,7 +362,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 			return nil, &cmderrors.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}
 		uploadToolID = split[1]
-		uploadToolPlatform = pme.GetInstalledPlatformRelease(p)
+		uploadToolPlatform = pme.GetBestInstalledPlatformRelease(p)
 		if uploadToolPlatform == nil {
 			return nil, &cmderrors.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}

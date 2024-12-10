@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -41,6 +42,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	skipPostInstall bool,
 	skipPreUninstall bool,
 ) (*cores.PlatformRelease, error) {
+	fmt.Println("D")
 	if platformRef.PlatformVersion != nil {
 		return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Upgrade doesn't accept parameters with version")}
 	}
@@ -439,7 +441,7 @@ func (pme *Explorer) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 	// Search in all installed platforms
 	for _, targetPackage := range pme.packages {
 		for _, platform := range targetPackage.Platforms {
-			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
+			if platformRelease := pme.GetBestInstalledPlatformRelease(platform); platformRelease != nil {
 				if platformRelease.RequiresToolRelease(toolRelease) {
 					return true
 				}

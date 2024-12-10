@@ -96,13 +96,17 @@ message Platform {
 message PlatformSummary {
   // Generic information about a platform.
   PlatformMetadata metadata = 1;
-  // Maps version to the corresponding PlatformRelease.
+  // Maps version to the corresponding PlatformRelease. The platforms that are
+  // manually installed by the user have an empty version string.
   map<string, PlatformRelease> releases = 2;
   // The installed version of the platform, or empty string if none installed.
   string installed_version = 3;
   // The latest available version of the platform that can be installable, or
   // empty if none available.
   string latest_version = 4;
+  // If true this Platform has a manually installed release in the sketchbook
+  // hardware folder.
+  bool has_manually_installed_release = 5;
 }
 
 // PlatformMetadata contains generic information about a platform (not
@@ -117,7 +121,7 @@ message PlatformMetadata {
   string website = 3;
   // Email of the maintainer of the platform's package.
   string email = 4;
-  // If true this Platform has been installed manually in the user' sketchbook
+  // If true this Platform has a manually installed release in the sketchbook
   // hardware folder.
   bool manually_installed = 5;
   // True if the latest release of this Platform has been deprecated.
