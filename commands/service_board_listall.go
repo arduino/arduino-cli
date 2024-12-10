@@ -39,7 +39,7 @@ func (s *arduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.Board
 	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range toSortedPackageArray(pme.GetPackages()) {
 		for _, platform := range toSortedPlatformArray(targetPackage.Platforms) {
-			installedPlatformRelease := pme.GetInstalledPlatformRelease(platform)
+			installedPlatformRelease := pme.GetBestInstalledPlatformRelease(platform)
 			// We only want to list boards for installed platforms
 			if installedPlatformRelease == nil {
 				continue

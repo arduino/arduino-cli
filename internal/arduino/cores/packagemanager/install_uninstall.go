@@ -441,7 +441,7 @@ func (pme *Explorer) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 	// Search in all installed platforms
 	for _, targetPackage := range pme.packages {
 		for _, platform := range targetPackage.Platforms {
-			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
+			if platformRelease := pme.GetBestInstalledPlatformRelease(platform); platformRelease != nil {
 				if platformRelease.RequiresToolRelease(toolRelease) {
 					return true
 				}

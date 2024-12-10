@@ -41,7 +41,7 @@ func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.Platf
 		res = pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
 		searchArgs := utils.SearchTermsFromQueryString(req.GetSearchArgs())
-		for _, targetPackage := range pme.GetPackages() {
+		for _, targetPackage := range pme.AllPackages() {
 			for _, platform := range targetPackage.Platforms {
 				if platform == nil {
 					continue
@@ -90,6 +90,9 @@ func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.Platf
 		}
 		if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
 			rpcPlatformSummary.LatestVersion = latestCompatible.Version.String()
+		}
+		if _, has := platform.GetManuallyInstalledRelease(); has {
+			rpcPlatformSummary.HasManuallyInstalledRelease = true
 		}
 		for _, platformRelease := range platform.GetAllReleases() {
 			rpcPlatformRelease := platformReleaseToRPC(platformRelease)
