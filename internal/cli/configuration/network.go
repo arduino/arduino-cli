@@ -59,9 +59,12 @@ func (settings *Settings) ExtraUserAgent() string {
 	return settings.GetString("network.user_agent_ext")
 }
 
+// ConnectionTimeout returns the network connection timeout
 func (settings *Settings) ConnectionTimeout() time.Duration {
-	timeout := settings.GetInt("network.connection_timeout")
-	return time.Duration(timeout) * time.Second
+	if timeout, ok, _ := settings.GetDurationOk("network.connection_timeout"); ok {
+		return timeout
+	}
+	return settings.Defaults.GetDuration("network.connection_timeout")
 }
 
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)

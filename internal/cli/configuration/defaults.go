@@ -71,7 +71,7 @@ func SetDefaults(settings *Settings) {
 	// network settings
 	setKeyTypeSchema("network.proxy", "")
 	setKeyTypeSchema("network.user_agent_ext", "")
-	setKeyTypeSchema("network.connection_timeout", 0)
+	setDefaultValueAndKeyTypeSchema("network.connection_timeout", (time.Second * 60).String())
 
 	// locale
 	setKeyTypeSchema("locale", "")
