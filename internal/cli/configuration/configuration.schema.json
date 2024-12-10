@@ -154,6 +154,16 @@
           "description": "timeout for network connections, defaults to '30s'",
           "type": "string",
           "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?|(\\.[0-9]+))(ns|us|µs|μs|ms|s|m|h))+$"
+        },
+        "cloud_api": {
+          "description": "settings related to the Arduino Cloud API.",
+          "type": "object",
+          "properties": {
+            "skip_board_detection_calls": {
+              "description": "do not call the Arduino Cloud API to detect an unknown board",
+              "type": "boolean"
+            }
+          }
         }
       }
     },

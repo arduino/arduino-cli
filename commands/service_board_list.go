@@ -170,7 +170,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *conf
 
 	// if installed cores didn't recognize the board, try querying
 	// the builder API if the board is a USB device port
-	if len(boards) == 0 && !skipCloudAPI {
+	if len(boards) == 0 && !skipCloudAPI && !settings.SkipCloudApiForBoardDetection() {
 		items, err := identifyViaCloudAPI(port.Properties, settings)
 		if err != nil {
 			// this is bad, but keep going

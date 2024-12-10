@@ -67,6 +67,11 @@ func (settings *Settings) ConnectionTimeout() time.Duration {
 	return settings.Defaults.GetDuration("network.connection_timeout")
 }
 
+// SkipCloudApiForBoardDetection returns whether the cloud API should be ignored for board detection
+func (settings *Settings) SkipCloudApiForBoardDetection() bool {
+	return settings.GetBool("network.cloud_api.skip_board_detection_calls")
+}
+
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
 func (settings *Settings) NetworkProxy() (*url.URL, error) {
 	if proxyConfig, ok, _ := settings.GetStringOk("network.proxy"); !ok {
