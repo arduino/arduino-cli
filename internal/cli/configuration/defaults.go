@@ -71,6 +71,9 @@ func SetDefaults(settings *Settings) {
 	// network settings
 	setKeyTypeSchema("network.proxy", "")
 	setKeyTypeSchema("network.user_agent_ext", "")
+	setDefaultValueAndKeyTypeSchema("network.connection_timeout", (time.Second * 60).String())
+	// network: Arduino Cloud API settings
+	setKeyTypeSchema("network.cloud_api.skip_board_detection_calls", false)
 
 	// locale
 	setKeyTypeSchema("locale", "")

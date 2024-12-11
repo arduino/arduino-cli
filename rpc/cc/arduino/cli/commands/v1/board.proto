@@ -162,6 +162,9 @@ message BoardListRequest {
   // The fully qualified board name of the board you want information about
   // (e.g., `arduino:avr:uno`).
   string fqbn = 3;
+  // If set to true, when a board cannot be identified using the installed
+  // platforms, the cloud API will not be called to detect the board.
+  bool skip_cloud_api_for_board_detection = 4;
 }
 
 message BoardListResponse {
@@ -195,6 +198,9 @@ message BoardListAllResponse {
 message BoardListWatchRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // If set to true, when a board cannot be identified using the installed
+  // platforms, the cloud API will not be called to detect the board.
+  bool skip_cloud_api_for_board_detection = 2;
 }
 
 message BoardListWatchResponse {

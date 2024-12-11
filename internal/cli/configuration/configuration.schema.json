@@ -38,16 +38,8 @@
         },
         "ttl": {
           "description": "cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for time.ParseDuration(), defaults to `720h` (30 days)",
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0
-            },
-            {
-              "type": "string",
-              "pattern": "^\\+?([0-9]?\\.?[0-9]+(([nuµm]?s)|m|h))+$"
-            }
-          ]
+          "type": "string",
+          "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?|(\\.[0-9]+))(ns|us|µs|μs|ms|s|m|h))+$"
         }
       },
       "type": "object"
@@ -145,6 +137,35 @@
         }
       },
       "type": "object"
+    },
+    "network": {
+      "description": "settings related to network connections.",
+      "type": "object",
+      "properties": {
+        "proxy": {
+          "description": "proxy settings for network connections.",
+          "type": "string"
+        },
+        "user_agent_ext": {
+          "description": "extra string to append to the user agent string in HTTP requests.",
+          "type": "string"
+        },
+        "connection_timeout": {
+          "description": "timeout for network connections, defaults to '30s'",
+          "type": "string",
+          "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?|(\\.[0-9]+))(ns|us|µs|μs|ms|s|m|h))+$"
+        },
+        "cloud_api": {
+          "description": "settings related to the Arduino Cloud API.",
+          "type": "object",
+          "properties": {
+            "skip_board_detection_calls": {
+              "description": "do not call the Arduino Cloud API to detect an unknown board",
+              "type": "boolean"
+            }
+          }
+        }
+      }
     },
     "output": {
       "description": "settings related to text output.",

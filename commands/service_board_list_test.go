@@ -157,7 +157,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	defer release()
 
 	settings := configuration.NewSettings()
-	res, err := identify(pme, &discovery.Port{Properties: idPrefs}, settings)
+	res, err := identify(pme, &discovery.Port{Properties: idPrefs}, settings, true)
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)
