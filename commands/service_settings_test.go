@@ -224,12 +224,73 @@ func TestDelete(t *testing.T) {
 	srv := NewArduinoCoreServer()
 	loadConfig(t, srv, paths.New("testdata", "arduino-cli.yml"))
 
-	_, err := srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
+	// Check loaded config
+	resp, err := srv.ConfigurationSave(context.Background(), &rpc.ConfigurationSaveRequest{
+		SettingsFormat: "yaml",
+	})
+	require.NoError(t, err)
+	require.YAMLEq(t, `
+board_manager:
+  additional_urls:
+    - http://foobar.com
+    - http://example.com
+
+daemon:
+  port: "50051"
+
+directories:
+  data: /home/massi/.arduino15
+  downloads: /home/massi/.arduino15/staging
+
+logging:
+  file: ""
+  format: text
+  level: info
+
+network:
+  proxy: "123"
+`, resp.GetEncodedSettings())
+
+	// Check default and setted values
+	res, err := srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
+	require.NoError(t, err)
+	require.Equal(t, `{"proxy":"123"}`, res.GetEncodedValue())
+	// Maybe should be like this?
+	// require.Equal(t, `{"proxy":"123","connection_timeout":"1m0s"}`, res.GetEncodedValue())
+	res, err = srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network.connection_timeout"})
+	require.Equal(t, `"1m0s"`, res.GetEncodedValue()) // default value
 	require.NoError(t, err)
 
+	// Run deletion
 	_, err = srv.SettingsSetValue(context.Background(), &rpc.SettingsSetValueRequest{Key: "network", EncodedValue: ""})
 	require.NoError(t, err)
+	resp, err = srv.ConfigurationSave(context.Background(), &rpc.ConfigurationSaveRequest{
+		SettingsFormat: "yaml",
+	})
+	require.NoError(t, err)
+	require.YAMLEq(t, `
+board_manager:
+  additional_urls:
+    - http://foobar.com
+    - http://example.com
 
-	_, err = srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
-	require.Error(t, err)
+daemon:
+  port: "50051"
+
+directories:
+  data: /home/massi/.arduino15
+  downloads: /home/massi/.arduino15/staging
+
+logging:
+  file: ""
+  format: text
+  level: info
+`, resp.GetEncodedSettings())
+	// Check default and setted values
+	res, err = srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network"})
+	require.NoError(t, err)
+	require.Equal(t, `{"connection_timeout":"1m0s"}`, res.GetEncodedValue())
+	res, err = srv.SettingsGetValue(context.Background(), &rpc.SettingsGetValueRequest{Key: "network.connection_timeout"})
+	require.Equal(t, `"1m0s"`, res.GetEncodedValue()) // default value
+	require.NoError(t, err)
 }

@@ -79,9 +79,9 @@ func TestConnectionTimeout(t *testing.T) {
 
 	doRequest := func(timeout int) (*http.Response, time.Duration, error) {
 		settings := configuration.NewSettings()
-		settings.Set("network.proxy", ts.URL)
+		require.NoError(t, settings.Set("network.proxy", ts.URL))
 		if timeout != 0 {
-			settings.Set("network.connection_timeout", 2)
+			require.NoError(t, settings.Set("network.connection_timeout", "2s"))
 		}
 		client, err := settings.NewHttpClient()
 		require.NoError(t, err)
