@@ -24,13 +24,13 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/table"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -159,9 +159,9 @@ func (dr listResult) String() string {
 				// to improve the user experience, show on a dedicated column
 				// the name of the core supporting the board detected
 				var coreName = ""
-				fqbn, err := cores.ParseFQBN(b.Fqbn)
+				fqbn, err := fqbn.Parse(b.Fqbn)
 				if err == nil {
-					coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
+					coreName = fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture)
 				}
 
 				t.AddRow(address, protocol, protocolLabel, board, fqbn, coreName)
@@ -215,9 +215,9 @@ func (dr watchEventResult) String() string {
 			// to improve the user experience, show on a dedicated column
 			// the name of the core supporting the board detected
 			var coreName = ""
-			fqbn, err := cores.ParseFQBN(b.Fqbn)
+			fqbn, err := fqbn.Parse(b.Fqbn)
 			if err == nil {
-				coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
+				coreName = fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture)
 			}
 
 			t.AddRow(address, protocol, event, board, fqbn, coreName)

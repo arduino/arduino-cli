@@ -13,40 +13,10 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package i18n
+//go:build darwin && !cgo
 
-import (
-	"strings"
-	"syscall"
-	"unsafe"
-
-	"github.com/sirupsen/logrus"
-)
+package locales
 
 func getLocaleIdentifier() string {
-	defer func() {
-		if r := recover(); r != nil {
-			logrus.WithField("error", r).Errorf("Failed to get windows user locale")
-		}
-	}()
-
-	if loc := getLocaleIdentifierFromEnv(); loc != "" {
-		return loc
-	}
-
-	dll := syscall.MustLoadDLL("kernel32")
-	defer dll.Release()
-	proc := dll.MustFindProc("GetUserDefaultLocaleName")
-
-	localeNameMaxLen := 85
-	buffer := make([]uint16, localeNameMaxLen)
-	len, _, err := proc.Call(uintptr(unsafe.Pointer(&buffer[0])), uintptr(localeNameMaxLen))
-
-	if len == 0 {
-		panic(err)
-	}
-
-	locale := syscall.UTF16ToString(buffer)
-
-	return strings.ReplaceAll(locale, "-", "_")
+	return getLocaleIdentifierFromEnv()
 }

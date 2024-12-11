@@ -27,10 +27,10 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -76,7 +76,7 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 
 	// Compute the minimum FQBN required to get the same debug configuration.
 	// (i.e. the FQBN cleaned up of the options that do not affect the debugger configuration)
-	minimumFQBN := cores.MustParseFQBN(req.GetFqbn())
+	minimumFQBN := fqbn.MustParse(req.GetFqbn())
 	for _, config := range minimumFQBN.Configs.Keys() {
 		checkFQBN := minimumFQBN.Clone()
 		checkFQBN.Configs.Remove(config)
@@ -127,7 +127,7 @@ func (s *arduinoCoreServerImpl) getDebugProperties(req *rpc.GetDebugConfigReques
 	if fqbnIn == "" {
 		return nil, &cmderrors.MissingFQBNError{}
 	}
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
 		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}

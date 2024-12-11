@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/arduino/arduino-cli/internal/i18n/cmd/po"
+	"github.com/arduino/arduino-cli/internal/locales/cmd/po"
 )
 
 // GenerateCatalog generates the i18n message catalog for the go source files
