@@ -26,6 +26,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestCompilePart4(t *testing.T) {
@@ -448,4 +449,42 @@ func TestCompileWithKnownPlatformNotInstalled(t *testing.T) {
 	require.Contains(t, string(stderr), "Error during build: Platform 'arduino:avr' not found: platform not installed")
 	// Verifies command to fix error is shown to user
 	require.Contains(t, string(stderr), "Try running `arduino-cli core install arduino:avr`")
+}
+
+func TestSketchWithVendoredLibraries(t *testing.T) {
+	sketchBook, err := paths.New("testdata", "sketchbook_1").Abs()
+	require.NoError(t, err)
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	cli.SetSketchbookDir(sketchBook)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	{
+		sketchWithLibsPath := sketchBook.Join("SketchWithLibraries")
+		// Sketch should use sketch bundled "MyLib" with and without profiles
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", sketchWithLibsPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, out, ".builder_result.used_libraries[0].name", `"MyLib"`)
+		requirejson.Query(t, out, ".builder_result.used_libraries[0].author", `"user"`)
+		out, _, err = cli.Run("compile", "--profile", "uno", sketchWithLibsPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, out, ".builder_result.used_libraries[0].name", `"MyLib"`)
+		requirejson.Query(t, out, ".builder_result.used_libraries[0].author", `"user"`)
+	}
+
+	{
+		sketchWithoutLibsPath := sketchBook.Join("SketchWithoutLibraries")
+		// This sketch should take the user-installed MyLib
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", sketchWithoutLibsPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, out, ".builder_result.used_libraries[0].name", `"MyLib"`)
+		requirejson.Query(t, out, ".builder_result.used_libraries[0].author", `"upstream"`)
+		// This sketch should fail to compile since profiles will not see the user-installed MyLib
+		_, _, err = cli.Run("compile", "--profile", "uno", sketchWithoutLibsPath.String())
+		require.Error(t, err)
+	}
 }

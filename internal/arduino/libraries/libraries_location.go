@@ -40,6 +40,8 @@ const (
 	// Unmanaged is for libraries set manually by the user in the CLI command or from the gRPC function.
 	// Ideally it's used for `libraries` outside folders managed by the CLI.
 	Unmanaged
+	// Sketch is for libraries that are part of the sketch (inside the `libraries` subfolder of the sketch).
+	Sketch
 )
 
 func (d *LibraryLocation) String() string {
@@ -54,6 +56,8 @@ func (d *LibraryLocation) String() string {
 		return "user"
 	case Unmanaged:
 		return "unmanaged"
+	case Sketch:
+		return "sketch"
 	default:
 		panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 	}
@@ -86,6 +90,9 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 	case "unmanaged":
 		*d = Unmanaged
 		return nil
+	case "sketch":
+		*d = Sketch
+		return nil
 	default:
 		return errors.New(i18n.Tr("invalid library location: %s", s))
 	}
@@ -104,6 +111,8 @@ func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 		return rpc.LibraryLocation_LIBRARY_LOCATION_USER
 	case Unmanaged:
 		return rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED
+	case Sketch:
+		return rpc.LibraryLocation_LIBRARY_LOCATION_SKETCH
 	default:
 		panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 	}
@@ -122,6 +131,8 @@ func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
 		return User
 	case rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED:
 		return Unmanaged
+	case rpc.LibraryLocation_LIBRARY_LOCATION_SKETCH:
+		return Sketch
 	default:
 		panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))
 	}
