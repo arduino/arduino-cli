@@ -1,9 +1,9 @@
 ---
-name: google.golang.org/protobuf/internal/detrand
+name: google.golang.org/protobuf/internal/protolazy
 version: v1.36.0
 type: go
-summary: Package detrand provides deterministically random functionality.
-homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/detrand
+summary: Package protolazy contains internal data structures for lazy message decoding.
+homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/protolazy
 license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.36.0/LICENSE
