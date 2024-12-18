@@ -58,13 +58,24 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 				})
 				if err != nil {
 					// Should never happen...
-					panic("Failed to set default value for directories.builtin.libraries: " + err.Error())
+					feedback.Fatal(i18n.Tr("Cannot set the configuration key directories.builtin.libraries: %v", err), feedback.ErrGeneric)
 				}
 			}
 
 			// Validate the maxGRPCRecvMsgSize flag
 			if maxGRPCRecvMsgSize < 1024 {
 				feedback.Fatal(i18n.Tr("%s must be >= 1024", "--max-grpc-recv-message-size"), feedback.ErrBadArgument)
+			}
+
+			// The user agent should include "daemon" for analytics purposes
+			_, err := srv.SettingsSetValue(cmd.Context(), &rpc.SettingsSetValueRequest{
+				Key:          "network.user_agent_ext",
+				ValueFormat:  "cli",
+				EncodedValue: "daemon",
+			})
+			if err != nil {
+				// Should never happen...
+				feedback.Fatal(i18n.Tr("Cannot set the configuration key network.user_agent_ext: %v", err), feedback.ErrGeneric)
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
