@@ -78,7 +78,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
 
 func TestIncludesFinderWithRegExpPaddedIncludes5(t *testing.T) {
 	output := "/some/path/sketch.ino:23:42: fatal error: 'Foobar.h' file not found" +
-              "   23 | #include \"Foobar.h\"" +
+              "   23 | #include <Foobar.h>" +
               "      |          ^~~~~~~~~~"
 
 	include := detector.IncludesFinderWithRegExp(output)
