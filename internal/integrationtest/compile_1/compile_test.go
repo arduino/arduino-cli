@@ -1321,3 +1321,46 @@ func buildWithCustomBuildPathAndOUtputDirFlag(t *testing.T, env *integrationtest
 		require.NotEmpty(t, content)
 	}
 }
+
+func TestCompileWithOutputDirFlagIgnoringFoldersCreatedByEsp32RainMakerLib(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Update index with esp32 core and install it
+	url := "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+	_, _, err = cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "esp32:esp32@3.0.7", "--additional-urls="+url)
+	require.NoError(t, err)
+
+	sketchName := "RainMakerSketch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// When importing the `RMaker` library, the esp32 core produces in output a folder,
+	// containing all the binaries exported. The name of the folder matches the sketch name.
+	// In out case:
+	// cache-dir/
+	//  |- RainMakerSketch.ino/ <--- This should be ignored
+	//  |- RainMakerSketch.ino.uf2
+	//  |- RainMakerSketch.ino.bin
+	//  |- ...
+	err = sketchPath.Join(sketchName + ".ino").WriteFile([]byte(`
+		#include "RMaker.h"
+		void setup() { }
+		void loop() { }`,
+	))
+	require.NoError(t, err)
+
+	buildPath := cli.DataDir().Join("test_dir", "build_dir")
+	outputDir := cli.SketchbookDir().Join("test_dir", "output_dir")
+	_, stderr, err := cli.Run("compile", "-b", "esp32:esp32:esp32", sketchPath.String(), "--build-path", buildPath.String(), "--output-dir", outputDir.String())
+	require.NoError(t, err)
+	require.NotContains(t, stderr, []byte("Error during build: Error copying output file"))
+	require.DirExists(t, buildPath.Join(sketchName+".ino").String())
+	require.NoDirExists(t, outputDir.Join(sketchName+".ino").String())
+}

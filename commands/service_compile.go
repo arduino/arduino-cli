@@ -404,6 +404,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 				return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error reading build directory"), Cause: err}
 			}
 			buildFiles.FilterPrefix(baseName)
+			buildFiles.FilterOutDirs()
 			for _, buildFile := range buildFiles {
 				exportedFile := exportPath.Join(buildFile.Base())
 				logrus.WithField("src", buildFile).WithField("dest", exportedFile).Trace("Copying artifact.")
