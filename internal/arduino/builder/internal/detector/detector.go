@@ -478,7 +478,7 @@ func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
 }
 
 // includeRegexp fixdoc
-var includeRegexp = regexp.MustCompile(`(?ms)[<"'](\S+)[">']`)
+var includeRegexp = regexp.MustCompile(`#include[ \t]*[<"](\S+)[">]`)
 
 // IncludesFinderWithRegExp fixdoc
 func IncludesFinderWithRegExp(source string) string {
