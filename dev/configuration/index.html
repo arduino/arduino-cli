@@ -1632,6 +1632,11 @@
 </li>
 <li><code>network</code> - configuration options related to the network connection.<ul>
 <li><code>proxy</code> - URL of the proxy server.</li>
+<li><code>connection_timeout</code> - network connection timeout, the value format must be a valid input for
+  <a href="https://pkg.go.dev/time#ParseDuration">time.ParseDuration()</a>, defaults to <code>60s</code> (60 seconds). <code>0</code> means it will
+  wait indefinitely.</li>
+<li><code>cloud_api.skip_board_detection_calls</code> - if set to <code>true</code> it will make the Arduino CLI skip network calls to Arduino
+  Cloud API to help detection of an unknown board.</li>
 </ul>
 </li>
 </ul>

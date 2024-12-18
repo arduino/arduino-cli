@@ -5762,6 +5762,12 @@ a platform and all its available releases.</p>
 <td></td>
 <td>The fully qualified board name of the board you want information about (e.g., <code>arduino:avr:uno</code>).</td>
 </tr>
+<tr>
+<td>skip_cloud_api_for_board_detection</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true, when a board cannot be identified using the installed platforms, the cloud API will not be called to detect the board.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.BoardListResponse"></a></p>
@@ -5807,6 +5813,12 @@ a platform and all its available releases.</p>
 <td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
 <td></td>
 <td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>skip_cloud_api_for_board_detection</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true, when a board cannot be identified using the installed platforms, the cloud API will not be called to detect the board.</td>
 </tr>
 </tbody>
 </table>
