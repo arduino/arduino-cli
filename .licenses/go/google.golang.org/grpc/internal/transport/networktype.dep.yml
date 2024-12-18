@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/transport/networktype
-version: v1.68.1
+version: v1.69.0
 type: go
 summary: Package networktype declares the network type to be used in the default dialer.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/transport/networktype
 license: apache-2.0
 licenses:
-- sources: grpc@v1.68.1/LICENSE
+- sources: grpc@v1.69.0/LICENSE
   text: |2
 
                                      Apache License

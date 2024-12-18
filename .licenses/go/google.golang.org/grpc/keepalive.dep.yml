@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/keepalive
-version: v1.68.1
+version: v1.69.0
 type: go
 summary: Package keepalive defines configurable parameters for point-to-point healthcheck.
 homepage: https://pkg.go.dev/google.golang.org/grpc/keepalive
 license: apache-2.0
 licenses:
-- sources: grpc@v1.68.1/LICENSE
+- sources: grpc@v1.69.0/LICENSE
   text: |2
 
                                      Apache License
