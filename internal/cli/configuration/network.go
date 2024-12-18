@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -58,6 +59,19 @@ func (settings *Settings) ExtraUserAgent() string {
 	return settings.GetString("network.user_agent_ext")
 }
 
+// ConnectionTimeout returns the network connection timeout
+func (settings *Settings) ConnectionTimeout() time.Duration {
+	if timeout, ok, _ := settings.GetDurationOk("network.connection_timeout"); ok {
+		return timeout
+	}
+	return settings.Defaults.GetDuration("network.connection_timeout")
+}
+
+// SkipCloudApiForBoardDetection returns whether the cloud API should be ignored for board detection
+func (settings *Settings) SkipCloudApiForBoardDetection() bool {
+	return settings.GetBool("network.cloud_api.skip_board_detection_calls")
+}
+
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
 func (settings *Settings) NetworkProxy() (*url.URL, error) {
 	if proxyConfig, ok, _ := settings.GetStringOk("network.proxy"); !ok {
@@ -82,6 +96,7 @@ func (settings *Settings) NewHttpClient() (*http.Client, error) {
 			},
 			userAgent: settings.UserAgent(),
 		},
+		Timeout: settings.ConnectionTimeout(),
 	}, nil
 }
 
