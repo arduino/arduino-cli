@@ -58,7 +58,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 				})
 				if err != nil {
 					// Should never happen...
-					panic("Failed to set default value for directories.builtin.libraries: " + err.Error())
+					feedback.Fatal(i18n.Tr("Cannot set the configuration key directories.builtin.libraries: %v", err), feedback.ErrGeneric)
 				}
 			}
 
@@ -75,7 +75,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 			})
 			if err != nil {
 				// Should never happen...
-				panic("Failed to set default value for network.user_agent_ext: " + err.Error())
+				feedback.Fatal(i18n.Tr("Cannot set the configuration key network.user_agent_ext: %v", err), feedback.ErrGeneric)
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
