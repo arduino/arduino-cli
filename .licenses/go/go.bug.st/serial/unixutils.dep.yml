@@ -1,12 +1,12 @@
 ---
 name: go.bug.st/serial/unixutils
-version: v1.6.1
+version: v1.6.2
 type: go
 summary: 
 homepage: https://pkg.go.dev/go.bug.st/serial/unixutils
 license: bsd-3-clause
 licenses:
-- sources: serial@v1.6.1/LICENSE
+- sources: serial@v1.6.2/LICENSE
   text: |2+
 
     Copyright (c) 2014-2023, Cristian Maglie.
@@ -41,7 +41,7 @@ licenses:
     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-- sources: serial@v1.6.1/README.md
+- sources: serial@v1.6.2/README.md
   text: |-
     The software is release under a [BSD 3-clause license]
 
