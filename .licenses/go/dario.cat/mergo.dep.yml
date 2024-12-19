@@ -1,9 +1,9 @@
 ---
-name: github.com/imdario/mergo
-version: v0.3.12
+name: dario.cat/mergo
+version: v1.0.0
 type: go
 summary: A helper to merge structs and maps in Golang.
-homepage: https://pkg.go.dev/github.com/imdario/mergo
+homepage: https://pkg.go.dev/dario.cat/mergo
 license: bsd-3-clause
 licenses:
 - sources: LICENSE
@@ -39,7 +39,6 @@ licenses:
 - sources: README.md
   text: |-
     [BSD 3-Clause](http://opensource.org/licenses/BSD-3-Clause) license, as [Go language](http://golang.org/LICENSE).
-
 
     [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fimdario%2Fmergo.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fimdario%2Fmergo?ref=badge_large)
 notices: []
