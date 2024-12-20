@@ -23,59 +23,78 @@ import (
 )
 
 func TestParseGitURL(t *testing.T) {
-	gitURL := ""
-	libraryName, ref, err := parseGitURL(gitURL)
-	require.Equal(t, "", libraryName)
-	require.EqualValues(t, "", ref)
-	require.Errorf(t, err, "invalid git url")
-
-	gitURL = "https://github.com/arduino/arduino-lib.git"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
-
-	gitURL = "https://github.com/arduino/arduino-lib.git#0.1.2"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "0.1.2", ref)
-	require.NoError(t, err)
-
-	gitURL = "git@github.com:arduino/arduino-lib.git"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
-
-	gitURL = "file:///path/to/arduino-lib"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
-
-	gitURL = "file:///path/to/arduino-lib.git"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
-
-	gitURL = "/path/to/arduino-lib"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
-
-	gitURL = "/path/to/arduino-lib.git"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
-
-	gitURL = "file:///path/to/arduino-lib"
-	libraryName, ref, err = parseGitURL(gitURL)
-	require.Equal(t, "arduino-lib", libraryName)
-	require.EqualValues(t, "", ref)
-	require.NoError(t, err)
+	{
+		_, _, _, err := parseGitArgURL("")
+		require.EqualError(t, err, "invalid git url")
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("https://github.com/arduino/arduino-lib.git")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "https://github.com/arduino/arduino-lib.git", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("https://github.com/arduino/arduino-lib.git#0.1.2")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "https://github.com/arduino/arduino-lib.git", gitURL)
+		require.EqualValues(t, "0.1.2", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("git@github.com:arduino/arduino-lib.git")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "https://github.com/arduino/arduino-lib.git", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("git@github.com:arduino/arduino-lib.git#0.1.2")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "https://github.com/arduino/arduino-lib.git", gitURL)
+		require.EqualValues(t, "0.1.2", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("file:///path/to/arduino-lib")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "file:///path/to/arduino-lib", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("file:///path/to/arduino-lib.git")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "file:///path/to/arduino-lib.git", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("/path/to/arduino-lib")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "/path/to/arduino-lib", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
+		libraryName, gitURL, ref, err := parseGitArgURL("/path/to/arduino-lib.git")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "/path/to/arduino-lib.git", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
+		_, _, _, err := parseGitArgURL("https://arduino.cc")
+		require.EqualError(t, err, "invalid git url")
+	}
+	{
+		_, _, _, err := parseGitArgURL("https://arduino.cc/")
+		require.EqualError(t, err, "invalid git url")
+	}
+	{
+		_, _, _, err := parseGitArgURL("://not@a@url")
+		require.EqualError(t, err, "invalid git url: parse \"://not@a@url\": missing protocol scheme")
+	}
 }
 
 func TestValidateLibrary(t *testing.T) {
