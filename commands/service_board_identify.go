@@ -32,7 +32,7 @@ func (s *arduinoCoreServerImpl) BoardIdentify(ctx context.Context, req *rpc.Boar
 	defer release()
 
 	props := properties.NewFromHashmap(req.GetProperties())
-	res, err := identify(pme, props, s.settings, true)
+	res, err := identify(pme, props, s.settings, !req.GetUseCloudApiForUnknownBoardDetection())
 	if err != nil {
 		return nil, err
 	}
