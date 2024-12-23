@@ -265,7 +265,7 @@ tasks:
   protoc:format:
     desc: Perform formatting of the protobuf definitions
     cmds:
-      - buf format --write --exit-code
+      - buf format --write
 
   protoc:breaking-change-detection:
     desc: Detect protobuf breaking changes
