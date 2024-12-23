@@ -228,11 +228,11 @@ tasks:
 
   protoc:
     desc: Lint, format and compile protobuf definitions
-    deps:
-      - protoc:check
-      - protoc:format
-      - protoc:compile
-      - protoc:breaking-change-detection
+    cmds:
+      - task: protoc:format
+      - task: protoc:check
+      - task: protoc:compile
+      - task: protoc:breaking-change-detection
 
   protoc:compile:
     desc: Compile protobuf definitions
@@ -243,8 +243,7 @@ tasks:
   protoc:docs:
     desc: Generate docs for protobuf definitions
     cmds:
-      - |
-        buf generate --template buf.doc.gen.yaml
+      - buf generate --template buf.doc.gen.yaml
 
   docs:include-configuration-json-schema:
     desc: Copy configuration JSON schema to make it available in documentation
@@ -266,7 +265,7 @@ tasks:
   protoc:format:
     desc: Perform formatting of the protobuf definitions
     cmds:
-      - buf format --write --exit-code
+      - buf format --write
 
   protoc:breaking-change-detection:
     desc: Detect protobuf breaking changes
