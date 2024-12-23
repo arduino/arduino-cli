@@ -78,6 +78,9 @@ service ArduinoCoreService {
   // Search boards in installed and not installed Platforms.
   rpc BoardSearch(BoardSearchRequest) returns (BoardSearchResponse);
 
+  // Identify a board using the given properties.
+  rpc BoardIdentify(BoardIdentifyRequest) returns (BoardIdentifyResponse);
+
   // List boards connection and disconnected events.
   rpc BoardListWatch(BoardListWatchRequest) returns (stream BoardListWatchResponse);
 
