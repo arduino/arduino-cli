@@ -37,7 +37,6 @@ import (
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
-	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -139,20 +138,20 @@ func identifyViaCloudAPI(props *properties.Map, settings *configuration.Settings
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
-func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *configuration.Settings, skipCloudAPI bool) ([]*rpc.BoardListItem, error) {
-	boards := []*rpc.BoardListItem{}
-	if port.Properties == nil {
-		return boards, nil
+func identify(pme *packagemanager.Explorer, properties *properties.Map, settings *configuration.Settings, skipCloudAPI bool) ([]*rpc.BoardListItem, error) {
+	if properties == nil {
+		return nil, nil
 	}
 
 	// first query installed cores through the Package Manager
+	boards := []*rpc.BoardListItem{}
 	logrus.Debug("Querying installed cores for board identification...")
-	for _, board := range pme.IdentifyBoard(port.Properties) {
+	for _, board := range pme.IdentifyBoard(properties) {
 		fqbn, err := fqbn.Parse(board.FQBN())
 		if err != nil {
 			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
-		fqbn.Configs = board.IdentifyBoardConfiguration(port.Properties)
+		fqbn.Configs = board.IdentifyBoardConfiguration(properties)
 
 		// We need the Platform maintaner for sorting so we set it here
 		platform := &rpc.Platform{
@@ -171,7 +170,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port, settings *conf
 	// if installed cores didn't recognize the board, try querying
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 && !skipCloudAPI && !settings.SkipCloudApiForBoardDetection() {
-		items, err := identifyViaCloudAPI(port.Properties, settings)
+		items, err := identifyViaCloudAPI(properties, settings)
 		if err != nil {
 			// this is bad, but keep going
 			logrus.WithError(err).Debug("Error querying builder API")
@@ -225,7 +224,7 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 
 	ports := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
-		boards, err := identify(pme, port, s.settings, req.GetSkipCloudApiForBoardDetection())
+		boards, err := identify(pme, port.Properties, s.settings, req.GetSkipCloudApiForBoardDetection())
 		if err != nil {
 			warnings = append(warnings, err.Error())
 		}
@@ -298,7 +297,7 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 
 			boardsError := ""
 			if event.Type == "add" {
-				boards, err := identify(pme, event.Port, s.settings, req.GetSkipCloudApiForBoardDetection())
+				boards, err := identify(pme, event.Port.Properties, s.settings, req.GetSkipCloudApiForBoardDetection())
 				if err != nil {
 					boardsError = err.Error()
 				}
