@@ -49,6 +49,7 @@ const (
 	ArduinoCoreService_BoardList_FullMethodName                         = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardList"
 	ArduinoCoreService_BoardListAll_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListAll"
 	ArduinoCoreService_BoardSearch_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardSearch"
+	ArduinoCoreService_BoardIdentify_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardIdentify"
 	ArduinoCoreService_BoardListWatch_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListWatch"
 	ArduinoCoreService_Compile_FullMethodName                           = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Compile"
 	ArduinoCoreService_PlatformInstall_FullMethodName                   = "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformInstall"
@@ -123,6 +124,8 @@ type ArduinoCoreServiceClient interface {
 	BoardListAll(ctx context.Context, in *BoardListAllRequest, opts ...grpc.CallOption) (*BoardListAllResponse, error)
 	// Search boards in installed and not installed Platforms.
 	BoardSearch(ctx context.Context, in *BoardSearchRequest, opts ...grpc.CallOption) (*BoardSearchResponse, error)
+	// Identify a board using the given properties.
+	BoardIdentify(ctx context.Context, in *BoardIdentifyRequest, opts ...grpc.CallOption) (*BoardIdentifyResponse, error)
 	// List boards connection and disconnected events.
 	BoardListWatch(ctx context.Context, in *BoardListWatchRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BoardListWatchResponse], error)
 	// Compile an Arduino sketch.
@@ -369,6 +372,16 @@ func (c *arduinoCoreServiceClient) BoardSearch(ctx context.Context, in *BoardSea
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BoardSearchResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_BoardSearch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) BoardIdentify(ctx context.Context, in *BoardIdentifyRequest, opts ...grpc.CallOption) (*BoardIdentifyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BoardIdentifyResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_BoardIdentify_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -912,6 +925,8 @@ type ArduinoCoreServiceServer interface {
 	BoardListAll(context.Context, *BoardListAllRequest) (*BoardListAllResponse, error)
 	// Search boards in installed and not installed Platforms.
 	BoardSearch(context.Context, *BoardSearchRequest) (*BoardSearchResponse, error)
+	// Identify a board using the given properties.
+	BoardIdentify(context.Context, *BoardIdentifyRequest) (*BoardIdentifyResponse, error)
 	// List boards connection and disconnected events.
 	BoardListWatch(*BoardListWatchRequest, grpc.ServerStreamingServer[BoardListWatchResponse]) error
 	// Compile an Arduino sketch.
@@ -1038,6 +1053,9 @@ func (UnimplementedArduinoCoreServiceServer) BoardListAll(context.Context, *Boar
 }
 func (UnimplementedArduinoCoreServiceServer) BoardSearch(context.Context, *BoardSearchRequest) (*BoardSearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardSearch not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) BoardIdentify(context.Context, *BoardIdentifyRequest) (*BoardIdentifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BoardIdentify not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) BoardListWatch(*BoardListWatchRequest, grpc.ServerStreamingServer[BoardListWatchResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method BoardListWatch not implemented")
@@ -1392,6 +1410,24 @@ func _ArduinoCoreService_BoardSearch_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArduinoCoreServiceServer).BoardSearch(ctx, req.(*BoardSearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_BoardIdentify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BoardIdentifyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).BoardIdentify(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_BoardIdentify_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).BoardIdentify(ctx, req.(*BoardIdentifyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1942,6 +1978,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BoardSearch",
 			Handler:    _ArduinoCoreService_BoardSearch_Handler,
+		},
+		{
+			MethodName: "BoardIdentify",
+			Handler:    _ArduinoCoreService_BoardIdentify_Handler,
 		},
 		{
 			MethodName: "SupportedUserFields",
