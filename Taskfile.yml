@@ -243,8 +243,7 @@ tasks:
   protoc:docs:
     desc: Generate docs for protobuf definitions
     cmds:
-      - |
-        buf generate --template buf.doc.gen.yaml
+      - buf generate --template buf.doc.gen.yaml
 
   docs:include-configuration-json-schema:
     desc: Copy configuration JSON schema to make it available in documentation
