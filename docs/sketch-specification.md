@@ -72,6 +72,14 @@ Files added to the sketch via the Arduino IDE's **Sketch > Add File...** are pla
 The Arduino IDE's **File > Save As...** only copies the code files in the sketch root folder and the full contents of
 the `data` folder, so any non-code files outside the `data` folder are stripped.
 
+### `libraries` subfolder
+
+The `libraries` folder is used to store libraries compiled with the sketch. This folder should be used to store
+libraries that have been patched or to store libraries that are not available through the official library repository.
+
+- This feature is available since Arduino CLI 1.1.1
+- This feature is not yet available in Arduino IDE and Arduino Web Editor.
+
 ### Metadata
 
 #### `sketch.json`
@@ -118,25 +126,27 @@ Web Editor.
 ### Sketch file structure example
 
 ```
-Foo
+MotorController
 |_ arduino_secrets.h
-|_ Abc.ino
-|_ Def.cpp
-|_ Def.h
-|_ Foo.ino
-|_ Ghi.c
-|_ Ghi.h
-|_ Jkl.h
-|_ Jkl.S
+|_ motors.ino
+|_ defs.cpp
+|_ defs.h
+|_ MotorController.ino
+|_ someASM.h
+|_ someASM.S
 |_ sketch.yaml
 |_ data
 |  |_ Schematic.pdf
+|_ libraries
+|  |_ SomeLib
+|     |_ library.properties
+|     |_ src
+|        |_ SomeLib.h
+|        |_ SomeLib.cpp
 |_ src
-   |_ SomeLib
-      |_ library.properties
-      |_ src
-         |_ SomeLib.h
-         |_ SomeLib.cpp
+   |_ encoders
+      |_ encoders.h
+      |_ encoders.cpp
 ```
 
 ## Sketchbook
