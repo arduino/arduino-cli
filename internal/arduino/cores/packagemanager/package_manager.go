@@ -255,40 +255,6 @@ func (pme *Explorer) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid strin
 	return res
 }
 
-// FindBoardsWithVidPid FIXMEDOC
-func (pme *Explorer) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
-	res := []*cores.Board{}
-	for _, targetPackage := range pme.packages {
-		for _, targetPlatform := range targetPackage.Platforms {
-			if platform := pme.GetInstalledPlatformRelease(targetPlatform); platform != nil {
-				for _, board := range platform.Boards {
-					if board.HasUsbID(vid, pid) {
-						res = append(res, board)
-					}
-				}
-			}
-		}
-	}
-	return res
-}
-
-// FindBoardsWithID FIXMEDOC
-func (pme *Explorer) FindBoardsWithID(id string) []*cores.Board {
-	res := []*cores.Board{}
-	for _, targetPackage := range pme.packages {
-		for _, targetPlatform := range targetPackage.Platforms {
-			if platform := pme.GetInstalledPlatformRelease(targetPlatform); platform != nil {
-				for _, board := range platform.Boards {
-					if board.BoardID == id {
-						res = append(res, board)
-					}
-				}
-			}
-		}
-	}
-	return res
-}
-
 // FindBoardWithFQBN returns the board identified by the fqbn, or an error
 func (pme *Explorer) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
 	fqbn, err := fqbn.Parse(fqbnIn)

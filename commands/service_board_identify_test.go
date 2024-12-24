@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
@@ -157,7 +156,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	defer release()
 
 	settings := configuration.NewSettings()
-	res, err := identify(pme, &discovery.Port{Properties: idPrefs}, settings, true)
+	res, err := identify(pme, idPrefs, settings, true)
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)

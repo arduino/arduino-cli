@@ -1481,6 +1481,121 @@ func (x *BoardSearchResponse) GetBoards() []*BoardListItem {
 	return nil
 }
 
+type BoardIdentifyRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// A set of properties to search (can be taken from a Port message).
+	Properties map[string]string `protobuf:"bytes,2,rep,name=properties,proto3" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// If set to true, when a board cannot be identified using the installed
+	// platforms, the cloud API will be called to detect the board.
+	UseCloudApiForUnknownBoardDetection bool `protobuf:"varint,3,opt,name=use_cloud_api_for_unknown_board_detection,json=useCloudApiForUnknownBoardDetection,proto3" json:"use_cloud_api_for_unknown_board_detection,omitempty"`
+}
+
+func (x *BoardIdentifyRequest) Reset() {
+	*x = BoardIdentifyRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_board_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BoardIdentifyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BoardIdentifyRequest) ProtoMessage() {}
+
+func (x *BoardIdentifyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_board_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BoardIdentifyRequest.ProtoReflect.Descriptor instead.
+func (*BoardIdentifyRequest) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_board_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *BoardIdentifyRequest) GetInstance() *Instance {
+	if x != nil {
+		return x.Instance
+	}
+	return nil
+}
+
+func (x *BoardIdentifyRequest) GetProperties() map[string]string {
+	if x != nil {
+		return x.Properties
+	}
+	return nil
+}
+
+func (x *BoardIdentifyRequest) GetUseCloudApiForUnknownBoardDetection() bool {
+	if x != nil {
+		return x.UseCloudApiForUnknownBoardDetection
+	}
+	return false
+}
+
+type BoardIdentifyResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// List of matching boards (they may have an FQBN with options set).
+	Boards []*BoardListItem `protobuf:"bytes,1,rep,name=boards,proto3" json:"boards,omitempty"`
+}
+
+func (x *BoardIdentifyResponse) Reset() {
+	*x = BoardIdentifyResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_board_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BoardIdentifyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BoardIdentifyResponse) ProtoMessage() {}
+
+func (x *BoardIdentifyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_board_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BoardIdentifyResponse.ProtoReflect.Descriptor instead.
+func (*BoardIdentifyResponse) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_board_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *BoardIdentifyResponse) GetBoards() []*BoardListItem {
+	if x != nil {
+		return x.Boards
+	}
+	return nil
+}
+
 var File_cc_arduino_cli_commands_v1_board_proto protoreflect.FileDescriptor
 
 var file_cc_arduino_cli_commands_v1_board_proto_rawDesc = []byte{
@@ -1720,6 +1835,33 @@ var file_cc_arduino_cli_commands_v1_board_proto_rawDesc = []byte{
 	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
 	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x6f, 0x61, 0x72,
 	0x64, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x06, 0x62, 0x6f, 0x61, 0x72, 0x64,
+	0x73, 0x22, 0xd1, 0x02, 0x0a, 0x14, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x64, 0x65, 0x6e, 0x74,
+	0x69, 0x66, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x40, 0x0a, 0x08, 0x69, 0x6e,
+	0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x63,
+	0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6e,
+	0x63, 0x65, 0x52, 0x08, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x12, 0x60, 0x0a, 0x0a,
+	0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x69, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x40, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
+	0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x6f,
+	0x61, 0x72, 0x64, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x69, 0x65, 0x73, 0x45, 0x6e, 0x74,
+	0x72, 0x79, 0x52, 0x0a, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x69, 0x65, 0x73, 0x12, 0x56,
+	0x0a, 0x29, 0x75, 0x73, 0x65, 0x5f, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x5f, 0x61, 0x70, 0x69, 0x5f,
+	0x66, 0x6f, 0x72, 0x5f, 0x75, 0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x6e, 0x5f, 0x62, 0x6f, 0x61, 0x72,
+	0x64, 0x5f, 0x64, 0x65, 0x74, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x23, 0x75, 0x73, 0x65, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x41, 0x70, 0x69, 0x46, 0x6f,
+	0x72, 0x55, 0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x6e, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x44, 0x65, 0x74,
+	0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x1a, 0x3d, 0x0a, 0x0f, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72,
+	0x74, 0x69, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x5a, 0x0a, 0x15, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x64,
+	0x65, 0x6e, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41,
+	0x0a, 0x06, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x29,
+	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x6f, 0x61, 0x72,
+	0x64, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x06, 0x62, 0x6f, 0x61, 0x72, 0x64,
 	0x73, 0x42, 0x48, 0x5a, 0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
 	0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d,
 	0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69,
@@ -1740,7 +1882,7 @@ func file_cc_arduino_cli_commands_v1_board_proto_rawDescGZIP() []byte {
 	return file_cc_arduino_cli_commands_v1_board_proto_rawDescData
 }
 
-var file_cc_arduino_cli_commands_v1_board_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_cc_arduino_cli_commands_v1_board_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_cc_arduino_cli_commands_v1_board_proto_goTypes = []any{
 	(*BoardDetailsRequest)(nil),           // 0: cc.arduino.cli.commands.v1.BoardDetailsRequest
 	(*BoardDetailsResponse)(nil),          // 1: cc.arduino.cli.commands.v1.BoardDetailsResponse
@@ -1762,40 +1904,46 @@ var file_cc_arduino_cli_commands_v1_board_proto_goTypes = []any{
 	(*BoardListItem)(nil),                 // 17: cc.arduino.cli.commands.v1.BoardListItem
 	(*BoardSearchRequest)(nil),            // 18: cc.arduino.cli.commands.v1.BoardSearchRequest
 	(*BoardSearchResponse)(nil),           // 19: cc.arduino.cli.commands.v1.BoardSearchResponse
-	nil,                                   // 20: cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry
-	(*Instance)(nil),                      // 21: cc.arduino.cli.commands.v1.Instance
-	(*Programmer)(nil),                    // 22: cc.arduino.cli.commands.v1.Programmer
-	(*Port)(nil),                          // 23: cc.arduino.cli.commands.v1.Port
-	(*Platform)(nil),                      // 24: cc.arduino.cli.commands.v1.Platform
+	(*BoardIdentifyRequest)(nil),          // 20: cc.arduino.cli.commands.v1.BoardIdentifyRequest
+	(*BoardIdentifyResponse)(nil),         // 21: cc.arduino.cli.commands.v1.BoardIdentifyResponse
+	nil,                                   // 22: cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry
+	nil,                                   // 23: cc.arduino.cli.commands.v1.BoardIdentifyRequest.PropertiesEntry
+	(*Instance)(nil),                      // 24: cc.arduino.cli.commands.v1.Instance
+	(*Programmer)(nil),                    // 25: cc.arduino.cli.commands.v1.Programmer
+	(*Port)(nil),                          // 26: cc.arduino.cli.commands.v1.Port
+	(*Platform)(nil),                      // 27: cc.arduino.cli.commands.v1.Platform
 }
 var file_cc_arduino_cli_commands_v1_board_proto_depIdxs = []int32{
-	21, // 0: cc.arduino.cli.commands.v1.BoardDetailsRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	24, // 0: cc.arduino.cli.commands.v1.BoardDetailsRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
 	3,  // 1: cc.arduino.cli.commands.v1.BoardDetailsResponse.package:type_name -> cc.arduino.cli.commands.v1.Package
 	5,  // 2: cc.arduino.cli.commands.v1.BoardDetailsResponse.platform:type_name -> cc.arduino.cli.commands.v1.BoardPlatform
 	6,  // 3: cc.arduino.cli.commands.v1.BoardDetailsResponse.tools_dependencies:type_name -> cc.arduino.cli.commands.v1.ToolsDependencies
 	8,  // 4: cc.arduino.cli.commands.v1.BoardDetailsResponse.config_options:type_name -> cc.arduino.cli.commands.v1.ConfigOption
-	22, // 5: cc.arduino.cli.commands.v1.BoardDetailsResponse.programmers:type_name -> cc.arduino.cli.commands.v1.Programmer
+	25, // 5: cc.arduino.cli.commands.v1.BoardDetailsResponse.programmers:type_name -> cc.arduino.cli.commands.v1.Programmer
 	2,  // 6: cc.arduino.cli.commands.v1.BoardDetailsResponse.identification_properties:type_name -> cc.arduino.cli.commands.v1.BoardIdentificationProperties
-	20, // 7: cc.arduino.cli.commands.v1.BoardIdentificationProperties.properties:type_name -> cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry
+	22, // 7: cc.arduino.cli.commands.v1.BoardIdentificationProperties.properties:type_name -> cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry
 	4,  // 8: cc.arduino.cli.commands.v1.Package.help:type_name -> cc.arduino.cli.commands.v1.Help
 	7,  // 9: cc.arduino.cli.commands.v1.ToolsDependencies.systems:type_name -> cc.arduino.cli.commands.v1.Systems
 	9,  // 10: cc.arduino.cli.commands.v1.ConfigOption.values:type_name -> cc.arduino.cli.commands.v1.ConfigValue
-	21, // 11: cc.arduino.cli.commands.v1.BoardListRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	24, // 11: cc.arduino.cli.commands.v1.BoardListRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
 	12, // 12: cc.arduino.cli.commands.v1.BoardListResponse.ports:type_name -> cc.arduino.cli.commands.v1.DetectedPort
 	17, // 13: cc.arduino.cli.commands.v1.DetectedPort.matching_boards:type_name -> cc.arduino.cli.commands.v1.BoardListItem
-	23, // 14: cc.arduino.cli.commands.v1.DetectedPort.port:type_name -> cc.arduino.cli.commands.v1.Port
-	21, // 15: cc.arduino.cli.commands.v1.BoardListAllRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	26, // 14: cc.arduino.cli.commands.v1.DetectedPort.port:type_name -> cc.arduino.cli.commands.v1.Port
+	24, // 15: cc.arduino.cli.commands.v1.BoardListAllRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
 	17, // 16: cc.arduino.cli.commands.v1.BoardListAllResponse.boards:type_name -> cc.arduino.cli.commands.v1.BoardListItem
-	21, // 17: cc.arduino.cli.commands.v1.BoardListWatchRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	24, // 17: cc.arduino.cli.commands.v1.BoardListWatchRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
 	12, // 18: cc.arduino.cli.commands.v1.BoardListWatchResponse.port:type_name -> cc.arduino.cli.commands.v1.DetectedPort
-	24, // 19: cc.arduino.cli.commands.v1.BoardListItem.platform:type_name -> cc.arduino.cli.commands.v1.Platform
-	21, // 20: cc.arduino.cli.commands.v1.BoardSearchRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	27, // 19: cc.arduino.cli.commands.v1.BoardListItem.platform:type_name -> cc.arduino.cli.commands.v1.Platform
+	24, // 20: cc.arduino.cli.commands.v1.BoardSearchRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
 	17, // 21: cc.arduino.cli.commands.v1.BoardSearchResponse.boards:type_name -> cc.arduino.cli.commands.v1.BoardListItem
-	22, // [22:22] is the sub-list for method output_type
-	22, // [22:22] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	24, // 22: cc.arduino.cli.commands.v1.BoardIdentifyRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	23, // 23: cc.arduino.cli.commands.v1.BoardIdentifyRequest.properties:type_name -> cc.arduino.cli.commands.v1.BoardIdentifyRequest.PropertiesEntry
+	17, // 24: cc.arduino.cli.commands.v1.BoardIdentifyResponse.boards:type_name -> cc.arduino.cli.commands.v1.BoardListItem
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_cc_arduino_cli_commands_v1_board_proto_init() }
@@ -2046,6 +2194,30 @@ func file_cc_arduino_cli_commands_v1_board_proto_init() {
 				return nil
 			}
 		}
+		file_cc_arduino_cli_commands_v1_board_proto_msgTypes[20].Exporter = func(v any, i int) any {
+			switch v := v.(*BoardIdentifyRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_board_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*BoardIdentifyResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2053,7 +2225,7 @@ func file_cc_arduino_cli_commands_v1_board_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cc_arduino_cli_commands_v1_board_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
