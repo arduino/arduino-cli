@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -159,7 +160,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		if err := downloadLibrary(ctx, downloadsDir, libRelease, downloadCB, taskCB, downloadReason, s.settings); err != nil {
 			return err
 		}
-		if err := installLibrary(lmi, downloadsDir, libRelease, installTask, taskCB); err != nil {
+		if err := installLibrary(lmi, downloadsDir, libRelease, installTask, taskCB, resources.IntegrityCheckFull); err != nil {
 			return err
 		}
 	}
@@ -179,7 +180,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 	return nil
 }
 
-func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB) error {
+func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, libRelease *librariesindex.Release, installTask *librariesmanager.LibraryInstallPlan, taskCB rpc.TaskProgressCB, checks resources.IntegrityCheckMode) error {
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
 
@@ -193,7 +194,7 @@ func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, l
 
 	installPath := installTask.TargetPath
 	tmpDirPath := installPath.Parent()
-	if err := libRelease.Resource.Install(downloadsDir, tmpDirPath, installPath); err != nil {
+	if err := libRelease.Resource.Install(downloadsDir, tmpDirPath, installPath, checks); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 

@@ -17,14 +17,12 @@ package packageindex
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"slices"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/security"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	easyjson "github.com/mailru/easyjson"
 	"github.com/sirupsen/logrus"
@@ -273,14 +271,15 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		outPlatform.Deprecated = inPlatformRelease.Deprecated
 	}
 
-	size, err := inPlatformRelease.Size.Int64()
-	if err != nil {
-		return errors.New(i18n.Tr("invalid platform archive size: %s", err))
-	}
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.Name = inPlatformRelease.Name
 	outPlatformRelease.Category = inPlatformRelease.Category
 	outPlatformRelease.IsTrusted = trusted
+	size, err := inPlatformRelease.Size.Int64()
+	if err != nil {
+		logrus.Warningf("invalid platform %s archive size: %s", outPlatformRelease, err)
+		size = 0
+	}
 	outPlatformRelease.Resource = &resources.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,
 		Checksum:        inPlatformRelease.Checksum,

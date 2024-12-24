@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -40,6 +41,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	taskCB rpc.TaskProgressCB,
 	skipPostInstall bool,
 	skipPreUninstall bool,
+	checks resources.IntegrityCheckMode,
 ) (*cores.PlatformRelease, error) {
 	if platformRef.PlatformVersion != nil {
 		return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Upgrade doesn't accept parameters with version")}
@@ -64,7 +66,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	if err != nil {
 		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
 	}
-	if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, skipPostInstall, skipPreUninstall); err != nil {
+	if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, skipPostInstall, skipPreUninstall, checks); err != nil {
 		return nil, err
 	}
 
@@ -78,7 +80,7 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 	ctx context.Context,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
-	skipPostInstall bool, skipPreUninstall bool) error {
+	skipPostInstall bool, skipPreUninstall bool, checks resources.IntegrityCheckMode) error {
 	log := pme.log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
@@ -106,7 +108,7 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 
 	// Install tools first
 	for _, tool := range toolsToInstall {
-		if err := pme.InstallTool(tool, taskCB, skipPostInstall); err != nil {
+		if err := pme.InstallTool(tool, taskCB, skipPostInstall, checks); err != nil {
 			return err
 		}
 	}
@@ -138,7 +140,7 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 	}
 
 	// Install
-	if err := pme.InstallPlatform(platformRelease); err != nil {
+	if err := pme.InstallPlatform(platformRelease, checks); err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Cannot install platform"), Cause: err}
 	}
@@ -196,18 +198,18 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 }
 
 // InstallPlatform installs a specific release of a platform.
-func (pme *Explorer) InstallPlatform(platformRelease *cores.PlatformRelease) error {
+func (pme *Explorer) InstallPlatform(platformRelease *cores.PlatformRelease, checks resources.IntegrityCheckMode) error {
 	destDir := pme.PackagesDir.Join(
 		platformRelease.Platform.Package.Name,
 		"hardware",
 		platformRelease.Platform.Architecture,
 		platformRelease.Version.String())
-	return pme.InstallPlatformInDirectory(platformRelease, destDir)
+	return pme.InstallPlatformInDirectory(platformRelease, destDir, checks)
 }
 
 // InstallPlatformInDirectory installs a specific release of a platform in a specific directory.
-func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path) error {
-	if err := platformRelease.Resource.Install(pme.DownloadDir, pme.tempDir, destDir); err != nil {
+func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path, checks resources.IntegrityCheckMode) error {
+	if err := platformRelease.Resource.Install(pme.DownloadDir, pme.tempDir, destDir, checks); err != nil {
 		return errors.New(i18n.Tr("installing platform %[1]s: %[2]s", platformRelease, err))
 	}
 	if d, err := destDir.Abs(); err == nil {
@@ -320,7 +322,7 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 }
 
 // InstallTool installs a specific release of a tool.
-func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB, skipPostInstall bool) error {
+func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB, skipPostInstall bool, checks resources.IntegrityCheckMode) error {
 	log := pme.log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {
@@ -343,7 +345,7 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir)
+	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir, checks)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Cannot install tool %s", toolRelease), Cause: err}

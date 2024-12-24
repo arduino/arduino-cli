@@ -41,6 +41,7 @@ func SetDefaults(settings *Settings) {
 
 	// Boards Manager
 	setDefaultValueAndKeyTypeSchema("board_manager.additional_urls", []string{})
+	setDefaultValueAndKeyTypeSchema("board_manager.enable_unsafe_install", false)
 
 	// arduino directories
 	setDefaultValueAndKeyTypeSchema("directories.data", getDefaultArduinoDataDir())

@@ -21,3 +21,10 @@ func (settings *Settings) BoardManagerAdditionalUrls() []string {
 	}
 	return settings.Defaults.GetStringSlice("board_manager.additional_urls")
 }
+
+func (settings *Settings) BoardManagerEnableUnsafeInstall() bool {
+	if v, ok, _ := settings.GetBoolOk("board_manager.enable_unsafe_install"); ok {
+		return v
+	}
+	return settings.Defaults.GetBool("board_manager.enable_unsafe_install")
+}
