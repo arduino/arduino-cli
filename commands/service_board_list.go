@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
+	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -46,14 +47,18 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 	if err != nil {
 		return nil, err
 	}
-	defer release()
 	dm := pme.DiscoveryManager()
 	warnings := f.Map(dm.Start(), (error).Error)
+	release()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	ports := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
-		boards, err := identify(pme, port.Properties, s.settings, req.GetSkipCloudApiForBoardDetection())
+		resp, err := s.BoardIdentify(ctx, &rpc.BoardIdentifyRequest{
+			Instance:                            req.GetInstance(),
+			Properties:                          port.Properties.AsMap(),
+			UseCloudApiForUnknownBoardDetection: !req.GetSkipCloudApiForBoardDetection(),
+		})
 		if err != nil {
 			warnings = append(warnings, err.Error())
 		}
@@ -62,7 +67,7 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 		// API managed to recognize the connected board
 		b := &rpc.DetectedPort{
 			Port:           rpc.DiscoveryPortToRPC(port),
-			MatchingBoards: boards,
+			MatchingBoards: resp.GetBoards(),
 		}
 
 		if fqbnFilter == nil || hasMatchingBoard(b, fqbnFilter) {
@@ -106,16 +111,18 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 		return err
 	}
 
-	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
-	if err != nil {
-		return err
-	}
-	dm := pme.DiscoveryManager()
-
-	watcher, err := dm.Watch()
-	release()
-	if err != nil {
-		return err
+	var watcher *discoverymanager.PortWatcher
+	{
+		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+		if err != nil {
+			return err
+		}
+		dm := pme.DiscoveryManager()
+		watcher, err = dm.Watch()
+		release()
+		if err != nil {
+			return err
+		}
 	}
 
 	go func() {
@@ -126,11 +133,16 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 
 			boardsError := ""
 			if event.Type == "add" {
-				boards, err := identify(pme, event.Port.Properties, s.settings, req.GetSkipCloudApiForBoardDetection())
+				resp, err := s.BoardIdentify(context.Background(), &rpc.BoardIdentifyRequest{
+					Instance:                            req.GetInstance(),
+					Properties:                          event.Port.Properties.AsMap(),
+					UseCloudApiForUnknownBoardDetection: !req.GetSkipCloudApiForBoardDetection(),
+				})
 				if err != nil {
 					boardsError = err.Error()
+				} else {
+					port.MatchingBoards = resp.GetBoards()
 				}
-				port.MatchingBoards = boards
 			}
 			stream.Send(&rpc.BoardListWatchResponse{
 				EventType: event.Type,
