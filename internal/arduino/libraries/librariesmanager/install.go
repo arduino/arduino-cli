@@ -257,10 +257,17 @@ func parseGitArgURL(argURL string) (string, string, plumbing.Revision, error) {
 		return path.Base(), argURL, "", nil
 	}
 
-	// Handle github-specific address in the form "git@github.com:arduino-libraries/SigFox.git"
-	if strings.HasPrefix(argURL, "git@github.com:") {
-		// We can't parse these as URLs
-		argURL = "https://github.com/" + strings.TrimPrefix(argURL, "git@github.com:")
+	// Handle commercial git-specific address in the form "git@xxxxx.com:arduino-libraries/SigFox.git"
+	prefixes := map[string]string{
+		"git@github.com:":    "https://github.com/",
+		"git@gitlab.com:":    "https://gitlab.com/",
+		"git@bitbucket.org:": "https://bitbucket.org/",
+	}
+	for prefix, replacement := range prefixes {
+		if strings.HasPrefix(argURL, prefix) {
+			// We can't parse these as URLs
+			argURL = replacement + strings.TrimPrefix(argURL, prefix)
+		}
 	}
 
 	parsedURL, err := url.Parse(argURL)

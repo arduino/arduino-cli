@@ -49,6 +49,13 @@ func TestParseGitURL(t *testing.T) {
 		require.EqualValues(t, "", ref)
 	}
 	{
+		libraryName, gitURL, ref, err := parseGitArgURL("git@bitbucket.org:arduino/arduino-lib.git")
+		require.NoError(t, err)
+		require.Equal(t, "arduino-lib", libraryName)
+		require.Equal(t, "https://bitbucket.org/arduino/arduino-lib.git", gitURL)
+		require.EqualValues(t, "", ref)
+	}
+	{
 		libraryName, gitURL, ref, err := parseGitArgURL("git@github.com:arduino/arduino-lib.git#0.1.2")
 		require.NoError(t, err)
 		require.Equal(t, "arduino-lib", libraryName)
