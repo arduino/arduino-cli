@@ -33,12 +33,6 @@ import (
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
 func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
-	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
-	if err != nil {
-		return nil, err
-	}
-	defer release()
-
 	var fqbnFilter *fqbn.FQBN
 	if f := req.GetFqbn(); f != "" {
 		var err error
@@ -48,6 +42,11 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 		}
 	}
 
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
+	}
+	defer release()
 	dm := pme.DiscoveryManager()
 	warnings := f.Map(dm.Start(), (error).Error)
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
