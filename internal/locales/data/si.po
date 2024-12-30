@@ -1,17 +1,17 @@
 # 
 # Translators:
-# rel_m3, 2022
+# HelaBasa Group <transifex-helabasa-group@yalu.lk>, 2024
 # 
 msgid ""
 msgstr ""
-"Last-Translator: rel_m3, 2022\n"
-"Language-Team: Hebrew (https://app.transifex.com/arduino-1/teams/108174/he/)\n"
-"Language: he\n"
-"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;\n"
+"Last-Translator: HelaBasa Group <transifex-helabasa-group@yalu.lk>, 2024\n"
+"Language-Team: Sinhala (https://app.transifex.com/arduino-1/teams/108174/si/)\n"
+"Language: si\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: internal/version/version.go:56
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
-msgstr "%[1]s%[2]s גרסה: %[3]s קומיט: %[4]sתאריך: %[5]s"
+msgstr ""
 
 #: internal/arduino/builder/internal/detector/detector.go:462
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
@@ -27,7 +27,7 @@ msgstr ""
 
 #: internal/arduino/builder/builder.go:487
 msgid "%[1]s pattern is missing"
-msgstr "%[1]s תבנית חסרה"
+msgstr ""
 
 #: internal/arduino/resources/download.go:51
 msgid "%s already downloaded"
@@ -39,7 +39,7 @@ msgstr ""
 
 #: internal/arduino/cores/packagemanager/install_uninstall.go:371
 msgid "%s installed"
-msgstr "%s מותקן"
+msgstr "%s ස්ථාපිතයි"
 
 #: internal/cli/lib/check_deps.go:121
 msgid "%s is already installed."
@@ -48,11 +48,11 @@ msgstr ""
 #: internal/arduino/cores/packagemanager/loader.go:63
 #: internal/arduino/cores/packagemanager/loader.go:617
 msgid "%s is not a directory"
-msgstr "%s אינו תיקייה"
+msgstr ""
 
 #: internal/arduino/cores/packagemanager/install_uninstall.go:290
 msgid "%s is not managed by package manager"
-msgstr "%s אינו מנוהל על ידי מנהל ההתקנות"
+msgstr ""
 
 #: internal/cli/daemon/daemon.go:67
 msgid "%s must be >= 1024"
@@ -79,11 +79,11 @@ msgstr ""
 
 #: internal/cli/board/listall.go:97 internal/cli/board/search.go:94
 msgid "(hidden)"
-msgstr "(מוסתר)"
+msgstr "(සැඟවුණු)"
 
 #: internal/arduino/builder/libraries.go:302
 msgid "(legacy)"
-msgstr ""
+msgstr "(පරණ)"
 
 #: internal/cli/lib/install.go:82
 msgid ""
@@ -116,7 +116,7 @@ msgstr ""
 #: internal/cli/core/download.go:35 internal/cli/core/install.go:37
 #: internal/cli/core/uninstall.go:36 internal/cli/core/upgrade.go:38
 msgid "ARCH"
-msgstr ""
+msgstr "ARCH"
 
 #: internal/cli/generatedocs/generatedocs.go:80
 msgid "ARDUINO COMMAND LINE MANUAL"
@@ -164,7 +164,7 @@ msgstr ""
 
 #: internal/cli/lib/search.go:208
 msgid "Architecture: %s"
-msgstr "ארכיטקטורה: %s"
+msgstr ""
 
 #: commands/service_sketch_archive.go:69
 msgid "Archive already exists"
@@ -176,11 +176,11 @@ msgstr ""
 
 #: internal/cli/sketch/sketch.go:30 internal/cli/sketch/sketch.go:31
 msgid "Arduino CLI sketch commands."
-msgstr "פקודות סקיצה בשורת הפקודה של ארדואינו."
+msgstr ""
 
 #: internal/cli/cli.go:88
 msgid "Arduino CLI."
-msgstr "שורת הפקודה של ארדואינו."
+msgstr ""
 
 #: internal/cli/cli.go:89
 msgid "Arduino Command Line Interface (arduino-cli)."
@@ -188,7 +188,7 @@ msgstr ""
 
 #: internal/cli/board/board.go:30 internal/cli/board/board.go:31
 msgid "Arduino board commands."
-msgstr "פקודות לוח של ארדואינו."
+msgstr ""
 
 #: internal/cli/cache/cache.go:30 internal/cli/cache/cache.go:31
 msgid "Arduino cache commands."
@@ -216,7 +216,7 @@ msgstr ""
 
 #: internal/cli/lib/search.go:199
 msgid "Author: %s"
-msgstr ""
+msgstr "කර්තෘ: %s"
 
 #: internal/arduino/libraries/librariesmanager/install.go:79
 msgid ""
