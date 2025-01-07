@@ -75,3 +75,13 @@ func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
 
 	require.Equal(t, "register.h", include)
 }
+
+func TestIncludesFinderWithRegExpPaddedIncludes5(t *testing.T) {
+	output := "/some/path/sketch.ino:23:42: fatal error: 'Foobar.h' file not found\n" +
+		"   23 | #include \"Foobar.h\"\n" +
+		"      |          ^~~~~~~~~~\n"
+
+	include := detector.IncludesFinderWithRegExp(output)
+
+	require.Equal(t, "Foobar.h", include)
+}
