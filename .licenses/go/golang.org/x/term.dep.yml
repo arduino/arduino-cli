@@ -1,6 +1,6 @@
 ---
 name: golang.org/x/term
-version: v0.27.0
+version: v0.28.0
 type: go
 summary: Package term provides support functions for dealing with terminals, as commonly
   found on UNIX systems.
