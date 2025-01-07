@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/protobuf/runtime/protoimpl
-version: v1.36.1
+version: v1.36.2
 type: go
 summary: Package protoimpl contains the default implementation for messages generated
   by protoc-gen-go.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/runtime/protoimpl
 license: bsd-3-clause
 licenses:
-- sources: protobuf@v1.36.1/LICENSE
+- sources: protobuf@v1.36.2/LICENSE
   text: |
     Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: protobuf@v1.36.1/PATENTS
+- sources: protobuf@v1.36.2/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
