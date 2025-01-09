@@ -32,7 +32,7 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 		if b.logger.Verbose() {
 			b.logger.WriteStdout(result.Stdout())
 		}
-		b.logger.WriteStdout(result.Stderr())
+		b.logger.WriteStderr(result.Stderr())
 		b.diagnosticStore.Parse(result.Args(), result.Stderr())
 	}
 
