@@ -107,7 +107,7 @@ func TestCompilerErrOutput(t *testing.T) {
 	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.5")
 	require.NoError(t, err)
 
-	{
+	t.Run("Diagnostics", func(t *testing.T) {
 		// prepare sketch
 		sketch, err := paths.New("testdata", "blink_with_wrong_cpp").Abs()
 		require.NoError(t, err)
@@ -126,10 +126,11 @@ func TestCompilerErrOutput(t *testing.T) {
 			  "context": [ { "message": "In function 'void wrong()':" } ]
 			}
 		]`)
-	}
+	})
 
-	// Test the preprocessor errors are present in the diagnostics
-	{
+	t.Run("PreprocessorDiagnostics", func(t *testing.T) {
+		// Test the preprocessor errors are present in the diagnostics
+
 		// prepare sketch
 		sketch, err := paths.New("testdata", "blink_with_wrong_include").Abs()
 		require.NoError(t, err)
@@ -148,14 +149,15 @@ func TestCompilerErrOutput(t *testing.T) {
 			  "message": "invalid preprocessing directive #wrong\n #wrong\n  ^~~~~",
 			}
 		]`)
-	}
+	})
 
-	// Test the preprocessor errors are present in the diagnostics.
-	// In case we have 2 libraries:
-	// 1. one is missing
-	// 2. the other one is missing only from the first GCC run
-	// The diagnostics should report only 1 missing library.
-	{
+	t.Run("PreprocessorDiagnosticsWithLibErrors", func(t *testing.T) {
+		// Test the preprocessor errors are present in the diagnostics.
+		// In case we have 2 libraries:
+		// 1. one is missing
+		// 2. the other one is missing only from the first GCC run
+		// The diagnostics should report only 1 missing library.
+
 		// prepare sketch
 		sketch, err := paths.New("testdata", "using_Wire_with_missing_lib").Abs()
 		require.NoError(t, err)
@@ -175,11 +177,12 @@ func TestCompilerErrOutput(t *testing.T) {
 			  "column": 10,
 			}
 		]`)
-	}
+	})
 
-	// Check that library discover do not generate false errors
-	// https://github.com/arduino/arduino-cli/issues/2263
-	{
+	t.Run("LibraryDiscoverFalseErrors", func(t *testing.T) {
+		// Check that library discover do not generate false errors
+		// https://github.com/arduino/arduino-cli/issues/2263
+
 		// prepare sketch
 		sketch, err := paths.New("testdata", "using_Wire").Abs()
 		require.NoError(t, err)
@@ -191,7 +194,7 @@ func TestCompilerErrOutput(t *testing.T) {
 		jsonOut.Query(".compiler_out").MustNotContain(`"fatal error"`)
 		jsonOut.Query(".compiler_err").MustNotContain(`"fatal error"`)
 		jsonOut.MustNotContain(`{ "diagnostics" : [] }`)
-	}
+	})
 }
 
 func TestCompileRelativeLibraryPath(t *testing.T) {
