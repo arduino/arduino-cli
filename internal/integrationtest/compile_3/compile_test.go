@@ -195,6 +195,31 @@ func TestCompilerErrOutput(t *testing.T) {
 		jsonOut.Query(".compiler_err").MustNotContain(`"fatal error"`)
 		jsonOut.MustNotContain(`{ "diagnostics" : [] }`)
 	})
+
+	t.Run("PreprocessorErrorsOnStderr", func(t *testing.T) {
+		// Test the preprocessor errors are present in the diagnostics
+		// when they are printed on stderr
+
+		// prepare sketch
+		sketch, err := paths.New("testdata", "blink_with_error_directive").Abs()
+		require.NoError(t, err)
+
+		// Run compile and catch err stream
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--json", sketch.String())
+		require.Error(t, err)
+		jsonOut := requirejson.Parse(t, out)
+		jsonOut.Query(".compiler_out").MustNotContain(`"error:"`)
+		jsonOut.Query(".compiler_err").MustContain(`"error:"`)
+		jsonOut.Query(`.builder_result.diagnostics`).MustContain(`
+		[
+			{
+				"severity": "ERROR",
+				"message": "#error void setup(){} void loop(){}\n #error void setup(){} void loop(){}\n  ^~~~~",
+				"line": 1,
+				"column": 2
+			}
+		]`)
+	})
 }
 
 func TestCompileRelativeLibraryPath(t *testing.T) {
