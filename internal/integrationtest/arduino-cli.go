@@ -694,3 +694,15 @@ func (inst *ArduinoCLIInstance) Upload(ctx context.Context, fqbn, sketchPath, po
 	logCallf(">>> Upload(%v %v port/protocol=%s/%s)\n", fqbn, sketchPath, port, protocol)
 	return uploadCl, err
 }
+
+// BoardIdentify calls the "BoardIdentify" gRPC method.
+func (inst *ArduinoCLIInstance) BoardIdentify(ctx context.Context, props map[string]string, useCloudAPI bool) (*commands.BoardIdentifyResponse, error) {
+	req := &commands.BoardIdentifyRequest{
+		Instance:                            inst.instance,
+		Properties:                          props,
+		UseCloudApiForUnknownBoardDetection: useCloudAPI,
+	}
+	logCallf(">>> BoardIdentify(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.BoardIdentify(ctx, req)
+	return resp, err
+}
