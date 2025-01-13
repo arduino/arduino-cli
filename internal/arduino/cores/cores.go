@@ -328,14 +328,14 @@ func (platform *Platform) latestReleaseVersion() *semver.Version {
 	if len(versions) == 0 {
 		return nil
 	}
-	max := versions[0]
+	maximum := versions[0]
 
 	for i := 1; i < len(versions); i++ {
-		if versions[i].GreaterThan(max) {
-			max = versions[i]
+		if versions[i].GreaterThan(maximum) {
+			maximum = versions[i]
 		}
 	}
-	return max
+	return maximum
 }
 
 // GetAllInstalled returns all installed PlatformRelease

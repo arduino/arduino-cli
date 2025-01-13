@@ -340,7 +340,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	logrus.WithField("index", indexFile).Info("Loading libraries index file")
 	li, err := librariesindex.LoadIndex(indexFile)
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, i18n.Tr("Loading index file: %v", err))
+		s := status.New(codes.FailedPrecondition, i18n.Tr("Loading index file: %v", err))
 		responseError(s)
 		li = librariesindex.EmptyIndex
 	}

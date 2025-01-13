@@ -123,7 +123,7 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 		logrus.
 			WithField("lib", lib.Name).
 			WithField("prio", fmt.Sprintf("%03X", libPriority)).
-			Infof(msg)
+			Info(msg)
 	}
 	if found == nil {
 		return nil

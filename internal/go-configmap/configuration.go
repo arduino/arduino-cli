@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"fortio.org/safecast"
 )
 
 type Map struct {
@@ -88,7 +90,7 @@ func tryConversion(current any, desiredType reflect.Type) (any, error) {
 			return uint(currentFloat), nil
 		}
 		if currentInt, ok := current.(int); ok {
-			return uint(currentInt), nil
+			return safecast.Convert[uint](currentInt)
 		}
 	case reflect.Int:
 		// Exception for JSON decoder: json decoder will decode all numbers as float64

@@ -3,7 +3,7 @@ name: Test Go
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.22"
+  GO_VERSION: "1.23"
   COVERAGE_ARTIFACT: coverage-data
 
 # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows

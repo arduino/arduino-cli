@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -27,7 +26,7 @@ import (
 
 // RunRecipe fixdoc
 func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
-	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
+	logrus.Debugf("Looking for recipes like %s", prefix+"*"+suffix)
 
 	// TODO is it necessary to use Clone?
 	buildProperties := b.buildProperties.Clone()
@@ -36,7 +35,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 	// TODO is it necessary to use Clone?
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
+		logrus.Debugf("Running recipe: %s", recipe)
 
 		command, err := b.prepareCommandForRecipe(properties, recipe, false)
 		if err != nil {

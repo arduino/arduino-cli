@@ -1,11 +1,12 @@
 module github.com/arduino/arduino-cli
 
-go 1.22.9
+go 1.23.4
 
 // We must use this fork until https://github.com/mailru/easyjson/pull/372 is merged
 replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
+	fortio.org/safecast v1.0.0
 	github.com/ProtonMail/go-crypto v1.1.3
 	github.com/arduino/go-paths-helper v1.12.1
 	github.com/arduino/go-properties-orderedmap v1.8.1
