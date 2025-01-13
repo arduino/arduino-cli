@@ -270,7 +270,7 @@ func (s *arduinoCoreServerImpl) getDebugProperties(req *rpc.GetDebugConfigReques
 	}, nil
 }
 
-// Extract a JSON from a given properies.Map and converts key-indexed arrays
+// Extract a JSON from a given properties.Map and converts key-indexed arrays
 // like:
 //
 //	my.indexed.array.0=first
