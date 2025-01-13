@@ -25,11 +25,11 @@ import (
 	"strings"
 
 	"fortio.org/safecast"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
+	"go.bug.st/f"
 )
 
 var (

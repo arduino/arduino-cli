@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"slices"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/orderedmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 

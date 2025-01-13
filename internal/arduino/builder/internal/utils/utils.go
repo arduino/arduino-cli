@@ -21,9 +21,9 @@ import (
 	"strings"
 	"unicode"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/f"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"

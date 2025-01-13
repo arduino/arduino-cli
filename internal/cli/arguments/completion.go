@@ -18,9 +18,9 @@ package arguments
 import (
 	"context"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"go.bug.st/f"
 )
 
 // GetInstalledBoards is an helper function useful to autocomplete.
