@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"strings"
 
+	"fortio.org/safecast"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -297,8 +298,12 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 		if segment.Address < initialAddress {
 			initialAddress = segment.Address
 		}
-		if segment.Address+uint32(len(segment.Data)) > lastAddress {
-			lastAddress = segment.Address + uint32(len(segment.Data))
+		lenData, err := safecast.Convert[uint32](len(segment.Data))
+		if err != nil {
+			return err
+		}
+		if segment.Address+lenData > lastAddress {
+			lastAddress = segment.Address + lenData
 		}
 	}
 	for _, segment := range memSketch.GetDataSegments() {
@@ -308,8 +313,12 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 		if segment.Address < initialAddress {
 			initialAddress = segment.Address
 		}
-		if segment.Address+uint32(len(segment.Data)) > lastAddress {
-			lastAddress = segment.Address + uint32(len(segment.Data))
+		lenData, err := safecast.Convert[uint32](len(segment.Data))
+		if err != nil {
+			return err
+		}
+		if segment.Address+lenData > lastAddress {
+			lastAddress = segment.Address + lenData
 		}
 	}
 
@@ -323,7 +332,11 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 	// Write out a .bin if the addresses doesn't go too far away from origin
 	// (and consequently produce a very large bin)
 	size := lastAddress - initialAddress
-	if size > uint32(maximumBinSize) {
+	maximumBinSizeUint32, err := safecast.Convert[uint32](maximumBinSize)
+	if err != nil {
+		return nil
+	}
+	if size > maximumBinSizeUint32 {
 		return nil
 	}
 	mergedSketchPathBin := paths.New(strings.TrimSuffix(mergedSketchPath.String(), ".hex") + ".bin")
