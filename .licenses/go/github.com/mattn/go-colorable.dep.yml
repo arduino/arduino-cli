@@ -1,9 +1,9 @@
 ---
 name: github.com/mattn/go-colorable
-version: v0.1.13
+version: v0.1.14
 type: go
-summary: 
-homepage: https://pkg.go.dev/github.com/mattn/go-colorable
+summary:
+homepage: https://godoc.org/github.com/mattn/go-colorable
 license: mit
 licenses:
 - sources: LICENSE
