@@ -1,13 +1,13 @@
 ---
 name: github.com/ProtonMail/go-crypto/openpgp/ecdsa
-version: v1.1.3
+version: v1.1.4
 type: go
 summary: Package ecdsa implements ECDSA signature, suitable for OpenPGP, as specified
   in RFC 6637, section 5.
-homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/ecdsa
+homepage: https://godoc.org/github.com/ProtonMail/go-crypto/openpgp/ecdsa
 license: other
 licenses:
-- sources: go-crypto@v1.1.3/LICENSE
+- sources: go-crypto@v1.1.4/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: go-crypto@v1.1.3/PATENTS
+- sources: go-crypto@v1.1.4/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
