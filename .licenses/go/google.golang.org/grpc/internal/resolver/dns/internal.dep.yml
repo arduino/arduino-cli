@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/resolver/dns/internal
-version: v1.69.2
+version: v1.69.4
 type: go
 summary: Package internal contains functionality internal to the dns resolver package.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/resolver/dns/internal
+homepage: https://godoc.org/google.golang.org/grpc/internal/resolver/dns/internal
 license: apache-2.0
 licenses:
-- sources: grpc@v1.69.2/LICENSE
+- sources: grpc@v1.69.4/LICENSE
   text: |2
 
                                      Apache License

@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/binarylog
-version: v1.69.2
+version: v1.69.4
 type: go
 summary: Package binarylog implementation binary logging as defined in https://github.com/grpc/proposal/blob/master/A16-binary-logging.md.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/binarylog
+homepage: https://godoc.org/google.golang.org/grpc/internal/binarylog
 license: apache-2.0
 licenses:
-- sources: grpc@v1.69.2/LICENSE
+- sources: grpc@v1.69.4/LICENSE
   text: |2
 
                                      Apache License

@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/grpclog
-version: v1.69.2
+version: v1.69.4
 type: go
 summary: Package grpclog defines logging for grpc.
-homepage: https://pkg.go.dev/google.golang.org/grpc/grpclog
+homepage: https://godoc.org/google.golang.org/grpc/grpclog
 license: apache-2.0
 licenses:
-- sources: grpc@v1.69.2/LICENSE
+- sources: grpc@v1.69.4/LICENSE
   text: |2
 
                                      Apache License
