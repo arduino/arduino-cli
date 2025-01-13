@@ -1309,6 +1309,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardidentifyrequest" class="md-nav__link">
+    BoardIdentifyRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardidentifyrequestpropertiesentry" class="md-nav__link">
+    BoardIdentifyRequest.PropertiesEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardidentifyresponse" class="md-nav__link">
+    BoardIdentifyResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#boardlistallrequest" class="md-nav__link">
     BoardListAllRequest
   </a>
@@ -3107,6 +3128,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardidentifyrequest" class="md-nav__link">
+    BoardIdentifyRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardidentifyrequestpropertiesentry" class="md-nav__link">
+    BoardIdentifyRequest.PropertiesEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardidentifyresponse" class="md-nav__link">
+    BoardIdentifyResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#boardlistallrequest" class="md-nav__link">
     BoardListAllRequest
   </a>
@@ -4480,6 +4522,9 @@
     - <a href="#cc.arduino.cli.commands.v1.BoardDetailsResponse">BoardDetailsResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties">BoardIdentificationProperties</a>
     - <a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry">BoardIdentificationProperties.PropertiesEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardIdentifyRequest">BoardIdentifyRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardIdentifyRequest.PropertiesEntry">BoardIdentifyRequest.PropertiesEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardIdentifyResponse">BoardIdentifyResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.BoardListAllRequest">BoardListAllRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.BoardListAllResponse">BoardListAllResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.BoardListItem">BoardListItem</a>
@@ -5639,6 +5684,84 @@ a platform and all its available releases.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.BoardIdentifyRequest"></a></p>
+<h3 id="boardidentifyrequest">BoardIdentifyRequest<a class="headerlink" href="#boardidentifyrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>properties</td>
+<td><a href="#cc.arduino.cli.commands.v1.BoardIdentifyRequest.PropertiesEntry">BoardIdentifyRequest.PropertiesEntry</a></td>
+<td>repeated</td>
+<td>A set of properties to search (can be taken from a Port message).</td>
+</tr>
+<tr>
+<td>use_cloud_api_for_unknown_board_detection</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true, when a board cannot be identified using the installed platforms, the cloud API will be called to detect the board.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.BoardIdentifyRequest.PropertiesEntry"></a></p>
+<h3 id="boardidentifyrequestpropertiesentry">BoardIdentifyRequest.PropertiesEntry<a class="headerlink" href="#boardidentifyrequestpropertiesentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.BoardIdentifyResponse"></a></p>
+<h3 id="boardidentifyresponse">BoardIdentifyResponse<a class="headerlink" href="#boardidentifyresponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boards</td>
+<td><a href="#cc.arduino.cli.commands.v1.BoardListItem">BoardListItem</a></td>
+<td>repeated</td>
+<td>List of matching boards (they may have an FQBN with options set).</td>
 </tr>
 </tbody>
 </table>
@@ -10843,6 +10966,12 @@ Any missing field will be kept at the default value.</p>
 <td><a href="#cc.arduino.cli.commands.v1.BoardSearchRequest">BoardSearchRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.BoardSearchResponse">BoardSearchResponse</a></td>
 <td>Search boards in installed and not installed Platforms.</td>
+</tr>
+<tr>
+<td>BoardIdentify</td>
+<td><a href="#cc.arduino.cli.commands.v1.BoardIdentifyRequest">BoardIdentifyRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.BoardIdentifyResponse">BoardIdentifyResponse</a></td>
+<td>Identify a board using the given properties.</td>
 </tr>
 <tr>
 <td>BoardListWatch</td>
