@@ -47,7 +47,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, checks resources.IntegrityCheckMode) error {
 	pme, release := pm.NewExplorer()
 	defer release()
 
@@ -56,7 +56,7 @@ func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *c
 		return errors.New(i18n.Tr("downloading %[1]s tool: %[2]s", tool, err))
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := pme.InstallTool(tool, taskCB, true); err != nil {
+	if err := pme.InstallTool(tool, taskCB, true, checks); err != nil {
 		return errors.New(i18n.Tr("installing %[1]s tool: %[2]s", tool, err))
 	}
 	return nil
@@ -282,7 +282,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		// Install builtin tools if necessary
 		if len(builtinToolsToInstall) > 0 {
 			for _, toolRelease := range builtinToolsToInstall {
-				if err := installTool(ctx, pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
+				if err := installTool(ctx, pmb.Build(), toolRelease, downloadCallback, taskCallback, resources.IntegrityCheckFull); err != nil {
 					e := &cmderrors.InitFailedError{
 						Code:   codes.Internal,
 						Cause:  err,
@@ -394,7 +394,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 				// Install library
 				taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Installing library %s", libraryRef)})
-				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir); err != nil {
+				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir, resources.IntegrityCheckFull); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
