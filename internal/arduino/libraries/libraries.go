@@ -16,8 +16,11 @@
 package libraries
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
+	"path/filepath"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
@@ -88,6 +91,379 @@ func (library *Library) String() string {
 		return library.Name
 	}
 	return library.Name + "@" + library.Version.String()
+}
+
+func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
+	writeString := func(in string) error {
+		inBytes := []byte(in)
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(inBytes))); err != nil {
+			return err
+		}
+		_, err := out.Write(inBytes)
+		return err
+	}
+	writeStringArray := func(in []string) error {
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+			return err
+		}
+		for _, i := range in {
+			if err := writeString(i); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	writeMap := func(in map[string]bool) error {
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+			return err
+		}
+		for k, v := range in {
+			if err := writeString(k); err != nil {
+				return err
+			}
+			if err := binary.Write(out, binary.NativeEndian, v); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	writeProperties := func(in *properties.Map) error {
+		var keys []string
+		if in != nil {
+			keys = in.Keys()
+		}
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(keys))); err != nil {
+			return err
+		}
+		for _, k := range keys {
+			v := in.Get(k)
+			if err := writeString(k); err != nil {
+				return err
+			}
+			if err := writeString(v); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	writePath := func(in *paths.Path) error {
+		if in == nil {
+			return writeString("")
+		} else if inside, err := in.IsInsideDir(prefix); err != nil {
+			return err
+		} else if !inside {
+			return writeString(in.String())
+		} else if p, err := in.RelFrom(prefix); err != nil {
+			return err
+		} else {
+			return writeString(p.String())
+		}
+	}
+	writePathList := func(in []*paths.Path) error {
+		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+			return err
+		}
+		for _, p := range in {
+			if err := writePath(p); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	if err := writeString(library.Name); err != nil {
+		return err
+	}
+	if err := writeString(library.Author); err != nil {
+		return err
+	}
+	if err := writeString(library.Maintainer); err != nil {
+		return err
+	}
+	if err := writeString(library.Sentence); err != nil {
+		return err
+	}
+	if err := writeString(library.Paragraph); err != nil {
+		return err
+	}
+	if err := writeString(library.Website); err != nil {
+		return err
+	}
+	if err := writeString(library.Category); err != nil {
+		return err
+	}
+	if err := writeStringArray(library.Architectures); err != nil {
+		return err
+	}
+	if err := writeStringArray(library.Types); err != nil {
+		return err
+	}
+	if err := writePath(library.InstallDir); err != nil {
+		return err
+	}
+	if err := writeString(library.DirName); err != nil {
+		return err
+	}
+	if err := writePath(library.SourceDir); err != nil {
+		return err
+	}
+	if err := writePath(library.UtilityDir); err != nil {
+		return err
+	}
+	if err := binary.Write(out, binary.NativeEndian, int32(library.Location)); err != nil {
+		return err
+	}
+	// library.ContainerPlatform      *cores.PlatformRelease `json:""`
+	if err := binary.Write(out, binary.NativeEndian, int32(library.Layout)); err != nil {
+		return err
+	}
+	if err := binary.Write(out, binary.NativeEndian, library.DotALinkage); err != nil {
+		return err
+	}
+	if err := binary.Write(out, binary.NativeEndian, library.Precompiled); err != nil {
+		return err
+	}
+	if err := binary.Write(out, binary.NativeEndian, library.PrecompiledWithSources); err != nil {
+		return err
+	}
+	if err := writeString(library.LDflags); err != nil {
+		return err
+	}
+	if err := binary.Write(out, binary.NativeEndian, library.IsLegacy); err != nil {
+		return err
+	}
+	if err := binary.Write(out, binary.NativeEndian, library.InDevelopment); err != nil {
+		return err
+	}
+	if err := writeString(library.Version.String()); err != nil {
+		return err
+	}
+	if err := writeString(library.License); err != nil {
+		return err
+	}
+	if err := writePathList(library.Examples); err != nil {
+		return err
+	}
+	if err := writeStringArray(library.declaredHeaders); err != nil {
+		return err
+	}
+	if err := writeStringArray(library.sourceHeaders); err != nil {
+		return err
+	}
+	if err := writeMap(library.CompatibleWith); err != nil {
+		return err
+	}
+	if err := writeProperties(library.Properties); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error {
+	readString := func() (string, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return "", err
+		}
+		res := make([]byte, len)
+		if _, err := in.Read(res); err != nil {
+			return "", err
+		}
+		return string(res), nil
+	}
+	readStringArray := func() ([]string, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		if len == 0 {
+			return nil, nil
+		}
+		res := make([]string, len)
+		for i := range res {
+			var err error
+			res[i], err = readString()
+			if err != nil {
+				return nil, err
+			}
+		}
+		return res, nil
+	}
+	readMap := func() (map[string]bool, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		res := map[string]bool{}
+		for range len {
+			k, err := readString()
+			if err != nil {
+				return nil, err
+			}
+			var v bool
+			if err := binary.Read(in, binary.NativeEndian, &v); err != nil {
+				return nil, err
+			}
+			res[k] = v
+		}
+		return res, nil
+	}
+	readPath := func() (*paths.Path, error) {
+		if p, err := readString(); err != nil {
+			return nil, err
+		} else if p == "" {
+			return nil, nil
+		} else if filepath.IsAbs(p) {
+			return paths.New(p), nil
+		} else {
+			return prefix.Join(p), nil
+		}
+	}
+	readPathList := func() (paths.PathList, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		list := paths.NewPathList()
+		for range len {
+			if p, err := readPath(); err != nil {
+				return nil, err
+			} else {
+				list.Add(p)
+			}
+		}
+		return list, nil
+	}
+	readProperties := func() (*properties.Map, error) {
+		var len uint16
+		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+			return nil, err
+		}
+		props := properties.NewMap()
+		for range len {
+			if k, err := readString(); err != nil {
+				return nil, err
+			} else if v, err := readString(); err != nil {
+				return nil, err
+			} else {
+				props.Set(k, v)
+			}
+		}
+		return props, nil
+	}
+	var err error
+	library.Name, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Author, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Maintainer, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Sentence, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Paragraph, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Website, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Category, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Architectures, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.Types, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.InstallDir, err = readPath()
+	if err != nil {
+		return err
+	}
+	library.DirName, err = readString()
+	if err != nil {
+		return err
+	}
+	library.SourceDir, err = readPath()
+	if err != nil {
+		return err
+	}
+	library.UtilityDir, err = readPath()
+	if err != nil {
+		return err
+	}
+	var location int32
+	if err := binary.Read(in, binary.NativeEndian, &location); err != nil {
+		return err
+	}
+	library.Location = LibraryLocation(location)
+	// library.ContainerPlatform      *cores.PlatformRelease `json:""`
+	var layout int32
+	if err := binary.Read(in, binary.NativeEndian, &layout); err != nil {
+		return err
+	}
+	library.Layout = LibraryLayout(layout)
+	if err := binary.Read(in, binary.NativeEndian, &library.DotALinkage); err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.Precompiled); err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.PrecompiledWithSources); err != nil {
+		return err
+	}
+	library.LDflags, err = readString()
+	if err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.IsLegacy); err != nil {
+		return err
+	}
+	if err := binary.Read(in, binary.NativeEndian, &library.InDevelopment); err != nil {
+		return err
+	}
+	version, err := readString()
+	if err != nil {
+		return err
+	}
+	library.Version = semver.MustParse(version)
+	library.License, err = readString()
+	if err != nil {
+		return err
+	}
+	library.Examples, err = readPathList()
+	if err != nil {
+		return err
+	}
+	library.declaredHeaders, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.sourceHeaders, err = readStringArray()
+	if err != nil {
+		return err
+	}
+	library.CompatibleWith, err = readMap()
+	if err != nil {
+		return err
+	}
+	library.Properties, err = readProperties()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // ToRPCLibrary converts this library into an rpc.Library
