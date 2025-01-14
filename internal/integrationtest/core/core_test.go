@@ -1366,3 +1366,30 @@ func TestCoreInstallWithWrongArchiveSize(t *testing.T) {
 	_, _, err = cli.Run("--additional-urls", "https://raw.githubusercontent.com/geolink/opentracker-arduino-board/bf6158ebab0402db217bfb02ea61461ddc6f2940/package_opentracker_index.json", "core", "install", "opentracker:sam@1.0.5")
 	require.NoError(t, err)
 }
+
+func TestCoreOverrideIfInstalledInSketchbook(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install avr@1.8.5
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.5")
+	require.NoError(t, err)
+
+	// Copy it in the sketchbook hardware folder (simulate a user installed core)
+	// avrCore := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5")
+	// avrCoreCopy := cli.SketchbookDir().Join("hardware", "arduino", "avr")
+	// require.NoError(t, avrCoreCopy.Parent().MkdirAll())
+	// require.NoError(t, avrCore.CopyDirTo(avrCoreCopy))
+
+	// Install avr@1.8.6
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	// List cores and check that version 1.8.5 is listed
+	stdout, _, err := cli.Run("core", "list", "--json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.platforms.[] | select(.id=="arduino:avr") | .installed_version`, `"1.8.5"`)
+}

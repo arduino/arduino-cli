@@ -77,7 +77,7 @@ func platformUninstall(_ context.Context, req *rpc.PlatformUninstallRequest, tas
 		if platform == nil {
 			return &cmderrors.PlatformNotFoundError{Platform: ref.String()}
 		}
-		platformRelease := pme.GetInstalledPlatformRelease(platform)
+		platformRelease := pme.GetBestInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			return &cmderrors.PlatformNotFoundError{Platform: ref.String()}
 		}

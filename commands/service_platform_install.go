@@ -76,17 +76,20 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 			PlatformArchitecture: req.GetArchitecture(),
 			PlatformVersion:      version,
 		}
+		fmt.Println(ref)
 		platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
 		if err != nil {
 			return &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 		}
 
 		// Prerequisite checks before install
+		fmt.Println("A")
 		if platformRelease.IsInstalled() {
 			taskCB(&rpc.TaskProgress{Name: i18n.Tr("Platform %s already installed", platformRelease), Completed: true})
 			return nil
 		}
 
+		fmt.Println("B")
 		if req.GetNoOverwrite() {
 			if installed := pme.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
 				return fmt.Errorf("%s: %s",

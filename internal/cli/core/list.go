@@ -76,7 +76,7 @@ func GetList(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 
 	result := []*rpc.PlatformSummary{}
 	for _, platform := range platforms.GetSearchOutput() {
-		if platform.GetInstalledVersion() == "" && !platform.GetMetadata().GetManuallyInstalled() {
+		if platform.GetInstalledVersion() == "" && !platform.GetHasManuallyInstalledRelease() {
 			continue
 		}
 		if updatableOnly && platform.GetInstalledVersion() == platform.GetLatestVersion() {
@@ -117,10 +117,12 @@ func (ir coreListResult) String() string {
 	t.SetHeader(i18n.Tr("ID"), i18n.Tr("Installed"), i18n.Tr("Latest"), i18n.Tr("Name"))
 	for _, platform := range ir.Platforms {
 		latestVersion := platform.LatestVersion.String()
-		if latestVersion == "" {
-			latestVersion = "n/a"
+		if platform.HasManuallyInstalledRelease {
+			t.AddRow(platform.Id, i18n.Tr("(in sketchbook)"), "", platform.GetPlatformName())
 		}
-		t.AddRow(platform.Id, platform.InstalledVersion, latestVersion, platform.GetPlatformName())
+		if !platform.HasManuallyInstalledRelease || platform.InstalledVersion.String() != "" {
+			t.AddRow(platform.Id, platform.InstalledVersion, latestVersion, platform.GetPlatformName())
+		}
 	}
 
 	return t.Render()

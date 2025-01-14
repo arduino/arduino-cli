@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"cmp"
 	"errors"
 	"net/url"
 	"os"
@@ -229,6 +230,17 @@ func (pme *Explorer) GetPackages() cores.Packages {
 	return pme.packages
 }
 
+func (pme *Explorer) AllPackages() []*cores.Package {
+	packages := make([]*cores.Package, 0, len(pme.packages))
+	for _, p := range pme.packages {
+		packages = append(packages, p)
+	}
+	slices.SortFunc(packages, func(i, j *cores.Package) int {
+		return cmp.Compare(i.String(), j.String())
+	})
+	return packages
+}
+
 // GetCustomGlobalProperties returns the user defined custom global
 // properties for installed platforms.
 func (pme *Explorer) GetCustomGlobalProperties() *properties.Map {
@@ -302,7 +314,7 @@ func (pme *Explorer) ResolveFQBN(fqbn *fqbn.FQBN) (
 		return targetPackage, nil, nil, nil, nil,
 			errors.New(i18n.Tr("unknown platform %s:%s", targetPackage, fqbn.Architecture))
 	}
-	boardPlatformRelease := pme.GetInstalledPlatformRelease(platform)
+	boardPlatformRelease := pme.GetBestInstalledPlatformRelease(platform)
 	if boardPlatformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
 			errors.New(i18n.Tr("platform %s is not installed", platform))
@@ -433,7 +445,7 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 			return "", nil, "", nil,
 				errors.New(i18n.Tr("missing platform %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.Architecture, fqbn))
 		}
-		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
+		referredPlatformRelease = pme.GetBestInstalledPlatformRelease(referredPlatform)
 		if referredPlatformRelease == nil {
 			return "", nil, "", nil,
 				errors.New(i18n.Tr("missing platform release %[1]s:%[2]s referenced by board %[3]s", referredPackageName, fqbn.Architecture, fqbn))
@@ -592,8 +604,20 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 	return tr.release, nil
 }
 
-// GetInstalledPlatformRelease returns the PlatformRelease installed (it is chosen)
+// GetInstalledPlatformRelease return the PlatformRelease installed through the package manager
+// or nil if the PlatformRelease is not installed. Platforms installed manually are ignored.
 func (pme *Explorer) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
+	for _, release := range platform.GetAllInstalled() {
+		if release.IsInstalled() && pme.IsManagedPlatformRelease(release) {
+			return release
+		}
+	}
+	return nil
+}
+
+// GetBestInstalledPlatformRelease returns the PlatformRelease installed (it is chosen between
+// the platform installed through the package manager and the one installed manually)
+func (pme *Explorer) GetBestInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
 	releases := platform.GetAllInstalled()
 	if len(releases) == 0 {
 		return nil
