@@ -22,10 +22,10 @@ import (
 	"reflect"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/go-configmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"go.bug.st/f"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )

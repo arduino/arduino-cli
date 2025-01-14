@@ -18,9 +18,9 @@ package builder
 import (
 	"strings"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
+	"go.bug.st/f"
 )
 
 // link fixdoc

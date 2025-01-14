@@ -22,12 +22,12 @@ import (
 	"os"
 	"strings"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
+	"go.bug.st/f"
 )
 
 // buildCore fixdoc

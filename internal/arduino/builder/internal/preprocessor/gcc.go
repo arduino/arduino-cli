@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"strings"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 )
 
 // GCC performs a run of the gcc preprocess (macro/includes expansion). The function outputs the result
