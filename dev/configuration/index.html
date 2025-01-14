@@ -1569,6 +1569,8 @@
 <ul>
 <li><code>board_manager</code><ul>
 <li><code>additional_urls</code> - the URLs to any additional Boards Manager package index files needed for your boards platforms.</li>
+<li><code>enable_unsafe_install</code> - set to <code>true</code> to allow installation of packages that do not pass the checksum test. This
+  is considered an unsafe installation method and should be used only for development purposes.</li>
 </ul>
 </li>
 <li><code>daemon</code> - options related to running Arduino CLI as a <a href="https://grpc.io">gRPC</a> server.<ul>
