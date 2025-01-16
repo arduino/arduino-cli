@@ -67,6 +67,24 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	var userAgent string
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		userAgent = strings.Join(md.Get("user-agent"), " ")
+		if userAgent != "" {
+			// s.SettingsGetValue() returns an error if the key does not exist and for this reason we are accessing
+			// network.user_agent_ext directly from s.settings.ExtraUserAgent() to set it
+			if s.settings.ExtraUserAgent() == "" {
+				if strings.Contains(userAgent, "arduino-ide/2") {
+					// needed for analytics purposes
+					userAgent = userAgent + " daemon"
+				}
+				_, err := s.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
+					Key:          "network.user_agent_ext",
+					ValueFormat:  "cli",
+					EncodedValue: userAgent,
+				})
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 	}
 
 	// Setup downloads directory
