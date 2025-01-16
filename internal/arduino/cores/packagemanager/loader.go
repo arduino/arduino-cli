@@ -65,8 +65,12 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 	// If the hardware directory is inside, or equals, the sketchbook/hardware directory
 	// it's not a managed package, otherwise it is.
 	managed := true
-	if userInstalled, err := path.IsInsideDir(pm.userPackagesDir.Parent()); err == nil && userInstalled {
-		managed = false
+	if pm.userPackagesDir != nil {
+		if path.EquivalentTo(pm.userPackagesDir) {
+			managed = false
+		} else if userInstalled, err := path.IsInsideDir(pm.userPackagesDir); err == nil && userInstalled {
+			managed = false
+		}
 	}
 
 	// Scan subdirs
