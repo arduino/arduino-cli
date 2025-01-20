@@ -944,3 +944,18 @@ func TestI18N(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(out), "Available Commands")
 }
+
+func TestCoreUpdateWithInvalidIndexURL(t *testing.T) {
+	// https://github.com/arduino/arduino-cli/issues/2786
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	t.Cleanup(env.CleanUp)
+
+	_, _, err := cli.Run("config", "init")
+	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "board_manager.additional_urls", "foo=https://espressif.github.io/arduino-esp32/package_esp32_index.json")
+	require.NoError(t, err)
+	_, stdErr, err := cli.Run("core", "update-index")
+	require.Error(t, err)
+	require.Contains(t, string(stdErr), `Error initializing instance: Some indexes could not be updated.`)
+	require.Contains(t, string(stdErr), `Invalid additional URL: parse "foo=https://espressif.github.io/arduino-esp32/package_esp32_index.json"`)
+}

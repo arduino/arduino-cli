@@ -534,9 +534,9 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		return &cmderrors.InvalidInstanceError{}
 	}
 
-	report := func(indexURL *url.URL, status rpc.IndexUpdateReport_Status) *rpc.IndexUpdateReport {
+	report := func(indexURL string, status rpc.IndexUpdateReport_Status) *rpc.IndexUpdateReport {
 		return &rpc.IndexUpdateReport{
-			IndexUrl: indexURL.String(),
+			IndexUrl: indexURL,
 			Status:   status,
 		}
 	}
@@ -564,7 +564,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", u))
 			downloadCB.End(false, msg)
 			failed = true
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 
@@ -582,9 +582,9 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 				downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 				downloadCB.End(false, msg)
 				failed = true
-				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 			} else {
-				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_SKIPPED))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_SKIPPED))
 			}
 			continue
 		}
@@ -596,14 +596,14 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, i18n.Tr("Invalid index URL: %s", err))
 			failed = true
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 		indexFile := indexpath.Join(indexFileName)
 		if info, err := indexFile.Stat(); err == nil {
 			ageSecs := int64(time.Since(info.ModTime()).Seconds())
 			if ageSecs < req.GetUpdateIfOlderThanSecs() {
-				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
 				continue
 			}
 		}
@@ -622,9 +622,9 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		}
 		if err := indexResource.Download(stream.Context(), indexpath, downloadCB, config); err != nil {
 			failed = true
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 		} else {
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_UPDATED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_UPDATED))
 		}
 	}
 	syncSend.Send(&rpc.UpdateIndexResponse{
