@@ -300,17 +300,17 @@ func TestBoardDetails(t *testing.T) {
 		  "package": {
 			"maintainer": "Arduino",
 			"url": "https://downloads.arduino.cc/packages/package_index.tar.bz2",
-			"website_url": "http://www.arduino.cc/",
+			"website_url": "https://www.arduino.cc/",
 			"email": "packages@arduino.cc",
 			"name": "arduino",
 			"help": {
-			  "online": "http://www.arduino.cc/en/Reference/HomePage"
+			  "online": "https://www.arduino.cc/en/Reference/HomePage"
 			}
 		  },
 		  "platform": {
 			"architecture": "samd",
 			"category": "Arduino",
-			"url": "http://downloads.arduino.cc/cores/core-ArduinoCore-samd-1.8.13.tar.bz2",
+			"url": "https://downloads.arduino.cc/cores/core-ArduinoCore-samd-1.8.13.tar.bz2",
 			"archive_filename": "core-ArduinoCore-samd-1.8.13.tar.bz2",
 			"checksum": "SHA-256:47d44c80a5fd4ea224eb64fd676169e896caa6856f338d78feb4a12d42b4ea67",
 			"size": 3074191,
@@ -319,8 +319,8 @@ func TestBoardDetails(t *testing.T) {
 		  "programmers": [
 			{
 			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
-			  "id": "jlink",
-			  "name": "Segger J-Link"
+			  "id": "atmel_ice",
+			  "name": "Atmel-ICE"
 			},
 			{
 			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
@@ -329,8 +329,8 @@ func TestBoardDetails(t *testing.T) {
 			},
 			{
 			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
-			  "id": "atmel_ice",
-			  "name": "Atmel-ICE"
+			  "id": "jlink",
+			  "name": "Segger J-Link"
 			},
 			{
 			  "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
