@@ -24,6 +24,7 @@ import (
 	"strconv"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
@@ -78,7 +79,7 @@ func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 	if err != nil {
 		return nil, errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 	}
-	if b.logger.Verbose() {
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 	}
 	out := &bytes.Buffer{}
@@ -215,7 +216,7 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
-	if b.logger.Verbose() {
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 	}
 	commandStdout := &bytes.Buffer{}

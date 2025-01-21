@@ -17,6 +17,7 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -26,10 +27,11 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	result, err := preprocessor.PreprocessSketchWithCtags(
 		b.ctx,
 		b.sketch, b.buildPath, includes, b.lineOffset,
-		b.buildProperties, b.onlyUpdateCompilationDatabase, b.logger.Verbose(),
+		b.buildProperties, b.onlyUpdateCompilationDatabase,
+		b.logger.VerbosityLevel() == logger.VerbosityVerbose,
 	)
 	if result != nil {
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.WriteStdout(result.Stdout())
 		}
 		b.logger.WriteStderr(result.Stderr())

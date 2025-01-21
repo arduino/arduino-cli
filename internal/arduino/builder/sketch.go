@@ -26,6 +26,7 @@ import (
 
 	"fortio.org/safecast"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
@@ -240,7 +241,7 @@ func (b *Builder) mergeSketchWithBootloader() error {
 
 	bootloaderPath := b.buildProperties.GetPath("runtime.platform.path").Join("bootloaders", bootloader)
 	if bootloaderPath.NotExist() {
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Warn(i18n.Tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
 		}
 		return nil
@@ -255,7 +256,7 @@ func (b *Builder) mergeSketchWithBootloader() error {
 		maximumBinSize *= 2
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
-	if err != nil && b.logger.Verbose() {
+	if err != nil && b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(err.Error())
 	}
 

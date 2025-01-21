@@ -27,9 +27,9 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/detector"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/progress"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
@@ -136,7 +136,7 @@ func NewBuilder(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
 	libraryDirs paths.PathList,
-	stdout, stderr io.Writer, verbose bool, warningsLevel string,
+	stdout, stderr io.Writer, verbosity logger.Verbosity, warningsLevel string,
 	progresCB rpc.TaskProgressCB,
 	toolEnv []string,
 ) (*Builder, error) {
@@ -189,7 +189,7 @@ func NewBuilder(
 		return nil, ErrSketchCannotBeLocatedInBuildPath
 	}
 
-	logger := logger.New(stdout, stderr, verbose, warningsLevel)
+	log := logger.New(stdout, stderr, verbosity, warningsLevel)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, librariesManager,
 		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
@@ -198,8 +198,8 @@ func NewBuilder(
 	if err != nil {
 		return nil, err
 	}
-	if logger.Verbose() {
-		logger.Warn(string(verboseOut))
+	if log.VerbosityLevel() == logger.VerbosityVerbose {
+		log.Warn(string(verboseOut))
 	}
 
 	diagnosticStore := diagnostics.NewStore()
@@ -215,7 +215,7 @@ func NewBuilder(
 		customBuildProperties:         customBuildPropertiesArgs,
 		coreBuildCachePath:            coreBuildCachePath,
 		extraCoreBuildCachePaths:      extraCoreBuildCachePaths,
-		logger:                        logger,
+		logger:                        log,
 		clean:                         clean,
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
@@ -242,7 +242,7 @@ func NewBuilder(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
 			onlyUpdateCompilationDatabase,
-			logger,
+			log,
 			diagnosticStore,
 		),
 	}
@@ -341,7 +341,7 @@ func (b *Builder) preprocess() error {
 }
 
 func (b *Builder) logIfVerbose(warn bool, msg string) {
-	if !b.logger.Verbose() {
+	if b.logger.VerbosityLevel() != logger.VerbosityVerbose {
 		return
 	}
 	if warn {
@@ -526,7 +526,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 }
 
 func (b *Builder) execCommand(command *paths.Process) error {
-	if b.logger.Verbose() {
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 		command.RedirectStdoutTo(b.logger.Stdout())
 	}
