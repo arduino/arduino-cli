@@ -246,6 +246,9 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		})
 	}
 	var verbosity logger.Verbosity = logger.VerbosityNormal
+	if req.GetQuiet() {
+		verbosity = logger.VerbosityQuiet
+	}
 	if req.GetVerbose() {
 		verbosity = logger.VerbosityVerbose
 	}
