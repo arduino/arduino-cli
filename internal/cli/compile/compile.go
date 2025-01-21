@@ -372,7 +372,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		ProfileOut:         profileOut,
 		Success:            compileError == nil,
 		showPropertiesMode: showProperties,
-		hideStats:          preprocess,
+		hideStats:          preprocess || quiet,
 	}
 
 	if compileError != nil {
