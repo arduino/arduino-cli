@@ -55,7 +55,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 
 	settings := configuration.NewSettings()
 	settings.Set("network.user_agent_ext", goldUserAgentValue)
-	config, err := settings.DownloaderConfig()
+	config, err := settings.DownloaderConfig(context.Background())
 	require.NoError(t, err)
 	err = r.Download(context.Background(), tmp, config, "", func(progress *rpc.DownloadProgress) {}, "")
 	require.NoError(t, err)

@@ -16,18 +16,21 @@
 package configuration
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/version"
 	"go.bug.st/downloader/v2"
+	"google.golang.org/grpc/metadata"
 )
 
 // UserAgent returns the user agent (mainly used by HTTP clients)
@@ -84,17 +87,23 @@ func (settings *Settings) NetworkProxy() (*url.URL, error) {
 }
 
 // NewHttpClient returns a new http client for use in the arduino-cli
-func (settings *Settings) NewHttpClient() (*http.Client, error) {
+func (settings *Settings) NewHttpClient(ctx context.Context) (*http.Client, error) {
 	proxy, err := settings.NetworkProxy()
 	if err != nil {
 		return nil, err
+	}
+	userAgent := settings.UserAgent()
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if extraUserAgent := strings.Join(md.Get("user-agent"), " "); extraUserAgent != "" {
+			userAgent += " " + extraUserAgent
+		}
 	}
 	return &http.Client{
 		Transport: &httpClientRoundTripper{
 			transport: &http.Transport{
 				Proxy: http.ProxyURL(proxy),
 			},
-			userAgent: settings.UserAgent(),
+			userAgent: userAgent,
 		},
 		Timeout: settings.ConnectionTimeout(),
 	}, nil
@@ -111,8 +120,8 @@ func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, e
 }
 
 // DownloaderConfig returns the downloader configuration based on current settings.
-func (settings *Settings) DownloaderConfig() (downloader.Config, error) {
-	httpClient, err := settings.NewHttpClient()
+func (settings *Settings) DownloaderConfig(ctx context.Context) (downloader.Config, error) {
+	httpClient, err := settings.NewHttpClient(ctx)
 	if err != nil {
 		return downloader.Config{}, &cmderrors.InvalidArgumentError{
 			Message: i18n.Tr("Could not connect via HTTP"),

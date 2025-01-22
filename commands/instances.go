@@ -43,7 +43,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -64,29 +63,6 @@ func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *c
 
 // Create a new Instance ready to be initialized, supporting directories are also created.
 func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
-	var userAgent string
-	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		userAgent = strings.Join(md.Get("user-agent"), " ")
-		if userAgent != "" {
-			// s.SettingsGetValue() returns an error if the key does not exist and for this reason we are accessing
-			// network.user_agent_ext directly from s.settings.ExtraUserAgent() to set it
-			if s.settings.ExtraUserAgent() == "" {
-				if strings.Contains(userAgent, "arduino-ide/2") {
-					// needed for analytics purposes
-					userAgent = userAgent + " daemon"
-				}
-				_, err := s.SettingsSetValue(ctx, &rpc.SettingsSetValueRequest{
-					Key:          "network.user_agent_ext",
-					ValueFormat:  "cli",
-					EncodedValue: userAgent,
-				})
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-	}
-
 	// Setup downloads directory
 	downloadsDir := s.settings.DownloadsDir()
 	if downloadsDir.NotExist() {
@@ -107,11 +83,11 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 		}
 	}
 
-	config, err := s.settings.DownloaderConfig()
+	config, err := s.settings.DownloaderConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	inst, err := instances.Create(dataDir, packagesDir, userPackagesDir, downloadsDir, userAgent, config)
+	inst, err := instances.Create(dataDir, packagesDir, userPackagesDir, downloadsDir, "", config)
 	if err != nil {
 		return nil, err
 	}
@@ -395,7 +371,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					responseError(err.GRPCStatus())
 					continue
 				}
-				config, err := s.settings.DownloaderConfig()
+				config, err := s.settings.DownloaderConfig(ctx)
 				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
@@ -516,7 +492,7 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	}
 
 	// Perform index update
-	config, err := s.settings.DownloaderConfig()
+	config, err := s.settings.DownloaderConfig(stream.Context())
 	if err != nil {
 		return err
 	}
@@ -626,7 +602,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			}
 		}
 
-		config, err := s.settings.DownloaderConfig()
+		config, err := s.settings.DownloaderConfig(stream.Context())
 		if err != nil {
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, i18n.Tr("Invalid network configuration: %s", err))

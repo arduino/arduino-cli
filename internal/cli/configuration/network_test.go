@@ -16,6 +16,7 @@
 package configuration_test
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,7 @@ func TestUserAgentHeader(t *testing.T) {
 
 	settings := configuration.NewSettings()
 	require.NoError(t, settings.Set("network.user_agent_ext", "test-user-agent"))
-	client, err := settings.NewHttpClient()
+	client, err := settings.NewHttpClient(context.Background())
 	require.NoError(t, err)
 
 	request, err := http.NewRequest("GET", ts.URL, nil)
@@ -59,7 +60,7 @@ func TestProxy(t *testing.T) {
 
 	settings := configuration.NewSettings()
 	settings.Set("network.proxy", ts.URL)
-	client, err := settings.NewHttpClient()
+	client, err := settings.NewHttpClient(context.Background())
 	require.NoError(t, err)
 
 	request, err := http.NewRequest("GET", "http://arduino.cc", nil)
@@ -83,7 +84,7 @@ func TestConnectionTimeout(t *testing.T) {
 		if timeout != 0 {
 			require.NoError(t, settings.Set("network.connection_timeout", "2s"))
 		}
-		client, err := settings.NewHttpClient()
+		client, err := settings.NewHttpClient(context.Background())
 		require.NoError(t, err)
 
 		request, err := http.NewRequest("GET", "http://arduino.cc", nil)

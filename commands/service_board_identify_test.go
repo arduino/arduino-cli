@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -48,7 +49,7 @@ func TestGetByVidPid(t *testing.T) {
 
 	vidPidURL = ts.URL
 	settings := configuration.NewSettings()
-	res, err := apiByVidPid("0xf420", "0XF069", settings)
+	res, err := apiByVidPid(context.Background(), "0xf420", "0XF069", settings)
 	require.Nil(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].GetName())
@@ -56,7 +57,7 @@ func TestGetByVidPid(t *testing.T) {
 
 	// wrong vid (too long), wrong pid (not an hex value)
 
-	_, err = apiByVidPid("0xfffff", "0xDEFG", settings)
+	_, err = apiByVidPid(context.Background(), "0xfffff", "0xDEFG", settings)
 	require.NotNil(t, err)
 }
 
@@ -69,7 +70,7 @@ func TestGetByVidPidNotFound(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069", settings)
+	res, err := apiByVidPid(context.Background(), "0x0420", "0x0069", settings)
 	require.NoError(t, err)
 	require.Empty(t, res)
 }
@@ -84,7 +85,7 @@ func TestGetByVidPid5xx(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069", settings)
+	res, err := apiByVidPid(context.Background(), "0x0420", "0x0069", settings)
 	require.NotNil(t, err)
 	require.Equal(t, "the server responded with status 500 Internal Server Error", err.Error())
 	require.Len(t, res, 0)
@@ -99,7 +100,7 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069", settings)
+	res, err := apiByVidPid(context.Background(), "0x0420", "0x0069", settings)
 	require.NotNil(t, err)
 	require.Equal(t, "wrong format in server response", err.Error())
 	require.Len(t, res, 0)
@@ -107,7 +108,7 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 	settings := configuration.NewSettings()
-	items, err := identifyViaCloudAPI(properties.NewMap(), settings)
+	items, err := identifyViaCloudAPI(context.Background(), properties.NewMap(), settings)
 	require.NoError(t, err)
 	require.Empty(t, items)
 }
@@ -156,7 +157,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	defer release()
 
 	settings := configuration.NewSettings()
-	res, err := identify(pme, idPrefs, settings, true)
+	res, err := identify(context.Background(), pme, idPrefs, settings, true)
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)
