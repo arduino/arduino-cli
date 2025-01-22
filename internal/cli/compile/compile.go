@@ -362,6 +362,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	}
 
 	stdIO := stdIORes()
+	successful := (compileError == nil)
 	res := &compileResult{
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
@@ -370,9 +371,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			UpdatedUploadPort: result.NewPort(uploadRes.GetUpdatedUploadPort()),
 		},
 		ProfileOut:         profileOut,
-		Success:            compileError == nil,
+		Success:            successful,
 		showPropertiesMode: showProperties,
-		hideStats:          preprocess || quiet,
+		hideStats:          preprocess || quiet || (!verbose && successful),
 	}
 
 	if compileError != nil {
