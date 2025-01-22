@@ -123,6 +123,13 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 // It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
 // The Environment must be disposed by calling the CleanUp method via defer.
 func CreateEnvForDaemon(t *testing.T) (*Environment, *ArduinoCLI) {
+	return CreateEnvForDaemonWithUserAgent(t, "cli-test/0.0.0")
+}
+
+// CreateEnvForDaemonWithUserAgent performs the minimum required operations to start the arduino-cli daemon.
+// It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
+// The Environment must be disposed by calling the CleanUp method via defer.
+func CreateEnvForDaemonWithUserAgent(t *testing.T, userAgent string) (*Environment, *ArduinoCLI) {
 	env := NewEnvironment(t)
 
 	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
@@ -130,7 +137,7 @@ func CreateEnvForDaemon(t *testing.T) (*Environment, *ArduinoCLI) {
 		UseSharedStagingFolder: true,
 	})
 
-	_ = cli.StartDaemon(false)
+	_ = cli.StartDaemon(false, userAgent)
 	return env, cli
 }
 
@@ -410,7 +417,7 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 }
 
 // StartDaemon starts the Arduino CLI daemon. It returns the address of the daemon.
-func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
+func (cli *ArduinoCLI) StartDaemon(verbose bool, userAgent string) string {
 	args := []string{"daemon", "--json"}
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
@@ -450,7 +457,11 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	for retries := 5; retries > 0; retries-- {
 		time.Sleep(time.Second)
 
-		conn, err := grpc.NewClient(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(
+			cli.daemonAddr,
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithUserAgent(userAgent),
+		)
 		if err != nil {
 			connErr = err
 			continue

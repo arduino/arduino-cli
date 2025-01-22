@@ -33,7 +33,10 @@ func (env *Environment) HTTPServeFile(port uint16, path *paths.Path, isDaemon bo
 		http.ServeFile(w, r, path.String())
 		if isDaemon {
 			// Test that the user-agent contains metadata from the context when the CLI is in daemon mode
-			require.Contains(t, r.Header.Get("User-Agent"), "arduino-cli/git-snapshot grpc-go")
+			userAgent := r.Header.Get("User-Agent")
+			require.Contains(t, userAgent, "arduino-cli/git-snapshot")
+			require.Contains(t, userAgent, "cli-test/0.0.0")
+			require.Contains(t, userAgent, "grpc-go")
 		}
 	})
 	server := &http.Server{
