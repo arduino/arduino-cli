@@ -26,17 +26,21 @@ import (
 
 // HTTPServeFile spawn an http server that serve a single file. The server
 // is started on the given port. The URL to the file and a cleanup function are returned.
-func (env *Environment) HTTPServeFile(port uint16, path *paths.Path) *url.URL {
+func (env *Environment) HTTPServeFile(port uint16, path *paths.Path, isDaemon bool) *url.URL {
+	t := env.T()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/"+path.Base(), func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, path.String())
+		if isDaemon {
+			// Test that the user-agent contains metadata from the context when the CLI is in daemon mode
+			require.Contains(t, r.Header.Get("User-Agent"), "arduino-cli/git-snapshot grpc-go")
+		}
 	})
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
 	}
 
-	t := env.T()
 	fileURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d/%s", port, path.Base()))
 	require.NoError(t, err)
 

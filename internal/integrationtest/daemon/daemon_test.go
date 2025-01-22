@@ -555,6 +555,34 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 	})
 }
 
+func TestDaemonUserAgent(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	defer env.CleanUp()
+
+	// Set up an http server to serve our custom index file
+	// The user-agent is tested inside the HTTPServeFile function
+	test_index := paths.New("..", "testdata", "test_index.json")
+	url := env.HTTPServeFile(8000, test_index, true)
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	// Set extra indexes
+	err := cli.SetValue("board_manager.additional_urls", `["http://127.0.0.1:8000/test_index.json"]`)
+	require.NoError(t, err)
+
+	{
+		cl, err := grpcInst.UpdateIndex(context.Background(), false)
+		require.NoError(t, err)
+		res, err := analyzeUpdateIndexClient(t, cl)
+		require.NoError(t, err)
+		require.Len(t, res, 2)
+		require.True(t, res[url.String()].GetSuccess())
+	}
+}
+
 func analyzeUpdateIndexClient(t *testing.T, cl commands.ArduinoCoreService_UpdateIndexClient) (map[string]*commands.DownloadProgressEnd, error) {
 	analyzer := NewDownloadProgressAnalyzer(t)
 	for {

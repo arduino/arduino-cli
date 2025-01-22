@@ -69,7 +69,7 @@ func TestCoreSearch(t *testing.T) {
 
 	// Set up an http server to serve our custom index file
 	test_index := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, test_index)
+	url := env.HTTPServeFile(8000, test_index, false)
 
 	// Run update-index with our test index
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -161,7 +161,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 
 	// Set up an http server to serve our custom index file
 	testIndex := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, testIndex)
+	url := env.HTTPServeFile(8000, testIndex, false)
 
 	// update custom index and install test core (installed cores affect `core search`)
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -749,7 +749,7 @@ func TestCoreSearchSortedResults(t *testing.T) {
 
 	// Set up the server to serve our custom index file
 	testIndex := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, testIndex)
+	url := env.HTTPServeFile(8000, testIndex, false)
 
 	// update custom index
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -821,7 +821,7 @@ func TestCoreListSortedResults(t *testing.T) {
 
 	// Set up the server to serve our custom index file
 	testIndex := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, testIndex)
+	url := env.HTTPServeFile(8000, testIndex, false)
 
 	// update custom index
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -892,7 +892,7 @@ func TestCoreListDeprecatedPlatformWithInstalledJson(t *testing.T) {
 
 	// Set up the server to serve our custom index file
 	testIndex := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, testIndex)
+	url := env.HTTPServeFile(8000, testIndex, false)
 
 	// update custom index
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -1110,8 +1110,8 @@ func TestCoreInstallRunsToolPostInstallScript(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	url := env.HTTPServeFile(8080, paths.New("testdata", "package_with_postinstall_index.json"))
-	env.HTTPServeFile(8081, paths.New("testdata", "core_with_postinst.zip"))
+	url := env.HTTPServeFile(8080, paths.New("testdata", "package_with_postinstall_index.json"), false)
+	env.HTTPServeFile(8081, paths.New("testdata", "core_with_postinst.zip"), false)
 
 	_, _, err := cli.Run("core", "update-index", "--additional-urls", url.String())
 	require.NoError(t, err)
@@ -1129,7 +1129,7 @@ func TestCoreBrokenDependency(t *testing.T) {
 
 	// Set up an http server to serve our custom index file
 	test_index := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, test_index)
+	url := env.HTTPServeFile(8000, test_index, false)
 
 	// Run update-index with our test index
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -1145,7 +1145,7 @@ func TestCoreUpgradeWarningWithPackageInstalledButNotIndexed(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	url := env.HTTPServeFile(8000, paths.New("..", "testdata", "test_index.json")).String()
+	url := env.HTTPServeFile(8000, paths.New("..", "testdata", "test_index.json"), false).String()
 
 	t.Run("missing additional-urls", func(t *testing.T) {
 		// update index
@@ -1187,7 +1187,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	url := env.HTTPServeFile(8000, paths.New("..", "testdata", "test_index.json")).String()
+	url := env.HTTPServeFile(8000, paths.New("..", "testdata", "test_index.json"), false).String()
 	additionalURLs := "--additional-urls=" + url
 
 	_, _, err := cli.Run("core", "update-index", additionalURLs)
