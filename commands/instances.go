@@ -43,6 +43,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -63,6 +64,11 @@ func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *c
 
 // Create a new Instance ready to be initialized, supporting directories are also created.
 func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
+	var userAgent string
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		userAgent = strings.Join(md.Get("user-agent"), " ")
+	}
+
 	// Setup downloads directory
 	downloadsDir := s.settings.DownloadsDir()
 	if downloadsDir.NotExist() {
@@ -87,7 +93,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 	if err != nil {
 		return nil, err
 	}
-	inst, err := instances.Create(dataDir, packagesDir, userPackagesDir, downloadsDir, "", config)
+	inst, err := instances.Create(dataDir, packagesDir, userPackagesDir, downloadsDir, userAgent, config)
 	if err != nil {
 		return nil, err
 	}
