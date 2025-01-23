@@ -62,6 +62,9 @@ func New(stdout, stderr io.Writer, verbosity Verbosity, warningsLevel string) *B
 
 // Info fixdoc
 func (l *BuilderLogger) Info(msg string) {
+	if msg == "" {
+		return
+	}
 	l.stdLock.Lock()
 	defer l.stdLock.Unlock()
 	fmt.Fprintln(l.stdout, msg)
@@ -69,6 +72,9 @@ func (l *BuilderLogger) Info(msg string) {
 
 // Warn fixdoc
 func (l *BuilderLogger) Warn(msg string) {
+	if msg == "" {
+		return
+	}
 	l.stdLock.Lock()
 	defer l.stdLock.Unlock()
 	fmt.Fprintln(l.stderr, msg)
