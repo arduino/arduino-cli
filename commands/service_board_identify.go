@@ -48,7 +48,7 @@ func (s *arduinoCoreServerImpl) BoardIdentify(ctx context.Context, req *rpc.Boar
 	defer release()
 
 	props := properties.NewFromHashmap(req.GetProperties())
-	res, err := identify(pme, props, s.settings, !req.GetUseCloudApiForUnknownBoardDetection())
+	res, err := identify(ctx, pme, props, s.settings, !req.GetUseCloudApiForUnknownBoardDetection())
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (s *arduinoCoreServerImpl) BoardIdentify(ctx context.Context, req *rpc.Boar
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
-func identify(pme *packagemanager.Explorer, properties *properties.Map, settings *configuration.Settings, skipCloudAPI bool) ([]*rpc.BoardListItem, error) {
+func identify(ctx context.Context, pme *packagemanager.Explorer, properties *properties.Map, settings *configuration.Settings, skipCloudAPI bool) ([]*rpc.BoardListItem, error) {
 	if properties == nil {
 		return nil, nil
 	}
@@ -90,7 +90,7 @@ func identify(pme *packagemanager.Explorer, properties *properties.Map, settings
 	// if installed cores didn't recognize the board, try querying
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 && !skipCloudAPI && !settings.SkipCloudApiForBoardDetection() {
-		items, err := identifyViaCloudAPI(properties, settings)
+		items, err := identifyViaCloudAPI(ctx, properties, settings)
 		if err != nil {
 			// this is bad, but keep going
 			logrus.WithError(err).Debug("Error querying builder API")
@@ -119,14 +119,14 @@ func identify(pme *packagemanager.Explorer, properties *properties.Map, settings
 	return boards, nil
 }
 
-func identifyViaCloudAPI(props *properties.Map, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
+func identifyViaCloudAPI(ctx context.Context, props *properties.Map, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
 	if !props.ContainsKey("vid") || !props.ContainsKey("pid") {
 		return nil, nil
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
-	return cachedAPIByVidPid(props.Get("vid"), props.Get("pid"), settings)
+	return cachedAPIByVidPid(ctx, props.Get("vid"), props.Get("pid"), settings)
 }
 
 var (
@@ -134,7 +134,7 @@ var (
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
 
-func cachedAPIByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
+func cachedAPIByVidPid(ctx context.Context, vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	var resp []*rpc.BoardListItem
 
 	cacheKey := fmt.Sprintf("cache.builder-api.v3/boards/byvid/pid/%s/%s", vid, pid)
@@ -148,7 +148,7 @@ func cachedAPIByVidPid(vid, pid string, settings *configuration.Settings) ([]*rp
 		}
 	}
 
-	resp, err := apiByVidPid(vid, pid, settings) // Perform API requrest
+	resp, err := apiByVidPid(ctx, vid, pid, settings) // Perform API requrest
 
 	if err == nil {
 		if cachedResp, err := json.Marshal(resp); err == nil {
@@ -160,7 +160,7 @@ func cachedAPIByVidPid(vid, pid string, settings *configuration.Settings) ([]*rp
 	return resp, err
 }
 
-func apiByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
+func apiByVidPid(ctx context.Context, vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
 	if !validVidPid.MatchString(vid) {
 		return nil, errors.New(i18n.Tr("Invalid vid value: '%s'", vid))
@@ -173,7 +173,7 @@ func apiByVidPid(vid, pid string, settings *configuration.Settings) ([]*rpc.Boar
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	httpClient, err := settings.NewHttpClient()
+	httpClient, err := settings.NewHttpClient(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", i18n.Tr("failed to initialize http client"), err)
 	}

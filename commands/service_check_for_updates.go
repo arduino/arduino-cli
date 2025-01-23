@@ -43,7 +43,7 @@ func (s *arduinoCoreServerImpl) CheckForArduinoCLIUpdates(ctx context.Context, r
 		inventory.WriteStore()
 	}()
 
-	latestVersion, err := semver.Parse(s.getLatestRelease())
+	latestVersion, err := semver.Parse(s.getLatestRelease(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +82,8 @@ func (s *arduinoCoreServerImpl) shouldCheckForUpdate(currentVersion *semver.Vers
 
 // getLatestRelease queries the official Arduino download server for the latest release,
 // if there are no errors or issues a version string is returned, in all other case an empty string.
-func (s *arduinoCoreServerImpl) getLatestRelease() string {
-	client, err := s.settings.NewHttpClient()
+func (s *arduinoCoreServerImpl) getLatestRelease(ctx context.Context) string {
+	client, err := s.settings.NewHttpClient(ctx)
 	if err != nil {
 		return ""
 	}

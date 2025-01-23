@@ -450,7 +450,11 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	for retries := 5; retries > 0; retries-- {
 		time.Sleep(time.Second)
 
-		conn, err := grpc.NewClient(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(
+			cli.daemonAddr,
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithUserAgent("cli-test/0.0.0"),
+		)
 		if err != nil {
 			connErr = err
 			continue

@@ -89,7 +89,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 		}
 	}
 
-	config, err := s.settings.DownloaderConfig()
+	config, err := s.settings.DownloaderConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +377,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					responseError(err.GRPCStatus())
 					continue
 				}
-				config, err := s.settings.DownloaderConfig()
+				config, err := s.settings.DownloaderConfig(ctx)
 				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
@@ -498,7 +498,7 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	}
 
 	// Perform index update
-	config, err := s.settings.DownloaderConfig()
+	config, err := s.settings.DownloaderConfig(stream.Context())
 	if err != nil {
 		return err
 	}
@@ -608,7 +608,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			}
 		}
 
-		config, err := s.settings.DownloaderConfig()
+		config, err := s.settings.DownloaderConfig(stream.Context())
 		if err != nil {
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, i18n.Tr("Invalid network configuration: %s", err))
