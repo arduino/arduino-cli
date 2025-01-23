@@ -117,6 +117,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 		i18n.Tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
 	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Optional, turns on verbose mode."))
 	compileCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, i18n.Tr("Optional, suppresses almost every output."))
+	compileCommand.MarkFlagsMutuallyExclusive("quiet", "verbose")
 	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, i18n.Tr("Upload the binary after the compilation."))
 	portArgs.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
