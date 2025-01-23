@@ -20,6 +20,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -562,7 +566,33 @@ func TestDaemonUserAgent(t *testing.T) {
 	// Set up an http server to serve our custom index file
 	// The user-agent is tested inside the HTTPServeFile function
 	test_index := paths.New("..", "testdata", "test_index.json")
-	url := env.HTTPServeFile(8000, test_index, true)
+	url := env.HTTPServeFile(8000, test_index)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Test that the user-agent contains metadata from the context when the CLI is in daemon mode
+		userAgent := r.Header.Get("User-Agent")
+
+		require.Contains(t, userAgent, "cli-test/0.0.0")
+		require.Contains(t, userAgent, "grpc-go")
+		// Depends on how we built the client we may have git-snapshot or 0.0.0-git in dev releases
+		require.Condition(t, func() (success bool) {
+			return strings.Contains(userAgent, "arduino-cli/git-snapshot") ||
+				strings.Contains(userAgent, "arduino-cli/0.0.0-git")
+		})
+
+		proxiedReq, err := http.NewRequest(r.Method, url.String(), r.Body)
+		require.NoError(t, err)
+		maps.Copy(proxiedReq.Header, r.Header)
+
+		proxiedResp, err := http.DefaultTransport.RoundTrip(proxiedReq)
+		require.NoError(t, err)
+		defer proxiedResp.Body.Close()
+
+		// Copy the headers from the proxy response to the original response
+		maps.Copy(r.Header, proxiedReq.Header)
+		w.WriteHeader(proxiedResp.StatusCode)
+		io.Copy(w, proxiedResp.Body)
+	}))
+	defer ts.Close()
 
 	grpcInst := cli.Create()
 	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
@@ -570,7 +600,8 @@ func TestDaemonUserAgent(t *testing.T) {
 	}))
 
 	// Set extra indexes
-	err := cli.SetValue("board_manager.additional_urls", `["http://127.0.0.1:8000/test_index.json"]`)
+	additionalURL := ts.URL + "/test_index.json"
+	err := cli.SetValue("board_manager.additional_urls", fmt.Sprintf(`["%s"]`, additionalURL))
 	require.NoError(t, err)
 
 	{
@@ -579,7 +610,7 @@ func TestDaemonUserAgent(t *testing.T) {
 		res, err := analyzeUpdateIndexClient(t, cl)
 		require.NoError(t, err)
 		require.Len(t, res, 2)
-		require.True(t, res[url.String()].GetSuccess())
+		require.True(t, res[additionalURL].GetSuccess())
 	}
 }
 
