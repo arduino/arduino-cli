@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/balancer/base
-version: v1.69.4
+version: v1.70.0
 type: go
 summary: Package base defines a balancer base that can be used to build balancers
   with different picking algorithms.
-homepage: https://godoc.org/google.golang.org/grpc/balancer/base
+homepage: https://pkg.go.dev/google.golang.org/grpc/balancer/base
 license: apache-2.0
 licenses:
-- sources: grpc@v1.69.4/LICENSE
+- sources: grpc@v1.70.0/LICENSE
   text: |2
 
                                      Apache License
