@@ -1,12 +1,12 @@
 ---
 name: github.com/pjbgf/sha1cd/internal
-version: v0.3.0
+version: v0.3.2
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/pjbgf/sha1cd/internal
 license: apache-2.0
 licenses:
-- sources: sha1cd@v0.3.0/LICENSE
+- sources: sha1cd@v0.3.2/LICENSE
   text: |2
                                      Apache License
                                Version 2.0, January 2004
@@ -196,7 +196,7 @@ licenses:
           same "printed page" as the copyright notice for easier
           identification within third-party archives.
 
-       Copyright [yyyy] [name of copyright owner]
+       Copyright 2023 pjbgf
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
