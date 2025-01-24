@@ -1,9 +1,9 @@
 ---
 name: google.golang.org/grpc
-version: v1.69.4
+version: v1.70.0
 type: go
 summary: Package grpc implements an RPC system called gRPC.
-homepage: https://godoc.org/google.golang.org/grpc
+homepage: https://pkg.go.dev/google.golang.org/grpc
 license: apache-2.0
 licenses:
 - sources: LICENSE

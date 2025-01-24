@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/stats
-version: v1.69.4
+version: v1.70.0
 type: go
 summary: Package stats provides internal stats related functionality.
-homepage: https://godoc.org/google.golang.org/grpc/internal/stats
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/stats
 license: apache-2.0
 licenses:
-- sources: grpc@v1.69.4/LICENSE
+- sources: grpc@v1.70.0/LICENSE
   text: |2
 
                                      Apache License
