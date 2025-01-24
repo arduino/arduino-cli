@@ -18,6 +18,7 @@ package builder
 import (
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"go.bug.st/f"
@@ -26,7 +27,7 @@ import (
 // link fixdoc
 func (b *Builder) link() error {
 	if b.onlyUpdateCompilationDatabase {
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Info(i18n.Tr("Skip linking of final executable."))
 		}
 		return nil

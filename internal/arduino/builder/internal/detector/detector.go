@@ -28,9 +28,9 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -87,7 +87,7 @@ func (l *SketchLibrariesDetector) resolveLibrary(header, platformArch string) *l
 	importedLibraries := l.importedLibraries
 	candidates := l.librariesResolver.AlternativesFor(header)
 
-	if l.logger.Verbose() {
+	if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		l.logger.Info(i18n.Tr("Alternatives for %[1]s: %[2]s", header, candidates))
 		l.logger.Info(fmt.Sprintf("ResolveLibrary(%s)", header))
 		l.logger.Info(fmt.Sprintf("  -> %s: %s", i18n.Tr("candidates"), candidates))
@@ -144,7 +144,7 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 	// - as warning, when the sketch didn't compile
 	// - as info, when verbose is on
 	// - otherwise, output nothing
-	if !sketchError && !l.logger.Verbose() {
+	if !sketchError && l.logger.VerbosityLevel() != logger.VerbosityVerbose {
 		return
 	}
 
@@ -239,7 +239,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err := json.Unmarshal(d, &l.includeFolders); err != nil {
 			return err
 		}
-		if l.logger.Verbose() {
+		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			l.logger.Info("Using cached library discovery: " + librariesResolutionCache.String())
 		}
 		return nil
@@ -347,12 +347,12 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		var missingIncludeH string
 		if unchanged && cache.valid {
 			missingIncludeH = cache.Next().Include
-			if first && l.logger.Verbose() {
+			if first && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
 			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
-			if l.logger.Verbose() {
+			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.WriteStdout(preprocFirstResult.Stdout())
 			}
 			// Unwrap error and see if it is an ExitError.
@@ -365,7 +365,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				return preprocErr
 			} else {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr()))
-				if missingIncludeH == "" && l.logger.Verbose() {
+				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
@@ -383,7 +383,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			if preprocErr == nil || preprocFirstResult.Stderr() == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				result, err := preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
-				if l.logger.Verbose() {
+				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.WriteStdout(result.Stdout())
 				}
 				if err == nil {
@@ -410,7 +410,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 
 		if library.Precompiled && library.PrecompiledWithSources {
 			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
-			if l.logger.Verbose() {
+			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 			}
 		} else {

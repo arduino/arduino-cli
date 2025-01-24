@@ -23,6 +23,7 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -152,7 +153,7 @@ func (b *Builder) compileFileWithRecipe(
 		command.RedirectStdoutTo(commandStdout)
 		command.RedirectStderrTo(commandStderr)
 
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 		}
 		// Since this compile could be multithreaded, we first capture the command output
@@ -161,7 +162,7 @@ func (b *Builder) compileFileWithRecipe(
 		}
 		err := command.Wait()
 		// and transfer all at once at the end...
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.WriteStdout(commandStdout.Bytes())
 		}
 		b.logger.WriteStderr(commandStderr.Bytes())
@@ -176,7 +177,7 @@ func (b *Builder) compileFileWithRecipe(
 		if err != nil {
 			return nil, err
 		}
-	} else if b.logger.Verbose() {
+	} else if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		if objIsUpToDate {
 			b.logger.Info(i18n.Tr("Using previously compiled file: %[1]s", objectFile))
 		} else {

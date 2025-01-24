@@ -19,6 +19,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
@@ -43,7 +44,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 		}
 
 		if b.onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
-			if b.logger.Verbose() {
+			if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				b.logger.Info(i18n.Tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}
 			return nil

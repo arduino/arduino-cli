@@ -24,6 +24,7 @@ import (
 	"strconv"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
@@ -78,7 +79,7 @@ func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 	if err != nil {
 		return nil, errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 	}
-	if b.logger.Verbose() {
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 	}
 	out := &bytes.Buffer{}
@@ -155,19 +156,21 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 		return nil, nil
 	}
 
-	b.logger.Info(i18n.Tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
-		strconv.Itoa(textSize),
-		strconv.Itoa(maxTextSize),
-		strconv.Itoa(textSize*100/maxTextSize)))
-	if dataSize >= 0 {
-		if maxDataSize > 0 {
-			b.logger.Info(i18n.Tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
-				strconv.Itoa(dataSize),
-				strconv.Itoa(maxDataSize),
-				strconv.Itoa(dataSize*100/maxDataSize),
-				strconv.Itoa(maxDataSize-dataSize)))
-		} else {
-			b.logger.Info(i18n.Tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
+	if b.logger.VerbosityLevel() > logger.VerbosityQuiet {
+		b.logger.Info(i18n.Tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
+			strconv.Itoa(textSize),
+			strconv.Itoa(maxTextSize),
+			strconv.Itoa(textSize*100/maxTextSize)))
+		if dataSize >= 0 {
+			if maxDataSize > 0 {
+				b.logger.Info(i18n.Tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
+					strconv.Itoa(dataSize),
+					strconv.Itoa(maxDataSize),
+					strconv.Itoa(dataSize*100/maxDataSize),
+					strconv.Itoa(maxDataSize-dataSize)))
+			} else {
+				b.logger.Info(i18n.Tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
+			}
 		}
 	}
 
@@ -215,7 +218,7 @@ func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, data
 		resErr = errors.New(i18n.Tr("Error while determining sketch size: %s", err))
 		return
 	}
-	if b.logger.Verbose() {
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 	}
 	commandStdout := &bytes.Buffer{}

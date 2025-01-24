@@ -85,6 +85,9 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
 		Args: cobra.MaximumNArgs(1),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			arguments.CheckFlagsConflicts(cmd, "quiet", "verbose")
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			if cmd.Flag("build-cache-path").Changed {
 				feedback.Warning(i18n.Tr("The flag --build-cache-path has been deprecated. Please use just --build-path alone or configure the build cache path in the Arduino CLI settings."))
@@ -116,7 +119,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer, settings *rpc.Configuration) *
 	compileCommand.Flags().StringVar(&warnings, "warnings", "none",
 		i18n.Tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
 	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Optional, turns on verbose mode."))
-	compileCommand.Flags().BoolVar(&quiet, "quiet", false, i18n.Tr("Optional, suppresses almost every output."))
+	compileCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, i18n.Tr("Optional, suppresses almost every output."))
 	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, i18n.Tr("Upload the binary after the compilation."))
 	portArgs.AddToCommand(compileCommand, srv)
 	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
@@ -362,6 +365,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 	}
 
 	stdIO := stdIORes()
+	successful := (compileError == nil)
 	res := &compileResult{
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
@@ -370,9 +374,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			UpdatedUploadPort: result.NewPort(uploadRes.GetUpdatedUploadPort()),
 		},
 		ProfileOut:         profileOut,
-		Success:            compileError == nil,
+		Success:            successful,
 		showPropertiesMode: showProperties,
-		hideStats:          preprocess,
+		hideStats:          preprocess || quiet || (!verbose && successful),
 	}
 
 	if compileError != nil {
