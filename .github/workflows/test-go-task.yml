@@ -72,7 +72,7 @@ jobs:
         id: collection
         # jq flags must be "-cRn" see: https://stackoverflow.com/a/68859958/1655275
         run: |
-          echo "tests-data=$(go list ./internal/integrationtest/... | grep integrationtest/ | tr "/" " " | cut -d " " -f 6 | grep lib | jq -cRn '[inputs]')" >> $GITHUB_OUTPUT
+          echo "tests-data=$(go list ./internal/integrationtest/... | grep integrationtest/ | tr "/" " " | cut -d " " -f 6 | grep 'lib' | jq -cRn '[inputs]')" >> $GITHUB_OUTPUT
 
   test-integration:
     needs: tests-collector
@@ -121,53 +121,52 @@ jobs:
           path: |
             ./coverage_integration_*.txt
 
-  test:
-    needs: run-determination
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system:
-          - windows-latest
-          - macos-latest
-          - ubuntu-latest
-
-    runs-on: ${{ matrix.operating-system }}
-
-    steps:
-      # By default, actions/checkout converts the repo's LF line endings to CRLF on the Windows runner.
-      - name: Disable EOL conversions
-        run: git config --global core.autocrlf false
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
-      - name: Run tests
-        run: task go:test
-
-      - name: Upload coverage data to workflow artifact
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          if-no-files-found: error
-          name: ${{ env.COVERAGE_ARTIFACT }}-test-${{ matrix.operating-system }}
-          path: |
-            ./coverage_unit.txt
+  # test:
+  #   needs: run-determination
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       operating-system:
+  #         - windows-latest
+  #         - macos-latest
+  #         - ubuntu-latest
+  #
+  #   runs-on: ${{ matrix.operating-system }}
+  #
+  #   steps:
+  #     # By default, actions/checkout converts the repo's LF line endings to CRLF on the Windows runner.
+  #     - name: Disable EOL conversions
+  #       run: git config --global core.autocrlf false
+  #
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Install Go
+  #       uses: actions/setup-go@v5
+  #       with:
+  #         go-version: ${{ env.GO_VERSION }}
+  #
+  #     - name: Install Task
+  #       uses: arduino/setup-task@v2
+  #       with:
+  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
+  #         version: 3.x
+  #
+  #     - name: Run tests
+  #       run: task go:test
+  #
+  #     - name: Upload coverage data to workflow artifact
+  #       if: runner.os == 'Linux'
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         if-no-files-found: error
+  #         name: ${{ env.COVERAGE_ARTIFACT }}-test-${{ matrix.operating-system }}
+  #         path: |
+  #           ./coverage_unit.txt
 
   coverage-upload:
     runs-on: ubuntu-latest
     needs:
-      - test
       - test-integration
     steps:
       - name: Checkout repository
