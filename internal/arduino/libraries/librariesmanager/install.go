@@ -208,11 +208,11 @@ func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
 	}
 
 	// Clone library in a temporary directory
-	tmp, err := paths.MkTempDir("", "")
+	tmp, err := paths.MkTempDir("", "arduino-cli-lib")
 	if err != nil {
 		return err
 	}
-	defer tmp.RemoveAll()
+	// defer tmp.RemoveAll()
 	tmpInstallPath := tmp.Join(libraryName)
 
 	depth := 1
@@ -239,7 +239,7 @@ func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
 	}
 
 	// We don't want the installed library to be a git repository thus we delete this folder
-	tmpInstallPath.Join(".git").RemoveAll()
+	// tmpInstallPath.Join(".git").RemoveAll()
 
 	// Install extracted library in the destination directory
 	if err := lmi.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
