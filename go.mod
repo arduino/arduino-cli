@@ -20,7 +20,7 @@ require (
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.18.0
-	github.com/go-git/go-git/v5 v5.12.1-0.20241007152421-41f08fc53529
+	github.com/go-git/go-git/v5 v5.12.1-0.20241011092502-95afe7e1cdf7
 	github.com/gofrs/uuid/v5 v5.3.0
 	github.com/leonelquinteros/gotext v1.7.0
 	github.com/mailru/easyjson v0.7.7
