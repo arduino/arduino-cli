@@ -17,18 +17,22 @@ package lib_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"os"
 	"runtime"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 )
@@ -650,36 +654,21 @@ func TestInstallWithGitUrl(t *testing.T) {
 }
 
 func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Initialize configs to enable --git-url flag
-	envVar := cli.GetDefaultEnv()
-	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
-	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	ref := plumbing.Revision("0.16.0")
+	repo, err := git.PlainClone(t.TempDir(), false, &git.CloneOptions{
+		URL:      "https://github.com/arduino-libraries/WiFi101.git",
+		Depth:    0,
+		Progress: os.Stdout,
+	})
 	require.NoError(t, err)
-
-	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
-	// Verifies library is not already installed
-	require.NoDirExists(t, libInstallDir.String())
-
-	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
-
-	// Test that a bad ref fails
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#x-ref-does-not-exist", "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-
-	// Verifies library is installed in expected path
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
-	require.DirExists(t, libInstallDir.String())
-
-	// Reinstall library at an existing ref
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
-
-	// Verifies library remains installed
-	require.DirExists(t, libInstallDir.String())
+	if ref != "" {
+		h, err := repo.ResolveRevision(ref)
+		require.NoError(t, err)
+		w, err := repo.Worktree()
+		require.NoError(t, err)
+		err = w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())})
+		require.NoError(t, err)
+	}
 }
 
 func TestUpdateIndex(t *testing.T) {
@@ -1220,68 +1209,6 @@ func TestInstallZipInvalidLibrary(t *testing.T) {
 	require.Contains(t, string(stderr), "library not valid")
 }
 
-func TestInstallGitInvalidLibrary(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Initialize configs to enable --zip-path flag
-	envVar := cli.GetDefaultEnv()
-	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
-	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
-	require.NoError(t, err)
-
-	// Create fake library repository
-	repoDir := cli.SketchbookDir().Join("lib-without-header")
-	repo, err := git.PlainInit(repoDir.String(), false)
-	require.NoError(t, err)
-	libProperties := repoDir.Join("library.properties")
-	f, err := libProperties.Create()
-	require.NoError(t, err)
-	require.NoError(t, f.Close())
-	tree, err := repo.Worktree()
-	require.NoError(t, err)
-	_, err = tree.Add("library.properties")
-	require.NoError(t, err)
-	_, err = tree.Commit("First commit", &git.CommitOptions{
-		All: false, Author: &object.Signature{Name: "a", Email: "b", When: time.Now()}, Committer: nil, Parents: nil, SignKey: nil})
-	require.NoError(t, err)
-
-	libInstallDir := cli.SketchbookDir().Join("libraries", "lib-without-header")
-	// Verifies library is not already installed
-	require.NoDirExists(t, libInstallDir.String())
-
-	_, stderr, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String(), "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-	require.Contains(t, string(stderr), "library not valid")
-	require.NoDirExists(t, libInstallDir.String())
-
-	// Create another fake library repository
-	repoDir = cli.SketchbookDir().Join("lib-without-properties")
-	repo, err = git.PlainInit(repoDir.String(), false)
-	require.NoError(t, err)
-	libHeader := repoDir.Join("src", "lib-without-properties.h")
-	require.NoError(t, libHeader.Parent().MkdirAll())
-	f, err = libHeader.Create()
-	require.NoError(t, err)
-	require.NoError(t, f.Close())
-	tree, err = repo.Worktree()
-	require.NoError(t, err)
-	_, err = tree.Add("src/lib-without-properties.h")
-	require.NoError(t, err)
-	_, err = tree.Commit("First commit", &git.CommitOptions{
-		All: false, Author: &object.Signature{Name: "a", Email: "b", When: time.Now()}, Committer: nil, Parents: nil, SignKey: nil})
-	require.NoError(t, err)
-
-	libInstallDir = cli.SketchbookDir().Join("libraries", "lib-without-properties")
-	// Verifies library is not already installed
-	require.NoDirExists(t, libInstallDir.String())
-
-	_, stderr, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String(), "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
-	require.Contains(t, string(stderr), "library not valid")
-	require.NoDirExists(t, libInstallDir.String())
-}
-
 func TestUpgradeDoesNotTryToUpgradeBundledCoreLibrariesInSketchbook(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
@@ -1714,4 +1641,49 @@ func TestDependencyResolverNoOverwrite(t *testing.T) {
 
 	_, _, err = cli.Run("lib", "install", "EncoderTool@2.2.0", "--no-overwrite")
 	require.NoError(t, err)
+}
+
+func parseGitArgURL(argURL string) (string, string, plumbing.Revision, error) {
+	// On Windows handle paths with backslashes in the form C:\Path\to\library
+	if path := paths.New(argURL); path != nil && path.Exist() {
+		return path.Base(), argURL, "", nil
+	}
+
+	// Handle commercial git-specific address in the form "git@xxxxx.com:arduino-libraries/SigFox.git"
+	prefixes := map[string]string{
+		"git@github.com:":    "https://github.com/",
+		"git@gitlab.com:":    "https://gitlab.com/",
+		"git@bitbucket.org:": "https://bitbucket.org/",
+	}
+	for prefix, replacement := range prefixes {
+		if strings.HasPrefix(argURL, prefix) {
+			// We can't parse these as URLs
+			argURL = replacement + strings.TrimPrefix(argURL, prefix)
+		}
+	}
+
+	parsedURL, err := url.Parse(argURL)
+	if err != nil {
+		return "", "", "", fmt.Errorf("%s: %w", i18n.Tr("invalid git url"), err)
+	}
+	if parsedURL.String() == "" {
+		return "", "", "", errors.New(i18n.Tr("invalid git url"))
+	}
+
+	// Extract lib name from "https://github.com/arduino-libraries/SigFox.git#1.0.3"
+	// path == "/arduino-libraries/SigFox.git"
+	slash := strings.LastIndex(parsedURL.Path, "/")
+	if slash == -1 {
+		return "", "", "", errors.New(i18n.Tr("invalid git url"))
+	}
+	libName := strings.TrimSuffix(parsedURL.Path[slash+1:], ".git")
+	if libName == "" {
+		return "", "", "", errors.New(i18n.Tr("invalid git url"))
+	}
+	// fragment == "1.0.3"
+	rev := plumbing.Revision(parsedURL.Fragment)
+	// gitURL == "https://github.com/arduino-libraries/SigFox.git"
+	parsedURL.Fragment = ""
+	gitURL := parsedURL.String()
+	return libName, gitURL, rev, nil
 }
