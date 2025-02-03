@@ -608,7 +608,7 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 // or nil if the PlatformRelease is not installed. Platforms installed manually are ignored.
 func (pme *Explorer) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
 	for _, release := range platform.GetAllInstalled() {
-		if release.IsInstalled() && pme.IsManagedPlatformRelease(release) {
+		if release.IsInstalled() && release.IsManaged() {
 			return release
 		}
 	}
@@ -625,33 +625,24 @@ func (pme *Explorer) GetBestInstalledPlatformRelease(platform *cores.Platform) *
 
 	debug := func(msg string, pl *cores.PlatformRelease) {
 		pme.log.WithField("version", pl.Version).
-			WithField("managed", pme.IsManagedPlatformRelease(pl)).
+			WithField("managed", pl.IsManaged()).
 			Debugf("%s: %s", msg, pl)
 	}
 
 	best := releases[0]
-	bestIsManaged := pme.IsManagedPlatformRelease(best)
-	debug("current best", best)
-
 	for _, candidate := range releases[1:] {
-		candidateIsManaged := pme.IsManagedPlatformRelease(candidate)
-		debug("candidate", candidate)
-		if !candidateIsManaged && !bestIsManaged {
-			if candidate.Version.GreaterThan(best.Version) {
-				best = candidate
-			}
-			continue
-		}
-		if !candidateIsManaged {
-			continue
-		}
-		if !bestIsManaged {
-			best = candidate
-			bestIsManaged = true
-		} else if candidate.Version.GreaterThan(best.Version) {
-			best = candidate
-		}
 		debug("current best", best)
+		debug("candidate", candidate)
+		if candidate.IsManaged() && !best.IsManaged() {
+			continue
+		}
+		if !candidate.IsManaged() && best.IsManaged() {
+			best = candidate
+			continue
+		}
+		if candidate.Version.GreaterThan(best.Version) {
+			best = candidate
+		}
 	}
 	return best
 }

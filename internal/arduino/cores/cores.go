@@ -117,6 +117,11 @@ func (t *TimestampsStore) Dirty() bool {
 	return false
 }
 
+// IsManaged returns true if the platform release is managed by the package manager.
+func (release *PlatformRelease) IsManaged() bool {
+	return release.Version.String() != ""
+}
+
 // Dirty returns true if one of the files of this PlatformRelease has been changed
 // (it means that the PlatformRelease should be rebuilt to be used correctly).
 func (release *PlatformRelease) Dirty() bool {

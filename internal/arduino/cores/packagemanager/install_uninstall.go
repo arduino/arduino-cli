@@ -257,23 +257,6 @@ func (pme *Explorer) RunPreOrPostScript(installDir *paths.Path, prefix string) (
 	return []byte{}, []byte{}, nil
 }
 
-// IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager
-func (pme *Explorer) IsManagedPlatformRelease(platformRelease *cores.PlatformRelease) bool {
-	if pme.PackagesDir == nil {
-		return false
-	}
-	installDir := platformRelease.InstallDir.Clone()
-	if installDir.FollowSymLink() != nil {
-		return false
-	}
-	packagesDir := pme.PackagesDir.Clone()
-	if packagesDir.FollowSymLink() != nil {
-		return false
-	}
-	managed, _ := installDir.IsInsideDir(packagesDir)
-	return managed
-}
-
 // UninstallPlatform remove a PlatformRelease.
 func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB, skipPreUninstall bool) error {
 	log := pme.log.WithField("platform", platformRelease)
@@ -288,7 +271,7 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 	}
 
 	// Safety measure
-	if !pme.IsManagedPlatformRelease(platformRelease) {
+	if !platformRelease.IsManaged() {
 		err := errors.New(i18n.Tr("%s is not managed by package manager", platformRelease))
 		log.WithError(err).Error("Error uninstalling")
 		return &cmderrors.FailedUninstallError{Message: err.Error()}
