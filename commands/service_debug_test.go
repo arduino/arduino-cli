@@ -37,7 +37,7 @@ func TestGetCommandLine(t *testing.T) {
 	sketchPath := paths.New("testdata", "debug", sketch)
 	require.NoError(t, sketchPath.ToAbs())
 
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
+	pmb := packagemanager.NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pmb.LoadHardwareFromDirectory(dataDir)
 

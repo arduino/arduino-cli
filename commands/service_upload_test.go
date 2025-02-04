@@ -132,10 +132,12 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
-	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "upload", "hardware"))
+	userdir := paths.New("testdata", "upload")
+	hwdir := userdir.Join("hardware")
+	pmb := packagemanager.NewBuilder(nil, nil, hwdir, nil, nil, "test", downloader.GetDefaultConfig())
+	errs := pmb.LoadHardwareFromDirectory(hwdir)
 	require.Len(t, errs, 0)
-	buildPath1 := paths.New("testdata", "upload", "build_path_1")
+	buildPath1 := userdir.Join("build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
 	type test struct {
 		importDir       *paths.Path

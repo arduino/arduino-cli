@@ -82,7 +82,7 @@ func GetUninstallableCores(ctx context.Context, srv rpc.ArduinoCoreServiceServer
 
 	platforms, _ := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
 		Instance:          inst,
-		ManuallyInstalled: true,
+		ManuallyInstalled: false,
 	})
 
 	var res []string
