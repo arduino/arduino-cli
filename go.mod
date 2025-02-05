@@ -42,7 +42,7 @@ require (
 	go.bug.st/testifyjson v1.3.0
 	golang.org/x/sys v0.29.0
 	golang.org/x/term v0.28.0
-	golang.org/x/text v0.21.0
+	golang.org/x/text v0.22.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.4
@@ -102,7 +102,7 @@ require (
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
