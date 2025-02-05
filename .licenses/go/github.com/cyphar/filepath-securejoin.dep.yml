@@ -1,6 +1,6 @@
 ---
 name: github.com/cyphar/filepath-securejoin
-version: v0.2.4
+version: v0.2.5
 type: go
 summary: Package securejoin is an implementation of the hopefully-soon-to-be-included
   SecureJoin helper that is meant to be part of the "path/filepath" package.
