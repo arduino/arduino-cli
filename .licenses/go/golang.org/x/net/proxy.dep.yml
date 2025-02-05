@@ -1,13 +1,13 @@
 ---
 name: golang.org/x/net/proxy
-version: v0.33.0
+version: v0.34.0
 type: go
 summary: Package proxy provides support for a variety of protocols to proxy network
   data.
 homepage: https://pkg.go.dev/golang.org/x/net/proxy
 license: bsd-3-clause
 licenses:
-- sources: net@v0.33.0/LICENSE
+- sources: net@v0.34.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: net@v0.33.0/PATENTS
+- sources: net@v0.34.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
