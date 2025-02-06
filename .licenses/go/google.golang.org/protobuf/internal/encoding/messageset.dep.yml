@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/protobuf/internal/encoding/messageset
-version: v1.36.4
+version: v1.36.5
 type: go
 summary: Package messageset encodes and decodes the obsolete MessageSet wire format.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/encoding/messageset
 license: bsd-3-clause
 licenses:
-- sources: protobuf@v1.36.4/LICENSE
+- sources: protobuf@v1.36.5/LICENSE
   text: |
     Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: protobuf@v1.36.4/PATENTS
+- sources: protobuf@v1.36.5/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
