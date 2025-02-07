@@ -659,27 +659,47 @@ func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
 	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
 
-	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
-	// Verifies library is not already installed
-	require.NoDirExists(t, libInstallDir.String())
+	t.Run("InvalidRef", func(t *testing.T) {
+		// Test that a bad ref fails
+		_, _, err = cli.Run("lib", "install", "--git-url", "https://github.com/arduino-libraries/WiFi101.git#x-ref-does-not-exist", "--config-file", "arduino-cli.yaml")
+		require.Error(t, err)
+	})
 
-	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	t.Run("RefPointingToATag", func(t *testing.T) {
+		gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+		libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101").String()
 
-	// Test that a bad ref fails
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#x-ref-does-not-exist", "--config-file", "arduino-cli.yaml")
-	require.Error(t, err)
+		// Verifies library is not already installed
+		require.NoDirExists(t, libInstallDir)
 
-	// Verifies library is installed in expected path
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
-	require.DirExists(t, libInstallDir.String())
+		// Verifies library is installed in expected path
+		_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0", "--config-file", "arduino-cli.yaml")
+		require.NoError(t, err)
+		require.DirExists(t, libInstallDir)
 
-	// Reinstall library at an existing ref
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master", "--config-file", "arduino-cli.yaml")
-	require.NoError(t, err)
+		// Reinstall library at an existing ref
+		_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master", "--config-file", "arduino-cli.yaml")
+		require.NoError(t, err)
 
-	// Verifies library remains installed
-	require.DirExists(t, libInstallDir.String())
+		// Verifies library remains installed
+		require.DirExists(t, libInstallDir)
+	})
+
+	t.Run("RefPointingToBranch", func(t *testing.T) {
+		libInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoCloud")
+
+		// Verify install with ref pointing to a branch
+		require.NoDirExists(t, libInstallDir.String())
+		_, _, err = cli.Run("lib", "install", "--git-url", "https://github.com/arduino-libraries/ArduinoCloud.git#revert-2-typos", "--config-file", "arduino-cli.yaml")
+		require.NoError(t, err)
+		require.DirExists(t, libInstallDir.String())
+
+		// Verify that the correct branch is checked out
+		// https://github.com/arduino-libraries/ArduinoCloud/commit/d098d4647967b3aeb4520e7baf279e4225254dd2
+		fileToTest, err := libInstallDir.Join("src", "ArduinoCloudThingBase.h").ReadFile()
+		require.NoError(t, err)
+		require.Contains(t, string(fileToTest), `#define LENGHT_M "meters"`)
+	})
 }
 
 func TestUpdateIndex(t *testing.T) {
