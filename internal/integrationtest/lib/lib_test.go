@@ -698,7 +698,7 @@ func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
 		// https://github.com/arduino-libraries/ArduinoCloud/commit/d098d4647967b3aeb4520e7baf279e4225254dd2
 		fileToTest, err := libInstallDir.Join("src", "ArduinoCloudThingBase.h").ReadFile()
 		require.NoError(t, err)
-		require.Contains(t, string(fileToTest), `#define LENGHT_M "meters"`)
+		require.Contains(t, string(fileToTest), `#define LENGHT_M "meters"`) // nolint:misspell
 	})
 }
 
