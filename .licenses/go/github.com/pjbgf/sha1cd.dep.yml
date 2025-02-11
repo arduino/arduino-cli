@@ -1,6 +1,6 @@
 ---
 name: github.com/pjbgf/sha1cd
-version: v0.3.0
+version: v0.3.2
 type: go
 summary: Package sha1cd implements collision detection based on the whitepaper Counter-cryptanalysis
   from Marc Stevens.
@@ -197,7 +197,7 @@ licenses:
           same "printed page" as the copyright notice for easier
           identification within third-party archives.
 
-       Copyright [yyyy] [name of copyright owner]
+       Copyright 2023 pjbgf
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
