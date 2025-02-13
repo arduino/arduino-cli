@@ -26,7 +26,7 @@ import (
 
 // FQBN represents an Fully Qualified Board Name string
 type FQBN struct {
-	Packager     string
+	Vendor       string
 	Architecture string
 	BoardID      string
 	Configs      *properties.Map
@@ -54,7 +54,7 @@ func Parse(fqbnIn string) (*FQBN, error) {
 	}
 
 	fqbn := &FQBN{
-		Packager:     fqbnParts[0],
+		Vendor:       fqbnParts[0],
 		Architecture: fqbnParts[1],
 		BoardID:      fqbnParts[2],
 		Configs:      properties.NewMap(),
@@ -95,7 +95,7 @@ func Parse(fqbnIn string) (*FQBN, error) {
 // Clone returns a copy of this FQBN.
 func (fqbn *FQBN) Clone() *FQBN {
 	return &FQBN{
-		Packager:     fqbn.Packager,
+		Vendor:       fqbn.Vendor,
 		Architecture: fqbn.Architecture,
 		BoardID:      fqbn.BoardID,
 		Configs:      fqbn.Configs.Clone(),
@@ -122,7 +122,7 @@ func (fqbn *FQBN) Match(target *FQBN) bool {
 
 // StringWithoutConfig returns the FQBN without the Config part
 func (fqbn *FQBN) StringWithoutConfig() string {
-	return fqbn.Packager + ":" + fqbn.Architecture + ":" + fqbn.BoardID
+	return fqbn.Vendor + ":" + fqbn.Architecture + ":" + fqbn.BoardID
 }
 
 // String returns the FQBN as a string

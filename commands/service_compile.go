@@ -125,7 +125,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	if err != nil {
 		if targetPlatform == nil {
 			return &cmderrors.PlatformNotFoundError{
-				Platform: fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture),
+				Platform: fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture),
 				Cause:    errors.New(i18n.Tr("platform not installed")),
 			}
 		}

@@ -62,7 +62,7 @@ func (s *arduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rp
 	_, platformRelease, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 	if platformRelease == nil {
 		return nil, &cmderrors.PlatformNotFoundError{
-			Platform: fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture),
+			Platform: fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture),
 			Cause:    err,
 		}
 	} else if err != nil {
@@ -293,7 +293,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if boardPlatform == nil {
 		return nil, &cmderrors.PlatformNotFoundError{
-			Platform: fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture),
+			Platform: fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture),
 			Cause:    err,
 		}
 	} else if err != nil {

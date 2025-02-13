@@ -161,7 +161,7 @@ func (dr listResult) String() string {
 				var coreName = ""
 				fqbn, err := fqbn.Parse(b.Fqbn)
 				if err == nil {
-					coreName = fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture)
+					coreName = fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture)
 				}
 
 				t.AddRow(address, protocol, protocolLabel, board, fqbn, coreName)
@@ -217,7 +217,7 @@ func (dr watchEventResult) String() string {
 			var coreName = ""
 			fqbn, err := fqbn.Parse(b.Fqbn)
 			if err == nil {
-				coreName = fmt.Sprintf("%s:%s", fqbn.Packager, fqbn.Architecture)
+				coreName = fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture)
 			}
 
 			t.AddRow(address, protocol, event, board, fqbn, coreName)
