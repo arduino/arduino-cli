@@ -450,7 +450,11 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	for retries := 5; retries > 0; retries-- {
 		time.Sleep(time.Second)
 
-		conn, err := grpc.NewClient(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(
+			cli.daemonAddr,
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithUserAgent("cli-test/0.0.0"),
+		)
 		if err != nil {
 			connErr = err
 			continue
@@ -693,4 +697,16 @@ func (inst *ArduinoCLIInstance) Upload(ctx context.Context, fqbn, sketchPath, po
 	})
 	logCallf(">>> Upload(%v %v port/protocol=%s/%s)\n", fqbn, sketchPath, port, protocol)
 	return uploadCl, err
+}
+
+// BoardIdentify calls the "BoardIdentify" gRPC method.
+func (inst *ArduinoCLIInstance) BoardIdentify(ctx context.Context, props map[string]string, useCloudAPI bool) (*commands.BoardIdentifyResponse, error) {
+	req := &commands.BoardIdentifyRequest{
+		Instance:                            inst.instance,
+		Properties:                          props,
+		UseCloudApiForUnknownBoardDetection: useCloudAPI,
+	}
+	logCallf(">>> BoardIdentify(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.BoardIdentify(ctx, req)
+	return resp, err
 }

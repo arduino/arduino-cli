@@ -22,12 +22,13 @@ import (
 	"os"
 	"strings"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/buildcache"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
+	"go.bug.st/f"
 )
 
 // buildCore fixdoc
@@ -116,7 +117,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 				return nil, nil, errors.New(i18n.Tr("creating core cache folder: %s", err))
 			}
 			// use archived core
-			if b.logger.Verbose() {
+			if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				b.logger.Info(i18n.Tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
@@ -128,7 +129,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 			extraTargetArchivedCore := extraCoreBuildCachePath.Join(archivedCoreName, "core.a")
 			if canUseArchivedCore(extraTargetArchivedCore) {
 				// use archived core
-				if b.logger.Verbose() {
+				if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					b.logger.Info(i18n.Tr("Using precompiled core: %[1]s", extraTargetArchivedCore))
 				}
 				return extraTargetArchivedCore, variantObjectFiles, nil
@@ -158,7 +159,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 	// archive core.a
 	if targetArchivedCore != nil && !b.onlyUpdateCompilationDatabase {
 		err := archiveFile.CopyTo(targetArchivedCore)
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			if err == nil {
 				b.logger.Info(i18n.Tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {

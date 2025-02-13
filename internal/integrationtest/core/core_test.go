@@ -1366,3 +1366,20 @@ func TestCoreInstallWithWrongArchiveSize(t *testing.T) {
 	_, _, err = cli.Run("--additional-urls", "https://raw.githubusercontent.com/geolink/opentracker-arduino-board/bf6158ebab0402db217bfb02ea61461ddc6f2940/package_opentracker_index.json", "core", "install", "opentracker:sam@1.0.5")
 	require.NoError(t, err)
 }
+
+func TestCoreInstallWithMissingOrInvalidChecksumAndUnsafeInstallEnabled(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/1468
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "install", "GD32Community:gd32")
+	require.Error(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(
+		map[string]string{"ARDUINO_BOARD_MANAGER_ENABLE_UNSAFE_INSTALL": "true"},
+		"--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "install", "GD32Community:gd32")
+	require.NoError(t, err)
+}

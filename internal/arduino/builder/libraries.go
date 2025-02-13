@@ -20,12 +20,13 @@ import (
 	"strings"
 	"time"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 )
 
 // nolint
@@ -129,7 +130,7 @@ func (b *Builder) compileLibraries(libraries libraries.List, includes []string) 
 }
 
 func (b *Builder) compileLibrary(library *libraries.Library, includes []string) (paths.PathList, error) {
-	if b.logger.Verbose() {
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(i18n.Tr(`Compiling library "%[1]s"`, library.Name))
 	}
 	libraryBuildPath := b.librariesBuildPath.Join(library.DirName)
@@ -292,7 +293,7 @@ func (b *Builder) warnAboutArchIncompatibleLibraries(importedLibraries libraries
 // TODO here we can completly remove this part as it's duplicated in what we can
 // read in the gRPC response
 func (b *Builder) printUsedLibraries(importedLibraries libraries.List) {
-	if !b.logger.Verbose() || len(importedLibraries) == 0 {
+	if b.logger.VerbosityLevel() != logger.VerbosityVerbose || len(importedLibraries) == 0 {
 		return
 	}
 

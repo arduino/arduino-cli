@@ -47,7 +47,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, checks resources.IntegrityCheckMode) error {
 	pme, release := pm.NewExplorer()
 	defer release()
 
@@ -56,7 +56,7 @@ func installTool(ctx context.Context, pm *packagemanager.PackageManager, tool *c
 		return errors.New(i18n.Tr("downloading %[1]s tool: %[2]s", tool, err))
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := pme.InstallTool(tool, taskCB, true); err != nil {
+	if err := pme.InstallTool(tool, taskCB, true, checks); err != nil {
 		return errors.New(i18n.Tr("installing %[1]s tool: %[2]s", tool, err))
 	}
 	return nil
@@ -89,7 +89,7 @@ func (s *arduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateReque
 		}
 	}
 
-	config, err := s.settings.DownloaderConfig()
+	config, err := s.settings.DownloaderConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		// Install builtin tools if necessary
 		if len(builtinToolsToInstall) > 0 {
 			for _, toolRelease := range builtinToolsToInstall {
-				if err := installTool(ctx, pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
+				if err := installTool(ctx, pmb.Build(), toolRelease, downloadCallback, taskCallback, resources.IntegrityCheckFull); err != nil {
 					e := &cmderrors.InitFailedError{
 						Code:   codes.Internal,
 						Cause:  err,
@@ -340,7 +340,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	logrus.WithField("index", indexFile).Info("Loading libraries index file")
 	li, err := librariesindex.LoadIndex(indexFile)
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, i18n.Tr("Loading index file: %v", err))
+		s := status.New(codes.FailedPrecondition, i18n.Tr("Loading index file: %v", err))
 		responseError(s)
 		li = librariesindex.EmptyIndex
 	}
@@ -377,7 +377,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					responseError(err.GRPCStatus())
 					continue
 				}
-				config, err := s.settings.DownloaderConfig()
+				config, err := s.settings.DownloaderConfig(ctx)
 				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
@@ -394,7 +394,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 				// Install library
 				taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Installing library %s", libraryRef)})
-				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir); err != nil {
+				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir, resources.IntegrityCheckFull); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
@@ -498,7 +498,7 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	}
 
 	// Perform index update
-	config, err := s.settings.DownloaderConfig()
+	config, err := s.settings.DownloaderConfig(stream.Context())
 	if err != nil {
 		return err
 	}
@@ -534,9 +534,9 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		return &cmderrors.InvalidInstanceError{}
 	}
 
-	report := func(indexURL *url.URL, status rpc.IndexUpdateReport_Status) *rpc.IndexUpdateReport {
+	report := func(indexURL string, status rpc.IndexUpdateReport_Status) *rpc.IndexUpdateReport {
 		return &rpc.IndexUpdateReport{
-			IndexUrl: indexURL.String(),
+			IndexUrl: indexURL,
 			Status:   status,
 		}
 	}
@@ -564,7 +564,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", u))
 			downloadCB.End(false, msg)
 			failed = true
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 
@@ -582,9 +582,9 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 				downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 				downloadCB.End(false, msg)
 				failed = true
-				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 			} else {
-				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_SKIPPED))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_SKIPPED))
 			}
 			continue
 		}
@@ -596,19 +596,19 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, i18n.Tr("Invalid index URL: %s", err))
 			failed = true
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 			continue
 		}
 		indexFile := indexpath.Join(indexFileName)
 		if info, err := indexFile.Stat(); err == nil {
 			ageSecs := int64(time.Since(info.ModTime()).Seconds())
 			if ageSecs < req.GetUpdateIfOlderThanSecs() {
-				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
+				result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_ALREADY_UP_TO_DATE))
 				continue
 			}
 		}
 
-		config, err := s.settings.DownloaderConfig()
+		config, err := s.settings.DownloaderConfig(stream.Context())
 		if err != nil {
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, i18n.Tr("Invalid network configuration: %s", err))
@@ -622,9 +622,9 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		}
 		if err := indexResource.Download(stream.Context(), indexpath, downloadCB, config); err != nil {
 			failed = true
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_FAILED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 		} else {
-			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(URL, rpc.IndexUpdateReport_STATUS_UPDATED))
+			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_UPDATED))
 		}
 	}
 	syncSend.Send(&rpc.UpdateIndexResponse{

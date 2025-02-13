@@ -83,8 +83,9 @@ func PreprocessSketchWithCtags(
 	}
 
 	// Run CTags on gcc-preprocessed source
-	ctagsOutput, ctagsStdErr, err := RunCTags(ctx, ctagsTarget, buildProperties)
+	ctagsOutput, ctagsStdErr, ctagsCmdLine, err := RunCTags(ctx, ctagsTarget, buildProperties)
 	if verbose {
+		stdout.Write([]byte(ctagsCmdLine + "\n"))
 		stderr.Write(ctagsStdErr)
 	}
 	if err != nil {
@@ -178,7 +179,7 @@ func isFirstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) 
 }
 
 // RunCTags performs a run of ctags on the given source file. Returns the ctags output and the stderr contents.
-func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
+func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, string, error) {
 	ctagsBuildProperties := properties.NewMap()
 	ctagsBuildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
 	ctagsBuildProperties.Set("tools.ctags.cmd.path", "{path}/ctags")
@@ -189,24 +190,22 @@ func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *prop
 
 	pattern := ctagsBuildProperties.Get("pattern")
 	if pattern == "" {
-		return nil, nil, errors.New(i18n.Tr("%s pattern is missing", "ctags"))
+		return nil, nil, "", errors.New(i18n.Tr("%s pattern is missing", "ctags"))
 	}
 
 	commandLine := ctagsBuildProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 	proc, err := paths.NewProcess(nil, parts...)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
 
-	// Append ctags arguments to stderr
 	args := fmt.Sprintln(strings.Join(parts, " "))
-	stderr = append([]byte(args), stderr...)
-	return stdout, stderr, err
+	return stdout, stderr, args, err
 }
 
 func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarkers bool) string {

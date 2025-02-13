@@ -126,7 +126,7 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 
 func (indexLib *indexRelease) extractDependencies() []*Dependency {
 	res := []*Dependency{}
-	if indexLib.Dependencies == nil || len(indexLib.Dependencies) == 0 {
+	if len(indexLib.Dependencies) == 0 {
 		return res
 	}
 	for _, indexDep := range indexLib.Dependencies {

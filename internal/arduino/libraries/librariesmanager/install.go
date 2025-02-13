@@ -201,8 +201,8 @@ func (lmi *Installer) InstallZipLib(ctx context.Context, archivePath *paths.Path
 }
 
 // InstallGitLib installs a library hosted on a git repository on the specified path.
-func (lmi *Installer) InstallGitLib(gitURL string, overwrite bool) error {
-	gitLibraryName, ref, err := parseGitURL(gitURL)
+func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
+	libraryName, gitURL, ref, err := parseGitArgURL(argURL)
 	if err != nil {
 		return err
 	}
@@ -213,29 +213,19 @@ func (lmi *Installer) InstallGitLib(gitURL string, overwrite bool) error {
 		return err
 	}
 	defer tmp.RemoveAll()
-	tmpInstallPath := tmp.Join(gitLibraryName)
+	tmpInstallPath := tmp.Join(libraryName)
 
 	depth := 1
 	if ref != "" {
 		depth = 0
 	}
-	repo, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
-		URL:      gitURL,
-		Depth:    depth,
-		Progress: os.Stdout,
-	})
-	if err != nil {
+	if _, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
+		URL:           gitURL,
+		Depth:         depth,
+		Progress:      os.Stdout,
+		ReferenceName: ref,
+	}); err != nil {
 		return err
-	}
-
-	if ref != "" {
-		if h, err := repo.ResolveRevision(ref); err != nil {
-			return err
-		} else if w, err := repo.Worktree(); err != nil {
-			return err
-		} else if err := w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())}); err != nil {
-			return err
-		}
 	}
 
 	// We don't want the installed library to be a git repository thus we delete this folder
@@ -249,25 +239,51 @@ func (lmi *Installer) InstallGitLib(gitURL string, overwrite bool) error {
 	return nil
 }
 
-// parseGitURL tries to recover a library name from a git URL.
+// parseGitArgURL tries to recover a library name from a git URL.
 // Returns an error in case the URL is not a valid git URL.
-func parseGitURL(gitURL string) (string, plumbing.Revision, error) {
-	var res string
-	var rev plumbing.Revision
-	if strings.HasPrefix(gitURL, "git@") {
-		// We can't parse these as URLs
-		i := strings.LastIndex(gitURL, "/")
-		res = strings.TrimSuffix(gitURL[i+1:], ".git")
-	} else if path := paths.New(gitURL); path != nil && path.Exist() {
-		res = path.Base()
-	} else if parsed, err := url.Parse(gitURL); parsed.String() != "" && err == nil {
-		i := strings.LastIndex(parsed.Path, "/")
-		res = strings.TrimSuffix(parsed.Path[i+1:], ".git")
-		rev = plumbing.Revision(parsed.Fragment)
-	} else {
-		return "", "", errors.New(i18n.Tr("invalid git url"))
+func parseGitArgURL(argURL string) (string, string, plumbing.ReferenceName, error) {
+	// On Windows handle paths with backslashes in the form C:\Path\to\library
+	if path := paths.New(argURL); path != nil && path.Exist() {
+		return path.Base(), argURL, "", nil
 	}
-	return res, rev, nil
+
+	// Handle commercial git-specific address in the form "git@xxxxx.com:arduino-libraries/SigFox.git"
+	prefixes := map[string]string{
+		"git@github.com:":    "https://github.com/",
+		"git@gitlab.com:":    "https://gitlab.com/",
+		"git@bitbucket.org:": "https://bitbucket.org/",
+	}
+	for prefix, replacement := range prefixes {
+		if strings.HasPrefix(argURL, prefix) {
+			// We can't parse these as URLs
+			argURL = replacement + strings.TrimPrefix(argURL, prefix)
+		}
+	}
+
+	parsedURL, err := url.Parse(argURL)
+	if err != nil {
+		return "", "", "", fmt.Errorf("%s: %w", i18n.Tr("invalid git url"), err)
+	}
+	if parsedURL.String() == "" {
+		return "", "", "", errors.New(i18n.Tr("invalid git url"))
+	}
+
+	// Extract lib name from "https://github.com/arduino-libraries/SigFox.git#1.0.3"
+	// path == "/arduino-libraries/SigFox.git"
+	slash := strings.LastIndex(parsedURL.Path, "/")
+	if slash == -1 {
+		return "", "", "", errors.New(i18n.Tr("invalid git url"))
+	}
+	libName := strings.TrimSuffix(parsedURL.Path[slash+1:], ".git")
+	if libName == "" {
+		return "", "", "", errors.New(i18n.Tr("invalid git url"))
+	}
+	// fragment == "1.0.3"
+	rev := plumbing.ReferenceName(parsedURL.Fragment)
+	// gitURL == "https://github.com/arduino-libraries/SigFox.git"
+	parsedURL.Fragment = ""
+	gitURL := parsedURL.String()
+	return libName, gitURL, rev, nil
 }
 
 // validateLibrary verifies the dir contains a valid library, meaning it has either

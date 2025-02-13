@@ -24,11 +24,11 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"go.bug.st/f"
 )
 
 // Sketch holds all the files composing a sketch

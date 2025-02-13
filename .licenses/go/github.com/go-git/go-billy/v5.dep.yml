@@ -1,6 +1,6 @@
 ---
 name: github.com/go-git/go-billy/v5
-version: v5.5.0
+version: v5.6.2
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/go-git/go-billy/v5

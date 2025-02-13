@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/pretty
-version: v1.68.1
+version: v1.70.0
 type: go
 summary: Package pretty defines helper functions to pretty-print structs for logging.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/pretty
 license: apache-2.0
 licenses:
-- sources: grpc@v1.68.1/LICENSE
+- sources: grpc@v1.70.0/LICENSE
   text: |2
 
                                      Apache License

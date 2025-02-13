@@ -2,6 +2,8 @@
 
 - `board_manager`
   - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
+  - `enable_unsafe_install` - set to `true` to allow installation of packages that do not pass the checksum test. This
+    is considered an unsafe installation method and should be used only for development purposes.
 - `daemon` - options related to running Arduino CLI as a [gRPC] server.
   - `port` - TCP port used for gRPC client connections.
 - `directories` - directories used by Arduino CLI.
@@ -45,6 +47,11 @@
     [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
 - `network` - configuration options related to the network connection.
   - `proxy` - URL of the proxy server.
+  - `connection_timeout` - network connection timeout, the value format must be a valid input for
+    [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `60s` (60 seconds). `0` means it will
+    wait indefinitely.
+  - `cloud_api.skip_board_detection_calls` - if set to `true` it will make the Arduino CLI skip network calls to Arduino
+    Cloud API to help detection of an unknown board.
 
 ### Default directories
 

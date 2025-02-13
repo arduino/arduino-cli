@@ -104,7 +104,7 @@ func (ir libraryExamplesResult) Data() interface{} {
 }
 
 func (ir libraryExamplesResult) String() string {
-	if ir.Examples == nil || len(ir.Examples) == 0 {
+	if len(ir.Examples) == 0 {
 		return i18n.Tr("No libraries found.")
 	}
 

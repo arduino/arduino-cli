@@ -16,10 +16,10 @@
 package builder
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
@@ -27,7 +27,7 @@ import (
 
 // RunRecipe fixdoc
 func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
-	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
+	logrus.Debugf("Looking for recipes like %s", prefix+"*"+suffix)
 
 	// TODO is it necessary to use Clone?
 	buildProperties := b.buildProperties.Clone()
@@ -36,7 +36,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 	// TODO is it necessary to use Clone?
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
+		logrus.Debugf("Running recipe: %s", recipe)
 
 		command, err := b.prepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
@@ -44,7 +44,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 		}
 
 		if b.onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
-			if b.logger.Verbose() {
+			if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				b.logger.Info(i18n.Tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}
 			return nil

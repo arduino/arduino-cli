@@ -24,11 +24,13 @@ import (
 	"strconv"
 	"strings"
 
-	f "github.com/arduino/arduino-cli/internal/algorithms"
+	"fortio.org/safecast"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
+	"go.bug.st/f"
 )
 
 var (
@@ -239,7 +241,7 @@ func (b *Builder) mergeSketchWithBootloader() error {
 
 	bootloaderPath := b.buildProperties.GetPath("runtime.platform.path").Join("bootloaders", bootloader)
 	if bootloaderPath.NotExist() {
-		if b.logger.Verbose() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Warn(i18n.Tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
 		}
 		return nil
@@ -254,7 +256,7 @@ func (b *Builder) mergeSketchWithBootloader() error {
 		maximumBinSize *= 2
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
-	if err != nil && b.logger.Verbose() {
+	if err != nil && b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 		b.logger.Info(err.Error())
 	}
 
@@ -297,8 +299,12 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 		if segment.Address < initialAddress {
 			initialAddress = segment.Address
 		}
-		if segment.Address+uint32(len(segment.Data)) > lastAddress {
-			lastAddress = segment.Address + uint32(len(segment.Data))
+		lenData, err := safecast.Convert[uint32](len(segment.Data))
+		if err != nil {
+			return err
+		}
+		if segment.Address+lenData > lastAddress {
+			lastAddress = segment.Address + lenData
 		}
 	}
 	for _, segment := range memSketch.GetDataSegments() {
@@ -308,8 +314,12 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 		if segment.Address < initialAddress {
 			initialAddress = segment.Address
 		}
-		if segment.Address+uint32(len(segment.Data)) > lastAddress {
-			lastAddress = segment.Address + uint32(len(segment.Data))
+		lenData, err := safecast.Convert[uint32](len(segment.Data))
+		if err != nil {
+			return err
+		}
+		if segment.Address+lenData > lastAddress {
+			lastAddress = segment.Address + lenData
 		}
 	}
 
@@ -323,7 +333,11 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 	// Write out a .bin if the addresses doesn't go too far away from origin
 	// (and consequently produce a very large bin)
 	size := lastAddress - initialAddress
-	if size > uint32(maximumBinSize) {
+	maximumBinSizeUint32, err := safecast.Convert[uint32](maximumBinSize)
+	if err != nil {
+		return nil
+	}
+	if size > maximumBinSizeUint32 {
 		return nil
 	}
 	mergedSketchPathBin := paths.New(strings.TrimSuffix(mergedSketchPath.String(), ".hex") + ".bin")

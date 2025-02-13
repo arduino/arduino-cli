@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/builder"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
@@ -244,6 +245,13 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 			Message: &rpc.CompileResponse_Progress{Progress: p},
 		})
 	}
+	var verbosity logger.Verbosity = logger.VerbosityNormal
+	if req.GetQuiet() {
+		verbosity = logger.VerbosityQuiet
+	}
+	if req.GetVerbose() {
+		verbosity = logger.VerbosityVerbose
+	}
 	sketchBuilder, err := builder.NewBuilder(
 		ctx,
 		sk,
@@ -265,7 +273,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
 		paths.NewPathList(req.GetLibrary()...),
-		outStream, errStream, req.GetVerbose(), req.GetWarnings(),
+		outStream, errStream, verbosity, req.GetWarnings(),
 		progressCB,
 		pme.GetEnvVarsForSpawnedProcess(),
 	)
@@ -404,6 +412,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 				return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error reading build directory"), Cause: err}
 			}
 			buildFiles.FilterPrefix(baseName)
+			buildFiles.FilterOutDirs()
 			for _, buildFile := range buildFiles {
 				exportedFile := exportPath.Join(buildFile.Base())
 				logrus.WithField("src", buildFile).WithField("dest", exportedFile).Trace("Copying artifact.")
