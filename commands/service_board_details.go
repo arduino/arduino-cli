@@ -48,7 +48,7 @@ func (s *arduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 	details.Name = board.Name()
 	details.Fqbn = board.FQBN()
 	details.PropertiesId = board.BoardID
-	details.Official = fqbn.Packager == "arduino"
+	details.Official = fqbn.Vendor == "arduino"
 	details.Version = board.PlatformRelease.Version.String()
 	details.IdentificationProperties = []*rpc.BoardIdentificationProperties{}
 	for _, p := range board.GetIdentificationProperties() {

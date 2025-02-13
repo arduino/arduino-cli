@@ -290,10 +290,10 @@ func (pme *Explorer) ResolveFQBN(fqbn *fqbn.FQBN) (
 	*properties.Map, *cores.PlatformRelease, error) {
 
 	// Find package
-	targetPackage := pme.packages[fqbn.Packager]
+	targetPackage := pme.packages[fqbn.Vendor]
 	if targetPackage == nil {
 		return nil, nil, nil, nil, nil,
-			errors.New(i18n.Tr("unknown package %s", fqbn.Packager))
+			errors.New(i18n.Tr("unknown package %s", fqbn.Vendor))
 	}
 
 	// Find platform
