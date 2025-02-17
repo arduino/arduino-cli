@@ -1,13 +1,13 @@
 # 
 # Translators:
-# CLI team <prj_cli_team@arduino.cc>, 2022
+# HelaBasa Group <transifex-helabasa-group@yalu.lk>, 2024
 # 
 msgid ""
 msgstr ""
-"Last-Translator: CLI team <prj_cli_team@arduino.cc>, 2022\n"
-"Language-Team: Korean (https://app.transifex.com/arduino-1/teams/108174/ko/)\n"
-"Language: ko\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Last-Translator: HelaBasa Group <transifex-helabasa-group@yalu.lk>, 2024\n"
+"Language-Team: Sinhala (https://app.transifex.com/arduino-1/teams/108174/si/)\n"
+"Language: si\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: internal/version/version.go:56
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
@@ -27,7 +27,7 @@ msgstr ""
 
 #: internal/arduino/builder/builder.go:487
 msgid "%[1]s pattern is missing"
-msgstr "%[1]s 패턴이 없습니다"
+msgstr ""
 
 #: internal/arduino/resources/download.go:51
 msgid "%s already downloaded"
@@ -39,7 +39,7 @@ msgstr ""
 
 #: internal/arduino/cores/packagemanager/install_uninstall.go:373
 msgid "%s installed"
-msgstr ""
+msgstr "%s ස්ථාපිතයි"
 
 #: internal/cli/lib/check_deps.go:121
 msgid "%s is already installed."
@@ -79,11 +79,11 @@ msgstr ""
 
 #: internal/cli/board/listall.go:97 internal/cli/board/search.go:94
 msgid "(hidden)"
-msgstr ""
+msgstr "(සැඟවුණු)"
 
 #: internal/arduino/builder/libraries.go:303
 msgid "(legacy)"
-msgstr "(레거시)"
+msgstr "(පරණ)"
 
 #: internal/cli/lib/install.go:82
 msgid ""
@@ -116,7 +116,7 @@ msgstr ""
 #: internal/cli/core/download.go:35 internal/cli/core/install.go:37
 #: internal/cli/core/uninstall.go:36 internal/cli/core/upgrade.go:38
 msgid "ARCH"
-msgstr ""
+msgstr "ARCH"
 
 #: internal/cli/generatedocs/generatedocs.go:80
 msgid "ARDUINO COMMAND LINE MANUAL"
@@ -216,7 +216,7 @@ msgstr ""
 
 #: internal/cli/lib/search.go:199
 msgid "Author: %s"
-msgstr ""
+msgstr "කර්තෘ: %s"
 
 #: internal/arduino/libraries/librariesmanager/install.go:79
 msgid ""
@@ -257,7 +257,7 @@ msgstr ""
 
 #: internal/arduino/builder/sketch.go:245
 msgid "Bootloader file specified but missing: %[1]s"
-msgstr "부트로더 파일이 지정되었으나 누락됨: %[1]s"
+msgstr ""
 
 #: internal/cli/compile/compile.go:104
 msgid ""
@@ -418,7 +418,7 @@ msgstr ""
 
 #: internal/arduino/builder/builder.go:384
 msgid "Compiling sketch..."
-msgstr "스케치를 컴파일 중…"
+msgstr ""
 
 #: internal/cli/config/init.go:94
 msgid ""
@@ -535,7 +535,7 @@ msgstr ""
 
 #: internal/cli/monitor/monitor.go:331
 msgid "Default"
-msgstr "디폴트"
+msgstr ""
 
 #: internal/cli/board/attach.go:115
 msgid "Default FQBN set to"
@@ -1185,11 +1185,10 @@ msgid ""
 "Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s "
 "bytes for local variables. Maximum is %[2]s bytes."
 msgstr ""
-"전역 변수는 동적 메모리 %[1]s바이트(%[3]s%%)를 사용, %[4]s바이트의 지역변수가 남음.  최대는 %[2]s 바이트."
 
 #: internal/arduino/builder/sizer.go:172
 msgid "Global variables use %[1]s bytes of dynamic memory."
-msgstr "전역 변수는 %[1]s 바이트의 동적 메모리를 사용."
+msgstr ""
 
 #: internal/cli/board/details.go:216 internal/cli/core/list.go:117
 #: internal/cli/core/search.go:117 internal/cli/monitor/monitor.go:331
@@ -1230,7 +1229,7 @@ msgstr ""
 #: internal/cli/core/list.go:117 internal/cli/lib/list.go:138
 #: internal/cli/outdated/outdated.go:103
 msgid "Installed"
-msgstr "설치됨"
+msgstr ""
 
 #: commands/service_library_install.go:201
 msgid "Installed %s"
@@ -1500,7 +1499,7 @@ msgstr ""
 
 #: internal/arduino/builder/sizer.go:208
 msgid "Low memory available, stability problems may occur."
-msgstr "사용 가능한 메모리 부족, 안정성에 문제가 생길 수 있습니다."
+msgstr ""
 
 #: internal/cli/lib/search.go:200
 msgid "Maintainer: %s"
@@ -1523,7 +1522,7 @@ msgstr ""
 
 #: internal/arduino/builder/internal/detector/detector.go:466
 msgid "Missing '%[1]s' from library in %[2]s"
-msgstr "라이브러리 %[2]s에서 '%[1]s'가 없음"
+msgstr ""
 
 #: commands/cmderrors/cmderrors.go:169
 msgid "Missing FQBN (Fully Qualified Board Name)"
@@ -1567,7 +1566,7 @@ msgstr ""
 
 #: internal/arduino/builder/internal/detector/detector.go:156
 msgid "Multiple libraries were found for \"%[1]s\""
-msgstr "\"%[1]s\"를 위한 복수개의 라이브러리가 발견되었습니다"
+msgstr ""
 
 #: internal/cli/board/details.go:216 internal/cli/core/list.go:117
 #: internal/cli/core/search.go:117 internal/cli/lib/list.go:138
@@ -1639,11 +1638,11 @@ msgstr ""
 
 #: internal/arduino/builder/sizer.go:198
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
-msgstr "메모리가 충분하지 않음; 메모리를 줄이기 위한 팁을 위해 다음 링크를 참고하세요%[1]s"
+msgstr ""
 
 #: internal/arduino/builder/internal/detector/detector.go:159
 msgid "Not used: %[1]s"
-msgstr "사용되지 않음: %[1]s"
+msgstr ""
 
 #: internal/cli/board/details.go:187
 msgid "OS:"
@@ -1862,7 +1861,7 @@ msgstr ""
 
 #: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Port"
-msgstr "포트"
+msgstr ""
 
 #: internal/cli/monitor/monitor.go:287 internal/cli/monitor/monitor.go:296
 msgid "Port closed: %v"
@@ -2202,13 +2201,13 @@ msgstr ""
 
 #: internal/arduino/builder/sizer.go:193
 msgid "Sketch too big; see %[1]s for tips on reducing it."
-msgstr "스케치가 너무 큼; 이것을 줄이기 위해 다음을 참고하세요. %[1]s"
+msgstr ""
 
 #: internal/arduino/builder/sizer.go:160
 msgid ""
 "Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s"
 " bytes."
-msgstr "스케치는 프로그램 저장 공간 %[1]s 바이트(%[3]s%%)를 사용. 최대 %[2]s 바이트."
+msgstr ""
 
 #: internal/cli/feedback/warn_deprecated.go:39
 msgid ""
@@ -2390,7 +2389,7 @@ msgstr ""
 
 #: internal/cli/board/list.go:104 internal/cli/board/list.go:142
 msgid "Type"
-msgstr "타입"
+msgstr ""
 
 #: internal/cli/lib/search.go:209
 msgid "Types: %s"
@@ -2560,7 +2559,7 @@ msgstr ""
 
 #: internal/arduino/builder/internal/detector/detector.go:157
 msgid "Used: %[1]s"
-msgstr "사용됨: %[1]s"
+msgstr ""
 
 #: commands/service_compile.go:361
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
@@ -2586,11 +2585,11 @@ msgstr ""
 
 #: internal/arduino/builder/libraries.go:313
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
-msgstr "라이브러리 %[1]s를 버전 %[2]s 폴더: %[3]s %[4]s 에서 사용"
+msgstr ""
 
 #: internal/arduino/builder/libraries.go:307
 msgid "Using library %[1]s in folder: %[2]s %[3]s"
-msgstr "폴더:%[2]s %[3]s의 라이브러리 %[1]s 사용"
+msgstr ""
 
 #: internal/arduino/builder/core.go:121 internal/arduino/builder/core.go:133
 msgid "Using precompiled core: %[1]s"
@@ -2604,7 +2603,7 @@ msgstr ""
 #: internal/arduino/builder/archive_compiled_files.go:51
 #: internal/arduino/builder/compilation.go:182
 msgid "Using previously compiled file: %[1]s"
-msgstr "이전에 컴파일된 파일: %[1]s 사용"
+msgstr ""
 
 #: internal/cli/core/download.go:35 internal/cli/core/install.go:37
 msgid "VERSION"
@@ -2654,7 +2653,6 @@ msgid ""
 "WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
 "incompatible with your current board which runs on %[3]s architecture(s)."
 msgstr ""
-"경고: 라이브러리 %[1]s가 %[2]s 아키텍처에서 실행되며 %[3]s아키텍처에서 실행되는 현재보드에서는 호환되지 않을 수 있습니다."
 
 #: commands/service_upload.go:521
 msgid "Waiting for upload port..."

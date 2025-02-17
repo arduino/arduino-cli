@@ -13,7 +13,7 @@ msgstr ""
 "Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: version/version.go:56
+#: internal/version/version.go:56
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s النسخة : %[3]s commit : %[4]s التاريخ : %[5]s"
 
@@ -29,7 +29,7 @@ msgstr "%[1]s غير صالح . جار اعادة بناء كل شيء"
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s مطلوب و لكن %[2]s مثبت حاليا"
 
-#: internal/arduino/builder/builder.go:486
+#: internal/arduino/builder/builder.go:487
 msgid "%[1]s pattern is missing"
 msgstr "%[1]s التنسيق مفقود"
 
@@ -37,11 +37,11 @@ msgstr "%[1]s التنسيق مفقود"
 msgid "%s already downloaded"
 msgstr "تم تنزيل %s مسبقا"
 
-#: commands/service_upload.go:781
+#: commands/service_upload.go:782
 msgid "%s and %s cannot be used together"
 msgstr "%s و %s لا يمكن استخدامهما معا"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:371
+#: internal/arduino/cores/packagemanager/install_uninstall.go:373
 msgid "%s installed"
 msgstr "%s تم تثبيته بنجاح"
 
@@ -54,7 +54,7 @@ msgstr "%s مثبت مسبقا"
 msgid "%s is not a directory"
 msgstr "%s ليس مسارا صحيحا"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:290
+#: internal/arduino/cores/packagemanager/install_uninstall.go:292
 msgid "%s is not managed by package manager"
 msgstr "%s غير مدار بواسطة مدير الحزمات"
 
@@ -66,7 +66,7 @@ msgstr ""
 msgid "%s must be installed."
 msgstr "يجب تثبيت %s"
 
-#: internal/arduino/builder/internal/preprocessor/ctags.go:192
+#: internal/arduino/builder/internal/preprocessor/ctags.go:193
 #: internal/arduino/builder/internal/preprocessor/gcc.go:62
 msgid "%s pattern is missing"
 msgstr "%s النسق مفقود"
@@ -75,7 +75,7 @@ msgstr "%s النسق مفقود"
 msgid "'%s' has an invalid signature"
 msgstr "'%s' لديه توقيع غير صحيح"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:448
+#: internal/arduino/cores/packagemanager/package_manager.go:415
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -85,7 +85,7 @@ msgstr "'build.core' و 'build.variant' تشيران الى منصة مختلف�
 msgid "(hidden)"
 msgstr "(مخفي)"
 
-#: internal/arduino/builder/libraries.go:302
+#: internal/arduino/builder/libraries.go:303
 msgid "(legacy)"
 msgstr "(الشكل القديم)"
 
@@ -150,7 +150,7 @@ msgstr "جميع المنصات محدثة"
 msgid "All the cores are already at the latest version"
 msgstr "كل الانوية محدثة باخر اصدار مسبقا"
 
-#: commands/service_library_install.go:135
+#: commands/service_library_install.go:136
 msgid "Already installed %s"
 msgstr "%s مثبت مسبقا"
 
@@ -180,7 +180,7 @@ msgstr "المعمارية : %s"
 msgid "Archive already exists"
 msgstr "الارشيف موجود مسبقا"
 
-#: internal/arduino/builder/core.go:163
+#: internal/arduino/builder/core.go:164
 msgid "Archiving built core (caching) in: %[1]s"
 msgstr "جار ارشفة built core (caching) في : %[1]s"
 
@@ -269,11 +269,11 @@ msgstr "اسم اللوحة"
 msgid "Board version:"
 msgstr "نسخة اللوحة :"
 
-#: internal/arduino/builder/sketch.go:243
+#: internal/arduino/builder/sketch.go:245
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "ملف محمل الإقلاع (Bootloader) تم تحدديده لكنه مفقود:  %[1]s"
 
-#: internal/cli/compile/compile.go:101
+#: internal/cli/compile/compile.go:104
 msgid ""
 "Builds of cores and sketches are saved into this path to be cached and "
 "reused."
@@ -287,13 +287,13 @@ msgstr "تعذر انشاء مسار البيانات %s"
 msgid "Can't create sketch"
 msgstr "تعذر انشاء المشروع"
 
-#: commands/service_library_download.go:91
-#: commands/service_library_download.go:94
+#: commands/service_library_download.go:95
+#: commands/service_library_download.go:98
 msgid "Can't download library"
 msgstr "تعذر تنزيل المكتبة"
 
 #: commands/service_platform_uninstall.go:89
-#: internal/arduino/cores/packagemanager/install_uninstall.go:136
+#: internal/arduino/cores/packagemanager/install_uninstall.go:138
 msgid "Can't find dependencies for platform %s"
 msgstr "تعذر ايجاد التبعيات للمنصة %s"
 
@@ -313,11 +313,11 @@ msgstr "لا يمكن استخدام العلامات التالية مع بعض
 msgid "Can't write debug log: %s"
 msgstr "تعذر كتابة سجل مصحح الاخطاء : %s"
 
-#: commands/service_compile.go:189 commands/service_compile.go:192
+#: commands/service_compile.go:190 commands/service_compile.go:193
 msgid "Cannot create build cache directory"
 msgstr "تعذر انشاء مجلد لل \"build cache\""
 
-#: commands/service_compile.go:214
+#: commands/service_compile.go:215
 msgid "Cannot create build directory"
 msgstr "تعذر انشاء مسار البناء"
 
@@ -355,15 +355,15 @@ msgstr "تعذر ايجاد المسار المطلق : %v"
 msgid "Cannot get the configuration key %[1]s: %[2]v"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:143
+#: internal/arduino/cores/packagemanager/install_uninstall.go:145
 msgid "Cannot install platform"
 msgstr "تعذر تثبيت المنصة"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:349
+#: internal/arduino/cores/packagemanager/install_uninstall.go:351
 msgid "Cannot install tool %s"
 msgstr "تعذر تثبيت الاداة %s"
 
-#: commands/service_upload.go:543
+#: commands/service_upload.go:544
 msgid "Cannot perform port reset: %s"
 msgstr "تعذر اجراء اعادة تشغيل المنفذ : %s"
 
@@ -372,7 +372,7 @@ msgstr "تعذر اجراء اعادة تشغيل المنفذ : %s"
 msgid "Cannot remove the configuration key %[1]s: %[2]v"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:161
+#: internal/arduino/cores/packagemanager/install_uninstall.go:163
 msgid "Cannot upgrade platform"
 msgstr "تعذر تحديث المنصة"
 
@@ -413,7 +413,7 @@ msgid ""
 "a change."
 msgstr "الامر يبقى قيد التشغيل و يطبع قائمة للوحات المتصلة عندما يوجد تغيير"
 
-#: commands/service_debug_config.go:178 commands/service_upload.go:451
+#: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
 msgstr "المشروع المترجم لم يتم ايجاده في %s"
 
@@ -421,19 +421,19 @@ msgstr "المشروع المترجم لم يتم ايجاده في %s"
 msgid "Compiles Arduino sketches."
 msgstr "يترجم مشاريع الاردوينو"
 
-#: internal/arduino/builder/builder.go:420
+#: internal/arduino/builder/builder.go:421
 msgid "Compiling core..."
 msgstr "يتم ترجمة النواة"
 
-#: internal/arduino/builder/builder.go:399
+#: internal/arduino/builder/builder.go:400
 msgid "Compiling libraries..."
 msgstr "يتم ترجمة المكتبات"
 
-#: internal/arduino/builder/libraries.go:133
+#: internal/arduino/builder/libraries.go:134
 msgid "Compiling library \"%[1]s\""
 msgstr "يتم ترجمة المكتبة \"%[1]s\""
 
-#: internal/arduino/builder/builder.go:383
+#: internal/arduino/builder/builder.go:384
 msgid "Compiling sketch..."
 msgstr "ترجمة الشيفرة البرمجية..."
 
@@ -457,11 +457,11 @@ msgid ""
 "<ID>=<value>[,<ID>=<value>]..."
 msgstr "تكوين إعدادات منفذ الاتصال. التنسيق هو <ID>=<value>[,<ID>=<value>]"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:177
+#: internal/arduino/cores/packagemanager/install_uninstall.go:179
 msgid "Configuring platform."
 msgstr "جار تهيئة المنصة"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:359
+#: internal/arduino/cores/packagemanager/install_uninstall.go:361
 msgid "Configuring tool."
 msgstr "جار تهيئة الاداة"
 
@@ -477,19 +477,19 @@ msgstr ""
 msgid "Core"
 msgstr "النواة"
 
-#: internal/cli/configuration/network.go:103
+#: internal/cli/configuration/network.go:127
 msgid "Could not connect via HTTP"
 msgstr "تعذر الاتصال بواسطة HTTP"
 
-#: commands/instances.go:486
+#: commands/instances.go:487
 msgid "Could not create index directory"
 msgstr "تعذر انشاء فهرس داخل المسار"
 
-#: internal/arduino/builder/core.go:41
+#: internal/arduino/builder/core.go:42
 msgid "Couldn't deeply cache core build: %[1]s"
 msgstr "تعذر القيام بـ deeply cache لــ core build : %[1]s"
 
-#: internal/arduino/builder/sizer.go:154
+#: internal/arduino/builder/sizer.go:155
 msgid "Couldn't determine program size"
 msgstr "تعذر معرفة حجم البرنامج"
 
@@ -501,7 +501,7 @@ msgstr "تعذر ايجاد المسار الحالي %v"
 msgid "Create a new Sketch"
 msgstr "انشاء مشروع جديد"
 
-#: internal/cli/compile/compile.go:98
+#: internal/cli/compile/compile.go:101
 msgid "Create and print a profile configuration from the build."
 msgstr "انشاء و طباعة اعدادات البروفايل من البناء (build)"
 
@@ -517,7 +517,7 @@ msgstr ""
 "انشاء او تحديث ملف الضبط في مسار البيانات او في مسار مخصص مع اعدادات التهيئة"
 " الحالية"
 
-#: internal/cli/compile/compile.go:331
+#: internal/cli/compile/compile.go:334
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -593,7 +593,7 @@ msgstr "تبعيات : %s"
 msgid "Description"
 msgstr "الوصف"
 
-#: internal/arduino/builder/builder.go:313
+#: internal/arduino/builder/builder.go:314
 msgid "Detecting libraries used..."
 msgstr "الكشف عن المكتبات المستخدمة ..."
 
@@ -657,7 +657,7 @@ msgstr ""
 msgid "Do not try to update library dependencies if already installed."
 msgstr "لا تحاول تحديث المكتبات أذا تم تثبيتها."
 
-#: commands/service_library_download.go:88
+#: commands/service_library_download.go:92
 msgid "Downloading %s"
 msgstr "يتم تنزيل %s"
 
@@ -665,21 +665,21 @@ msgstr "يتم تنزيل %s"
 msgid "Downloading index signature: %s"
 msgstr "جار تنزيل فهرس التوقيعات %s"
 
-#: commands/instances.go:563 commands/instances.go:581
-#: commands/instances.go:595 commands/instances.go:612
+#: commands/instances.go:564 commands/instances.go:582
+#: commands/instances.go:596 commands/instances.go:613
 #: internal/arduino/resources/index.go:82
 msgid "Downloading index: %s"
 msgstr "جار تنزيل الفهرس : %s"
 
-#: commands/instances.go:371
+#: commands/instances.go:372
 msgid "Downloading library %s"
 msgstr "جار تحميل المكتبة %s"
 
-#: commands/instances.go:53
+#: commands/instances.go:54
 msgid "Downloading missing tool %s"
 msgstr "جار تنزيل الاداة الناقصة"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:96
+#: internal/arduino/cores/packagemanager/install_uninstall.go:98
 msgid "Downloading packages"
 msgstr "جار تنزيل الحزم"
 
@@ -717,7 +717,7 @@ msgid "Error adding file to sketch archive"
 msgstr ""
 "خطأ اثناء اضافة الملف لارشيف المشروع (Error adding file to sketch archive)"
 
-#: internal/arduino/builder/core.go:169
+#: internal/arduino/builder/core.go:170
 msgid "Error archiving built core (caching) in %[1]s: %[2]s"
 msgstr "خطا اثناء ارشفة built core (caching) في %[1]s : %[2]s"
 
@@ -734,11 +734,11 @@ msgstr ""
 msgid "Error cleaning caches: %v"
 msgstr "خطأ اثناء تنظيف الكاش : %v"
 
-#: internal/cli/compile/compile.go:220
+#: internal/cli/compile/compile.go:223
 msgid "Error converting path to absolute: %v"
 msgstr "تعذر تحويل المسار الى مطلق : %v"
 
-#: commands/service_compile.go:411
+#: commands/service_compile.go:420
 msgid "Error copying output file %s"
 msgstr "خطا اثناء نسخ ملف الخرج %s"
 
@@ -752,7 +752,7 @@ msgstr "خطأ في أنشاء ملف التعريفات:%v"
 msgid "Error creating instance: %v"
 msgstr "خطا اثناء انشاء النسخة %v"
 
-#: commands/service_compile.go:395
+#: commands/service_compile.go:403
 msgid "Error creating output dir"
 msgstr "خطا اثناء انشاء مسار الخرج"
 
@@ -777,7 +777,7 @@ msgstr "خطا اثناء تحميل %[1]s : %[2]v"
 msgid "Error downloading %s"
 msgstr "خطأ اثناء تحميل %s"
 
-#: commands/instances.go:660 internal/arduino/resources/index.go:83
+#: commands/instances.go:661 internal/arduino/resources/index.go:83
 msgid "Error downloading index '%s'"
 msgstr "خطأ اثناء تحميل الفهرس '%s'"
 
@@ -785,7 +785,7 @@ msgstr "خطأ اثناء تحميل الفهرس '%s'"
 msgid "Error downloading index signature '%s'"
 msgstr "خطأ اثناء تحميل توقيع الفهرس : '%s'"
 
-#: commands/instances.go:381 commands/instances.go:387
+#: commands/instances.go:382 commands/instances.go:388
 msgid "Error downloading library %s"
 msgstr "خطأ اثناء تحميل المكتبة %s"
 
@@ -809,7 +809,7 @@ msgstr "خطا اثناء ترميز JSON الخاص بالخرج : %v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:264 internal/cli/compile/compile.go:306
+#: internal/cli/compile/compile.go:267 internal/cli/compile/compile.go:309
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "خطا اثناء الرفع : %v"
@@ -818,7 +818,7 @@ msgstr "خطا اثناء الرفع : %v"
 msgid "Error during board detection"
 msgstr ""
 
-#: internal/cli/compile/compile.go:379
+#: internal/cli/compile/compile.go:383
 msgid "Error during build: %v"
 msgstr "خطأ اثناء بناء : %v"
 
@@ -839,7 +839,7 @@ msgstr "خطا اثناء تطوير : %v"
 msgid "Error extracting %s"
 msgstr "خطأ اثناء استخراج %s"
 
-#: commands/service_upload.go:448
+#: commands/service_upload.go:449
 msgid "Error finding build artifacts"
 msgstr "خطا اثناء البحث عن build artifacts"
 
@@ -865,7 +865,7 @@ msgid ""
 "correct sketch folder or provide the --port flag: %s"
 msgstr ""
 
-#: commands/service_compile.go:330 commands/service_library_list.go:115
+#: commands/service_compile.go:338 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "خطأ  اثناء الحصول على المعلومات للمكتبة %s"
 
@@ -902,7 +902,7 @@ msgstr "خطأ اثناء تثبيت مكتبة GIT : %v"
 msgid "Error installing Zip Library: %v"
 msgstr "خطأ اثناء تثبيت مكتبة ZIP : %v"
 
-#: commands/instances.go:397
+#: commands/instances.go:398
 msgid "Error installing library %s"
 msgstr "خطأ اثناء تثبيت المكتبة %s"
 
@@ -946,15 +946,15 @@ msgstr "خطأ اثناء فتح %s"
 msgid "Error opening debug logging file: %s"
 msgstr "تعذر فتح الملف الذي يحوي سجلات التصحيح (debug logging file) : %s"
 
-#: internal/cli/compile/compile.go:193
+#: internal/cli/compile/compile.go:196
 msgid "Error opening source code overrides data file: %v"
 msgstr "خطا اثناء فتح الكود المصدر الذي يتجاوز ملف البيانات : %v"
 
-#: internal/cli/compile/compile.go:206
+#: internal/cli/compile/compile.go:209
 msgid "Error parsing --show-properties flag: %v"
 msgstr "تعذر تقطيع علامة show-properties-- : %v"
 
-#: commands/service_compile.go:404
+#: commands/service_compile.go:412
 msgid "Error reading build directory"
 msgstr "خطا اثناء قراءة مسار البناء"
 
@@ -970,7 +970,7 @@ msgstr "خطا اثناء حل التبعيات ل %[1]s:%[2]s"
 msgid "Error retrieving core list: %v"
 msgstr "خطا اثناء استعادة قائمة النواة : %v"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:158
+#: internal/arduino/cores/packagemanager/install_uninstall.go:160
 msgid "Error rolling-back changes: %s"
 msgstr "خطا اثناء التراجع عن التغييرات : %s"
 
@@ -1027,7 +1027,7 @@ msgstr "خطا اثناء تحديث فهرس المكتبات : %v"
 msgid "Error upgrading libraries"
 msgstr "تعذر ترقية المكتبات"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:153
+#: internal/arduino/cores/packagemanager/install_uninstall.go:155
 msgid "Error upgrading platform: %s"
 msgstr "خطا اثناء تطوير المنصة : %s"
 
@@ -1040,10 +1040,10 @@ msgstr "تعذر التحقق من التوقيع"
 msgid "Error while detecting libraries included by %[1]s"
 msgstr "تعذر العثور على المكتبات التي ضُمِّنَت (included) من قبل : %[1]s"
 
-#: internal/arduino/builder/sizer.go:79 internal/arduino/builder/sizer.go:88
-#: internal/arduino/builder/sizer.go:91 internal/arduino/builder/sizer.go:110
-#: internal/arduino/builder/sizer.go:215 internal/arduino/builder/sizer.go:225
-#: internal/arduino/builder/sizer.go:229
+#: internal/arduino/builder/sizer.go:80 internal/arduino/builder/sizer.go:89
+#: internal/arduino/builder/sizer.go:92 internal/arduino/builder/sizer.go:111
+#: internal/arduino/builder/sizer.go:218 internal/arduino/builder/sizer.go:228
+#: internal/arduino/builder/sizer.go:232
 msgid "Error while determining sketch size: %s"
 msgstr "خطأ اثناء تحديد حجم المشروع : %s"
 
@@ -1059,7 +1059,7 @@ msgstr "خطأ في كتابة الملف: %v"
 msgid "Error: command description is not supported by %v"
 msgstr "خطأ : وصف الامر غير مدعوم من قبل %v"
 
-#: internal/cli/compile/compile.go:199
+#: internal/cli/compile/compile.go:202
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "خطأ : كود مصدري خاطئ سيقوم بالكتابة فوق ملف البيانات : %v"
 
@@ -1079,7 +1079,7 @@ msgstr "الامثلة : "
 msgid "Executable to debug"
 msgstr "الملف التنفيذي الذي سيتم تصحيحه (Executable to debug)"
 
-#: commands/service_debug_config.go:181 commands/service_upload.go:454
+#: commands/service_debug_config.go:181 commands/service_upload.go:455
 msgid "Expected compiled sketch in directory %s, but is a file instead"
 msgstr "توقعت وجود المشروع المترجم في المسار %s . لكنني وجدت ملفا بدلا عن ذلك"
 
@@ -1093,23 +1093,23 @@ msgstr "FQBN"
 msgid "FQBN:"
 msgstr "FQBN:"
 
-#: commands/service_upload.go:577
+#: commands/service_upload.go:578
 msgid "Failed chip erase"
 msgstr "فشل محي الشريحة"
 
-#: commands/service_upload.go:584
+#: commands/service_upload.go:585
 msgid "Failed programming"
 msgstr "فشل المبرمجة"
 
-#: commands/service_upload.go:580
+#: commands/service_upload.go:581
 msgid "Failed to burn bootloader"
 msgstr "فشل حرق محمل الاقلاع"
 
-#: commands/instances.go:87
+#: commands/instances.go:88
 msgid "Failed to create data directory"
 msgstr "فشل انشاء مسار البيانات"
 
-#: commands/instances.go:76
+#: commands/instances.go:77
 msgid "Failed to create downloads directory"
 msgstr "فشل انشاء مسار التنزيلات"
 
@@ -1129,7 +1129,7 @@ msgstr "تعذر الاستماع على منفذ TCP : %[1]s . خطأ غير م
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "تعذر الاستماع على منفذ TCP : %s . العناوين قيد الاستخدام مسبقا"
 
-#: commands/service_upload.go:588
+#: commands/service_upload.go:589
 msgid "Failed uploading"
 msgstr "تعذر الرفع"
 
@@ -1137,7 +1137,7 @@ msgstr "تعذر الرفع"
 msgid "File:"
 msgstr "الملف : "
 
-#: commands/service_compile.go:162
+#: commands/service_compile.go:163
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1203,7 +1203,7 @@ msgstr "يولد سكربت الاكمال"
 msgid "Generates completion scripts for various shells"
 msgstr "يولد سكربتات اكمال من اجل مختلف ال shells"
 
-#: internal/arduino/builder/builder.go:333
+#: internal/arduino/builder/builder.go:334
 msgid "Generating function prototypes..."
 msgstr "يتم توليد النماذج الاولية للتوابع :"
 
@@ -1215,7 +1215,7 @@ msgstr ""
 msgid "Global Flags:"
 msgstr "علامات عامة :"
 
-#: internal/arduino/builder/sizer.go:164
+#: internal/arduino/builder/sizer.go:166
 msgid ""
 "Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s "
 "bytes for local variables. Maximum is %[2]s bytes."
@@ -1223,7 +1223,7 @@ msgstr ""
 "المتغيرات العامة تستخدم  %[1]s بايت (%[3]s%%) من الرام ، تبقى %[4]s بايت "
 "للمتغيرات المحلية. الحجم الاقصى  %[2]s بايت."
 
-#: internal/arduino/builder/sizer.go:170
+#: internal/arduino/builder/sizer.go:172
 msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "المتغيرات العامة تستخدم  %[1]s بايت من الذاكرة المتغيرة."
 
@@ -1241,7 +1241,7 @@ msgstr "Id"
 msgid "Identification properties:"
 msgstr "خصائص التعرُّف"
 
-#: internal/cli/compile/compile.go:132
+#: internal/cli/compile/compile.go:135
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr ""
 "اذا تم تحديده فان مجموعة الكود الثنائي الذي تم بناؤه سيتم تصديره الى مجلد "
@@ -1272,20 +1272,20 @@ msgstr "تثبيت المكتبات داخل مجلد IDE-Builtin"
 msgid "Installed"
 msgstr "تم التنصيب"
 
-#: commands/service_library_install.go:200
+#: commands/service_library_install.go:201
 msgid "Installed %s"
 msgstr "تم تثبيت %s"
 
-#: commands/service_library_install.go:183
-#: internal/arduino/cores/packagemanager/install_uninstall.go:333
+#: commands/service_library_install.go:184
+#: internal/arduino/cores/packagemanager/install_uninstall.go:335
 msgid "Installing %s"
 msgstr "جار تثبيت %s"
 
-#: commands/instances.go:395
+#: commands/instances.go:396
 msgid "Installing library %s"
 msgstr "جار تثبيت المكتبة %s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:119
+#: internal/arduino/cores/packagemanager/install_uninstall.go:121
 #: internal/arduino/cores/packagemanager/profiles.go:134
 msgid "Installing platform %s"
 msgstr "جار تثبيت المنصة %s"
@@ -1324,7 +1324,7 @@ msgstr "عنوان TCP غير صالح لان المنفذ غير موجود"
 msgid "Invalid URL"
 msgstr "URL غير صالح"
 
-#: commands/instances.go:183
+#: commands/instances.go:184
 msgid "Invalid additional URL: %v"
 msgstr "URL الاضافي غير صالح : %v"
 
@@ -1338,19 +1338,19 @@ msgstr ""
 msgid "Invalid argument passed: %v"
 msgstr "تم اعطاء وسيط غير صالح %v"
 
-#: commands/service_compile.go:274
+#: commands/service_compile.go:282
 msgid "Invalid build properties"
 msgstr "خصائص البناء غير صالحة"
 
-#: internal/arduino/builder/sizer.go:250
+#: internal/arduino/builder/sizer.go:253
 msgid "Invalid data size regexp: %s"
 msgstr "data size regexp غير صالح : %s"
 
-#: internal/arduino/builder/sizer.go:256
+#: internal/arduino/builder/sizer.go:259
 msgid "Invalid eeprom size regexp: %s"
 msgstr "eeprom size regexp غير صالح %s"
 
-#: commands/instances.go:596
+#: commands/instances.go:597
 msgid "Invalid index URL: %s"
 msgstr ""
 
@@ -1370,11 +1370,11 @@ msgstr "مكتبة غير صالحة"
 msgid "Invalid logging level: %s"
 msgstr ""
 
-#: commands/instances.go:613
+#: commands/instances.go:614
 msgid "Invalid network configuration: %s"
 msgstr ""
 
-#: internal/cli/configuration/network.go:66
+#: internal/cli/configuration/network.go:83
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "network.proxy غير صالح '%[1]s': %[2]s"
 
@@ -1382,7 +1382,7 @@ msgstr "network.proxy غير صالح '%[1]s': %[2]s"
 msgid "Invalid output format: %s"
 msgstr "صيغة اخراج خاطئة : %s"
 
-#: commands/instances.go:580
+#: commands/instances.go:581
 msgid "Invalid package index in %s"
 msgstr "فهرس الحزمة غير صالح في %s"
 
@@ -1390,7 +1390,7 @@ msgstr "فهرس الحزمة غير صالح في %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "معطيات خاطئة %s: النسخة غير مسموح بها"
 
-#: commands/service_board_list.go:81
+#: commands/service_board_identify.go:169
 msgid "Invalid pid value: '%s'"
 msgstr "قيمة pid غير صالحة : '%s'"
 
@@ -1398,15 +1398,15 @@ msgstr "قيمة pid غير صالحة : '%s'"
 msgid "Invalid profile"
 msgstr "ملف تعريف غير صالح"
 
-#: commands/service_monitor.go:269
+#: commands/service_monitor.go:270
 msgid "Invalid recipe in platform.txt"
 msgstr "وصفة غير صالحة ضمن platform.txt"
 
-#: internal/arduino/builder/sizer.go:240
+#: internal/arduino/builder/sizer.go:243
 msgid "Invalid size regexp: %s"
 msgstr "size regexp غير صالح : %s"
 
-#: main.go:85
+#: main.go:86
 msgid "Invalid value in configuration"
 msgstr ""
 
@@ -1414,11 +1414,11 @@ msgstr ""
 msgid "Invalid version"
 msgstr "نسخة غير صالحة"
 
-#: commands/service_board_list.go:78
+#: commands/service_board_identify.go:166
 msgid "Invalid vid value: '%s'"
 msgstr "قيمة vid غير صالحة : '%s'"
 
-#: internal/cli/compile/compile.go:129
+#: internal/cli/compile/compile.go:132
 msgid ""
 "Just produce the compilation database, without actually compiling. All build"
 " commands are skipped except pre* hooks."
@@ -1443,11 +1443,11 @@ msgstr "اسم المكتبة"
 msgid "Latest"
 msgstr "الأخير"
 
-#: internal/arduino/builder/libraries.go:91
+#: internal/arduino/builder/libraries.go:92
 msgid "Library %[1]s has been declared precompiled:"
 msgstr "المكتبة %[1]s تم تحديدها بانها precompiled"
 
-#: commands/service_library_install.go:141
+#: commands/service_library_install.go:142
 #: internal/arduino/libraries/librariesmanager/install.go:131
 msgid ""
 "Library %[1]s is already installed, but with a different version: %[2]s"
@@ -1461,7 +1461,7 @@ msgstr "المكتبة %s مثبتة باخر اصدار مسبقا"
 msgid "Library %s is not installed"
 msgstr "المكتبة %s غير مثبتة"
 
-#: commands/instances.go:374
+#: commands/instances.go:375
 msgid "Library %s not found"
 msgstr "تعذر ايجاد المكتبة %s"
 
@@ -1480,8 +1480,8 @@ msgstr ""
 msgid "Library install failed"
 msgstr "فشل تثبيت المكتبة"
 
-#: commands/service_library_install.go:234
-#: commands/service_library_install.go:274
+#: commands/service_library_install.go:235
+#: commands/service_library_install.go:275
 msgid "Library installed"
 msgstr "المكتبة مثبتة"
 
@@ -1489,7 +1489,7 @@ msgstr "المكتبة مثبتة"
 msgid "License: %s"
 msgstr "رخصة"
 
-#: internal/arduino/builder/builder.go:436
+#: internal/arduino/builder/builder.go:437
 msgid "Linking everything together..."
 msgstr "جار ربط كل شيء مع بعضه"
 
@@ -1517,7 +1517,7 @@ msgstr ""
 "اعرض كل خيارات اللوحات مفصولة عن بعضها بفواصل . او يمكن استخدامها عدة مرات "
 "من اجل عدة خيارات"
 
-#: internal/cli/compile/compile.go:107
+#: internal/cli/compile/compile.go:110
 msgid ""
 "List of custom build properties separated by commas. Or can be used multiple"
 " times for multiple properties."
@@ -1541,8 +1541,8 @@ msgstr "انشاء قائمة بجميع اللوحات المتصلة"
 msgid "Lists cores and libraries that can be upgraded"
 msgstr "يحصي النوى و المكتبات التي يمكن ترقيتها"
 
-#: commands/instances.go:221 commands/instances.go:232
-#: commands/instances.go:342
+#: commands/instances.go:222 commands/instances.go:233
+#: commands/instances.go:343
 msgid "Loading index file: %v"
 msgstr "جار تحميل ملف الفهرس : %v"
 
@@ -1550,7 +1550,7 @@ msgstr "جار تحميل ملف الفهرس : %v"
 msgid "Location"
 msgstr "الموقع"
 
-#: internal/arduino/builder/sizer.go:205
+#: internal/arduino/builder/sizer.go:208
 msgid "Low memory available, stability problems may occur."
 msgstr "ذاكرة منخفضة متبقية، مشاكل عدم إستقرار قد تحدث."
 
@@ -1558,7 +1558,7 @@ msgstr "ذاكرة منخفضة متبقية، مشاكل عدم إستقرار 
 msgid "Maintainer: %s"
 msgstr "القائم بالصيانة : %s"
 
-#: internal/cli/compile/compile.go:137
+#: internal/cli/compile/compile.go:140
 msgid ""
 "Max number of parallel compiles. If set to 0 the number of available CPUs "
 "cores will be used."
@@ -1602,7 +1602,7 @@ msgstr "المبرمج مفقود"
 msgid "Missing required upload field: %s"
 msgstr ""
 
-#: internal/arduino/builder/sizer.go:244
+#: internal/arduino/builder/sizer.go:247
 msgid "Missing size regexp"
 msgstr " size regexp مفقود"
 
@@ -1684,7 +1684,7 @@ msgstr "لا توجد منصات مثبتة"
 msgid "No platforms matching your search."
 msgstr "ﻻ يوجد منصات تطابق بحثك"
 
-#: commands/service_upload.go:533
+#: commands/service_upload.go:534
 msgid "No upload port found, using %s as fallback"
 msgstr "تعذر ايجاد منفذ رفع , باستخدام %s كرجوع احتياطي fallback"
 
@@ -1692,7 +1692,7 @@ msgstr "تعذر ايجاد منفذ رفع , باستخدام %s كرجوع ا�
 msgid "No valid dependencies solution found"
 msgstr "تعذر ايجاد حل تبعيات صالح"
 
-#: internal/arduino/builder/sizer.go:195
+#: internal/arduino/builder/sizer.go:198
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
 msgstr "الذاكرة غير كافية؛ راجع %[1]s لنصائح حول استخدامها بكفائة"
 
@@ -1724,38 +1724,38 @@ msgstr "فتح منفذ تواصل مع اللوحة"
 msgid "Option:"
 msgstr "اختيار:"
 
-#: internal/cli/compile/compile.go:117
+#: internal/cli/compile/compile.go:120
 msgid ""
 "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr ""
 "اختياري، يمكن أن يكون: %s. يُستخدم لإخبار ال gcc أي مستوي تحذير يَستخدِم (-W"
 " flag)"
 
-#: internal/cli/compile/compile.go:130
+#: internal/cli/compile/compile.go:133
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr "اختياري , يقوم بتنظيف مجلد البناء ولا يستخدم اي بناء مخزن مؤقتا"
 
-#: internal/cli/compile/compile.go:127
+#: internal/cli/compile/compile.go:130
 msgid ""
 "Optional, optimize compile output for debugging, rather than for release."
 msgstr "اختياري , يحسن مخرجات المترجم خلال تصحيح الاخطاء بدلا عن الاصدار"
 
-#: internal/cli/compile/compile.go:119
+#: internal/cli/compile/compile.go:122
 msgid "Optional, suppresses almost every output."
 msgstr "اختياري , يكبح كل خرج"
 
-#: internal/cli/compile/compile.go:118 internal/cli/upload/upload.go:79
+#: internal/cli/compile/compile.go:121 internal/cli/upload/upload.go:79
 msgid "Optional, turns on verbose mode."
 msgstr "اختياري، يُفعل الوضع المفصل."
 
-#: internal/cli/compile/compile.go:133
+#: internal/cli/compile/compile.go:136
 msgid ""
 "Optional. Path to a .json file that contains a set of replacements of the "
 "sketch source code."
 msgstr ""
 "اختياري , مسار لملف json. الذي يحتوي على البدائل من الكود المصدري للمشروع"
 
-#: internal/cli/compile/compile.go:109
+#: internal/cli/compile/compile.go:112
 msgid ""
 "Override a build property with a custom value. Can be used multiple times "
 "for multiple properties."
@@ -1817,11 +1817,11 @@ msgstr "موقع الحزمة على الويب"
 msgid "Paragraph: %s"
 msgstr "المقطع : %s"
 
-#: internal/cli/compile/compile.go:454 internal/cli/compile/compile.go:469
+#: internal/cli/compile/compile.go:458 internal/cli/compile/compile.go:473
 msgid "Path"
 msgstr "المسار"
 
-#: internal/cli/compile/compile.go:126
+#: internal/cli/compile/compile.go:129
 msgid ""
 "Path to a collection of libraries. Can be used multiple times or entries can"
 " be comma separated."
@@ -1829,7 +1829,7 @@ msgstr ""
 "المسار الى مجموعة من المكتبات . يمكن استخدامه عدة مرات او من اجل عدة مدخلات "
 "حيث يتم فصلها باستخدام فاصلة"
 
-#: internal/cli/compile/compile.go:124
+#: internal/cli/compile/compile.go:127
 msgid ""
 "Path to a single library’s root folder. Can be used multiple times or "
 "entries can be comma separated."
@@ -1841,7 +1841,7 @@ msgstr ""
 msgid "Path to the file where logs will be written."
 msgstr "مسار للملف حيث تُكتب السجلات"
 
-#: internal/cli/compile/compile.go:105
+#: internal/cli/compile/compile.go:108
 msgid ""
 "Path where to save compiled files. If omitted, a directory will be created "
 "in the default temporary path of your OS."
@@ -1849,20 +1849,20 @@ msgstr ""
 "المسار الذي يتم فيه حفظ الملفات التي تمت ترجمتها , اذا تم ازالته , سيتم "
 "انشاء مجلد داخل المسار المؤقت الافتراضي في نظام التشغيل"
 
-#: commands/service_upload.go:514
+#: commands/service_upload.go:515
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr "جار تفعيل 1200-bps touch reset على المنفذ التسلسلي %s"
 
-#: commands/service_platform_install.go:86
-#: commands/service_platform_install.go:93
+#: commands/service_platform_install.go:87
+#: commands/service_platform_install.go:94
 msgid "Platform %s already installed"
 msgstr "المنصة %s مثبتة سابقا"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:194
+#: internal/arduino/cores/packagemanager/install_uninstall.go:196
 msgid "Platform %s installed"
 msgstr "تم تثبيت المنصة: %s"
 
-#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:406 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1870,7 +1870,7 @@ msgstr ""
 "المنصة %sغير موجودة في اي فهرس معروف\n"
 "ربما تحتاج الى اضافة عنوان url من طرف 3 "
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:318
+#: internal/arduino/cores/packagemanager/install_uninstall.go:320
 msgid "Platform %s uninstalled"
 msgstr "تم إلغاء تثبيت المنصة: %s"
 
@@ -1886,7 +1886,7 @@ msgstr "المنصة '%s' غير موجودة"
 msgid "Platform ID"
 msgstr "Platform ID"
 
-#: internal/cli/compile/compile.go:387 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:391 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "id المنصة غير صحيح"
 
@@ -1946,8 +1946,8 @@ msgstr "المنفذ %v مغلق"
 msgid "Port monitor error"
 msgstr "خطا في مراقب المنفذ"
 
-#: internal/arduino/builder/libraries.go:101
-#: internal/arduino/builder/libraries.go:109
+#: internal/arduino/builder/libraries.go:102
+#: internal/arduino/builder/libraries.go:110
 msgid "Precompiled library in \"%[1]s\" not found"
 msgstr "تعذر ايجاد المكتبة التي تمت ترجمتها مسبقا في \"%[1]s\""
 
@@ -1955,7 +1955,7 @@ msgstr "تعذر ايجاد المكتبة التي تمت ترجمتها مسب
 msgid "Print details about a board."
 msgstr "طباعة تفاصيل عن لوحة."
 
-#: internal/cli/compile/compile.go:100
+#: internal/cli/compile/compile.go:103
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "طباعة الكود قبل معالجته الى stdout بدلا من الترجمة "
 
@@ -2011,11 +2011,11 @@ msgstr "يشمل : %s"
 msgid "Removes one or more values from a setting."
 msgstr "يزيل قيمة او اكثر من اعداد"
 
-#: commands/service_library_install.go:187
+#: commands/service_library_install.go:188
 msgid "Replacing %[1]s with %[2]s"
 msgstr "تبديل %[1]s ب %[2]s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:123
+#: internal/arduino/cores/packagemanager/install_uninstall.go:125
 msgid "Replacing platform %[1]s with %[2]s"
 msgstr "استبدال المنصة %[1]s بـ %[2]s"
 
@@ -2031,12 +2031,12 @@ msgstr "التشغيل ضمن الوضع الصامت , يظهر فقط شاشة
 msgid "Run the Arduino CLI as a gRPC daemon."
 msgstr ""
 
-#: internal/arduino/builder/core.go:42
+#: internal/arduino/builder/core.go:43
 msgid "Running normal build of the core..."
 msgstr "جار تشغيل البناء العادي من النواة"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:297
-#: internal/arduino/cores/packagemanager/install_uninstall.go:411
+#: internal/arduino/cores/packagemanager/install_uninstall.go:299
+#: internal/arduino/cores/packagemanager/install_uninstall.go:413
 msgid "Running pre_uninstall script."
 msgstr ""
 
@@ -2048,7 +2048,7 @@ msgstr ""
 msgid "SVD file path"
 msgstr ""
 
-#: internal/cli/compile/compile.go:103
+#: internal/cli/compile/compile.go:106
 msgid "Save build artifacts in this directory."
 msgstr "حفظ ادوات البناء ضمن هذا المجلد"
 
@@ -2269,7 +2269,7 @@ msgstr "عرض رقم نسخة Arduino CLI"
 msgid "Size (bytes):"
 msgstr "الحجم (بالبايت) :"
 
-#: commands/service_compile.go:278
+#: commands/service_compile.go:286
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2283,13 +2283,13 @@ msgstr "تم انشاء المشروع في : %s"
 msgid "Sketch profile to use"
 msgstr "ملف التعريف للمشروع الذي سيتم استخدامه"
 
-#: internal/arduino/builder/sizer.go:190
+#: internal/arduino/builder/sizer.go:193
 msgid "Sketch too big; see %[1]s for tips on reducing it."
 msgstr ""
 "الشيفرة البرمجية كبير جدا; راجع %[1]s\n"
 "لنصائح لاختصارها."
 
-#: internal/arduino/builder/sizer.go:158
+#: internal/arduino/builder/sizer.go:160
 msgid ""
 "Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s"
 " bytes."
@@ -2304,19 +2304,19 @@ msgid ""
 msgstr ""
 "المشاريع ذوي اللاحقة pde. في حالة تقاعد , الرجاء تغيير لاحقة الملف الى ino."
 
-#: internal/arduino/builder/linker.go:30
+#: internal/arduino/builder/linker.go:31
 msgid "Skip linking of final executable."
 msgstr "تخطي ربط البرنامج النهائي القابل للتنفيذ"
 
-#: commands/service_upload.go:507
+#: commands/service_upload.go:508
 msgid "Skipping 1200-bps touch reset: no serial port selected!"
 msgstr "جار تخطي 1200bps touch reset لانه لم يتم تحديد منفذ تسلسلي"
 
-#: internal/arduino/builder/archive_compiled_files.go:27
+#: internal/arduino/builder/archive_compiled_files.go:28
 msgid "Skipping archive creation of: %[1]s"
 msgstr "جار تخطي انشاء الارشيف لـ : %[1]s"
 
-#: internal/arduino/builder/compilation.go:183
+#: internal/arduino/builder/compilation.go:184
 msgid "Skipping compile of: %[1]s"
 msgstr "جار تخطي ترجمة : %[1]s"
 
@@ -2324,16 +2324,16 @@ msgstr "جار تخطي ترجمة : %[1]s"
 msgid "Skipping dependencies detection for precompiled library %[1]s"
 msgstr "جار تخطي الكشف عن توابع المكتبة %[1]s التي تمت ترجمتها مسبقا"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:190
+#: internal/arduino/cores/packagemanager/install_uninstall.go:192
 msgid "Skipping platform configuration."
 msgstr "جار تخطي ضبط المنصة"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:306
-#: internal/arduino/cores/packagemanager/install_uninstall.go:420
+#: internal/arduino/cores/packagemanager/install_uninstall.go:308
+#: internal/arduino/cores/packagemanager/install_uninstall.go:422
 msgid "Skipping pre_uninstall script."
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:368
+#: internal/arduino/cores/packagemanager/install_uninstall.go:370
 msgid "Skipping tool configuration."
 msgstr "جار تخطي ضبط الاداة"
 
@@ -2341,7 +2341,7 @@ msgstr "جار تخطي ضبط الاداة"
 msgid "Skipping: %[1]s"
 msgstr "جار تخطي : %[1]s"
 
-#: commands/instances.go:633
+#: commands/instances.go:634
 msgid "Some indexes could not be updated."
 msgstr "يمكن تحديث بعض الفهارس"
 
@@ -2362,7 +2362,7 @@ msgstr ""
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "ملف التهيئة المخصص (اذا لم يتم تحديده سيتم استخدام الملف الافتراضي)"
 
-#: internal/cli/compile/compile.go:90
+#: internal/cli/compile/compile.go:93
 msgid ""
 "The flag --build-cache-path has been deprecated. Please use just --build-"
 "path alone or configure the build cache path in the Arduino CLI settings."
@@ -2404,7 +2404,7 @@ msgstr ""
 msgid "The library %s has multiple installations:"
 msgstr "يوجد عدة نسخ مثبتة من المكتبة %s"
 
-#: internal/cli/compile/compile.go:115
+#: internal/cli/compile/compile.go:118
 msgid ""
 "The name of the custom encryption key to use to encrypt a binary during the "
 "compile process. Used only by the platforms that support it."
@@ -2412,7 +2412,7 @@ msgstr ""
 "اسم مفتاح التشفير المخصص الذي سيستخدم لتشفير ملف ثنائي اثناء الترجمة . "
 "يستخدم فقط من قبل المنصات التي تدعم ذلك"
 
-#: internal/cli/compile/compile.go:113
+#: internal/cli/compile/compile.go:116
 msgid ""
 "The name of the custom signing key to use to sign a binary during the "
 "compile process. Used only by the platforms that support it."
@@ -2424,7 +2424,7 @@ msgstr ""
 msgid "The output format for the logs, can be: %s"
 msgstr "تنسيق الخرج الخاص بالسجلات , يمكن ان يكون : %s"
 
-#: internal/cli/compile/compile.go:111
+#: internal/cli/compile/compile.go:114
 msgid ""
 "The path of the dir to search for the custom keys to sign and encrypt a "
 "binary. Used only by the platforms that support it."
@@ -2432,7 +2432,7 @@ msgstr ""
 "المسار الى المجلد للبحث عن مفتاح خاص لتوقيع و تشفير الملف الثنائي , يتم "
 "استخدامه من قبل المنصات التي تدعم ذلك فقط"
 
-#: internal/arduino/builder/libraries.go:151
+#: internal/arduino/builder/libraries.go:152
 msgid "The platform does not support '%[1]s' for precompiled libraries."
 msgstr "المنصة لا تدعم '%[1]s' من اجل المكتبات الغير مترجمة"
 
@@ -2459,12 +2459,12 @@ msgstr ""
 msgid "Timestamp each incoming line."
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:89
-#: internal/arduino/cores/packagemanager/install_uninstall.go:328
+#: internal/arduino/cores/packagemanager/install_uninstall.go:91
+#: internal/arduino/cores/packagemanager/install_uninstall.go:330
 msgid "Tool %s already installed"
 msgstr "الاداة %s مثبتة مسبقا"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:432
+#: internal/arduino/cores/packagemanager/install_uninstall.go:434
 msgid "Tool %s uninstalled"
 msgstr "تم الغاء تثبيت الاداة %s"
 
@@ -2484,7 +2484,7 @@ msgstr "بادئة مجموعة الادوات "
 msgid "Toolchain type"
 msgstr "نوع مجموعة الادوات"
 
-#: internal/cli/compile/compile.go:400 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "جرب تشغيل %s"
 
@@ -2504,7 +2504,7 @@ msgstr "الأنواع: %s"
 msgid "URL:"
 msgstr "URL:"
 
-#: internal/arduino/builder/core.go:165
+#: internal/arduino/builder/core.go:166
 msgid ""
 "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
 msgstr ""
@@ -2527,17 +2527,17 @@ msgstr "تعذر ايجاد user home dir : %v"
 msgid "Unable to open file for logging: %s"
 msgstr "تعذر فتح ملف من اجل انشاء سجلات : %s"
 
-#: commands/instances.go:562
+#: commands/instances.go:563
 msgid "Unable to parse URL"
 msgstr "تعذر تقطيع عنوان URL"
 
 #: commands/service_library_uninstall.go:71
-#: internal/arduino/cores/packagemanager/install_uninstall.go:280
+#: internal/arduino/cores/packagemanager/install_uninstall.go:282
 msgid "Uninstalling %s"
 msgstr "إلغاء تثبيت %s"
 
 #: commands/service_platform_uninstall.go:99
-#: internal/arduino/cores/packagemanager/install_uninstall.go:166
+#: internal/arduino/cores/packagemanager/install_uninstall.go:168
 msgid "Uninstalling %s, tool is no more required"
 msgstr "إلغاء تثبيت %s، الأداة لم تعد مطلوبة"
 
@@ -2583,7 +2583,7 @@ msgstr "يحدث فهرس المكتبات الى اخر نسخة"
 msgid "Updates the libraries index."
 msgstr "يحدث فهرس المكتبات"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:45
+#: internal/arduino/cores/packagemanager/install_uninstall.go:47
 msgid "Upgrade doesn't accept parameters with version"
 msgstr "الترقية لا تقبل مدخلات مع نسخة"
 
@@ -2616,7 +2616,7 @@ msgstr "يرفع مشاريع الاردوينو , و لا يقوم بترجمة
 msgid "Upload port address, e.g.: COM3 or /dev/ttyACM2"
 msgstr "عنوان منفذ الرفع : مثال , COM3 او /dev/ttyACM2"
 
-#: commands/service_upload.go:531
+#: commands/service_upload.go:532
 msgid "Upload port found on %s"
 msgstr "تم ايجاد منفذ الرفع في %s"
 
@@ -2624,7 +2624,7 @@ msgstr "تم ايجاد منفذ الرفع في %s"
 msgid "Upload port protocol, e.g: serial"
 msgstr "بروتوكول منفذ الرفع , مثال : serial \"تسلسلي\""
 
-#: internal/cli/compile/compile.go:120
+#: internal/cli/compile/compile.go:123
 msgid "Upload the binary after the compilation."
 msgstr "يرفع الملف الثنائي بعد الترجمة"
 
@@ -2636,7 +2636,7 @@ msgstr "يرفع محمل الاقلاع على اللوحة باستخدام م
 msgid "Upload the bootloader."
 msgstr "يرفع محمل الاقلاع"
 
-#: internal/cli/compile/compile.go:269 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:272 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2658,11 +2658,11 @@ msgstr "الاستخدام"
 msgid "Use %s for more information about a command."
 msgstr "استخدم %s من اجل المزيد من المعلومات حول امر معين"
 
-#: internal/cli/compile/compile.go:452
+#: internal/cli/compile/compile.go:456
 msgid "Used library"
 msgstr "المكتبة المستخدمة"
 
-#: internal/cli/compile/compile.go:467
+#: internal/cli/compile/compile.go:471
 msgid "Used platform"
 msgstr "المنصة المستخدمة"
 
@@ -2670,7 +2670,7 @@ msgstr "المنصة المستخدمة"
 msgid "Used: %[1]s"
 msgstr "مستخدم : %[1]s"
 
-#: commands/service_compile.go:353
+#: commands/service_compile.go:361
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "يتم استخدام اللوحة '%[1]s' من منصة داخل المجلد %[2]s"
 
@@ -2678,7 +2678,7 @@ msgstr "يتم استخدام اللوحة '%[1]s' من منصة داخل الم
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "يتم استخدام توابع المكتبة التي تم تخزينها مؤقتا من اجل الملف : %[1]s"
 
-#: commands/service_compile.go:354
+#: commands/service_compile.go:362
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "يتم استخدام النواة '%[1]s' من منصة داخل الملف %[2]s "
 
@@ -2692,25 +2692,25 @@ msgid ""
 "WARNING: Your board may require different settings to work!\n"
 msgstr ""
 
-#: internal/arduino/builder/libraries.go:312
+#: internal/arduino/builder/libraries.go:313
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
 msgstr "استخدام المكتبة %[1]s الإصدار %[2]s في المجلد:  %[3]s %[4]s"
 
-#: internal/arduino/builder/libraries.go:306
+#: internal/arduino/builder/libraries.go:307
 msgid "Using library %[1]s in folder: %[2]s %[3]s"
 msgstr "استخدام المكتبة %[1]s في المجلد:  %[2]s %[3]s"
 
-#: internal/arduino/builder/core.go:120 internal/arduino/builder/core.go:132
+#: internal/arduino/builder/core.go:121 internal/arduino/builder/core.go:133
 msgid "Using precompiled core: %[1]s"
 msgstr "يتم استخدام النواة التي تم ترجمتها مسبقا %[1]s"
 
-#: internal/arduino/builder/libraries.go:98
-#: internal/arduino/builder/libraries.go:106
+#: internal/arduino/builder/libraries.go:99
+#: internal/arduino/builder/libraries.go:107
 msgid "Using precompiled library in %[1]s"
 msgstr "يتم استخدام المكتبة التي تم ترجمتها مسبقا %[1]s"
 
-#: internal/arduino/builder/archive_compiled_files.go:50
-#: internal/arduino/builder/compilation.go:181
+#: internal/arduino/builder/archive_compiled_files.go:51
+#: internal/arduino/builder/compilation.go:182
 msgid "Using previously compiled file: %[1]s"
 msgstr "استخدام الملف المترجم سابقا: %[1]s"
 
@@ -2727,11 +2727,11 @@ msgid "Values"
 msgstr "القيم"
 
 #: internal/cli/burnbootloader/burnbootloader.go:62
-#: internal/cli/compile/compile.go:122 internal/cli/upload/upload.go:78
+#: internal/cli/compile/compile.go:125 internal/cli/upload/upload.go:78
 msgid "Verify uploaded binary after the upload."
 msgstr "التاكد من الملف الثنائي الذي سيتم رفعه قبل الرفع"
 
-#: internal/cli/compile/compile.go:453 internal/cli/compile/compile.go:468
+#: internal/cli/compile/compile.go:457 internal/cli/compile/compile.go:472
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "النسخة"
@@ -2740,24 +2740,24 @@ msgstr "النسخة"
 msgid "Versions: %s"
 msgstr "النسخ : %s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:185
+#: internal/arduino/cores/packagemanager/install_uninstall.go:187
 msgid "WARNING cannot configure platform: %s"
 msgstr "تحذير , تعذرت تهيئة المنصة %s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:364
+#: internal/arduino/cores/packagemanager/install_uninstall.go:366
 msgid "WARNING cannot configure tool: %s"
 msgstr "تحذير , تعذر تهيئة الاداة %s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:302
-#: internal/arduino/cores/packagemanager/install_uninstall.go:416
+#: internal/arduino/cores/packagemanager/install_uninstall.go:304
+#: internal/arduino/cores/packagemanager/install_uninstall.go:418
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr ""
 
-#: internal/cli/compile/compile.go:330
+#: internal/cli/compile/compile.go:333
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "تحذير : المشروع سيترجم باستخدام مكتبة خاصة او اكثر . "
 
-#: internal/arduino/builder/libraries.go:283
+#: internal/arduino/builder/libraries.go:284
 msgid ""
 "WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
 "incompatible with your current board which runs on %[3]s architecture(s)."
@@ -2765,11 +2765,11 @@ msgstr ""
 "تحذير: المكتبة %[1]s تعمل على معمارية %[2]s وقد لا تتوافق مع لوحتك الحالية "
 "التي تعمل على معمارية %[3]s."
 
-#: commands/service_upload.go:520
+#: commands/service_upload.go:521
 msgid "Waiting for upload port..."
 msgstr "يتم انتظار منفذ الرفع (upload port) ... "
 
-#: commands/service_compile.go:359
+#: commands/service_compile.go:367
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -2789,7 +2789,7 @@ msgid ""
 "directory."
 msgstr "تكتب الاعدادات الضبط الحالية في ملف التهيئة داخل مجلد البيانات"
 
-#: internal/cli/compile/compile.go:150 internal/cli/compile/compile.go:153
+#: internal/cli/compile/compile.go:153 internal/cli/compile/compile.go:156
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 "لا يمكنك استخدام flag %s اثناء الترجمة باستخدام بروفايل (while compiling "
@@ -2827,11 +2827,11 @@ msgstr ""
 msgid "basic search for \"esp32\" and \"display\" limited to official Maintainer"
 msgstr ""
 
-#: commands/service_upload.go:791
+#: commands/service_upload.go:792
 msgid "binary file not found in %s"
 msgstr "تعذر ايجاد الملف الثنائي (Binary file) داخل %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:348
+#: internal/arduino/cores/packagemanager/package_manager.go:315
 msgid "board %s not found"
 msgstr "اللوحة %s غير موجودة"
 
@@ -2847,7 +2847,7 @@ msgstr "مجلد المكتبات المدمجة غير محدد"
 msgid "can't find latest release of %s"
 msgstr "تعذر العثور على اخر اصدار من %s"
 
-#: commands/instances.go:272
+#: commands/instances.go:273
 msgid "can't find latest release of tool %s"
 msgstr "تعذر العثور على اخر اصدار من الاداة %s"
 
@@ -2859,11 +2859,11 @@ msgstr "تعذر ايجاد نمط للاكتشاف بواسطة id %s"
 msgid "candidates"
 msgstr "المرشحون"
 
-#: commands/service_upload.go:737 commands/service_upload.go:744
+#: commands/service_upload.go:738 commands/service_upload.go:745
 msgid "cannot execute upload tool: %s"
 msgstr "تعذر تشغيل اداة الرفع : %s"
 
-#: internal/arduino/resources/install.go:40
+#: internal/arduino/resources/install.go:48
 msgid "checking local archive integrity"
 msgstr "جار التاكد من اكتمال ملف الارشيف"
 
@@ -2891,11 +2891,11 @@ msgstr ""
 msgid "computing hash: %s"
 msgstr "جار حوسبة التلبيد \"hash\" : %s"
 
-#: internal/arduino/cores/fqbn.go:81
+#: pkg/fqbn/fqbn.go:83
 msgid "config key %s contains an invalid character"
 msgstr ""
 
-#: internal/arduino/cores/fqbn.go:86
+#: pkg/fqbn/fqbn.go:87
 msgid "config value %s contains an invalid character"
 msgstr ""
 
@@ -2903,15 +2903,15 @@ msgstr ""
 msgid "copying library to destination directory:"
 msgstr "جار نسخ المكتبة الى مجلد الوجهة"
 
-#: commands/service_upload.go:863
+#: commands/service_upload.go:864
 msgid "could not find a valid build artifact"
 msgstr "تعذر ايجاد ادوات صالحة للبناء (valid build artifact)"
 
-#: commands/service_platform_install.go:94
+#: commands/service_platform_install.go:95
 msgid "could not overwrite"
 msgstr "تعذر الكتابة فوقه"
 
-#: commands/service_library_install.go:190
+#: commands/service_library_install.go:191
 msgid "could not remove old library"
 msgstr "تعذر ازالة المكتبة القديمة"
 
@@ -2920,20 +2920,20 @@ msgstr "تعذر ازالة المكتبة القديمة"
 msgid "could not update sketch project file"
 msgstr "تعذر تحديث ملف المشروع"
 
-#: internal/arduino/builder/core.go:116 internal/arduino/builder/core.go:140
+#: internal/arduino/builder/core.go:117 internal/arduino/builder/core.go:141
 msgid "creating core cache folder: %s"
 msgstr "جار انشاء ملف تخزن مؤقت للنواة : %s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:219
+#: internal/arduino/cores/packagemanager/install_uninstall.go:221
 msgid "creating installed.json in %[1]s: %[2]s"
 msgstr "جار انشاء installed.json داخل %[1]s : %[2]s"
 
-#: internal/arduino/resources/install.go:45
-#: internal/arduino/resources/install.go:49
+#: internal/arduino/resources/install.go:54
+#: internal/arduino/resources/install.go:58
 msgid "creating temp dir for extraction: %s"
 msgstr "جار انشاء مسار مؤقت للاستخراج : %s"
 
-#: internal/arduino/builder/sizer.go:196
+#: internal/arduino/builder/sizer.go:199
 msgid "data section exceeds available space in board"
 msgstr ""
 "قسم البيانات تخطى الحجم المتوفر في اللوحة (data section exceeds available "
@@ -2951,7 +2951,7 @@ msgstr "تعذر التثبيت لان مجلد الوجهة %s موجود مس�
 msgid "destination directory already exists"
 msgstr "مجلد الوجهة موجودة مسبقا"
 
-#: internal/arduino/libraries/librariesmanager/install.go:278
+#: internal/arduino/libraries/librariesmanager/install.go:294
 msgid "directory doesn't exist: %s"
 msgstr "المجلد غير موجود : %s"
 
@@ -2967,7 +2967,7 @@ msgstr "المستكشف %s غير موجود"
 msgid "discovery %s not installed"
 msgstr "تعذر تثبيت المستكشف %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:746
+#: internal/arduino/cores/packagemanager/package_manager.go:713
 msgid "discovery release not found: %s"
 msgstr "تعذر ايجاد اصدار المستكشف %s"
 
@@ -2983,11 +2983,11 @@ msgstr "تنزيل اخر نسخة من  Arduino SAMD core"
 msgid "downloaded"
 msgstr "تم تحميله"
 
-#: commands/instances.go:55
+#: commands/instances.go:56
 msgid "downloading %[1]s tool: %[2]s"
 msgstr "جار تنزيل الاداة %[1]s : %[2]s"
 
-#: internal/arduino/cores/fqbn.go:60
+#: pkg/fqbn/fqbn.go:63
 msgid "empty board identifier"
 msgstr "معرف اللوحة خالي (empty board identifier)"
 
@@ -3003,12 +3003,12 @@ msgstr "تعذر فتح %s"
 msgid "error parsing version constraints"
 msgstr "تعذر تقطيع قيود النسخة"
 
-#: commands/service_board_list.go:115
+#: commands/service_board_identify.go:203
 msgid "error processing response from server"
 msgstr ""
 "خطأ اثناء معالجة الرد من السيرفر (error processing response from server)"
 
-#: commands/service_board_list.go:95
+#: commands/service_board_identify.go:183
 msgid "error querying Arduino Cloud Api"
 msgstr "خطا اثناء القيام باستعلامات مع Arduino Cloud Api"
 
@@ -3016,7 +3016,7 @@ msgstr "خطا اثناء القيام باستعلامات مع Arduino Cloud A
 msgid "extracting archive"
 msgstr ""
 
-#: internal/arduino/resources/install.go:68
+#: internal/arduino/resources/install.go:77
 msgid "extracting archive: %s"
 msgstr "جار استخراج الارشيف : %s"
 
@@ -3024,7 +3024,7 @@ msgstr "جار استخراج الارشيف : %s"
 msgid "failed to compute hash of file \"%s\""
 msgstr "تعذر حساب تلبيد \"hash\" ملف \"%s\""
 
-#: commands/service_board_list.go:90
+#: commands/service_board_identify.go:178
 msgid "failed to initialize http client"
 msgstr "تعذر تهيئة http client"
 
@@ -3032,7 +3032,7 @@ msgstr "تعذر تهيئة http client"
 msgid "fetched archive size differs from size specified in index"
 msgstr "حجم الارشيف الذي تم جلبه يختلف عن الحجم المحدد في الفهرس"
 
-#: internal/arduino/resources/install.go:123
+#: internal/arduino/resources/install.go:132
 msgid "files in archive must be placed in a subdirectory"
 msgstr "ملفات الارشيف يجب ان توضع في مسار فرعي"
 
@@ -3062,7 +3062,7 @@ msgstr "من اجل اخر نسخة"
 msgid "for the specific version."
 msgstr "من اجل النسخة الحالية "
 
-#: internal/arduino/cores/fqbn.go:66
+#: pkg/fqbn/fqbn.go:68
 msgid "fqbn's field %s contains an invalid character"
 msgstr ""
 
@@ -3086,11 +3086,11 @@ msgstr "جار جلب معلومات الارشيف : %s"
 #: internal/arduino/resources/checksums.go:89
 #: internal/arduino/resources/download.go:36
 #: internal/arduino/resources/helpers.go:39
-#: internal/arduino/resources/install.go:56
+#: internal/arduino/resources/install.go:65
 msgid "getting archive path: %s"
 msgstr "جار جلب مسار الارشيف : %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:354
+#: internal/arduino/cores/packagemanager/package_manager.go:321
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "جار الحصول على خصائص البناء للوحة %[1]s : %[2]s "
 
@@ -3110,11 +3110,11 @@ msgstr "جار الحصول على توابع الاداة من اجل المن�
 msgid "install directory not set"
 msgstr "لم يتم تحديد مجلد التثبيت"
 
-#: commands/instances.go:59
+#: commands/instances.go:60
 msgid "installing %[1]s tool: %[2]s"
 msgstr "جار تثبيت الاداة %[1]s : %[2]s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:211
+#: internal/arduino/cores/packagemanager/install_uninstall.go:213
 msgid "installing platform %[1]s: %[2]s"
 msgstr "جار تثبيت المنصة %[1]s : %[2]s"
 
@@ -3130,7 +3130,7 @@ msgstr "يوجد directive \"عبارة برمجية بداخل الكود ال�
 msgid "invalid checksum format: %s"
 msgstr "تنسيق المجموع الاختباري \"checksum\" غير صالح : %s"
 
-#: internal/arduino/cores/fqbn.go:73 internal/arduino/cores/fqbn.go:78
+#: pkg/fqbn/fqbn.go:75 pkg/fqbn/fqbn.go:80
 msgid "invalid config option: %s"
 msgstr "اعداد التهيئة غير صالح : %s"
 
@@ -3162,11 +3162,14 @@ msgstr "اسم المكتبة الفارغة غير صالح "
 msgid "invalid empty library version: %s"
 msgstr "نسخة المكتبة الفارغة غير صالحة : %s"
 
-#: internal/arduino/cores/board.go:143
+#: internal/arduino/cores/board.go:144
 msgid "invalid empty option found"
 msgstr "تم ايجاد اعداد اعداد فارغ غير صالح"
 
+#: internal/arduino/libraries/librariesmanager/install.go:265
 #: internal/arduino/libraries/librariesmanager/install.go:268
+#: internal/arduino/libraries/librariesmanager/install.go:275
+#: internal/arduino/libraries/librariesmanager/install.go:279
 msgid "invalid git url"
 msgstr "عنوان url لـ git غير صالح"
 
@@ -3194,7 +3197,7 @@ msgstr "موقع المكتبة غير صالح : %s"
 msgid "invalid library: no header files found"
 msgstr "مكتبة غير صالحة : لا يوجد ترويسة في الملف"
 
-#: internal/arduino/cores/board.go:146
+#: internal/arduino/cores/board.go:147
 msgid "invalid option '%s'"
 msgstr "خيار غير صالح %s"
 
@@ -3209,10 +3212,6 @@ msgstr ""
 #: internal/inventory/inventory.go:98
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr ""
-
-#: internal/arduino/cores/packageindex/index.go:278
-msgid "invalid platform archive size: %s"
-msgstr "حجم ملف ارشيف المنصة غير صالح : %s"
 
 #: internal/arduino/sketch/profiles.go:252
 msgid "invalid platform identifier"
@@ -3234,7 +3233,7 @@ msgstr "قيمة الضبط الخاصة بالمنفذ غير صالحة : %s:%
 msgid "invalid port configuration: %s=%s"
 msgstr ""
 
-#: commands/service_upload.go:724
+#: commands/service_upload.go:725
 msgid "invalid recipe '%[1]s': %[2]s"
 msgstr "وصفة غير صالحة %[1]s : %[2]s"
 
@@ -3248,7 +3247,7 @@ msgstr ""
 "\"_\" , المحارف المتبقية يمكنها ان تحوي \"-\" و \".\" بالاضافة الى ما سبق , "
 "المحرف الاخير لا يمكن ان يكون \".\""
 
-#: internal/arduino/cores/board.go:150
+#: internal/arduino/cores/board.go:151
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr "قيمة خاطئة '%[1]s' من اجل الخيار %[2]s"
 
@@ -3292,7 +3291,7 @@ msgstr ""
 msgid "library %s already installed"
 msgstr "المكتبة %s مثبتة مسبقا"
 
-#: internal/arduino/libraries/librariesmanager/install.go:315
+#: internal/arduino/libraries/librariesmanager/install.go:331
 msgid "library not valid"
 msgstr "المكتبة غير صالحة"
 
@@ -3306,8 +3305,8 @@ msgstr "جار تحميل %[1]s:%[2]s"
 msgid "loading boards: %s"
 msgstr "جار تحميل اللوحات : %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:501
-#: internal/arduino/cores/packagemanager/package_manager.go:516
+#: internal/arduino/cores/packagemanager/package_manager.go:468
+#: internal/arduino/cores/packagemanager/package_manager.go:483
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "جار تحميل ملف json index %[1]s : %[2]s"
 
@@ -3344,7 +3343,7 @@ msgstr "جار تحميل اصدار الاداة (tool release) في %s"
 msgid "looking for boards.txt in %s"
 msgstr "جار البحث عن boards.txt داخل %s"
 
-#: commands/service_upload.go:806
+#: commands/service_upload.go:807
 msgid "looking for build artifacts"
 msgstr ""
 
@@ -3360,7 +3359,7 @@ msgstr "يوجد directive \"عبارة برمجية بداخل الكود ال�
 msgid "missing checksum for: %s"
 msgstr "المجموع الاختباري (checksum) لـ %s مفقود"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:462
+#: internal/arduino/cores/packagemanager/package_manager.go:429
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "تعذر العثور على الحزمة %[1]s التي التي تشير اليها اللوحة %[2]s "
 
@@ -3369,12 +3368,12 @@ msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr ""
 "يوجد حزمة مفقودة من الفهرس %s , لا يمكن ضمان التحديثات المستقبلية بسبب ذلك"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:467
+#: internal/arduino/cores/packagemanager/package_manager.go:434
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "تعذر العثور على المنصة %[1]s : %[2]s التي التي تشير اليها اللوحة  %[3]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:472
+#: internal/arduino/cores/packagemanager/package_manager.go:439
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "تعذر العثور على المنصة اصدار (platform release) %[1]s : %[2]s التي التي تشير"
@@ -3384,17 +3383,17 @@ msgstr ""
 msgid "missing signature"
 msgstr "هناك توقيع غير موجود"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:757
+#: internal/arduino/cores/packagemanager/package_manager.go:724
 msgid "monitor release not found: %s"
 msgstr "تعذر ايجاد اصدار المراقب : %s"
 
 #: internal/arduino/libraries/librariesmanager/install.go:197
-#: internal/arduino/libraries/librariesmanager/install.go:246
-#: internal/arduino/resources/install.go:97
+#: internal/arduino/libraries/librariesmanager/install.go:236
+#: internal/arduino/resources/install.go:106
 msgid "moving extracted archive to destination dir: %s"
 msgstr "جار نقل الارشيف الذي تم استخراجه الى مجلد الوجهة : %s"
 
-#: commands/service_upload.go:858
+#: commands/service_upload.go:859
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "تم ايجاد اكثر من build artifacts : '%[1]s' و '%[2]s'"
 
@@ -3402,7 +3401,7 @@ msgstr "تم ايجاد اكثر من build artifacts : '%[1]s' و '%[2]s'"
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "تم العثور على اكثر من ملف مشروع رئيسي main sketch file (%[1]v,%[2]v)"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:338
+#: internal/arduino/cores/packagemanager/install_uninstall.go:340
 msgid ""
 "no compatible version of %[1]s tools found for the current os, try "
 "contacting %[2]s"
@@ -3410,11 +3409,11 @@ msgstr ""
 "لا يوجد نسخة متوافقة من الاداة %[1]s من اجل نظام التشغيل الحالي , جرب "
 "التواصل مع %[2]s"
 
-#: commands/service_board_list.go:273
+#: commands/service_board_list.go:106
 msgid "no instance specified"
 msgstr "لا يوجد نسخ محددة"
 
-#: commands/service_upload.go:813
+#: commands/service_upload.go:814
 msgid "no sketch or build directory/file specified"
 msgstr "لم يتم تحديد مجلد/ملف المشروع او البناء "
 
@@ -3422,11 +3421,11 @@ msgstr "لم يتم تحديد مجلد/ملف المشروع او البناء 
 msgid "no such file or directory"
 msgstr "لا يوجد ملف او مجلد مشابه"
 
-#: internal/arduino/resources/install.go:126
+#: internal/arduino/resources/install.go:135
 msgid "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgstr "لا يوجد مجلد اصلي في الارشيف , تم ايجاد %[1]s و %[2]s"
 
-#: commands/service_upload.go:719
+#: commands/service_upload.go:720
 msgid "no upload port provided"
 msgstr "لم يتم تحديد اي منفذ للرفع"
 
@@ -3438,7 +3437,7 @@ msgstr "تعذر ايجاد اي مشروع صالح في %[2]s : %[1]sمفقو�
 msgid "no versions available for the current OS, try contacting %s"
 msgstr "لا يوجد نسخة متوفرة لنظام التشغيل الحالي , جرب التواصل مع %s"
 
-#: internal/arduino/cores/fqbn.go:50
+#: pkg/fqbn/fqbn.go:53
 msgid "not an FQBN: %s"
 msgstr ""
 
@@ -3447,7 +3446,7 @@ msgid "not running in a terminal"
 msgstr "لا يعمل في الطرفية \"terminal\""
 
 #: internal/arduino/resources/checksums.go:71
-#: internal/arduino/resources/install.go:60
+#: internal/arduino/resources/install.go:69
 msgid "opening archive file: %s"
 msgstr "جار فتح ملف الارشيف : %s"
 
@@ -3469,12 +3468,12 @@ msgstr "جار فتح الملف الهدف : %s"
 msgid "package %s not found"
 msgstr "الحزمة %sغير موجودة "
 
-#: internal/arduino/cores/packagemanager/package_manager.go:530
+#: internal/arduino/cores/packagemanager/package_manager.go:497
 msgid "package '%s' not found"
 msgstr "الحزمة '%s' غير موجودة"
 
-#: internal/arduino/cores/board.go:166
-#: internal/arduino/cores/packagemanager/package_manager.go:295
+#: internal/arduino/cores/board.go:167
+#: internal/arduino/cores/packagemanager/package_manager.go:262
 msgid "parsing fqbn: %s"
 msgstr "جار تقطيع FQBN : %s"
 
@@ -3490,7 +3489,7 @@ msgstr "المسار المحدد ليس مجلدا لمنصة : %s"
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "تعذر ايجاد المنصة %[1]s في الحزمة %[2]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:341
+#: internal/arduino/cores/packagemanager/package_manager.go:308
 msgid "platform %s is not installed"
 msgstr "المنصة %s غير مثبتة"
 
@@ -3498,14 +3497,14 @@ msgstr "المنصة %s غير مثبتة"
 msgid "platform is not available for your OS"
 msgstr "المنصة غير متاحة لنظام التشغيل الخاص بك"
 
-#: commands/service_compile.go:128
-#: internal/arduino/cores/packagemanager/install_uninstall.go:179
-#: internal/arduino/cores/packagemanager/install_uninstall.go:283
+#: commands/service_compile.go:129
+#: internal/arduino/cores/packagemanager/install_uninstall.go:181
+#: internal/arduino/cores/packagemanager/install_uninstall.go:285
 #: internal/arduino/cores/packagemanager/loader.go:420
 msgid "platform not installed"
 msgstr "المنصة غير مثبتة"
 
-#: internal/cli/compile/compile.go:139
+#: internal/cli/compile/compile.go:142
 msgid "please use --build-property instead."
 msgstr "الرجاء استخدام build-property-- بدلا من ذلك"
 
@@ -3544,11 +3543,11 @@ msgstr ""
 msgid "reading directory %s"
 msgstr "جار قراءة المجلد %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:288
+#: internal/arduino/libraries/librariesmanager/install.go:304
 msgid "reading directory %s content"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:81
+#: internal/arduino/builder/sketch.go:83
 msgid "reading file %[1]s: %[2]s"
 msgstr "جار قراءة الملف %[1]s : %[2]s"
 
@@ -3572,7 +3571,7 @@ msgstr ""
 msgid "reading library_index.json: %s"
 msgstr "جار قراءة library_index.json : %s"
 
-#: internal/arduino/resources/install.go:116
+#: internal/arduino/resources/install.go:125
 msgid "reading package root dir: %s"
 msgstr "جار قراءة المجلد الاصلي للحزمة : %s"
 
@@ -3580,11 +3579,11 @@ msgstr "جار قراءة المجلد الاصلي للحزمة : %s"
 msgid "reading sketch files"
 msgstr "جاري قرأت ملفات المذكرة"
 
-#: commands/service_upload.go:713
+#: commands/service_upload.go:714
 msgid "recipe not found '%s'"
 msgstr "تعذر ايجاد الوصفة '%s'"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:606
+#: internal/arduino/cores/packagemanager/package_manager.go:573
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "تعذر ايجاد الاصدار %[1]s للاداة %[2]s"
 
@@ -3601,7 +3600,7 @@ msgstr "جار ازالة ملف الارشيف المتخرب %s"
 msgid "removing library directory: %s"
 msgstr "جار ازالة مجلد المكتبة %s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:310
+#: internal/arduino/cores/packagemanager/install_uninstall.go:312
 msgid "removing platform files: %s"
 msgstr "جار ازالة ملفات المنصة %s"
 
@@ -3618,7 +3617,7 @@ msgstr "جار ازالة المفاتيح العامة للاردوينو : %s"
 msgid "scanning sketch examples"
 msgstr "جاري فحص امثلة المذكرة"
 
-#: internal/arduino/resources/install.go:74
+#: internal/arduino/resources/install.go:83
 msgid "searching package root dir: %s"
 msgstr "جار البحث عن المجلد الاصلي لـ %s"
 
@@ -3663,11 +3662,11 @@ msgstr "جار فحص حجم الارشيف : %s"
 msgid "testing if archive is cached: %s"
 msgstr "جار فحص ما اذا كان الارشيف تم تخزينه مؤقتا %s"
 
-#: internal/arduino/resources/install.go:38
+#: internal/arduino/resources/install.go:46
 msgid "testing local archive integrity: %s"
 msgstr "جار فحص تكامل ملف الارشيف المحلي : %s"
 
-#: internal/arduino/builder/sizer.go:191
+#: internal/arduino/builder/sizer.go:194
 msgid "text section exceeds available space in board"
 msgstr "القسم النصي تخطى المساحة المتوفرة في اللوحة"
 
@@ -3676,7 +3675,7 @@ msgstr "القسم النصي تخطى المساحة المتوفرة في ال
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr "ربما قاعدة بيانات الترجمة ناقصة او غير دقيقة"
 
-#: commands/service_board_list.go:102
+#: commands/service_board_identify.go:190
 msgid "the server responded with status %s"
 msgstr "استجاب السيرفر بالحالة %s"
 
@@ -3684,7 +3683,7 @@ msgstr "استجاب السيرفر بالحالة %s"
 msgid "timeout waiting for message"
 msgstr "نفذ الوقت اثناء انتظار الرسالة "
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:404
+#: internal/arduino/cores/packagemanager/install_uninstall.go:406
 msgid "tool %s is not managed by package manager"
 msgstr "الاداة %s لا تتم ادارتها من قبل مدير الحزم"
 
@@ -3693,16 +3692,16 @@ msgstr "الاداة %s لا تتم ادارتها من قبل مدير الحز
 msgid "tool %s not found"
 msgstr "الاداة %s غير موجودة"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:556
+#: internal/arduino/cores/packagemanager/package_manager.go:523
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "الاداة '%[1]s' غير موجودة ضمن الحزمة '%[2]s'"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:399
+#: internal/arduino/cores/packagemanager/install_uninstall.go:401
 msgid "tool not installed"
 msgstr "الاداة غير مثبتة"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:735
-#: internal/arduino/cores/packagemanager/package_manager.go:841
+#: internal/arduino/cores/packagemanager/package_manager.go:702
+#: internal/arduino/cores/packagemanager/package_manager.go:808
 msgid "tool release not found: %s"
 msgstr "اصدار الاداة غير موجود : %s"
 
@@ -3710,22 +3709,22 @@ msgstr "اصدار الاداة غير موجود : %s"
 msgid "tool version %s not found"
 msgstr "نسخة الاداة %s غير موجودة"
 
-#: commands/service_library_install.go:92
+#: commands/service_library_install.go:93
 msgid ""
 "two different versions of the library %[1]s are required: %[2]s and %[3]s"
 msgstr ""
 "يجب ان يكون هناك اصدارين من نفس المكتبة %[1]s , هذا  %[2]s و هذا %[3]s"
 
-#: internal/arduino/builder/sketch.go:74
-#: internal/arduino/builder/sketch.go:118
+#: internal/arduino/builder/sketch.go:76
+#: internal/arduino/builder/sketch.go:120
 msgid "unable to compute relative path to the sketch for the item"
 msgstr "تعذر حوسبة المسار النسبي للمشروع من اجل العنصر"
 
-#: internal/arduino/builder/sketch.go:43
+#: internal/arduino/builder/sketch.go:45
 msgid "unable to create a folder to save the sketch"
 msgstr "تعذر انشاء مجلد لحفظ المشروع"
 
-#: internal/arduino/builder/sketch.go:124
+#: internal/arduino/builder/sketch.go:126
 msgid "unable to create the folder containing the item"
 msgstr "تعذر انشاء مجلد يحوي العنصر"
 
@@ -3733,23 +3732,23 @@ msgstr "تعذر انشاء مجلد يحوي العنصر"
 msgid "unable to marshal config to YAML: %v"
 msgstr " %v : unable to marshal config to YAML"
 
-#: internal/arduino/builder/sketch.go:162
+#: internal/arduino/builder/sketch.go:164
 msgid "unable to read contents of the destination item"
 msgstr "تعذر قراءة محتويات العنصر الهدف"
 
-#: internal/arduino/builder/sketch.go:135
+#: internal/arduino/builder/sketch.go:137
 msgid "unable to read contents of the source item"
 msgstr "تعذر قراءة محتويات العنصر الاصل"
 
-#: internal/arduino/builder/sketch.go:145
+#: internal/arduino/builder/sketch.go:147
 msgid "unable to write to destination file"
 msgstr "تعذر الكتابة الى المجلد الوجهة"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:329
+#: internal/arduino/cores/packagemanager/package_manager.go:296
 msgid "unknown package %s"
 msgstr "حزمة غير معروفة %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:336
+#: internal/arduino/cores/packagemanager/package_manager.go:303
 msgid "unknown platform %s:%s"
 msgstr "منصة غير معروفة %s:%s"
 
@@ -3769,7 +3768,7 @@ msgstr "جار تحديث arduino:samd لاخر اصدار"
 msgid "upgrade everything to the latest version"
 msgstr "تحديث كل شيء الى اخر اصدار"
 
-#: commands/service_upload.go:759
+#: commands/service_upload.go:760
 msgid "uploading error: %s"
 msgstr "خطا اثناء الرفع %s"
 
@@ -3793,6 +3792,6 @@ msgstr "الاصدار %s غير مدعوم من اجل نظام التشغيل 
 msgid "version %s not found"
 msgstr "الاصدار %s غير موجود"
 
-#: commands/service_board_list.go:120
+#: commands/service_board_identify.go:208
 msgid "wrong format in server response"
 msgstr "تنسيق خاطئ في استجابة السيرفر"
