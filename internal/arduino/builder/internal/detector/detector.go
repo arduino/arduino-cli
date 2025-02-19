@@ -414,9 +414,14 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 			}
 		} else {
-			for _, sourceDir := range library.SourceDirs() {
-				l.queueSourceFilesFromFolder(sourceFileQueue, sourceDir.Dir, sourceDir.Recurse,
+			if helperSource := library.DependencyHelper(); helperSource != nil {
+				l.queueSourceFile(sourceFileQueue, helperSource,
 					library.SourceDir, librariesBuildPath.Join(library.DirName), library.UtilityDir)
+			} else {
+				for _, sourceDir := range library.SourceDirs() {
+					l.queueSourceFilesFromFolder(sourceFileQueue, sourceDir.Dir, sourceDir.Recurse,
+						library.SourceDir, librariesBuildPath.Join(library.DirName), library.UtilityDir)
+				}
 			}
 		}
 		first = false
@@ -441,13 +446,26 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
-		if err != nil {
+		if err := l.queueSourceFile(sourceFileQueue, filePath, sourceDir, buildDir, extraIncludePath...); err != nil {
 			return err
 		}
-		sourceFileQueue.push(sourceFile)
 	}
 
+	return nil
+}
+
+func (l *SketchLibrariesDetector) queueSourceFile(
+	sourceFileQueue *uniqueSourceFileQueue,
+	filePath *paths.Path,
+	sourceDir *paths.Path,
+	buildDir *paths.Path,
+	extraIncludePath ...*paths.Path,
+) error {
+	sourceFile, err := makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
+	if err != nil {
+		return err
+	}
+	sourceFileQueue.push(sourceFile)
 	return nil
 }
 
