@@ -3,7 +3,7 @@ name: Check Go Dependencies
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.23"
+  GO_VERSION: "1.24"
 
 # See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
 on:
