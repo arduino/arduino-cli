@@ -618,6 +618,7 @@ func analyzeUpdateIndexClient(t *testing.T, cl commands.ArduinoCoreService_Updat
 	analyzer := NewDownloadProgressAnalyzer(t)
 	for {
 		msg, err := cl.Recv()
+		fmt.Println("UPDATE>", msg, err)
 		if errors.Is(err, io.EOF) {
 			return analyzer.Results, nil
 		}
