@@ -1,12 +1,13 @@
 ---
-name: golang.org/x/net/internal/socks
-version: v0.35.0
+name: golang.org/x/crypto/sha3
+version: v0.33.0
 type: go
-summary: Package socks provides a SOCKS version 5 client implementation.
-homepage: https://pkg.go.dev/golang.org/x/net/internal/socks
-license: bsd-3-clause
+summary: Package sha3 implements the SHA-3 fixed-output-length hash functions and
+  the SHAKE variable-output-length hash functions defined by FIPS-202.
+homepage: https://pkg.go.dev/golang.org/x/crypto/sha3
+license: other
 licenses:
-- sources: net@v0.35.0/LICENSE
+- sources: crypto@v0.33.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -35,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: net@v0.35.0/PATENTS
+- sources: crypto@v0.33.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
