@@ -1,12 +1,12 @@
 ---
 name: github.com/spf13/cobra/doc
-version: v1.8.1
+version: v1.9.1
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/spf13/cobra/doc
 license: apache-2.0
 licenses:
-- sources: cobra@v1.8.1/LICENSE.txt
+- sources: cobra@v1.9.1/LICENSE.txt
   text: |2
                                     Apache License
                                Version 2.0, January 2004
@@ -182,6 +182,6 @@ licenses:
           defend, and hold each Contributor harmless for any liability
           incurred by, or claims asserted against, such Contributor by reason
           of your accepting any such warranty or additional liability.
-- sources: cobra@v1.8.1/README.md
+- sources: cobra@v1.9.1/README.md
   text: Cobra is released under the Apache 2.0 license. See [LICENSE.txt](LICENSE.txt)
 notices: []
