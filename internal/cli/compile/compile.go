@@ -211,7 +211,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 
 	var stdOut, stdErr io.Writer
 	var stdIORes func() *feedback.OutputStreamsResult
-	if showProperties != arguments.ShowPropertiesDisabled {
+	if showProperties != arguments.ShowPropertiesDisabled || dumpProfile {
+		// When dumping profile or showing properties, we buffer the output
+		// to avoid mixing compilation output with profile/properties output
 		stdOut, stdErr, stdIORes = feedback.NewBufferedStreams()
 	} else {
 		stdOut, stdErr, stdIORes = feedback.OutputStreams()
@@ -312,60 +314,69 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		}
 	}
 
+	successful := (compileError == nil)
 	profileOut := ""
-	if dumpProfile && compileError == nil {
-		// Output profile
+	stdIO := stdIORes()
 
-		libs := ""
-		hasVendoredLibs := false
-		for _, lib := range builderRes.GetUsedLibraries() {
-			if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
-				continue
+	if dumpProfile {
+		if successful {
+			// Output profile
+
+			libs := ""
+			hasVendoredLibs := false
+			for _, lib := range builderRes.GetUsedLibraries() {
+				if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
+					continue
+				}
+				if lib.GetVersion() == "" {
+					hasVendoredLibs = true
+					continue
+				}
+				libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
 			}
-			if lib.GetVersion() == "" {
-				hasVendoredLibs = true
-				continue
+			if hasVendoredLibs {
+				msg := "\n"
+				msg += i18n.Tr("WARNING: The sketch is compiled using one or more custom libraries.") + "\n"
+				msg += i18n.Tr("Currently, Build Profiles only support libraries available through Arduino Library Manager.")
+				feedback.Warning(msg)
 			}
-			libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
-		}
-		if hasVendoredLibs {
-			msg := "\n"
-			msg += i18n.Tr("WARNING: The sketch is compiled using one or more custom libraries.") + "\n"
-			msg += i18n.Tr("Currently, Build Profiles only support libraries available through Arduino Library Manager.")
-			feedback.Warning(msg)
-		}
 
-		newProfileName := "my_profile_name"
-		if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
-			newProfileName = split[2]
-		}
-		profileOut = fmt.Sprintln("profiles:")
-		profileOut += fmt.Sprintln("  " + newProfileName + ":")
-		profileOut += fmt.Sprintln("    fqbn: " + compileRequest.GetFqbn())
-		profileOut += fmt.Sprintln("    platforms:")
-		boardPlatform := builderRes.GetBoardPlatform()
-		profileOut += fmt.Sprintln("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
-		if url := boardPlatform.GetPackageUrl(); url != "" {
-			profileOut += fmt.Sprintln("        platform_index_url: " + url)
-		}
-
-		if buildPlatform := builderRes.GetBuildPlatform(); buildPlatform != nil &&
-			buildPlatform.GetId() != boardPlatform.GetId() &&
-			buildPlatform.GetVersion() != boardPlatform.GetVersion() {
-			profileOut += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
-			if url := buildPlatform.GetPackageUrl(); url != "" {
+			newProfileName := "my_profile_name"
+			if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
+				newProfileName = split[2]
+			}
+			profileOut = fmt.Sprintln("profiles:")
+			profileOut += fmt.Sprintln("  " + newProfileName + ":")
+			profileOut += fmt.Sprintln("    fqbn: " + compileRequest.GetFqbn())
+			profileOut += fmt.Sprintln("    platforms:")
+			boardPlatform := builderRes.GetBoardPlatform()
+			profileOut += fmt.Sprintln("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
+			if url := boardPlatform.GetPackageUrl(); url != "" {
 				profileOut += fmt.Sprintln("        platform_index_url: " + url)
 			}
+
+			if buildPlatform := builderRes.GetBuildPlatform(); buildPlatform != nil &&
+				buildPlatform.GetId() != boardPlatform.GetId() &&
+				buildPlatform.GetVersion() != boardPlatform.GetVersion() {
+				profileOut += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
+				if url := buildPlatform.GetPackageUrl(); url != "" {
+					profileOut += fmt.Sprintln("        platform_index_url: " + url)
+				}
+			}
+			if len(libs) > 0 {
+				profileOut += fmt.Sprintln("    libraries:")
+				profileOut += fmt.Sprint(libs)
+			}
+			profileOut += fmt.Sprintln()
+		} else {
+			// An error occurred, output the buffered build errors instead of the profile
+			if stdOut, stdErr, err := feedback.DirectStreams(); err == nil {
+				stdOut.Write([]byte(stdIO.Stdout))
+				stdErr.Write([]byte(stdIO.Stderr))
+			}
 		}
-		if len(libs) > 0 {
-			profileOut += fmt.Sprintln("    libraries:")
-			profileOut += fmt.Sprint(libs)
-		}
-		profileOut += fmt.Sprintln()
 	}
 
-	stdIO := stdIORes()
-	successful := (compileError == nil)
 	res := &compileResult{
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
@@ -437,6 +448,10 @@ func (r *compileResult) String() string {
 		return strings.Join(r.BuilderResult.BuildProperties, fmt.Sprintln())
 	}
 
+	if r.Success && r.ProfileOut != "" {
+		return r.ProfileOut
+	}
+
 	if r.hideStats {
 		return ""
 	}
@@ -484,9 +499,6 @@ func (r *compileResult) String() string {
 				table.NewCell(buildPlatform.InstallDir, pathColor))
 		}
 		res += fmt.Sprintln(platforms.Render())
-	}
-	if r.ProfileOut != "" {
-		res += fmt.Sprintln(r.ProfileOut)
 	}
 	return strings.TrimRight(res, fmt.Sprintln())
 }
