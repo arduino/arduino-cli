@@ -1,12 +1,12 @@
 ---
 name: github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
-version: v1.1.5
+version: v1.1.6
 type: go
 summary: Package keywrap is an implementation of the RFC 3394 AES key wrapping algorithm.
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
 license: other
 licenses:
-- sources: go-crypto@v1.1.5/LICENSE
+- sources: go-crypto@v1.1.6/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: go-crypto@v1.1.5/PATENTS
+- sources: go-crypto@v1.1.6/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
