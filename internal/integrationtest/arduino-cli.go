@@ -158,6 +158,12 @@ func (cli *ArduinoCLI) SketchbookDir() *paths.Path {
 	return cli.sketchbookDir
 }
 
+// SetSketchbookDir sets the sketchbook directory
+func (cli *ArduinoCLI) SetSketchbookDir(d *paths.Path) {
+	cli.sketchbookDir = d
+	cli.cliEnvVars["ARDUINO_SKETCHBOOK_DIR"] = d.String()
+}
+
 // WorkingDir returns the working directory
 func (cli *ArduinoCLI) WorkingDir() *paths.Path {
 	return cli.workingDir
