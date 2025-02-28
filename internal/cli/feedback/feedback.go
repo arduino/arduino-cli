@@ -84,8 +84,8 @@ func reset() {
 	stdErr = os.Stderr
 	feedbackOut = os.Stdout
 	feedbackErr = os.Stderr
-	bufferOut = &bytes.Buffer{}
-	bufferErr = &bytes.Buffer{}
+	bufferOut = bytes.NewBuffer(nil)
+	bufferErr = bytes.NewBuffer(nil)
 	bufferWarnings = nil
 	format = Text
 	formatSelected = false

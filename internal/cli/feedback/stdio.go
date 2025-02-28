@@ -68,7 +68,7 @@ func OutputStreams() (io.Writer, io.Writer, func() *OutputStreamsResult) {
 // object that can be used as a Result or to retrieve the accumulated output
 // to embed it in another object.
 func NewBufferedStreams() (io.Writer, io.Writer, func() *OutputStreamsResult) {
-	out, err := &bytes.Buffer{}, &bytes.Buffer{}
+	out, err := bytes.NewBuffer(nil), bytes.NewBuffer(nil)
 	return out, err, func() *OutputStreamsResult {
 		return &OutputStreamsResult{
 			Stdout: out.String(),
