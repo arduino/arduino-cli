@@ -3,7 +3,7 @@ name: Check Go
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.23"
+  GO_VERSION: "1.24"
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
@@ -116,7 +116,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.63
+          version: v1.64.5
 
       - name: Check style
         env:
