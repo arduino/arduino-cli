@@ -1,6 +1,6 @@
 ---
 name: github.com/leonelquinteros/gotext
-version: v1.7.0
+version: v1.7.1
 type: go
 summary: Package gotext implements GNU gettext utilities.
 homepage: https://pkg.go.dev/github.com/leonelquinteros/gotext
