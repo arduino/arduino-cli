@@ -111,7 +111,6 @@ func (b *Builder) compileFiles(
 	return objectFiles, nil
 }
 
-// CompileFilesRecursive fixdoc
 func (b *Builder) compileFileWithRecipe(
 	sourcePath *paths.Path,
 	source *paths.Path,
@@ -119,28 +118,21 @@ func (b *Builder) compileFileWithRecipe(
 	includes []string,
 	recipe string,
 ) (*paths.Path, error) {
-	properties := b.buildProperties.Clone()
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
-	properties.Set("includes", strings.Join(includes, " "))
-	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
 		return nil, err
 	}
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
+	if err := objectFile.Parent().MkdirAll(); err != nil {
+		return nil, err
+	}
 
+	properties := b.buildProperties.Clone()
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
+	properties.Set("includes", strings.Join(includes, " "))
+	properties.SetPath("source_file", source)
 	properties.SetPath("object_file", objectFile)
-	err = objectFile.Parent().MkdirAll()
-	if err != nil {
-		return nil, err
-	}
-
-	objIsUpToDate, err := utils.ObjFileIsUpToDate(source, objectFile, depsFile)
-	if err != nil {
-		return nil, err
-	}
-
 	command, err := b.prepareCommandForRecipe(properties, recipe, false)
 	if err != nil {
 		return nil, err
@@ -148,41 +140,50 @@ func (b *Builder) compileFileWithRecipe(
 	if b.compilationDatabase != nil {
 		b.compilationDatabase.Add(source, command)
 	}
-	if !objIsUpToDate && !b.onlyUpdateCompilationDatabase {
-		commandStdout, commandStderr := &bytes.Buffer{}, &bytes.Buffer{}
-		command.RedirectStdoutTo(commandStdout)
-		command.RedirectStderrTo(commandStderr)
 
+	objIsUpToDate, err := utils.ObjFileIsUpToDate(source, objectFile, depsFile)
+	if err != nil {
+		return nil, err
+	}
+	if objIsUpToDate {
 		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			b.logger.Info(utils.PrintableCommand(command.GetArgs()))
-		}
-		// Since this compile could be multithreaded, we first capture the command output
-		if err := command.Start(); err != nil {
-			return nil, err
-		}
-		err := command.Wait()
-		// and transfer all at once at the end...
-		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			b.logger.WriteStdout(commandStdout.Bytes())
-		}
-		b.logger.WriteStderr(commandStderr.Bytes())
-
-		// Parse the output of the compiler to gather errors and warnings...
-		if b.diagnosticStore != nil {
-			b.diagnosticStore.Parse(command.GetArgs(), commandStdout.Bytes())
-			b.diagnosticStore.Parse(command.GetArgs(), commandStderr.Bytes())
-		}
-
-		// ...and then return the error
-		if err != nil {
-			return nil, err
-		}
-	} else if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
-		if objIsUpToDate {
 			b.logger.Info(i18n.Tr("Using previously compiled file: %[1]s", objectFile))
-		} else {
+		}
+		return objectFile, nil
+	}
+	if b.onlyUpdateCompilationDatabase {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Info(i18n.Tr("Skipping compile of: %[1]s", objectFile))
 		}
+		return objectFile, nil
+	}
+
+	commandStdout, commandStderr := &bytes.Buffer{}, &bytes.Buffer{}
+	command.RedirectStdoutTo(commandStdout)
+	command.RedirectStderrTo(commandStderr)
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
+		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
+	}
+	// Since this compile could be multithreaded, we first capture the command output
+	if err := command.Start(); err != nil {
+		return nil, err
+	}
+	err = command.Wait()
+	// and transfer all at once at the end...
+	if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
+		b.logger.WriteStdout(commandStdout.Bytes())
+	}
+	b.logger.WriteStderr(commandStderr.Bytes())
+
+	// Parse the output of the compiler to gather errors and warnings...
+	if b.diagnosticStore != nil {
+		b.diagnosticStore.Parse(command.GetArgs(), commandStdout.Bytes())
+		b.diagnosticStore.Parse(command.GetArgs(), commandStderr.Bytes())
+	}
+
+	// ...and then return the error
+	if err != nil {
+		return nil, err
 	}
 
 	return objectFile, nil
