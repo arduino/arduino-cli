@@ -614,6 +614,22 @@ func TestDaemonUserAgent(t *testing.T) {
 	}
 }
 
+func TestDaemonCreateSketch(t *testing.T) {
+	// https://github.com/arduino/arduino-cli/issues/2861
+
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	defer env.CleanUp()
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	sketchName := "test_sketch.ino"
+	_, err := grpcInst.NewSketch(context.Background(), sketchName, "", false)
+	require.NoError(t, err)
+}
+
 func analyzeUpdateIndexClient(t *testing.T, cl commands.ArduinoCoreService_UpdateIndexClient) (map[string]*commands.DownloadProgressEnd, error) {
 	analyzer := NewDownloadProgressAnalyzer(t)
 	for {

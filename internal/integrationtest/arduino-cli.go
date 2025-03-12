@@ -710,3 +710,14 @@ func (inst *ArduinoCLIInstance) BoardIdentify(ctx context.Context, props map[str
 	resp, err := inst.cli.daemonClient.BoardIdentify(ctx, req)
 	return resp, err
 }
+
+// NewSketch calls the "NewSketch" gRPC method.
+func (inst *ArduinoCLIInstance) NewSketch(ctx context.Context, sketchName, sketchDir string, overwrite bool) (*commands.NewSketchResponse, error) {
+	req := &commands.NewSketchRequest{
+		SketchName: sketchName,
+		SketchDir:  sketchDir,
+		Overwrite:  overwrite,
+	}
+	logCallf(">>> NewSketch(%+v)\n", req)
+	return inst.cli.daemonClient.NewSketch(ctx, req)
+}
