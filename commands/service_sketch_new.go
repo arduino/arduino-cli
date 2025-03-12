@@ -48,7 +48,7 @@ func (s *arduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketc
 	if len(req.GetSketchDir()) > 0 {
 		sketchesDir = req.GetSketchDir()
 	} else {
-		sketchesDir = s.settings.GetString("directories.User")
+		sketchesDir = s.settings.UserDir().String()
 	}
 
 	if err := validateSketchName(req.GetSketchName()); err != nil {
