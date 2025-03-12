@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/resolver/dns
-version: v1.70.0
+version: v1.71.0
 type: go
 summary: Package dns implements a dns resolver to be installed as the default resolver
   in grpc.
 homepage: https://pkg.go.dev/google.golang.org/grpc/resolver/dns
 license: apache-2.0
 licenses:
-- sources: grpc@v1.70.0/LICENSE
+- sources: grpc@v1.71.0/LICENSE
   text: |2
 
                                      Apache License

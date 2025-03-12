@@ -1,10 +1,10 @@
 ---
-name: google.golang.org/grpc/internal/grpclog
+name: google.golang.org/grpc/internal/resolver/delegatingresolver
 version: v1.71.0
 type: go
-summary: Package grpclog provides logging functionality for internal gRPC packages,
-  outside of the functionality provided by the external `grpclog` package.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/grpclog
+summary: Package delegatingresolver implements a resolver capable of resolving both
+  target URIs and proxy addresses.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/resolver/delegatingresolver
 license: apache-2.0
 licenses:
 - sources: grpc@v1.71.0/LICENSE

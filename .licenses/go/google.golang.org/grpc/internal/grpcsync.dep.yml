@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal/grpcsync
-version: v1.70.0
+version: v1.71.0
 type: go
 summary: Package grpcsync implements additional synchronization primitives built upon
   the sync package.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/grpcsync
 license: apache-2.0
 licenses:
-- sources: grpc@v1.70.0/LICENSE
+- sources: grpc@v1.71.0/LICENSE
   text: |2
 
                                      Apache License
