@@ -40,8 +40,8 @@ require (
 	go.bug.st/f v0.4.0
 	go.bug.st/relaxed-semver v0.12.0
 	go.bug.st/testifyjson v1.3.0
-	golang.org/x/sys v0.30.0
-	golang.org/x/term v0.29.0
+	golang.org/x/sys v0.31.0
+	golang.org/x/term v0.30.0
 	golang.org/x/text v0.23.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f
 	google.golang.org/grpc v1.71.0
