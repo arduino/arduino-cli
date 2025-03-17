@@ -501,7 +501,7 @@ msgid ""
 "directory with the current configuration settings."
 msgstr "用当前的配置创建或更新数据目录或自定义目录中的配置文件。"
 
-#: internal/cli/compile/compile.go:334
+#: internal/cli/compile/compile.go:340
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -709,7 +709,7 @@ msgstr "计算相对文件路径时出错"
 msgid "Error cleaning caches: %v"
 msgstr "清理缓存出错：%v"
 
-#: internal/cli/compile/compile.go:223
+#: internal/cli/compile/compile.go:225
 msgid "Error converting path to absolute: %v"
 msgstr "将路径转换为绝对路径时出错：%v"
 
@@ -784,7 +784,7 @@ msgstr "输出编码 JSON 过程时出错：%v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:267 internal/cli/compile/compile.go:309
+#: internal/cli/compile/compile.go:269 internal/cli/compile/compile.go:311
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "上传时出错：%v"
@@ -793,7 +793,7 @@ msgstr "上传时出错：%v"
 msgid "Error during board detection"
 msgstr ""
 
-#: internal/cli/compile/compile.go:383
+#: internal/cli/compile/compile.go:394
 msgid "Error during build: %v"
 msgstr "构建时出错：%v"
 
@@ -1760,7 +1760,7 @@ msgstr "软件包网站："
 msgid "Paragraph: %s"
 msgstr "段落：%s"
 
-#: internal/cli/compile/compile.go:458 internal/cli/compile/compile.go:473
+#: internal/cli/compile/compile.go:473 internal/cli/compile/compile.go:488
 msgid "Path"
 msgstr "路径"
 
@@ -1799,7 +1799,7 @@ msgstr "%s 平台已经安装"
 msgid "Platform %s installed"
 msgstr "已安装 %s 平台"
 
-#: internal/cli/compile/compile.go:406 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1823,7 +1823,7 @@ msgstr "未找到 ‘%s’ 平台"
 msgid "Platform ID"
 msgstr "平台 ID"
 
-#: internal/cli/compile/compile.go:391 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "平台 ID 不正确"
 
@@ -2432,7 +2432,7 @@ msgstr "工具链前缀"
 msgid "Toolchain type"
 msgstr "工具链类型"
 
-#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:415 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "尝试运行 %s"
 
@@ -2583,7 +2583,7 @@ msgstr "使用外部编程器将引导加载程序上传到板上。"
 msgid "Upload the bootloader."
 msgstr "上传引导加载程序。"
 
-#: internal/cli/compile/compile.go:272 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:274 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr "使用 %s 协议上传到指定的开发板需要以下信息："
@@ -2604,11 +2604,11 @@ msgstr "用法："
 msgid "Use %s for more information about a command."
 msgstr "使用 %s 获取有关命令的更多信息。"
 
-#: internal/cli/compile/compile.go:456
+#: internal/cli/compile/compile.go:471
 msgid "Used library"
 msgstr "已使用的库"
 
-#: internal/cli/compile/compile.go:471
+#: internal/cli/compile/compile.go:486
 msgid "Used platform"
 msgstr "已使用的平台"
 
@@ -2677,7 +2677,7 @@ msgstr "值"
 msgid "Verify uploaded binary after the upload."
 msgstr "上传后验证上传的二进制文件。"
 
-#: internal/cli/compile/compile.go:457 internal/cli/compile/compile.go:472
+#: internal/cli/compile/compile.go:472 internal/cli/compile/compile.go:487
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "版本"
@@ -2699,7 +2699,7 @@ msgstr "警告无法配置工具：%s"
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr "警告！无法运行 pre_uninstall 命令%s"
 
-#: internal/cli/compile/compile.go:333
+#: internal/cli/compile/compile.go:339
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "警告：该项目是用一个或多个自定义库编译的。"
 
