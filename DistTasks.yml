@@ -163,9 +163,9 @@ tasks:
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_64"
-      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
+      BUILD_COMMAND: "go build -buildvcs=false -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
       BUILD_PLATFORM: "linux/arm64"
-      CONTAINER_TAG: "{{.GO_VERSION}}-arm"
+      CONTAINER_TAG: "{{.GO_VERSION}}-arm-debian12"
       PACKAGE_PLATFORM: "Linux_ARM64"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
