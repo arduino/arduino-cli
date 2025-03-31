@@ -1,6 +1,6 @@
 ---
 name: github.com/cyphar/filepath-securejoin
-version: v0.3.6
+version: v0.4.1
 type: go
 summary: Package securejoin implements a set of helpers to make it easier to write
   Go code that is safe against symlink-related escape attacks.

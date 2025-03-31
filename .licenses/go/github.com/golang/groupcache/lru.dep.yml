@@ -1,12 +1,12 @@
 ---
 name: github.com/golang/groupcache/lru
-version: v0.0.0-20210331224755-41bb18bfe9da
+version: v0.0.0-20241129210726-2c02b8208cf8
 type: go
 summary: Package lru implements an LRU cache.
 homepage: https://pkg.go.dev/github.com/golang/groupcache/lru
 license: apache-2.0
 licenses:
-- sources: groupcache@v0.0.0-20210331224755-41bb18bfe9da/LICENSE
+- sources: groupcache@v0.0.0-20241129210726-2c02b8208cf8/LICENSE
   text: |
     Apache License
     Version 2.0, January 2004
