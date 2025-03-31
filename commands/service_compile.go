@@ -159,7 +159,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	signProp := boardBuildProperties.ContainsKey("build.keys.sign_key")
 	encryptProp := boardBuildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
-	if !(keychainProp == signProp && signProp == encryptProp) {
+	if keychainProp != signProp || signProp != encryptProp {
 		return errors.New(i18n.Tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
 
