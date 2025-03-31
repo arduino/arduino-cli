@@ -1,6 +1,6 @@
 run:
   timeout: 10m
-  go: "1.22"
+  go: "1.24"
   tests: true
 
 linters:
