@@ -1,6 +1,6 @@
 ---
 name: github.com/skeema/knownhosts
-version: v1.3.0
+version: v1.3.1
 type: go
 summary: Package knownhosts is a thin wrapper around golang.org/x/crypto/ssh/knownhosts,
   adding the ability to obtain the list of host key algorithms for a known host.
@@ -212,7 +212,7 @@ licenses:
        limitations under the License.
 - sources: README.md
   text: |-
-    **Source code copyright 2024 Skeema LLC and the Skeema Knownhosts authors**
+    **Source code copyright 2025 Skeema LLC and the Skeema Knownhosts authors**
 
     ```text
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -230,7 +230,7 @@ licenses:
 notices:
 - sources: NOTICE
   text: |-
-    Copyright 2024 Skeema LLC and the Skeema Knownhosts authors
+    Copyright 2025 Skeema LLC and the Skeema Knownhosts authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
