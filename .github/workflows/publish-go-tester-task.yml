@@ -76,7 +76,7 @@ jobs:
   create-artifacts:
     needs: package-name-prefix
     name: Create artifact ${{ matrix.artifact.name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.artifact.runner }}
 
     strategy:
       matrix:
@@ -84,36 +84,47 @@ jobs:
           - task: dist:Windows_32bit
             path: "*Windows_32bit.zip"
             name: Windows_X86-32
+            runner: ubuntu-latest
           - task: dist:Windows_64bit
             path: "*Windows_64bit.zip"
             name: Windows_X86-64
+            runner: ubuntu-latest
           - task: dist:Linux_32bit
             path: "*Linux_32bit.tar.gz"
             name: Linux_X86-32
+            runner: ubuntu-latest
           - task: dist:Linux_64bit
             path: "*Linux_64bit.tar.gz"
             name: Linux_X86-64
+            runner: ubuntu-latest
           - task: dist:Linux_ARMv6
             path: "*Linux_ARMv6.tar.gz"
             name: Linux_ARMv6
+            runner: ubuntu-latest
           - task: dist:Linux_ARMv7
             path: "*Linux_ARMv7.tar.gz"
             name: Linux_ARMv7
+            runner: ubuntu-latest
           - task: dist:Linux_ARM64
             path: "*Linux_ARM64.tar.gz"
             name: Linux_ARM64
+            runner: ubuntu-latest
           - task: dist:macOS_64bit
             path: "*macOS_64bit.tar.gz"
             name: macOS_64
+            runner: ubuntu-latest
           - task: dist:macOS_ARM64
             path: "*macOS_ARM64.tar.gz"
             name: macOS_ARM64
+            runner: ubuntu-24.04-arm
           - task: protoc:collect
             path: "*_proto.zip"
             name: rpc-protocol-files
+            runner: ubuntu-latest
           - task: dist:jsonschema
             path: "*configuration.schema.json"
             name: configuration-schema
+            runner: ubuntu-latest
 
     steps:
       - name: Checkout repository
