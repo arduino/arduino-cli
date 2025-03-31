@@ -1,11 +1,11 @@
+version: "2"
 run:
-  timeout: 10m
   go: "1.24"
   tests: true
 
 linters:
   # Disable all linters.
-  disable-all: true
+  default: none
   # Enable specific linter
   enable:
     # Nice to have
@@ -13,173 +13,168 @@ linters:
     #- errcheck
     #- gocritic
     #- thelper
-    - errorlint
-    - dupword
     - copyloopvar
+    - dupword
+    - errorlint
     - forbidigo
-    - gofmt
-    - goimports
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - misspell
     - revive
     - staticcheck
-    - tenv
-    - typecheck
     - unconvert
     # We must disable this one because there is no support 'optional' protobuf fields yet: https://github.com/arduino/arduino-cli/pull/2570
     #- protogetter
 
-linters-settings:
-  govet:
-    # Enable analyzers by name.
-    # Run `GL_DEBUG=govet golangci-lint run --enable=govet` to see default, all available analyzers, and enabled analyzers.
-    enable:
-      - appends
-      - asmdecl
-      - assign
-      - atomic
-      - atomicalign
-      - bools
-      - buildtag
-      - cgocall
-      - composites
-      - copylocks
-      - deepequalerrors
-      - defers
-      - directive
-      - errorsas
-      #- fieldalignment
-      - findcall
-      - framepointer
-      - httpresponse
-      - ifaceassert
-      - loopclosure
-      - lostcancel
-      - nilfunc
-      - nilness
-      - printf
-      - reflectvaluecompare
-      #- shadow
-      - shift
-      - sigchanyzer
-      - slog
-      - sortslice
-      - stdmethods
-      - stringintconv
-      - structtag
-      - testinggoroutine
-      - tests
-      - unmarshal
-      - unreachable
-      - unsafeptr
-      - unusedresult
-      - unusedwrite
-
-  forbidigo:
-    forbid:
-      - p: ^(fmt\.Print(|f|ln)|print|println)$
-        msg: in cli package use `feedback.*` instead
-      - p: (os\.(Stdout|Stderr|Stdin))(# )?
-        msg: in cli package use `feedback.*` instead
-    analyze-types: true
-
-  revive:
-    confidence: 0.8
+  settings:
+    errorlint:
+      errorf: false
+      asserts: false
+      comparison: true
+    forbidigo:
+      forbid:
+        - pattern: ^(fmt\.Print(|f|ln)|print|println)$
+          msg: in cli package use `feedback.*` instead
+        - pattern: (os\.(Stdout|Stderr|Stdin))(# )?
+          msg: in cli package use `feedback.*` instead
+      analyze-types: true
+    govet:
+      enable:
+        - appends
+        - asmdecl
+        - assign
+        - atomic
+        - atomicalign
+        - bools
+        - buildtag
+        - cgocall
+        - composites
+        - copylocks
+        - deepequalerrors
+        - defers
+        - directive
+        - errorsas
+        - findcall
+        - framepointer
+        - httpresponse
+        - ifaceassert
+        - loopclosure
+        - lostcancel
+        - nilfunc
+        - nilness
+        - printf
+        - reflectvaluecompare
+        - shift
+        - sigchanyzer
+        - slog
+        - sortslice
+        - stdmethods
+        - stringintconv
+        - structtag
+        - testinggoroutine
+        - tests
+        - unmarshal
+        - unreachable
+        - unsafeptr
+        - unusedresult
+        - unusedwrite
+    revive:
+      confidence: 0.8
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: empty-block
+        - name: error-naming
+        - name: error-strings
+        - name: errorf
+        - name: exported
+        - name: increment-decrement
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: superfluous-else
+        - name: time-naming
+        - name: unreachable-code
+        - name: var-declaration
+        - name: defer
+        - name: atomic
+        - name: waitgroup-by-value
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
-      #- name: error-return
-      #- name: unused-parameter
-      #- name: var-naming
-      - name: blank-imports
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: dot-imports
-      - name: empty-block
-      - name: error-naming
-      - name: error-strings
-      - name: errorf
-      - name: exported
-      - name: increment-decrement
-      #- name: indent-error-flow
-      - name: package-comments
-      - name: range
-      - name: receiver-naming
-      - name: redefines-builtin-id
-      - name: superfluous-else
-      - name: time-naming
-      - name: unreachable-code
-      - name: var-declaration
-      - name: defer
-      - name: atomic
-      - name: waitgroup-by-value
-
-  errorlint:
-    # Check for plain error comparisons.
-    comparison: true
-
-    # We might evalute to allow the asserts and errofs in the future
-    # Do not check for plain type assertions and type switches.
-    asserts: false
-    # Do not check whether fmt.Errorf uses the %w verb for formatting errors.
-    errorf: false
-
+      - linters:
+          - errcheck
+          - gosec
+        path: _test\.go
+      - linters:
+          - gosec
+        text: G401
+      - linters:
+          - gosec
+        text: G501
+      - linters:
+          - gosec
+        path: internal/integrationtest/
+        text: G112
+      - linters:
+          - gosec
+        path: executils/process.go
+        text: G204
+      - linters:
+          - staticcheck
+        path: commands/lib/search.go
+        text: SA1019
+      - linters:
+          - revive
+        path: arduino/libraries/loader.go
+        text: empty-block
+      - linters:
+          - revive
+        path: arduino/serialutils/serialutils.go
+        text: empty-block
+      - linters:
+          - revive
+        path: arduino/resources/download.go
+        text: empty-block
+      - linters:
+          - revive
+        path: arduino/builder/internal/progress/progress_test.go
+        text: empty-block
+      - linters:
+          - revive
+        path: internal/algorithms/channels.go
+        text: empty-block
+      - linters:
+          - forbidigo
+        path-except: internal/cli/
+      - linters:
+          - forbidigo
+        path: internal/cli/.*_test.go
+      - linters:
+          - forbidigo
+        path: internal/cli/feedback/
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  # Fix found issues (if it's supported by the linter).
   fix: false
-  # List of regexps of issue texts to exclude.
-  #
-  # But independently of this option we use default exclude patterns,
-  # it can be disabled by `exclude-use-default: false`.
-  # To list all excluded by default patterns execute `golangci-lint run --help`
-  #
-  # Default: https://golangci-lint.run/usage/false-positives/#default-exclusions
-  exclude-rules:
-    # Exclude some linters from running on tests files.
-    - path: _test\.go
-      linters: [gosec, errcheck]
-    # G401: Use of weak cryptographic primitive
-    - linters: [gosec]
-      text: "G401"
-    # G501: Blocklisted import crypto/md5: weak cryptographic primitive
-    - linters: [gosec]
-      text: "G501"
-    # G112: Potential Slowloris Attack because ReadHeaderTimeout is not configured in the http.Server
-    - linters: [gosec]
-      path: internal/integrationtest/
-      text: "G112"
-    # G204: Subprocess launched with a potential tainted input or cmd arguments
-    - linters: [gosec]
-      path: executils/process.go
-      text: "G204"
-    # SA1019: req.GetQuery is deprecated: Marked as deprecated in cc/arduino/cli/commands/v1/lib.proto.
-    - linters: [staticcheck]
-      path: commands/lib/search.go
-      text: "SA1019"
-
-    # Ignore revive emptyblock
-    - linters: [revive]
-      path: arduino/libraries/loader.go
-      text: "empty-block"
-    - linters: [revive]
-      path: arduino/serialutils/serialutils.go
-      text: "empty-block"
-    - linters: [revive]
-      path: arduino/resources/download.go
-      text: "empty-block"
-    - linters: [revive]
-      path: arduino/builder/internal/progress/progress_test.go
-      text: "empty-block"
-    - linters: [revive]
-      path: internal/algorithms/channels.go
-      text: "empty-block"
-
-    # Run linters only on specific path
-    - path-except: internal/cli/
-      linters:
-        - forbidigo
-    - path: internal/cli/.*_test.go
-      linters: [forbidigo]
-    - path: internal/cli/feedback/
-      linters: [forbidigo]
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
