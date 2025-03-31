@@ -1,9 +1,9 @@
 ---
-name: golang.org/x/net/internal/socks
+name: golang.org/x/net/internal/httpcommon
 version: v0.38.0
 type: go
-summary: Package socks provides a SOCKS version 5 client implementation.
-homepage: https://pkg.go.dev/golang.org/x/net/internal/socks
+summary: 
+homepage: https://pkg.go.dev/golang.org/x/net/internal/httpcommon
 license: bsd-3-clause
 licenses:
 - sources: net@v0.38.0/LICENSE
