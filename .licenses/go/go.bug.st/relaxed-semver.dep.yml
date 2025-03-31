@@ -1,6 +1,6 @@
 ---
 name: go.bug.st/relaxed-semver
-version: v0.12.0
+version: v0.15.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/go.bug.st/relaxed-semver
@@ -9,7 +9,7 @@ licenses:
 - sources: LICENSE
   text: |2+
 
-    Copyright (c) 2018-2022, Cristian Maglie.
+    Copyright (c) 2018-2025, Cristian Maglie.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
