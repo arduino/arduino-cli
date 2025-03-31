@@ -1,6 +1,6 @@
 ---
 name: github.com/spf13/viper
-version: v1.19.0
+version: v1.20.1
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/spf13/viper

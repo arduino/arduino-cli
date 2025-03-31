@@ -1,16 +1,16 @@
 ---
-name: github.com/spf13/viper/internal/encoding/javaproperties
-version: v1.19.0
+name: github.com/sourcegraph/conc/panics
+version: v0.3.0
 type: go
 summary: 
-homepage: https://pkg.go.dev/github.com/spf13/viper/internal/encoding/javaproperties
+homepage: https://pkg.go.dev/github.com/sourcegraph/conc/panics
 license: mit
 licenses:
-- sources: viper@v1.19.0/LICENSE
-  text: |-
-    The MIT License (MIT)
+- sources: conc@v0.3.0/LICENSE
+  text: |
+    MIT License
 
-    Copyright (c) 2014 Steve Francia
+    Copyright (c) 2023 Sourcegraph
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,4 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: viper@v1.19.0/README.md
-  text: The project is licensed under the [MIT License](LICENSE).
 notices: []

@@ -1,12 +1,12 @@
 ---
-name: github.com/fsnotify/fsnotify
+name: github.com/fsnotify/fsnotify/internal
 version: v1.8.0
 type: go
-summary: Package fsnotify provides a cross-platform interface for file system notifications.
-homepage: https://pkg.go.dev/github.com/fsnotify/fsnotify
+summary: Package internal contains some helpers.
+homepage: https://pkg.go.dev/github.com/fsnotify/fsnotify/internal
 license: bsd-3-clause
 licenses:
-- sources: LICENSE
+- sources: fsnotify@v1.8.0/LICENSE
   text: |
     Copyright © 2012 The Go Authors. All rights reserved.
     Copyright © fsnotify Authors. All rights reserved.
