@@ -529,9 +529,9 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 				}
 				if verbose {
 					if portAddress != "" {
-						outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Upload port found on %s", portAddress))))
+						fmt.Fprintln(outStream, i18n.Tr("Upload port found on %s", portAddress))
 					} else {
-						outStream.Write([]byte(fmt.Sprintln(i18n.Tr("No upload port found, using %s as fallback", actualPort.Address))))
+						fmt.Fprintln(outStream, i18n.Tr("No upload port found, using %s as fallback", actualPort.Address))
 					}
 				}
 			},
@@ -541,7 +541,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		}
 
 		if newPortAddress, err := serialutils.Reset(portToTouch, wait, dryRun, nil, cb); err != nil {
-			errStream.Write([]byte(fmt.Sprintln(i18n.Tr("Cannot perform port reset: %s", err))))
+			fmt.Fprintln(errStream, i18n.Tr("Cannot perform port reset: %s", err))
 		} else {
 			if newPortAddress != "" {
 				actualPort.Address = newPortAddress
@@ -728,7 +728,7 @@ func runTool(ctx context.Context, recipeID string, props *properties.Map, outStr
 	// Run Tool
 	logrus.WithField("phase", "upload").Tracef("Executing upload tool: %s", cmdLine)
 	if verbose {
-		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
+		fmt.Fprintln(outStream, cmdLine)
 	}
 	if dryRun {
 		return nil
