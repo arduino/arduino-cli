@@ -143,8 +143,7 @@ func (d *SerialMonitor) Open(boardPort string) (io.ReadWriter, error) {
 			d.mockedSerialPort.Write([]byte("Tmpfile: " + d.muxFile.String() + "\n"))
 		}
 		for parameter, descriptor := range d.serialSettings.ConfigurationParameter {
-			d.mockedSerialPort.Write([]byte(
-				fmt.Sprintf("Configuration %s = %s\n", parameter, descriptor.Selected)))
+			fmt.Fprintf(d.mockedSerialPort, "Configuration %s = %s\n", parameter, descriptor.Selected)
 		}
 		for {
 			n, err := d.mockedSerialPort.Read(buff)

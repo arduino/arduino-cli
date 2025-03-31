@@ -353,10 +353,10 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		// select the core name in case of "package:core" format
 		normalizedFQBN, err := pme.NormalizeFQBN(fqbn)
 		if err != nil {
-			outStream.Write([]byte(fmt.Sprintf("Could not normalize FQBN: %s\n", err)))
+			fmt.Fprintf(outStream, "Could not normalize FQBN: %s\n", err)
 			normalizedFQBN = fqbn
 		}
-		outStream.Write([]byte(fmt.Sprintf("FQBN: %s\n", normalizedFQBN)))
+		fmt.Fprintf(outStream, "FQBN: %s\n", normalizedFQBN)
 		core = core[strings.Index(core, ":")+1:]
 		outStream.Write([]byte(i18n.Tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir) + "\n"))
 		outStream.Write([]byte(i18n.Tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir) + "\n"))

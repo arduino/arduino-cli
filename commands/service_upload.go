@@ -505,20 +505,20 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 
 		// if touch is requested but port is not specified, print a warning
 		if touch && portToTouch == "" {
-			outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Skipping 1200-bps touch reset: no serial port selected!"))))
+			fmt.Fprintln(outStream, i18n.Tr("Skipping 1200-bps touch reset: no serial port selected!"))
 		}
 
 		cb := &serialutils.ResetProgressCallbacks{
 			TouchingPort: func(portAddress string) {
 				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", portAddress)
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Performing 1200-bps touch reset on serial port %s", portAddress))))
+					fmt.Fprintln(outStream, i18n.Tr("Performing 1200-bps touch reset on serial port %s", portAddress))
 				}
 			},
 			WaitingForNewSerial: func() {
 				logrus.WithField("phase", "board reset").Info("Waiting for upload port...")
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintln(i18n.Tr("Waiting for upload port..."))))
+					fmt.Fprintln(outStream, i18n.Tr("Waiting for upload port..."))
 				}
 			},
 			BootloaderPortFound: func(portAddress string) {
