@@ -205,7 +205,7 @@ jobs:
           echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> "$GITHUB_ENV"
 
       - name: Send unit tests coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ env.CODECOV_TOKEN }}
           files: ./coverage.txt
