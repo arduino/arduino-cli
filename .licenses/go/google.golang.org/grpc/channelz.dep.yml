@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/channelz
-version: v1.71.0
+version: v1.71.1
 type: go
 summary: Package channelz exports internals of the channelz implementation as required
   by other gRPC packages.
 homepage: https://pkg.go.dev/google.golang.org/grpc/channelz
 license: apache-2.0
 licenses:
-- sources: grpc@v1.71.0/LICENSE
+- sources: grpc@v1.71.1/LICENSE
   text: |2
 
                                      Apache License

@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/metadata
-version: v1.71.0
+version: v1.71.1
 type: go
 summary: Package metadata contains functions to set and get metadata from addresses.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/metadata
 license: apache-2.0
 licenses:
-- sources: grpc@v1.71.0/LICENSE
+- sources: grpc@v1.71.1/LICENSE
   text: |2
 
                                      Apache License
