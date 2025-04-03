@@ -364,10 +364,7 @@ func convertLegacyPlatformToPluggableDiscovery(platform *cores.PlatformRelease) 
 
 				// Add identification properties for network protocol
 				i := 0
-				for {
-					if !board.Properties.ContainsKey(fmt.Sprintf("upload_port.%d.vid", i)) {
-						break
-					}
+				for board.Properties.ContainsKey(fmt.Sprintf("upload_port.%d.vid", i)) {
 					i++
 				}
 				board.Properties.Set(fmt.Sprintf("upload_port.%d.board", i), board.BoardID)

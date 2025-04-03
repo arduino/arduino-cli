@@ -114,13 +114,14 @@ func outputDep(dep *result.LibraryDependencyStatus) string {
 	green := color.New(color.FgGreen)
 	red := color.New(color.FgRed)
 	yellow := color.New(color.FgYellow)
-	if dep.VersionInstalled == "" {
+	switch dep.VersionInstalled {
+	case "":
 		res += i18n.Tr("%s must be installed.",
 			red.Sprintf("✕ %s %s", dep.Name, dep.VersionRequired))
-	} else if dep.VersionInstalled == dep.VersionRequired {
+	case dep.VersionRequired:
 		res += i18n.Tr("%s is already installed.",
 			green.Sprintf("✓ %s %s", dep.Name, dep.VersionRequired))
-	} else {
+	default:
 		res += i18n.Tr("%[1]s is required but %[2]s is currently installed.",
 			yellow.Sprintf("✕ %s %s", dep.Name, dep.VersionRequired),
 			yellow.Sprintf("%s", dep.VersionInstalled))

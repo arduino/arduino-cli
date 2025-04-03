@@ -159,7 +159,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	signProp := boardBuildProperties.ContainsKey("build.keys.sign_key")
 	encryptProp := boardBuildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
-	if !(keychainProp == signProp && signProp == encryptProp) {
+	if keychainProp != signProp || signProp != encryptProp {
 		return errors.New(i18n.Tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
 
@@ -245,7 +245,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 			Message: &rpc.CompileResponse_Progress{Progress: p},
 		})
 	}
-	var verbosity logger.Verbosity = logger.VerbosityNormal
+	var verbosity = logger.VerbosityNormal
 	if req.GetQuiet() {
 		verbosity = logger.VerbosityQuiet
 	}
@@ -353,10 +353,10 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		// select the core name in case of "package:core" format
 		normalizedFQBN, err := pme.NormalizeFQBN(fqbn)
 		if err != nil {
-			outStream.Write([]byte(fmt.Sprintf("Could not normalize FQBN: %s\n", err)))
+			fmt.Fprintf(outStream, "Could not normalize FQBN: %s\n", err)
 			normalizedFQBN = fqbn
 		}
-		outStream.Write([]byte(fmt.Sprintf("FQBN: %s\n", normalizedFQBN)))
+		fmt.Fprintf(outStream, "FQBN: %s\n", normalizedFQBN)
 		core = core[strings.Index(core, ":")+1:]
 		outStream.Write([]byte(i18n.Tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir) + "\n"))
 		outStream.Write([]byte(i18n.Tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir) + "\n"))

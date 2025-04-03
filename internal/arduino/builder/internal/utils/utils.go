@@ -82,7 +82,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	}
 
 	checkDepFile := func(depFile string) (bool, error) {
-		rows := strings.Split(strings.Replace(depFile, "\r\n", "\n", -1), "\n")
+		rows := strings.Split(strings.ReplaceAll(depFile, "\r\n", "\n"), "\n")
 		rows = f.Map(rows, removeEndingBackSlash)
 		rows = f.Map(rows, strings.TrimSpace)
 		rows = f.Map(rows, unescapeDep)
