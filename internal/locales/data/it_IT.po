@@ -30,7 +30,7 @@ msgstr ""
 msgid "%[1]s invalid, rebuilding all"
 msgstr "%[1]s non è valido, ricompilo tutto"
 
-#: internal/cli/lib/check_deps.go:124
+#: internal/cli/lib/check_deps.go:125
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s è richiesto ma %[2]s risulta attualmente installato."
 
@@ -50,12 +50,12 @@ msgstr "%s e %s non possono essere usati insieme"
 msgid "%s installed"
 msgstr "%s installato"
 
-#: internal/cli/lib/check_deps.go:121
+#: internal/cli/lib/check_deps.go:122
 msgid "%s is already installed."
 msgstr "%s è già installato."
 
 #: internal/arduino/cores/packagemanager/loader.go:63
-#: internal/arduino/cores/packagemanager/loader.go:617
+#: internal/arduino/cores/packagemanager/loader.go:614
 msgid "%s is not a directory"
 msgstr "%s non è una directory"
 
@@ -67,7 +67,7 @@ msgstr "%s non è gestito dal gestore pacchetti"
 msgid "%s must be >= 1024"
 msgstr "%s deve essere >= 1024"
 
-#: internal/cli/lib/check_deps.go:118
+#: internal/cli/lib/check_deps.go:119
 msgid "%s must be installed."
 msgstr "%s deve essere installato."
 
@@ -531,7 +531,7 @@ msgstr ""
 "Crea o aggiorna il file di configurazione nella directory dei dati o nella "
 "directory personalizzata con le impostazioni di configurazione correnti."
 
-#: internal/cli/compile/compile.go:334
+#: internal/cli/compile/compile.go:340
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -758,7 +758,7 @@ msgstr ""
 msgid "Error cleaning caches: %v"
 msgstr "Si è verificato un errore durante la pulizia della cache: %v"
 
-#: internal/cli/compile/compile.go:223
+#: internal/cli/compile/compile.go:225
 msgid "Error converting path to absolute: %v"
 msgstr ""
 "Si è verificato un errore durante la conversione del percorso in assoluto:: "
@@ -840,7 +840,7 @@ msgstr "Si è verificato un errore durante la codifica JSON dell'output: %v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:267 internal/cli/compile/compile.go:309
+#: internal/cli/compile/compile.go:269 internal/cli/compile/compile.go:311
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "Errore durante il caricamento di: %v"
@@ -849,7 +849,7 @@ msgstr "Errore durante il caricamento di: %v"
 msgid "Error during board detection"
 msgstr "Si è verificato un errore durante il rilevamento della scheda"
 
-#: internal/cli/compile/compile.go:383
+#: internal/cli/compile/compile.go:394
 msgid "Error during build: %v"
 msgstr "Si è verificato un errore durante la compilazione: %v"
 
@@ -1921,7 +1921,7 @@ msgstr "Website pacchetto:"
 msgid "Paragraph: %s"
 msgstr "Paragrafo: %s"
 
-#: internal/cli/compile/compile.go:458 internal/cli/compile/compile.go:473
+#: internal/cli/compile/compile.go:473 internal/cli/compile/compile.go:488
 msgid "Path"
 msgstr "Percorso"
 
@@ -1966,7 +1966,7 @@ msgstr "La piattaforma %s è già installata"
 msgid "Platform %s installed"
 msgstr "La piattaforma %s è installata"
 
-#: internal/cli/compile/compile.go:406 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1990,7 +1990,7 @@ msgstr "Impossibile trovare la piattaforma '%s'"
 msgid "Platform ID"
 msgstr "ID piattaforma"
 
-#: internal/cli/compile/compile.go:391 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "L' ID della piattaforma non è esatto"
 
@@ -2655,7 +2655,7 @@ msgstr "Il prefisso della toolchain"
 msgid "Toolchain type"
 msgstr "Il tipo della toolchain"
 
-#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:415 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "Prova ad eseguire %s"
 
@@ -2814,7 +2814,7 @@ msgstr ""
 msgid "Upload the bootloader."
 msgstr "Carica il bootloader."
 
-#: internal/cli/compile/compile.go:272 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:274 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2837,11 +2837,11 @@ msgstr "Uso: "
 msgid "Use %s for more information about a command."
 msgstr "Usa %s  per ulteriori informazioni su un comando."
 
-#: internal/cli/compile/compile.go:456
+#: internal/cli/compile/compile.go:471
 msgid "Used library"
 msgstr "Libreria utilizzata"
 
-#: internal/cli/compile/compile.go:471
+#: internal/cli/compile/compile.go:486
 msgid "Used platform"
 msgstr "Piattaforma utilizzata"
 
@@ -2914,7 +2914,7 @@ msgstr "Valori"
 msgid "Verify uploaded binary after the upload."
 msgstr "Verifica dei binari dopo il caricamento."
 
-#: internal/cli/compile/compile.go:457 internal/cli/compile/compile.go:472
+#: internal/cli/compile/compile.go:472 internal/cli/compile/compile.go:487
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "Versione"
@@ -2936,7 +2936,7 @@ msgstr "ATTENZIONE non è possibile configurare lo strumento: %s"
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr "AVVISO non è possibile eseguire lo script pre_uninstall: %s"
 
-#: internal/cli/compile/compile.go:333
+#: internal/cli/compile/compile.go:339
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr ""
 "ATTENZIONE: lo sketch è compilato utilizzando una o più librerie "
@@ -3043,7 +3043,7 @@ msgstr "Impossibile trovare l'ultima versione di %s"
 msgid "can't find latest release of tool %s"
 msgstr "Impossibile trovare l'ultima versione del tool %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:712
+#: internal/arduino/cores/packagemanager/loader.go:709
 msgid "can't find pattern for discovery with id %s"
 msgstr "Non riesco a trovare un pattern per il rilevamento con id %s"
 
@@ -3148,11 +3148,11 @@ msgstr "la directory non esiste: %s"
 msgid "discovery %[1]s process not started"
 msgstr "sono stati trovati %[1]s processi non avviati"
 
-#: internal/arduino/cores/packagemanager/loader.go:644
+#: internal/arduino/cores/packagemanager/loader.go:641
 msgid "discovery %s not found"
 msgstr "rilevamento %s non è stato trovato"
 
-#: internal/arduino/cores/packagemanager/loader.go:648
+#: internal/arduino/cores/packagemanager/loader.go:645
 msgid "discovery %s not installed"
 msgstr "il rilevamento %s non è installato"
 
@@ -3186,7 +3186,7 @@ msgstr ""
 "si è verificato un errore durante il caricamento del file di progetto dello "
 "sketch:"
 
-#: internal/arduino/cores/packagemanager/loader.go:615
+#: internal/arduino/cores/packagemanager/loader.go:612
 msgid "error opening %s"
 msgstr "si è verificato un errore durante l'apertura di %s"
 
@@ -3536,7 +3536,7 @@ msgstr "caricamento della piattaforma richiesta %s"
 msgid "loading required tool %s"
 msgstr "caricamento del tool richiesto %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:590
+#: internal/arduino/cores/packagemanager/loader.go:587
 msgid "loading tool release in %s"
 msgstr "rilascio del tool di caricamento in %s"
 
@@ -3705,7 +3705,7 @@ msgstr "la piattaforma non è disponibile per il sistema operativo in uso"
 #: commands/service_compile.go:129
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
-#: internal/arduino/cores/packagemanager/loader.go:420
+#: internal/arduino/cores/packagemanager/loader.go:417
 msgid "platform not installed"
 msgstr "piattaforma non installata"
 
@@ -3745,7 +3745,7 @@ msgstr "lettura in corso del contenuto della directory %[1]s"
 #: internal/arduino/cores/packagemanager/loader.go:69
 #: internal/arduino/cores/packagemanager/loader.go:151
 #: internal/arduino/cores/packagemanager/loader.go:218
-#: internal/arduino/cores/packagemanager/loader.go:582
+#: internal/arduino/cores/packagemanager/loader.go:579
 msgid "reading directory %s"
 msgstr "lettura cartella %s"
 
