@@ -232,7 +232,9 @@ func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
 			return err
 		} else if w, err := repo.Worktree(); err != nil {
 			return err
-		} else if err := w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())}); err != nil {
+		} else if err := w.Checkout(&git.CheckoutOptions{
+			Force: true, // workaround for: https://github.com/go-git/go-git/issues/1411
+			Hash:  plumbing.NewHash(h.String())}); err != nil {
 			return err
 		}
 	}
