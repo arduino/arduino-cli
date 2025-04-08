@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -215,17 +214,29 @@ func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
 	defer tmp.RemoveAll()
 	tmpInstallPath := tmp.Join(libraryName)
 
-	depth := 1
-	if ref != "" {
-		depth = 0
-	}
 	if _, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
 		URL:           gitURL,
-		Depth:         depth,
-		Progress:      os.Stdout,
-		ReferenceName: ref,
+		ReferenceName: plumbing.ReferenceName(ref),
 	}); err != nil {
-		return err
+		if err.Error() != "reference not found" {
+			return err
+		}
+
+		// We did not find the requested reference, let's do a PlainClone and use
+		// "ResolveRevision" to find and checkout the requested revision
+		if repo, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
+			URL: gitURL,
+		}); err != nil {
+			return err
+		} else if h, err := repo.ResolveRevision(plumbing.Revision(ref)); err != nil {
+			return err
+		} else if w, err := repo.Worktree(); err != nil {
+			return err
+		} else if err := w.Checkout(&git.CheckoutOptions{
+			Force: true, // workaround for: https://github.com/go-git/go-git/issues/1411
+			Hash:  plumbing.NewHash(h.String())}); err != nil {
+			return err
+		}
 	}
 
 	// We don't want the installed library to be a git repository thus we delete this folder
@@ -241,7 +252,7 @@ func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
 
 // parseGitArgURL tries to recover a library name from a git URL.
 // Returns an error in case the URL is not a valid git URL.
-func parseGitArgURL(argURL string) (string, string, plumbing.ReferenceName, error) {
+func parseGitArgURL(argURL string) (string, string, string, error) {
 	// On Windows handle paths with backslashes in the form C:\Path\to\library
 	if path := paths.New(argURL); path != nil && path.Exist() {
 		return path.Base(), argURL, "", nil
@@ -279,7 +290,7 @@ func parseGitArgURL(argURL string) (string, string, plumbing.ReferenceName, erro
 		return "", "", "", errors.New(i18n.Tr("invalid git url"))
 	}
 	// fragment == "1.0.3"
-	rev := plumbing.ReferenceName(parsedURL.Fragment)
+	rev := parsedURL.Fragment
 	// gitURL == "https://github.com/arduino-libraries/SigFox.git"
 	parsedURL.Fragment = ""
 	gitURL := parsedURL.String()

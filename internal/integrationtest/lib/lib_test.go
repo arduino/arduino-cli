@@ -16,6 +16,8 @@
 package lib_test
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -687,6 +689,7 @@ func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
 
 	t.Run("RefPointingToBranch", func(t *testing.T) {
 		libInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoCloud")
+		t.Cleanup(func() { libInstallDir.RemoveAll() })
 
 		// Verify install with ref pointing to a branch
 		require.NoDirExists(t, libInstallDir.String())
@@ -699,6 +702,24 @@ func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
 		fileToTest, err := libInstallDir.Join("src", "ArduinoCloudThingBase.h").ReadFile()
 		require.NoError(t, err)
 		require.Contains(t, string(fileToTest), `#define LENGHT_M "meters"`) // nolint:misspell
+	})
+
+	t.Run("RefPointingToHash", func(t *testing.T) {
+		libInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoCloud")
+		t.Cleanup(func() { libInstallDir.RemoveAll() })
+
+		// Verify install with ref pointing to a branch
+		require.NoDirExists(t, libInstallDir.String())
+		_, _, err = cli.Run("lib", "install", "--git-url", "https://github.com/arduino-libraries/ArduinoCloud.git#fe1a1c5d1f8ea2cb27ece1a3b9344dc1eaed60b6", "--config-file", "arduino-cli.yaml")
+		require.NoError(t, err)
+		require.DirExists(t, libInstallDir.String())
+
+		// Verify that the correct branch is checked out
+		// https://github.com/arduino-libraries/ArduinoCloud/commit/fe1a1c5d1f8ea2cb27ece1a3b9344dc1eaed60b6
+		fileToTest, err := libInstallDir.Join("examples", "ReadAndWrite", "ReadAndWrite.ino").ReadFile()
+		require.NoError(t, err)
+		chksum := sha256.Sum256(fileToTest)
+		require.Equal(t, hex.EncodeToString(chksum[:]), `f71889cd6da3b91755c7d1b8ec76b7ee6e2824d8a417c043d117ffdf1546f896`)
 	})
 }
 
