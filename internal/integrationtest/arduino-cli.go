@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"runtime"
 	"strings"
@@ -199,9 +200,7 @@ func (cli *ArduinoCLI) RunWithContext(ctx context.Context, args ...string) ([]by
 // GetDefaultEnv returns a copy of the default execution env used with the Run method.
 func (cli *ArduinoCLI) GetDefaultEnv() map[string]string {
 	res := map[string]string{}
-	for k, v := range cli.cliEnvVars {
-		res[k] = v
-	}
+	maps.Copy(res, cli.cliEnvVars)
 	return res
 }
 
