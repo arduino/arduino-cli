@@ -190,6 +190,12 @@ func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	return cli.RunWithCustomEnv(cli.cliEnvVars, args...)
 }
 
+// RunWithContext executes the given arduino-cli command with the given context and returns the output.
+// If the context is canceled, the command is killed.
+func (cli *ArduinoCLI) RunWithContext(ctx context.Context, args ...string) ([]byte, []byte, error) {
+	return cli.RunWithCustomEnvContext(ctx, cli.cliEnvVars, args...)
+}
+
 // GetDefaultEnv returns a copy of the default execution env used with the Run method.
 func (cli *ArduinoCLI) GetDefaultEnv() map[string]string {
 	res := map[string]string{}
@@ -324,8 +330,13 @@ func (cli *ArduinoCLI) InstallMockedAvrdude(t *testing.T) {
 
 // RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
 func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) ([]byte, []byte, error) {
+	return cli.RunWithCustomEnvContext(context.Background(), env, args...)
+}
+
+// RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
+func (cli *ArduinoCLI) RunWithCustomEnvContext(ctx context.Context, env map[string]string, args ...string) ([]byte, []byte, error) {
 	var stdoutBuf, stderrBuf bytes.Buffer
-	err := cli.run(&stdoutBuf, &stderrBuf, nil, env, args...)
+	err := cli.run(ctx, &stdoutBuf, &stderrBuf, nil, env, args...)
 
 	errBuf := stderrBuf.Bytes()
 	cli.t.NotContains(string(errBuf), "panic: runtime error:", "arduino-cli panicked")
@@ -336,7 +347,7 @@ func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) (
 // RunWithCustomInput executes the given arduino-cli command pushing the given input stream and returns the output.
 func (cli *ArduinoCLI) RunWithCustomInput(in io.Reader, args ...string) ([]byte, []byte, error) {
 	var stdoutBuf, stderrBuf bytes.Buffer
-	err := cli.run(&stdoutBuf, &stderrBuf, in, cli.cliEnvVars, args...)
+	err := cli.run(context.Background(), &stdoutBuf, &stderrBuf, in, cli.cliEnvVars, args...)
 
 	errBuf := stderrBuf.Bytes()
 	cli.t.NotContains(string(errBuf), "panic: runtime error:", "arduino-cli panicked")
@@ -344,7 +355,7 @@ func (cli *ArduinoCLI) RunWithCustomInput(in io.Reader, args ...string) ([]byte,
 	return stdoutBuf.Bytes(), errBuf, err
 }
 
-func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader, env map[string]string, args ...string) error {
+func (cli *ArduinoCLI) run(ctx context.Context, stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader, env map[string]string, args ...string) error {
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
@@ -402,8 +413,8 @@ func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader
 			}
 		}()
 	}
+	cliErr := cliProc.WaitWithinContext(ctx)
 	wg.Wait()
-	cliErr := cliProc.Wait()
 	fmt.Fprintln(terminalOut, color.HiBlackString("<<< Run completed (err = %v)", cliErr))
 
 	return cliErr
