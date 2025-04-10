@@ -16,6 +16,7 @@
 package preprocessor
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -77,10 +78,42 @@ func GCC(
 	if err != nil {
 		return Result{}, err
 	}
-	stdout, stderr, err := proc.RunAndCaptureOutput(ctx)
 
-	// Append gcc arguments to stdout
-	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)
+	stdout := bytes.NewBuffer(nil)
+	stderr := bytes.NewBuffer(nil)
 
-	return Result{args: proc.GetArgs(), stdout: stdout, stderr: stderr}, err
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	count := 0
+	stderrLimited := writerFunc(func(p []byte) (int, error) {
+		// Limit the size of the stderr buffer to 100KB
+		n, err := stderr.Write(p)
+		count += n
+		if count > 100*1024 {
+			cancel()
+			fmt.Fprintln(stderr, i18n.Tr("Compiler error output has been truncated."))
+		}
+		return n, err
+	})
+
+	proc.RedirectStdoutTo(stdout)
+	proc.RedirectStderrTo(stderrLimited)
+
+	// Append gcc arguments to stdout before running the command
+	fmt.Fprintln(stdout, strings.Join(args, " "))
+
+	if err := proc.Start(); err != nil {
+		return Result{}, err
+	}
+
+	// Wait for the process to finish
+	err = proc.WaitWithinContext(ctx)
+
+	return Result{args: proc.GetArgs(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
+}
+
+type writerFunc func(p []byte) (n int, err error)
+
+func (f writerFunc) Write(p []byte) (n int, err error) {
+	return f(p)
 }
