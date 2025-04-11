@@ -8,7 +8,7 @@ replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 require (
 	fortio.org/safecast v1.0.0
 	github.com/ProtonMail/go-crypto v1.2.0
-	github.com/arduino/go-paths-helper v1.12.1
+	github.com/arduino/go-paths-helper v1.13.0
 	github.com/arduino/go-properties-orderedmap v1.8.1
 	github.com/arduino/go-serial-utils v0.1.2
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b

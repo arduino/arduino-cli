@@ -10,8 +10,8 @@ github.com/ProtonMail/go-crypto v1.2.0/go.mod h1:9whxjD8Rbs29b4XWbB8irEcE8KHMqaR
 github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
 github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuWl6zY27l47sB3qLNK6tF2fkHG55UZxx8oIVo4=
 github.com/arduino/go-paths-helper v1.0.1/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
-github.com/arduino/go-paths-helper v1.12.1 h1:WkxiVUxBjKWlLMiMuYy8DcmVrkxdP7aKxQOAq7r2lVM=
-github.com/arduino/go-paths-helper v1.12.1/go.mod h1:jcpW4wr0u69GlXhTYydsdsqAjLaYK5n7oWHfKqOG6LM=
+github.com/arduino/go-paths-helper v1.13.0 h1:HIkgg8ChPw1QPNHkB5bQSs+geTj74vf6TFgVhm/9mmw=
+github.com/arduino/go-paths-helper v1.13.0/go.mod h1:jcpW4wr0u69GlXhTYydsdsqAjLaYK5n7oWHfKqOG6LM=
 github.com/arduino/go-properties-orderedmap v1.8.1 h1:nU5S6cXPwMoxZs4ORw61wPTALNfriIduvNB4cxTmNYM=
 github.com/arduino/go-properties-orderedmap v1.8.1/go.mod h1:DKjD2VXY/NZmlingh4lSFMEYCVubfeArCsGPGDwb2yk=
 github.com/arduino/go-serial-utils v0.1.2 h1:MRFwME4w/uaVkJ1R+wzz4KSbI9cF9IDVrYorazvjpTk=
