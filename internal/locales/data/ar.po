@@ -25,7 +25,7 @@ msgstr "الملف %[1]s اصبح غير مدعوما! راجع %[2]s للمزي
 msgid "%[1]s invalid, rebuilding all"
 msgstr "%[1]s غير صالح . جار اعادة بناء كل شيء"
 
-#: internal/cli/lib/check_deps.go:124
+#: internal/cli/lib/check_deps.go:125
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s مطلوب و لكن %[2]s مثبت حاليا"
 
@@ -45,12 +45,12 @@ msgstr "%s و %s لا يمكن استخدامهما معا"
 msgid "%s installed"
 msgstr "%s تم تثبيته بنجاح"
 
-#: internal/cli/lib/check_deps.go:121
+#: internal/cli/lib/check_deps.go:122
 msgid "%s is already installed."
 msgstr "%s مثبت مسبقا"
 
 #: internal/arduino/cores/packagemanager/loader.go:63
-#: internal/arduino/cores/packagemanager/loader.go:617
+#: internal/arduino/cores/packagemanager/loader.go:614
 msgid "%s is not a directory"
 msgstr "%s ليس مسارا صحيحا"
 
@@ -62,7 +62,7 @@ msgstr "%s غير مدار بواسطة مدير الحزمات"
 msgid "%s must be >= 1024"
 msgstr ""
 
-#: internal/cli/lib/check_deps.go:118
+#: internal/cli/lib/check_deps.go:119
 msgid "%s must be installed."
 msgstr "يجب تثبيت %s"
 
@@ -517,7 +517,7 @@ msgstr ""
 "انشاء او تحديث ملف الضبط في مسار البيانات او في مسار مخصص مع اعدادات التهيئة"
 " الحالية"
 
-#: internal/cli/compile/compile.go:334
+#: internal/cli/compile/compile.go:340
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -734,7 +734,7 @@ msgstr ""
 msgid "Error cleaning caches: %v"
 msgstr "خطأ اثناء تنظيف الكاش : %v"
 
-#: internal/cli/compile/compile.go:223
+#: internal/cli/compile/compile.go:225
 msgid "Error converting path to absolute: %v"
 msgstr "تعذر تحويل المسار الى مطلق : %v"
 
@@ -809,7 +809,7 @@ msgstr "خطا اثناء ترميز JSON الخاص بالخرج : %v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:267 internal/cli/compile/compile.go:309
+#: internal/cli/compile/compile.go:269 internal/cli/compile/compile.go:311
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "خطا اثناء الرفع : %v"
@@ -818,7 +818,7 @@ msgstr "خطا اثناء الرفع : %v"
 msgid "Error during board detection"
 msgstr ""
 
-#: internal/cli/compile/compile.go:383
+#: internal/cli/compile/compile.go:394
 msgid "Error during build: %v"
 msgstr "خطأ اثناء بناء : %v"
 
@@ -1817,7 +1817,7 @@ msgstr "موقع الحزمة على الويب"
 msgid "Paragraph: %s"
 msgstr "المقطع : %s"
 
-#: internal/cli/compile/compile.go:458 internal/cli/compile/compile.go:473
+#: internal/cli/compile/compile.go:473 internal/cli/compile/compile.go:488
 msgid "Path"
 msgstr "المسار"
 
@@ -1862,7 +1862,7 @@ msgstr "المنصة %s مثبتة سابقا"
 msgid "Platform %s installed"
 msgstr "تم تثبيت المنصة: %s"
 
-#: internal/cli/compile/compile.go:406 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1886,7 +1886,7 @@ msgstr "المنصة '%s' غير موجودة"
 msgid "Platform ID"
 msgstr "Platform ID"
 
-#: internal/cli/compile/compile.go:391 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "id المنصة غير صحيح"
 
@@ -2484,7 +2484,7 @@ msgstr "بادئة مجموعة الادوات "
 msgid "Toolchain type"
 msgstr "نوع مجموعة الادوات"
 
-#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:415 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "جرب تشغيل %s"
 
@@ -2636,7 +2636,7 @@ msgstr "يرفع محمل الاقلاع على اللوحة باستخدام م
 msgid "Upload the bootloader."
 msgstr "يرفع محمل الاقلاع"
 
-#: internal/cli/compile/compile.go:272 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:274 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2658,11 +2658,11 @@ msgstr "الاستخدام"
 msgid "Use %s for more information about a command."
 msgstr "استخدم %s من اجل المزيد من المعلومات حول امر معين"
 
-#: internal/cli/compile/compile.go:456
+#: internal/cli/compile/compile.go:471
 msgid "Used library"
 msgstr "المكتبة المستخدمة"
 
-#: internal/cli/compile/compile.go:471
+#: internal/cli/compile/compile.go:486
 msgid "Used platform"
 msgstr "المنصة المستخدمة"
 
@@ -2731,7 +2731,7 @@ msgstr "القيم"
 msgid "Verify uploaded binary after the upload."
 msgstr "التاكد من الملف الثنائي الذي سيتم رفعه قبل الرفع"
 
-#: internal/cli/compile/compile.go:457 internal/cli/compile/compile.go:472
+#: internal/cli/compile/compile.go:472 internal/cli/compile/compile.go:487
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "النسخة"
@@ -2753,7 +2753,7 @@ msgstr "تحذير , تعذر تهيئة الاداة %s"
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr ""
 
-#: internal/cli/compile/compile.go:333
+#: internal/cli/compile/compile.go:339
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "تحذير : المشروع سيترجم باستخدام مكتبة خاصة او اكثر . "
 
@@ -2851,7 +2851,7 @@ msgstr "تعذر العثور على اخر اصدار من %s"
 msgid "can't find latest release of tool %s"
 msgstr "تعذر العثور على اخر اصدار من الاداة %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:712
+#: internal/arduino/cores/packagemanager/loader.go:709
 msgid "can't find pattern for discovery with id %s"
 msgstr "تعذر ايجاد نمط للاكتشاف بواسطة id %s"
 
@@ -2959,11 +2959,11 @@ msgstr "المجلد غير موجود : %s"
 msgid "discovery %[1]s process not started"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/loader.go:644
+#: internal/arduino/cores/packagemanager/loader.go:641
 msgid "discovery %s not found"
 msgstr "المستكشف %s غير موجود"
 
-#: internal/arduino/cores/packagemanager/loader.go:648
+#: internal/arduino/cores/packagemanager/loader.go:645
 msgid "discovery %s not installed"
 msgstr "تعذر تثبيت المستكشف %s"
 
@@ -2995,7 +2995,7 @@ msgstr "معرف اللوحة خالي (empty board identifier)"
 msgid "error loading sketch project file:"
 msgstr "خطا اثناء تحميل ملفات المشروع :"
 
-#: internal/arduino/cores/packagemanager/loader.go:615
+#: internal/arduino/cores/packagemanager/loader.go:612
 msgid "error opening %s"
 msgstr "تعذر فتح %s"
 
@@ -3335,7 +3335,7 @@ msgstr "جار تحميل المنصات المطلوبة %s"
 msgid "loading required tool %s"
 msgstr "جار تحميل الادوات المطلوبة %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:590
+#: internal/arduino/cores/packagemanager/loader.go:587
 msgid "loading tool release in %s"
 msgstr "جار تحميل اصدار الاداة (tool release) في %s"
 
@@ -3500,7 +3500,7 @@ msgstr "المنصة غير متاحة لنظام التشغيل الخاص بك
 #: commands/service_compile.go:129
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
-#: internal/arduino/cores/packagemanager/loader.go:420
+#: internal/arduino/cores/packagemanager/loader.go:417
 msgid "platform not installed"
 msgstr "المنصة غير مثبتة"
 
@@ -3539,7 +3539,7 @@ msgstr ""
 #: internal/arduino/cores/packagemanager/loader.go:69
 #: internal/arduino/cores/packagemanager/loader.go:151
 #: internal/arduino/cores/packagemanager/loader.go:218
-#: internal/arduino/cores/packagemanager/loader.go:582
+#: internal/arduino/cores/packagemanager/loader.go:579
 msgid "reading directory %s"
 msgstr "جار قراءة المجلد %s"
 
