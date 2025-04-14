@@ -20,7 +20,7 @@ require (
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.18.0
-	github.com/go-git/go-git/v5 v5.14.0
+	github.com/go-git/go-git/v5 v5.15.0
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/leonelquinteros/gotext v1.7.1
 	github.com/mailru/easyjson v0.7.7
@@ -42,7 +42,7 @@ require (
 	go.bug.st/testifyjson v1.3.0
 	golang.org/x/sys v0.32.0
 	golang.org/x/term v0.31.0
-	golang.org/x/text v0.23.0
+	golang.org/x/text v0.24.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f
 	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.6
@@ -52,7 +52,7 @@ require (
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/cloudflare/circl v1.6.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
@@ -95,8 +95,8 @@ require (
 	go.bug.st/serial v1.6.2 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
