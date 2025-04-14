@@ -124,6 +124,7 @@ func (pmb *Builder) Build() *PackageManager {
 		profile:                        pmb.profile,
 		discoveryManager:               pmb.discoveryManager,
 		userAgent:                      pmb.userAgent,
+		downloaderConfig:               pmb.downloaderConfig,
 	}
 }
 
