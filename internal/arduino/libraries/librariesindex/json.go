@@ -18,6 +18,7 @@ package librariesindex
 import (
 	"errors"
 
+	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -124,8 +125,8 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 	}
 }
 
-func (indexLib *indexRelease) extractDependencies() []*Dependency {
-	res := []*Dependency{}
+func (indexLib *indexRelease) extractDependencies() []*libraries.Dependency {
+	res := []*libraries.Dependency{}
 	if len(indexLib.Dependencies) == 0 {
 		return res
 	}
@@ -135,13 +136,13 @@ func (indexLib *indexRelease) extractDependencies() []*Dependency {
 	return res
 }
 
-func (indexDep *indexDependency) extractDependency() *Dependency {
+func (indexDep *indexDependency) extractDependency() *libraries.Dependency {
 	var constraint semver.Constraint
 	if c, err := semver.ParseConstraint(indexDep.Version); err == nil {
 		constraint = c
 	}
 	// FIXME: else { report invalid constraint }
-	return &Dependency{
+	return &libraries.Dependency{
 		Name:              indexDep.Name,
 		VersionConstraint: constraint,
 	}

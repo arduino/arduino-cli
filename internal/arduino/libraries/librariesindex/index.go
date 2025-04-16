@@ -45,7 +45,7 @@ type Library struct {
 type Release struct {
 	Author           string
 	Version          *semver.Version
-	Dependencies     []*Dependency
+	Dependencies     []*libraries.Dependency
 	Maintainer       string
 	Sentence         string
 	Paragraph        string
@@ -86,24 +86,8 @@ func (r *Release) GetVersion() *semver.Version {
 }
 
 // GetDependencies returns the dependencies of this library.
-func (r *Release) GetDependencies() []*Dependency {
+func (r *Release) GetDependencies() []*libraries.Dependency {
 	return r.Dependencies
-}
-
-// Dependency is a library dependency
-type Dependency struct {
-	Name              string
-	VersionConstraint semver.Constraint
-}
-
-// GetName returns the name of the dependency
-func (r *Dependency) GetName() string {
-	return r.Name
-}
-
-// GetConstraint returns the version Constraint of the dependecy
-func (r *Dependency) GetConstraint() semver.Constraint {
-	return r.VersionConstraint
 }
 
 func (r *Release) String() string {
@@ -155,7 +139,7 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 // An optional "override" releases may be passed if we want to exclude the same
 // libraries from the index (for example if we want to keep an installed library).
 func (idx *Index) ResolveDependencies(lib *Release, overrides []*Release) []*Release {
-	resolver := semver.NewResolver[*Release, *Dependency]()
+	resolver := semver.NewResolver[*Release, *libraries.Dependency]()
 
 	overridden := map[string]bool{}
 	for _, override := range overrides {

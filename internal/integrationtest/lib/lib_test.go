@@ -1756,3 +1756,41 @@ func TestDependencyResolverNoOverwrite(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "EncoderTool@2.2.0", "--no-overwrite")
 	require.NoError(t, err)
 }
+
+func TestLibListContainsDependenciesField(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "Arduino_ConnectionHandler@0.6.6")
+	require.NoError(t, err)
+	stdOut, _, err := cli.Run("lib", "list", "--json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdOut, `{"installed_libraries": [ { "library": {
+			"name":"Arduino_ConnectionHandler",
+			"version": "0.6.6",
+			"dependencies": [
+			  {"name": "Arduino_DebugUtils"},
+			  {"name": "WiFi101"},
+			  {"name": "WiFiNINA"},
+			  {"name": "MKRGSM"},
+			  {"name": "MKRNB"},
+			  {"name": "MKRWAN"}
+			]
+		} } ]}`)
+
+	_, _, err = cli.Run("lib", "install", "DebugLog@0.8.4")
+	require.NoError(t, err)
+	stdOut, _, err = cli.Run("lib", "list", "--json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdOut, `{"installed_libraries": [ { "library": {
+			"name":"DebugLog",
+			"version": "0.8.4",
+			"dependencies": [
+			  {"name": "ArxContainer", "version_constraint": ">=0.6.0"},
+			  {"name": "ArxTypeTraits"}
+			]
+		} } ]}`)
+}

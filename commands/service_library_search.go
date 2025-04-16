@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
@@ -116,7 +117,7 @@ func getLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 	}
 }
 
-func getLibraryDependenciesParameter(deps []*librariesindex.Dependency) []*rpc.LibraryDependency {
+func getLibraryDependenciesParameter(deps []*libraries.Dependency) []*rpc.LibraryDependency {
 	res := []*rpc.LibraryDependency{}
 	for _, dep := range deps {
 		res = append(res, &rpc.LibraryDependency{

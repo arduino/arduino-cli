@@ -355,6 +355,9 @@ message Library {
   // be treated as read-only. This status is determined by the presence of a
   // `.development` file in the library root directory.
   bool in_development = 29;
+  // The names of the library's dependencies, as defined by the 'depends'
+  // field of library.properties.
+  repeated LibraryDependency dependencies = 30;
 }
 
 // Represent the library layout.
