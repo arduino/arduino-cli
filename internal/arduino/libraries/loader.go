@@ -130,6 +130,21 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	library.LDflags = strings.TrimSpace(libProperties.Get("ldflags"))
 	library.Properties = libProperties
 	library.InDevelopment = libraryDir.Join(".development").Exist()
+	if dependencies := libProperties.Get("depends"); dependencies != "" {
+		for dep := range strings.SplitSeq(strings.TrimSpace(libProperties.Get("depends")), ",") {
+			var depConstraint semver.Constraint
+			depName := strings.TrimSpace(dep)
+			idx := strings.LastIndex(dep, " (")
+			if idx != -1 {
+				depName = dep[:idx]
+				depConstraint, _ = semver.ParseConstraint(dep[idx+1:])
+			}
+			library.Dependencies = append(library.Dependencies, &Dependency{
+				Name:              depName,
+				VersionConstraint: depConstraint,
+			})
+		}
+	}
 	return library, nil
 }
 
