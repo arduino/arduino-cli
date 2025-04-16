@@ -17,6 +17,7 @@ package packagemanager
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"runtime"
@@ -29,6 +30,7 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/downloader/v2"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -1024,4 +1026,21 @@ func TestRunScript(t *testing.T) {
 			require.Equal(t, "sent in stderr", strings.Trim(string(stderr), "\n\r "))
 		})
 	}
+}
+
+func TestCorrectlyUsesDownloaderConfig(t *testing.T) {
+	proxyURL := f.Must(url.Parse("http://proxy:test@test.test/404:42"))
+
+	downloaderCfg := downloader.Config{
+		HttpClient: http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(proxyURL),
+			},
+			Timeout: 123,
+		},
+	}
+	pmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloaderCfg)
+	pmb.LoadHardwareFromDirectory(customHardware)
+	pm := pmb.Build()
+	require.Equal(t, downloaderCfg, pm.downloaderConfig)
 }
