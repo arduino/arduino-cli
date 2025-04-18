@@ -47,7 +47,7 @@ func main() {
 
 	// Read the settings from the configuration file
 	openReq := &rpc.ConfigurationOpenRequest{SettingsFormat: "yaml"}
-	var configFileLoadingWarnings []string
+	var configFileWarnings []string
 	if configData, err := paths.New(configFile).ReadFile(); err == nil {
 		openReq.EncodedSettings = string(configData)
 	} else if !os.IsNotExist(err) {
@@ -57,7 +57,7 @@ func main() {
 		feedback.FatalError(fmt.Errorf("couldn't load configuration: %w", err), feedback.ErrGeneric)
 	} else if warnings := resp.GetWarnings(); len(warnings) > 0 {
 		// Save the warnings to show them later when the feedback package is fully initialized
-		configFileLoadingWarnings = warnings
+		configFileWarnings = warnings
 	}
 
 	// Get the current settings from the server
@@ -82,7 +82,7 @@ func main() {
 		// only if we are inside the "config ..." command. In JSON mode always
 		// output the warning.
 		if feedback.GetFormat() != feedback.Text || (cmd.HasParent() && cmd.Parent().Name() == "config") {
-			for _, warning := range configFileLoadingWarnings {
+			for _, warning := range configFileWarnings {
 				feedback.Warning(fmt.Sprintf("%s: %s", i18n.Tr("Invalid value in configuration"), warning))
 			}
 		}
