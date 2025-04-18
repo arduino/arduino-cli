@@ -19,8 +19,9 @@ services and messages are detailed in the [gRPC reference] pages.
 
 ## Versioning and backward compatibility policy
 
-This software is currently under active development: anything can change at any time, API and UI must be considered
-unstable until we release version 1.0.0. For more information see our [versioning and backward compatibility] policy.
+The Arduino CLI is in the stable production release 1.x.x. All API (JSON and gRPC) stable, any possible new breaking
+change will be delayed until the next major release. For more information see our [versioning and backward
+compatibility] policy.
 
 [installation]: installation.md
 [getting started guide]: getting-started.md
