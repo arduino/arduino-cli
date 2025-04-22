@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal/transport
-version: v1.71.1
+version: v1.72.0
 type: go
 summary: Package transport defines and implements message oriented communication channel
   to complete various transactions (e.g., an RPC).
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/transport
 license: apache-2.0
 licenses:
-- sources: grpc@v1.71.1/LICENSE
+- sources: grpc@v1.72.0/LICENSE
   text: |2
 
                                      Apache License
