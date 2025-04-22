@@ -20,20 +20,29 @@ jobs:
   create-release-artifacts:
     outputs:
       version: ${{ steps.get-version.outputs.version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.env.runner }}
 
     strategy:
       matrix:
-        os:
-          - Windows_32bit
-          - Windows_64bit
-          - Linux_32bit
-          - Linux_64bit
-          - Linux_ARMv6
-          - Linux_ARMv7
-          - Linux_ARM64
-          - macOS_64bit
-          - macOS_ARM64
+        env:
+          - os: Windows_32bit
+            runner: ubuntu-latest
+          - os: Windows_64bit
+            runner: ubuntu-latest
+          - os: Linux_32bit
+            runner: ubuntu-latest
+          - os: Linux_64bit
+            runner: ubuntu-latest
+          - os: Linux_ARMv6
+            runner: ubuntu-latest
+          - os: Linux_ARMv7
+            runner: ubuntu-latest
+          - os: Linux_ARM64
+            runner: ubuntu-latest
+          - os: macOS_64bit
+            runner: ubuntu-latest
+          - os: macOS_ARM64
+            runner: ubuntu-24.04-arm
 
     steps:
       - name: Checkout repository
@@ -43,7 +52,7 @@ jobs:
 
       - name: Create changelog
         # Avoid creating the same changelog for each os
-        if: matrix.os == 'Windows_32bit'
+        if: matrix.env.os == 'Windows_32bit'
         uses: arduino/create-changelog@v1
         with:
           tag-regex: '^v[0-9]+\.[0-9]+\.[0-9]+.*$'
@@ -58,7 +67,7 @@ jobs:
           version: 3.x
 
       - name: Build
-        run: task dist:${{ matrix.os }}
+        run: task dist:${{ matrix.env.os }}
 
       - name: Output Version
         id: get-version
@@ -68,7 +77,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.os }}
+          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.env.os }}
           path: ${{ env.DIST_DIR }}
 
   notarize-macos:
