@@ -1,12 +1,12 @@
 ---
 name: github.com/cloudflare/circl/internal/conv
-version: v1.6.0
+version: v1.6.1
 type: go
-summary: 
+summary:
 homepage: https://pkg.go.dev/github.com/cloudflare/circl/internal/conv
 license: other
 licenses:
-- sources: circl@v1.6.0/LICENSE
+- sources: circl@v1.6.1/LICENSE
   text: |
     Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -65,6 +65,6 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: circl@v1.6.0/README.md
+- sources: circl@v1.6.1/README.md
   text: The project is licensed under the [BSD-3-Clause License](./LICENSE).
 notices: []
