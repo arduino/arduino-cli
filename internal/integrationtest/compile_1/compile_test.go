@@ -850,7 +850,9 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	require.NoError(t, err)
 
 	// Install test library
-	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud", "--config-file", "arduino-cli.yaml")
+	// (We must use ArduinoIOTCloud@2.4.1 because it has a folder with a lot of files
+	// that will trigger the creation of an objs.a archive)
+	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud@2.4.1", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--json", "--config-file", "arduino-cli.yaml")
@@ -859,12 +861,10 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	sketchPath := paths.New(libOutput)
 	sketchPath = sketchPath.Join("examples", "ArduinoIoTCloud-Advanced")
 
-	t.Run("Compile", func(t *testing.T) {
+	t.Run("CheckCachingOfFolderArchives", func(t *testing.T) {
 		_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml")
 		require.NoError(t, err)
-	})
 
-	t.Run("CheckCachingOfFolderArchives", func(t *testing.T) {
 		// Run compile again and check if the archive is re-used (cached)
 		out, _, err := cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml", "-v")
 		require.NoError(t, err)
