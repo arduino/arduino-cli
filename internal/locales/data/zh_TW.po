@@ -21,7 +21,7 @@ msgstr "已不支援%[1]s 檔案夾！詳細資訊，請見 %[2]s"
 msgid "%[1]s invalid, rebuilding all"
 msgstr "%[1]s 無效，重新建構全部"
 
-#: internal/cli/lib/check_deps.go:124
+#: internal/cli/lib/check_deps.go:125
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "需要 %[1]s ，但已安裝 %[2]s"
 
@@ -41,12 +41,12 @@ msgstr "%s 和 %s 不能一起使用"
 msgid "%s installed"
 msgstr "%s 已安裝"
 
-#: internal/cli/lib/check_deps.go:121
+#: internal/cli/lib/check_deps.go:122
 msgid "%s is already installed."
 msgstr "%s 已安裝"
 
 #: internal/arduino/cores/packagemanager/loader.go:63
-#: internal/arduino/cores/packagemanager/loader.go:617
+#: internal/arduino/cores/packagemanager/loader.go:614
 msgid "%s is not a directory"
 msgstr "%s 不是目錄"
 
@@ -58,7 +58,7 @@ msgstr "%s 不是由套件管理員管理的"
 msgid "%s must be >= 1024"
 msgstr "%s 必須 >= 1024"
 
-#: internal/cli/lib/check_deps.go:118
+#: internal/cli/lib/check_deps.go:119
 msgid "%s must be installed."
 msgstr "必須安裝 %s "
 
@@ -71,7 +71,7 @@ msgstr "%s 樣態遺失"
 msgid "'%s' has an invalid signature"
 msgstr "'%s'的簽名無效"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:415
+#: internal/arduino/cores/packagemanager/package_manager.go:416
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -218,7 +218,7 @@ msgstr "將 sketch 放入開發板"
 msgid "Author: %s"
 msgstr "作者: %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:79
+#: internal/arduino/libraries/librariesmanager/install.go:78
 msgid ""
 "Automatic library install can't be performed in this case, please manually "
 "remove all duplicates and retry."
@@ -497,7 +497,7 @@ msgid ""
 "directory with the current configuration settings."
 msgstr "用目前的設定值建立或更新資料或自定義目錄內的設定檔"
 
-#: internal/cli/compile/compile.go:334
+#: internal/cli/compile/compile.go:340
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -705,7 +705,7 @@ msgstr "計算相對檔案路徑時出錯"
 msgid "Error cleaning caches: %v"
 msgstr "清理快取時出錯: %v"
 
-#: internal/cli/compile/compile.go:223
+#: internal/cli/compile/compile.go:225
 msgid "Error converting path to absolute: %v"
 msgstr "將路徑轉換成絕對路徑時出錯: %v"
 
@@ -780,7 +780,7 @@ msgstr "輸出 JSON 編碼過程出錯：%v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:267 internal/cli/compile/compile.go:309
+#: internal/cli/compile/compile.go:269 internal/cli/compile/compile.go:311
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "上傳時出錯: %v"
@@ -789,7 +789,7 @@ msgstr "上傳時出錯: %v"
 msgid "Error during board detection"
 msgstr "開發板偵測時出現錯誤。"
 
-#: internal/cli/compile/compile.go:383
+#: internal/cli/compile/compile.go:394
 msgid "Error during build: %v"
 msgstr "建構時出錯: %v"
 
@@ -1403,7 +1403,7 @@ msgid "Library %[1]s has been declared precompiled:"
 msgstr "程式庫 %[1]s 已聲明為預編譯:"
 
 #: commands/service_library_install.go:142
-#: internal/arduino/libraries/librariesmanager/install.go:131
+#: internal/arduino/libraries/librariesmanager/install.go:130
 msgid ""
 "Library %[1]s is already installed, but with a different version: %[2]s"
 msgstr "程式庫 %[1]s 已經安裝, 但版本不同: %[2]s"
@@ -1756,7 +1756,7 @@ msgstr "套件網站:"
 msgid "Paragraph: %s"
 msgstr "段落: %s"
 
-#: internal/cli/compile/compile.go:458 internal/cli/compile/compile.go:473
+#: internal/cli/compile/compile.go:473 internal/cli/compile/compile.go:488
 msgid "Path"
 msgstr "路徑"
 
@@ -1795,7 +1795,7 @@ msgstr "平台 %s 已安裝過"
 msgid "Platform %s installed"
 msgstr "平台 %s 已安裝"
 
-#: internal/cli/compile/compile.go:406 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1819,7 +1819,7 @@ msgstr "平台 '%s' 沒找到"
 msgid "Platform ID"
 msgstr "平台 ID"
 
-#: internal/cli/compile/compile.go:391 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "平台 ID 不正確"
 
@@ -2420,7 +2420,7 @@ msgstr "工具包前綴字元"
 msgid "Toolchain type"
 msgstr "工具包類型"
 
-#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:415 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "嘗試執行 %s"
 
@@ -2571,7 +2571,7 @@ msgstr "使用燒錄器將 bootloader 上傳到開發板"
 msgid "Upload the bootloader."
 msgstr "上傳 bootloader"
 
-#: internal/cli/compile/compile.go:272 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:274 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr "以 %s 協議上傳到開發板需要以下資訊:"
@@ -2592,11 +2592,11 @@ msgstr "用法:"
 msgid "Use %s for more information about a command."
 msgstr "使用 %s 取得指令的更多資訊"
 
-#: internal/cli/compile/compile.go:456
+#: internal/cli/compile/compile.go:471
 msgid "Used library"
 msgstr "使用的程式庫"
 
-#: internal/cli/compile/compile.go:471
+#: internal/cli/compile/compile.go:486
 msgid "Used platform"
 msgstr "使用的平台"
 
@@ -2667,7 +2667,7 @@ msgstr "數值"
 msgid "Verify uploaded binary after the upload."
 msgstr "上傳後驗證上傳的二進位碼"
 
-#: internal/cli/compile/compile.go:457 internal/cli/compile/compile.go:472
+#: internal/cli/compile/compile.go:472 internal/cli/compile/compile.go:487
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "版本"
@@ -2689,7 +2689,7 @@ msgstr "警告!無法設定工具: %s"
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr "警告 !  無法執行 pre_uninstall 命令: %s"
 
-#: internal/cli/compile/compile.go:333
+#: internal/cli/compile/compile.go:339
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "警告! sketch 用了一或多個客製程式庫編譯"
 
@@ -2730,11 +2730,11 @@ msgstr "使用設定集編譯時不能使用  %s 旗標參數"
 msgid "archive hash differs from hash in index"
 msgstr "保存與和索引不同的雜湊"
 
-#: internal/arduino/libraries/librariesmanager/install.go:188
+#: internal/arduino/libraries/librariesmanager/install.go:187
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr "存檔無效: 在 zip 檔頂層找到多個檔案"
 
-#: internal/arduino/libraries/librariesmanager/install.go:191
+#: internal/arduino/libraries/librariesmanager/install.go:190
 msgid "archive is not valid: no files found in zip file top level"
 msgstr "存檔無效: 在 zip 檔的頂層沒找到檔案"
 
@@ -2762,7 +2762,7 @@ msgstr "基本搜尋只限於官方維護者的 \"esp32\" 和 \"display\""
 msgid "binary file not found in %s"
 msgstr "%s 裏找不到二進位檔"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:315
+#: internal/arduino/cores/packagemanager/package_manager.go:316
 msgid "board %s not found"
 msgstr "找不到開發板 %s"
 
@@ -2782,7 +2782,7 @@ msgstr "找不到最新版的 %s "
 msgid "can't find latest release of tool %s"
 msgstr "找不到最新版的工具 %s "
 
-#: internal/arduino/cores/packagemanager/loader.go:712
+#: internal/arduino/cores/packagemanager/loader.go:709
 msgid "can't find pattern for discovery with id %s"
 msgstr "找不到 id 為 %s 探索的樣態"
 
@@ -2828,7 +2828,7 @@ msgstr "設定鍵 %s 含有無效字元"
 msgid "config value %s contains an invalid character"
 msgstr "設定值%s 含有無效字元"
 
-#: internal/arduino/libraries/librariesmanager/install.go:141
+#: internal/arduino/libraries/librariesmanager/install.go:140
 msgid "copying library to destination directory:"
 msgstr "拷貝程式庫到目標目錄:"
 
@@ -2870,15 +2870,15 @@ msgstr "資料區已超出開發板的可用空間"
 msgid "dependency '%s' is not available"
 msgstr "沒有 '%s' 的相依"
 
-#: internal/arduino/libraries/librariesmanager/install.go:94
+#: internal/arduino/libraries/librariesmanager/install.go:93
 msgid "destination dir %s already exists, cannot install"
 msgstr "目標目錄 %s 已存在，無法安裝"
 
-#: internal/arduino/libraries/librariesmanager/install.go:138
+#: internal/arduino/libraries/librariesmanager/install.go:137
 msgid "destination directory already exists"
 msgstr "目標目錄已存在"
 
-#: internal/arduino/libraries/librariesmanager/install.go:294
+#: internal/arduino/libraries/librariesmanager/install.go:305
 msgid "directory doesn't exist: %s"
 msgstr "目錄不存在: %s"
 
@@ -2886,15 +2886,15 @@ msgstr "目錄不存在: %s"
 msgid "discovery %[1]s process not started"
 msgstr "探索%[1]s 程序沒啟動"
 
-#: internal/arduino/cores/packagemanager/loader.go:644
+#: internal/arduino/cores/packagemanager/loader.go:641
 msgid "discovery %s not found"
 msgstr "探索 %s找不到 "
 
-#: internal/arduino/cores/packagemanager/loader.go:648
+#: internal/arduino/cores/packagemanager/loader.go:645
 msgid "discovery %s not installed"
 msgstr "探索 %s 未安裝"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:713
+#: internal/arduino/cores/packagemanager/package_manager.go:714
 msgid "discovery release not found: %s"
 msgstr "找不到探索發行: %s"
 
@@ -2922,7 +2922,7 @@ msgstr "清空開發板識別"
 msgid "error loading sketch project file:"
 msgstr "錯誤載入 sketch 專案:"
 
-#: internal/arduino/cores/packagemanager/loader.go:615
+#: internal/arduino/cores/packagemanager/loader.go:612
 msgid "error opening %s"
 msgstr "錯誤開啟 %s"
 
@@ -2938,7 +2938,7 @@ msgstr "錯誤處理伺服器回應"
 msgid "error querying Arduino Cloud Api"
 msgstr "錯誤查詢 Arduino Cloud Api"
 
-#: internal/arduino/libraries/librariesmanager/install.go:179
+#: internal/arduino/libraries/librariesmanager/install.go:178
 msgid "extracting archive"
 msgstr "解開存檔"
 
@@ -3016,7 +3016,7 @@ msgstr "取得存檔資訊: %s"
 msgid "getting archive path: %s"
 msgstr "取得存檔路徑: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:321
+#: internal/arduino/cores/packagemanager/package_manager.go:322
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "取得開發板 %[1]s: %[2]s 的建構屬性"
 
@@ -3032,7 +3032,7 @@ msgstr "取得平台 %[1]s: %[2]s 的監視器相依"
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "取得平台 %[1]s: %[2]s 的工具相依"
 
-#: internal/arduino/libraries/librariesmanager/install.go:149
+#: internal/arduino/libraries/librariesmanager/install.go:148
 msgid "install directory not set"
 msgstr "未設定安裝目錄"
 
@@ -3092,10 +3092,10 @@ msgstr "無效的空程式庫版本: %s"
 msgid "invalid empty option found"
 msgstr "找到無效的空選項"
 
-#: internal/arduino/libraries/librariesmanager/install.go:265
-#: internal/arduino/libraries/librariesmanager/install.go:268
-#: internal/arduino/libraries/librariesmanager/install.go:275
+#: internal/arduino/libraries/librariesmanager/install.go:276
 #: internal/arduino/libraries/librariesmanager/install.go:279
+#: internal/arduino/libraries/librariesmanager/install.go:286
+#: internal/arduino/libraries/librariesmanager/install.go:290
 msgid "invalid git url"
 msgstr "無效的 git 網址"
 
@@ -3210,11 +3210,11 @@ msgstr "名字有 \"buzzer\" 的程式庫"
 msgid "libraries with a Name exactly matching \"pcf8523\""
 msgstr "名字上有 \"pcf8523\" 的程式庫"
 
-#: internal/arduino/libraries/librariesmanager/install.go:126
+#: internal/arduino/libraries/librariesmanager/install.go:125
 msgid "library %s already installed"
 msgstr "程式庫 %s 已安裝"
 
-#: internal/arduino/libraries/librariesmanager/install.go:331
+#: internal/arduino/libraries/librariesmanager/install.go:342
 msgid "library not valid"
 msgstr "程式庫無效"
 
@@ -3228,8 +3228,8 @@ msgstr "載入 %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "載入開發板: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:468
-#: internal/arduino/cores/packagemanager/package_manager.go:483
+#: internal/arduino/cores/packagemanager/package_manager.go:469
+#: internal/arduino/cores/packagemanager/package_manager.go:484
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "載入json 索引檔 %[1]s:%[2]s"
 
@@ -3258,7 +3258,7 @@ msgstr "載入需要的平台 %s"
 msgid "loading required tool %s"
 msgstr "載入需要的工具 %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:590
+#: internal/arduino/cores/packagemanager/loader.go:587
 msgid "loading tool release in %s"
 msgstr "載入在 %s 的工具"
 
@@ -3282,7 +3282,7 @@ msgstr "缺少 '%s' 指令"
 msgid "missing checksum for: %s"
 msgstr "缺少 %s 的校驗碼"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:429
+#: internal/arduino/cores/packagemanager/package_manager.go:430
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "缺少開發板 %[2]s 參照的套件 %[1]s"
 
@@ -3290,11 +3290,11 @@ msgstr "缺少開發板 %[2]s 參照的套件 %[1]s"
 msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr "缺少 %s 的套件索引, 不保証未來更新與否"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:434
+#: internal/arduino/cores/packagemanager/package_manager.go:435
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少被開發板 %[3]s 參照的平台 %[1]s : %[2]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:439
+#: internal/arduino/cores/packagemanager/package_manager.go:440
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少開發板 %[3]s 參照的平台發行版 %[1]s : %[2]s"
 
@@ -3302,12 +3302,12 @@ msgstr "缺少開發板 %[3]s 參照的平台發行版 %[1]s : %[2]s"
 msgid "missing signature"
 msgstr "找不到簽名"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:724
+#: internal/arduino/cores/packagemanager/package_manager.go:725
 msgid "monitor release not found: %s"
 msgstr "沒找到監視器發行版: %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:197
-#: internal/arduino/libraries/librariesmanager/install.go:236
+#: internal/arduino/libraries/librariesmanager/install.go:196
+#: internal/arduino/libraries/librariesmanager/install.go:247
 #: internal/arduino/resources/install.go:106
 msgid "moving extracted archive to destination dir: %s"
 msgstr "移動解壓縮的存檔到目標資料夾: %s"
@@ -3385,12 +3385,12 @@ msgstr "開啟目標檔: %s"
 msgid "package %s not found"
 msgstr "找不到套件 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:497
+#: internal/arduino/cores/packagemanager/package_manager.go:498
 msgid "package '%s' not found"
 msgstr "找不到套件 '%s'"
 
 #: internal/arduino/cores/board.go:167
-#: internal/arduino/cores/packagemanager/package_manager.go:262
+#: internal/arduino/cores/packagemanager/package_manager.go:263
 msgid "parsing fqbn: %s"
 msgstr "解析 FQBN：%s"
 
@@ -3406,7 +3406,7 @@ msgstr "路徑不是平台目錄: %s"
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "%[2]s 套件裏找不到 %[1]s 平台"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:308
+#: internal/arduino/cores/packagemanager/package_manager.go:309
 msgid "platform %s is not installed"
 msgstr "平台 %s 未安裝"
 
@@ -3417,7 +3417,7 @@ msgstr "平台不支援使用中的作業系統"
 #: commands/service_compile.go:129
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
-#: internal/arduino/cores/packagemanager/loader.go:420
+#: internal/arduino/cores/packagemanager/loader.go:417
 msgid "platform not installed"
 msgstr "平台未安裝"
 
@@ -3456,11 +3456,11 @@ msgstr "讀取目錄 %[1]s 的內容"
 #: internal/arduino/cores/packagemanager/loader.go:69
 #: internal/arduino/cores/packagemanager/loader.go:151
 #: internal/arduino/cores/packagemanager/loader.go:218
-#: internal/arduino/cores/packagemanager/loader.go:582
+#: internal/arduino/cores/packagemanager/loader.go:579
 msgid "reading directory %s"
 msgstr "讀取目錄 %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:304
+#: internal/arduino/libraries/librariesmanager/install.go:315
 msgid "reading directory %s content"
 msgstr "讀取目錄 %s 的內容"
 
@@ -3500,7 +3500,7 @@ msgstr "讀取 sketch 檔"
 msgid "recipe not found '%s'"
 msgstr "作法未找到 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:573
+#: internal/arduino/cores/packagemanager/package_manager.go:574
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "找不到工具 %[2]s 的發行版 %[1]s"
 
@@ -3513,7 +3513,7 @@ msgstr "發行版不能是無"
 msgid "removing corrupted archive file: %s"
 msgstr "刪除損壞的存檔 %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:152
+#: internal/arduino/libraries/librariesmanager/install.go:151
 msgid "removing library directory: %s"
 msgstr "刪除程式庫目錄: %s"
 
@@ -3609,7 +3609,7 @@ msgstr "工具 %s 不是由套件管理員管理的"
 msgid "tool %s not found"
 msgstr "找不到工具 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:523
+#: internal/arduino/cores/packagemanager/package_manager.go:524
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "套件 '%[2]s' 裏找不到工具 '%[1]s'"
 
@@ -3617,8 +3617,8 @@ msgstr "套件 '%[2]s' 裏找不到工具 '%[1]s'"
 msgid "tool not installed"
 msgstr "工具未安裝"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:702
-#: internal/arduino/cores/packagemanager/package_manager.go:808
+#: internal/arduino/cores/packagemanager/package_manager.go:703
+#: internal/arduino/cores/packagemanager/package_manager.go:809
 msgid "tool release not found: %s"
 msgstr "工具發行未找到: %s"
 
@@ -3660,11 +3660,11 @@ msgstr "無法讀取來源項目的內容"
 msgid "unable to write to destination file"
 msgstr "無法寫入目標檔"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:296
+#: internal/arduino/cores/packagemanager/package_manager.go:297
 msgid "unknown package %s"
 msgstr "未知的套件 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:303
+#: internal/arduino/cores/packagemanager/package_manager.go:304
 msgid "unknown platform %s:%s"
 msgstr "未知的平台 %s:%s"
 

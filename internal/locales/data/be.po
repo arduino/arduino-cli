@@ -1,10 +1,10 @@
 # 
 # Translators:
-# lidacity <dzmitry@lidacity.by>, 2024
+# lidacity <dzmitry@lidacity.by>, 2025
 # 
 msgid ""
 msgstr ""
-"Last-Translator: lidacity <dzmitry@lidacity.by>, 2024\n"
+"Last-Translator: lidacity <dzmitry@lidacity.by>, 2025\n"
 "Language-Team: Belarusian (https://app.transifex.com/arduino-1/teams/108174/be/)\n"
 "Language: be\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "%[1]s invalid, rebuilding all"
 msgstr "%[1]s несапраўдны, перабудаваць усё"
 
-#: internal/cli/lib/check_deps.go:124
+#: internal/cli/lib/check_deps.go:125
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "Патрабуецца %[1]s, але ў дадзены момант усталяваны %[2]s."
 
@@ -43,12 +43,12 @@ msgstr "%s і %s не могуць ужывацца разам"
 msgid "%s installed"
 msgstr "%s усталяваны"
 
-#: internal/cli/lib/check_deps.go:121
+#: internal/cli/lib/check_deps.go:122
 msgid "%s is already installed."
 msgstr "%s ужо ўсталяваны."
 
 #: internal/arduino/cores/packagemanager/loader.go:63
-#: internal/arduino/cores/packagemanager/loader.go:617
+#: internal/arduino/cores/packagemanager/loader.go:614
 msgid "%s is not a directory"
 msgstr "%s не каталог"
 
@@ -60,7 +60,7 @@ msgstr "%s не кіруецца кіраўніком пакетаў"
 msgid "%s must be >= 1024"
 msgstr "%s павинны быць >= 1024"
 
-#: internal/cli/lib/check_deps.go:118
+#: internal/cli/lib/check_deps.go:119
 msgid "%s must be installed."
 msgstr "%s павінен быць усталяваны."
 
@@ -71,9 +71,9 @@ msgstr "Шаблон %s адсутнічае"
 
 #: commands/cmderrors/cmderrors.go:818
 msgid "'%s' has an invalid signature"
-msgstr "'%s' мае несапраўдны подпіс"
+msgstr "'%s' мае несапраўдную сігнатуру"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:415
+#: internal/arduino/cores/packagemanager/package_manager.go:416
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -228,7 +228,7 @@ msgstr "Прымацаванне сцэнара да платы."
 msgid "Author: %s"
 msgstr "Аўтар: %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:79
+#: internal/arduino/libraries/librariesmanager/install.go:78
 msgid ""
 "Automatic library install can't be performed in this case, please manually "
 "remove all duplicates and retry."
@@ -525,7 +525,7 @@ msgstr ""
 "Стварэнне ці абнаўленне файлу канфігурацыі ў каталогу дадзеных або "
 "карыстальніцкім каталогу з бягучымі наладамі канфігурацыі."
 
-#: internal/cli/compile/compile.go:334
+#: internal/cli/compile/compile.go:340
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -743,7 +743,7 @@ msgstr "Памылка пры вылічэнні адноснага шляху �
 msgid "Error cleaning caches: %v"
 msgstr "Памылка пры ачысткі кэшу: %v"
 
-#: internal/cli/compile/compile.go:223
+#: internal/cli/compile/compile.go:225
 msgid "Error converting path to absolute: %v"
 msgstr "Памылка пры пераўтварэнні шляху ў абсалютны: %v"
 
@@ -818,7 +818,7 @@ msgstr "Памылка пры кадаванні выходных дадзены
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:267 internal/cli/compile/compile.go:309
+#: internal/cli/compile/compile.go:269 internal/cli/compile/compile.go:311
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "Памылка падчас выгрузкі: %v"
@@ -827,7 +827,7 @@ msgstr "Памылка падчас выгрузкі: %v"
 msgid "Error during board detection"
 msgstr "Памылка падчас выяўленні платы"
 
-#: internal/cli/compile/compile.go:383
+#: internal/cli/compile/compile.go:394
 msgid "Error during build: %v"
 msgstr "Памылка падчас зборкі: %v"
 
@@ -1477,7 +1477,7 @@ msgid "Library %[1]s has been declared precompiled:"
 msgstr "Бібліятэка %[1]s была абвешчаная папярэдне скампіляванай:"
 
 #: commands/service_library_install.go:142
-#: internal/arduino/libraries/librariesmanager/install.go:131
+#: internal/arduino/libraries/librariesmanager/install.go:130
 msgid ""
 "Library %[1]s is already installed, but with a different version: %[2]s"
 msgstr "Бібліятэка %[1]s ужо ўсталяваная, але з іншай версіяй: %[2]s"
@@ -1859,7 +1859,7 @@ msgstr "Вэб-сайт пакету:"
 msgid "Paragraph: %s"
 msgstr "Абзац: %s"
 
-#: internal/cli/compile/compile.go:458 internal/cli/compile/compile.go:473
+#: internal/cli/compile/compile.go:473 internal/cli/compile/compile.go:488
 msgid "Path"
 msgstr "Шлях"
 
@@ -1904,7 +1904,7 @@ msgstr "Платформа %s ужо ўсталяваная"
 msgid "Platform %s installed"
 msgstr "Платформа %s усталяваная"
 
-#: internal/cli/compile/compile.go:406 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1928,7 +1928,7 @@ msgstr "Платформа '%s' не знойдзеная"
 msgid "Platform ID"
 msgstr "Ідэнтыфікатар платформы"
 
-#: internal/cli/compile/compile.go:391 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "Неправільны ідэнтыфікатар платформы"
 
@@ -2575,7 +2575,7 @@ msgstr "Прыстаўка ланцужка інструментаў"
 msgid "Toolchain type"
 msgstr "Тып ланцужка інструментаў"
 
-#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:415 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "Спроба выканання %s"
 
@@ -2732,7 +2732,7 @@ msgstr "Выгрузіць загрузнік на плату з дапамог�
 msgid "Upload the bootloader."
 msgstr "Выгрузіць загрузнік."
 
-#: internal/cli/compile/compile.go:272 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:274 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2756,11 +2756,11 @@ msgstr "Ужыта:"
 msgid "Use %s for more information about a command."
 msgstr "Ужыць %s для атрымання дадатковай інфармацыі пра каманду."
 
-#: internal/cli/compile/compile.go:456
+#: internal/cli/compile/compile.go:471
 msgid "Used library"
 msgstr "Ужытая бібліятэка"
 
-#: internal/cli/compile/compile.go:471
+#: internal/cli/compile/compile.go:486
 msgid "Used platform"
 msgstr "Ужытая платформа"
 
@@ -2831,7 +2831,7 @@ msgstr "Значэнні"
 msgid "Verify uploaded binary after the upload."
 msgstr "Праверыць загружаны двайковы файл пасля выгрузкі."
 
-#: internal/cli/compile/compile.go:457 internal/cli/compile/compile.go:472
+#: internal/cli/compile/compile.go:472 internal/cli/compile/compile.go:487
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "Версія"
@@ -2853,7 +2853,7 @@ msgstr "Увага: не атрымалася канфігураваць інс�
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr "Увага: не атрымалася запусціць сцэнар pre_uninstall: %s"
 
-#: internal/cli/compile/compile.go:333
+#: internal/cli/compile/compile.go:339
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr ""
 "Увага: сцэнар скампіляваны з ужываннем адной ці некалькіх карыстальніцкіх "
@@ -2901,12 +2901,12 @@ msgstr "Вы не можаце ўжываць аргумент %s пры кам�
 msgid "archive hash differs from hash in index"
 msgstr "архіўны хэш адрозніваецца ад хэша па індэксе"
 
-#: internal/arduino/libraries/librariesmanager/install.go:188
+#: internal/arduino/libraries/librariesmanager/install.go:187
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr ""
 "архіў несапраўдны: у верхнім узроўні файла zip знойдзена некалькі файлаў"
 
-#: internal/arduino/libraries/librariesmanager/install.go:191
+#: internal/arduino/libraries/librariesmanager/install.go:190
 msgid "archive is not valid: no files found in zip file top level"
 msgstr "архіў несапраўдны: файлы верхняга ўзроўню файла zip не знойдзеныя"
 
@@ -2934,7 +2934,7 @@ msgstr "асноўны пошук па \"esp32\" і \"display\" абмежава
 msgid "binary file not found in %s"
 msgstr "двайковы файл не знойдзены ў %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:315
+#: internal/arduino/cores/packagemanager/package_manager.go:316
 msgid "board %s not found"
 msgstr "плата %s не знойдзеная "
 
@@ -2954,7 +2954,7 @@ msgstr "не атрымалася знайсці апошнюю версію %s"
 msgid "can't find latest release of tool %s"
 msgstr "не атрымлася знайсці апошнюю версію інструмента %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:712
+#: internal/arduino/cores/packagemanager/loader.go:709
 msgid "can't find pattern for discovery with id %s"
 msgstr "не атрымалася знайсці шаблон для выяўлення з ідэнтыфікатарам %s"
 
@@ -3000,7 +3000,7 @@ msgstr "ключ канфігурацыі %s змяшчае недапушчал
 msgid "config value %s contains an invalid character"
 msgstr "значэнне канфігурацыі %s змяшчае недапушчальны знак"
 
-#: internal/arduino/libraries/librariesmanager/install.go:141
+#: internal/arduino/libraries/librariesmanager/install.go:140
 msgid "copying library to destination directory:"
 msgstr "капіраванне бібліятэкі ў каталог прызначэння:"
 
@@ -3042,15 +3042,15 @@ msgstr "аб'ём секцыі дадзеных перавышае даступ�
 msgid "dependency '%s' is not available"
 msgstr "залежнасць '%s' недаступная"
 
-#: internal/arduino/libraries/librariesmanager/install.go:94
+#: internal/arduino/libraries/librariesmanager/install.go:93
 msgid "destination dir %s already exists, cannot install"
 msgstr "каталог прызначэння %s ужо існуе, усталяваць не атрымалася"
 
-#: internal/arduino/libraries/librariesmanager/install.go:138
+#: internal/arduino/libraries/librariesmanager/install.go:137
 msgid "destination directory already exists"
 msgstr "каталог прызначэння ўжо існуе"
 
-#: internal/arduino/libraries/librariesmanager/install.go:294
+#: internal/arduino/libraries/librariesmanager/install.go:305
 msgid "directory doesn't exist: %s"
 msgstr "каталог не існуе: %s"
 
@@ -3058,15 +3058,15 @@ msgstr "каталог не існуе: %s"
 msgid "discovery %[1]s process not started"
 msgstr "працэс выяўлення %[1]s не запушчаны"
 
-#: internal/arduino/cores/packagemanager/loader.go:644
+#: internal/arduino/cores/packagemanager/loader.go:641
 msgid "discovery %s not found"
 msgstr "выяўленне %s не знойдзенае"
 
-#: internal/arduino/cores/packagemanager/loader.go:648
+#: internal/arduino/cores/packagemanager/loader.go:645
 msgid "discovery %s not installed"
 msgstr "выяўленне %s не ўсталяванае"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:713
+#: internal/arduino/cores/packagemanager/package_manager.go:714
 msgid "discovery release not found: %s"
 msgstr "выпуск выяўлення не знойдзены: %s"
 
@@ -3094,7 +3094,7 @@ msgstr "пусты ідэнтыфікатар платы"
 msgid "error loading sketch project file:"
 msgstr "памылка пры загрузцы сцэнара праекту:"
 
-#: internal/arduino/cores/packagemanager/loader.go:615
+#: internal/arduino/cores/packagemanager/loader.go:612
 msgid "error opening %s"
 msgstr "памылка пры адкрыцці %s"
 
@@ -3110,7 +3110,7 @@ msgstr "памылка пры апрацоўцы адказу ад сервер�
 msgid "error querying Arduino Cloud Api"
 msgstr "памылка пры запыце Arduino Cloud Api"
 
-#: internal/arduino/libraries/librariesmanager/install.go:179
+#: internal/arduino/libraries/librariesmanager/install.go:178
 msgid "extracting archive"
 msgstr "выманне архіва"
 
@@ -3189,7 +3189,7 @@ msgstr "атрыманне інфармацыі пра архіў: %s"
 msgid "getting archive path: %s"
 msgstr "атрыманне шляху да архіва: %"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:321
+#: internal/arduino/cores/packagemanager/package_manager.go:322
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "атрыманне ўласцівасцяў зборкі для платы %[1]s: %[2]s"
 
@@ -3205,7 +3205,7 @@ msgstr "атрыманне залежнасцяў манітора для пла
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "атрыманне залежнасцяў інструментаў для платформы %[1]s: %[2]s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:149
+#: internal/arduino/libraries/librariesmanager/install.go:148
 msgid "install directory not set"
 msgstr "каталог для ўсталявання не зададзены"
 
@@ -3265,10 +3265,10 @@ msgstr "хібная пустая версія адра: %s"
 msgid "invalid empty option found"
 msgstr "знойдзена хібная пустая налада"
 
-#: internal/arduino/libraries/librariesmanager/install.go:265
-#: internal/arduino/libraries/librariesmanager/install.go:268
-#: internal/arduino/libraries/librariesmanager/install.go:275
+#: internal/arduino/libraries/librariesmanager/install.go:276
 #: internal/arduino/libraries/librariesmanager/install.go:279
+#: internal/arduino/libraries/librariesmanager/install.go:286
+#: internal/arduino/libraries/librariesmanager/install.go:290
 msgid "invalid git url"
 msgstr "хібны адрас URL git"
 
@@ -3387,11 +3387,11 @@ msgstr "бібліятэкі з \"buzzer\" у полі назвы"
 msgid "libraries with a Name exactly matching \"pcf8523\""
 msgstr "бібліятэкі з назвай, якая дакладна супадае з \"pcf8523\""
 
-#: internal/arduino/libraries/librariesmanager/install.go:126
+#: internal/arduino/libraries/librariesmanager/install.go:125
 msgid "library %s already installed"
 msgstr "бібліятэка %s ужо ўсталяваная"
 
-#: internal/arduino/libraries/librariesmanager/install.go:331
+#: internal/arduino/libraries/librariesmanager/install.go:342
 msgid "library not valid"
 msgstr "бібліятэка несапраўдная"
 
@@ -3405,8 +3405,8 @@ msgstr "загрузка %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "загрузка платы: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:468
-#: internal/arduino/cores/packagemanager/package_manager.go:483
+#: internal/arduino/cores/packagemanager/package_manager.go:469
+#: internal/arduino/cores/packagemanager/package_manager.go:484
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "загрузка індэкснага файла json %[1]s: %[2]s"
 
@@ -3435,7 +3435,7 @@ msgstr "загрузка неабходнай платформы %s"
 msgid "loading required tool %s"
 msgstr "загрузка неабходнага інструмента %s"
 
-#: internal/arduino/cores/packagemanager/loader.go:590
+#: internal/arduino/cores/packagemanager/loader.go:587
 msgid "loading tool release in %s"
 msgstr "загрузка выпуску інструмента ў %s"
 
@@ -3459,7 +3459,7 @@ msgstr "адсутнічае дырэктыва '%s'"
 msgid "missing checksum for: %s"
 msgstr "адсутнічае кантрольная сума для: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:429
+#: internal/arduino/cores/packagemanager/package_manager.go:430
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "адсутнічае пакет %[1]s, на які спасылаецца плата%[2]s"
 
@@ -3468,25 +3468,25 @@ msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr ""
 "адсутнічае індэкс пакета %s, будучыя абнаўленні не могуць быць гарантаваныя"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:434
+#: internal/arduino/cores/packagemanager/package_manager.go:435
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "адсутнічае платформа %[1]s: %[2]s на якую спасылаецца плата %[3]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:439
+#: internal/arduino/cores/packagemanager/package_manager.go:440
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "адсутнічае выпуск платформы %[1]s: %[2]s на які спасылаецца плата %[3]s"
 
 #: internal/arduino/resources/index.go:153
 msgid "missing signature"
-msgstr "адсутнчіае сігнатура"
+msgstr "адсутнічае сігнатура"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:724
+#: internal/arduino/cores/packagemanager/package_manager.go:725
 msgid "monitor release not found: %s"
 msgstr "выпуск маніторынгу не знойдзена: %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:197
-#: internal/arduino/libraries/librariesmanager/install.go:236
+#: internal/arduino/libraries/librariesmanager/install.go:196
+#: internal/arduino/libraries/librariesmanager/install.go:247
 #: internal/arduino/resources/install.go:106
 msgid "moving extracted archive to destination dir: %s"
 msgstr "перамяшчэнне вынятага архіва ў каталог прызначэння: %s"
@@ -3569,12 +3569,12 @@ msgstr "адкрыццё мэтавага файлау: %s"
 msgid "package %s not found"
 msgstr "пакет %s не знойдзены"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:497
+#: internal/arduino/cores/packagemanager/package_manager.go:498
 msgid "package '%s' not found"
 msgstr "пакет '%s' не знойдзены"
 
 #: internal/arduino/cores/board.go:167
-#: internal/arduino/cores/packagemanager/package_manager.go:262
+#: internal/arduino/cores/packagemanager/package_manager.go:263
 msgid "parsing fqbn: %s"
 msgstr "разбор fqbn: %s"
 
@@ -3590,7 +3590,7 @@ msgstr "шлях не з'яўляецца каталогам платформы:
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "платформа %[1]s не знойдзена ў пакеце %[2]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:308
+#: internal/arduino/cores/packagemanager/package_manager.go:309
 msgid "platform %s is not installed"
 msgstr "платформа %s не ўсталяваная"
 
@@ -3601,7 +3601,7 @@ msgstr "платформа недаступная для вашай аперац
 #: commands/service_compile.go:129
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
-#: internal/arduino/cores/packagemanager/loader.go:420
+#: internal/arduino/cores/packagemanager/loader.go:417
 msgid "platform not installed"
 msgstr "платформа не ўсталяваная"
 
@@ -3640,11 +3640,11 @@ msgstr "чытанне зместу каталога %[1]s"
 #: internal/arduino/cores/packagemanager/loader.go:69
 #: internal/arduino/cores/packagemanager/loader.go:151
 #: internal/arduino/cores/packagemanager/loader.go:218
-#: internal/arduino/cores/packagemanager/loader.go:582
+#: internal/arduino/cores/packagemanager/loader.go:579
 msgid "reading directory %s"
 msgstr "чытанне каталогу %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:304
+#: internal/arduino/libraries/librariesmanager/install.go:315
 msgid "reading directory %s content"
 msgstr "чытанне зместу каталога %s"
 
@@ -3684,7 +3684,7 @@ msgstr "чытанне файлаў сцэнару"
 msgid "recipe not found '%s'"
 msgstr "пакет '%s' не знойдзены"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:573
+#: internal/arduino/cores/packagemanager/package_manager.go:574
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "не знойдзены выпуск %[1]s для інструмента %[2]s"
 
@@ -3697,7 +3697,7 @@ msgstr "выпуск не можа быць нулявым"
 msgid "removing corrupted archive file: %s"
 msgstr "выдаленне пашкоджанага архіўнага файла: %s"
 
-#: internal/arduino/libraries/librariesmanager/install.go:152
+#: internal/arduino/libraries/librariesmanager/install.go:151
 msgid "removing library directory: %s"
 msgstr "выдаленне каталогу бібліятэкі: %s"
 
@@ -3725,6 +3725,8 @@ msgstr "пошук у каранёвым каталогу пакета: %s"
 #: internal/arduino/security/signatures.go:87
 msgid "signature expired: is your system clock set correctly?"
 msgstr ""
+"скончыўся тэрмін дзеяння сігнатуры: ці правільна зададзены ваш сістэмны "
+"гадзіннік?"
 
 #: commands/service_sketch_new.go:78
 msgid "sketch name cannot be empty"
@@ -3795,7 +3797,7 @@ msgstr "інструмент %s не кіруецца кіраўніком па�
 msgid "tool %s not found"
 msgstr "інструмент %s не знойдзены"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:523
+#: internal/arduino/cores/packagemanager/package_manager.go:524
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "інструмент '%[1]s не знойдзены ў пакеты '%[2]s'"
 
@@ -3803,8 +3805,8 @@ msgstr "інструмент '%[1]s не знойдзены ў пакеты '%[2
 msgid "tool not installed"
 msgstr "інструмент не ўсталяваны"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:702
-#: internal/arduino/cores/packagemanager/package_manager.go:808
+#: internal/arduino/cores/packagemanager/package_manager.go:703
+#: internal/arduino/cores/packagemanager/package_manager.go:809
 msgid "tool release not found: %s"
 msgstr "выпуск інструмента не знойдзены: %s"
 
@@ -3846,11 +3848,11 @@ msgstr "не атрымалася прачытаць змест зыходнаг
 msgid "unable to write to destination file"
 msgstr "не атрымалася запісаць у файл прызначэння"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:296
+#: internal/arduino/cores/packagemanager/package_manager.go:297
 msgid "unknown package %s"
 msgstr "невядомы пакет %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:303
+#: internal/arduino/cores/packagemanager/package_manager.go:304
 msgid "unknown platform %s:%s"
 msgstr "невядомая платформа %s: %s"
 
