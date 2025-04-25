@@ -5,9 +5,6 @@
   "aliveStatusCodes": [200, 206],
   "ignorePatterns": [
     {
-      "pattern": "^#"
-    },
-    {
       "pattern": "https?://localhost:\\d*/"
     },
     {
