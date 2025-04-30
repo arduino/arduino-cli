@@ -90,8 +90,8 @@ func GCC(
 		n, err := stderr.Write(p)
 		count += n
 		if count > 100*1024 {
-			cancel()
 			fmt.Fprintln(stderr, i18n.Tr("Compiler error output has been truncated."))
+			cancel()
 		}
 		return n, err
 	})
