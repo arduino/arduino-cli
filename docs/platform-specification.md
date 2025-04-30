@@ -24,7 +24,11 @@ Alternatively, a platform may be manually installed by the user inside the Sketc
 - `{directories.user}` is the user directory as specified in the
   [configuration file](configuration.md#default-directories).
 - `{VENDOR_NAME}` is the identifier of the vendor/maintainer of the platform.
+  - The name of the vendor directory must not contain any characters other than the letters `A`-`Z` and `a`-`z`, numbers
+    (`0`-`9`), underscores (`_`), dashes (`-`), and dots (`.`).
 - `{ARCHITECTURE}` is the architecture of the CPU used in the platform.
+  - The name of the architecture directory must not contain any characters other than the letters `A`-`Z` and `a`-`z`,
+    numbers (`0`-`9`), underscores (`_`), dashes (`-`), and dots (`.`).
 
 A vendor/maintainer may have multiple supported architectures.
 
@@ -533,6 +537,9 @@ be placed in the same folder as the `platform.txt` it supplements.
 This file contains definitions and metadata for the boards supported by the platform. Boards are referenced by their
 short name, the board ID. The settings for a board are defined through a set of properties with keys having the board ID
 as prefix.
+
+The board ID must not contain any characters other than the letters `A`-`Z` and `a`-`z`, numbers (`0`-`9`), underscores
+(`_`), and dashes (`-`).
 
 For example, the board ID chosen for the Arduino Uno board is "uno". An extract of the Uno board configuration in
 boards.txt looks like:
@@ -1591,8 +1598,13 @@ This board was produced in two models, one with an ATmega168 microcontroller and
 going then to define a custom option, using the "cpu" MENU_ID, that allows the user to choose between the two different
 microcontrollers.
 
-We must first define a set of **menu.MENU_ID=Text** properties. **Text** is what is displayed on the GUI for every
-custom menu we are going to create and must be declared at the beginning of the boards.txt file:
+We must first define a set of **menu.MENU_ID=Text** properties.
+
+The menu ID must not contain any characters other than the letters `A`-`Z` and `a`-`z`, numbers (`0`-`9`), underscores
+(`_`), and dashes (`-`).
+
+**Text** is what is displayed on the GUI for every custom menu we are going to create and must be declared at the
+beginning of the boards.txt file:
 
 ```
 menu.cpu=Processor
@@ -1627,7 +1639,12 @@ duemilanove.menu.cpu.atmega168=ATmega168
 
 We have defined two values: "atmega328" and "atmega168".<br> Note that the property keys must follow the format
 **BOARD_ID.menu.MENU_ID.OPTION_ID=Text**, where **Text** is what is displayed under the "Processor" menu in the IDE's
-GUI.<br> Finally, the specific configuration for each option value:
+GUI.
+
+The option ID must not contain any characters other than the letters `A`-`Z` and `a`-`z`, numbers (`0`-`9`), underscores
+(`_`), dashes (`-`), and equal signs (`=`).
+
+Finally, the specific configuration for each option value:
 
 ```
 [.....]
