@@ -64,8 +64,8 @@ configuration file.
   - on Windows is: `{HOME}/AppData/Local/Arduino15`
   - on MacOS is: `{HOME}/Library/Arduino15`
 
-- The `directories.download` default is `{directories.data}/staging`. If the value of `{directories.data}` is changed in
-  the configuration the user-specified value will be used.
+- The `directories.downloads` default is `{directories.data}/staging`. If the value of `{directories.data}` is changed
+  in the configuration the user-specified value will be used.
 
 - The `directories.user` default is OS-dependent:
   - on Linux (and other Unix-based OS) is: `{HOME}/Arduino`
