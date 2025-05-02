@@ -1,76 +1,55 @@
 ## Configuration keys
 
-- `board_manager`
-  - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
-  - `enable_unsafe_install` - set to `true` to allow installation of packages that do not pass the checksum test. This
-    is considered an unsafe installation method and should be used only for development purposes.
-- `daemon` - options related to running Arduino CLI as a [gRPC] server.
-  - `port` - TCP port used for gRPC client connections.
-- `directories` - directories used by Arduino CLI.
-  - `data` - directory used to store Boards/Library Manager index files and Boards Manager platform installations.
-  - `downloads` - directory used to stage downloaded archives during Boards/Library Manager installations.
-  - `user` - the equivalent of the Arduino IDE's ["sketchbook" directory][sketchbook directory]. Library Manager
-    installations are made to the `libraries` subdirectory of the user directory. Users can manually install 3rd party
-    platforms in the `hardware` subdirectory of the user directory.
-  - `builtin.libraries` - the libraries in this directory will be available to all platforms without the need for the
-    user to install them, but with the lowest priority over other installed libraries with the same name, it's the
-    equivalent of the Arduino IDE's bundled libraries directory.
-- `library` - configuration options relating to Arduino libraries.
-  - `enable_unsafe_install` - set to `true` to enable the use of the `--git-url` and `--zip-file` flags with
-    [`arduino-cli lib install`][arduino cli lib install]. These are considered "unsafe" installation methods because
-    they allow installing files that have not passed through the Library Manager submission process.
-- `locale` - the language used by Arduino CLI to communicate to the user, the parameter is the language identifier in
-  the standard POSIX format `<language>[_<TERRITORY>[.<encoding>]]` (for example `it` or `it_IT`, or `it_IT.UTF-8`).
-- `logging` - configuration options for Arduino CLI's logs.
-  - `file` - path to the file where logs will be written.
-  - `format` - output format for the logs. Allowed values are `text` or `json`.
-  - `level` - messages with this level and above will be logged. Valid levels are: `trace`, `debug`, `info`, `warn`,
-    `error`, `fatal`, `panic`.
-- `metrics` - settings related to the collection of data used for continued improvement of Arduino CLI.
-  - `addr` - TCP port used for metrics communication.
-  - `enabled` - controls the use of metrics.
-- `output` - settings related to text output.
-  - `no_color` - ANSI color escape codes are added by default to the output. Set to `true` to disable colored text
-    output.
-- `sketch` - configuration options relating to [Arduino sketches][sketch specification].
-  - `always_export_binaries` - set to `true` to make [`arduino-cli compile`][arduino-cli compile] always save binaries
-    to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag.
-- `updater` - configuration options related to Arduino CLI updates
-  - `enable_notification` - set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`
-- `build_cache` configuration options related to the compilation cache
-  - `path` - the path to the build cache, default is `$TMP/arduino`.
-  - `extra_paths` - a list of paths to look for precompiled artifacts if not found on `build_cache.path` setting.
-  - `compilations_before_purge` - interval, in number of compilations, at which the cache is purged, defaults to `10`.
-    When `0` the cache is never purged.
-  - `ttl` - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files
-    lifetime is renewed. The value format must be a valid input for
-    [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
-- `network` - configuration options related to the network connection.
-  - `proxy` - URL of the proxy server.
-  - `connection_timeout` - network connection timeout, the value format must be a valid input for
-    [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `60s` (60 seconds). `0` means it will
-    wait indefinitely.
-  - `cloud_api.skip_board_detection_calls` - if set to `true` it will make the Arduino CLI skip network calls to Arduino
-    Cloud API to help detection of an unknown board.
+| Name | Default | Doc |
+|---------------|---------------|------|
+|`board_manager`| | |
+| &nbsp;&nbsp;&nbsp;.`additional_urls` | `[]` | The URLs to any additional Boards Manager package index files needed for your boards platforms.
+| &nbsp;&nbsp;&nbsp;.`enable_unsafe_install` | `false` | Set to `true` to allow installation of packages that do not pass the checksum test. This is considered an unsafe installation method and should be use **only for development purposes**.
+| `daemon` | | Options related to running Arduino CLI as a [gRPC] server. |
+| &nbsp;&nbsp;&nbsp;.`port` | `50051` | TCP port used for gRPC client connections. |
+| `directories` | | Directories used by Arduino CLI. |
+| &nbsp;&nbsp;&nbsp;.`data:` | [OS dependant](#default-directories) | Directory used to store Boards/Library Manager index files and Boards Manager platform installations. |
+| &nbsp;&nbsp;&nbsp;.`downloads:` | [OS dependant](#default-directories) | Directory used to stage downloaded archives during Boards/Library Manager installations. |
+| &nbsp;&nbsp;&nbsp;.`user:` | [OS dependant](#default-directories) | The equivalent of the Arduino IDE's ["sketchbook" directory][sketchbook directory]. Library Manager installations are made to the `libraries` subdirectory of the user directory. Users can manually install 3rd party platforms in the `hardware` subdirectory of the user directory. |
+| &nbsp;&nbsp;&nbsp;.`builtin.libraries:` | | The libraries in this directory will be available to all platforms without the need for the user to install them, but with the lowest priority over other installed libraries with the same name, it's the equivalent of the Arduino IDE's bundled libraries directory. |
+| `library` | | configuration options relating to Arduino libraries.|
+| &nbsp;&nbsp;&nbsp;.`enable_unsafe_install` | false | Set to `true` to enable the use of the `--git-url` and `--zip-file` flags with [`arduino-cli lib install`][arduino cli lib install]. These are considered "unsafe" installation methods because they allow installing files that have not passed through the Library Manager submission process. |
+| `locale` | No default value | The language used by Arduino CLI to communicate to the user, the parameter is the language identifier in the standard POSIX format `<language>[_<TERRITORY>[.<encoding>]]` (for example `it` or `it_IT`, or `it_IT.UTF-8`). |
+| `logging` | | Configuration options for Arduino CLI's logs. |
+| &nbsp;&nbsp;&nbsp;.`file` | No default value | Path to the file where logs will be written. |
+| &nbsp;&nbsp;&nbsp;.`format` | | output format for the logs. Allowed values are `text` or `json`. |
+| &nbsp;&nbsp;&nbsp;.`level` | | messages with this level and above will be logged. Valid levels are: `trace`, `debug`, `info`, `warn`, `error`, `fatal`, `panic`. |
+| `metrics` | | settings related to the collection of data used for continued improvement of Arduino CLI. |
+| &nbsp;&nbsp;&nbsp;.`addr` | :9090 | TCP port used for metrics communication. |
+| &nbsp;&nbsp;&nbsp;.`enabled` | true | controls the use of metrics. |
+| `output.no_color` | `false` | When `logging.format` is `text`, do not use ANSI color escape codes to the output. Set to `true` to disable colored text output. |
+| `sketch.always_export_binaries` | false |  When set to `true`, make's [`arduino-cli compile`][arduino-cli compile] always save binaries to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag. See [Arduino sketches][sketch specification]. |
+| `updater.enable_notification` | `true` | set to `false` to disable notifications of new Arduino CLI releases. |
+| `build_cache` | | configuration options related to the compilation cache |
+| &nbsp;&nbsp;&nbsp;.`path` | [OS dependant](#default-directories) | the path to the build cache, default is `$TMP/arduino`. |
+| &nbsp;&nbsp;&nbsp;.`extra_paths` | No default value | a list of paths to look for precompiled artifacts if not found on `build_cache.path` setting. |
+| &nbsp;&nbsp;&nbsp;.`compilations_before_purge` | 10 | interval, in number of compilations, at which the cache is purged, defaults to `10`.  When `0` the cache is never purged. |
+| &nbsp;&nbsp;&nbsp;.`ttl` | `720h0m0s` | cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days). |
+| `network` | | configuration options related to the network connection. |
+| &nbsp;&nbsp;&nbsp;.`proxy` | No default value | URL of the proxy server. |
+| &nbsp;&nbsp;&nbsp;.`connection_timeout` | `1m0s` | network connection timeout, the value format must be a valid input for [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `60s` (60 seconds). `0` means it will wait indefinitely. |
+| &nbsp;&nbsp;&nbsp;.`cloud_api.skip_board_detection_calls` | No default value | if set to `true` it will make the Arduino CLI skip network calls to Arduino Cloud API to help detection of an unknown board. |
+| &nbsp;&nbsp;&nbsp;.`user_agent_ext` | No default value | |
 
 ### Default directories
+The default directories.data are OS-dependent:
 
-The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
-configuration file.
+- `directories.data` is
+  - `{HOME}/.arduino15` on Linux (and other Unix-based OS);
+  - `{HOME}/AppData/Local/Arduino15` on Windows;
+  - `{HOME}/Library/Arduino15` on MacOS
 
-- The `directories.data` default is OS-dependent:
+- If not set, `directories.download` is the subfolder `staging` of the `{directories.data}`.
 
-  - on Linux (and other Unix-based OS) is: `{HOME}/.arduino15`
-  - on Windows is: `{HOME}/AppData/Local/Arduino15`
-  - on MacOS is: `{HOME}/Library/Arduino15`
-
-- The `directories.download` default is `{directories.data}/staging`. If the value of `{directories.data}` is changed in
-  the configuration the user-specified value will be used.
-
-- The `directories.user` default is OS-dependent:
-  - on Linux (and other Unix-based OS) is: `{HOME}/Arduino`
-  - on Windows is: `{DOCUMENTS}/Arduino`
-  - on MacOS is: `{HOME}/Documents/Arduino`
+- `directories.user` is
+  - `{HOME}/Arduino `on Linux (and other Unix-based OS);
+  - `{DOCUMENTS}/Arduino` on Windows;
+  - `{HOME}/Documents/Arduino` on MacOS
 
 ## Configuration methods
 
