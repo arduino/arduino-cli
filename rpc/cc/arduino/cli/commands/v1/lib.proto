@@ -379,6 +379,8 @@ enum LibraryLocation {
   LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN = 3;
   // Outside the `libraries` folders managed by the CLI.
   LIBRARY_LOCATION_UNMANAGED = 4;
+  // Inside the `libraries` folder of the sketch.
+  LIBRARY_LOCATION_SKETCH = 5;
 }
 
 message ZipLibraryInstallRequest {

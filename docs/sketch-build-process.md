@@ -52,19 +52,19 @@ generated for the path to each library dependency and appended to the
 If multiple libraries contain a file that matches the `#include` directive, the priority is determined by applying the
 following rules, one by one in this order, until a rule determines a winner:
 
-1. A library that has been specified using the [`--library` option](commands/arduino-cli_compile.md#options) of
-   `arduino-cli compile` wins against a library in other locations
+1. A library has been specified using the [`--library` option](commands/arduino-cli_compile.md#options) of
+   `arduino-cli compile`.
+1. A library is found in the `libraries` subfolder of the sketch.
 1. A library that is architecture compatible wins against a library that is not architecture compatible (see
    [**Architecture Matching**](#architecture-matching))
 1. A library with both [library name](#library-name-priority) and [folder name](#folder-name-priority) matching the
-   include wins
-1. A library that has better "library name priority" or "folder name priority" wins (see
-   [**Library Name Priority**](#library-name-priority) and [**Folder Name Priority**](#folder-name-priority))
-1. A library that is architecture optimized wins against a library that is not architecture optimized (see
-   [**Architecture Matching**](#architecture-matching))
-1. A library that has a better "location priority" wins (see [**Location Priority**](#location-priority))
-1. A library that has a folder name with a better score using the "closest-match" algorithm wins
-1. A library that has a folder name that comes first in alphanumeric order wins
+   include.
+1. A library has better "library name priority" or "folder name priority" (see
+   [**Library Name Priority**](#library-name-priority) and [**Folder Name Priority**](#folder-name-priority)).
+1. A library is architecture optimized (see [**Architecture Matching**](#architecture-matching)).
+1. A library has a better "location priority" (see [**Location Priority**](#location-priority)).
+1. A library has a folder name with a better score using the "closest-match" algorithm.
+1. A library has a folder name that comes first in alphanumeric order.
 
 ### Architecture Matching
 
@@ -126,14 +126,15 @@ The "location priority" is determined as follows (in order of highest to lowest 
 
 1. The library is under a custom libraries path specified via the
    [`--libraries` option](commands/arduino-cli_compile.md#options) of `arduino-cli compile` (in decreasing order of
-   priority when multiple custom paths are defined)
-1. The library is under the `libraries` subfolder of the IDE's sketchbook or Arduino CLI's user directory
+   priority when multiple custom paths are defined).
+1. The library is under the `libraries` subfolder of the sketch.
+1. The library is under the `libraries` subfolder of the IDE's sketchbook or Arduino CLI's user directory.
 1. The library is bundled with the board platform/core
-   ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties))
+   ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties)).
 1. The library is bundled with the [referenced](platform-specification.md#referencing-another-core-variant-or-tool)
-   board platform/core
+   board platform/core.
 1. The library is bundled with the Arduino IDE (this location is determined by the Arduino CLI configuration setting
-   `directories.builtin.libraries`)
+   `directories.builtin.libraries`).
 
 #### Location priorities in Arduino Web Editor
 
