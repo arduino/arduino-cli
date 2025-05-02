@@ -18,6 +18,7 @@ package libraries
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
@@ -130,6 +131,12 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	library.LDflags = strings.TrimSpace(libProperties.Get("ldflags"))
 	library.Properties = libProperties
 	library.InDevelopment = libraryDir.Join(".development").Exist()
+
+	dependencies, err := extractDependenciesList(libProperties.Get("depends"))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("scanning library dependencies"), err)
+	}
+	library.Dependencies = dependencies
 	return library, nil
 }
 
@@ -219,4 +226,35 @@ func filterExamplesDirs(dir *paths.Path) bool {
 		}
 	}
 	return false
+}
+
+var libraryDependsRegex = regexp.MustCompile(`^([^()]+?) *(?: \((.*)\))?$`)
+
+// extractDependenciesList extracts dependencies from the "depends" field of library.properties
+func extractDependenciesList(depends string) ([]*Dependency, error) {
+	deps := []*Dependency{}
+	depends = strings.TrimSpace(depends)
+	if depends == "" {
+		return deps, nil
+	}
+	for dep := range strings.SplitSeq(depends, ",") {
+		dep = strings.TrimSpace(dep)
+		if dep == "" {
+			return nil, fmt.Errorf("invalid dep: %s", dep)
+		}
+		matches := libraryDependsRegex.FindAllStringSubmatch(dep, -1)
+		if matches == nil {
+			return nil, fmt.Errorf("invalid dep: %s", dep)
+		}
+
+		depConstraint, err := semver.ParseConstraint(matches[0][2])
+		if err != nil {
+			return nil, fmt.Errorf("invalid dep constraint: %s", matches[0][2])
+		}
+		deps = append(deps, &Dependency{
+			Name:              matches[0][1],
+			VersionConstraint: depConstraint,
+		})
+	}
+	return deps, nil
 }
