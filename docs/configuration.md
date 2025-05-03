@@ -26,7 +26,7 @@
 | `sketch.always_export_binaries` | false |  When set to `true`, make's [`arduino-cli compile`][arduino-cli compile] always save binaries to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag. See [Arduino sketches][sketch specification]. |
 | `updater.enable_notification` | `true` | set to `false` to disable notifications of new Arduino CLI releases. |
 | `build_cache` | | configuration options related to the compilation cache |
-| &nbsp;&nbsp;&nbsp;.`path` | [OS dependant](#default-directories) | the path to the build cache, default is `$TMP/arduino`. |
+| &nbsp;&nbsp;&nbsp;.`path` | [OS dependant](#default-directories) | the path to the build cache. |
 | &nbsp;&nbsp;&nbsp;.`extra_paths` | No default value | a list of paths to look for precompiled artifacts if not found on `build_cache.path` setting. |
 | &nbsp;&nbsp;&nbsp;.`compilations_before_purge` | 10 | interval, in number of compilations, at which the cache is purged, defaults to `10`.  When `0` the cache is never purged. |
 | &nbsp;&nbsp;&nbsp;.`ttl` | `720h0m0s` | cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days). |
@@ -50,6 +50,11 @@ The default directories.data are OS-dependent:
   - `{HOME}/Arduino `on Linux (and other Unix-based OS);
   - `{DOCUMENTS}/Arduino` on Windows;
   - `{HOME}/Documents/Arduino` on MacOS
+
+- `build_cache.path` is
+  - `{HOME}/.cache/arduino` on Linux;
+  - ??? on Windows;
+  - ??? on MacOS;
 
 ## Configuration methods
 
