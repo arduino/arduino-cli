@@ -1600,7 +1600,11 @@ active users).</p>
 <ul>
 <li><code>name</code>: the folder used for the installed cores. The
   <a href="../platform-specification/#hardware-folders-structure">vendor folder</a> name of the installed package is determined by
-  this field</li>
+  this field<ul>
+<li>The value must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>, numbers (<code>0</code>-<code>9</code>), underscores
+  (<code>_</code>), dashes (<code>-</code>), and dots (<code>.</code>).</li>
+</ul>
+</li>
 <li><code>maintainer</code>: the extended name of the vendor that is displayed on the Arduino IDE Boards Manager GUI</li>
 <li><code>websiteURL</code>: the URL to the vendor's website, appears on the Arduino IDE Boards Manager as a "More info" link</li>
 <li><code>email</code>: the email of the vendor/maintainer</li>
@@ -1854,7 +1858,11 @@ used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</c
 <ul>
 <li><code>name</code>: the extended name of the platform that is displayed on the Boards Manager GUI</li>
 <li><code>architecture</code>: is the architecture of the platform (avr, sam, etc...). It must match the architecture of the core as
-  explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a></li>
+  explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a><ul>
+<li>The value must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>, numbers (<code>0</code>-<code>9</code>), underscores
+  (<code>_</code>), dashes (<code>-</code>), and dots (<code>.</code>).</li>
+</ul>
+</li>
 <li><code>version</code>: the version of the platform.</li>
 <li><code>deprecated</code>: (optional) setting to <code>true</code> causes the platform to be moved to the bottom of all Boards Manager and
   <a href="https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core/"><code>arduino-cli core</code></a> listings and marked
