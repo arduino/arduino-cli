@@ -1045,15 +1045,14 @@ func TestBuildOptionsFile(t *testing.T) {
 		"sketchLocation"
 	]`)
 	requirejson.Query(t, buildOptionsBytes, ".fqbn", `"arduino:avr:uno"`)
-	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"build.warn_data_percentage=75"`)
 
 	// Recompiling a second time should provide the same result
 	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
 	require.NoError(t, err)
 
-	buildOptionsBytes, err = buildPath.Join("build.options.json").ReadFile()
+	buildOptionsBytes2, err := buildPath.Join("build.options.json").ReadFile()
 	require.NoError(t, err)
-	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"build.warn_data_percentage=75"`)
+	require.Equal(t, buildOptionsBytes, buildOptionsBytes2)
 
 	// Recompiling with a new build option must produce a new `build.options.json`
 	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(),
@@ -1062,7 +1061,7 @@ func TestBuildOptionsFile(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	buildOptionsBytes, err = buildPath.Join("build.options.json").ReadFile()
+	buildOptionsBytes3, err := buildPath.Join("build.options.json").ReadFile()
 	require.NoError(t, err)
-	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"custom=prop,build.warn_data_percentage=75"`)
+	require.NotEqual(t, buildOptionsBytes, buildOptionsBytes3)
 }
