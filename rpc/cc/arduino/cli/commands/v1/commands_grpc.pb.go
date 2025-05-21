@@ -85,6 +85,7 @@ const (
 	ArduinoCoreService_SettingsEnumerate_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsEnumerate"
 	ArduinoCoreService_SettingsGetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetValue"
 	ArduinoCoreService_SettingsSetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsSetValue"
+	ArduinoCoreService_InitProfile_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/InitProfile"
 )
 
 // ArduinoCoreServiceClient is the client API for ArduinoCoreService service.
@@ -201,6 +202,8 @@ type ArduinoCoreServiceClient interface {
 	SettingsGetValue(ctx context.Context, in *SettingsGetValueRequest, opts ...grpc.CallOption) (*SettingsGetValueResponse, error)
 	// Set a single configuration value.
 	SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error)
+	// Create the project file and add a profile to it.
+	InitProfile(ctx context.Context, in *InitProfileRequest, opts ...grpc.CallOption) (*InitProfileResponse, error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -888,6 +891,16 @@ func (c *arduinoCoreServiceClient) SettingsSetValue(ctx context.Context, in *Set
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) InitProfile(ctx context.Context, in *InitProfileRequest, opts ...grpc.CallOption) (*InitProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InitProfileResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_InitProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArduinoCoreServiceServer is the server API for ArduinoCoreService service.
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility.
@@ -1002,6 +1015,8 @@ type ArduinoCoreServiceServer interface {
 	SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error)
 	// Set a single configuration value.
 	SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error)
+	// Create the project file and add a profile to it.
+	InitProfile(context.Context, *InitProfileRequest) (*InitProfileResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1161,6 +1176,9 @@ func (UnimplementedArduinoCoreServiceServer) SettingsGetValue(context.Context, *
 }
 func (UnimplementedArduinoCoreServiceServer) SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SettingsSetValue not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) InitProfile(context.Context, *InitProfileRequest) (*InitProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InitProfile not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 func (UnimplementedArduinoCoreServiceServer) testEmbeddedByValue()                            {}
@@ -1928,6 +1946,24 @@ func _ArduinoCoreService_SettingsSetValue_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_InitProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).InitProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_InitProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).InitProfile(ctx, req.(*InitProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArduinoCoreService_ServiceDesc is the grpc.ServiceDesc for ArduinoCoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2050,6 +2086,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SettingsSetValue",
 			Handler:    _ArduinoCoreService_SettingsSetValue_Handler,
+		},
+		{
+			MethodName: "InitProfile",
+			Handler:    _ArduinoCoreService_InitProfile_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

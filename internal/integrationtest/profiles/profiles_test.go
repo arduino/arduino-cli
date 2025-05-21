@@ -150,3 +150,106 @@ func TestCompileWithDefaultProfile(t *testing.T) {
 		jsonOut.Query(".builder_result.build_properties").MustContain(`[ "build.fqbn=arduino:avr:nano" ]`)
 	}
 }
+
+func TestInitProfile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("sketch", "new", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	integrationtest.CLISubtests{
+		{"NoProfile", initNoProfile},
+		{"ProfileCorrectFQBN", initWithCorrectFqbn},
+		{"ProfileWrongFQBN", initWithWrongFqbn},
+		{"ProfileMissingFQBN", initMissingFqbn},
+		{"ExistingProfile", initExistingProfile},
+	}.Run(t, env, cli)
+}
+
+func initNoProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	projectFile := cli.SketchbookDir().Join("Simple", "sketch.yaml")
+	// Create an empty project file
+	stdout, _, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Project file created in: "+projectFile.String())
+	require.FileExists(t, projectFile.String())
+	fileContent, err := projectFile.ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, "profiles:\n", string(fileContent))
+}
+
+func initWithCorrectFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	projectFile := cli.SketchbookDir().Join("Simple", "sketch.yaml")
+	// Add a profile with a correct FQBN
+	_, _, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+	require.FileExists(t, projectFile.String())
+	fileContent, err := projectFile.ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n\n", string(fileContent))
+}
+
+func initWithWrongFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Adding a profile with an incorrect FQBN should return an error
+	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "wrong_fqbn", "-b", "foo:bar")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Invalid FQBN")
+}
+
+func initMissingFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Add a profile with no FQBN should return an error
+	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Missing FQBN (Fully Qualified Board Name)")
+}
+
+func initExistingProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Adding a profile with a name that already exists should return an error
+	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "the profile already exists")
+}
+
+func TestInitProfileMissingSketchFile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "no such file or directory")
+
+	err = cli.SketchbookDir().Join("Simple").MkdirAll()
+	require.NoError(t, err)
+	_, stderr, err = cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "main file missing from sketch")
+}
+
+func TestInitProfilePlatformNotInstalled(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("sketch", "new", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+
+	// Adding a profile with a name that already exists should return an error
+	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "platform not installed")
+}
