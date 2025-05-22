@@ -40,6 +40,7 @@ func initLibCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 
 	libCommand.AddCommand(initLibAddCommand(srv))
+	libCommand.AddCommand(initLibRemoveCommand(srv))
 
 	return libCommand
 }
@@ -88,20 +89,80 @@ func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreSer
 		if err != nil {
 			feedback.Fatal(i18n.Tr("Error adding %s to the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(libResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: profileArg.Get()})
+		feedback.PrintResult(libAddResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: profileArg.Get()})
 	}
 }
 
-type libResult struct {
+func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
+	var destDir string
+
+	removeCommand := &cobra.Command{
+		Use:   fmt.Sprintf("remove %s[@%s]...", i18n.Tr("LIBRARY"), i18n.Tr("VERSION_NUMBER")),
+		Short: i18n.Tr("Removes a library from the profile."),
+		Long:  i18n.Tr("Removes a library from the profile."),
+		Example: "" +
+			"  " + os.Args[0] + " profile lib remove AudioZero -m my_profile\n" +
+			"  " + os.Args[0] + " profile lib remove Arduino_JSON@0.2.0 --profile my_profile\n",
+		Args: cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			runLibRemoveCommand(cmd.Context(), args, srv, destDir)
+		},
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
+		},
+	}
+
+	removeCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the project file."))
+	profileArg.AddToCommand(removeCommand, srv)
+
+	return removeCommand
+}
+
+func runLibRemoveCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, destDir string) {
+	sketchPath := arguments.InitSketchPath(destDir)
+
+	instance := instance.CreateAndInit(ctx, srv)
+	libRefs, err := lib.ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)
+	if err != nil {
+		feedback.Fatal(i18n.Tr("Arguments error: %v", err), feedback.ErrBadArgument)
+	}
+	for _, lib := range libRefs {
+		resp, err := srv.ProfileLibRemove(ctx, &rpc.ProfileLibRemoveRequest{
+			SketchPath:  sketchPath.String(),
+			ProfileName: profileArg.Get(),
+			LibName:     lib.Name,
+		})
+		if err != nil {
+			feedback.Fatal(i18n.Tr("Error removing %s from the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
+		}
+		feedback.PrintResult(libRemoveResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: profileArg.Get()})
+	}
+}
+
+type libAddResult struct {
 	LibName     string `json:"library_name"`
 	LibVersion  string `json:"library_version"`
 	ProfileName string `json:"profile_name"`
 }
 
-func (lr libResult) Data() interface{} {
+func (lr libAddResult) Data() interface{} {
 	return lr
 }
 
-func (lr libResult) String() string {
-	return i18n.Tr("Profile %s: %s@%s added succesfully", lr.ProfileName, lr.LibName, lr.LibVersion)
+func (lr libAddResult) String() string {
+	return i18n.Tr("Profile %s: %s@%s added successfully", lr.ProfileName, lr.LibName, lr.LibVersion)
+}
+
+type libRemoveResult struct {
+	LibName     string `json:"library_name"`
+	LibVersion  string `json:"library_version"`
+	ProfileName string `json:"profile_name"`
+}
+
+func (lr libRemoveResult) Data() interface{} {
+	return lr
+}
+
+func (lr libRemoveResult) String() string {
+	return i18n.Tr("Profile %s: %s@%s removed successfully", lr.ProfileName, lr.LibName, lr.LibVersion)
 }

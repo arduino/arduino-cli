@@ -196,6 +196,9 @@ service ArduinoCoreService {
 
   // Add a library to the profile.
   rpc ProfileLibAdd(ProfileLibAddRequest) returns (ProfileLibAddResponse) {}
+
+  // Remove a library from the profile.
+  rpc ProfileLibRemove(ProfileLibRemoveRequest) returns (ProfileLibRemoveResponse) {}
 }
 
 message CreateRequest {}
@@ -456,6 +459,22 @@ message ProfileLibAddRequest {
 }
 
 message ProfileLibAddResponse {
+  // Name of the library.
+  string lib_name = 1;
+  // Version of the library
+  string lib_version = 2;
+}
+
+message ProfileLibRemoveRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // Name of the profile to be added to the sketch.yaml file.
+  string profile_name = 2;
+  // Name of the library.
+  string lib_name = 3;
+}
+
+message ProfileLibRemoveResponse {
   // Name of the library.
   string lib_name = 1;
   // Version of the library
