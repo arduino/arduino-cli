@@ -193,6 +193,9 @@ service ArduinoCoreService {
 
   // Create the project file and add a profile to it.
   rpc InitProfile(InitProfileRequest) returns (InitProfileResponse) {}
+
+  // Add a library to the profile.
+  rpc ProfileLibAdd(ProfileLibAddRequest) returns (ProfileLibAddResponse) {}
 }
 
 message CreateRequest {}
@@ -437,4 +440,24 @@ message InitProfileRequest {
 message InitProfileResponse {
   // Absolute path to the project file.
   string project_file_path = 1;
+}
+
+message ProfileLibAddRequest {
+  // An Arduino Core instance.
+  Instance instance = 1;
+  // Absolute path to Sketch folder.
+  string sketch_path = 2;
+  // Name of the profile to be added to the sketch.yaml file.
+  string profile_name = 3;
+  // Name of the library.
+  string lib_name = 4;
+  // Version of the library
+  string lib_version = 5;
+}
+
+message ProfileLibAddResponse {
+  // Name of the library.
+  string lib_name = 1;
+  // Version of the library
+  string lib_version = 2;
 }

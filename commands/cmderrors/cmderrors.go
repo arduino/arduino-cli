@@ -435,7 +435,7 @@ func (e *PlatformLoadingError) Unwrap() error {
 	return e.Cause
 }
 
-// LibraryNotFoundError is returned when a platform is not found
+// LibraryNotFoundError is returned when a library is not found
 type LibraryNotFoundError struct {
 	Library string
 	Cause   error
@@ -882,4 +882,16 @@ func (e *InstanceNeedsReinitialization) GRPCStatus() *status.Status {
 		New(codes.InvalidArgument, e.Error()).
 		WithDetails(&rpc.InstanceNeedsReinitializationError{})
 	return st
+}
+
+// MissingProfileError is returned when the Profile is mandatory and not specified
+type MissingProfileError struct{}
+
+func (e *MissingProfileError) Error() string {
+	return i18n.Tr("Missing Profile name")
+}
+
+// GRPCStatus converts the error into a *status.Status
+func (e *MissingProfileError) GRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
 }
