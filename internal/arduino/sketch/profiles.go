@@ -24,6 +24,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -123,6 +124,16 @@ type Profile struct {
 // UsesSystemPlatform checks if this profile requires a system installed platform.
 func (p *Profile) RequireSystemInstalledPlatform() bool {
 	return p.Platforms[0].RequireSystemInstalledPlatform()
+}
+
+// GetLibrary returns the requested library or an error if not found
+func (p *Profile) GetLibrary(libraryName string) (*ProfileLibraryReference, error) {
+	for _, l := range p.Libraries {
+		if l.Library == libraryName {
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
 }
 
 // ToRpc converts this Profile to an rpc.SketchProfile
