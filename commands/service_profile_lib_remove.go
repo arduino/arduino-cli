@@ -19,13 +19,12 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
-	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
 
-func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.ProfileLibAddRequest) (*rpc.ProfileLibAddResponse, error) {
+func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.ProfileLibRemoveRequest) (*rpc.ProfileLibRemoveResponse, error) {
 	sketchPath := paths.New(req.GetSketchPath())
 	projectFilePath, err := sketchPath.Join("sketch.yaml").Abs()
 	if err != nil {
@@ -47,28 +46,9 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	// Obtain the library index from the manager
-	li, err := instances.GetLibrariesIndex(req.GetInstance())
+	lib, err := profile.GetLibrary(req.LibName, true)
 	if err != nil {
 		return nil, err
-	}
-	version, err := parseVersion(req.LibVersion)
-	if err != nil {
-		return nil, err
-	}
-	libRelease, err := li.FindRelease(req.GetLibName(), version)
-	if err != nil {
-		return nil, err
-	}
-
-	// If the library has been already added to the profile, just update the version
-	if lib, _ := profile.GetLibrary(req.LibName, false); lib != nil {
-		lib.Version = libRelease.GetVersion()
-	} else {
-		profile.Libraries = append(profile.Libraries, &sketch.ProfileLibraryReference{
-			Library: req.GetLibName(),
-			Version: libRelease.GetVersion(),
-		})
 	}
 
 	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
@@ -76,5 +56,5 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	return &rpc.ProfileLibAddResponse{LibName: req.LibName, LibVersion: libRelease.GetVersion().String()}, nil
+	return &rpc.ProfileLibRemoveResponse{LibName: lib.Library, LibVersion: lib.Version.String()}, nil
 }

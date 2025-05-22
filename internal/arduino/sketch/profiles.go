@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -121,9 +122,12 @@ type Profile struct {
 }
 
 // GetLibrary returns the requested library or an error if not found
-func (p *Profile) GetLibrary(libraryName string) (*ProfileLibraryReference, error) {
-	for _, l := range p.Libraries {
+func (p *Profile) GetLibrary(libraryName string, toDelete bool) (*ProfileLibraryReference, error) {
+	for i, l := range p.Libraries {
 		if l.Library == libraryName {
+			if toDelete {
+				p.Libraries = slices.Delete(p.Libraries, i, i+1)
+			}
 			return l, nil
 		}
 	}
