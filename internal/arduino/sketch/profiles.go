@@ -22,8 +22,10 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -117,6 +119,19 @@ type Profile struct {
 	Programmer string                   `yaml:"programmer"`
 	Platforms  ProfileRequiredPlatforms `yaml:"platforms"`
 	Libraries  ProfileRequiredLibraries `yaml:"libraries"`
+}
+
+// GetLibrary returns the requested library or an error if not found
+func (p *Profile) GetLibrary(libraryName string, toDelete bool) (*ProfileLibraryReference, error) {
+	for i, l := range p.Libraries {
+		if l.Library == libraryName {
+			if toDelete {
+				p.Libraries = slices.Delete(p.Libraries, i, i+1)
+			}
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
 }
 
 // ToRpc converts this Profile to an rpc.SketchProfile
