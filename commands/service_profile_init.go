@@ -57,7 +57,7 @@ func (s *arduinoCoreServerImpl) InitProfile(ctx context.Context, req *rpc.InitPr
 
 		// Check that the profile name is unique
 		if profile, _ := sk.GetProfile(req.ProfileName); profile != nil {
-			return nil, fmt.Errorf("%s: the profile already exists", req.ProfileName)
+			return nil, &cmderrors.DuplicateProfileError{Profile: req.ProfileName}
 		}
 
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
