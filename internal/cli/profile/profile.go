@@ -39,6 +39,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	profileCommand.AddCommand(initInitCommand(srv))
 	profileCommand.AddCommand(initLibCommand(srv))
+	profileCommand.AddCommand(initSetDefaultCommand(srv))
 
 	return profileCommand
 }

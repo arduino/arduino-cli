@@ -88,6 +88,7 @@ const (
 	ArduinoCoreService_InitProfile_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/InitProfile"
 	ArduinoCoreService_ProfileLibAdd_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibAdd"
 	ArduinoCoreService_ProfileLibRemove_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibRemove"
+	ArduinoCoreService_ProfileSetDefault_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileSetDefault"
 )
 
 // ArduinoCoreServiceClient is the client API for ArduinoCoreService service.
@@ -210,6 +211,8 @@ type ArduinoCoreServiceClient interface {
 	ProfileLibAdd(ctx context.Context, in *ProfileLibAddRequest, opts ...grpc.CallOption) (*ProfileLibAddResponse, error)
 	// Remove a library from the profile.
 	ProfileLibRemove(ctx context.Context, in *ProfileLibRemoveRequest, opts ...grpc.CallOption) (*ProfileLibRemoveResponse, error)
+	// Set the default profile.
+	ProfileSetDefault(ctx context.Context, in *ProfileSetDefaultRequest, opts ...grpc.CallOption) (*ProfileSetDefaultResponse, error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -927,6 +930,16 @@ func (c *arduinoCoreServiceClient) ProfileLibRemove(ctx context.Context, in *Pro
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) ProfileSetDefault(ctx context.Context, in *ProfileSetDefaultRequest, opts ...grpc.CallOption) (*ProfileSetDefaultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProfileSetDefaultResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_ProfileSetDefault_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArduinoCoreServiceServer is the server API for ArduinoCoreService service.
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility.
@@ -1047,6 +1060,8 @@ type ArduinoCoreServiceServer interface {
 	ProfileLibAdd(context.Context, *ProfileLibAddRequest) (*ProfileLibAddResponse, error)
 	// Remove a library from the profile.
 	ProfileLibRemove(context.Context, *ProfileLibRemoveRequest) (*ProfileLibRemoveResponse, error)
+	// Set the default profile.
+	ProfileSetDefault(context.Context, *ProfileSetDefaultRequest) (*ProfileSetDefaultResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1215,6 +1230,9 @@ func (UnimplementedArduinoCoreServiceServer) ProfileLibAdd(context.Context, *Pro
 }
 func (UnimplementedArduinoCoreServiceServer) ProfileLibRemove(context.Context, *ProfileLibRemoveRequest) (*ProfileLibRemoveResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProfileLibRemove not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) ProfileSetDefault(context.Context, *ProfileSetDefaultRequest) (*ProfileSetDefaultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProfileSetDefault not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 func (UnimplementedArduinoCoreServiceServer) testEmbeddedByValue()                            {}
@@ -2036,6 +2054,24 @@ func _ArduinoCoreService_ProfileLibRemove_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_ProfileSetDefault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProfileSetDefaultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).ProfileSetDefault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_ProfileSetDefault_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).ProfileSetDefault(ctx, req.(*ProfileSetDefaultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArduinoCoreService_ServiceDesc is the grpc.ServiceDesc for ArduinoCoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2170,6 +2206,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ProfileLibRemove",
 			Handler:    _ArduinoCoreService_ProfileLibRemove_Handler,
+		},
+		{
+			MethodName: "ProfileSetDefault",
+			Handler:    _ArduinoCoreService_ProfileSetDefault_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

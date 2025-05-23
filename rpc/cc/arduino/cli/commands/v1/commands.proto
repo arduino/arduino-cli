@@ -199,6 +199,9 @@ service ArduinoCoreService {
 
   // Remove a library from the profile.
   rpc ProfileLibRemove(ProfileLibRemoveRequest) returns (ProfileLibRemoveResponse) {}
+
+  // Set the default profile.
+  rpc ProfileSetDefault(ProfileSetDefaultRequest) returns (ProfileSetDefaultResponse) {}
 }
 
 message CreateRequest {}
@@ -486,3 +489,12 @@ message ProfileLibRemoveResponse {
   // Name of the profile.
   string profile_name = 3;
 }
+
+message ProfileSetDefaultRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // Name of the profile.
+  string profile_name = 2;
+}
+
+message ProfileSetDefaultResponse {}

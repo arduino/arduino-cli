@@ -365,3 +365,42 @@ func TestProfileLibSpecificProfile(t *testing.T) {
 	require.NoError(t, err)
 	require.NotContains(t, string(fileContent), "- Modulino (0.5.0)")
 }
+
+func TestProfileSetDefault(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("sketch", "new", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+
+	// Add a second profile
+	_, _, err = cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "my_profile", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFileAsLines()
+	require.NoError(t, err)
+	require.Contains(t, fileContent, "default_profile: Uno")
+	require.NotContains(t, fileContent, "default_profile: my_profile")
+
+	// Change default profile
+	_, _, err = cli.Run("profile", "set-default", "my_profile", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	fileContent, err = cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFileAsLines()
+	require.NoError(t, err)
+	require.NotContains(t, fileContent, "default_profile: Uno")
+	require.Contains(t, fileContent, "default_profile: my_profile")
+
+	// Changing to an inexistent profile returns an error
+	_, stderr, err := cli.Run("profile", "set-default", "inexistent_profile", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.Error(t, err)
+	require.Equal(t, "Cannot set inexistent_profile as default profile: Profile 'inexistent_profile' not found\n", string(stderr))
+}
