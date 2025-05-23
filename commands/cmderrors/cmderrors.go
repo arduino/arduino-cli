@@ -211,6 +211,20 @@ func (e *UnknownProfileError) GRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 
+// DuplicateProfileError is returned when the profile is a duplicate of an already existing one
+type DuplicateProfileError struct {
+	Profile string
+}
+
+func (e *DuplicateProfileError) Error() string {
+	return i18n.Tr("Profile '%s' already exists", e.Profile)
+}
+
+// GRPCStatus converts the error into a *status.Status
+func (e *DuplicateProfileError) GRPCStatus() *status.Status {
+	return status.New(codes.NotFound, e.Error())
+}
+
 // InvalidProfileError is returned when the profile has errors
 type InvalidProfileError struct {
 	Cause error
