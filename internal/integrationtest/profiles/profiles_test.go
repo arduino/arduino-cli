@@ -171,6 +171,7 @@ func TestInitProfile(t *testing.T) {
 		{"ProfileWrongFQBN", initWithWrongFqbn},
 		{"ProfileMissingFQBN", initMissingFqbn},
 		{"ExistingProfile", initExistingProfile},
+		{"SetDefaultProfile", initSetDefaultProfile},
 	}.Run(t, env, cli)
 }
 
@@ -194,7 +195,7 @@ func initWithCorrectFqbn(t *testing.T, env *integrationtest.Environment, cli *in
 	require.FileExists(t, projectFile.String())
 	fileContent, err := projectFile.ReadFile()
 	require.NoError(t, err)
-	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n\n", string(fileContent))
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n\ndefault_profile: Uno\n", string(fileContent))
 }
 
 func initWithWrongFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -215,7 +216,16 @@ func initExistingProfile(t *testing.T, env *integrationtest.Environment, cli *in
 	// Adding a profile with a name that already exists should return an error
 	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "the profile already exists")
+	require.Contains(t, string(stderr), "Profile 'Uno' already exists")
+}
+
+func initSetDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Adding a profile with a name that already exists should return an error
+	_, _, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "new_profile", "-b", "arduino:avr:uno", "--default")
+	require.NoError(t, err)
+	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFileAsLines()
+	require.NoError(t, err)
+	require.Contains(t, fileContent, "default_profile: new_profile")
 }
 
 func TestInitProfileMissingSketchFile(t *testing.T) {
@@ -252,4 +262,106 @@ func TestInitProfilePlatformNotInstalled(t *testing.T) {
 	_, stderr, err := cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "platform not installed")
+}
+
+func TestProfileLib(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("sketch", "new", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+
+	integrationtest.CLISubtests{
+		{"AddLibToDefaultProfile", addLibToDefaultProfile},
+		{"ChangeLibVersionDefaultProfile", changeLibVersionDefaultProfile},
+		{"RemoveLibFromDefaultProfile", removeLibFromDefaultProfile},
+		{"AddInexistentLibToDefaultProfile", addInexistentLibToDefaultProfile},
+		{"RemoveLibNotInDefaultProfile", removeLibNotInDefaultProfile},
+	}.Run(t, env, cli)
+}
+
+func addLibToDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	_, _, err := cli.Run("profile", "lib", "add", "Modulino@0.5.0", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n      - Modulino (0.5.0)\n\ndefault_profile: Uno\n", string(fileContent))
+}
+
+func changeLibVersionDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n      - Modulino (0.5.0)\n\ndefault_profile: Uno\n", string(fileContent))
+
+	_, _, err = cli.Run("profile", "lib", "add", "Modulino@0.4.0", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	fileContent, err = cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n      - Modulino (0.4.0)\n\ndefault_profile: Uno\n", string(fileContent))
+}
+
+func removeLibFromDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	_, _, err := cli.Run("profile", "lib", "remove", "Modulino", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n\ndefault_profile: Uno\n", string(fileContent))
+}
+
+func addInexistentLibToDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	_, stderr, err := cli.Run("profile", "lib", "add", "foobar", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.Error(t, err)
+	require.Equal(t, "Error adding foobar to the profile : Library 'foobar@latest' not found\n", string(stderr))
+}
+
+func removeLibNotInDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	_, stderr, err := cli.Run("profile", "lib", "remove", "Arduino_JSON", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.Error(t, err)
+	require.Equal(t, "Error removing Arduino_JSON from the profile : Library 'Arduino_JSON' not found\n", string(stderr))
+}
+
+func TestProfileLibSpecificProfile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("sketch", "new", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "Uno", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+
+	// Add a second profile
+	_, _, err = cli.Run("profile", "init", cli.SketchbookDir().Join("Simple").String(), "-m", "my_profile", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+
+	// Add library to a specific profile
+	_, _, err = cli.Run("profile", "lib", "add", "Modulino@0.5.0", "-m", "my_profile", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
+	require.NoError(t, err)
+	require.Contains(t, string(fileContent), "  my_profile:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n      - Modulino (0.5.0)\n")
+
+	// Remove library from a specific profile
+	_, _, err = cli.Run("profile", "lib", "remove", "Modulino", "-m", "my_profile", "--dest-dir", cli.SketchbookDir().Join("Simple").String())
+	require.NoError(t, err)
+	fileContent, err = cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
+	require.NoError(t, err)
+	require.NotContains(t, string(fileContent), "- Modulino (0.5.0)")
 }
