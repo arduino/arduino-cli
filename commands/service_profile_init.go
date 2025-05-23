@@ -97,6 +97,11 @@ func (s *arduinoCoreServerImpl) InitProfile(ctx context.Context, req *rpc.InitPr
 		})
 
 		sk.Project.Profiles = append(sk.Project.Profiles, newProfile)
+		// Set the profile as the default one if it's the only one
+		if req.DefaultProfile || len(sk.Project.Profiles) == 1 {
+			sk.Project.DefaultProfile = newProfile.Name
+		}
+
 		err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
 		if err != nil {
 			return nil, err

@@ -32,17 +32,22 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	if req.GetProfileName() == "" {
-		return nil, &cmderrors.MissingProfileError{}
-	}
-
 	// Returns an error if the main file is missing from the sketch so there is no need to check if the path exists
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
 		return nil, err
 	}
 
-	profile, err := sk.GetProfile(req.ProfileName)
+	// If no profile is specified, try to use the default one
+	profileName := sk.Project.DefaultProfile
+	if req.GetProfileName() != "" {
+		profileName = req.GetProfileName()
+	}
+	if profileName == "" {
+		return nil, &cmderrors.MissingProfileError{}
+	}
+
+	profile, err := sk.GetProfile(profileName)
 	if err != nil {
 		return nil, err
 	}
@@ -76,5 +81,5 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	return &rpc.ProfileLibAddResponse{LibName: req.LibName, LibVersion: libRelease.GetVersion().String()}, nil
+	return &rpc.ProfileLibAddResponse{LibName: req.LibName, LibVersion: libRelease.GetVersion().String(), ProfileName: profileName}, nil
 }

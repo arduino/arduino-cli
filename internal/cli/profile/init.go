@@ -28,6 +28,7 @@ import (
 )
 
 func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
+	var defaultProfile bool
 	initCommand := &cobra.Command{
 		Use:   "init",
 		Short: i18n.Tr("Creates or updates the sketch project file."),
@@ -38,15 +39,16 @@ func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " config init --profile Uno_profile -b arduino:avr:uno",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runInitCommand(cmd.Context(), args, srv)
+			runInitCommand(cmd.Context(), args, srv, defaultProfile)
 		},
 	}
 	fqbnArg.AddToCommand(initCommand, srv)
 	profileArg.AddToCommand(initCommand, srv)
+	initCommand.Flags().BoolVar(&defaultProfile, "default", false, i18n.Tr("Set the profile as the default one."))
 	return initCommand
 }
 
-func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer) {
+func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, defaultProfile bool) {
 	path := ""
 	if len(args) > 0 {
 		path = args[0]
@@ -56,7 +58,7 @@ func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServi
 
 	inst := instance.CreateAndInit(ctx, srv)
 
-	resp, err := srv.InitProfile(ctx, &rpc.InitProfileRequest{Instance: inst, SketchPath: sketchPath.String(), ProfileName: profileArg.Get(), Fqbn: fqbnArg.String()})
+	resp, err := srv.InitProfile(ctx, &rpc.InitProfileRequest{Instance: inst, SketchPath: sketchPath.String(), ProfileName: profileArg.Get(), Fqbn: fqbnArg.String(), DefaultProfile: defaultProfile})
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Error initializing the project file: %v", err), feedback.ErrGeneric)
 	}
