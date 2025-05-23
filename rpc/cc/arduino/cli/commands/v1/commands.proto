@@ -434,10 +434,12 @@ message InitProfileRequest {
   Instance instance = 1;
   // Absolute path to Sketch folder.
   string sketch_path = 2;
-  // Name of the profile to be added to the sketch.yaml file.
+  // Name of the profile.
   string profile_name = 3;
   // FQBN of the provided profile.
   string fqbn = 4;
+  // Set the profile as the default one.
+  bool default_profile = 5;
 }
 
 message InitProfileResponse {
@@ -450,7 +452,7 @@ message ProfileLibAddRequest {
   Instance instance = 1;
   // Absolute path to Sketch folder.
   string sketch_path = 2;
-  // Name of the profile to be added to the sketch.yaml file.
+  // Name of the profile.
   string profile_name = 3;
   // Name of the library.
   string lib_name = 4;
@@ -463,12 +465,14 @@ message ProfileLibAddResponse {
   string lib_name = 1;
   // Version of the library
   string lib_version = 2;
+  // Name of the profile.
+  string profile_name = 3;
 }
 
 message ProfileLibRemoveRequest {
   // Absolute path to Sketch folder.
   string sketch_path = 1;
-  // Name of the profile to be added to the sketch.yaml file.
+  // Name of the profile.
   string profile_name = 2;
   // Name of the library.
   string lib_name = 3;
@@ -479,4 +483,6 @@ message ProfileLibRemoveResponse {
   string lib_name = 1;
   // Version of the library
   string lib_version = 2;
+  // Name of the profile.
+  string profile_name = 3;
 }

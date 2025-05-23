@@ -89,7 +89,7 @@ func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreSer
 		if err != nil {
 			feedback.Fatal(i18n.Tr("Error adding %s to the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(libAddResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: profileArg.Get()})
+		feedback.PrintResult(libAddResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: resp.ProfileName})
 	}
 }
 
@@ -135,7 +135,7 @@ func runLibRemoveCommand(ctx context.Context, args []string, srv rpc.ArduinoCore
 		if err != nil {
 			feedback.Fatal(i18n.Tr("Error removing %s from the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(libRemoveResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: profileArg.Get()})
+		feedback.PrintResult(libRemoveResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: resp.ProfileName})
 	}
 }
 
