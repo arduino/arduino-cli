@@ -38,7 +38,7 @@
 - `updater` - configuration options related to Arduino CLI updates
   - `enable_notification` - set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`
 - `build_cache` configuration options related to the compilation cache
-  - `path` - the path to the build cache, default is `$TMP/arduino`.
+  - `path` - the path to the folder under which build caches are stored.
   - `extra_paths` - a list of paths to look for precompiled artifacts if not found on `build_cache.path` setting.
   - `compilations_before_purge` - interval, in number of compilations, at which the cache is purged, defaults to `10`.
     When `0` the cache is never purged.
@@ -57,6 +57,14 @@
 
 The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
 configuration file.
+
+- The `build_cache.path` default is OS-dependent:
+
+  - on Linux (and other Unix-based OS) is: if
+    [`$XDG_CACHE_HOME`](https://specifications.freedesktop.org/basedir-spec/latest/#variables) is defined,
+    `$XDG_CACHE_HOME/arduino`. Otherwise `{HOME}/.config/arduino`.
+  - on Windows is: `{HOME}/AppData/Local/arduino`
+  - on MacOS is: `{HOME}/Library/Caches/arduino`
 
 - The `directories.data` default is OS-dependent:
 
