@@ -202,6 +202,9 @@ service ArduinoCoreService {
 
   // Set the default profile.
   rpc ProfileSetDefault(ProfileSetDefaultRequest) returns (ProfileSetDefaultResponse) {}
+
+// Dump the project file.
+  rpc ProfileDump(ProfileDumpRequest) returns (ProfileDumpResponse) {}
 }
 
 message CreateRequest {}
@@ -498,3 +501,15 @@ message ProfileSetDefaultRequest {
 }
 
 message ProfileSetDefaultResponse {}
+
+message ProfileDumpRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // The format of the dump.
+  string dump_format = 2;
+}
+
+message ProfileDumpResponse {
+  // The encoded profile dump.
+  string encoded_profile = 1;
+}
