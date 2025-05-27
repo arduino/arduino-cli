@@ -24,6 +24,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
+// ProfileLibRemove removes a library from the specified profile or from the default profile.
 func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.ProfileLibRemoveRequest) (*rpc.ProfileLibRemoveResponse, error) {
 	sketchPath := paths.New(req.GetSketchPath())
 	projectFilePath, err := sketchPath.Join("sketch.yaml").Abs()

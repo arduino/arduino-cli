@@ -25,6 +25,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
+// ProfileLibAdd adds a library to the specified profile or to the default profile.
 func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.ProfileLibAddRequest) (*rpc.ProfileLibAddResponse, error) {
 	sketchPath := paths.New(req.GetSketchPath())
 	projectFilePath, err := sketchPath.Join("sketch.yaml").Abs()

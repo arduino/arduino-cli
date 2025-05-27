@@ -24,6 +24,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
+// ProfileSetDefault sets an existing profile as the default profile.
 func (s *arduinoCoreServerImpl) ProfileSetDefault(ctx context.Context, req *rpc.ProfileSetDefaultRequest) (*rpc.ProfileSetDefaultResponse, error) {
 	if req.GetProfileName() == "" {
 		return nil, &cmderrors.MissingProfileError{}
