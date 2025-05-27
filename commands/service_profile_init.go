@@ -30,6 +30,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
+// InitProfile creates a new project file if it does not exist. If a profile name with the associated FQBN is specified,
+// it is added to the project.
 func (s *arduinoCoreServerImpl) InitProfile(ctx context.Context, req *rpc.InitProfileRequest) (*rpc.InitProfileResponse, error) {
 	sketchPath := paths.New(req.GetSketchPath())
 	projectFilePath, err := sketchPath.Join("sketch.yaml").Abs()

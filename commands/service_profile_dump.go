@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
+// ProfileDump dumps the content of the project file.
 func (s *arduinoCoreServerImpl) ProfileDump(ctx context.Context, req *rpc.ProfileDumpRequest) (*rpc.ProfileDumpResponse, error) {
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
