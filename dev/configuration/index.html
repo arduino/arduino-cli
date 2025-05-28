@@ -1651,7 +1651,7 @@
 </ul>
 </li>
 <li><code>build_cache</code> configuration options related to the compilation cache<ul>
-<li><code>path</code> - the path to the build cache, default is <code>$TMP/arduino</code>.</li>
+<li><code>path</code> - the path to the folder under which build caches are stored.</li>
 <li><code>extra_paths</code> - a list of paths to look for precompiled artifacts if not found on <code>build_cache.path</code> setting.</li>
 <li><code>compilations_before_purge</code> - interval, in number of compilations, at which the cache is purged, defaults to <code>10</code>.
   When <code>0</code> the cache is never purged.</li>
@@ -1673,6 +1673,18 @@
 <h3 id="default-directories">Default directories<a class="headerlink" href="#default-directories" title="Permanent link">&para;</a></h3>
 <p>The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
 configuration file.</p>
+<ul>
+<li>
+<p>The <code>build_cache.path</code> default is OS-dependent:</p>
+<ul>
+<li>on Linux (and other Unix-based OS) is: if
+  <a href="https://specifications.freedesktop.org/basedir-spec/latest/#variables"><code>$XDG_CACHE_HOME</code></a> is defined,
+  <code>$XDG_CACHE_HOME/arduino</code>. Otherwise <code>{HOME}/.config/arduino</code>.</li>
+<li>on Windows is: <code>{HOME}/AppData/Local/arduino</code></li>
+<li>on MacOS is: <code>{HOME}/Library/Caches/arduino</code></li>
+</ul>
+</li>
+</ul>
 <ul>
 <li>
 <p>The <code>directories.data</code> default is OS-dependent:</p>
