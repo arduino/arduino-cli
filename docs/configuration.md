@@ -62,11 +62,11 @@ configuration file.
 
   - on Linux (and other Unix-based OS) is: if
     [`$XDG_CACHE_HOME`](https://specifications.freedesktop.org/basedir-spec/latest/#variables) is defined,
-    `$XDG_CACHE_HOME/arduino`. Otherwise `${HOME}/.cache/arduino`.
+    `$XDG_CACHE_HOME/arduino`. Otherwise `$HOME/.cache/arduino`.
   - on Windows is: `%LocalAppData%/arduino`
-  - on MacOS is: `${HOME}/Library/Caches/arduino`
+  - on MacOS is: `$HOME/Library/Caches/arduino`
 
-  If neither `$HOME` or `$XDG_CACHE_HOME` are defined, a temporary directory will be used.
+  If neither `$HOME` nor `$XDG_CACHE_HOME` are defined, a temporary directory will be used.
 
 - The `directories.data` default is OS-dependent:
 
