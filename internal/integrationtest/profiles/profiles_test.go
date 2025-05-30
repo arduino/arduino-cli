@@ -184,7 +184,7 @@ func initNoProfile(t *testing.T, env *integrationtest.Environment, cli *integrat
 	require.FileExists(t, projectFile.String())
 	fileContent, err := projectFile.ReadFile()
 	require.NoError(t, err)
-	require.Equal(t, "profiles:\n", string(fileContent))
+	require.Equal(t, "profiles: {}\n", string(fileContent))
 }
 
 func initWithCorrectFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -195,7 +195,7 @@ func initWithCorrectFqbn(t *testing.T, env *integrationtest.Environment, cli *in
 	require.FileExists(t, projectFile.String())
 	fileContent, err := projectFile.ReadFile()
 	require.NoError(t, err)
-	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n\ndefault_profile: Uno\n", string(fileContent))
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n\ndefault_profile: Uno\n", string(fileContent))
 }
 
 func initWithWrongFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -315,7 +315,7 @@ func removeLibFromDefaultProfile(t *testing.T, env *integrationtest.Environment,
 	require.NoError(t, err)
 	fileContent, err := cli.SketchbookDir().Join("Simple", "sketch.yaml").ReadFile()
 	require.NoError(t, err)
-	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n\ndefault_profile: Uno\n", string(fileContent))
+	require.Equal(t, "profiles:\n  Uno:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n\ndefault_profile: Uno\n", string(fileContent))
 }
 
 func addInexistentLibToDefaultProfile(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {

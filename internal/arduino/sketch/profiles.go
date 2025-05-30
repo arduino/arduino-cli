@@ -195,6 +195,9 @@ type ProfileRequiredPlatforms []*ProfilePlatformReference
 
 // AsYaml outputs the required platforms as Yaml
 func (p *ProfileRequiredPlatforms) AsYaml() string {
+	if len(*p) == 0 {
+		return "    platforms: []\n"
+	}
 	res := "    platforms:\n"
 	for _, platform := range *p {
 		res += platform.AsYaml()

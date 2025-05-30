@@ -46,7 +46,7 @@ func (s *arduinoCoreServerImpl) InitProfile(ctx context.Context, req *rpc.InitPr
 	}
 
 	if !projectFilePath.Exist() {
-		err := projectFilePath.WriteFile([]byte("profiles:\n"))
+		err := projectFilePath.WriteFile([]byte("profiles: {}\n"))
 		if err != nil {
 			return nil, err
 		}
