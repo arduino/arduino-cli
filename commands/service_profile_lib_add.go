@@ -27,17 +27,12 @@ import (
 
 // ProfileLibAdd adds a library to the specified profile or to the default profile.
 func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.ProfileLibAddRequest) (*rpc.ProfileLibAddResponse, error) {
-	sketchPath := paths.New(req.GetSketchPath())
-	projectFilePath, err := sketchPath.Join("sketch.yaml").Abs()
-	if err != nil {
-		return nil, err
-	}
-
 	// Returns an error if the main file is missing from the sketch so there is no need to check if the path exists
-	sk, err := sketch.New(sketchPath)
+	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, err
 	}
+	projectFilePath := sk.GetProjectPath()
 
 	// If no profile is specified, try to use the default one
 	profileName := sk.Project.DefaultProfile
