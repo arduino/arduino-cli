@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 	"gopkg.in/yaml.v3"
 )
@@ -271,12 +272,26 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 
 // ProfileLibraryReference is a reference to a library
 type ProfileLibraryReference struct {
-	Library string
-	Version *semver.Version
+	Library    string
+	InstallDir *paths.Path
+	Version    *semver.Version
 }
 
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var dataMap map[string]any
+	if err := unmarshal(&dataMap); err == nil {
+		if installDir, ok := dataMap["dir"]; !ok {
+			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
+		} else if installDir, ok := installDir.(string); !ok {
+			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
+		} else {
+			l.InstallDir = paths.New(installDir)
+			l.Library = l.InstallDir.Base()
+			return nil
+		}
+	}
+
 	var data string
 	if err := unmarshal(&data); err != nil {
 		return err
@@ -294,16 +309,23 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 
 // AsYaml outputs the required library as Yaml
 func (l *ProfileLibraryReference) AsYaml() string {
-	res := fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
-	return res
+	if l.InstallDir != nil {
+		return fmt.Sprintf("      - dir: %s\n", l.InstallDir)
+	}
+	return fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
 }
 
 func (l *ProfileLibraryReference) String() string {
+	if l.InstallDir != nil {
+		return fmt.Sprintf("%s@dir:%s", l.Library, l.InstallDir)
+	}
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
 }
 
 // InternalUniqueIdentifier returns the unique identifier for this object
 func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
+	f.Assert(l.InstallDir == nil,
+		"InternalUniqueIdentifier should not be called for library references with an install directory")
 	id := l.String()
 	h := sha256.Sum256([]byte(id))
 	res := fmt.Sprintf("%s_%s", id, hex.EncodeToString(h[:])[:16])
