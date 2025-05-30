@@ -30,17 +30,12 @@ func (s *arduinoCoreServerImpl) ProfileSetDefault(ctx context.Context, req *rpc.
 		return nil, &cmderrors.MissingProfileError{}
 	}
 
-	sketchPath := paths.New(req.GetSketchPath())
-	projectFilePath, err := sketchPath.Join("sketch.yaml").Abs()
-	if err != nil {
-		return nil, err
-	}
-
 	// Returns an error if the main file is missing from the sketch so there is no need to check if the path exists
-	sk, err := sketch.New(sketchPath)
+	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, err
 	}
+	projectFilePath := sk.GetProjectPath()
 
 	if _, err := sk.GetProfile(req.GetProfileName()); err != nil {
 		return nil, err
