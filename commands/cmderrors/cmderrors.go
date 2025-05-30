@@ -222,7 +222,7 @@ func (e *DuplicateProfileError) Error() string {
 
 // GRPCStatus converts the error into a *status.Status
 func (e *DuplicateProfileError) GRPCStatus() *status.Status {
-	return status.New(codes.NotFound, e.Error())
+	return status.New(codes.AlreadyExists, e.Error())
 }
 
 // InvalidProfileError is returned when the profile has errors

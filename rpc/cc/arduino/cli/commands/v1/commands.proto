@@ -191,19 +191,19 @@ service ArduinoCoreService {
   // Set a single configuration value.
   rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse);
 
-  // Create the project file and add a profile to it.
+  // Create the sketch project file and add a build profile to it.
   rpc InitProfile(InitProfileRequest) returns (InitProfileResponse) {}
 
-  // Add a library to the profile.
+  // Add a library to the build profile.
   rpc ProfileLibAdd(ProfileLibAddRequest) returns (ProfileLibAddResponse) {}
 
-  // Remove a library from the profile.
+  // Remove a library from the build profile.
   rpc ProfileLibRemove(ProfileLibRemoveRequest) returns (ProfileLibRemoveResponse) {}
 
-  // Set the default profile.
+  // Set the default build profile.
   rpc ProfileSetDefault(ProfileSetDefaultRequest) returns (ProfileSetDefaultResponse) {}
 
-  // Dump the project file.
+  // Dump the sketch project file.
   rpc ProfileDump(ProfileDumpRequest) returns (ProfileDumpResponse) {}
 }
 
@@ -505,7 +505,7 @@ message ProfileSetDefaultResponse {}
 message ProfileDumpRequest {
   // Absolute path to Sketch folder.
   string sketch_path = 1;
-  // The format of the dump.
+  // The format of the dump (default is "json", allowed values are "json", and "yaml").
   string dump_format = 2;
 }
 

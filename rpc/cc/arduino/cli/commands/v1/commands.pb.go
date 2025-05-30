@@ -2179,7 +2179,7 @@ type ProfileDumpRequest struct {
 
 	// Absolute path to Sketch folder.
 	SketchPath string `protobuf:"bytes,1,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
-	// The format of the dump.
+	// The format of the dump (default is "json", allowed values are "json", and "yaml").
 	DumpFormat string `protobuf:"bytes,2,opt,name=dump_format,json=dumpFormat,proto3" json:"dump_format,omitempty"`
 }
 

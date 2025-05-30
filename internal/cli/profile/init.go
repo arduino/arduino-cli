@@ -31,12 +31,12 @@ func initInitCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var defaultProfile bool
 	initCommand := &cobra.Command{
 		Use:   "init",
-		Short: i18n.Tr("Creates or updates the sketch project file."),
-		Long:  i18n.Tr("Creates or updates the sketch project file."),
+		Short: i18n.Tr("Create or update the sketch project file."),
+		Long:  i18n.Tr("Create or update the sketch project file."),
 		Example: "" +
 			"  # " + i18n.Tr("Creates or updates the sketch project file in the current directory.") + "\n" +
 			"  " + os.Args[0] + " profile init\n" +
-			"  " + os.Args[0] + " config init --profile Uno_profile -b arduino:avr:uno",
+			"  " + os.Args[0] + " profile init --profile uno_profile -b arduino:avr:uno",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			runInitCommand(cmd.Context(), args, srv, defaultProfile)

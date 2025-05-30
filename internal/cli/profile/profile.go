@@ -32,8 +32,8 @@ var (
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	profileCommand := &cobra.Command{
 		Use:     "profile",
-		Short:   i18n.Tr("Arduino profile operations."),
-		Long:    i18n.Tr("Arduino profile operations."),
+		Short:   i18n.Tr("Build profile operations."),
+		Long:    i18n.Tr("Build profile operations."),
 		Example: "  " + os.Args[0] + " profile init",
 	}
 

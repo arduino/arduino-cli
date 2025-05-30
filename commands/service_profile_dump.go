@@ -35,7 +35,7 @@ func (s *arduinoCoreServerImpl) ProfileDump(ctx context.Context, req *rpc.Profil
 	switch req.GetDumpFormat() {
 	case "yaml":
 		return &rpc.ProfileDumpResponse{EncodedProfile: sk.Project.AsYaml()}, nil
-	case "json":
+	case "", "json":
 		data, err := json.MarshalIndent(sk.Project, "", "  ")
 		if err != nil {
 			return nil, fmt.Errorf("error marshalling settings: %v", err)

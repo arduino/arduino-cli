@@ -32,8 +32,8 @@ import (
 func initLibCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
-		Short: i18n.Tr("Profile commands about libraries."),
-		Long:  i18n.Tr("Profile commands about libraries."),
+		Short: i18n.Tr("Commands related to build profile libraries."),
+		Long:  i18n.Tr("Commands related to the library dependencies of build profiles."),
 		Example: "" +
 			"  " + os.Args[0] + " profile lib add AudioZero -m my_profile\n" +
 			"  " + os.Args[0] + " profile lib remove Arduino_JSON --profile my_profile\n",
@@ -64,7 +64,7 @@ func initLibAddCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 
-	addCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the project file."))
+	addCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
 	profileArg.AddToCommand(addCommand, srv)
 
 	return addCommand
@@ -112,7 +112,7 @@ func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 
-	removeCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the project file."))
+	removeCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
 	profileArg.AddToCommand(removeCommand, srv)
 
 	return removeCommand
