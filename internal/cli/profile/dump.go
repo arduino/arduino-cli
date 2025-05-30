@@ -29,8 +29,8 @@ import (
 func initDumpCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	dumpCommand := &cobra.Command{
 		Use:   "dump",
-		Short: i18n.Tr("Dumps the project file."),
-		Long:  i18n.Tr("Dumps the project file."),
+		Short: i18n.Tr("Print the sketch project file."),
+		Long:  i18n.Tr("Print the data from the sketch project file."),
 		Example: "" +
 			"  " + os.Args[0] + " profile dump\n",
 		Args: cobra.MaximumNArgs(1),

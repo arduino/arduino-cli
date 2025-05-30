@@ -206,15 +206,15 @@ type ArduinoCoreServiceClient interface {
 	SettingsGetValue(ctx context.Context, in *SettingsGetValueRequest, opts ...grpc.CallOption) (*SettingsGetValueResponse, error)
 	// Set a single configuration value.
 	SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error)
-	// Create the project file and add a profile to it.
+	// Create the sketch project file and add a build profile to it.
 	InitProfile(ctx context.Context, in *InitProfileRequest, opts ...grpc.CallOption) (*InitProfileResponse, error)
-	// Add a library to the profile.
+	// Add a library to the build profile.
 	ProfileLibAdd(ctx context.Context, in *ProfileLibAddRequest, opts ...grpc.CallOption) (*ProfileLibAddResponse, error)
-	// Remove a library from the profile.
+	// Remove a library from the build profile.
 	ProfileLibRemove(ctx context.Context, in *ProfileLibRemoveRequest, opts ...grpc.CallOption) (*ProfileLibRemoveResponse, error)
-	// Set the default profile.
+	// Set the default build profile.
 	ProfileSetDefault(ctx context.Context, in *ProfileSetDefaultRequest, opts ...grpc.CallOption) (*ProfileSetDefaultResponse, error)
-	// Dump the project file.
+	// Dump the sketch project file.
 	ProfileDump(ctx context.Context, in *ProfileDumpRequest, opts ...grpc.CallOption) (*ProfileDumpResponse, error)
 }
 
@@ -1067,15 +1067,15 @@ type ArduinoCoreServiceServer interface {
 	SettingsGetValue(context.Context, *SettingsGetValueRequest) (*SettingsGetValueResponse, error)
 	// Set a single configuration value.
 	SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error)
-	// Create the project file and add a profile to it.
+	// Create the sketch project file and add a build profile to it.
 	InitProfile(context.Context, *InitProfileRequest) (*InitProfileResponse, error)
-	// Add a library to the profile.
+	// Add a library to the build profile.
 	ProfileLibAdd(context.Context, *ProfileLibAddRequest) (*ProfileLibAddResponse, error)
-	// Remove a library from the profile.
+	// Remove a library from the build profile.
 	ProfileLibRemove(context.Context, *ProfileLibRemoveRequest) (*ProfileLibRemoveResponse, error)
-	// Set the default profile.
+	// Set the default build profile.
 	ProfileSetDefault(context.Context, *ProfileSetDefaultRequest) (*ProfileSetDefaultResponse, error)
-	// Dump the project file.
+	// Dump the sketch project file.
 	ProfileDump(context.Context, *ProfileDumpRequest) (*ProfileDumpResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }

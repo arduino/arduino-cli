@@ -30,8 +30,8 @@ func initSetDefaultCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var destDir string
 	setDefaultCommand := &cobra.Command{
 		Use:   "set-default",
-		Short: i18n.Tr("Sets the default profile."),
-		Long:  i18n.Tr("Sets the default profile."),
+		Short: i18n.Tr("Set the default build profile."),
+		Long:  i18n.Tr("Set the default build profile."),
 		Example: "" +
 			"  " + os.Args[0] + " profile set-default my_profile\n",
 		Args: cobra.ExactArgs(1),
@@ -40,7 +40,7 @@ func initSetDefaultCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 
-	setDefaultCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the project file."))
+	setDefaultCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
 
 	return setDefaultCommand
 }
@@ -53,4 +53,5 @@ func runSetDefaultCommand(ctx context.Context, args []string, srv rpc.ArduinoCor
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Cannot set %s as default profile: %v", profileName, err), feedback.ErrGeneric)
 	}
+	feedback.Print(i18n.Tr("Default profile set to: %s", profileName))
 }
