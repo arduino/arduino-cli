@@ -1,10 +1,10 @@
 # 
 # Translators:
-# coby2023t, 2024
+# coby2023t, 2025
 # 
 msgid ""
 msgstr ""
-"Last-Translator: coby2023t, 2024\n"
+"Last-Translator: coby2023t, 2025\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/arduino-1/teams/108174/zh_TW/)\n"
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -63,7 +63,7 @@ msgid "%s must be installed."
 msgstr "必須安裝 %s "
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:193
-#: internal/arduino/builder/internal/preprocessor/gcc.go:62
+#: internal/arduino/builder/internal/preprocessor/gcc.go:63
 msgid "%s pattern is missing"
 msgstr "%s 樣態遺失"
 
@@ -399,6 +399,10 @@ msgstr "命令保持執行, 在有更動時列出連接的開發板"
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
 msgstr "在 %s 中找不到已編譯的 sketch"
+
+#: internal/arduino/builder/internal/preprocessor/gcc.go:93
+msgid "Compiler error output has been truncated."
+msgstr "編譯器的錯誤訊息已截斷。"
 
 #: internal/cli/compile/compile.go:80 internal/cli/compile/compile.go:81
 msgid "Compiles Arduino sketches."
