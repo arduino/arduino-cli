@@ -380,7 +380,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				}
 				lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 					Path:            libDir,
-					Location:        libraries.Unmanaged,
+					Location:        libraries.Profile,
 					IsSingleLibrary: true,
 				})
 				continue
@@ -428,7 +428,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:     libRoot,
-				Location: libraries.User,
+				Location: libraries.Profile,
 			})
 		}
 	}

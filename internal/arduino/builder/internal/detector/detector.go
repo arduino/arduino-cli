@@ -275,6 +275,14 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
 		}
 
+		for _, library := range l.librariesManager.FindAllInstalled() {
+			if library.Location == libraries.Profile {
+				l.logger.Info(i18n.Tr("The library %[1]s has been automatically added from sketch project.", library.Name))
+				l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+				l.addIncludeFolder(library.SourceDir)
+			}
+		}
+
 		for !sourceFileQueue.Empty() {
 			err := l.findMissingIncludesInCompilationUnit(ctx, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
 			if err != nil {

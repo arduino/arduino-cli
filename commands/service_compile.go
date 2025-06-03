@@ -105,10 +105,11 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return &cmderrors.CantOpenSketchError{Cause: err}
 	}
 
+	profile := pme.GetProfile()
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sk != nil {
-		if pme.GetProfile() != nil {
-			fqbnIn = pme.GetProfile().FQBN
+		if profile != nil {
+			fqbnIn = profile.FQBN
 		} else {
 			fqbnIn = sk.GetDefaultFQBN()
 		}
@@ -224,7 +225,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	otherLibrariesDirs.Add(s.settings.LibrariesDir())
 
 	var libsManager *librariesmanager.LibrariesManager
-	if pme.GetProfile() != nil {
+	if profile != nil {
 		libsManager = lm
 	}
 
