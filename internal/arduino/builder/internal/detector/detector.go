@@ -134,10 +134,25 @@ func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 	return l.importedLibraries
 }
 
-// AppendImportedLibraries todo should rename this, probably after refactoring the
-// container_find_includes command.
-func (l *SketchLibrariesDetector) AppendImportedLibraries(library *libraries.Library) {
+// addAndBuildLibrary adds the given library to the imported libraries list and queues its source files
+// for further processing.
+func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSourceFileQueue, librariesBuildPath *paths.Path, library *libraries.Library) {
 	l.importedLibraries = append(l.importedLibraries, library)
+	if library.Precompiled && library.PrecompiledWithSources {
+		// Fully precompiled libraries should have no dependencies to avoid ABI breakage
+		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+			l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+		}
+	} else {
+		for _, sourceDir := range library.SourceDirs() {
+			l.queueSourceFilesFromFolder(
+				sourceFileQueue,
+				sourceDir.Dir, sourceDir.Recurse,
+				library.SourceDir,
+				librariesBuildPath.Join(library.DirName),
+				library.UtilityDir)
+		}
+	}
 }
 
 // PrintUsedAndNotUsedLibraries todo
@@ -396,20 +411,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		// Add this library to the list of libraries, the
 		// include path and queue its source files for further
 		// include scanning
-		l.AppendImportedLibraries(library)
+		l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
 		l.addIncludeFolder(library.SourceDir)
-
-		if library.Precompiled && library.PrecompiledWithSources {
-			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
-			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-				l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
-			}
-		} else {
-			for _, sourceDir := range library.SourceDirs() {
-				l.queueSourceFilesFromFolder(sourceFileQueue, sourceDir.Dir, sourceDir.Recurse,
-					library.SourceDir, librariesBuildPath.Join(library.DirName), library.UtilityDir)
-			}
-		}
 	}
 }
 
