@@ -254,6 +254,7 @@ tasks:
 
   build_deb:
     desc: Builds the deb package
+    internal: true
     cmds:
       - |
         docker build \
