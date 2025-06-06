@@ -264,3 +264,5 @@ tasks:
           --build-arg GO_BINARY={{ .GO_BINARY }} \
           --output=./dist \
           -f debian/Dockerfile .
+    vars:
+      VERSION: "{{if .TAG}}{{.VERSION}}{{else}}v0.0.0-{{.VERSION}}{{end}}"
