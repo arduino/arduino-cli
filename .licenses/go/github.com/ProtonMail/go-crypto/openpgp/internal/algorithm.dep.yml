@@ -1,12 +1,12 @@
 ---
 name: github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
-version: v1.2.0
+version: v1.3.0
 type: go
 summary:
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
 license: other
 licenses:
-- sources: go-crypto@v1.2.0/LICENSE
+- sources: go-crypto@v1.3.0/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: go-crypto@v1.2.0/PATENTS
+- sources: go-crypto@v1.3.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
