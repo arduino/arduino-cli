@@ -76,6 +76,10 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+      - task: build_deb
+        vars:
+          GO_BINARY: "{{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}"
+          ARCH: "i386"
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd32"
@@ -97,6 +101,10 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+      - task: build_deb
+        vars:
+          GO_BINARY: "{{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}"
+          ARCH: "amd64"
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd64"
@@ -118,6 +126,10 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+      - task: build_deb
+        vars:
+          GO_BINARY: "{{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}"
+          ARCH: "armhf"
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_7"
@@ -139,6 +151,10 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+      - task: build_deb
+        vars:
+          GO_BINARY: "{{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}"
+          ARCH: "armel"
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_6"
@@ -160,6 +176,10 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+      - task: build_deb
+        vars:
+          GO_BINARY: "{{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}"
+          ARCH: "arm64"
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_64"
@@ -231,3 +251,19 @@ tasks:
     cmds:
       - mkdir --parents {{.DIST_DIR}}
       - cp ./internal/cli/configuration/configuration.schema.json {{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_configuration.schema.json
+
+  build_deb:
+    desc: Builds the deb package
+    internal: true
+    cmds:
+      - |
+        docker build \
+          --build-arg BINARY_NAME={{.PROJECT_NAME}} \
+          --build-arg DEB_NAME={{.PROJECT_NAME}} \
+          --build-arg VERSION={{ .VERSION }} \
+          --build-arg ARCH={{ .ARCH }} \
+          --build-arg GO_BINARY={{ .GO_BINARY }} \
+          --output=./dist \
+          -f debian/Dockerfile .
+    vars:
+      VERSION: "{{if .TAG}}{{.VERSION}}{{else}}v0.0.0-{{.VERSION}}{{end}}"
