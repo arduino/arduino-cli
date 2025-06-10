@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -333,7 +334,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 					// to the sketch path, so that the sketch is portable.
 					if ok, err := libDir.IsInsideDir(sketchPath); err == nil && ok {
 						if ref, err := libDir.RelFrom(sketchPath); err == nil {
-							libDir = ref
+							libDir = paths.New(filepath.ToSlash(ref.String()))
 						}
 					}
 					libs += fmt.Sprintln("      - dir: " + libDir.String())
