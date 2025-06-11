@@ -16,6 +16,7 @@
 package cmderrors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -412,6 +413,26 @@ func (e *PlatformNotFoundError) GRPCStatus() *status.Status {
 }
 
 func (e *PlatformNotFoundError) Unwrap() error {
+	return e.Cause
+}
+
+// PlatformNotAvaliableForOSError is returned when a platform contains a tool not aviable
+// for the user OS + ARCH
+type PlatformNotAvaliableForOSError struct {
+	Platform string
+	Cause    error
+}
+
+func (e *PlatformNotAvaliableForOSError) Error() string {
+	return composeErrorMsg(i18n.Tr("Platform '%s'", e.Platform), errors.New(i18n.Tr("platform is not available for your OS")))
+}
+
+// GRPCStatus converts the error into a *status.Status
+func (e *PlatformNotAvaliableForOSError) GRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+func (e *PlatformNotAvaliableForOSError) Unwrap() error {
 	return e.Cause
 }
 

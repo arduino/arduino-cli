@@ -26,6 +26,8 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
+var ErrPlatformNotAvailableForOS = errors.New("platform is not available for your OS")
+
 // PlatformReference represents a tuple to identify a Platform
 type PlatformReference struct {
 	Package              string // The package where this Platform belongs to.
@@ -89,7 +91,7 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 	} else {
 		release = platform.GetLatestCompatibleRelease()
 		if release == nil {
-			return nil, nil, errors.New(i18n.Tr("platform is not available for your OS"))
+			return nil, nil, ErrPlatformNotAvailableForOS
 		}
 	}
 
