@@ -16,21 +16,39 @@
 package sketch_test
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestSketchProfileDump(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
+	t.Cleanup(env.CleanUp)
 
-	sketch, err := paths.New("testdata", "SketchWithLibrary").Abs()
+	// Prepare the sketch with libraries
+	tmpDir, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = tmpDir.RemoveAll })
+
+	sketchTemplate, err := paths.New("testdata", "SketchWithLibrary").Abs()
 	require.NoError(t, err)
 
+	sketch := tmpDir.Join("SketchWithLibrary")
+	libInside := sketch.Join("libraries", "MyLib")
+	err = sketchTemplate.CopyDirTo(sketch)
+	require.NoError(t, err)
+
+	libOutsideTemplate := sketchTemplate.Join("..", "MyLibOutside")
+	libOutside := sketch.Join("..", "MyLibOutside")
+	err = libOutsideTemplate.CopyDirTo(libOutside)
+	require.NoError(t, err)
+
+	// Install the required core and libraries
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "Adafruit BusIO@1.17.1")
@@ -44,9 +62,8 @@ func TestSketchProfileDump(t *testing.T) {
 	// - keeps libraries in the sketch with a relative path
 	// - keeps libraries outside the sketch with an absolute path
 	// - keeps libraries installed in the system with just the name and version
-	libOutside := sketch.Join("..", "MyLibOutside")
 	out, _, err := cli.Run("compile", "-b", "arduino:avr:uno",
-		"--library", sketch.Join("libraries", "MyLib").String(),
+		"--library", libInside.String(),
 		"--library", libOutside.String(),
 		"--dump-profile",
 		sketch.String())
@@ -64,4 +81,19 @@ profiles:
       - Adafruit GFX Library (1.12.1)
       - Adafruit BusIO (1.17.1)
 `), strings.TrimSpace(string(out)))
+
+	// Dump the profile in the sketch directory and compile with it again
+	err = sketch.Join("sketch.yaml").WriteFile(out)
+	require.NoError(t, err)
+	out, _, err = cli.Run("compile", "-m", "uno", "--json", sketch.String())
+	require.NoError(t, err)
+	// Check if local libraries are picked up correctly
+	libInsideJson, _ := json.Marshal(libInside.String())
+	libOutsideJson, _ := json.Marshal(libOutside.String())
+	j := requirejson.Parse(t, out).Query(".builder_result.used_libraries")
+	j.MustContain(`
+		[
+			{"name": "MyLib", "install_dir": ` + string(libInsideJson) + `},
+			{"name": "MyLibOutside", "install_dir": ` + string(libOutsideJson) + `}
+		]`)
 }
