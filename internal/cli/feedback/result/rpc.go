@@ -234,6 +234,7 @@ type Library struct {
 	ProvidesIncludes  []string                       `json:"provides_includes,omitempty"`
 	CompatibleWith    orderedmap.Map[string, bool]   `json:"compatible_with,omitempty"`
 	InDevelopment     bool                           `json:"in_development,omitempty"`
+	Dependencies      []*LibraryDependency           `json:"dependencies,omitempty"`
 }
 
 func NewLibrary(l *rpc.Library) *Library {
@@ -279,6 +280,7 @@ func NewLibrary(l *rpc.Library) *Library {
 		ProvidesIncludes:  l.GetProvidesIncludes(),
 		CompatibleWith:    libraryCompatibleWithMap,
 		InDevelopment:     l.GetInDevelopment(),
+		Dependencies:      NewLibraryDependencies(l.GetDependencies()),
 	}
 }
 
