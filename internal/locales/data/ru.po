@@ -69,7 +69,7 @@ msgid "%s must be installed."
 msgstr "%s должен быть установлен."
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:193
-#: internal/arduino/builder/internal/preprocessor/gcc.go:62
+#: internal/arduino/builder/internal/preprocessor/gcc.go:63
 msgid "%s pattern is missing"
 msgstr "не найден шаблон %s"
 
@@ -422,6 +422,10 @@ msgstr ""
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
 msgstr "Скомпилированный эскиз не найден в %s"
+
+#: internal/arduino/builder/internal/preprocessor/gcc.go:93
+msgid "Compiler error output has been truncated."
+msgstr ""
 
 #: internal/cli/compile/compile.go:80 internal/cli/compile/compile.go:81
 msgid "Compiles Arduino sketches."
