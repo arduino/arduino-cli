@@ -14,7 +14,9 @@ Each profile will define:
 - The target core platform name and version (with the 3rd party platform index URL if needed)
 - A possible core platform name and version, that is a dependency of the target core platform (with the 3rd party
   platform index URL if needed)
-- The libraries used in the sketch (including their version)
+- A list of libraries used in the sketch. Each library could be:
+  - a library taken from the Arduino Libraries Index
+  - a library installed anywhere in the filesystem
 - The port and protocol to upload the sketch and monitor the board
 
 The format of the file is the following:
@@ -31,9 +33,8 @@ profiles:
       - platform: <PLATFORM_DEPENDENCY> (<PLATFORM_DEPENDENCY_VERSION>)
         platform_index_url: <3RD_PARTY_PLATFORM_DEPENDENCY_URL>
     libraries:
-      - <LIB_NAME> (<LIB_VERSION>)
-      - <LIB_NAME> (<LIB_VERSION>)
-      - <LIB_NAME> (<LIB_VERSION>)
+      - <INDEX_LIB_NAME> (<INDEX_LIB_VERSION>)
+      - dir: <LOCAL_LIB_PATH>
     port: <PORT_NAME>
     port_config:
       <PORT_SETTING_NAME>: <PORT_SETTING_VALUE>
@@ -55,7 +56,11 @@ otherwise below). The available fields are:
   information as `<PLATFORM>`, `<PLATFORM_VERSION>`, and `<3RD_PARTY_PLATFORM_URL>` respectively but for the core
   platform dependency of the main core platform. These fields are optional.
 - `libraries:` is a section where the required libraries to build the project are defined. This section is optional.
-- `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
+  - `<INDEX_LIB_NAME> (<INDEX_LIB_VERSION>)` represents a library from the Arduino Libraries Index, for example,
+    `MyLib (1.0.0)`.
+  - `dir: <LOCAL_LIB_PATH>` represents a library installed in the filesystem and `<LOCAL_LIB_PATH>` is the path to the
+    library. The path could be absolute or relative to the sketch folder. This option is available since Arduino CLI
+    1.3.0.
 - `<USER_NOTES>` is a free text string available to the developer to add comments. This field is optional.
 - `<PROGRAMMER>` is the programmer that will be used. This field is optional.
 
