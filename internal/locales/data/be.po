@@ -65,11 +65,11 @@ msgid "%s must be installed."
 msgstr "%s павінен быць усталяваны."
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:193
-#: internal/arduino/builder/internal/preprocessor/gcc.go:62
+#: internal/arduino/builder/internal/preprocessor/gcc.go:63
 msgid "%s pattern is missing"
 msgstr "Шаблон %s адсутнічае"
 
-#: commands/cmderrors/cmderrors.go:818
+#: commands/cmderrors/cmderrors.go:839
 msgid "'%s' has an invalid signature"
 msgstr "'%s' мае несапраўдную сігнатуру"
 
@@ -119,7 +119,7 @@ msgstr "Файл .ino ужо існуе"
 msgid "A new release of Arduino CLI is available:"
 msgstr "Новая версія Arduino CLI даступная:"
 
-#: commands/cmderrors/cmderrors.go:299
+#: commands/cmderrors/cmderrors.go:300
 msgid "A programmer is required to upload"
 msgstr "Для выгрузкі патрабуецца праграматар"
 
@@ -285,7 +285,7 @@ msgstr ""
 msgid "Can't create data directory %s"
 msgstr "Не атрымалася стварыць каталог дадзеных %s"
 
-#: commands/cmderrors/cmderrors.go:511
+#: commands/cmderrors/cmderrors.go:532
 msgid "Can't create sketch"
 msgstr "Не атрымалася стварыць сцэнар"
 
@@ -299,11 +299,11 @@ msgstr "Не атрымалася спампаваць бібліятэку"
 msgid "Can't find dependencies for platform %s"
 msgstr "Не атрымалася знайсці залежнасці для платформы %s"
 
-#: commands/cmderrors/cmderrors.go:537
+#: commands/cmderrors/cmderrors.go:558
 msgid "Can't open sketch"
 msgstr "Не атрымалася адчыніць сцэнар"
 
-#: commands/cmderrors/cmderrors.go:524
+#: commands/cmderrors/cmderrors.go:545
 msgid "Can't update sketch"
 msgstr "Не атрымалася абнавіць сцэнар"
 
@@ -331,11 +331,11 @@ msgstr "Не атрымалася стварыць каталог канфігу
 msgid "Cannot create config file: %v"
 msgstr "Не атрымалася стварыць файл кафігурацыі: %v"
 
-#: commands/cmderrors/cmderrors.go:781
+#: commands/cmderrors/cmderrors.go:802
 msgid "Cannot create temp dir"
 msgstr "Не атрымалася стварыць часовы каталог"
 
-#: commands/cmderrors/cmderrors.go:799
+#: commands/cmderrors/cmderrors.go:820
 msgid "Cannot create temp file"
 msgstr "Не атрымалася стварыць часовы файл"
 
@@ -420,6 +420,10 @@ msgstr ""
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
 msgstr "Скампіляваны сцэнар не знойдзены ў %s"
+
+#: internal/arduino/builder/internal/preprocessor/gcc.go:93
+msgid "Compiler error output has been truncated."
+msgstr ""
 
 #: internal/cli/compile/compile.go:80 internal/cli/compile/compile.go:81
 msgid "Compiles Arduino sketches."
@@ -803,7 +807,7 @@ msgstr "Памылка пры спамоўцы бібліятэкі %s"
 msgid "Error downloading platform %s"
 msgstr "Памылка пры спампоўцы платформы %s"
 
-#: internal/arduino/cores/packagemanager/download.go:127
+#: internal/arduino/cores/packagemanager/download.go:129
 #: internal/arduino/cores/packagemanager/profiles.go:179
 msgid "Error downloading tool %s"
 msgstr "Памылка пры спампоўцы інструменту %s"
@@ -940,7 +944,7 @@ msgstr "Памылка пры пералічэнні бібліятэк: %v"
 msgid "Error listing platforms: %v"
 msgstr "Памылка пры пералічэнні платформ: %v"
 
-#: commands/cmderrors/cmderrors.go:424
+#: commands/cmderrors/cmderrors.go:445
 msgid "Error loading hardware platform"
 msgstr "Памылка пры загрузцы апаратнай платформы"
 
@@ -1207,7 +1211,7 @@ msgstr ""
 "Прымусовы пропуск сцэнараў папярэдняга выдалення (калі CLI запушчаны ў "
 "інтэрактыўным рэжыме)."
 
-#: commands/cmderrors/cmderrors.go:839
+#: commands/cmderrors/cmderrors.go:860
 msgid "Found %d platforms matching \"%s\": %s"
 msgstr "Знойдзены платформы %d, якія адпаведныя \"%s\": %s"
 
@@ -1337,11 +1341,11 @@ msgstr "Усталёўвае ў сістэму адну ці некалькі н
 msgid "Internal error in cache"
 msgstr "Унутраная памылка ў кэшы"
 
-#: commands/cmderrors/cmderrors.go:377
+#: commands/cmderrors/cmderrors.go:378
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "Недапушчальная ўласцівасць '%[1]s': %[2]s"
 
-#: commands/cmderrors/cmderrors.go:60
+#: commands/cmderrors/cmderrors.go:61
 msgid "Invalid FQBN"
 msgstr "Хібны FQBN"
 
@@ -1349,7 +1353,7 @@ msgstr "Хібны FQBN"
 msgid "Invalid TCP address: port is missing"
 msgstr "Хібны адрас TCP: порт адсутнічае"
 
-#: commands/cmderrors/cmderrors.go:78
+#: commands/cmderrors/cmderrors.go:79
 msgid "Invalid URL"
 msgstr "Хібны адрас URL"
 
@@ -1383,7 +1387,7 @@ msgstr "Хібны памер eeprom рэгулярнага выразу: %s"
 msgid "Invalid index URL: %s"
 msgstr "Хібны індэкс адрасу URL: %s"
 
-#: commands/cmderrors/cmderrors.go:46
+#: commands/cmderrors/cmderrors.go:47
 msgid "Invalid instance"
 msgstr "Хібны асобнік"
 
@@ -1391,7 +1395,7 @@ msgstr "Хібны асобнік"
 msgid "Invalid item %s"
 msgstr "Хібны элемент %s"
 
-#: commands/cmderrors/cmderrors.go:96
+#: commands/cmderrors/cmderrors.go:97
 msgid "Invalid library"
 msgstr "Хібная бібліятэка"
 
@@ -1423,7 +1427,7 @@ msgstr "Хібная налада %s: версія не дазволеная"
 msgid "Invalid pid value: '%s'"
 msgstr "Хібнае значэнне pid: '%s'"
 
-#: commands/cmderrors/cmderrors.go:220
+#: commands/cmderrors/cmderrors.go:221
 msgid "Invalid profile"
 msgstr "Хібны профіль"
 
@@ -1439,7 +1443,7 @@ msgstr "Хібны памер regexp: %s"
 msgid "Invalid value in configuration"
 msgstr "Хібнае значэнне ў канфігурацыі"
 
-#: commands/cmderrors/cmderrors.go:114
+#: commands/cmderrors/cmderrors.go:115
 msgid "Invalid version"
 msgstr "Хібаня версія"
 
@@ -1494,7 +1498,7 @@ msgstr "Бібліятэка %s не ўсталяваная"
 msgid "Library %s not found"
 msgstr "Бібліятэка %s не знойдзеная"
 
-#: commands/cmderrors/cmderrors.go:445
+#: commands/cmderrors/cmderrors.go:466
 msgid "Library '%s' not found"
 msgstr "Бібліятэка '%s' не знойдзеная"
 
@@ -1505,7 +1509,7 @@ msgstr ""
 "Бібліятэка не можа ўжываць абодва каталога '%[1]s' і '%[2]s'.\n"
 "Праверце '%[3]s' яшчэ раз."
 
-#: commands/cmderrors/cmderrors.go:574
+#: commands/cmderrors/cmderrors.go:595
 msgid "Library install failed"
 msgstr "Не атрымалася ўсталяваць бібліятэку"
 
@@ -1611,23 +1615,23 @@ msgstr ""
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "Адсутнічае '%[1]s' з бібліятэкі ў %[2]s"
 
-#: commands/cmderrors/cmderrors.go:169
+#: commands/cmderrors/cmderrors.go:170
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr "Адсутнічае FQBN  (поўная назва платы)"
 
-#: commands/cmderrors/cmderrors.go:260
+#: commands/cmderrors/cmderrors.go:261
 msgid "Missing port"
 msgstr "Адсутнічае порт"
 
-#: commands/cmderrors/cmderrors.go:236
+#: commands/cmderrors/cmderrors.go:237
 msgid "Missing port address"
 msgstr "Адсутнічае адрас порту"
 
-#: commands/cmderrors/cmderrors.go:248
+#: commands/cmderrors/cmderrors.go:249
 msgid "Missing port protocol"
 msgstr "Адсутнічае порт пратаколу"
 
-#: commands/cmderrors/cmderrors.go:286
+#: commands/cmderrors/cmderrors.go:287
 msgid "Missing programmer"
 msgstr "Адсутнічае праграматар"
 
@@ -1639,11 +1643,11 @@ msgstr "Адсутнічае абавязковае поле для выгруз
 msgid "Missing size regexp"
 msgstr "Адсутнічае памер regexp"
 
-#: commands/cmderrors/cmderrors.go:497
+#: commands/cmderrors/cmderrors.go:518
 msgid "Missing sketch path"
 msgstr "Адсутнчіае шлях сцэнара"
 
-#: commands/cmderrors/cmderrors.go:358
+#: commands/cmderrors/cmderrors.go:359
 msgid "Monitor '%s' not found"
 msgstr "Манітор '%s' не знойдзены"
 
@@ -1701,7 +1705,7 @@ msgstr ""
 msgid "No libraries update is available."
 msgstr "Абнаўленне бібліятэк недаступна."
 
-#: commands/cmderrors/cmderrors.go:274
+#: commands/cmderrors/cmderrors.go:275
 msgid "No monitor available for the port protocol %s"
 msgstr "Манітор для пратаколу порта %s недаступны"
 
@@ -1721,7 +1725,7 @@ msgstr "Няма платформаў, якія адпавядаюць ваша�
 msgid "No upload port found, using %s as fallback"
 msgstr "Порт выгрузкі не знойдзены, ўжываецца %s у якасці рэзервовага"
 
-#: commands/cmderrors/cmderrors.go:464
+#: commands/cmderrors/cmderrors.go:485
 msgid "No valid dependencies solution found"
 msgstr "Не знойдзена дапушчальнага рашэння для залежнасцяў"
 
@@ -1895,8 +1899,8 @@ msgstr ""
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr "Выкананне сэнсарнага скіду з хуткасцю 1200 біт/с на паслядоўным порце"
 
-#: commands/service_platform_install.go:87
-#: commands/service_platform_install.go:94
+#: commands/service_platform_install.go:91
+#: commands/service_platform_install.go:98
 msgid "Platform %s already installed"
 msgstr "Платформа %s ужо ўсталяваная"
 
@@ -1916,11 +1920,15 @@ msgstr ""
 msgid "Platform %s uninstalled"
 msgstr "Платформа %s выдаленая"
 
-#: commands/cmderrors/cmderrors.go:482
+#: commands/cmderrors/cmderrors.go:427
+msgid "Platform '%s'"
+msgstr ""
+
+#: commands/cmderrors/cmderrors.go:503
 msgid "Platform '%s' is already at the latest version"
 msgstr "Платформа '%s' ужо апошняй версіі"
 
-#: commands/cmderrors/cmderrors.go:406
+#: commands/cmderrors/cmderrors.go:407
 msgid "Platform '%s' not found"
 msgstr "Платформа '%s' не знойдзеная"
 
@@ -1960,7 +1968,7 @@ msgstr "Назва платформы:"
 msgid "Platform size (bytes):"
 msgstr "Памер платформы (у байтах):"
 
-#: commands/cmderrors/cmderrors.go:153
+#: commands/cmderrors/cmderrors.go:154
 msgid ""
 "Please specify an FQBN. Multiple possible boards detected on port %[1]s with"
 " protocol %[2]s"
@@ -1968,7 +1976,7 @@ msgstr ""
 "Калі ласка, пакажыце FQBN.\n"
 "У порце %[1]s з пратаколам %[2]s выяўлена некалькі магчымых плат"
 
-#: commands/cmderrors/cmderrors.go:133
+#: commands/cmderrors/cmderrors.go:134
 msgid ""
 "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be"
 " identified"
@@ -1984,7 +1992,7 @@ msgstr "Порт"
 msgid "Port closed: %v"
 msgstr "Порт зачынены: %v"
 
-#: commands/cmderrors/cmderrors.go:668
+#: commands/cmderrors/cmderrors.go:689
 msgid "Port monitor error"
 msgstr "Памылка манитора порта"
 
@@ -2018,11 +2026,11 @@ msgstr "Друкуе бягучую канфігурацыю"
 msgid "Prints the current configuration."
 msgstr "Друкуе бягучую канфігурацыю."
 
-#: commands/cmderrors/cmderrors.go:202
+#: commands/cmderrors/cmderrors.go:203
 msgid "Profile '%s' not found"
 msgstr "Профіль '%s' не знойдзены"
 
-#: commands/cmderrors/cmderrors.go:339
+#: commands/cmderrors/cmderrors.go:340
 msgid "Programmer '%s' not found"
 msgstr "Праграматар '%s' не знойдзены"
 
@@ -2038,7 +2046,7 @@ msgstr "Праграматар, які ўжываецца, напрыклад: a
 msgid "Programmers:"
 msgstr "Праграматары:"
 
-#: commands/cmderrors/cmderrors.go:391
+#: commands/cmderrors/cmderrors.go:392
 msgid "Property '%s' is undefined"
 msgstr "Уласцівасць '%s' не вызначана"
 
@@ -2471,7 +2479,7 @@ msgstr "Дадзеная канфігурацыя платы/праграмат�
 msgid "The given board/programmer configuration supports debugging."
 msgstr "Дадзеная канфігурацыя платы/праграматара падтрымлівае адладку."
 
-#: commands/cmderrors/cmderrors.go:876
+#: commands/cmderrors/cmderrors.go:897
 msgid "The instance is no longer valid and needs to be reinitialized"
 msgstr "Асобнік больш несапраўдны і мае патрэбу ў паўторнай ініцыялізацыі"
 
@@ -2491,7 +2499,7 @@ msgstr ""
 "Ключ '%[1]v' не з'яўляецца спісам элементаў, не можа быць выдалены з яго.\n"
 "Ці можа быць трэба ўжываць '%[2]s'?"
 
-#: commands/cmderrors/cmderrors.go:858
+#: commands/cmderrors/cmderrors.go:879
 msgid "The library %s has multiple installations:"
 msgstr "Бібліятэка %s мае некалькі ўсталяванняў:"
 
@@ -2649,7 +2657,7 @@ msgstr "Выдаленне адной ці некалькі бібліятэк."
 msgid "Unknown"
 msgstr "Невядомы"
 
-#: commands/cmderrors/cmderrors.go:183
+#: commands/cmderrors/cmderrors.go:184
 msgid "Unknown FQBN"
 msgstr "Невядомы FQBN"
 
@@ -3008,7 +3016,7 @@ msgstr "капіраванне бібліятэкі ў каталог прызн
 msgid "could not find a valid build artifact"
 msgstr "не атрымалася знайсці дапушчальны артэфакт зборкі"
 
-#: commands/service_platform_install.go:95
+#: commands/service_platform_install.go:99
 msgid "could not overwrite"
 msgstr "не атрымалася перазапісаць"
 
@@ -3193,15 +3201,15 @@ msgstr "атрыманне шляху да архіва: %"
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "атрыманне ўласцівасцяў зборкі для платы %[1]s: %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:106
+#: internal/arduino/cores/packagemanager/download.go:108
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr "атрыманне залежнасцяў выяўлення для платформы %[1]s: %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:114
+#: internal/arduino/cores/packagemanager/download.go:116
 msgid "getting monitor dependencies for platform %[1]s: %[2]s"
 msgstr "атрыманне залежнасцяў манітора для платформы %[1]s: %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:99
+#: internal/arduino/cores/packagemanager/download.go:101
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "атрыманне залежнасцяў інструментаў для платформы %[1]s: %[2]s"
 
@@ -3532,7 +3540,7 @@ msgstr "порт загрузкі не пазначаны"
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "не знойдзены сапраўдны сцэнар у %[1]s: адсутнічае %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:128
+#: internal/arduino/cores/packagemanager/download.go:130
 msgid "no versions available for the current OS, try contacting %s"
 msgstr ""
 "для бягучай аперацыйнай сістэмы не даступна ні адной версіі, паспрабуйце "
@@ -3563,7 +3571,7 @@ msgstr "адкрыццё файла сігнатуры: %s"
 msgid "opening target file: %s"
 msgstr "адкрыццё мэтавага файлау: %s"
 
-#: internal/arduino/cores/packagemanager/download.go:76
+#: internal/arduino/cores/packagemanager/download.go:78
 #: internal/arduino/cores/status.go:97 internal/arduino/cores/status.go:122
 #: internal/arduino/cores/status.go:149
 msgid "package %s not found"
@@ -3586,7 +3594,7 @@ msgstr "разбор library_index.json: %s"
 msgid "path is not a platform directory: %s"
 msgstr "шлях не з'яўляецца каталогам платформы: %s"
 
-#: internal/arduino/cores/packagemanager/download.go:80
+#: internal/arduino/cores/packagemanager/download.go:82
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "платформа %[1]s не знойдзена ў пакеце %[2]s"
 
@@ -3594,7 +3602,7 @@ msgstr "платформа %[1]s не знойдзена ў пакеце %[2]s"
 msgid "platform %s is not installed"
 msgstr "платформа %s не ўсталяваная"
 
-#: internal/arduino/cores/packagemanager/download.go:92
+#: commands/cmderrors/cmderrors.go:427
 msgid "platform is not available for your OS"
 msgstr "платформа недаступная для вашай аперацыйнай сістэмы"
 
@@ -3705,7 +3713,7 @@ msgstr "выдаленне каталогу бібліятэкі: %s"
 msgid "removing platform files: %s"
 msgstr "выдаленне файлаў платформы: %s"
 
-#: internal/arduino/cores/packagemanager/download.go:87
+#: internal/arduino/cores/packagemanager/download.go:89
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "неабходная версія %[1]s для платформы %[2]s не знойдзена"
 

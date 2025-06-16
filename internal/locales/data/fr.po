@@ -67,11 +67,11 @@ msgid "%s must be installed."
 msgstr ""
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:193
-#: internal/arduino/builder/internal/preprocessor/gcc.go:62
+#: internal/arduino/builder/internal/preprocessor/gcc.go:63
 msgid "%s pattern is missing"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:818
+#: commands/cmderrors/cmderrors.go:839
 msgid "'%s' has an invalid signature"
 msgstr ""
 
@@ -113,7 +113,7 @@ msgstr ""
 msgid "A new release of Arduino CLI is available:"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:299
+#: commands/cmderrors/cmderrors.go:300
 msgid "A programmer is required to upload"
 msgstr ""
 
@@ -273,7 +273,7 @@ msgstr ""
 msgid "Can't create data directory %s"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:511
+#: commands/cmderrors/cmderrors.go:532
 msgid "Can't create sketch"
 msgstr ""
 
@@ -287,11 +287,11 @@ msgstr ""
 msgid "Can't find dependencies for platform %s"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:537
+#: commands/cmderrors/cmderrors.go:558
 msgid "Can't open sketch"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:524
+#: commands/cmderrors/cmderrors.go:545
 msgid "Can't update sketch"
 msgstr ""
 
@@ -319,11 +319,11 @@ msgstr ""
 msgid "Cannot create config file: %v"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:781
+#: commands/cmderrors/cmderrors.go:802
 msgid "Cannot create temp dir"
 msgstr "Impossible de créer le dossier temporaire"
 
-#: commands/cmderrors/cmderrors.go:799
+#: commands/cmderrors/cmderrors.go:820
 msgid "Cannot create temp file"
 msgstr "Impossible de créer le fichier temporaire"
 
@@ -403,6 +403,10 @@ msgstr ""
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
 msgstr "Croquis compilé introuvable %s"
+
+#: internal/arduino/builder/internal/preprocessor/gcc.go:93
+msgid "Compiler error output has been truncated."
+msgstr ""
 
 #: internal/cli/compile/compile.go:80 internal/cli/compile/compile.go:81
 msgid "Compiles Arduino sketches."
@@ -769,7 +773,7 @@ msgstr ""
 msgid "Error downloading platform %s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:127
+#: internal/arduino/cores/packagemanager/download.go:129
 #: internal/arduino/cores/packagemanager/profiles.go:179
 msgid "Error downloading tool %s"
 msgstr ""
@@ -903,7 +907,7 @@ msgstr ""
 msgid "Error listing platforms: %v"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:424
+#: commands/cmderrors/cmderrors.go:445
 msgid "Error loading hardware platform"
 msgstr ""
 
@@ -1147,7 +1151,7 @@ msgid ""
 "Force skip of pre-uninstall scripts (if the CLI is running interactively)."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:839
+#: commands/cmderrors/cmderrors.go:860
 msgid "Found %d platforms matching \"%s\": %s"
 msgstr ""
 
@@ -1272,11 +1276,11 @@ msgstr ""
 msgid "Internal error in cache"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:377
+#: commands/cmderrors/cmderrors.go:378
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:60
+#: commands/cmderrors/cmderrors.go:61
 msgid "Invalid FQBN"
 msgstr ""
 
@@ -1284,7 +1288,7 @@ msgstr ""
 msgid "Invalid TCP address: port is missing"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:78
+#: commands/cmderrors/cmderrors.go:79
 msgid "Invalid URL"
 msgstr ""
 
@@ -1318,7 +1322,7 @@ msgstr ""
 msgid "Invalid index URL: %s"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:46
+#: commands/cmderrors/cmderrors.go:47
 msgid "Invalid instance"
 msgstr ""
 
@@ -1326,7 +1330,7 @@ msgstr ""
 msgid "Invalid item %s"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:96
+#: commands/cmderrors/cmderrors.go:97
 msgid "Invalid library"
 msgstr ""
 
@@ -1358,7 +1362,7 @@ msgstr ""
 msgid "Invalid pid value: '%s'"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:220
+#: commands/cmderrors/cmderrors.go:221
 msgid "Invalid profile"
 msgstr ""
 
@@ -1374,7 +1378,7 @@ msgstr ""
 msgid "Invalid value in configuration"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:114
+#: commands/cmderrors/cmderrors.go:115
 msgid "Invalid version"
 msgstr ""
 
@@ -1427,7 +1431,7 @@ msgstr ""
 msgid "Library %s not found"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:445
+#: commands/cmderrors/cmderrors.go:466
 msgid "Library '%s' not found"
 msgstr ""
 
@@ -1436,7 +1440,7 @@ msgid ""
 "Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:574
+#: commands/cmderrors/cmderrors.go:595
 msgid "Library install failed"
 msgstr ""
 
@@ -1533,23 +1537,23 @@ msgstr ""
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "Fichier manquant '%[1]s' de la bibliothèque dans %[2]s"
 
-#: commands/cmderrors/cmderrors.go:169
+#: commands/cmderrors/cmderrors.go:170
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:260
+#: commands/cmderrors/cmderrors.go:261
 msgid "Missing port"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:236
+#: commands/cmderrors/cmderrors.go:237
 msgid "Missing port address"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:248
+#: commands/cmderrors/cmderrors.go:249
 msgid "Missing port protocol"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:286
+#: commands/cmderrors/cmderrors.go:287
 msgid "Missing programmer"
 msgstr ""
 
@@ -1561,11 +1565,11 @@ msgstr ""
 msgid "Missing size regexp"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:497
+#: commands/cmderrors/cmderrors.go:518
 msgid "Missing sketch path"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:358
+#: commands/cmderrors/cmderrors.go:359
 msgid "Monitor '%s' not found"
 msgstr ""
 
@@ -1621,7 +1625,7 @@ msgstr ""
 msgid "No libraries update is available."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:274
+#: commands/cmderrors/cmderrors.go:275
 msgid "No monitor available for the port protocol %s"
 msgstr ""
 
@@ -1641,7 +1645,7 @@ msgstr ""
 msgid "No upload port found, using %s as fallback"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:464
+#: commands/cmderrors/cmderrors.go:485
 msgid "No valid dependencies solution found"
 msgstr ""
 
@@ -1795,8 +1799,8 @@ msgstr ""
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr ""
 
-#: commands/service_platform_install.go:87
-#: commands/service_platform_install.go:94
+#: commands/service_platform_install.go:91
+#: commands/service_platform_install.go:98
 msgid "Platform %s already installed"
 msgstr ""
 
@@ -1814,11 +1818,15 @@ msgstr ""
 msgid "Platform %s uninstalled"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:482
+#: commands/cmderrors/cmderrors.go:427
+msgid "Platform '%s'"
+msgstr ""
+
+#: commands/cmderrors/cmderrors.go:503
 msgid "Platform '%s' is already at the latest version"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:406
+#: commands/cmderrors/cmderrors.go:407
 msgid "Platform '%s' not found"
 msgstr ""
 
@@ -1858,13 +1866,13 @@ msgstr ""
 msgid "Platform size (bytes):"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:153
+#: commands/cmderrors/cmderrors.go:154
 msgid ""
 "Please specify an FQBN. Multiple possible boards detected on port %[1]s with"
 " protocol %[2]s"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:133
+#: commands/cmderrors/cmderrors.go:134
 msgid ""
 "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be"
 " identified"
@@ -1878,7 +1886,7 @@ msgstr "Port"
 msgid "Port closed: %v"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:668
+#: commands/cmderrors/cmderrors.go:689
 msgid "Port monitor error"
 msgstr ""
 
@@ -1911,11 +1919,11 @@ msgstr ""
 msgid "Prints the current configuration."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:202
+#: commands/cmderrors/cmderrors.go:203
 msgid "Profile '%s' not found"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:339
+#: commands/cmderrors/cmderrors.go:340
 msgid "Programmer '%s' not found"
 msgstr ""
 
@@ -1931,7 +1939,7 @@ msgstr ""
 msgid "Programmers:"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:391
+#: commands/cmderrors/cmderrors.go:392
 msgid "Property '%s' is undefined"
 msgstr ""
 
@@ -2303,7 +2311,7 @@ msgstr ""
 msgid "The given board/programmer configuration supports debugging."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:876
+#: commands/cmderrors/cmderrors.go:897
 msgid "The instance is no longer valid and needs to be reinitialized"
 msgstr ""
 
@@ -2319,7 +2327,7 @@ msgid ""
 "Maybe use '%[2]s'?"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:858
+#: commands/cmderrors/cmderrors.go:879
 msgid "The library %s has multiple installations:"
 msgstr ""
 
@@ -2462,7 +2470,7 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:183
+#: commands/cmderrors/cmderrors.go:184
 msgid "Unknown FQBN"
 msgstr ""
 
@@ -2810,7 +2818,7 @@ msgstr ""
 msgid "could not find a valid build artifact"
 msgstr ""
 
-#: commands/service_platform_install.go:95
+#: commands/service_platform_install.go:99
 msgid "could not overwrite"
 msgstr ""
 
@@ -2994,15 +3002,15 @@ msgstr ""
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:106
+#: internal/arduino/cores/packagemanager/download.go:108
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:114
+#: internal/arduino/cores/packagemanager/download.go:116
 msgid "getting monitor dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:99
+#: internal/arduino/cores/packagemanager/download.go:101
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
@@ -3324,7 +3332,7 @@ msgstr ""
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:128
+#: internal/arduino/cores/packagemanager/download.go:130
 msgid "no versions available for the current OS, try contacting %s"
 msgstr ""
 
@@ -3353,7 +3361,7 @@ msgstr ""
 msgid "opening target file: %s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:76
+#: internal/arduino/cores/packagemanager/download.go:78
 #: internal/arduino/cores/status.go:97 internal/arduino/cores/status.go:122
 #: internal/arduino/cores/status.go:149
 msgid "package %s not found"
@@ -3376,7 +3384,7 @@ msgstr ""
 msgid "path is not a platform directory: %s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:80
+#: internal/arduino/cores/packagemanager/download.go:82
 msgid "platform %[1]s not found in package %[2]s"
 msgstr ""
 
@@ -3384,7 +3392,7 @@ msgstr ""
 msgid "platform %s is not installed"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:92
+#: commands/cmderrors/cmderrors.go:427
 msgid "platform is not available for your OS"
 msgstr ""
 
@@ -3495,7 +3503,7 @@ msgstr ""
 msgid "removing platform files: %s"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/download.go:87
+#: internal/arduino/cores/packagemanager/download.go:89
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr ""
 
