@@ -7,11 +7,11 @@
 # Gabriel F., 2022
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # Gaia Castronovo <g.castronovo@arduino.cc>, 2023
-# Giovanni Scafora <scafora.giovanni@gmail.com>, 2024
+# Giovanni Scafora <scafora.giovanni@gmail.com>, 2025
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Giovanni Scafora <scafora.giovanni@gmail.com>, 2024\n"
+"Last-Translator: Giovanni Scafora <scafora.giovanni@gmail.com>, 2025\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/arduino-1/teams/108174/it_IT/)\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
@@ -72,11 +72,11 @@ msgid "%s must be installed."
 msgstr "%s deve essere installato."
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:193
-#: internal/arduino/builder/internal/preprocessor/gcc.go:62
+#: internal/arduino/builder/internal/preprocessor/gcc.go:63
 msgid "%s pattern is missing"
 msgstr "Manca il pattern %s"
 
-#: commands/cmderrors/cmderrors.go:818
+#: commands/cmderrors/cmderrors.go:839
 msgid "'%s' has an invalid signature"
 msgstr "'%s' ha una firma invalida"
 
@@ -125,7 +125,7 @@ msgstr "il file .ino è già presente"
 msgid "A new release of Arduino CLI is available:"
 msgstr "È disponibile una nuova versione di Arduino CLI:"
 
-#: commands/cmderrors/cmderrors.go:299
+#: commands/cmderrors/cmderrors.go:300
 msgid "A programmer is required to upload"
 msgstr "Per caricare è necessario un programmatore"
 
@@ -291,7 +291,7 @@ msgstr ""
 msgid "Can't create data directory %s"
 msgstr "Non è possibile creare la directory dei dati %s"
 
-#: commands/cmderrors/cmderrors.go:511
+#: commands/cmderrors/cmderrors.go:532
 msgid "Can't create sketch"
 msgstr "Non è possibile creare lo sketch"
 
@@ -305,11 +305,11 @@ msgstr "Non è possibile scaricare la libreria"
 msgid "Can't find dependencies for platform %s"
 msgstr "Impossibile trovare le dipendenze per la piattaforma %s"
 
-#: commands/cmderrors/cmderrors.go:537
+#: commands/cmderrors/cmderrors.go:558
 msgid "Can't open sketch"
 msgstr "Non è possibile aprire lo sketch"
 
-#: commands/cmderrors/cmderrors.go:524
+#: commands/cmderrors/cmderrors.go:545
 msgid "Can't update sketch"
 msgstr "Impossibile aggiornare lo sketch"
 
@@ -338,11 +338,11 @@ msgstr ""
 msgid "Cannot create config file: %v"
 msgstr "Non è possibile creare il file di configurazione: %v"
 
-#: commands/cmderrors/cmderrors.go:781
+#: commands/cmderrors/cmderrors.go:802
 msgid "Cannot create temp dir"
 msgstr "Non è possibile creare la cartella temporanea"
 
-#: commands/cmderrors/cmderrors.go:799
+#: commands/cmderrors/cmderrors.go:820
 msgid "Cannot create temp file"
 msgstr "Non è possibile creare il file temporaneo"
 
@@ -426,6 +426,10 @@ msgstr ""
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
 msgstr "Sketch compilato non trovato in %s"
+
+#: internal/arduino/builder/internal/preprocessor/gcc.go:93
+msgid "Compiler error output has been truncated."
+msgstr "L'output degli errori del compilatore è stato troncato."
 
 #: internal/cli/compile/compile.go:80 internal/cli/compile/compile.go:81
 msgid "Compiles Arduino sketches."
@@ -825,7 +829,7 @@ msgstr "Errore durante il download della libreria %s"
 msgid "Error downloading platform %s"
 msgstr "Errore durante il download della piattaforma %s"
 
-#: internal/arduino/cores/packagemanager/download.go:127
+#: internal/arduino/cores/packagemanager/download.go:129
 #: internal/arduino/cores/packagemanager/profiles.go:179
 msgid "Error downloading tool %s"
 msgstr "Errore durante il download del tool %s"
@@ -983,7 +987,7 @@ msgstr ""
 "Si è verificato un errore durante la visualizzazione dell'elenco delle "
 "piattaforme: %v"
 
-#: commands/cmderrors/cmderrors.go:424
+#: commands/cmderrors/cmderrors.go:445
 msgid "Error loading hardware platform"
 msgstr ""
 "Si è verificato un errore durante il caricamento della piattaforma hardware"
@@ -1265,7 +1269,7 @@ msgstr ""
 "Forza il salto degli script pre-uninstall (se la CLI viene eseguita in modo "
 "interattivo)."
 
-#: commands/cmderrors/cmderrors.go:839
+#: commands/cmderrors/cmderrors.go:860
 msgid "Found %d platforms matching \"%s\": %s"
 msgstr "Sono state trovate %d piattaforme corrispondenti \"%s\": %s"
 
@@ -1393,11 +1397,11 @@ msgstr "Installa nel sistema una o più librerie specificate."
 msgid "Internal error in cache"
 msgstr "Errore interno alla cache"
 
-#: commands/cmderrors/cmderrors.go:377
+#: commands/cmderrors/cmderrors.go:378
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "La proprietà '%[1]s' non è valida: %[2]s"
 
-#: commands/cmderrors/cmderrors.go:60
+#: commands/cmderrors/cmderrors.go:61
 msgid "Invalid FQBN"
 msgstr "FQBN non è valido"
 
@@ -1405,7 +1409,7 @@ msgstr "FQBN non è valido"
 msgid "Invalid TCP address: port is missing"
 msgstr "Indirizzo TCP non valido: manca la porta"
 
-#: commands/cmderrors/cmderrors.go:78
+#: commands/cmderrors/cmderrors.go:79
 msgid "Invalid URL"
 msgstr "URL non è valido"
 
@@ -1440,7 +1444,7 @@ msgstr "La dimensione della eeprom della regexp non è valida: %s"
 msgid "Invalid index URL: %s"
 msgstr "URL non valido: %s"
 
-#: commands/cmderrors/cmderrors.go:46
+#: commands/cmderrors/cmderrors.go:47
 msgid "Invalid instance"
 msgstr "Istanza non è valida"
 
@@ -1448,7 +1452,7 @@ msgstr "Istanza non è valida"
 msgid "Invalid item %s"
 msgstr "Oggetto invalido %s"
 
-#: commands/cmderrors/cmderrors.go:96
+#: commands/cmderrors/cmderrors.go:97
 msgid "Invalid library"
 msgstr "Libreria non è valida"
 
@@ -1480,7 +1484,7 @@ msgstr "Il parametro %s non è valido: versione non consentita"
 msgid "Invalid pid value: '%s'"
 msgstr "Il valore pid non è valido: '%s'"
 
-#: commands/cmderrors/cmderrors.go:220
+#: commands/cmderrors/cmderrors.go:221
 msgid "Invalid profile"
 msgstr "Il profilo non è valido"
 
@@ -1496,7 +1500,7 @@ msgstr "La dimensione della regexp non è valida: %s"
 msgid "Invalid value in configuration"
 msgstr "Nella configurazione c'è un valore non valido"
 
-#: commands/cmderrors/cmderrors.go:114
+#: commands/cmderrors/cmderrors.go:115
 msgid "Invalid version"
 msgstr "Versione non è valida"
 
@@ -1552,7 +1556,7 @@ msgstr "La libreria %s non è installata"
 msgid "Library %s not found"
 msgstr "Impossibile trovare la libreria %s"
 
-#: commands/cmderrors/cmderrors.go:445
+#: commands/cmderrors/cmderrors.go:466
 msgid "Library '%s' not found"
 msgstr "Impossibile trovare la libreria '%s'"
 
@@ -1563,7 +1567,7 @@ msgstr ""
 "La libreria non può utilizzare entramble le cartelle '%[1]s' e '%[2]s'.  "
 "Doppio controllo in '%[3]s'."
 
-#: commands/cmderrors/cmderrors.go:574
+#: commands/cmderrors/cmderrors.go:595
 msgid "Library install failed"
 msgstr "Impossibile installare la libreria"
 
@@ -1670,23 +1674,23 @@ msgstr ""
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "Manca '%[1]s' nella libreria %[2]s"
 
-#: commands/cmderrors/cmderrors.go:169
+#: commands/cmderrors/cmderrors.go:170
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr "FQBN mancante (Fully Qualified Board Name)"
 
-#: commands/cmderrors/cmderrors.go:260
+#: commands/cmderrors/cmderrors.go:261
 msgid "Missing port"
 msgstr "Porta mancante"
 
-#: commands/cmderrors/cmderrors.go:236
+#: commands/cmderrors/cmderrors.go:237
 msgid "Missing port address"
 msgstr "Porta di comunicazione non trovata"
 
-#: commands/cmderrors/cmderrors.go:248
+#: commands/cmderrors/cmderrors.go:249
 msgid "Missing port protocol"
 msgstr "Manca il protocollo della porta"
 
-#: commands/cmderrors/cmderrors.go:286
+#: commands/cmderrors/cmderrors.go:287
 msgid "Missing programmer"
 msgstr "Manca il programmatore"
 
@@ -1698,11 +1702,11 @@ msgstr "Manca un campo obbligatorio del caricamento: %s"
 msgid "Missing size regexp"
 msgstr "Manca la dimensione della regexp"
 
-#: commands/cmderrors/cmderrors.go:497
+#: commands/cmderrors/cmderrors.go:518
 msgid "Missing sketch path"
 msgstr "Manca il percorso dello sketch"
 
-#: commands/cmderrors/cmderrors.go:358
+#: commands/cmderrors/cmderrors.go:359
 msgid "Monitor '%s' not found"
 msgstr "Impossibile trovare il monitor '%s'"
 
@@ -1760,7 +1764,7 @@ msgstr ""
 msgid "No libraries update is available."
 msgstr "Non sono disponibili aggiornamenti per le librerie."
 
-#: commands/cmderrors/cmderrors.go:274
+#: commands/cmderrors/cmderrors.go:275
 msgid "No monitor available for the port protocol %s"
 msgstr "Nessun monitor disponibile per il protocollo della porta %s"
 
@@ -1782,7 +1786,7 @@ msgstr ""
 "Non è stata trovata alcuna porta di upload, come alternativa verrà "
 "utilizzata %s"
 
-#: commands/cmderrors/cmderrors.go:464
+#: commands/cmderrors/cmderrors.go:485
 msgid "No valid dependencies solution found"
 msgstr "Non è stata trovata una soluzione valida per le dipendenze"
 
@@ -1957,8 +1961,8 @@ msgstr ""
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr "Esecuzione di un touch reset a 1200-bps sulla porta seriale %s"
 
-#: commands/service_platform_install.go:87
-#: commands/service_platform_install.go:94
+#: commands/service_platform_install.go:91
+#: commands/service_platform_install.go:98
 msgid "Platform %s already installed"
 msgstr "La piattaforma %s è già installata"
 
@@ -1978,11 +1982,15 @@ msgstr ""
 msgid "Platform %s uninstalled"
 msgstr "La piattaforma %s è stata disinstallata"
 
-#: commands/cmderrors/cmderrors.go:482
+#: commands/cmderrors/cmderrors.go:427
+msgid "Platform '%s'"
+msgstr ""
+
+#: commands/cmderrors/cmderrors.go:503
 msgid "Platform '%s' is already at the latest version"
 msgstr "La piattaforma '%s' è già aggiornata all'ultima versione"
 
-#: commands/cmderrors/cmderrors.go:406
+#: commands/cmderrors/cmderrors.go:407
 msgid "Platform '%s' not found"
 msgstr "Impossibile trovare la piattaforma '%s'"
 
@@ -2022,7 +2030,7 @@ msgstr "Nome piattaforma:"
 msgid "Platform size (bytes):"
 msgstr "Dimensione della piattaforma (bytes):"
 
-#: commands/cmderrors/cmderrors.go:153
+#: commands/cmderrors/cmderrors.go:154
 msgid ""
 "Please specify an FQBN. Multiple possible boards detected on port %[1]s with"
 " protocol %[2]s"
@@ -2030,7 +2038,7 @@ msgstr ""
 "Specificare un FQBN. Sono state rilevate più schede sulla porta %[1]s con "
 "protocollo %[2]s"
 
-#: commands/cmderrors/cmderrors.go:133
+#: commands/cmderrors/cmderrors.go:134
 msgid ""
 "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be"
 " identified"
@@ -2046,7 +2054,7 @@ msgstr "Porta"
 msgid "Port closed: %v"
 msgstr "Porta chiusa: %v"
 
-#: commands/cmderrors/cmderrors.go:668
+#: commands/cmderrors/cmderrors.go:689
 msgid "Port monitor error"
 msgstr "Errore di monitoraggio della porta"
 
@@ -2079,11 +2087,11 @@ msgstr "Stampa la configurazione attuale"
 msgid "Prints the current configuration."
 msgstr "Stampa la configurazione attuale."
 
-#: commands/cmderrors/cmderrors.go:202
+#: commands/cmderrors/cmderrors.go:203
 msgid "Profile '%s' not found"
 msgstr "Impossibile trovare il profilo '%s'"
 
-#: commands/cmderrors/cmderrors.go:339
+#: commands/cmderrors/cmderrors.go:340
 msgid "Programmer '%s' not found"
 msgstr "Impossibile trovare il programmatore '%s'"
 
@@ -2099,7 +2107,7 @@ msgstr "Programmatore da utilizzare, ad esempio: atmel_ice"
 msgid "Programmers:"
 msgstr "Programmatori:"
 
-#: commands/cmderrors/cmderrors.go:391
+#: commands/cmderrors/cmderrors.go:392
 msgid "Property '%s' is undefined"
 msgstr "La proprietà '%s' non è definita"
 
@@ -2547,7 +2555,7 @@ msgstr "La configurazione fornita scheda/programmatore NON supporta il debug."
 msgid "The given board/programmer configuration supports debugging."
 msgstr "La configurazione fornita scheda/programmatore supporta il debug."
 
-#: commands/cmderrors/cmderrors.go:876
+#: commands/cmderrors/cmderrors.go:897
 msgid "The instance is no longer valid and needs to be reinitialized"
 msgstr "L'istanza non è più valida e deve essere reinizializzata."
 
@@ -2567,7 +2575,7 @@ msgstr ""
 "La chiave '%[1]v' non è un elenco di elementi, non può essere rimossa.\n"
 "Forse si può usare '%[2]s'?"
 
-#: commands/cmderrors/cmderrors.go:858
+#: commands/cmderrors/cmderrors.go:879
 msgid "The library %s has multiple installations:"
 msgstr "La libreria %s richiede altre installazioni:"
 
@@ -2729,7 +2737,7 @@ msgstr "Disinstalla una o più librerie."
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-#: commands/cmderrors/cmderrors.go:183
+#: commands/cmderrors/cmderrors.go:184
 msgid "Unknown FQBN"
 msgstr "FQBN sconosciuto"
 
@@ -3097,7 +3105,7 @@ msgstr "copia della libreria nella directory di destinazione:"
 msgid "could not find a valid build artifact"
 msgstr "impossibile trovare un artefatto di compilazione valido"
 
-#: commands/service_platform_install.go:95
+#: commands/service_platform_install.go:99
 msgid "could not overwrite"
 msgstr "impossibile sovrascrivere"
 
@@ -3288,18 +3296,18 @@ msgstr "sto recuperando il percorso dell'archivio: %s"
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "sto recuperando le proprietà di costruzione della scheda %[1]s: %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:106
+#: internal/arduino/cores/packagemanager/download.go:108
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr ""
 "sto recuperando le dipendenze del rilevamento per la piattaforma %[1]s: "
 "%[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:114
+#: internal/arduino/cores/packagemanager/download.go:116
 msgid "getting monitor dependencies for platform %[1]s: %[2]s"
 msgstr ""
 "sto recuperando le dipendenze del monitor per la piattaforma %[1]s: %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:99
+#: internal/arduino/cores/packagemanager/download.go:101
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr ""
 "sto recuperando le dipendenze dei tool per la piattaforma %[1]s: %[2]s"
@@ -3636,7 +3644,7 @@ msgstr "Non è stata fornita alcuna porta di upload"
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "Non è stato trovato uno sketch valido in %[1]s: manca %[2]s"
 
-#: internal/arduino/cores/packagemanager/download.go:128
+#: internal/arduino/cores/packagemanager/download.go:130
 msgid "no versions available for the current OS, try contacting %s"
 msgstr ""
 "non sono disponibili versioni per il sistema operativo corrente, prova a "
@@ -3667,7 +3675,7 @@ msgstr "apertura del file della firma: %s"
 msgid "opening target file: %s"
 msgstr "apertura del file di destinazione: %s"
 
-#: internal/arduino/cores/packagemanager/download.go:76
+#: internal/arduino/cores/packagemanager/download.go:78
 #: internal/arduino/cores/status.go:97 internal/arduino/cores/status.go:122
 #: internal/arduino/cores/status.go:149
 msgid "package %s not found"
@@ -3690,7 +3698,7 @@ msgstr "sto facendo il parsing di library_index.json: %s"
 msgid "path is not a platform directory: %s"
 msgstr "il percorso non è una directory della piattaforma: %s"
 
-#: internal/arduino/cores/packagemanager/download.go:80
+#: internal/arduino/cores/packagemanager/download.go:82
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "la piattaforma %[1]s non è stata trovata nel pacchetto %[2]s"
 
@@ -3698,7 +3706,7 @@ msgstr "la piattaforma %[1]s non è stata trovata nel pacchetto %[2]s"
 msgid "platform %s is not installed"
 msgstr "la piattaforma %s non è installata"
 
-#: internal/arduino/cores/packagemanager/download.go:92
+#: commands/cmderrors/cmderrors.go:427
 msgid "platform is not available for your OS"
 msgstr "la piattaforma non è disponibile per il sistema operativo in uso"
 
@@ -3810,7 +3818,7 @@ msgstr "rimozione directory della libreria: %s"
 msgid "removing platform files: %s"
 msgstr "sto rimuovendo i file della piattaforma: %s"
 
-#: internal/arduino/cores/packagemanager/download.go:87
+#: internal/arduino/cores/packagemanager/download.go:89
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr ""
 "la versione richiesta %[1]s non è stata trovata per la piattaforma %[2]s"
