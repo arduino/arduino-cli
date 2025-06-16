@@ -74,7 +74,7 @@ func PreprocessSketchWithCtags(
 	}
 
 	if src, err := ctagsTarget.ReadFile(); err == nil {
-		filteredSource := filterSketchSource(sketch, bytes.NewReader(src), false)
+		filteredSource := filterSketchSource(sketch, bytes.NewReader(src), false, stderr)
 		if err := ctagsTarget.WriteFile([]byte(filteredSource)); err != nil {
 			return &Result{args: result.Args(), stdout: stdout.Bytes(), stderr: stderr.Bytes()}, err
 		}
@@ -208,7 +208,7 @@ func RunCTags(ctx context.Context, sourceFile *paths.Path, buildProperties *prop
 	return stdout, stderr, args, err
 }
 
-func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarkers bool) string {
+func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarkers bool, stderr *bytes.Buffer) string {
 	fileNames := paths.NewPathList()
 	fileNames.Add(sketch.MainFile)
 	fileNames.AddAll(sketch.OtherSketchFiles)
@@ -217,6 +217,11 @@ func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarke
 	filtered := ""
 
 	scanner := bufio.NewScanner(source)
+
+	var buf []byte
+	const maxTokenSize = 1024 * 1024 // 1 MB
+	scanner.Buffer(buf, maxTokenSize)
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if filename := cpp.ParseLineMarker(line); filename != nil {
@@ -229,6 +234,11 @@ func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarke
 		if inSketch {
 			filtered += line + "\n"
 		}
+	}
+	if scanner.Err() == bufio.ErrTooLong {
+		fmt.Fprintf(stderr, "%s: %s",
+			i18n.Tr("An error occurred adding prototypes"),
+			i18n.Tr("line too long\n"))
 	}
 
 	return filtered
