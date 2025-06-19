@@ -661,6 +661,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_get/" class="md-nav__link">
+        config get
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../commands/arduino-cli_config_remove/" class="md-nav__link">
         config remove
       </a>
@@ -817,6 +831,20 @@
     <li class="md-nav__item">
       <a href="../commands/arduino-cli_debug/" class="md-nav__link">
         debug
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_debug_check/" class="md-nav__link">
+        debug check
       </a>
     </li>
   
@@ -1460,10 +1488,8 @@
 <h2 id="whats-the-fqbn-string">What's the FQBN string?<a class="headerlink" href="#whats-the-fqbn-string" title="Permanent link">&para;</a></h2>
 <p>FQBN stands for Fully Qualified Board Name. It has the following format:
 <code>VENDOR:ARCHITECTURE:BOARD_ID[:MENU_ID=OPTION_ID[,MENU2_ID=OPTION_ID ...]]</code>, with each <code>MENU_ID=OPTION_ID</code> being an
-optional key-value pair configuration. Each field accepts letters (<code>A-Z</code> or <code>a-z</code>), numbers (<code>0-9</code>), underscores (<code>_</code>),
-dashes(<code>-</code>) and dots(<code>.</code>). The special character <code>=</code> is accepted in the configuration value. The <code>VENDOR</code> and
-<code>ARCHITECTURE</code> parts can be empty. For a deeper understanding of how FQBN works, you should understand the <a href="../platform-specification/">Arduino
-platform specification</a>.</p>
+optional key-value pair configuration. The <code>VENDOR</code> and <code>ARCHITECTURE</code> parts can be empty. For a deeper understanding of
+how FQBN works, you should understand the <a href="../platform-specification/">Arduino platform specification</a>.</p>
 <h2 id="how-to-set-multiple-board-options">How to set multiple board options?<a class="headerlink" href="#how-to-set-multiple-board-options" title="Permanent link">&para;</a></h2>
 <p>Additional board options have to be separated by commas (instead of colon):</p>
 <p><code>$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch</code></p>

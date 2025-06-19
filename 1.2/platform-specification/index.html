@@ -581,6 +581,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_get/" class="md-nav__link">
+        config get
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../commands/arduino-cli_config_remove/" class="md-nav__link">
         config remove
       </a>
@@ -737,6 +751,20 @@
     <li class="md-nav__item">
       <a href="../commands/arduino-cli_debug/" class="md-nav__link">
         debug
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_debug_check/" class="md-nav__link">
+        debug check
       </a>
     </li>
   
@@ -2437,8 +2465,16 @@ sketchbook folder (AKA "user directory").<br> A platform may consist of as littl
 <ul>
 <li><code>{directories.user}</code> is the user directory as specified in the
   <a href="../configuration/#default-directories">configuration file</a>.</li>
-<li><code>{VENDOR_NAME}</code> is the identifier of the vendor/maintainer of the platform.</li>
-<li><code>{ARCHITECTURE}</code> is the architecture of the CPU used in the platform.</li>
+<li><code>{VENDOR_NAME}</code> is the identifier of the vendor/maintainer of the platform.<ul>
+<li>The name of the vendor directory must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>, numbers
+  (<code>0</code>-<code>9</code>), underscores (<code>_</code>), dashes (<code>-</code>), and dots (<code>.</code>).</li>
+</ul>
+</li>
+<li><code>{ARCHITECTURE}</code> is the architecture of the CPU used in the platform.<ul>
+<li>The name of the architecture directory must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>,
+  numbers (<code>0</code>-<code>9</code>), underscores (<code>_</code>), dashes (<code>-</code>), and dots (<code>.</code>).</li>
+</ul>
+</li>
 </ul>
 <p>A vendor/maintainer may have multiple supported architectures.</p>
 <p>Let's see an example, below we have a bunch of platforms downloaded from three hardware vendors <code>arduino</code>, <code>adafruit</code>
@@ -2838,6 +2874,8 @@ be placed in the same folder as the <code>platform.txt</code> it supplements.</p
 <p>This file contains definitions and metadata for the boards supported by the platform. Boards are referenced by their
 short name, the board ID. The settings for a board are defined through a set of properties with keys having the board ID
 as prefix.</p>
+<p>The board ID must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>, numbers (<code>0</code>-<code>9</code>), underscores
+(<code>_</code>), and dashes (<code>-</code>).</p>
 <p>For example, the board ID chosen for the Arduino Uno board is "uno". An extract of the Uno board configuration in
 boards.txt looks like:</p>
 <div class="highlight"><pre><span></span><code>[......]
@@ -3603,8 +3641,11 @@ the board model, and so on...</p>
 This board was produced in two models, one with an ATmega168 microcontroller and another with an ATmega328P.<br> We are
 going then to define a custom option, using the "cpu" MENU_ID, that allows the user to choose between the two different
 microcontrollers.</p>
-<p>We must first define a set of <strong>menu.MENU_ID=Text</strong> properties. <strong>Text</strong> is what is displayed on the GUI for every
-custom menu we are going to create and must be declared at the beginning of the boards.txt file:</p>
+<p>We must first define a set of <strong>menu.MENU_ID=Text</strong> properties.</p>
+<p>The menu ID must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>, numbers (<code>0</code>-<code>9</code>), underscores
+(<code>_</code>), and dashes (<code>-</code>).</p>
+<p><strong>Text</strong> is what is displayed on the GUI for every custom menu we are going to create and must be declared at the
+beginning of the boards.txt file:</p>
 <div class="highlight"><pre><span></span><code>menu.cpu=Processor
 [.....]
 </code></pre></div>
@@ -3630,7 +3671,10 @@ duemilanove.menu.cpu.atmega168=ATmega168
 </code></pre></div>
 <p>We have defined two values: "atmega328" and "atmega168".<br> Note that the property keys must follow the format
 <strong>BOARD_ID.menu.MENU_ID.OPTION_ID=Text</strong>, where <strong>Text</strong> is what is displayed under the "Processor" menu in the IDE's
-GUI.<br> Finally, the specific configuration for each option value:</p>
+GUI.</p>
+<p>The option ID must not contain any characters other than the letters <code>A</code>-<code>Z</code> and <code>a</code>-<code>z</code>, numbers (<code>0</code>-<code>9</code>), underscores
+(<code>_</code>), dashes (<code>-</code>), and equal signs (<code>=</code>).</p>
+<p>Finally, the specific configuration for each option value:</p>
 <div class="highlight"><pre><span></span><code>[.....]
 ## Arduino Duemilanove w/ ATmega328P
 duemilanove.menu.cpu.atmega328=ATmega328P

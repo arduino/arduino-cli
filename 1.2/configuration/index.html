@@ -581,6 +581,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_get/" class="md-nav__link">
+        config get
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../commands/arduino-cli_config_remove/" class="md-nav__link">
         config remove
       </a>
@@ -737,6 +751,20 @@
     <li class="md-nav__item">
       <a href="../commands/arduino-cli_debug/" class="md-nav__link">
         debug
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_debug_check/" class="md-nav__link">
+        debug check
       </a>
     </li>
   
@@ -1623,7 +1651,7 @@
 </ul>
 </li>
 <li><code>build_cache</code> configuration options related to the compilation cache<ul>
-<li><code>path</code> - the path to the build cache, default is <code>$TMP/arduino</code>.</li>
+<li><code>path</code> - the path to the folder under which build caches are stored.</li>
 <li><code>extra_paths</code> - a list of paths to look for precompiled artifacts if not found on <code>build_cache.path</code> setting.</li>
 <li><code>compilations_before_purge</code> - interval, in number of compilations, at which the cache is purged, defaults to <code>10</code>.
   When <code>0</code> the cache is never purged.</li>
@@ -1647,6 +1675,18 @@
 configuration file.</p>
 <ul>
 <li>
+<p>The <code>build_cache.path</code> default is OS-dependent:</p>
+<ul>
+<li>on Linux (and other Unix-based OS) is: if
+  <a href="https://specifications.freedesktop.org/basedir-spec/latest/#variables"><code>$XDG_CACHE_HOME</code></a> is defined,
+  <code>$XDG_CACHE_HOME/arduino</code>. Otherwise <code>{HOME}/.config/arduino</code>.</li>
+<li>on Windows is: <code>{HOME}/AppData/Local/arduino</code></li>
+<li>on MacOS is: <code>{HOME}/Library/Caches/arduino</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
 <p>The <code>directories.data</code> default is OS-dependent:</p>
 <ul>
 <li>on Linux (and other Unix-based OS) is: <code>{HOME}/.arduino15</code></li>
@@ -1656,8 +1696,8 @@ configuration file.</p>
 </li>
 </ul>
 <ul>
-<li>The <code>directories.download</code> default is <code>{directories.data}/staging</code>. If the value of <code>{directories.data}</code> is changed in
-  the configuration the user-specified value will be used.</li>
+<li>The <code>directories.downloads</code> default is <code>{directories.data}/staging</code>. If the value of <code>{directories.data}</code> is changed
+  in the configuration the user-specified value will be used.</li>
 </ul>
 <ul>
 <li>The <code>directories.user</code> default is OS-dependent:<ul>
