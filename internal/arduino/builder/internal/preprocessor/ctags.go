@@ -235,7 +235,7 @@ func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarke
 			filtered += line + "\n"
 		}
 	}
-	if scanner.Err() == bufio.ErrTooLong {
+	if errors.Is(scanner.Err(), bufio.ErrTooLong) {
 		fmt.Fprintf(stderr, "%s: %s",
 			i18n.Tr("An error occurred adding prototypes"),
 			i18n.Tr("line too long\n"))
