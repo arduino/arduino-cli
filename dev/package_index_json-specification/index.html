@@ -1913,9 +1913,7 @@ that can be referenced from <code>platform.txt</code> using one of the following
 <code>arduino:avr-gcc</code> and another 3rd party packager may provide their own <code>3rdparty:avr-gcc</code>). The rules to disambiguate
 are as follows:</p>
 <ul>
-<li>
-<p>The property <code>{runtime.tools.TOOLNAME.path}</code> points, in order of priority, to:</p>
-<ol>
+<li>The property <code>{runtime.tools.TOOLNAME.path}</code> points, in order of priority, to:<ol>
 <li>the tool, version and packager specified via <code>toolsDependencies</code> in the <code>package_index.json</code></li>
 <li>the highest version of the tool provided by the packager of the current platform</li>
 <li>the highest version of the tool provided by the packager of the referenced platform used for compile (see
