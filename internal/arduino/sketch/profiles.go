@@ -187,6 +187,9 @@ type ProfileRequiredLibraries []*ProfileLibraryReference
 
 // AsYaml outputs the required libraries as Yaml
 func (p *ProfileRequiredLibraries) AsYaml() string {
+	if len(*p) == 0 {
+		return ""
+	}
 	res := "    libraries:\n"
 	for _, lib := range *p {
 		res += lib.AsYaml()
