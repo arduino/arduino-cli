@@ -151,19 +151,6 @@ func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 // which in turn contains a single indexPlatformRelease converted from the one
 // passed as argument
 func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
-	boards := []indexBoard{}
-	for _, manifest := range pr.BoardsManifest {
-		board := indexBoard{
-			Name: manifest.Name,
-		}
-		for _, id := range manifest.ID {
-			if id.USB != "" {
-				board.ID = []indexBoardID{{USB: id.USB}}
-			}
-		}
-		boards = append(boards, board)
-	}
-
 	tools := []indexToolDependency{}
 	for _, t := range pr.ToolDependencies {
 		tools = append(tools, indexToolDependency{
@@ -189,56 +176,86 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 		})
 	}
 
-	packageTools := []*indexToolRelease{}
-	for name, tool := range pr.Platform.Package.Tools {
-		for _, toolRelease := range tool.Releases {
-			flavours := []indexToolReleaseFlavour{}
-			for _, flavour := range toolRelease.Flavors {
-				flavours = append(flavours, indexToolReleaseFlavour{
-					OS:              flavour.OS,
-					URL:             flavour.Resource.URL,
-					ArchiveFileName: flavour.Resource.ArchiveFileName,
-					Size:            json.Number(fmt.Sprintf("%d", flavour.Resource.Size)),
-					Checksum:        flavour.Resource.Checksum,
+	// Helper functions: those are needed to build an extract of the package_index.json
+	// that is compatible with the one used by the CLI.
+	// The installed.json is a simplified version of the cores.Packages
+	// and therefore we need to extract the relevant information from the
+	// cores.PlatformRelease and cores.Package structures.
+	extractIndexPackage := func(pack *cores.Package) *indexPackage {
+		packageTools := []*indexToolRelease{}
+		for name, tool := range pack.Tools {
+			for _, toolRelease := range tool.Releases {
+				flavours := []indexToolReleaseFlavour{}
+				for _, flavour := range toolRelease.Flavors {
+					flavours = append(flavours, indexToolReleaseFlavour{
+						OS:              flavour.OS,
+						URL:             flavour.Resource.URL,
+						ArchiveFileName: flavour.Resource.ArchiveFileName,
+						Size:            json.Number(fmt.Sprintf("%d", flavour.Resource.Size)),
+						Checksum:        flavour.Resource.Checksum,
+					})
+				}
+				packageTools = append(packageTools, &indexToolRelease{
+					Name:    name,
+					Version: toolRelease.Version,
+					Systems: flavours,
 				})
 			}
-			packageTools = append(packageTools, &indexToolRelease{
-				Name:    name,
-				Version: toolRelease.Version,
-				Systems: flavours,
-			})
+		}
+		return &indexPackage{
+			Name:       pack.Name,
+			Maintainer: pack.Maintainer,
+			WebsiteURL: pack.WebsiteURL,
+			URL:        pack.URL,
+			Email:      pack.Email,
+			Platforms:  nil,
+			Tools:      packageTools,
+			Help:       indexHelp{Online: pack.Help.Online},
+		}
+	}
+	extractIndexPlatformRelease := func(pr *cores.PlatformRelease) *indexPlatformRelease {
+		boards := []indexBoard{}
+		for _, manifest := range pr.BoardsManifest {
+			board := indexBoard{
+				Name: manifest.Name,
+			}
+			for _, id := range manifest.ID {
+				if id.USB != "" {
+					board.ID = []indexBoardID{{USB: id.USB}}
+				}
+			}
+			boards = append(boards, board)
+		}
+
+		return &indexPlatformRelease{
+			Name:                  pr.Name,
+			Architecture:          pr.Platform.Architecture,
+			Version:               pr.Version,
+			Deprecated:            pr.Deprecated,
+			Category:              pr.Category,
+			URL:                   pr.Resource.URL,
+			ArchiveFileName:       pr.Resource.ArchiveFileName,
+			Checksum:              pr.Resource.Checksum,
+			Size:                  json.Number(fmt.Sprintf("%d", pr.Resource.Size)),
+			Help:                  indexHelp{Online: pr.Help.Online},
+			Boards:                boards,
+			ToolDependencies:      nil,
+			DiscoveryDependencies: nil,
+			MonitorDependencies:   nil,
 		}
 	}
 
+	mainPlatform := extractIndexPlatformRelease(pr)
+	mainPlatform.ToolDependencies = tools
+	mainPlatform.DiscoveryDependencies = discoveries
+	mainPlatform.MonitorDependencies = monitors
+
+	mainPackage := extractIndexPackage(pr.Platform.Package)
+	mainPackage.Platforms = []*indexPlatformRelease{mainPlatform}
+
 	return Index{
 		IsTrusted: pr.IsTrusted,
-		Packages: []*indexPackage{
-			{
-				Name:       pr.Platform.Package.Name,
-				Maintainer: pr.Platform.Package.Maintainer,
-				WebsiteURL: pr.Platform.Package.WebsiteURL,
-				URL:        pr.Platform.Package.URL,
-				Email:      pr.Platform.Package.Email,
-				Platforms: []*indexPlatformRelease{{
-					Name:                  pr.Name,
-					Architecture:          pr.Platform.Architecture,
-					Version:               pr.Version,
-					Deprecated:            pr.Deprecated,
-					Category:              pr.Category,
-					URL:                   pr.Resource.URL,
-					ArchiveFileName:       pr.Resource.ArchiveFileName,
-					Checksum:              pr.Resource.Checksum,
-					Size:                  json.Number(fmt.Sprintf("%d", pr.Resource.Size)),
-					Boards:                boards,
-					Help:                  indexHelp{Online: pr.Help.Online},
-					ToolDependencies:      tools,
-					DiscoveryDependencies: discoveries,
-					MonitorDependencies:   monitors,
-				}},
-				Tools: packageTools,
-				Help:  indexHelp{Online: pr.Platform.Package.Help.Online},
-			},
-		},
+		Packages:  []*indexPackage{mainPackage},
 	}
 }
 
