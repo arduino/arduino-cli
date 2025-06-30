@@ -120,6 +120,11 @@ type Profile struct {
 	Libraries  ProfileRequiredLibraries `yaml:"libraries"`
 }
 
+// UsesSystemPlatform checks if this profile requires a system installed platform.
+func (p *Profile) RequireSystemInstalledPlatform() bool {
+	return p.Platforms[0].RequireSystemInstalledPlatform()
+}
+
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
 	var portConfig *rpc.MonitorPortConfiguration
@@ -206,6 +211,12 @@ type ProfilePlatformReference struct {
 	PlatformIndexURL *url.URL
 }
 
+// RequireSystemInstalledPlatform returns true if the platform reference
+// does not specify a version, meaning it requires the system installed platform.
+func (p *ProfilePlatformReference) RequireSystemInstalledPlatform() bool {
+	return p.Version == nil
+}
+
 // InternalUniqueIdentifier returns the unique identifier for this object
 func (p *ProfilePlatformReference) InternalUniqueIdentifier() string {
 	id := p.String()
@@ -224,7 +235,12 @@ func (p *ProfilePlatformReference) String() string {
 
 // AsYaml outputs the platform reference as Yaml
 func (p *ProfilePlatformReference) AsYaml() string {
-	res := fmt.Sprintf("      - platform: %s:%s (%s)\n", p.Packager, p.Architecture, p.Version)
+	res := ""
+	if p.Version != nil {
+		res += fmt.Sprintf("      - platform: %s:%s (%s)\n", p.Packager, p.Architecture, p.Version)
+	} else {
+		res += fmt.Sprintf("      - platform: %s:%s\n", p.Packager, p.Architecture)
+	}
 	if p.PlatformIndexURL != nil {
 		res += fmt.Sprintf("        platform_index_url: %s\n", p.PlatformIndexURL)
 	}
@@ -232,12 +248,25 @@ func (p *ProfilePlatformReference) AsYaml() string {
 }
 
 func parseNameAndVersion(in string) (string, string, bool) {
-	re := regexp.MustCompile(`^([a-zA-Z0-9.\-_ :]+) \((.+)\)$`)
-	split := re.FindAllStringSubmatch(in, -1)
-	if len(split) != 1 || len(split[0]) != 3 {
-		return "", "", false
+	{
+		// Try to parse the input string in the format "VENDOR:ARCH (VERSION)"
+		re := regexp.MustCompile(`^([a-zA-Z0-9.\-_ :]+) \((.+)\)$`)
+		split := re.FindAllStringSubmatch(in, -1)
+		if len(split) == 1 && len(split[0]) == 3 {
+			return split[0][1], split[0][2], true
+		}
 	}
-	return split[0][1], split[0][2], true
+
+	{
+		// Try to parse the input string in the format "VENDOR:ARCH"
+		re := regexp.MustCompile(`^([a-zA-Z0-9.\-_ :]+)$`)
+		split := re.FindAllStringSubmatch(in, -1)
+		if len(split) == 1 && len(split[0]) == 2 {
+			return split[0][1], "", true
+		}
+	}
+
+	return "", "", false
 }
 
 // UnmarshalYAML decodes a ProfilePlatformReference from YAML source.
@@ -250,14 +279,23 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 		return errors.New(i18n.Tr("missing '%s' directive", "platform"))
 	} else if platformID, platformVersion, ok := parseNameAndVersion(platformID); !ok {
 		return errors.New(i18n.Tr("invalid '%s' directive", "platform"))
-	} else if c, err := semver.Parse(platformVersion); err != nil {
-		return fmt.Errorf("%s: %w", i18n.Tr("error parsing version constraints"), err)
-	} else if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {
-		return fmt.Errorf("%s: %s", i18n.Tr("invalid platform identifier"), platformID)
 	} else {
-		p.Packager = split[0]
-		p.Architecture = split[1]
-		p.Version = c
+		var version *semver.Version
+		if platformVersion != "" {
+			if v, err := semver.Parse(platformVersion); err != nil {
+				return fmt.Errorf("%s: %w", i18n.Tr("error parsing version constraints"), err)
+			} else {
+				version = v
+			}
+		}
+
+		if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {
+			return fmt.Errorf("%s: %s", i18n.Tr("invalid platform identifier"), platformID)
+		} else {
+			p.Packager = split[0]
+			p.Architecture = split[1]
+			p.Version = version
+		}
 	}
 
 	if rawIndexURL, ok := data["platform_index_url"]; ok {
