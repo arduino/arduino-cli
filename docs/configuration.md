@@ -59,7 +59,6 @@ The following are the default directories selected by the Arduino CLI if alterna
 configuration file.
 
 - The `build_cache.path` default is OS-dependent:
-
   - on Linux (and other Unix-based OS) is: if
     [`$XDG_CACHE_HOME`](https://specifications.freedesktop.org/basedir-spec/latest/#variables) is defined,
     `$XDG_CACHE_HOME/arduino`. Otherwise `{HOME}/.config/arduino`.
@@ -67,7 +66,6 @@ configuration file.
   - on MacOS is: `{HOME}/Library/Caches/arduino`
 
 - The `directories.data` default is OS-dependent:
-
   - on Linux (and other Unix-based OS) is: `{HOME}/.arduino15`
   - on Windows is: `{HOME}/AppData/Local/Arduino15`
   - on MacOS is: `{HOME}/Library/Arduino15`

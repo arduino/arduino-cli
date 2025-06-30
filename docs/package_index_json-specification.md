@@ -318,7 +318,6 @@ In general the same tool may be provided by different packagers (for example the
 are as follows:
 
 - The property `{runtime.tools.TOOLNAME.path}` points, in order of priority, to:
-
   1. the tool, version and packager specified via `toolsDependencies` in the `package_index.json`
   1. the highest version of the tool provided by the packager of the current platform
   1. the highest version of the tool provided by the packager of the referenced platform used for compile (see

@@ -2742,7 +2742,6 @@ changes are trivial and falls into the following categories:
 Consumers of the JSON output of the CLI must update their clients if they use one of the following commands:
 
 - in `core search` command the following fields have been renamed:
-
   - `Boards` -> `boards`
   - `Email` -> `email`
   - `ID` -> `id`
@@ -2778,7 +2777,6 @@ Consumers of the JSON output of the CLI must update their clients if they use on
   ```
 
 - in `board details` command the following fields have been renamed:
-
   - `identification_pref` -> `identification_prefs`
   - `usbID` -> `usb_id`
   - `PID` -> `pid`
@@ -2856,7 +2854,6 @@ Consumers of the JSON output of the CLI must update their clients if they use on
   ```
 
 - in `board listall` command the following fields have been renamed:
-
   - `FQBN` -> `fqbn`
   - `Email` -> `email`
   - `ID` -> `id`
@@ -2890,7 +2887,6 @@ Consumers of the JSON output of the CLI must update their clients if they use on
   ```
 
 - in `board search` command the following fields have been renamed:
-
   - `FQBN` -> `fqbn`
   - `Email` -> `email`
   - `ID` -> `id`
@@ -2922,7 +2918,6 @@ Consumers of the JSON output of the CLI must update their clients if they use on
   ```
 
 - in `lib deps` command the following fields have been renamed:
-
   - `versionRequired` -> `version_required`
   - `versionInstalled` -> `version_installed`
 
@@ -2947,7 +2942,6 @@ Consumers of the JSON output of the CLI must update their clients if they use on
   ```
 
 - in `lib search` command the following fields have been renamed:
-
   - `archivefilename` -> `archive_filename`
   - `cachepath` -> `cache_path`
 
@@ -3016,7 +3010,6 @@ Consumers of the JSON output of the CLI must update their clients if they use on
   ```
 
 - in `board list` command the following fields have been renamed:
-
   - `FQBN` -> `fqbn`
   - `VID` -> `vid`
   - `PID` -> `pid`
