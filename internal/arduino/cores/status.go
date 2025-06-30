@@ -50,6 +50,13 @@ type Package struct {
 	Packages   Packages             `json:"-"`
 }
 
+// GetPackage returns the specified Package if it exists
+// and a boolean indicating whether it was found or not.
+func (packages Packages) GetPackage(packager string) (*Package, bool) {
+	targetPackage, ok := packages[packager]
+	return targetPackage, ok
+}
+
 // GetOrCreatePackage returns the specified Package or creates an empty one
 // filling all the cross-references
 func (packages Packages) GetOrCreatePackage(packager string) *Package {

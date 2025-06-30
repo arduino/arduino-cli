@@ -151,6 +151,9 @@ func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 // which in turn contains a single indexPlatformRelease converted from the one
 // passed as argument
 func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
+	// While enumerating the dependencies we also build a set of required packages.
+	requiredPackages := map[string]bool{}
+
 	tools := []indexToolDependency{}
 	for _, t := range pr.ToolDependencies {
 		tools = append(tools, indexToolDependency{
@@ -158,6 +161,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 			Name:     t.ToolName,
 			Version:  t.ToolVersion,
 		})
+		requiredPackages[t.ToolPackager] = true
 	}
 
 	discoveries := []indexDiscoveryDependency{}
@@ -166,6 +170,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 			Packager: d.Packager,
 			Name:     d.Name,
 		})
+		requiredPackages[d.Packager] = true
 	}
 
 	monitors := []indexMonitorDependency{}
@@ -174,6 +179,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 			Packager: m.Packager,
 			Name:     m.Name,
 		})
+		requiredPackages[m.Packager] = true
 	}
 
 	// Helper functions: those are needed to build an extract of the package_index.json
@@ -249,13 +255,22 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	mainPlatform.ToolDependencies = tools
 	mainPlatform.DiscoveryDependencies = discoveries
 	mainPlatform.MonitorDependencies = monitors
+	delete(requiredPackages, pr.Platform.Package.Name)
 
 	mainPackage := extractIndexPackage(pr.Platform.Package)
 	mainPackage.Platforms = []*indexPlatformRelease{mainPlatform}
 
+	packages := []*indexPackage{mainPackage}
+	for requiredPackageName := range requiredPackages {
+		requiredPackage, ok := pr.Platform.Package.Packages.GetPackage(requiredPackageName)
+		if ok {
+			packages = append(packages, extractIndexPackage(requiredPackage))
+		}
+	}
+
 	return Index{
 		IsTrusted: pr.IsTrusted,
-		Packages:  []*indexPackage{mainPackage},
+		Packages:  packages,
 	}
 }
 
