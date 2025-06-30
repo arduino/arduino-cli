@@ -161,6 +161,7 @@ msgid "Alternatives for %[1]s: %[2]s"
 msgstr "%[1]sAlternativas para‎%[2]s:"
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:69
+#: internal/arduino/builder/internal/preprocessor/ctags.go:240
 msgid "An error occurred adding prototypes"
 msgstr "‎Ocorreu um erro ao adicionar os protótipos‎"
 
@@ -3328,6 +3329,10 @@ msgstr ""
 
 #: internal/arduino/libraries/librariesmanager/install.go:342
 msgid "library not valid"
+msgstr ""
+
+#: internal/arduino/builder/internal/preprocessor/ctags.go:241
+msgid "line too long\n"
 msgstr ""
 
 #: internal/arduino/cores/packagemanager/loader.go:255
