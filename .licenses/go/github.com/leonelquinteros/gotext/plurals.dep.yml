@@ -1,13 +1,13 @@
 ---
 name: github.com/leonelquinteros/gotext/plurals
-version: v1.7.1
+version: v1.7.2
 type: go
 summary: Package plurals is the pluralform compiler to get the correct translation
   id of the plural string
 homepage: https://pkg.go.dev/github.com/leonelquinteros/gotext/plurals
 license: other
 licenses:
-- sources: gotext@v1.7.1/LICENSE
+- sources: gotext@v1.7.2/LICENSE
   text: |
     The MIT License (MIT)
 
@@ -64,6 +64,6 @@ licenses:
         ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: gotext@v1.7.1/README.md
+- sources: gotext@v1.7.2/README.md
   text: "[MIT license](LICENSE)"
 notices: []
