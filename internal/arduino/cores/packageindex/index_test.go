@@ -270,6 +270,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 		DiscoveryDependencies: cores.DiscoveryDependencies{
 			{Packager: "arduino", Name: "ble-discovery"},
 			{Packager: "arduino", Name: "serial-discovery"},
+			{Packager: "dev", Name: "dev-discovery"},
 		},
 		MonitorDependencies: cores.MonitorDependencies{
 			{Packager: "arduino", Name: "ble-monitor"},
@@ -299,6 +300,51 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 		},
 	}
 	avrPlatform.Package = arduinoPackage
+
+	dependentPackage := &cores.Package{
+		Name:       "dev",
+		Maintainer: "Arduino Dev",
+		WebsiteURL: "https://arduino.cc/",
+		URL:        "",
+		Email:      "packages@arduino.cc",
+		Help:       cores.PackageHelp{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+		Tools: map[string]*cores.Tool{
+			"dev-discovery": {
+				Name: "dev-discovery",
+				Releases: map[semver.NormalizedString]*cores.ToolRelease{
+					"1.0.0": {
+						Version: semver.ParseRelaxed("1.0.0"),
+						Flavors: []*cores.Flavor{
+							{
+								OS: "arm-linux-gnueabihf",
+								Resource: &resources.DownloadResource{
+									URL:             "dev-discovery-1.0.0-url",
+									ArchiveFileName: "dev-discovery-1.0.0.tar.bz2",
+									Checksum:        "SHA-256:dev-discovery-1.0.0-sha",
+									Size:            201341,
+								},
+							},
+							{
+								OS: "i686-mingw32",
+								Resource: &resources.DownloadResource{
+									URL:             "dev-discovery-1.0.0-other-url",
+									ArchiveFileName: "dev-discovery-1.0.0.tar.gz",
+									Checksum:        "SHA-256:dev-discovery-1.0.0-other-sha",
+									Size:            222918,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	packages := cores.NewPackages()
+	packages[arduinoPackage.Name] = arduinoPackage
+	arduinoPackage.Packages = packages
+	packages[dependentPackage.Name] = dependentPackage
+	dependentPackage.Packages = packages
 
 	expectedIndex := Index{
 		IsTrusted: false,
@@ -332,6 +378,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				DiscoveryDependencies: []indexDiscoveryDependency{
 					{Packager: "arduino", Name: "ble-discovery"},
 					{Packager: "arduino", Name: "serial-discovery"},
+					{Packager: "dev", Name: "dev-discovery"},
 				},
 				MonitorDependencies: []indexMonitorDependency{
 					{Packager: "arduino", Name: "ble-monitor"},
@@ -496,6 +543,35 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 							ArchiveFileName: "gcc-arm-none-eabi-7-2018-q2-update-linuxarm64.tar.bz2",
 							Size:            "99558726",
 							Checksum:        "SHA-256:6fb5752fb4d11012bd0a1ceb93a19d0641ff7cf29d289b3e6b86b99768e66f76",
+						},
+					},
+				},
+			},
+		}, {
+			Name:       "dev",
+			Maintainer: "Arduino Dev",
+			WebsiteURL: "https://arduino.cc/",
+			URL:        "",
+			Email:      "packages@arduino.cc",
+			Help:       indexHelp{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+			Tools: []*indexToolRelease{
+				{
+					Name:    "dev-discovery",
+					Version: semver.ParseRelaxed("1.0.0"),
+					Systems: []indexToolReleaseFlavour{
+						{
+							OS:              "arm-linux-gnueabihf",
+							URL:             "dev-discovery-1.0.0-url",
+							ArchiveFileName: "dev-discovery-1.0.0.tar.bz2",
+							Checksum:        "SHA-256:dev-discovery-1.0.0-sha",
+							Size:            "201341",
+						},
+						{
+							OS:              "i686-mingw32",
+							URL:             "dev-discovery-1.0.0-other-url",
+							ArchiveFileName: "dev-discovery-1.0.0.tar.gz",
+							Checksum:        "SHA-256:dev-discovery-1.0.0-other-sha",
+							Size:            "222918",
 						},
 					},
 				},
