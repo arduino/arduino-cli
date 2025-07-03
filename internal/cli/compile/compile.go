@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -323,22 +324,23 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			// Output profile
 
 			libs := ""
-			hasVendoredLibs := false
 			for _, lib := range builderRes.GetUsedLibraries() {
 				if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
 					continue
 				}
-				if lib.GetVersion() == "" {
-					hasVendoredLibs = true
-					continue
+				if lib.GetVersion() == "" || lib.Location == rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
+					libDir := paths.New(lib.GetInstallDir())
+					// If the library is installed in the sketch path, we want to output the relative path
+					// to the sketch path, so that the sketch is portable.
+					if ok, err := libDir.IsInsideDir(sketchPath); err == nil && ok {
+						if ref, err := libDir.RelFrom(sketchPath); err == nil {
+							libDir = paths.New(filepath.ToSlash(ref.String()))
+						}
+					}
+					libs += fmt.Sprintln("      - dir: " + libDir.String())
+				} else {
+					libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
 				}
-				libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
-			}
-			if hasVendoredLibs {
-				msg := "\n"
-				msg += i18n.Tr("WARNING: The sketch is compiled using one or more custom libraries.") + "\n"
-				msg += i18n.Tr("Currently, Build Profiles only support libraries available through Arduino Library Manager.")
-				feedback.Warning(msg)
 			}
 
 			newProfileName := "my_profile_name"

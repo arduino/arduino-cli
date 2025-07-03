@@ -363,6 +363,24 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	} else {
 		// Load libraries required for profile
 		for _, libraryRef := range profile.Libraries {
+			if libraryRef.InstallDir != nil {
+				libDir := libraryRef.InstallDir
+				if !libDir.IsAbs() {
+					libDir = paths.New(req.GetSketchPath()).JoinPath(libraryRef.InstallDir)
+				}
+				if !libDir.IsDir() {
+					return &cmderrors.InvalidArgumentError{
+						Message: i18n.Tr("Invalid library directory in sketch project: %s", libraryRef.InstallDir),
+					}
+				}
+				lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
+					Path:            libDir,
+					Location:        libraries.Unmanaged,
+					IsSingleLibrary: true,
+				})
+				continue
+			}
+
 			uid := libraryRef.InternalUniqueIdentifier()
 			libRoot := s.settings.ProfilesCacheDir().Join(uid)
 			libDir := libRoot.Join(libraryRef.Library)
