@@ -28,9 +28,9 @@ profiles:
     fqbn: <FQBN>
     programmer: <PROGRAMMER>
     platforms:
-      - platform: <PLATFORM> (<PLATFORM_VERSION>)
+      - platform: <PLATFORM> [(<PLATFORM_VERSION>)]
         platform_index_url: <3RD_PARTY_PLATFORM_URL>
-      - platform: <PLATFORM_DEPENDENCY> (<PLATFORM_DEPENDENCY_VERSION>)
+      - platform: <PLATFORM_DEPENDENCY> [(<PLATFORM_DEPENDENCY_VERSION>)]
         platform_index_url: <3RD_PARTY_PLATFORM_DEPENDENCY_URL>
     libraries:
       - <INDEX_LIB_NAME> (<INDEX_LIB_VERSION>)
@@ -72,6 +72,14 @@ The following fields are available since Arduino CLI 1.1.0:
   used in the `monitor` command. Typically is used to set the baudrate for the serial port (for example
   `baudrate: 115200`) but any setting/value can be specified. Multiple settings can be set. These fields are optional.
 - `<PORT_PROTOCOL>` is the protocol for the port used to upload and monitor the board. This field is optional.
+
+#### Using a system-installed platform.
+
+The fields `<PLATFORM_VERSION>` and `<PLATFORM_DEPENDENCY_VERSION>` are optional, if they are omitted, the sketch
+compilation will use the platforms installed system-wide. This could be helpful during the development of a platform
+(where a specific release is not yet available), or if a specific version of a platform is not a strict requirement.
+
+#### An example of a complete project file.
 
 A complete example of a sketch project file may be the following:
 
