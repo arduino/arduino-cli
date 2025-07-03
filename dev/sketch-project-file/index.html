@@ -1459,7 +1459,11 @@ multiple profiles.</p>
 <li>The target core platform name and version (with the 3rd party platform index URL if needed)</li>
 <li>A possible core platform name and version, that is a dependency of the target core platform (with the 3rd party
   platform index URL if needed)</li>
-<li>The libraries used in the sketch (including their version)</li>
+<li>A list of libraries used in the sketch. Each library could be:<ul>
+<li>a library taken from the Arduino Libraries Index</li>
+<li>a library installed anywhere in the filesystem</li>
+</ul>
+</li>
 <li>The port and protocol to upload the sketch and monitor the board</li>
 </ul>
 <p>The format of the file is the following:</p>
@@ -1474,9 +1478,8 @@ multiple profiles.</p>
       - platform: &lt;PLATFORM_DEPENDENCY&gt; (&lt;PLATFORM_DEPENDENCY_VERSION&gt;)
         platform_index_url: &lt;3RD_PARTY_PLATFORM_DEPENDENCY_URL&gt;
     libraries:
-      - &lt;LIB_NAME&gt; (&lt;LIB_VERSION&gt;)
-      - &lt;LIB_NAME&gt; (&lt;LIB_VERSION&gt;)
-      - &lt;LIB_NAME&gt; (&lt;LIB_VERSION&gt;)
+      - &lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)
+      - dir: &lt;LOCAL_LIB_PATH&gt;
     port: &lt;PORT_NAME&gt;
     port_config:
       &lt;PORT_SETTING_NAME&gt;: &lt;PORT_SETTING_VALUE&gt;
@@ -1496,8 +1499,14 @@ otherwise below). The available fields are:</p>
 <li><code>&lt;PLATFORM_DEPENDENCY&gt;</code>, <code>&lt;PLATFORM_DEPENDENCY_VERSION&gt;</code>, and <code>&lt;3RD_PARTY_PLATFORM_DEPENDENCY_URL&gt;</code> contains the same
   information as <code>&lt;PLATFORM&gt;</code>, <code>&lt;PLATFORM_VERSION&gt;</code>, and <code>&lt;3RD_PARTY_PLATFORM_URL&gt;</code> respectively but for the core
   platform dependency of the main core platform. These fields are optional.</li>
-<li><code>libraries:</code> is a section where the required libraries to build the project are defined. This section is optional.</li>
-<li><code>&lt;LIB_VERSION&gt;</code> is the version required for the library, for example, <code>1.0.0</code>.</li>
+<li><code>libraries:</code> is a section where the required libraries to build the project are defined. This section is optional.<ul>
+<li><code>&lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)</code> represents a library from the Arduino Libraries Index, for example,
+  <code>MyLib (1.0.0)</code>.</li>
+<li><code>dir: &lt;LOCAL_LIB_PATH&gt;</code> represents a library installed in the filesystem and <code>&lt;LOCAL_LIB_PATH&gt;</code> is the path to the
+  library. The path could be absolute or relative to the sketch folder. This option is available since Arduino CLI
+  1.3.0.</li>
+</ul>
+</li>
 <li><code>&lt;USER_NOTES&gt;</code> is a free text string available to the developer to add comments. This field is optional.</li>
 <li><code>&lt;PROGRAMMER&gt;</code> is the programmer that will be used. This field is optional.</li>
 </ul>
