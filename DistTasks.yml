@@ -24,57 +24,41 @@ vars:
 tasks:
   Windows_32bit:
     desc: Builds Windows 32 bit binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=windows GOARCH=386 {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_386"
       BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}"
-      BUILD_PLATFORM: "windows/386"
-      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Windows_32bit"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.zip"
 
   Windows_64bit:
     desc: Builds Windows 64 bit binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=windows GOARCH=amd64 {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_amd64"
       BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}"
-      BUILD_PLATFORM: "windows/amd64"
-      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Windows_64bit"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.zip"
 
   Linux_32bit:
     desc: Builds Linux 32 bit binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=linux GOARCH=386 {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
       - task: build_deb
         vars:
@@ -84,22 +68,16 @@ tasks:
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd32"
       BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
-      BUILD_PLATFORM: "linux/386"
-      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Linux_32bit"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   Linux_64bit:
     desc: Builds Linux 64 bit binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
       - task: build_deb
         vars:
@@ -109,22 +87,16 @@ tasks:
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd64"
       BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
-      BUILD_PLATFORM: "linux/amd64"
-      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Linux_64bit"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   Linux_ARMv7:
     desc: Builds Linux ARMv7 binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=linux GOARM=7 GOARCH=arm {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
       - task: build_deb
         vars:
@@ -134,22 +106,16 @@ tasks:
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_7"
       BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
-      BUILD_PLATFORM: "linux/armv7"
-      CONTAINER_TAG: "{{.GO_VERSION}}-armhf"
       PACKAGE_PLATFORM: "Linux_ARMv7"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   Linux_ARMv6:
     desc: Builds Linux ARMv6 binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=linux GOARM=6 GOARCH=arm {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
       - task: build_deb
         vars:
@@ -159,22 +125,16 @@ tasks:
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_6"
       BUILD_COMMAND: "go build -buildvcs=false -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
-      BUILD_PLATFORM: "linux/armv6"
-      CONTAINER_TAG: "{{.GO_VERSION}}-armel-debian12"
       PACKAGE_PLATFORM: "Linux_ARMv6"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   Linux_ARM64:
     desc: Builds Linux ARM64 binaries
-    dir: "{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
-        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
-        --build-cmd "{{.BUILD_COMMAND}}" \
-        -p "{{.BUILD_PLATFORM}}"
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 {{.BUILD_COMMAND}}
 
+        cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
       - task: build_deb
         vars:
@@ -184,8 +144,6 @@ tasks:
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_64"
       BUILD_COMMAND: "go build -buildvcs=false -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
-      BUILD_PLATFORM: "linux/arm64"
-      CONTAINER_TAG: "{{.GO_VERSION}}-arm-debian12"
       PACKAGE_PLATFORM: "Linux_ARM64"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
