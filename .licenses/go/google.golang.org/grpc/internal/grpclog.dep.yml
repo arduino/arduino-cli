@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal/grpclog
-version: v1.72.0
+version: v1.73.0
 type: go
 summary: Package grpclog provides logging functionality for internal gRPC packages,
   outside of the functionality provided by the external `grpclog` package.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/grpclog
 license: apache-2.0
 licenses:
-- sources: grpc@v1.72.0/LICENSE
+- sources: grpc@v1.73.0/LICENSE
   text: |2
 
                                      Apache License
