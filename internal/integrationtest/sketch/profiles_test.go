@@ -51,11 +51,11 @@ func TestSketchProfileDump(t *testing.T) {
 	// Install the required core and libraries
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "Adafruit BusIO@1.17.1")
+	_, _, err = cli.Run("lib", "install", "Adafruit BusIO@1.17.1", "--no-overwrite")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "Adafruit GFX Library@1.12.1")
+	_, _, err = cli.Run("lib", "install", "Adafruit GFX Library@1.12.1", "--no-overwrite")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "Adafruit SSD1306@2.5.14")
+	_, _, err = cli.Run("lib", "install", "Adafruit SSD1306@2.5.14", "--no-overwrite")
 	require.NoError(t, err)
 
 	// Check if the profile dump:
