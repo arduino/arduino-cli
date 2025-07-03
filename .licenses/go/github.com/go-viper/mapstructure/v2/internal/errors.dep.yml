@@ -1,12 +1,12 @@
 ---
 name: github.com/go-viper/mapstructure/v2/internal/errors
-version: v2.2.1
+version: v2.3.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/go-viper/mapstructure/v2/internal/errors
 license: mit
 licenses:
-- sources: v2@v2.2.1/LICENSE
+- sources: v2@v2.3.0/LICENSE
   text: |
     The MIT License (MIT)
 
@@ -29,6 +29,6 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
-- sources: v2@v2.2.1/README.md
+- sources: v2@v2.3.0/README.md
   text: The project is licensed under the [MIT License](LICENSE).
 notices: []
