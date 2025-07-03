@@ -187,6 +187,20 @@ func (p *ProfileRequiredPlatforms) AsYaml() string {
 	return res
 }
 
+func (p *ProfileRequiredPlatforms) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	_p := (*[]*ProfilePlatformReference)(p)
+	if err := unmarshal(_p); err != nil {
+		return err
+	}
+	requireSystemPlatform := (*_p)[0].RequireSystemInstalledPlatform()
+	for _, platform := range *_p {
+		if platform.RequireSystemInstalledPlatform() != requireSystemPlatform {
+			return errors.New(i18n.Tr("all platforms in a profile must either require a specific version or not"))
+		}
+	}
+	return nil
+}
+
 // ProfileRequiredLibraries is a list of ProfileLibraryReference (libraries
 // required to build the sketch using this profile)
 type ProfileRequiredLibraries []*ProfileLibraryReference

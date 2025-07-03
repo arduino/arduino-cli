@@ -47,4 +47,9 @@ func TestProjectFileLoading(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, string(golden), proj.AsYaml())
 	}
+	{
+		sketchProj := paths.New("testdata", "profiles", "bad_profile_1.yml")
+		_, err := LoadProjectFile(sketchProj)
+		require.Error(t, err)
+	}
 }
