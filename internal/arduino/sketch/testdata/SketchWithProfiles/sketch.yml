@@ -9,6 +9,12 @@ profiles:
       - Arduino_ConnectionHandler (0.6.4)
       - TinyDHT sensor library (1.1.0)
 
+  nanorp_nolib:
+    fqbn: arduino:mbed_nano:nanorp2040connect
+    programmer: p1
+    platforms:
+      - platform: arduino:mbed_nano (2.1.0)
+
   another_profile_name:
     notes: testing the limit of the AVR platform, may be unstable
     fqbn: arduino:avr:uno
