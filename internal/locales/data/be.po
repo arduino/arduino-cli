@@ -161,6 +161,7 @@ msgid "Alternatives for %[1]s: %[2]s"
 msgstr "Варыянт для %[1]s: %[2]s"
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:69
+#: internal/arduino/builder/internal/preprocessor/ctags.go:240
 msgid "An error occurred adding prototypes"
 msgstr "Адбылася памылка пры даданні прататыпаў"
 
@@ -3402,6 +3403,10 @@ msgstr "бібліятэка %s ужо ўсталяваная"
 #: internal/arduino/libraries/librariesmanager/install.go:342
 msgid "library not valid"
 msgstr "бібліятэка несапраўдная"
+
+#: internal/arduino/builder/internal/preprocessor/ctags.go:241
+msgid "line too long\n"
+msgstr ""
 
 #: internal/arduino/cores/packagemanager/loader.go:255
 #: internal/arduino/cores/packagemanager/loader.go:268
