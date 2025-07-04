@@ -33,6 +33,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// LoadGlobalHardwareForProfile loads the hardware platforms for the given profile.
+// It uses the global package manager and does not download or install any missing tools or platforms.
+func (pmb *Builder) LoadGlobalHardwareForProfile(p *sketch.Profile) []error {
+	pmb.profile = p
+	return pmb.LoadHardware()
+}
+
 // LoadHardwareForProfile load the hardware platforms for the given profile.
 // If installMissing is true then possibly missing tools and platforms will be downloaded and installed.
 func (pmb *Builder) LoadHardwareForProfile(ctx context.Context, p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) []error {

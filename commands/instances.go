@@ -248,6 +248,11 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
 			}
+		} else if profile.RequireSystemInstalledPlatform() {
+			for _, err := range pmb.LoadGlobalHardwareForProfile(profile) {
+				s := &cmderrors.PlatformLoadingError{Cause: err}
+				responseError(s.GRPCStatus())
+			}
 		} else {
 			// Load platforms from profile
 			errs := pmb.LoadHardwareForProfile(ctx, profile, true, downloadCallback, taskCallback, s.settings)
