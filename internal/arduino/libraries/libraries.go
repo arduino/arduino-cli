@@ -25,6 +25,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -78,6 +79,7 @@ type Library struct {
 	License                string
 	Properties             *properties.Map
 	Examples               paths.PathList
+	Dependencies           []*Dependency
 	declaredHeaders        []string
 	sourceHeaders          []string
 	CompatibleWith         map[string]bool
@@ -142,6 +144,13 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		Examples:          library.Examples.AsStrings(),
 		ProvidesIncludes:  headers,
 		CompatibleWith:    library.CompatibleWith,
+		Dependencies: f.Map(library.Dependencies, func(d *Dependency) *rpc.LibraryDependency {
+			dep := &rpc.LibraryDependency{Name: d.GetName()}
+			if d.GetConstraint() != nil {
+				dep.VersionConstraint = d.GetConstraint().String()
+			}
+			return dep
+		}),
 	}, nil
 }
 
@@ -238,4 +247,20 @@ func (library *Library) SourceHeaders() ([]string, error) {
 		library.sourceHeaders = res
 	}
 	return library.sourceHeaders, nil
+}
+
+// Dependency is a library dependency
+type Dependency struct {
+	Name              string
+	VersionConstraint semver.Constraint
+}
+
+// GetName returns the name of the dependency
+func (r *Dependency) GetName() string {
+	return r.Name
+}
+
+// GetConstraint returns the version Constraint of the dependecy
+func (r *Dependency) GetConstraint() semver.Constraint {
+	return r.VersionConstraint
 }
