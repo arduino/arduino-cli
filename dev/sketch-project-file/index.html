@@ -1198,6 +1198,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#using-a-system-installed-platform" class="md-nav__link">
+    Using a system-installed platform.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#an-example-of-a-complete-project-file" class="md-nav__link">
+    An example of a complete project file.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#building-a-sketch" class="md-nav__link">
     Building a sketch
   </a>
@@ -1403,6 +1417,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#using-a-system-installed-platform" class="md-nav__link">
+    Using a system-installed platform.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#an-example-of-a-complete-project-file" class="md-nav__link">
+    An example of a complete project file.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#building-a-sketch" class="md-nav__link">
     Building a sketch
   </a>
@@ -1473,9 +1501,9 @@ multiple profiles.</p>
     fqbn: &lt;FQBN&gt;
     programmer: &lt;PROGRAMMER&gt;
     platforms:
-      - platform: &lt;PLATFORM&gt; (&lt;PLATFORM_VERSION&gt;)
+      - platform: &lt;PLATFORM&gt; [(&lt;PLATFORM_VERSION&gt;)]
         platform_index_url: &lt;3RD_PARTY_PLATFORM_URL&gt;
-      - platform: &lt;PLATFORM_DEPENDENCY&gt; (&lt;PLATFORM_DEPENDENCY_VERSION&gt;)
+      - platform: &lt;PLATFORM_DEPENDENCY&gt; [(&lt;PLATFORM_DEPENDENCY_VERSION&gt;)]
         platform_index_url: &lt;3RD_PARTY_PLATFORM_DEPENDENCY_URL&gt;
     libraries:
       - &lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)
@@ -1519,6 +1547,11 @@ otherwise below). The available fields are:</p>
   <code>baudrate: 115200</code>) but any setting/value can be specified. Multiple settings can be set. These fields are optional.</li>
 <li><code>&lt;PORT_PROTOCOL&gt;</code> is the protocol for the port used to upload and monitor the board. This field is optional.</li>
 </ul>
+<h4 id="using-a-system-installed-platform">Using a system-installed platform.<a class="headerlink" href="#using-a-system-installed-platform" title="Permanent link">&para;</a></h4>
+<p>The fields <code>&lt;PLATFORM_VERSION&gt;</code> and <code>&lt;PLATFORM_DEPENDENCY_VERSION&gt;</code> are optional, if they are omitted, the sketch
+compilation will use the platforms installed system-wide. This could be helpful during the development of a platform
+(where a specific release is not yet available), or if a specific version of a platform is not a strict requirement.</p>
+<h4 id="an-example-of-a-complete-project-file">An example of a complete project file.<a class="headerlink" href="#an-example-of-a-complete-project-file" title="Permanent link">&para;</a></h4>
 <p>A complete example of a sketch project file may be the following:</p>
 <div class="highlight"><pre><span></span><code>profiles:
   nanorp:
