@@ -172,6 +172,7 @@ const (
 	LibraryLocationPlatformBuiltin           LibraryLocation = "platform"
 	LibraryLocationReferencedPlatformBuiltin LibraryLocation = "ref-platform"
 	LibraryLocationUnmanged                  LibraryLocation = "unmanaged"
+	LibraryLocationProfile                   LibraryLocation = "profile"
 )
 
 func NewLibraryLocation(r rpc.LibraryLocation) LibraryLocation {
@@ -186,6 +187,8 @@ func NewLibraryLocation(r rpc.LibraryLocation) LibraryLocation {
 		return LibraryLocationUser
 	case rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED:
 		return LibraryLocationUnmanged
+	case rpc.LibraryLocation_LIBRARY_LOCATION_PROFILE:
+		return LibraryLocationProfile
 	}
 	return LibraryLocationIDEBuiltin
 }
