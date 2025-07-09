@@ -50,6 +50,7 @@ func TestLibLayoutAndLocationJSONUnMarshaler(t *testing.T) {
 	testLocation(ReferencedPlatformBuiltIn)
 	testLocation(User)
 	testLocation(Unmanaged)
+	testLocation(Sketch)
 }
 
 func TestLibrariesLoader(t *testing.T) {
