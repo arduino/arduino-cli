@@ -275,7 +275,9 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
 		}
 
-		for _, library := range l.librariesManager.FindAllInstalled() {
+		allInstalledSorted := l.librariesManager.FindAllInstalled()
+		allInstalledSorted.SortByName() // Sort libraries to ensure consistent ordering
+		for _, library := range allInstalledSorted {
 			if library.Location == libraries.Profile {
 				l.logger.Info(i18n.Tr("The library %[1]s has been automatically added from sketch project.", library.Name))
 				l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
