@@ -86,6 +86,7 @@ jobs:
 
       - uses: bufbuild/buf-action@v1
         with:
+          token: ${{ secrets.BUF_TOKEN }}
           pr_comment: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           lint: ${{ github.event_name == 'pull_request' }}
           format: ${{ github.event_name == 'pull_request' }}
