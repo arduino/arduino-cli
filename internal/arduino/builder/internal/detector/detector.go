@@ -23,12 +23,12 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
-	"slices"
 	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
@@ -52,6 +52,7 @@ type SketchLibrariesDetector struct {
 	librariesManager              *librariesmanager.LibrariesManager
 	librariesResolver             *librariesresolver.Cpp
 	useCachedLibrariesResolution  bool
+	cache                         *detectorCache
 	onlyUpdateCompilationDatabase bool
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
@@ -73,6 +74,7 @@ func NewSketchLibrariesDetector(
 		librariesManager:              lm,
 		librariesResolver:             libsResolver,
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
+		cache:                         newDetectorCache(),
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
 		importedLibraries:             libraries.List{},
 		includeFolders:                paths.PathList{},
@@ -132,10 +134,25 @@ func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 	return l.importedLibraries
 }
 
-// AppendImportedLibraries todo should rename this, probably after refactoring the
-// container_find_includes command.
-func (l *SketchLibrariesDetector) AppendImportedLibraries(library *libraries.Library) {
+// addAndBuildLibrary adds the given library to the imported libraries list and queues its source files
+// for further processing.
+func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSourceFileQueue, librariesBuildPath *paths.Path, library *libraries.Library) {
 	l.importedLibraries = append(l.importedLibraries, library)
+	if library.Precompiled && library.PrecompiledWithSources {
+		// Fully precompiled libraries should have no dependencies to avoid ABI breakage
+		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+			l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+		}
+	} else {
+		for _, sourceDir := range library.SourceDirs() {
+			l.queueSourceFilesFromFolder(
+				sourceFileQueue,
+				sourceDir.Dir, sourceDir.Recurse,
+				library.SourceDir,
+				librariesBuildPath.Join(library.DirName),
+				library.UtilityDir)
+		}
+	}
 }
 
 // PrintUsedAndNotUsedLibraries todo
@@ -169,28 +186,15 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 	time.Sleep(100 * time.Millisecond)
 }
 
-// IncludeFolders fixdoc
+// IncludeFolders returns the list of include folders detected as needed.
 func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
-	// TODO should we do a deep copy?
 	return l.includeFolders
 }
 
-// appendIncludeFolder todo should rename this, probably after refactoring the
-// container_find_includes command.
-// Original comment:
-// Append the given folder to the include path and match or append it to
-// the cache. sourceFilePath and include indicate the source of this
-// include (e.g. what #include line in what file it was resolved from)
-// and should be the empty string for the default include folders, like
-// the core or variant.
-func (l *SketchLibrariesDetector) appendIncludeFolder(
-	cache *includeCache,
-	sourceFilePath *paths.Path,
-	include string,
-	folder *paths.Path,
-) {
+// addIncludeFolder add the given folder to the include path.
+func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	l.includeFolders = append(l.includeFolders, folder)
-	cache.ExpectEntry(sourceFilePath, include, folder)
+	l.cache.Expect(&detectorCacheEntry{AddedIncludePath: folder})
 }
 
 // FindIncludes todo
@@ -246,11 +250,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 	}
 
 	cachePath := buildPath.Join("includes.cache")
-	cache := readCache(cachePath)
+	if err := l.cache.Load(cachePath); err != nil {
+		l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
+	}
 
-	l.appendIncludeFolder(cache, nil, "", buildCorePath)
+	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
-		l.appendIncludeFolder(cache, nil, "", buildVariantPath)
+		l.addIncludeFolder(buildVariantPath)
 	}
 
 	sourceFileQueue := &uniqueSourceFileQueue{}
@@ -261,7 +267,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err != nil {
 			return err
 		}
-		sourceFileQueue.push(mergedfile)
+		sourceFileQueue.Push(mergedfile)
 
 		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath)
 		srcSubfolderPath := sketchBuildPath.Join("src")
@@ -269,8 +275,18 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
 		}
 
-		for !sourceFileQueue.empty() {
-			err := l.findIncludesUntilDone(ctx, cache, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
+		allInstalledSorted := l.librariesManager.FindAllInstalled()
+		allInstalledSorted.SortByName() // Sort libraries to ensure consistent ordering
+		for _, library := range allInstalledSorted {
+			if library.Location == libraries.Profile {
+				l.logger.Info(i18n.Tr("The library %[1]s has been automatically added from sketch project.", library.Name))
+				l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+				l.addIncludeFolder(library.SourceDir)
+			}
+		}
+
+		for !sourceFileQueue.Empty() {
+			err := l.findMissingIncludesInCompilationUnit(ctx, sourceFileQueue, buildProperties, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
 				return err
@@ -278,8 +294,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 
 		// Finalize the cache
-		cache.ExpectEnd()
-		if err := writeCache(cache, cachePath); err != nil {
+		if err := l.cache.Save(cachePath); err != nil {
 			return err
 		}
 	}
@@ -297,15 +312,14 @@ func (l *SketchLibrariesDetector) findIncludes(
 	return nil
 }
 
-func (l *SketchLibrariesDetector) findIncludesUntilDone(
+func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	ctx context.Context,
-	cache *includeCache,
 	sourceFileQueue *uniqueSourceFileQueue,
 	buildProperties *properties.Map,
 	librariesBuildPath *paths.Path,
 	platformArch string,
 ) error {
-	sourceFile := sourceFileQueue.pop()
+	sourceFile := sourceFileQueue.Pop()
 	sourcePath := sourceFile.SourcePath()
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath()
@@ -330,7 +344,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 
 	first := true
 	for {
-		cache.ExpectFile(sourcePath)
+		l.cache.Expect(&detectorCacheEntry{CompilingSourcePath: sourcePath})
 
 		// Libraries may require the "utility" directory to be added to the include
 		// search path, but only for the source code of the library, so we temporary
@@ -342,49 +356,51 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		}
 
 		var preprocErr error
-		var preprocFirstResult preprocessor.Result
+		var preprocFirstResult *runner.Result
 
 		var missingIncludeH string
-		if unchanged && cache.valid {
-			missingIncludeH = cache.Next().Include
+		if entry := l.cache.Peek(); unchanged && entry != nil && entry.MissingIncludeH != nil {
+			missingIncludeH = *entry.MissingIncludeH
 			if first && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
+			first = false
 		} else {
 			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-				l.logger.WriteStdout(preprocFirstResult.Stdout())
+				l.logger.WriteStdout(preprocFirstResult.Stdout)
 			}
 			// Unwrap error and see if it is an ExitError.
 			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || preprocFirstResult.Stderr() == nil {
+			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || len(preprocFirstResult.Stderr) == 0 {
 				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return preprocErr
 			} else {
-				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr()))
+				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr))
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
 
+		l.cache.Expect(&detectorCacheEntry{MissingIncludeH: &missingIncludeH})
+
 		if missingIncludeH == "" {
 			// No missing includes found, we're done
-			cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
 		library := l.resolveLibrary(missingIncludeH, platformArch)
 		if library == nil {
 			// Library could not be resolved, show error
-			if preprocErr == nil || preprocFirstResult.Stderr() == nil {
+			if preprocErr == nil || len(preprocFirstResult.Stderr) == 0 {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				result, err := preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
 				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-					l.logger.WriteStdout(result.Stdout())
+					l.logger.WriteStdout(result.Stdout)
 				}
 				if err == nil {
 					// If there is a missing #include in the cache, but running
@@ -393,33 +409,20 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 					// deleted, so hopefully the next compilation will succeed.
 					return errors.New(i18n.Tr("Internal error in cache"))
 				}
-				l.diagnosticStore.Parse(result.Args(), result.Stderr())
-				l.logger.WriteStderr(result.Stderr())
+				l.diagnosticStore.Parse(result.Args, result.Stderr)
+				l.logger.WriteStderr(result.Stderr)
 				return err
 			}
-			l.diagnosticStore.Parse(preprocFirstResult.Args(), preprocFirstResult.Stderr())
-			l.logger.WriteStderr(preprocFirstResult.Stderr())
+			l.diagnosticStore.Parse(preprocFirstResult.Args, preprocFirstResult.Stderr)
+			l.logger.WriteStderr(preprocFirstResult.Stderr)
 			return preprocErr
 		}
 
 		// Add this library to the list of libraries, the
 		// include path and queue its source files for further
 		// include scanning
-		l.AppendImportedLibraries(library)
-		l.appendIncludeFolder(cache, sourcePath, missingIncludeH, library.SourceDir)
-
-		if library.Precompiled && library.PrecompiledWithSources {
-			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
-			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-				l.logger.Info(i18n.Tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
-			}
-		} else {
-			for _, sourceDir := range library.SourceDirs() {
-				l.queueSourceFilesFromFolder(sourceFileQueue, sourceDir.Dir, sourceDir.Recurse,
-					library.SourceDir, librariesBuildPath.Join(library.DirName), library.UtilityDir)
-			}
-		}
-		first = false
+		l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+		l.addIncludeFolder(library.SourceDir)
 	}
 }
 
@@ -445,7 +448,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 		if err != nil {
 			return err
 		}
-		sourceFileQueue.push(sourceFile)
+		sourceFileQueue.Push(sourceFile)
 	}
 
 	return nil
@@ -499,97 +502,6 @@ func findIncludeForOldCompilers(source string) string {
 		}
 	}
 	return ""
-}
-
-type sourceFile struct {
-	// Path to the source file within the sketch/library root folder
-	relativePath *paths.Path
-
-	// ExtraIncludePath contains an extra include path that must be
-	// used to compile this source file.
-	// This is mainly used for source files that comes from old-style libraries
-	// (Arduino IDE <1.5) requiring an extra include path to the "utility" folder.
-	extraIncludePath *paths.Path
-
-	// The source root for the given origin, where its source files
-	// can be found. Prepending this to SourceFile.RelativePath will give
-	// the full path to that source file.
-	sourceRoot *paths.Path
-
-	// The build root for the given origin, where build products will
-	// be placed. Any directories inside SourceFile.RelativePath will be
-	// appended here.
-	buildRoot *paths.Path
-}
-
-// Equals fixdoc
-func (f *sourceFile) Equals(g *sourceFile) bool {
-	return f.relativePath.EqualsTo(g.relativePath) &&
-		f.buildRoot.EqualsTo(g.buildRoot) &&
-		f.sourceRoot.EqualsTo(g.sourceRoot)
-}
-
-// makeSourceFile containing the given source file path within the
-// given origin. The given path can be absolute, or relative within the
-// origin's root source folder
-func makeSourceFile(
-	sourceDir *paths.Path,
-	buildDir *paths.Path,
-	sourceFilePath *paths.Path,
-	extraIncludePath ...*paths.Path,
-) (*sourceFile, error) {
-	res := &sourceFile{
-		buildRoot:  buildDir,
-		sourceRoot: sourceDir,
-	}
-
-	if len(extraIncludePath) > 1 {
-		panic("only one extra include path allowed")
-	}
-	if len(extraIncludePath) > 0 {
-		res.extraIncludePath = extraIncludePath[0]
-	}
-	// switch o := origin.(type) {
-	// case *sketch.Sketch:
-	// 	res.buildRoot = sketchBuildPath
-	// 	res.sourceRoot = sketchBuildPath
-	// case *libraries.Library:
-	// 	res.buildRoot = librariesBuildPath.Join(o.DirName)
-	// 	res.sourceRoot = o.SourceDir
-	// 	res.extraIncludePath = o.UtilityDir
-	// default:
-	// 	panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
-	// }
-
-	if sourceFilePath.IsAbs() {
-		var err error
-		sourceFilePath, err = res.sourceRoot.RelTo(sourceFilePath)
-		if err != nil {
-			return nil, err
-		}
-	}
-	res.relativePath = sourceFilePath
-	return res, nil
-}
-
-// ExtraIncludePath fixdoc
-func (f *sourceFile) ExtraIncludePath() *paths.Path {
-	return f.extraIncludePath
-}
-
-// SourcePath fixdoc
-func (f *sourceFile) SourcePath() *paths.Path {
-	return f.sourceRoot.JoinPath(f.relativePath)
-}
-
-// ObjectPath fixdoc
-func (f *sourceFile) ObjectPath() *paths.Path {
-	return f.buildRoot.Join(f.relativePath.String() + ".o")
-}
-
-// DepfilePath fixdoc
-func (f *sourceFile) DepfilePath() *paths.Path {
-	return f.buildRoot.Join(f.relativePath.String() + ".d")
 }
 
 // LibrariesLoader todo
@@ -668,138 +580,4 @@ func LibrariesLoader(
 	allLibs := lm.FindAllInstalled()
 	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
-}
-
-type includeCacheEntry struct {
-	Sourcefile  *paths.Path
-	Include     string
-	Includepath *paths.Path
-}
-
-// String fixdoc
-func (entry *includeCacheEntry) String() string {
-	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
-		entry.Sourcefile, entry.Include, entry.Includepath)
-}
-
-// Equals fixdoc
-func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
-	return entry.String() == other.String()
-}
-
-type includeCache struct {
-	// Are the cache contents valid so far?
-	valid bool
-	// Index into entries of the next entry to be processed. Unused
-	// when the cache is invalid.
-	next    int
-	entries []*includeCacheEntry
-}
-
-// Next Return the next cache entry. Should only be called when the cache is
-// valid and a next entry is available (the latter can be checked with
-// ExpectFile). Does not advance the cache.
-func (cache *includeCache) Next() *includeCacheEntry {
-	return cache.entries[cache.next]
-}
-
-// ExpectFile check that the next cache entry is about the given file. If it is
-// not, or no entry is available, the cache is invalidated. Does not
-// advance the cache.
-func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
-	if cache.valid && (cache.next >= len(cache.entries) || !cache.Next().Sourcefile.EqualsTo(sourcefile)) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
-	}
-}
-
-// ExpectEntry check that the next entry matches the given values. If so, advance
-// the cache. If not, the cache is invalidated. If the cache is
-// invalidated, or was already invalid, an entry with the given values
-// is appended.
-func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
-	entry := &includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
-	if cache.valid {
-		if cache.next < len(cache.entries) && cache.Next().Equals(entry) {
-			cache.next++
-		} else {
-			cache.valid = false
-			cache.entries = cache.entries[:cache.next]
-		}
-	}
-
-	if !cache.valid {
-		cache.entries = append(cache.entries, entry)
-	}
-}
-
-// ExpectEnd check that the cache is completely consumed. If not, the cache is
-// invalidated.
-func (cache *includeCache) ExpectEnd() {
-	if cache.valid && cache.next < len(cache.entries) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
-	}
-}
-
-// Read the cache from the given file
-func readCache(path *paths.Path) *includeCache {
-	bytes, err := path.ReadFile()
-	if err != nil {
-		// Return an empty, invalid cache
-		return &includeCache{}
-	}
-	result := &includeCache{}
-	err = json.Unmarshal(bytes, &result.entries)
-	if err != nil {
-		// Return an empty, invalid cache
-		return &includeCache{}
-	}
-	result.valid = true
-	return result
-}
-
-// Write the given cache to the given file if it is invalidated. If the
-// cache is still valid, just update the timestamps of the file.
-func writeCache(cache *includeCache, path *paths.Path) error {
-	// If the cache was still valid all the way, just touch its file
-	// (in case any source file changed without influencing the
-	// includes). If it was invalidated, overwrite the cache with
-	// the new contents.
-	if cache.valid {
-		path.Chtimes(time.Now(), time.Now())
-	} else {
-		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
-		if err != nil {
-			return err
-		}
-		err = path.WriteFile(bytes)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type uniqueSourceFileQueue []*sourceFile
-
-func (queue *uniqueSourceFileQueue) push(value *sourceFile) {
-	if !queue.contains(value) {
-		*queue = append(*queue, value)
-	}
-}
-
-func (queue uniqueSourceFileQueue) contains(target *sourceFile) bool {
-	return slices.ContainsFunc(queue, target.Equals)
-}
-
-func (queue *uniqueSourceFileQueue) pop() *sourceFile {
-	old := *queue
-	x := old[0]
-	*queue = old[1:]
-	return x
-}
-
-func (queue uniqueSourceFileQueue) empty() bool {
-	return len(queue) == 0
 }
