@@ -522,9 +522,17 @@ commands to run to compile the sketch), but the `post*` hooks and all compile co
 
 ## Global platform.txt
 
-Properties defined in a platform.txt created in the **hardware** subfolder of the Arduino IDE installation folder will
-be used for all platforms and will override local properties. This feature is currently only available when using the
-Arduino IDE.
+Properties defined in a platform.txt file located in the root of any of the packages folders will be used for all
+platforms and will override local properties.
+
+The packages folder locations are:
+
+- `{directories.data}/packages`<br />(where `{directories.data}` is the path from the `directories.data`
+  [configuration key](configuration.md))
+- `{directories.user}/hardware`<br />(where `{directories.user}` is the path from the `directories.user`
+  [configuration key](configuration.md), or Arduino IDE "Sketchbook location" preference)
+- `{Arduino IDE installation}/hardware` (Arduino IDE 1.x only)<br />(where `{Arduino IDE installation}` is the path of
+  the Arduino IDE installation folder)
 
 ## platform.local.txt
 
