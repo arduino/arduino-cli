@@ -718,11 +718,8 @@ func (pme *Explorer) loadDiscoveries(release *cores.PlatformRelease) []error {
 		}
 
 		cmd := configuration.ExpandPropsInString(pattern)
-		if cmdArgs, err := properties.SplitQuotedString(cmd, `"'`, true); err != nil {
-			merr = append(merr, err)
-		} else {
-			pme.discoveryManager.Add(discoveryID, cmdArgs...)
-		}
+		cmdArgs, _ := properties.SplitQuotedString(cmd, `"'`, true)
+		pme.discoveryManager.Add(discoveryID, cmdArgs...)
 	}
 
 	return merr

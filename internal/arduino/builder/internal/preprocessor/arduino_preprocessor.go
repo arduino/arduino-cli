@@ -45,11 +45,11 @@ func PreprocessSketchWithArduinoPreprocessor(
 
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
-	gccResult, err := GCC(ctx, sourceFile, targetFile, includeFolders, buildProperties)
+	gccResult := GCC(sourceFile, targetFile, includeFolders, buildProperties).Run(ctx)
 	verboseOut.Write(gccResult.Stdout)
 	verboseOut.Write(gccResult.Stderr)
-	if err != nil {
-		return nil, err
+	if gccResult.Error != nil {
+		return nil, gccResult.Error
 	}
 
 	arduinoPreprocessorProperties := properties.NewMap()
@@ -66,18 +66,14 @@ func PreprocessSketchWithArduinoPreprocessor(
 	}
 
 	commandLine := arduinoPreprocessorProperties.ExpandPropsInString(pattern)
-	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
-	if err != nil {
-		return nil, err
-	}
-
-	command, err := paths.NewProcess(nil, parts...)
+	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
+	command, err := paths.NewProcess(nil, args...)
 	if err != nil {
 		return nil, err
 	}
 	if runtime.GOOS == "windows" {
 		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)
-		command.SetDir(filepath.VolumeName(parts[0]) + "/")
+		command.SetDir(filepath.VolumeName(args[0]) + "/")
 	}
 
 	verboseOut.WriteString(commandLine)

@@ -169,7 +169,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	if buildPathArg := req.GetBuildPath(); buildPathArg != "" {
 		buildPath = paths.New(req.GetBuildPath()).Canonical()
 		if in, _ := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
-			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
+			if sk.AdditionalFiles, err = removeBuildPathFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
 				return err
 			}
 		}
@@ -220,10 +220,6 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return err
 	}
 
-	actualPlatform := buildPlatform
-	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
-	otherLibrariesDirs.Add(s.settings.LibrariesDir())
-
 	var libsManager *librariesmanager.LibrariesManager
 	if profile != nil {
 		libsManager = lm
@@ -253,6 +249,11 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	if req.GetVerbose() {
 		verbosity = logger.VerbosityVerbose
 	}
+
+	librariesDirs := paths.NewPathList(req.GetLibraries()...) // Array of collection of libraries directories
+	librariesDirs.Add(s.settings.LibrariesDir())
+	libraryDirs := paths.NewPathList(req.GetLibrary()...) // Array of single-library directories
+
 	sketchBuilder, err := builder.NewBuilder(
 		ctx,
 		sk,
@@ -264,16 +265,16 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
 		s.settings.HardwareDirectories(),
-		otherLibrariesDirs,
+		librariesDirs,
 		s.settings.IDEBuiltinLibrariesDir(),
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
 		req.GetCreateCompilationDatabaseOnly(),
-		targetPlatform, actualPlatform,
+		targetPlatform, buildPlatform,
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
-		paths.NewPathList(req.GetLibrary()...),
+		libraryDirs,
 		outStream, errStream, verbosity, req.GetWarnings(),
 		progressCB,
 		pme.GetEnvVarsForSpawnedProcess(),
@@ -462,15 +463,15 @@ func maybePurgeBuildCache(compilationsBeforePurge uint, cacheTTL time.Duration) 
 	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
 }
 
-// removeBuildFromSketchFiles removes the files contained in the build directory from
+// removeBuildPathFromSketchFiles removes the files contained in the build directory from
 // the list of the sketch files
-func removeBuildFromSketchFiles(files paths.PathList, build *paths.Path) (paths.PathList, error) {
+func removeBuildPathFromSketchFiles(files paths.PathList, build *paths.Path) (paths.PathList, error) {
 	var res paths.PathList
 	ignored := false
 	for _, file := range files {
 		if isInside, _ := file.IsInsideDir(build); !isInside {
-			res = append(res, file)
-		} else if !ignored {
+			res.Add(file)
+		} else {
 			ignored = true
 		}
 	}

@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -28,17 +29,18 @@ type detectorCache struct {
 }
 
 type detectorCacheEntry struct {
-	AddedIncludePath    *paths.Path `json:"added_include_path,omitempty"`
-	CompilingSourcePath *paths.Path `json:"compiling_source_path,omitempty"`
-	MissingIncludeH     *string     `json:"missing_include_h,omitempty"`
+	AddedIncludePath *paths.Path  `json:"added_include_path,omitempty"`
+	Compile          *sourceFile  `json:"compile,omitempty"`
+	CompileTask      *runner.Task `json:"compile_task,omitempty"`
+	MissingIncludeH  *string      `json:"missing_include_h,omitempty"`
 }
 
 func (e *detectorCacheEntry) String() string {
 	if e.AddedIncludePath != nil {
 		return "Added include path: " + e.AddedIncludePath.String()
 	}
-	if e.CompilingSourcePath != nil {
-		return "Compiling source path: " + e.CompilingSourcePath.String()
+	if e.Compile != nil && e.CompileTask != nil {
+		return "Compiling: " + e.Compile.String() + " / " + e.CompileTask.String()
 	}
 	if e.MissingIncludeH != nil {
 		if *e.MissingIncludeH == "" {
@@ -105,6 +107,14 @@ func (c *detectorCache) Expect(entry *detectorCacheEntry) {
 func (c *detectorCache) Peek() *detectorCacheEntry {
 	if c.curr < len(c.entries) {
 		return c.entries[c.curr]
+	}
+	return nil
+}
+
+// EntriesAhead returns the entries that are ahead of the current cache position.
+func (c *detectorCache) EntriesAhead() []*detectorCacheEntry {
+	if c.curr < len(c.entries) {
+		return c.entries[c.curr:]
 	}
 	return nil
 }

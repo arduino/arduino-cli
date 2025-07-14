@@ -59,9 +59,6 @@ type Builder struct {
 	// Parallel processes
 	jobs int
 
-	// Custom build properties defined by user (line by line as "key=value" pairs)
-	customBuildProperties []string
-
 	// core related
 	coreBuildCachePath       *paths.Path
 	extraCoreBuildCachePaths paths.PathList
@@ -89,7 +86,7 @@ type Builder struct {
 	lineOffset int
 
 	targetPlatform *cores.PlatformRelease
-	actualPlatform *cores.PlatformRelease
+	buildPlatform  *cores.PlatformRelease
 
 	buildArtifacts *buildArtifacts
 
@@ -125,19 +122,20 @@ func NewBuilder(
 	coreBuildCachePath *paths.Path,
 	extraCoreBuildCachePaths paths.PathList,
 	jobs int,
-	requestBuildProperties []string,
-	hardwareDirs, otherLibrariesDirs paths.PathList,
+	customBuildProperties []string,
+	hardwareDirs paths.PathList,
+	librariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
 	fqbn *fqbn.FQBN,
 	clean bool,
 	sourceOverrides map[string]string,
 	onlyUpdateCompilationDatabase bool,
-	targetPlatform, actualPlatform *cores.PlatformRelease,
+	targetPlatform, buildPlatform *cores.PlatformRelease,
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
-	libraryDirs paths.PathList,
+	customLibraryDirs paths.PathList,
 	stdout, stderr io.Writer, verbosity logger.Verbosity, warningsLevel string,
-	progresCB rpc.TaskProgressCB,
+	progressCB rpc.TaskProgressCB,
 	toolEnv []string,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
@@ -146,13 +144,11 @@ func NewBuilder(
 	}
 	if sk != nil {
 		buildProperties.SetPath("sketch_path", sk.FullPath)
+		buildProperties.Set("build.project_name", sk.MainFile.Base())
+		buildProperties.SetPath("build.source.path", sk.FullPath)
 	}
 	if buildPath != nil {
 		buildProperties.SetPath("build.path", buildPath)
-	}
-	if sk != nil {
-		buildProperties.Set("build.project_name", sk.MainFile.Base())
-		buildProperties.SetPath("build.source.path", sk.FullPath)
 	}
 	if optimizeForDebug {
 		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {
@@ -165,12 +161,11 @@ func NewBuilder(
 	}
 
 	// Add user provided custom build properties
-	customBuildProperties, err := properties.LoadFromSlice(requestBuildProperties)
-	if err != nil {
+	if p, err := properties.LoadFromSlice(customBuildProperties); err == nil {
+		buildProperties.Merge(p)
+	} else {
 		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
-	buildProperties.Merge(customBuildProperties)
-	customBuildPropertiesArgs := append(requestBuildProperties, "build.warn_data_percentage=75")
 
 	sketchBuildPath, err := buildPath.Join("sketch").Abs()
 	if err != nil {
@@ -190,16 +185,20 @@ func NewBuilder(
 	}
 
 	log := logger.New(stdout, stderr, verbosity, warningsLevel)
-	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
-		useCachedLibrariesResolution, librariesManager,
-		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
-		actualPlatform, targetPlatform,
+	libsManager, libsResolver, libsLoadingWarnings, err := detector.LibrariesLoader(
+		useCachedLibrariesResolution,
+		librariesManager,
+		builtInLibrariesDirs,
+		customLibraryDirs,
+		librariesDirs,
+		buildPlatform,
+		targetPlatform,
 	)
 	if err != nil {
 		return nil, err
 	}
 	if log.VerbosityLevel() == logger.VerbosityVerbose {
-		log.Warn(string(verboseOut))
+		log.Warn(string(libsLoadingWarnings))
 	}
 
 	diagnosticStore := diagnostics.NewStore()
@@ -212,7 +211,6 @@ func NewBuilder(
 		coreBuildPath:                 coreBuildPath,
 		librariesBuildPath:            librariesBuildPath,
 		jobs:                          jobs,
-		customBuildProperties:         customBuildPropertiesArgs,
 		coreBuildCachePath:            coreBuildCachePath,
 		extraCoreBuildCachePaths:      extraCoreBuildCachePaths,
 		logger:                        log,
@@ -220,17 +218,19 @@ func NewBuilder(
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
-		Progress:                      progress.New(progresCB),
+		Progress:                      progress.New(progressCB),
 		executableSectionsSize:        []ExecutableSectionSize{},
 		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
-		actualPlatform:                actualPlatform,
+		buildPlatform:                 buildPlatform,
 		toolEnv:                       toolEnv,
 		buildOptions: newBuildOptions(
-			hardwareDirs, otherLibrariesDirs,
-			builtInLibrariesDirs, buildPath,
+			hardwareDirs,
+			librariesDirs,
+			builtInLibrariesDirs,
+			buildPath,
 			sk,
-			customBuildPropertiesArgs,
+			customBuildProperties,
 			fqbn,
 			clean,
 			buildProperties.Get("compiler.optimization_flags"),
@@ -322,9 +322,18 @@ func (b *Builder) preprocess() error {
 		b.librariesBuildPath,
 		b.buildProperties,
 		b.targetPlatform.Platform.Architecture,
+		b.jobs,
 	)
 	if err != nil {
 		return err
+	}
+	if b.libsDetector.IncludeFoldersChanged() && b.librariesBuildPath.Exist() {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
+			b.logger.Info(i18n.Tr("The list of included libraries has been changed... rebuilding all libraries."))
+		}
+		if err := b.librariesBuildPath.RemoveAll(); err != nil {
+			return err
+		}
 	}
 	b.Progress.CompleteStep()
 
@@ -492,10 +501,7 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
-	if err != nil {
-		return nil, err
-	}
+	args, _ := properties.SplitQuotedString(commandLine, `"'`, false)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative
@@ -503,18 +509,18 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 	var relativePath string
 	if len(commandLine) > 30000 {
 		relativePath = buildProperties.Get("build.path")
-		for i, arg := range parts {
+		for i, arg := range args {
 			if _, err := os.Stat(arg); os.IsNotExist(err) {
 				continue
 			}
 			rel, err := filepath.Rel(relativePath, arg)
 			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
-				parts[i] = rel
+				args[i] = rel
 			}
 		}
 	}
 
-	command, err := paths.NewProcess(b.toolEnv, parts...)
+	command, err := paths.NewProcess(b.toolEnv, args...)
 	if err != nil {
 		return nil, err
 	}
