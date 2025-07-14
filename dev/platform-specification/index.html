@@ -2863,9 +2863,17 @@ recipe.hooks.sketch.prebuild.11.pattern=echo 11
 commands to run to compile the sketch), but the <code>post*</code> hooks and all compile commands are skipped. See the
 <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> command reference for more info.</p>
 <h2 id="global-platformtxt">Global platform.txt<a class="headerlink" href="#global-platformtxt" title="Permanent link">&para;</a></h2>
-<p>Properties defined in a platform.txt created in the <strong>hardware</strong> subfolder of the Arduino IDE installation folder will
-be used for all platforms and will override local properties. This feature is currently only available when using the
-Arduino IDE.</p>
+<p>Properties defined in a platform.txt file located in the root of any of the packages folders will be used for all
+platforms and will override local properties.</p>
+<p>The packages folder locations are:</p>
+<ul>
+<li><code>{directories.data}/packages</code><br />(where <code>{directories.data}</code> is the path from the <code>directories.data</code>
+  <a href="../configuration/">configuration key</a>)</li>
+<li><code>{directories.user}/hardware</code><br />(where <code>{directories.user}</code> is the path from the <code>directories.user</code>
+  <a href="../configuration/">configuration key</a>, or Arduino IDE "Sketchbook location" preference)</li>
+<li><code>{Arduino IDE installation}/hardware</code> (Arduino IDE 1.x only)<br />(where <code>{Arduino IDE installation}</code> is the path of
+  the Arduino IDE installation folder)</li>
+</ul>
 <h2 id="platformlocaltxt">platform.local.txt<a class="headerlink" href="#platformlocaltxt" title="Permanent link">&para;</a></h2>
 <p>Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in <code>platform.txt</code> or define new
 properties without modifying <code>platform.txt</code> (e.g. when <code>platform.txt</code> is tracked by a version control system). It must
