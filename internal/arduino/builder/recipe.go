@@ -60,10 +60,18 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 
 func findRecipes(buildProperties *properties.Map, patternPrefix string, patternSuffix string) []string {
 	var recipes []string
+
+	exactKey := patternPrefix + patternSuffix
+
 	for _, key := range buildProperties.Keys() {
-		if strings.HasPrefix(key, patternPrefix) && strings.HasSuffix(key, patternSuffix) && buildProperties.Get(key) != "" {
+		if key != exactKey && strings.HasPrefix(key, patternPrefix) && strings.HasSuffix(key, patternSuffix) && buildProperties.Get(key) != "" {
 			recipes = append(recipes, key)
 		}
+	}
+
+	// If no recipes were found, check if the exact key exists
+	if len(recipes) == 0 && buildProperties.Get(exactKey) != "" {
+		recipes = append(recipes, exactKey)
 	}
 
 	sort.Strings(recipes)
