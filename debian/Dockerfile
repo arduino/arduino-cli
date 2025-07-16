@@ -19,7 +19,7 @@ ARG GO_BINARY
 
 COPY ./debian/${DEB_NAME} /${DEB_NAME}/
 COPY ./${GO_BINARY} /${DEB_NAME}/usr/bin/${BINARY_NAME}
-COPY ./debian/${DEB_NAME}/DEBIAN/copyright /usr/share/doc/${DEB_NAME}/copyright
+COPY ./debian/${DEB_NAME}/DEBIAN/copyright /${DEB_NAME}/usr/share/doc/${DEB_NAME}/copyright
 
 # Go application are tagged with `v` prefix, this remove the first v if present
 RUN export VERSION=$(echo "${VERSION}" | sed -e "s/^v\(.*\)/\1/") && \
