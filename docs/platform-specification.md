@@ -302,6 +302,10 @@ compiler.libraries.ldflags=
 recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} {compiler.libraries.ldflags} "{archive_file_path}" "-L{build.path}" -lm
 ```
 
+If the linking process requires multiple steps, the recipe can be written using the **recipe.c.combine.NUMBER.pattern**
+syntax. In this case, each step will be executed in the order specified by the number. When multiple steps are defined,
+the **recipe.c.combine.pattern** property is ignored.
+
 #### Recipes for extraction of executable files and other binary data
 
 An arbitrary number of extra steps can be performed at the end of objects linking. These steps can be used to extract
