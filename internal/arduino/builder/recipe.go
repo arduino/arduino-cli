@@ -27,10 +27,13 @@ import (
 
 // RunRecipe fixdoc
 func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
+	// TODO is it necessary to use Clone?
+	return b.RunRecipeWithProps(prefix, suffix, b.buildProperties.Clone(), skipIfOnlyUpdatingCompilationDatabase)
+}
+
+func (b *Builder) RunRecipeWithProps(prefix, suffix string, buildProperties *properties.Map, skipIfOnlyUpdatingCompilationDatabase bool) error {
 	logrus.Debugf("Looking for recipes like %s", prefix+"*"+suffix)
 
-	// TODO is it necessary to use Clone?
-	buildProperties := b.buildProperties.Clone()
 	recipes := findRecipes(buildProperties, prefix, suffix)
 
 	// TODO is it necessary to use Clone?
