@@ -2,7 +2,7 @@ version: "3"
 
 includes:
   dist: ./DistTasks.yml
-  
+
 tasks:
   extract-licenses:
     desc: Extract project and dependency licenses into debian copyright
@@ -24,8 +24,6 @@ tasks:
     sources:
       - LICENSE.txt
       - licenses/**
-  
-
 
   append-license:
     desc: Render and append arduino-cli license to NOTICE file
@@ -39,10 +37,10 @@ tasks:
         cat "$notice_file" >> "$tmp_file"
         mv "$tmp_file" "$notice_file"
     env:
-      Year:  '{{ now | date "2006" }}'
-      Holder: 'ARDUINO SA (http://www.arduino.cc/)'
+      Year: '{{ now | date "2006" }}'
+      Holder: "ARDUINO SA (http://www.arduino.cc/)"
     silent: false
-    
+
   docs:generate:
     desc: Create all generated documentation content
     deps:
