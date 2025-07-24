@@ -20,7 +20,7 @@ tasks:
       - mkdir -p debian/arduino-cli/usr/share/doc/arduino-cli/
       - cat LICENSE.txt > debian/arduino-cli/usr/share/doc/arduino-cli/copyright
       - echo -e "\n\n---\n\n" >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
-      - find .licenses -type f -name "LICENSE*" -exec bash -c 'cat "$1"; echo -e "\n\n---\n\n"' _ {} \; >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
+      - cat /Users/sedia/repo/arduino-cli/.licenses/NOTICE.arduino-cli  >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
     sources:
       - LICENSE.txt
       - licenses/**
