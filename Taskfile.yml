@@ -12,13 +12,9 @@ tasks:
           echo "Installing Ruby gem: licensed"
           gem install licensed
         fi
-      - |
-        if [ ! -f .licensed.yml ]; then
-          licensed init || true
-        fi
       - licensed notices
       - mkdir -p debian/arduino-cli/usr/share/doc/arduino-cli/
-      - cat LICENSE.txt > debian/arduino-cli/usr/share/doc/arduino-cli/copyright
+      - cat arduino-cli-license.txt > debian/arduino-cli/usr/share/doc/arduino-cli/copyright
       - echo -e "\n\n---\n\n" >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
       - cat /Users/sedia/repo/arduino-cli/.licenses/NOTICE.arduino-cli  >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
     sources:
