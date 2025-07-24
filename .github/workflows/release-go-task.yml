@@ -65,7 +65,12 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
-
+          
+      - name: Build License 
+        run: | 
+          task extract-licenses
+          task append-license
+                
       - name: Build
         run: task dist:${{ matrix.env.os }}
 

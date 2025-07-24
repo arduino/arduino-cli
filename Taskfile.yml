@@ -2,8 +2,47 @@ version: "3"
 
 includes:
   dist: ./DistTasks.yml
-
+  
 tasks:
+  extract-licenses:
+    desc: Extract project and dependency licenses into debian copyright
+    cmds:
+      - |
+        if ! command -v licensed >/dev/null; then
+          echo "Installing Ruby gem: licensed"
+          gem install licensed
+        fi
+      - |
+        if [ ! -f .licensed.yml ]; then
+          licensed init || true
+        fi
+      - licensed notices
+      - mkdir -p debian/arduino-cli/usr/share/doc/arduino-cli/
+      - cat LICENSE.txt > debian/arduino-cli/usr/share/doc/arduino-cli/copyright
+      - echo -e "\n\n---\n\n" >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
+      - find .licenses -type f -name "LICENSE*" -exec bash -c 'cat "$1"; echo -e "\n\n---\n\n"' _ {} \; >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
+    sources:
+      - LICENSE.txt
+      - licenses/**
+  
+
+
+  append-license:
+    desc: Render and append arduino-cli license to NOTICE file
+    cmds:
+      - |
+        rendered=$(envsubst < .licenses/templates/arduino-cli-license.txt)
+        notice_file=".licenses/NOTICE.arduino-cli"
+        tmp_file=$(mktemp)
+        echo "$rendered" > "$tmp_file"
+        echo -e "\n" >> "$tmp_file"
+        cat "$notice_file" >> "$tmp_file"
+        mv "$tmp_file" "$notice_file"
+    env:
+      Year:  '{{ now | date "2006" }}'
+      Holder: 'ARDUINO SA (http://www.arduino.cc/)'
+    silent: false
+    
   docs:generate:
     desc: Create all generated documentation content
     deps:
