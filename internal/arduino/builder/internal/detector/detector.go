@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -59,6 +60,8 @@ type SketchLibrariesDetector struct {
 	includeFolders                paths.PathList
 	logger                        *logger.BuilderLogger
 	diagnosticStore               *diagnostics.Store
+	preRunner                     *runner.Runner
+	detectedChangeInLibraries     bool
 }
 
 // NewSketchLibrariesDetector todo
@@ -191,6 +194,12 @@ func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
 	return l.includeFolders
 }
 
+// IncludeFoldersChanged returns true if the include folders list changed
+// from the previous compile.
+func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
+	return l.detectedChangeInLibraries
+}
+
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	l.includeFolders = append(l.includeFolders, folder)
@@ -208,8 +217,9 @@ func (l *SketchLibrariesDetector) FindIncludes(
 	librariesBuildPath *paths.Path,
 	buildProperties *properties.Map,
 	platformArch string,
+	jobs int,
 ) error {
-	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch)
+	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch, jobs)
 	if err != nil && l.onlyUpdateCompilationDatabase {
 		l.logger.Info(
 			fmt.Sprintf(
@@ -233,18 +243,23 @@ func (l *SketchLibrariesDetector) findIncludes(
 	librariesBuildPath *paths.Path,
 	buildProperties *properties.Map,
 	platformArch string,
+	jobs int,
 ) error {
-	librariesResolutionCache := buildPath.Join("libraries.cache")
-	if l.useCachedLibrariesResolution && librariesResolutionCache.Exist() {
-		d, err := librariesResolutionCache.ReadFile()
+	librariesResolutionCachePath := buildPath.Join("libraries.cache")
+	var cachedIncludeFolders paths.PathList
+	if librariesResolutionCachePath.Exist() {
+		d, err := librariesResolutionCachePath.ReadFile()
 		if err != nil {
 			return err
 		}
-		if err := json.Unmarshal(d, &l.includeFolders); err != nil {
+		if err := json.Unmarshal(d, &cachedIncludeFolders); err != nil {
 			return err
 		}
+	}
+	if l.useCachedLibrariesResolution && librariesResolutionCachePath.Exist() {
+		l.includeFolders = cachedIncludeFolders
 		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			l.logger.Info("Using cached library discovery: " + librariesResolutionCache.String())
+			l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())
 		}
 		return nil
 	}
@@ -253,6 +268,18 @@ func (l *SketchLibrariesDetector) findIncludes(
 	if err := l.cache.Load(cachePath); err != nil {
 		l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
 	}
+
+	// Pre-run cache entries
+	l.preRunner = runner.New(ctx, jobs)
+	for _, entry := range l.cache.EntriesAhead() {
+		if entry.Compile != nil && entry.CompileTask != nil {
+			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
+			if !upToDate {
+				l.preRunner.Enqueue(entry.CompileTask)
+			}
+		}
+	}
+	defer l.preRunner.Cancel()
 
 	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
@@ -291,6 +318,15 @@ func (l *SketchLibrariesDetector) findIncludes(
 				cachePath.Remove()
 				return err
 			}
+
+			// Create a new pre-runner if the previous one was cancelled
+			if l.preRunner == nil {
+				l.preRunner = runner.New(ctx, jobs)
+				// Push in the remainder of the queue
+				for _, sourceFile := range *sourceFileQueue {
+					l.preRunner.Enqueue(l.gccPreprocessTask(sourceFile, buildProperties))
+				}
+			}
 		}
 
 		// Finalize the cache
@@ -305,11 +341,26 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 	if d, err := json.Marshal(l.includeFolders); err != nil {
 		return err
-	} else if err := librariesResolutionCache.WriteFile(d); err != nil {
+	} else if err := librariesResolutionCachePath.WriteFile(d); err != nil {
 		return err
 	}
-
+	l.detectedChangeInLibraries = !slices.Equal(
+		cachedIncludeFolders.AsStrings(),
+		l.includeFolders.AsStrings())
 	return nil
+}
+
+func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buildProperties *properties.Map) *runner.Task {
+	// Libraries may require the "utility" directory to be added to the include
+	// search path, but only for the source code of the library, so we temporary
+	// copy the current search path list and add the library' utility directory
+	// if needed.
+	includeFolders := l.includeFolders
+	if extraInclude := sourceFile.ExtraIncludePath; extraInclude != nil {
+		includeFolders = append(includeFolders, extraInclude)
+	}
+
+	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties)
 }
 
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
@@ -320,10 +371,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	platformArch string,
 ) error {
 	sourceFile := sourceFileQueue.Pop()
-	sourcePath := sourceFile.SourcePath()
-	targetFilePath := paths.NullPath()
-	depPath := sourceFile.DepfilePath()
-	objPath := sourceFile.ObjectPath()
+	sourcePath := sourceFile.SourcePath
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -337,26 +385,18 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := utils.ObjFileIsUpToDate(sourcePath, objPath, depPath)
+	unchanged, err := sourceFile.ObjFileIsUpToDate()
 	if err != nil {
 		return err
 	}
 
 	first := true
 	for {
-		l.cache.Expect(&detectorCacheEntry{CompilingSourcePath: sourcePath})
-
-		// Libraries may require the "utility" directory to be added to the include
-		// search path, but only for the source code of the library, so we temporary
-		// copy the current search path list and add the library' utility directory
-		// if needed.
-		includeFolders := l.includeFolders
-		if extraInclude := sourceFile.ExtraIncludePath(); extraInclude != nil {
-			includeFolders = append(includeFolders, extraInclude)
-		}
+		preprocTask := l.gccPreprocessTask(sourceFile, buildProperties)
+		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile, CompileTask: preprocTask})
 
 		var preprocErr error
-		var preprocFirstResult *runner.Result
+		var preprocResult *runner.Result
 
 		var missingIncludeH string
 		if entry := l.cache.Peek(); unchanged && entry != nil && entry.MissingIncludeH != nil {
@@ -366,20 +406,40 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			}
 			first = false
 		} else {
-			preprocFirstResult, preprocErr = preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
+			if l.preRunner != nil {
+				if r := l.preRunner.Results(preprocTask); r != nil {
+					preprocResult = r
+					preprocErr = preprocResult.Error
+				}
+			}
+			if preprocResult == nil {
+				// The pre-runner missed this task, maybe the cache is outdated
+				// or maybe the source code changed.
+
+				// Stop the pre-runner
+				if l.preRunner != nil {
+					preRunner := l.preRunner
+					l.preRunner = nil
+					go preRunner.Cancel()
+				}
+
+				// Run the actual preprocessor
+				preprocResult = preprocTask.Run(ctx)
+				preprocErr = preprocResult.Error
+			}
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-				l.logger.WriteStdout(preprocFirstResult.Stdout)
+				l.logger.WriteStdout(preprocResult.Stdout)
 			}
 			// Unwrap error and see if it is an ExitError.
 			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || len(preprocFirstResult.Stderr) == 0 {
+			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || len(preprocResult.Stderr) == 0 {
 				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return preprocErr
 			} else {
-				missingIncludeH = IncludesFinderWithRegExp(string(preprocFirstResult.Stderr))
+				missingIncludeH = IncludesFinderWithRegExp(string(preprocResult.Stderr))
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
@@ -396,25 +456,24 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		library := l.resolveLibrary(missingIncludeH, platformArch)
 		if library == nil {
 			// Library could not be resolved, show error
-			if preprocErr == nil || len(preprocFirstResult.Stderr) == 0 {
-				// Filename came from cache, so run preprocessor to obtain error to show
-				result, err := preprocessor.GCC(ctx, sourcePath, targetFilePath, includeFolders, buildProperties)
+
+			// If preprocess result came from cache, run the preprocessor to obtain the actual error to show
+			if preprocErr == nil || len(preprocResult.Stderr) == 0 {
+				preprocResult = preprocTask.Run(ctx)
+				preprocErr = preprocResult.Error
 				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-					l.logger.WriteStdout(result.Stdout)
+					l.logger.WriteStdout(preprocResult.Stdout)
 				}
-				if err == nil {
+				if preprocErr == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
 					// Returning an error here will cause the cache to be
 					// deleted, so hopefully the next compilation will succeed.
 					return errors.New(i18n.Tr("Internal error in cache"))
 				}
-				l.diagnosticStore.Parse(result.Args, result.Stderr)
-				l.logger.WriteStderr(result.Stderr)
-				return err
 			}
-			l.diagnosticStore.Parse(preprocFirstResult.Args, preprocFirstResult.Stderr)
-			l.logger.WriteStderr(preprocFirstResult.Stderr)
+			l.diagnosticStore.Parse(preprocResult.Args, preprocResult.Stderr)
+			l.logger.WriteStderr(preprocResult.Stderr)
 			return preprocErr
 		}
 
@@ -508,8 +567,11 @@ func findIncludeForOldCompilers(source string) string {
 func LibrariesLoader(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
-	builtInLibrariesDirs *paths.Path, libraryDirs, otherLibrariesDirs paths.PathList,
-	actualPlatform, targetPlatform *cores.PlatformRelease,
+	builtInLibrariesDir *paths.Path,
+	customLibraryDirs paths.PathList, // libraryDirs paths.PathList,
+	librariesDirs paths.PathList, // otherLibrariesDirs paths.PathList,
+	buildPlatform *cores.PlatformRelease,
+	targetPlatform *cores.PlatformRelease,
 ) (*librariesmanager.LibrariesManager, *librariesresolver.Cpp, []byte, error) {
 	verboseOut := &bytes.Buffer{}
 	lm := librariesManager
@@ -521,21 +583,20 @@ func LibrariesLoader(
 	if librariesManager == nil {
 		lmb := librariesmanager.NewBuilder()
 
-		builtInLibrariesFolders := builtInLibrariesDirs
-		if builtInLibrariesFolders != nil {
-			if err := builtInLibrariesFolders.ToAbs(); err != nil {
+		if builtInLibrariesDir != nil {
+			if err := builtInLibrariesDir.ToAbs(); err != nil {
 				return nil, nil, nil, err
 			}
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
-				Path:     builtInLibrariesFolders,
+				Path:     builtInLibrariesDir,
 				Location: libraries.IDEBuiltIn,
 			})
 		}
 
-		if actualPlatform != targetPlatform {
+		if buildPlatform != targetPlatform {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
-				PlatformRelease: actualPlatform,
-				Path:            actualPlatform.GetLibrariesDir(),
+				PlatformRelease: buildPlatform,
+				Path:            buildPlatform.GetLibrariesDir(),
 				Location:        libraries.ReferencedPlatformBuiltIn,
 			})
 		}
@@ -545,7 +606,7 @@ func LibrariesLoader(
 			Location:        libraries.PlatformBuiltIn,
 		})
 
-		librariesFolders := otherLibrariesDirs
+		librariesFolders := librariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
 			return nil, nil, nil, err
 		}
@@ -556,7 +617,7 @@ func LibrariesLoader(
 			})
 		}
 
-		for _, dir := range libraryDirs {
+		for _, dir := range customLibraryDirs {
 			lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 				Path:            dir,
 				Location:        libraries.Unmanaged,
@@ -566,18 +627,12 @@ func LibrariesLoader(
 
 		newLm, libsLoadingWarnings := lmb.Build()
 		for _, status := range libsLoadingWarnings {
-			// With the refactoring of the initialization step of the CLI we changed how
-			// errors are returned when loading platforms and libraries, that meant returning a list of
-			// errors instead of a single one to enhance the experience for the user.
-			// I have no intention right now to start a refactoring of the legacy package too, so
-			// here's this shitty solution for now.
-			// When we're gonna refactor the legacy package this will be gone.
 			verboseOut.Write([]byte(status.Message()))
 		}
 		lm = newLm
 	}
 
 	allLibs := lm.FindAllInstalled()
-	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, actualPlatform)
+	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, buildPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
