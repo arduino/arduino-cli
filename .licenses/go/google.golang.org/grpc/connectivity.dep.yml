@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/connectivity
-version: v1.73.0
+version: v1.74.2
 type: go
 summary: Package connectivity defines connectivity semantics.
 homepage: https://pkg.go.dev/google.golang.org/grpc/connectivity
 license: apache-2.0
 licenses:
-- sources: grpc@v1.73.0/LICENSE
+- sources: grpc@v1.74.2/LICENSE
   text: |2
 
                                      Apache License
