@@ -4,7 +4,7 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
-  extract-licenses:
+  update-deb-copyright:
     desc: Extract project and dependency licenses into debian copyright
     cmds:
       - |

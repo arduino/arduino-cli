@@ -68,7 +68,7 @@ jobs:
 
       - name: Build License
         run: |
-          task extract-licenses
+          task update-deb-copyright
 
       - name: Build
         run: task dist:${{ matrix.env.os }}
