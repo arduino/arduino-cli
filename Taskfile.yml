@@ -21,7 +21,6 @@ tasks:
       - LICENSE.txt
       - licenses/**
 
-
   docs:generate:
     desc: Create all generated documentation content
     deps:
