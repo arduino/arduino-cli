@@ -21,21 +21,6 @@ tasks:
       - LICENSE.txt
       - licenses/**
 
-  append-license:
-    desc: Render and append arduino-cli license to NOTICE file
-    cmds:
-      - |
-        rendered=$(envsubst < .licenses/templates/arduino-cli-license.txt)
-        notice_file=".licenses/NOTICE.arduino-cli"
-        tmp_file=$(mktemp)
-        echo "$rendered" > "$tmp_file"
-        echo -e "\n" >> "$tmp_file"
-        cat "$notice_file" >> "$tmp_file"
-        mv "$tmp_file" "$notice_file"
-    env:
-      Year: '{{ now | date "2006" }}'
-      Holder: "ARDUINO SA (http://www.arduino.cc/)"
-    silent: false
 
   docs:generate:
     desc: Create all generated documentation content
