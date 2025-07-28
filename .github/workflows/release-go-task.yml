@@ -69,7 +69,6 @@ jobs:
       - name: Build License
         run: |
           task extract-licenses
-          task append-license
 
       - name: Build
         run: task dist:${{ matrix.env.os }}
