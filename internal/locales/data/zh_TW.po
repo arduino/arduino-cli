@@ -13,7 +13,7 @@ msgstr ""
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s 版本：%[3]s 交付：%[4]s 日期：%[5]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:462
+#: internal/arduino/builder/internal/detector/detector.go:524
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "已不支援%[1]s 檔案夾！詳細資訊，請見 %[2]s"
 
@@ -25,7 +25,7 @@ msgstr "%[1]s 無效，重新建構全部"
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "需要 %[1]s ，但已安裝 %[2]s"
 
-#: internal/arduino/builder/builder.go:487
+#: internal/arduino/builder/builder.go:496
 msgid "%[1]s pattern is missing"
 msgstr "%[1]s 樣態遺失"
 
@@ -33,7 +33,7 @@ msgstr "%[1]s 樣態遺失"
 msgid "%s already downloaded"
 msgstr "%s 已經下載"
 
-#: commands/service_upload.go:782
+#: commands/service_upload.go:779
 msgid "%s and %s cannot be used together"
 msgstr "%s 和 %s 不能一起使用"
 
@@ -62,8 +62,7 @@ msgstr "%s 必須 >= 1024"
 msgid "%s must be installed."
 msgstr "必須安裝 %s "
 
-#: internal/arduino/builder/internal/preprocessor/ctags.go:193
-#: internal/arduino/builder/internal/preprocessor/gcc.go:63
+#: internal/arduino/builder/internal/preprocessor/ctags.go:194
 msgid "%s pattern is missing"
 msgstr "%s 樣態遺失"
 
@@ -146,15 +145,16 @@ msgstr "所有核心都已是最新版"
 msgid "Already installed %s"
 msgstr "已安裝 %s"
 
-#: internal/arduino/builder/internal/detector/detector.go:91
+#: internal/arduino/builder/internal/detector/detector.go:96
 msgid "Alternatives for %[1]s: %[2]s"
 msgstr "%[1]s 的替代品: %[2]s"
 
-#: internal/arduino/builder/internal/preprocessor/ctags.go:69
+#: internal/arduino/builder/internal/preprocessor/ctags.go:70
+#: internal/arduino/builder/internal/preprocessor/ctags.go:241
 msgid "An error occurred adding prototypes"
 msgstr "新增原型時出錯"
 
-#: internal/arduino/builder/internal/detector/detector.go:213
+#: internal/arduino/builder/internal/detector/detector.go:227
 msgid "An error occurred detecting libraries"
 msgstr "偵測程式庫時出錯"
 
@@ -259,7 +259,7 @@ msgstr "開發板版本:"
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "找不到指定的 Bootloader 檔: %[1]s"
 
-#: internal/cli/compile/compile.go:104
+#: internal/cli/compile/compile.go:105
 msgid ""
 "Builds of cores and sketches are saved into this path to be cached and "
 "reused."
@@ -299,11 +299,11 @@ msgstr "不能同時使用下列參數: %s"
 msgid "Can't write debug log: %s"
 msgstr "無法寫入除錯日誌: %s"
 
-#: commands/service_compile.go:190 commands/service_compile.go:193
+#: commands/service_compile.go:191 commands/service_compile.go:194
 msgid "Cannot create build cache directory"
 msgstr "無法建立編譯快取的目錄"
 
-#: commands/service_compile.go:215
+#: commands/service_compile.go:216
 msgid "Cannot create build directory"
 msgstr "無法建立編譯目錄"
 
@@ -400,19 +400,19 @@ msgstr "命令保持執行, 在有更動時列出連接的開發板"
 msgid "Compiled sketch not found in %s"
 msgstr "在 %s 中找不到已編譯的 sketch"
 
-#: internal/arduino/builder/internal/preprocessor/gcc.go:93
+#: internal/arduino/builder/internal/runner/task.go:76
 msgid "Compiler error output has been truncated."
 msgstr "編譯器的錯誤訊息已截斷。"
 
-#: internal/cli/compile/compile.go:80 internal/cli/compile/compile.go:81
+#: internal/cli/compile/compile.go:81 internal/cli/compile/compile.go:82
 msgid "Compiles Arduino sketches."
 msgstr "編譯 Arduino sketch"
 
-#: internal/arduino/builder/builder.go:421
+#: internal/arduino/builder/builder.go:430
 msgid "Compiling core..."
 msgstr "編譯核心..."
 
-#: internal/arduino/builder/builder.go:400
+#: internal/arduino/builder/builder.go:409
 msgid "Compiling libraries..."
 msgstr "編譯程式庫..."
 
@@ -420,7 +420,7 @@ msgstr "編譯程式庫..."
 msgid "Compiling library \"%[1]s\""
 msgstr "編譯程式庫 “%[1]s”"
 
-#: internal/arduino/builder/builder.go:384
+#: internal/arduino/builder/builder.go:393
 msgid "Compiling sketch..."
 msgstr "編譯 sketch ..."
 
@@ -467,7 +467,7 @@ msgstr "核心"
 msgid "Could not connect via HTTP"
 msgstr "無法通過 HTTP 連接"
 
-#: commands/instances.go:487
+#: commands/instances.go:510
 msgid "Could not create index directory"
 msgstr "無法建立索引目錄"
 
@@ -487,7 +487,7 @@ msgstr "無法取得工作目錄：%v"
 msgid "Create a new Sketch"
 msgstr "建立新 sketch"
 
-#: internal/cli/compile/compile.go:101
+#: internal/cli/compile/compile.go:102
 msgid "Create and print a profile configuration from the build."
 msgstr "從建構中建立並印出設定檔內容"
 
@@ -500,12 +500,6 @@ msgid ""
 "Creates or updates the configuration file in the data directory or custom "
 "directory with the current configuration settings."
 msgstr "用目前的設定值建立或更新資料或自定義目錄內的設定檔"
-
-#: internal/cli/compile/compile.go:340
-msgid ""
-"Currently, Build Profiles only support libraries available through Arduino "
-"Library Manager."
-msgstr "目前建構方案只支援 Arduino 程式庫管理員所提供的程式庫"
 
 #: internal/cli/debug/debug.go:266
 msgid "Custom configuration for %s:"
@@ -643,13 +637,13 @@ msgstr "下載 %s"
 msgid "Downloading index signature: %s"
 msgstr "下載索引簽名: %s"
 
-#: commands/instances.go:564 commands/instances.go:582
-#: commands/instances.go:596 commands/instances.go:613
+#: commands/instances.go:587 commands/instances.go:605
+#: commands/instances.go:619 commands/instances.go:636
 #: internal/arduino/resources/index.go:82
 msgid "Downloading index: %s"
 msgstr "下載索引: %s"
 
-#: commands/instances.go:372
+#: commands/instances.go:395
 msgid "Downloading library %s"
 msgstr "下載程式庫 %s"
 
@@ -661,11 +655,11 @@ msgstr "下載缺少的工具 %s"
 msgid "Downloading packages"
 msgstr "下載安裝包"
 
-#: internal/arduino/cores/packagemanager/profiles.go:101
+#: internal/arduino/cores/packagemanager/profiles.go:108
 msgid "Downloading platform %s"
 msgstr "下載平台 %s"
 
-#: internal/arduino/cores/packagemanager/profiles.go:177
+#: internal/arduino/cores/packagemanager/profiles.go:184
 msgid "Downloading tool %s"
 msgstr "下載工具 %s"
 
@@ -709,11 +703,11 @@ msgstr "計算相對檔案路徑時出錯"
 msgid "Error cleaning caches: %v"
 msgstr "清理快取時出錯: %v"
 
-#: internal/cli/compile/compile.go:225
+#: internal/cli/compile/compile.go:226
 msgid "Error converting path to absolute: %v"
 msgstr "將路徑轉換成絕對路徑時出錯: %v"
 
-#: commands/service_compile.go:420
+#: commands/service_compile.go:422
 msgid "Error copying output file %s"
 msgstr "複製輸出檔 %s 時出錯"
 
@@ -727,7 +721,7 @@ msgstr "建立設定檔出錯: %v"
 msgid "Error creating instance: %v"
 msgstr "建立實例時出錯: %v"
 
-#: commands/service_compile.go:403
+#: commands/service_compile.go:405
 msgid "Error creating output dir"
 msgstr "建立輸出目錄時出錯"
 
@@ -747,12 +741,12 @@ msgstr "偵測開發板時出錯: %v"
 msgid "Error downloading %[1]s: %[2]v"
 msgstr "下載 %[1]s 出錯: %[2]v"
 
-#: internal/arduino/cores/packagemanager/profiles.go:110
-#: internal/arduino/cores/packagemanager/profiles.go:111
+#: internal/arduino/cores/packagemanager/profiles.go:117
+#: internal/arduino/cores/packagemanager/profiles.go:118
 msgid "Error downloading %s"
 msgstr "下載 %s 出錯"
 
-#: commands/instances.go:661 internal/arduino/resources/index.go:83
+#: commands/instances.go:684 internal/arduino/resources/index.go:83
 msgid "Error downloading index '%s'"
 msgstr "下載索引'%s'時出錯"
 
@@ -760,17 +754,17 @@ msgstr "下載索引'%s'時出錯"
 msgid "Error downloading index signature '%s'"
 msgstr "下載索引簽名 '%s' 出錯"
 
-#: commands/instances.go:382 commands/instances.go:388
+#: commands/instances.go:405 commands/instances.go:411
 msgid "Error downloading library %s"
 msgstr "下載程式庫 %s 出錯"
 
-#: internal/arduino/cores/packagemanager/profiles.go:128
-#: internal/arduino/cores/packagemanager/profiles.go:129
+#: internal/arduino/cores/packagemanager/profiles.go:135
+#: internal/arduino/cores/packagemanager/profiles.go:136
 msgid "Error downloading platform %s"
 msgstr "下載平台 %s 出錯"
 
 #: internal/arduino/cores/packagemanager/download.go:129
-#: internal/arduino/cores/packagemanager/profiles.go:179
+#: internal/arduino/cores/packagemanager/profiles.go:186
 msgid "Error downloading tool %s"
 msgstr "下載工具 %s 出錯"
 
@@ -784,7 +778,7 @@ msgstr "輸出 JSON 編碼過程出錯：%v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:78
 #: internal/cli/burnbootloader/burnbootloader.go:100
-#: internal/cli/compile/compile.go:269 internal/cli/compile/compile.go:311
+#: internal/cli/compile/compile.go:270 internal/cli/compile/compile.go:312
 #: internal/cli/upload/upload.go:99 internal/cli/upload/upload.go:128
 msgid "Error during Upload: %v"
 msgstr "上傳時出錯: %v"
@@ -793,7 +787,7 @@ msgstr "上傳時出錯: %v"
 msgid "Error during board detection"
 msgstr "開發板偵測時出現錯誤。"
 
-#: internal/cli/compile/compile.go:394
+#: internal/cli/compile/compile.go:396
 msgid "Error during build: %v"
 msgstr "建構時出錯: %v"
 
@@ -840,7 +834,7 @@ msgid ""
 "correct sketch folder or provide the --port flag: %s"
 msgstr "從 `sketch.yaml` 取得預設連接埠出錯. 請檢查是否在正確的 sketch 目錄下, 或者提供 --port 參數: %s"
 
-#: commands/service_compile.go:338 commands/service_library_list.go:115
+#: commands/service_compile.go:340 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "取得程式庫 %s 資訊時出錯"
 
@@ -876,18 +870,18 @@ msgstr "安裝 Git 程式庫出錯: %v"
 msgid "Error installing Zip Library: %v"
 msgstr "安裝 Zip 程式庫出錯: %v"
 
-#: commands/instances.go:398
+#: commands/instances.go:421
 msgid "Error installing library %s"
 msgstr "安裝程式庫 %s 出錯"
 
-#: internal/arduino/cores/packagemanager/profiles.go:136
-#: internal/arduino/cores/packagemanager/profiles.go:137
+#: internal/arduino/cores/packagemanager/profiles.go:143
+#: internal/arduino/cores/packagemanager/profiles.go:144
 msgid "Error installing platform %s"
 msgstr "安裝 %s 平台出錯"
 
-#: internal/arduino/cores/packagemanager/profiles.go:180
 #: internal/arduino/cores/packagemanager/profiles.go:187
-#: internal/arduino/cores/packagemanager/profiles.go:188
+#: internal/arduino/cores/packagemanager/profiles.go:194
+#: internal/arduino/cores/packagemanager/profiles.go:195
 msgid "Error installing tool %s"
 msgstr "安裝 %s 工具出錯"
 
@@ -907,8 +901,8 @@ msgstr "列出平台出錯: %v"
 msgid "Error loading hardware platform"
 msgstr "載入硬體平台時出錯"
 
-#: internal/arduino/cores/packagemanager/profiles.go:114
-#: internal/arduino/cores/packagemanager/profiles.go:115
+#: internal/arduino/cores/packagemanager/profiles.go:121
+#: internal/arduino/cores/packagemanager/profiles.go:122
 msgid "Error loading index %s"
 msgstr "載入索引  %s 出錯"
 
@@ -920,15 +914,15 @@ msgstr "開啟 %s 時出錯"
 msgid "Error opening debug logging file: %s"
 msgstr "打開除錯日誌檔出錯: %s"
 
-#: internal/cli/compile/compile.go:196
+#: internal/cli/compile/compile.go:197
 msgid "Error opening source code overrides data file: %v"
 msgstr "打開原始碼覆寫資料檔時出錯: %v"
 
-#: internal/cli/compile/compile.go:209
+#: internal/cli/compile/compile.go:210
 msgid "Error parsing --show-properties flag: %v"
 msgstr "解析 --show-properties 參數出錯: %v"
 
-#: commands/service_compile.go:412
+#: commands/service_compile.go:414
 msgid "Error reading build directory"
 msgstr "讀取建構目錄時出錯"
 
@@ -1007,14 +1001,14 @@ msgstr "更新平台時出錯: %s"
 msgid "Error verifying signature"
 msgstr "驗證簽名時出錯"
 
-#: internal/arduino/builder/internal/detector/detector.go:369
+#: internal/arduino/builder/internal/detector/detector.go:444
 msgid "Error while detecting libraries included by %[1]s"
 msgstr "偵測 %[1]s 所包含的程式庫時出錯"
 
 #: internal/arduino/builder/sizer.go:80 internal/arduino/builder/sizer.go:89
 #: internal/arduino/builder/sizer.go:92 internal/arduino/builder/sizer.go:111
-#: internal/arduino/builder/sizer.go:218 internal/arduino/builder/sizer.go:228
-#: internal/arduino/builder/sizer.go:232
+#: internal/arduino/builder/sizer.go:220 internal/arduino/builder/sizer.go:230
+#: internal/arduino/builder/sizer.go:234
 msgid "Error while determining sketch size: %s"
 msgstr "確定 sketch 大小時出錯: %s"
 
@@ -1030,7 +1024,7 @@ msgstr "寫入檔案時出錯: %v"
 msgid "Error: command description is not supported by %v"
 msgstr "錯誤: %v 不支持命令說明"
 
-#: internal/cli/compile/compile.go:202
+#: internal/cli/compile/compile.go:203
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "錯誤: 無效原始碼覆蓋了資料檔: %v"
 
@@ -1100,6 +1094,10 @@ msgstr "監聽 TCP 埠: %[1]s 失敗,  未預期的錯誤: %[2]v"
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "監聽 TCP 埠: %s 失敗。位址已被使用"
 
+#: internal/arduino/builder/internal/detector/detector.go:269
+msgid "Failed to load library discovery cache: %[1]s"
+msgstr ""
+
 #: commands/service_upload.go:589
 msgid "Failed uploading"
 msgstr "上傳失敗"
@@ -1108,7 +1106,7 @@ msgstr "上傳失敗"
 msgid "File:"
 msgstr "檔案:"
 
-#: commands/service_compile.go:163
+#: commands/service_compile.go:164
 msgid ""
 "Firmware encryption/signing requires all the following properties to be "
 "defined: %s"
@@ -1172,7 +1170,7 @@ msgstr "已生成指令檔"
 msgid "Generates completion scripts for various shells"
 msgstr "已為各種 shell 生成指令檔"
 
-#: internal/arduino/builder/builder.go:334
+#: internal/arduino/builder/builder.go:343
 msgid "Generating function prototypes..."
 msgstr "生成函式原型..."
 
@@ -1208,7 +1206,7 @@ msgstr "Id"
 msgid "Identification properties:"
 msgstr "標識屬性:"
 
-#: internal/cli/compile/compile.go:135
+#: internal/cli/compile/compile.go:136
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr "一經設定，建構的二進位檔將導出到 sketch 檔案夾"
 
@@ -1244,16 +1242,16 @@ msgstr "已安裝 %s"
 msgid "Installing %s"
 msgstr "安裝 %s..."
 
-#: commands/instances.go:396
+#: commands/instances.go:419
 msgid "Installing library %s"
 msgstr "安裝程式庫 %s"
 
 #: internal/arduino/cores/packagemanager/install_uninstall.go:121
-#: internal/arduino/cores/packagemanager/profiles.go:134
+#: internal/arduino/cores/packagemanager/profiles.go:141
 msgid "Installing platform %s"
 msgstr "安裝平台 %s "
 
-#: internal/arduino/cores/packagemanager/profiles.go:185
+#: internal/arduino/cores/packagemanager/profiles.go:192
 msgid "Installing tool %s"
 msgstr "安裝工具 %s"
 
@@ -1265,7 +1263,7 @@ msgstr "安裝一或多個核心和工具相依"
 msgid "Installs one or more specified libraries into the system."
 msgstr "安裝一或多個指定程式庫到系統中"
 
-#: internal/arduino/builder/internal/detector/detector.go:394
+#: internal/arduino/builder/internal/detector/detector.go:472
 msgid "Internal error in cache"
 msgstr "快取的內部錯誤"
 
@@ -1299,19 +1297,19 @@ msgstr "無效的存檔：%[1]s 不在 %[2]s 存檔裏"
 msgid "Invalid argument passed: %v"
 msgstr "傳送的參數無效: %v"
 
-#: commands/service_compile.go:282
+#: commands/service_compile.go:284
 msgid "Invalid build properties"
 msgstr "無效的建構屬性"
 
-#: internal/arduino/builder/sizer.go:253
+#: internal/arduino/builder/sizer.go:255
 msgid "Invalid data size regexp: %s"
 msgstr "無效的資料大小正規表示式: %s"
 
-#: internal/arduino/builder/sizer.go:259
+#: internal/arduino/builder/sizer.go:261
 msgid "Invalid eeprom size regexp: %s"
 msgstr "無效的 eeprom 大小正規表示式: %s"
 
-#: commands/instances.go:597
+#: commands/instances.go:620
 msgid "Invalid index URL: %s"
 msgstr "無效的索引網址: 1%s"
 
@@ -1327,11 +1325,15 @@ msgstr "無效的項目 %s"
 msgid "Invalid library"
 msgstr "無效的程式庫"
 
+#: commands/instances.go:378
+msgid "Invalid library directory in sketch project: %s"
+msgstr ""
+
 #: internal/cli/cli.go:265
 msgid "Invalid logging level: %s"
 msgstr "無效的日誌層級: %s"
 
-#: commands/instances.go:614
+#: commands/instances.go:637
 msgid "Invalid network configuration: %s"
 msgstr "網路設定無效: %s"
 
@@ -1343,7 +1345,7 @@ msgstr "無效的 '%[1]s' 網路代理 network.proxy: %[2]s"
 msgid "Invalid output format: %s"
 msgstr "無效的輸出格式: %s"
 
-#: commands/instances.go:581
+#: commands/instances.go:604
 msgid "Invalid package index in %s"
 msgstr "%s 內的套件索引無效"
 
@@ -1359,13 +1361,13 @@ msgstr "無效的 pid 值: '%s'"
 msgid "Invalid profile"
 msgstr "無效的設定檔"
 
-#: commands/service_monitor.go:270
-msgid "Invalid recipe in platform.txt"
-msgstr "platform.txt 中的方法無效"
-
-#: internal/arduino/builder/sizer.go:243
+#: internal/arduino/builder/sizer.go:245
 msgid "Invalid size regexp: %s"
 msgstr "無效的大小正規表示式: %s"
+
+#: internal/arduino/builder/sizer.go:207
+msgid "Invalid value for build.warn_data_percentage: %s"
+msgstr ""
 
 #: main.go:86
 msgid "Invalid value in configuration"
@@ -1379,7 +1381,7 @@ msgstr "無效的版本"
 msgid "Invalid vid value: '%s'"
 msgstr "無效的 vid 值: '%s'"
 
-#: internal/cli/compile/compile.go:132
+#: internal/cli/compile/compile.go:133
 msgid ""
 "Just produce the compilation database, without actually compiling. All build"
 " commands are skipped except pre* hooks."
@@ -1420,7 +1422,7 @@ msgstr "程式庫 %s 已是最新版"
 msgid "Library %s is not installed"
 msgstr "程式庫 %s 未安裝"
 
-#: commands/instances.go:375
+#: commands/instances.go:398
 msgid "Library %s not found"
 msgstr "未找到程式庫 %s "
 
@@ -1428,7 +1430,7 @@ msgstr "未找到程式庫 %s "
 msgid "Library '%s' not found"
 msgstr "未找到程式庫 '%s'"
 
-#: internal/arduino/builder/internal/detector/detector.go:471
+#: internal/arduino/builder/internal/detector/detector.go:533
 msgid ""
 "Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
 msgstr "程式庫不能同時用'%[1]s'和'%[2]s'檔案夾。再檢查 '%[3]s'"
@@ -1446,7 +1448,7 @@ msgstr "程式庫已安裝"
 msgid "License: %s"
 msgstr "許可證: %s"
 
-#: internal/arduino/builder/builder.go:437
+#: internal/arduino/builder/builder.go:446
 msgid "Linking everything together..."
 msgstr "將所有內容鏈接在一起..."
 
@@ -1470,7 +1472,7 @@ msgid ""
 " multiple options."
 msgstr "列出開發板選項列表。可多選項多次使用"
 
-#: internal/cli/compile/compile.go:110
+#: internal/cli/compile/compile.go:111
 msgid ""
 "List of custom build properties separated by commas. Or can be used multiple"
 " times for multiple properties."
@@ -1493,7 +1495,7 @@ msgid "Lists cores and libraries that can be upgraded"
 msgstr "列出可升級的核心和程式庫"
 
 #: commands/instances.go:222 commands/instances.go:233
-#: commands/instances.go:343
+#: commands/instances.go:348
 msgid "Loading index file: %v"
 msgstr "載入索引檔: %v"
 
@@ -1501,7 +1503,7 @@ msgstr "載入索引檔: %v"
 msgid "Location"
 msgstr "位置"
 
-#: internal/arduino/builder/sizer.go:208
+#: internal/arduino/builder/sizer.go:211
 msgid "Low memory available, stability problems may occur."
 msgstr "記憶體低容量，可能影響穩定性"
 
@@ -1509,7 +1511,7 @@ msgstr "記憶體低容量，可能影響穩定性"
 msgid "Maintainer: %s"
 msgstr "維護者: %s"
 
-#: internal/cli/compile/compile.go:140
+#: internal/cli/compile/compile.go:141
 msgid ""
 "Max number of parallel compiles. If set to 0 the number of available CPUs "
 "cores will be used."
@@ -1524,7 +1526,7 @@ msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr "記錄此等級含以上的訊息。有效等級為 %s"
 
-#: internal/arduino/builder/internal/detector/detector.go:466
+#: internal/arduino/builder/internal/detector/detector.go:528
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "%[2]s 的程式庫缺少 '%[1]s'"
 
@@ -1552,7 +1554,7 @@ msgstr "缺少燒錄器"
 msgid "Missing required upload field: %s"
 msgstr "缺少必要的上傳欄位: %s"
 
-#: internal/arduino/builder/sizer.go:247
+#: internal/arduino/builder/sizer.go:249
 msgid "Missing size regexp"
 msgstr "缺少大小正規表示式"
 
@@ -1568,7 +1570,7 @@ msgstr "監視器 '%s' 找不到"
 msgid "Monitor port settings:"
 msgstr "監視連接埠設定:"
 
-#: internal/arduino/builder/internal/detector/detector.go:156
+#: internal/arduino/builder/internal/detector/detector.go:176
 msgid "Multiple libraries were found for \"%[1]s\""
 msgstr "找到了多個 “%[1]s” 程式庫"
 
@@ -1646,7 +1648,7 @@ msgstr "找不到有效的相依解決方案"
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
 msgstr "記憶體不足；有關減少用量的方法，請參見 %[1]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:159
+#: internal/arduino/builder/internal/detector/detector.go:179
 msgid "Not used: %[1]s"
 msgstr "未使用: %[1]s"
 
@@ -1672,35 +1674,35 @@ msgstr "開啟開發板的通信埠"
 msgid "Option:"
 msgstr "選項:"
 
-#: internal/cli/compile/compile.go:120
+#: internal/cli/compile/compile.go:121
 msgid ""
 "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr "選項，可以是：%s。用來告訴 gcc 使用哪個警告級別 (-W 參數)"
 
-#: internal/cli/compile/compile.go:133
+#: internal/cli/compile/compile.go:134
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr "選項，清理建構用的檔案夾且不使用任何快取"
 
-#: internal/cli/compile/compile.go:130
+#: internal/cli/compile/compile.go:131
 msgid ""
 "Optional, optimize compile output for debugging, rather than for release."
 msgstr "選項，優化編譯用於除錯的輸出，還不到發佈用"
 
-#: internal/cli/compile/compile.go:122
+#: internal/cli/compile/compile.go:123
 msgid "Optional, suppresses almost every output."
 msgstr "選項，禁止全部輸出"
 
-#: internal/cli/compile/compile.go:121 internal/cli/upload/upload.go:79
+#: internal/cli/compile/compile.go:122 internal/cli/upload/upload.go:79
 msgid "Optional, turns on verbose mode."
 msgstr "選項，開啟詳細模式"
 
-#: internal/cli/compile/compile.go:136
+#: internal/cli/compile/compile.go:137
 msgid ""
 "Optional. Path to a .json file that contains a set of replacements of the "
 "sketch source code."
 msgstr "選項, 包含一組替代 sketch 原始碼的 .json 檔的路徑"
 
-#: internal/cli/compile/compile.go:112
+#: internal/cli/compile/compile.go:113
 msgid ""
 "Override a build property with a custom value. Can be used multiple times "
 "for multiple properties."
@@ -1760,17 +1762,17 @@ msgstr "套件網站:"
 msgid "Paragraph: %s"
 msgstr "段落: %s"
 
-#: internal/cli/compile/compile.go:473 internal/cli/compile/compile.go:488
+#: internal/cli/compile/compile.go:475 internal/cli/compile/compile.go:490
 msgid "Path"
 msgstr "路徑"
 
-#: internal/cli/compile/compile.go:129
+#: internal/cli/compile/compile.go:130
 msgid ""
 "Path to a collection of libraries. Can be used multiple times or entries can"
 " be comma separated."
 msgstr "程式庫集合的路徑。可多次使用，或以逗號分隔"
 
-#: internal/cli/compile/compile.go:127
+#: internal/cli/compile/compile.go:128
 msgid ""
 "Path to a single library’s root folder. Can be used multiple times or "
 "entries can be comma separated."
@@ -1780,7 +1782,7 @@ msgstr "單一程式庫的根目錄路徑。可多次使用，或以逗號分隔
 msgid "Path to the file where logs will be written."
 msgstr "日誌檔的路徑"
 
-#: internal/cli/compile/compile.go:108
+#: internal/cli/compile/compile.go:109
 msgid ""
 "Path where to save compiled files. If omitted, a directory will be created "
 "in the default temporary path of your OS."
@@ -1799,7 +1801,7 @@ msgstr "平台 %s 已安裝過"
 msgid "Platform %s installed"
 msgstr "平台 %s 已安裝"
 
-#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:419 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1827,7 +1829,7 @@ msgstr "平台 '%s' 沒找到"
 msgid "Platform ID"
 msgstr "平台 ID"
 
-#: internal/cli/compile/compile.go:402 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "平台 ID 不正確"
 
@@ -1892,7 +1894,7 @@ msgstr "找不到在“%[1]s”的預編譯程式庫"
 msgid "Print details about a board."
 msgstr "列出開發板的詳細資訊"
 
-#: internal/cli/compile/compile.go:103
+#: internal/cli/compile/compile.go:104
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "列出預處理的代碼到標準輸出，而不是編譯"
 
@@ -1985,7 +1987,7 @@ msgstr "搜尋_條件"
 msgid "SVD file path"
 msgstr "SVD 檔案路徑"
 
-#: internal/cli/compile/compile.go:106
+#: internal/cli/compile/compile.go:107
 msgid "Save build artifacts in this directory."
 msgstr "將建構成品存在這個目錄"
 
@@ -2229,7 +2231,7 @@ msgstr "顯示 Arduino CLI 版本"
 msgid "Size (bytes):"
 msgstr "大小 (字元組) :"
 
-#: commands/service_compile.go:286
+#: commands/service_compile.go:288
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2271,11 +2273,11 @@ msgstr "跳過 1200-bps 接觸重設：未選取序列埠！"
 msgid "Skipping archive creation of: %[1]s"
 msgstr "跳過建立壓縮檔: %[1]s"
 
-#: internal/arduino/builder/compilation.go:184
+#: internal/arduino/builder/compilation.go:156
 msgid "Skipping compile of: %[1]s"
 msgstr "跳過編譯: %[1]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:414
+#: internal/arduino/builder/internal/detector/detector.go:147
 msgid "Skipping dependencies detection for precompiled library %[1]s"
 msgstr "跳過預編譯程式庫  %[1]s 的相依偵測"
 
@@ -2296,7 +2298,7 @@ msgstr "跳過工具設定"
 msgid "Skipping: %[1]s"
 msgstr "跳過: %[1]s"
 
-#: commands/instances.go:634
+#: commands/instances.go:657
 msgid "Some indexes could not be updated."
 msgstr "有些索引無法更新"
 
@@ -2316,7 +2318,7 @@ msgstr "輸出格式，可以是: %s"
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "自定義設定檔 (如沒指定，將使用預設值)"
 
-#: internal/cli/compile/compile.go:93
+#: internal/cli/compile/compile.go:94
 msgid ""
 "The flag --build-cache-path has been deprecated. Please use just --build-"
 "path alone or configure the build cache path in the Arduino CLI settings."
@@ -2355,17 +2357,26 @@ msgstr ""
 "'%[1]v' 鍵不是項目列表，無法移除。\n"
 "還是用 '%[2]s'？"
 
+#: internal/arduino/builder/internal/detector/detector.go:309
+msgid "The library %[1]s has been automatically added from sketch project."
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:879
 msgid "The library %s has multiple installations:"
 msgstr "程式庫 %s 有多個安裝"
 
-#: internal/cli/compile/compile.go:118
+#: internal/arduino/builder/builder.go:332
+msgid ""
+"The list of included libraries has been changed... rebuilding all libraries."
+msgstr ""
+
+#: internal/cli/compile/compile.go:119
 msgid ""
 "The name of the custom encryption key to use to encrypt a binary during the "
 "compile process. Used only by the platforms that support it."
 msgstr "自定義加密密鑰的名稱，用在編譯過程中對二進位碼進行加密。只用在有支援的平台"
 
-#: internal/cli/compile/compile.go:116
+#: internal/cli/compile/compile.go:117
 msgid ""
 "The name of the custom signing key to use to sign a binary during the "
 "compile process. Used only by the platforms that support it."
@@ -2375,7 +2386,7 @@ msgstr "自定義簽名密鑰的名稱，用在編譯過程中對二進位碼進
 msgid "The output format for the logs, can be: %s"
 msgstr "日誌的輸出格​​式，可以是: %s"
 
-#: internal/cli/compile/compile.go:114
+#: internal/cli/compile/compile.go:115
 msgid ""
 "The path of the dir to search for the custom keys to sign and encrypt a "
 "binary. Used only by the platforms that support it."
@@ -2428,7 +2439,7 @@ msgstr "工具包前綴字元"
 msgid "Toolchain type"
 msgstr "工具包類型"
 
-#: internal/cli/compile/compile.go:415 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "嘗試執行 %s"
 
@@ -2470,7 +2481,7 @@ msgstr "無法取得用戶家目錄: %v"
 msgid "Unable to open file for logging: %s"
 msgstr "無法開啟檔案做日誌記錄: %s"
 
-#: commands/instances.go:563
+#: commands/instances.go:586
 msgid "Unable to parse URL"
 msgstr "無法解析網址"
 
@@ -2567,7 +2578,7 @@ msgstr "找到上傳連接埠 %s "
 msgid "Upload port protocol, e.g: serial"
 msgstr "上傳連接埠協議，例如：串列"
 
-#: internal/cli/compile/compile.go:123
+#: internal/cli/compile/compile.go:124
 msgid "Upload the binary after the compilation."
 msgstr "編譯完成就上傳二進位碼"
 
@@ -2579,7 +2590,7 @@ msgstr "使用燒錄器將 bootloader 上傳到開發板"
 msgid "Upload the bootloader."
 msgstr "上傳 bootloader"
 
-#: internal/cli/compile/compile.go:274 internal/cli/upload/upload.go:167
+#: internal/cli/compile/compile.go:275 internal/cli/upload/upload.go:167
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr "以 %s 協議上傳到開發板需要以下資訊:"
@@ -2600,27 +2611,27 @@ msgstr "用法:"
 msgid "Use %s for more information about a command."
 msgstr "使用 %s 取得指令的更多資訊"
 
-#: internal/cli/compile/compile.go:471
+#: internal/cli/compile/compile.go:473
 msgid "Used library"
 msgstr "使用的程式庫"
 
-#: internal/cli/compile/compile.go:486
+#: internal/cli/compile/compile.go:488
 msgid "Used platform"
 msgstr "使用的平台"
 
-#: internal/arduino/builder/internal/detector/detector.go:157
+#: internal/arduino/builder/internal/detector/detector.go:177
 msgid "Used: %[1]s"
 msgstr "使用: %[1]s"
 
-#: commands/service_compile.go:361
+#: commands/service_compile.go:363
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "使用檔案夾: %[2]s 裏面平台的開發板 '%[1]s'  "
 
-#: internal/arduino/builder/internal/detector/detector.go:351
+#: internal/arduino/builder/internal/detector/detector.go:405
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "檔案: %[1]s 使用快取程式庫相依"
 
-#: commands/service_compile.go:362
+#: commands/service_compile.go:364
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "使用檔案夾: %[2]s 裏面平台的核心 '%[1]s' "
 
@@ -2654,7 +2665,7 @@ msgid "Using precompiled library in %[1]s"
 msgstr "使用在%[1]s 裏預編譯的程式庫"
 
 #: internal/arduino/builder/archive_compiled_files.go:51
-#: internal/arduino/builder/compilation.go:182
+#: internal/arduino/builder/compilation.go:150
 msgid "Using previously compiled file: %[1]s"
 msgstr "使用先前編譯的檔案: %[1]s"
 
@@ -2671,11 +2682,11 @@ msgid "Values"
 msgstr "數值"
 
 #: internal/cli/burnbootloader/burnbootloader.go:62
-#: internal/cli/compile/compile.go:125 internal/cli/upload/upload.go:78
+#: internal/cli/compile/compile.go:126 internal/cli/upload/upload.go:78
 msgid "Verify uploaded binary after the upload."
 msgstr "上傳後驗證上傳的二進位碼"
 
-#: internal/cli/compile/compile.go:472 internal/cli/compile/compile.go:487
+#: internal/cli/compile/compile.go:474 internal/cli/compile/compile.go:489
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "版本"
@@ -2697,10 +2708,6 @@ msgstr "警告!無法設定工具: %s"
 msgid "WARNING cannot run pre_uninstall script: %s"
 msgstr "警告 !  無法執行 pre_uninstall 命令: %s"
 
-#: internal/cli/compile/compile.go:339
-msgid "WARNING: The sketch is compiled using one or more custom libraries."
-msgstr "警告! sketch 用了一或多個客製程式庫編譯"
-
 #: internal/arduino/builder/libraries.go:284
 msgid ""
 "WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
@@ -2711,7 +2718,7 @@ msgstr "警告: %[1]s 程式庫是 (%[2]s 架構)，可能與選擇的開發板 
 msgid "Waiting for upload port..."
 msgstr "等待上傳連接埠..."
 
-#: commands/service_compile.go:367
+#: commands/service_compile.go:369
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr "警告: 開發板 %[1]s 並沒定義 %[2]s 喜好。自動設定成：%[3]s"
@@ -2730,9 +2737,14 @@ msgid ""
 "directory."
 msgstr "將目前的設定寫入資料目錄裏面的設定檔"
 
-#: internal/cli/compile/compile.go:153 internal/cli/compile/compile.go:156
+#: internal/cli/compile/compile.go:154 internal/cli/compile/compile.go:157
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr "使用設定集編譯時不能使用  %s 旗標參數"
+
+#: internal/arduino/sketch/profiles.go:198
+msgid ""
+"all platforms in a profile must either require a specific version or not"
+msgstr ""
 
 #: internal/arduino/resources/checksums.go:79
 msgid "archive hash differs from hash in index"
@@ -2750,7 +2762,7 @@ msgstr "存檔無效: 在 zip 檔的頂層沒找到檔案"
 msgid "archivePath"
 msgstr "存檔路徑"
 
-#: internal/arduino/builder/internal/preprocessor/arduino_preprocessor.go:64
+#: internal/arduino/builder/internal/preprocessor/arduino_preprocessor.go:65
 msgid "arduino-preprocessor pattern is missing"
 msgstr "缺少 arduino 預處理器樣態"
 
@@ -2766,7 +2778,7 @@ msgstr "基本搜尋\"audio\" "
 msgid "basic search for \"esp32\" and \"display\" limited to official Maintainer"
 msgstr "基本搜尋只限於官方維護者的 \"esp32\" 和 \"display\""
 
-#: commands/service_upload.go:792
+#: commands/service_upload.go:789
 msgid "binary file not found in %s"
 msgstr "%s 裏找不到二進位檔"
 
@@ -2782,11 +2794,11 @@ msgstr "開發板名"
 msgid "built-in libraries directory not set"
 msgstr "內建程式庫目錄未設定"
 
-#: internal/arduino/cores/status.go:132 internal/arduino/cores/status.go:159
+#: internal/arduino/cores/status.go:139 internal/arduino/cores/status.go:166
 msgid "can't find latest release of %s"
 msgstr "找不到最新版的 %s "
 
-#: commands/instances.go:273
+#: commands/instances.go:278
 msgid "can't find latest release of tool %s"
 msgstr "找不到最新版的工具 %s "
 
@@ -2794,11 +2806,11 @@ msgstr "找不到最新版的工具 %s "
 msgid "can't find pattern for discovery with id %s"
 msgstr "找不到 id 為 %s 探索的樣態"
 
-#: internal/arduino/builder/internal/detector/detector.go:93
+#: internal/arduino/builder/internal/detector/detector.go:98
 msgid "candidates"
 msgstr "候選"
 
-#: commands/service_upload.go:738 commands/service_upload.go:745
+#: commands/service_upload.go:735 commands/service_upload.go:742
 msgid "cannot execute upload tool: %s"
 msgstr "無法執行上傳工具: %s"
 
@@ -2840,7 +2852,7 @@ msgstr "設定值%s 含有無效字元"
 msgid "copying library to destination directory:"
 msgstr "拷貝程式庫到目標目錄:"
 
-#: commands/service_upload.go:864
+#: commands/service_upload.go:861
 msgid "could not find a valid build artifact"
 msgstr "找不到正確的建構成品"
 
@@ -2934,7 +2946,7 @@ msgstr "錯誤載入 sketch 專案:"
 msgid "error opening %s"
 msgstr "錯誤開啟 %s"
 
-#: internal/arduino/sketch/profiles.go:250
+#: internal/arduino/sketch/profiles.go:300
 msgid "error parsing version constraints"
 msgstr "錯誤解析版本限制"
 
@@ -3056,7 +3068,7 @@ msgstr "安裝平台%[1]s: %[2]s"
 msgid "interactive terminal not supported for the '%s' output format"
 msgstr "互動終端不支援 '%s' 輸出格式"
 
-#: internal/arduino/sketch/profiles.go:248
+#: internal/arduino/sketch/profiles.go:295
 msgid "invalid '%s' directive"
 msgstr "無效的 '%s' 指令"
 
@@ -3115,7 +3127,7 @@ msgstr "無效的雜湊 '%[1]s': %[2]s"
 msgid "invalid item %s"
 msgstr "無效的項目 %s"
 
-#: internal/arduino/sketch/profiles.go:282
+#: internal/arduino/sketch/profiles.go:352
 msgid "invalid library directive:"
 msgstr "無效的程式庫指令:"
 
@@ -3123,9 +3135,14 @@ msgstr "無效的程式庫指令:"
 msgid "invalid library layout: %s"
 msgstr "無效的程式庫配置: %s"
 
-#: internal/arduino/libraries/libraries_location.go:90
+#: internal/arduino/libraries/libraries_location.go:97
 msgid "invalid library location: %s"
 msgstr "無效的程式庫位置: %s"
+
+#: internal/arduino/sketch/profiles.go:337
+#: internal/arduino/sketch/profiles.go:339
+msgid "invalid library reference: %s"
+msgstr ""
 
 #: internal/arduino/libraries/loader.go:140
 msgid "invalid library: no header files found"
@@ -3147,11 +3164,11 @@ msgstr "無效路徑難建立設定目錄: %[1]s 錯誤"
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr "無效路徑來寫入檔案: %[1]s 錯誤"
 
-#: internal/arduino/sketch/profiles.go:252
+#: internal/arduino/sketch/profiles.go:307
 msgid "invalid platform identifier"
 msgstr "無效的平台識別"
 
-#: internal/arduino/sketch/profiles.go:262
+#: internal/arduino/sketch/profiles.go:318
 msgid "invalid platform index URL:"
 msgstr "無效的平台索引位址:"
 
@@ -3166,10 +3183,6 @@ msgstr "無效的連接埠設定值 %s : %s"
 #: internal/cli/monitor/monitor.go:182
 msgid "invalid port configuration: %s=%s"
 msgstr "無效的連接埠設定: %s"
-
-#: commands/service_upload.go:725
-msgid "invalid recipe '%[1]s': %[2]s"
-msgstr "無效的作法'%[1]s': %[2]s"
 
 #: commands/service_sketch_new.go:86
 msgid ""
@@ -3186,7 +3199,7 @@ msgstr "無效的 '%[2]s' 選項值 '%[1]s' "
 msgid "invalid version directory %s"
 msgstr "無效的版本目錄 %s"
 
-#: internal/arduino/sketch/profiles.go:284
+#: internal/arduino/sketch/profiles.go:354
 msgid "invalid version:"
 msgstr "無效的版本:"
 
@@ -3226,6 +3239,10 @@ msgstr "程式庫 %s 已安裝"
 msgid "library not valid"
 msgstr "程式庫無效"
 
+#: internal/arduino/builder/internal/preprocessor/ctags.go:242
+msgid "line too long\n"
+msgstr ""
+
 #: internal/arduino/cores/packagemanager/loader.go:255
 #: internal/arduino/cores/packagemanager/loader.go:268
 #: internal/arduino/cores/packagemanager/loader.go:276
@@ -3258,11 +3275,11 @@ msgstr "載入平台發行版 %s"
 msgid "loading platform.txt"
 msgstr "載入 platform.txt"
 
-#: internal/arduino/cores/packagemanager/profiles.go:47
+#: internal/arduino/cores/packagemanager/profiles.go:54
 msgid "loading required platform %s"
 msgstr "載入需要的平台 %s"
 
-#: internal/arduino/cores/packagemanager/profiles.go:63
+#: internal/arduino/cores/packagemanager/profiles.go:70
 msgid "loading required tool %s"
 msgstr "載入需要的工具 %s"
 
@@ -3274,7 +3291,7 @@ msgstr "載入在 %s 的工具"
 msgid "looking for boards.txt in %s"
 msgstr "在 %s 尋找 boards.txt"
 
-#: commands/service_upload.go:807
+#: commands/service_upload.go:804
 msgid "looking for build artifacts"
 msgstr "尋找建構成品"
 
@@ -3282,7 +3299,7 @@ msgstr "尋找建構成品"
 msgid "main file missing from sketch: %s"
 msgstr "sketch 缺少主檔: %s"
 
-#: internal/arduino/sketch/profiles.go:246
+#: internal/arduino/sketch/profiles.go:293
 msgid "missing '%s' directive"
 msgstr "缺少 '%s' 指令"
 
@@ -3320,7 +3337,7 @@ msgstr "沒找到監視器發行版: %s"
 msgid "moving extracted archive to destination dir: %s"
 msgstr "移動解壓縮的存檔到目標資料夾: %s"
 
-#: commands/service_upload.go:859
+#: commands/service_upload.go:856
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "找到多個建構成品: '%[1]s' 和 '%[2]s'"
 
@@ -3338,7 +3355,7 @@ msgstr "沒找到目前作業系統相容工具版本 %[1]s，請聯絡 %[2]s"
 msgid "no instance specified"
 msgstr "未指定實例"
 
-#: commands/service_upload.go:814
+#: commands/service_upload.go:811
 msgid "no sketch or build directory/file specified"
 msgstr "未指定 sketch 或建構目錄/檔"
 
@@ -3388,8 +3405,8 @@ msgid "opening target file: %s"
 msgstr "開啟目標檔: %s"
 
 #: internal/arduino/cores/packagemanager/download.go:78
-#: internal/arduino/cores/status.go:97 internal/arduino/cores/status.go:122
-#: internal/arduino/cores/status.go:149
+#: internal/arduino/cores/status.go:104 internal/arduino/cores/status.go:129
+#: internal/arduino/cores/status.go:156
 msgid "package %s not found"
 msgstr "找不到套件 %s"
 
@@ -3422,14 +3439,14 @@ msgstr "平台 %s 未安裝"
 msgid "platform is not available for your OS"
 msgstr "平台不支援使用中的作業系統"
 
-#: commands/service_compile.go:129
+#: commands/service_compile.go:130
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
 #: internal/arduino/cores/packagemanager/loader.go:417
 msgid "platform not installed"
 msgstr "平台未安裝"
 
-#: internal/cli/compile/compile.go:142
+#: internal/cli/compile/compile.go:143
 msgid "please use --build-property instead."
 msgstr "請改用 --build-property"
 
@@ -3512,8 +3529,8 @@ msgstr "作法未找到 %s"
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "找不到工具 %[2]s 的發行版 %[1]s"
 
-#: internal/arduino/cores/status.go:91 internal/arduino/cores/status.go:115
-#: internal/arduino/cores/status.go:142
+#: internal/arduino/cores/status.go:98 internal/arduino/cores/status.go:122
+#: internal/arduino/cores/status.go:149
 msgid "release cannot be nil"
 msgstr "發行版不能是無"
 
@@ -3595,8 +3612,8 @@ msgstr "測試本地存檔完整性: %s"
 msgid "text section exceeds available space in board"
 msgstr "本文區已超出開發板的可用空間"
 
-#: internal/arduino/builder/internal/detector/detector.go:214
-#: internal/arduino/builder/internal/preprocessor/ctags.go:70
+#: internal/arduino/builder/internal/detector/detector.go:228
+#: internal/arduino/builder/internal/preprocessor/ctags.go:71
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr "編譯資料庫可能不完整或不準確"
 
@@ -3612,8 +3629,8 @@ msgstr "等待訊息超時"
 msgid "tool %s is not managed by package manager"
 msgstr "工具 %s 不是由套件管理員管理的"
 
-#: internal/arduino/cores/status.go:101 internal/arduino/cores/status.go:126
-#: internal/arduino/cores/status.go:153
+#: internal/arduino/cores/status.go:108 internal/arduino/cores/status.go:133
+#: internal/arduino/cores/status.go:160
 msgid "tool %s not found"
 msgstr "找不到工具 %s"
 
@@ -3630,7 +3647,7 @@ msgstr "工具未安裝"
 msgid "tool release not found: %s"
 msgstr "工具發行未找到: %s"
 
-#: internal/arduino/cores/status.go:105
+#: internal/arduino/cores/status.go:112
 msgid "tool version %s not found"
 msgstr "工具版本 %s 未找到"
 
@@ -3692,7 +3709,7 @@ msgstr "升級 arduino:samd 到最新版"
 msgid "upgrade everything to the latest version"
 msgstr "升級全部內容到最新版"
 
-#: commands/service_upload.go:760
+#: commands/service_upload.go:757
 msgid "uploading error: %s"
 msgstr "上傳錯誤: %s"
 
@@ -3708,11 +3725,11 @@ msgstr "用戶輸入不支援 '%s' 輸出格式"
 msgid "user input not supported in non interactive mode"
 msgstr "在非互動模式下不支援用戶輸入"
 
-#: internal/arduino/cores/packagemanager/profiles.go:175
+#: internal/arduino/cores/packagemanager/profiles.go:182
 msgid "version %s not available for this operating system"
 msgstr "版本 %s 不適合本作業系統"
 
-#: internal/arduino/cores/packagemanager/profiles.go:154
+#: internal/arduino/cores/packagemanager/profiles.go:161
 msgid "version %s not found"
 msgstr "沒找到版本 %s "
 
