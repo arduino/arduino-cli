@@ -289,7 +289,6 @@ func (l *SketchLibrariesDetector) findIncludes(
 	sourceFileQueue := &uniqueSourceFileQueue{}
 
 	if !l.useCachedLibrariesResolution {
-		sketch := sketch
 		mergedfile, err := makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
 			return err
