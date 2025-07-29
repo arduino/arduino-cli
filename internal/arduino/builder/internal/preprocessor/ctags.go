@@ -55,9 +55,19 @@ func PreprocessSketchWithCtags(
 
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 
+	// Check if the preprocessed file is already up-to-date
+	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
+	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
+	if unpreprocessedStat, err := unpreprocessedSourceFile.Stat(); err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("unable to open unpreprocessed source file"), err)
+	} else if sourceStat, err := preprocessedSourceFile.Stat(); err == nil && unpreprocessedStat.ModTime().Before(sourceStat.ModTime()) {
+		fmt.Fprintln(stdout, i18n.Tr("Sketch is unchanged, skipping preprocessing."))
+		res := &runner.Result{Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}
+		return res, nil
+	}
+
 	// Run GCC preprocessor
-	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	result := GCC(sourceFile, ctagsTarget, includes, buildProperties).Run(ctx)
+	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties).Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {
@@ -69,7 +79,7 @@ func PreprocessSketchWithCtags(
 		fmt.Fprintf(stderr, "%s: %s",
 			i18n.Tr("An error occurred adding prototypes"),
 			i18n.Tr("the compilation database may be incomplete or inaccurate"))
-		if err := sourceFile.CopyTo(ctagsTarget); err != nil {
+		if err := unpreprocessedSourceFile.CopyTo(ctagsTarget); err != nil {
 			return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 		}
 	}
@@ -102,7 +112,7 @@ func PreprocessSketchWithCtags(
 
 	// Add prototypes to the original sketch source
 	var source string
-	if sourceData, err := sourceFile.ReadFile(); err == nil {
+	if sourceData, err := unpreprocessedSourceFile.ReadFile(); err == nil {
 		source = string(sourceData)
 	} else {
 		return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
@@ -136,7 +146,7 @@ func PreprocessSketchWithCtags(
 	}
 
 	// Write back arduino-preprocess output to the sourceFile
-	err = sourceFile.WriteFile([]byte(preprocessedSource))
+	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 }
 
