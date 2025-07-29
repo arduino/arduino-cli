@@ -61,11 +61,6 @@ func (b *Builder) prepareSketchBuildPath() error {
 		if err := destFileUnpreprocessed.WriteFile([]byte(mergedSource)); err != nil {
 			return err
 		}
-
-		destFile := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp")
-		if err := destFileUnpreprocessed.CopyTo(destFile); err != nil {
-			return err
-		}
 	}
 
 	if err := b.sketchCopyAdditionalFiles(b.sketchBuildPath, b.sourceOverrides); err != nil {
