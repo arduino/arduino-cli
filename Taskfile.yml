@@ -16,9 +16,6 @@ tasks:
       - mkdir -p debian/arduino-cli/usr/share/doc/arduino-cli/
       - echo -e "\n\n---\n\n" >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
       - cat .licenses/NOTICE.arduino-cli  >> debian/arduino-cli/usr/share/doc/arduino-cli/copyright
-    sources:
-      - LICENSE.txt
-      - licenses/**
 
   docs:generate:
     desc: Create all generated documentation content

@@ -65,3 +65,8 @@ jobs:
           fi
 
           exit $EXIT_STATUS
+
+      - name: Check debian copyright file
+        run: |
+          task update-deb-copyright
+          git diff --color --exit-code

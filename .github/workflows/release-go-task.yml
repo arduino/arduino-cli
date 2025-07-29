@@ -66,10 +66,6 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
-      - name: Build License
-        run: |
-          task update-deb-copyright
-
       - name: Build
         run: task dist:${{ matrix.env.os }}
 
