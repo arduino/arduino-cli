@@ -41,6 +41,12 @@ jobs:
         with:
           ruby-version: ruby # Install latest version
 
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Install licensee
         run: gem install licensee
 
