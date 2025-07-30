@@ -27,8 +27,7 @@ import (
 
 // RunRecipe fixdoc
 func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
-	// TODO is it necessary to use Clone?
-	return b.RunRecipeWithProps(prefix, suffix, b.buildProperties.Clone(), skipIfOnlyUpdatingCompilationDatabase)
+	return b.RunRecipeWithProps(prefix, suffix, b.buildProperties, skipIfOnlyUpdatingCompilationDatabase)
 }
 
 func (b *Builder) RunRecipeWithProps(prefix, suffix string, buildProperties *properties.Map, skipIfOnlyUpdatingCompilationDatabase bool) error {
@@ -36,12 +35,10 @@ func (b *Builder) RunRecipeWithProps(prefix, suffix string, buildProperties *pro
 
 	recipes := findRecipes(buildProperties, prefix, suffix)
 
-	// TODO is it necessary to use Clone?
-	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
 		logrus.Debugf("Running recipe: %s", recipe)
 
-		command, err := b.prepareCommandForRecipe(properties, recipe, false)
+		command, err := b.prepareCommandForRecipe(buildProperties, recipe, false)
 		if err != nil {
 			return err
 		}
