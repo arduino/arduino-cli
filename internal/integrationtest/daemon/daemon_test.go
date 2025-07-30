@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -567,17 +568,36 @@ func TestDaemonUserAgent(t *testing.T) {
 	// The user-agent is tested inside the HTTPServeFile function
 	test_index := paths.New("..", "testdata", "test_index.json")
 	url := env.HTTPServeFile(8000, test_index)
+	// Wait for the server to be ready
+	fmt.Print("Waiting for test server to be ready: ")
+	for i := range 20 {
+		if resp, err := http.Get(url.String()); err == nil && resp.StatusCode == http.StatusOK {
+			fmt.Println("Test server is ready")
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+		fmt.Print(".")
+		require.Less(t, i, 19, "Test server did not start in time")
+	}
+
+	var enableTest atomic.Bool
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Test that the user-agent contains metadata from the context when the CLI is in daemon mode
 		userAgent := r.Header.Get("User-Agent")
 
+		if !enableTest.Load() {
+			return
+		}
+		fmt.Println("Got user-agent:", userAgent)
+
 		require.Contains(t, userAgent, "cli-test/0.0.0")
 		require.Contains(t, userAgent, "grpc-go")
 		// Depends on how we built the client we may have git-snapshot or 0.0.0-git in dev releases
-		require.Condition(t, func() (success bool) {
-			return strings.Contains(userAgent, "arduino-cli/git-snapshot") ||
-				strings.Contains(userAgent, "arduino-cli/0.0.0-git")
-		})
+		require.True(t,
+			strings.Contains(userAgent, "arduino-cli/git-snapshot") || strings.Contains(userAgent, "arduino-cli/0.0.0-git"),
+			"invalid user-agent value: "+userAgent,
+		)
 
 		proxiedReq, err := http.NewRequest(r.Method, url.String(), r.Body)
 		require.NoError(t, err)
@@ -593,6 +613,19 @@ func TestDaemonUserAgent(t *testing.T) {
 		io.Copy(w, proxiedResp.Body)
 	}))
 	defer ts.Close()
+
+	fmt.Print("Waiting for the proxy test server to be ready: ")
+	for i := range 20 {
+		if resp, err := http.Get(ts.URL); err == nil && resp.StatusCode == http.StatusOK {
+			fmt.Println("Test server is ready")
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+		fmt.Print(".")
+		require.Less(t, i, 19, "Test server did not start in time")
+	}
+
+	enableTest.Store(true)
 
 	grpcInst := cli.Create()
 	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
