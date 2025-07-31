@@ -49,17 +49,23 @@ func (b *Builder) prepareSketchBuildPath() error {
 	if err != nil {
 		return err
 	}
+	b.lineOffset = offset
 
-	destFile := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp")
-	if err := destFile.WriteFile([]byte(mergedSource)); err != nil {
-		return err
+	// Save the unpreprocessed merged source to a file named sketch.cpp.merged.
+	destFileUnpreprocessed := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp.merged")
+	oldUnpreprocessedSource, _ := destFileUnpreprocessed.ReadFile()
+
+	// If the merged source is unchanged, skip writing it.
+	// This avoids unnecessary rebuilds and keeps the build path clean.
+	if !bytes.Equal(oldUnpreprocessedSource, []byte(mergedSource)) {
+		if err := destFileUnpreprocessed.WriteFile([]byte(mergedSource)); err != nil {
+			return err
+		}
 	}
 
 	if err := b.sketchCopyAdditionalFiles(b.sketchBuildPath, b.sourceOverrides); err != nil {
 		return err
 	}
-
-	b.lineOffset = offset
 
 	return nil
 }
