@@ -27,18 +27,18 @@ import (
 
 // RunRecipe fixdoc
 func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
+	return b.RunRecipeWithProps(prefix, suffix, b.buildProperties, skipIfOnlyUpdatingCompilationDatabase)
+}
+
+func (b *Builder) RunRecipeWithProps(prefix, suffix string, buildProperties *properties.Map, skipIfOnlyUpdatingCompilationDatabase bool) error {
 	logrus.Debugf("Looking for recipes like %s", prefix+"*"+suffix)
 
-	// TODO is it necessary to use Clone?
-	buildProperties := b.buildProperties.Clone()
 	recipes := findRecipes(buildProperties, prefix, suffix)
 
-	// TODO is it necessary to use Clone?
-	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
 		logrus.Debugf("Running recipe: %s", recipe)
 
-		command, err := b.prepareCommandForRecipe(properties, recipe, false)
+		command, err := b.prepareCommandForRecipe(buildProperties, recipe, false)
 		if err != nil {
 			return err
 		}
@@ -60,10 +60,18 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 
 func findRecipes(buildProperties *properties.Map, patternPrefix string, patternSuffix string) []string {
 	var recipes []string
+
+	exactKey := patternPrefix + patternSuffix
+
 	for _, key := range buildProperties.Keys() {
-		if strings.HasPrefix(key, patternPrefix) && strings.HasSuffix(key, patternSuffix) && buildProperties.Get(key) != "" {
+		if key != exactKey && strings.HasPrefix(key, patternPrefix) && strings.HasSuffix(key, patternSuffix) && buildProperties.Get(key) != "" {
 			recipes = append(recipes, key)
 		}
+	}
+
+	// If no recipes were found, check if the exact key exists
+	if len(recipes) == 0 && buildProperties.Get(exactKey) != "" {
+		recipes = append(recipes, exactKey)
 	}
 
 	sort.Strings(recipes)

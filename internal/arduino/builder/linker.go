@@ -90,10 +90,5 @@ func (b *Builder) link() error {
 	properties.Set("archive_file_path", b.buildArtifacts.coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	command, err := b.prepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)
-	if err != nil {
-		return err
-	}
-
-	return b.execCommand(command)
+	return b.RunRecipeWithProps("recipe.c.combine", ".pattern", properties, false)
 }

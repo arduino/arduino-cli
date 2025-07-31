@@ -464,7 +464,7 @@ func (b *Builder) build() error {
 	}
 	b.Progress.CompleteStep()
 
-	if err := b.RunRecipe("recipe.objcopy.", ".pattern", true); err != nil {
+	if err := b.RunRecipe("recipe.objcopy", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
