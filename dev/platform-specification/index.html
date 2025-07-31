@@ -2691,6 +2691,9 @@ compiler.libraries.ldflags=
 ## Combine gc-sections, archives, and objects
 recipe.c.combine.pattern=&quot;{compiler.path}{compiler.c.elf.cmd}&quot; {compiler.c.elf.flags} -mmcu={build.mcu} -o &quot;{build.path}/{build.project_name}.elf&quot; {object_files} {compiler.libraries.ldflags} &quot;{archive_file_path}&quot; &quot;-L{build.path}&quot; -lm
 </code></pre></div>
+<p>If the linking process requires multiple steps, the recipe can be written using the <strong>recipe.c.combine.NUMBER.pattern</strong>
+syntax. In this case, each step will be executed in the order specified by the number. When multiple steps are defined,
+the <strong>recipe.c.combine.pattern</strong> property is ignored.</p>
 <h4 id="recipes-for-extraction-of-executable-files-and-other-binary-data">Recipes for extraction of executable files and other binary data<a class="headerlink" href="#recipes-for-extraction-of-executable-files-and-other-binary-data" title="Permanent link">&para;</a></h4>
 <p>An arbitrary number of extra steps can be performed at the end of objects linking. These steps can be used to extract
 binary data used for upload and they are defined by a set of recipes with the following format:</p>
