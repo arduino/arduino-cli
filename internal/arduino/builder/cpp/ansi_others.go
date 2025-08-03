@@ -15,7 +15,7 @@
 
 //go:build !windows
 
-package utils
+package cpp
 
 import (
 	"errors"
