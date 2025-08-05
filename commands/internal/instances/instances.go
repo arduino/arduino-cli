@@ -1,5 +1,6 @@
-// This file is part of arduino-cli.
-//
+sensör görcek
+// hareketi algılacak
+
 // Copyright 2024 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
