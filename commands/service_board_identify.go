@@ -137,7 +137,7 @@ var (
 func cachedAPIByVidPid(ctx context.Context, vid, pid string, settings *configuration.Settings) ([]*rpc.BoardListItem, error) {
 	var resp []*rpc.BoardListItem
 
-	cacheKey := fmt.Sprintf("cache.builder-api.v3/boards/byvid/pid/%s/%s", vid, pid)
+	cacheKey := fmt.Sprintf("cache.api2.arduino.cc/boards/v1/boards?vid-pid=%s-%s", vid, pid)
 	if cachedResp := inventory.Store.GetString(cacheKey + ".data"); cachedResp != "" {
 		ts := inventory.Store.GetTime(cacheKey + ".ts")
 		if time.Since(ts) < time.Hour*24 {
