@@ -54,9 +54,9 @@ func findMatchingLanguage(language string, supportedLocales []string) string {
 }
 
 func findMatchingLocale(locale string, supportedLocales []string) string {
-	for _, suportedLocale := range supportedLocales {
-		if locale == suportedLocale {
-			return suportedLocale
+	for _, supportedLocale := range supportedLocales {
+		if locale == supportedLocale {
+			return supportedLocale
 		}
 	}
 

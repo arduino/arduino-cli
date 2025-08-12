@@ -161,7 +161,7 @@ service ArduinoCoreService {
   // Start a debug session and communicate with the debugger tool.
   rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
 
-  // Determine if debugging is suported given a specific configuration.
+  // Determine if debugging is supported given a specific configuration.
   rpc IsDebugSupported(IsDebugSupportedRequest) returns (IsDebugSupportedResponse) {}
 
   // Query the debugger information given a specific configuration.
@@ -336,7 +336,7 @@ message NewSketchRequest {
   // Default Sketchbook directory "directories.User" is used if sketch_dir is
   // empty.
   string sketch_dir = 3;
-  // Specificies if an existing .ino sketch should be overwritten.
+  // Specifies if an existing .ino sketch should be overwritten.
   bool overwrite = 4;
 
   reserved 1;
@@ -387,7 +387,7 @@ message SetSketchDefaultsRequest {
 }
 
 message SetSketchDefaultsResponse {
-  // The value of default_fqnn that has been written in project file
+  // The value of default_fqbn that has been written in project file
   // (sketch.yaml).
   string default_fqbn = 1;
   // The value of default_port that has been written in project file

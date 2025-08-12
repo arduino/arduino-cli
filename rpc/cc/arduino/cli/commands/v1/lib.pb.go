@@ -1065,7 +1065,7 @@ type LibraryResolveDependenciesRequest struct {
 	// The version of the library to check dependencies of. If no version is
 	// specified, dependencies of the newest version will be listed.
 	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	// If true the computed solution will try to keep exising libraries
+	// If true the computed solution will try to keep existing libraries
 	// at their current version.
 	DoNotUpdateInstalledLibraries bool `protobuf:"varint,4,opt,name=do_not_update_installed_libraries,json=doNotUpdateInstalledLibraries,proto3" json:"do_not_update_installed_libraries,omitempty"`
 }

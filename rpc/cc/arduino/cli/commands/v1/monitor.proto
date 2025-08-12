@@ -49,6 +49,8 @@ message MonitorPortOpenRequest {
   string fqbn = 3;
   // Port configuration, optional, contains settings of the port to be applied.
   MonitorPortConfiguration port_configuration = 4;
+  // Optional buffering configuration for the monitor stream.
+  MonitorBufferConfig buffer_config = 5;
 }
 
 message MonitorResponse {
@@ -62,7 +64,7 @@ message MonitorResponse {
     // (to report the new settings applied).
     MonitorPortConfiguration applied_settings = 3;
     // A message with this field set to true is sent as soon as the port is
-    // succesfully opened.
+    // successfully opened.
     bool success = 4;
   }
 }
@@ -89,10 +91,41 @@ message MonitorPortSettingDescriptor {
   string setting_id = 1;
   // A human-readable label of the setting (to be displayed on the GUI).
   string label = 2;
-  // The setting type (at the moment only "enum" is avaiable).
+  // The setting type (at the moment only "enum" is available).
   string type = 3;
   // The values allowed on "enum" types.
   repeated string enum_values = 4;
   // The selected or default value.
   string value = 5;
+}
+
+message MonitorBufferConfig {
+  // Size trigger (bytes). Example: 64. If unset or <= 0, treated as 1 ("unbuffered").
+  uint32 high_water_mark_bytes = 1;
+
+  // Time trigger (ms). Example: 16. 0 disables interval-based flushing.
+  uint32 flush_interval_ms = 2;
+
+  // Flush on '\n'.
+  bool line_buffering = 3;
+
+  // Queue capacity between aggregator and TCP writer. If unset or 0, default to 32.
+  uint32 flush_queue_capacity = 4;
+
+  // Overflow policy when queue is full. If not set, defaults to drop.
+  BufferOverflowStrategy overflow_strategy = 5;
+
+  // Bounded wait (ms) when overflow_strategy=WAIT. If unset/negative, treated as 0.
+  uint32 overflow_wait_ms = 6;
+}
+
+// BufferOverflowStrategy defines how the pluggable monitor should behave
+// when the port→TCP queue is full.
+enum BufferOverflowStrategy {
+  // Unspecified; treated as DROP by the server/handler for backward compatibility.
+  BUFFER_OVERFLOW_STRATEGY_UNSPECIFIED = 0;
+  // Drop the aggregated payload when the queue is full (do not block the port reader).
+  BUFFER_OVERFLOW_STRATEGY_DROP = 1;
+  // Wait up to a bounded timeout for space in the queue before dropping.
+  BUFFER_OVERFLOW_STRATEGY_WAIT = 2;
 }

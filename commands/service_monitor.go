@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -95,6 +96,38 @@ func (s *monitorPipeClient) Close() error {
 	return nil
 }
 
+// configurer is the minimal subset of the monitor used to apply settings.
+type configurer interface {
+	Configure(parameterName, value string) error
+}
+
+// applyBufferConfig translates the gRPC buffer config into pluggable-monitor CONFIGURE calls.
+func applyBufferConfig(c configurer, cfg *rpc.MonitorBufferConfig) {
+	if cfg == nil {
+		return
+	}
+	if v := cfg.GetHighWaterMarkBytes(); v > 0 {
+		_ = c.Configure("_buffer.hwm", strconv.Itoa(int(v)))
+	}
+	// Interval (0 disables)
+	_ = c.Configure("_buffer.interval_ms", strconv.Itoa(int(cfg.GetFlushIntervalMs())))
+	// Line buffering
+	_ = c.Configure("_buffer.line", strconv.FormatBool(cfg.GetLineBuffering()))
+	// Queue capacity
+	if v := cfg.GetFlushQueueCapacity(); v > 0 {
+		_ = c.Configure("_buffer.queue", strconv.Itoa(int(v)))
+	}
+	// Overflow strategy (default to drop if unspecified)
+	switch cfg.GetOverflowStrategy() {
+	case rpc.BufferOverflowStrategy_BUFFER_OVERFLOW_STRATEGY_WAIT:
+		_ = c.Configure("_buffer.overflow", "wait")
+	default: // unspecified or drop
+		_ = c.Configure("_buffer.overflow", "drop")
+	}
+	// Bounded wait for overflow (ms)
+	_ = c.Configure("_buffer.overflow_wait_ms", strconv.Itoa(int(cfg.GetOverflowWaitMs())))
+}
+
 // MonitorServerToReadWriteCloser creates a monitor server that proxies the data to a ReadWriteCloser.
 // The server is returned along with the ReadWriteCloser that can be used to send and receive data
 // to the server. The MonitorPortOpenRequest is used to configure the monitor.
@@ -148,6 +181,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	for setting, value := range boardSettings.AsMap() {
 		monitor.Configure(setting, value)
 	}
+	applyBufferConfig(monitor, openReq.GetBufferConfig())
 	monitorIO, err := monitor.Open(openReq.GetPort().GetAddress(), openReq.GetPort().GetProtocol())
 	if err != nil {
 		monitor.Quit()
@@ -165,7 +199,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 
 	ctx, cancel := context.WithCancel(stream.Context())
 	gracefulCloseInitiated := &atomic.Bool{}
-	gracefuleCloseCtx, gracefulCloseCancel := context.WithCancel(context.Background())
+	gracefulCloseCtx, gracefulCloseCancel := context.WithCancel(context.Background())
 
 	// gRPC stream receiver (gRPC data -> monitor, config, close)
 	go func() {
@@ -230,7 +264,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	<-ctx.Done()
 	if gracefulCloseInitiated.Load() {
 		// Port closing has been initiated in the receiver
-		<-gracefuleCloseCtx.Done()
+		<-gracefulCloseCtx.Done()
 	} else {
 		monitorClose()
 	}
