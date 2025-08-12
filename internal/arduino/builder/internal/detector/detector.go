@@ -290,7 +290,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 	if !l.useCachedLibrariesResolution {
 		sketch := sketch
-		mergedfile, err := makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
+		mergedfile, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
 			return err
 		}
@@ -503,7 +503,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
+		sourceFile, err := l.makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
 		if err != nil {
 			return err
 		}
@@ -511,6 +511,33 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	return nil
+}
+
+// makeSourceFile create a sourceFile object for the given source file path.
+// The given sourceFilePath can be absolute, or relative within the sourceRoot root folder.
+func (l *SketchLibrariesDetector) makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePaths ...*paths.Path) (*sourceFile, error) {
+	if len(extraIncludePaths) > 1 {
+		panic("only one extra include path allowed")
+	}
+	var extraIncludePath *paths.Path
+	if len(extraIncludePaths) > 0 {
+		extraIncludePath = extraIncludePaths[0]
+	}
+
+	if sourceFilePath.IsAbs() {
+		var err error
+		sourceFilePath, err = sourceRoot.RelTo(sourceFilePath)
+		if err != nil {
+			return nil, err
+		}
+	}
+	res := &sourceFile{
+		SourcePath:       sourceRoot.JoinPath(sourceFilePath),
+		ObjectPath:       buildRoot.Join(sourceFilePath.String() + ".o"),
+		DepfilePath:      buildRoot.Join(sourceFilePath.String() + ".d"),
+		ExtraIncludePath: extraIncludePath,
+	}
+	return res, nil
 }
 
 func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
