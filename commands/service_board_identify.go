@@ -23,6 +23,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -216,5 +217,14 @@ func apiByVidPid(ctx context.Context, vid, pid string, settings *configuration.S
 		}
 		response[i] = &rpc.BoardListItem{Name: v.Name, Fqbn: v.FQBN}
 	}
+
+	// In case multiple platform matches the same vid-pid we put on top
+	// the arduino ones
+	slices.SortFunc(response, func(a, b *rpc.BoardListItem) int {
+		if strings.HasPrefix(a.Fqbn, "arduino") {
+			return -1
+		}
+		return 0
+	})
 	return response, nil
 }

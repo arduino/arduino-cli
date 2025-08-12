@@ -63,6 +63,41 @@ func TestGetByVidPid(t *testing.T) {
 	require.NotNil(t, err)
 }
 
+func TestGetByVidPidPutArduinoOnTop(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `
+{
+  "items": [
+    {
+      "fqbn": "esp32:esp32:nano_nora",
+      "vendor": "esp32",
+      "architecture": "esp32",
+      "board_id": "nano_nora",
+      "name": "Arduino Nano ESP32"
+    },
+    {
+      "fqbn": "arduino:esp32:nano_nora",
+      "vendor": "arduino",
+      "architecture": "esp32",
+      "board_id": "nano_nora",
+      "name": "Arduino Nano ESP32"
+    }
+  ]
+}
+		`)
+	}))
+	defer ts.Close()
+
+	vidPidURL = ts.URL
+	settings := configuration.NewSettings()
+	res, err := apiByVidPid(context.Background(), "0x2341", "0x0070", settings)
+	require.Nil(t, err)
+	require.Len(t, res, 2)
+	require.Equal(t, "Arduino Nano ESP32", res[0].GetName())
+	require.Equal(t, "arduino:esp32:nano_nora", res[0].GetFqbn())
+	require.Equal(t, "esp32:esp32:nano_nora", res[1].GetFqbn())
+}
+
 func TestGetByVidPidNotFound(t *testing.T) {
 	settings := configuration.NewSettings()
 
