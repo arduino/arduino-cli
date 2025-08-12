@@ -828,7 +828,7 @@ type buildOptions struct {
 	Verbose         bool
 }
 
-func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, optionsArg ...*buildOptions) (*builderOutput, error) {
+func tryBuild(t *testing.T, _ *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, optionsArg ...*buildOptions) (*builderOutput, error) {
 	var options *buildOptions
 	if len(optionsArg) == 0 {
 		options = &buildOptions{}
@@ -870,7 +870,7 @@ func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationte
 	return &out, err
 }
 
-func tryPreprocess(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, []byte, error) {
+func tryPreprocess(t *testing.T, _ *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, []byte, error) {
 	subTestName := strings.Split(t.Name(), "/")[1]
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
