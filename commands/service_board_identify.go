@@ -130,7 +130,7 @@ func identifyViaCloudAPI(ctx context.Context, props *properties.Map, settings *c
 }
 
 var (
-	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
+	vidPidURL   = "https://api2.arduino.cc/boards/v1/boards"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
 
@@ -169,7 +169,7 @@ func apiByVidPid(ctx context.Context, vid, pid string, settings *configuration.S
 		return nil, errors.New(i18n.Tr("Invalid pid value: '%s'", pid))
 	}
 
-	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
+	url := fmt.Sprintf("%s?vid-pid=%s-%s", vidPidURL, vid, pid)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -198,20 +198,23 @@ func apiByVidPid(ctx context.Context, vid, pid string, settings *configuration.S
 		return nil, err
 	}
 
-	var dat map[string]interface{}
+	type boardsResponse struct {
+		Items []struct {
+			Name string `json:"name"`
+			FQBN string `json:"fqbn"`
+		} `json:"items"`
+	}
+	var dat boardsResponse
 	if err := json.Unmarshal(resp, &dat); err != nil {
 		return nil, fmt.Errorf("%s: %w", i18n.Tr("error processing response from server"), err)
 	}
-	name, nameFound := dat["name"].(string)
-	fqbn, fbqnFound := dat["fqbn"].(string)
-	if !nameFound || !fbqnFound {
-		return nil, errors.New(i18n.Tr("wrong format in server response"))
-	}
 
-	return []*rpc.BoardListItem{
-		{
-			Name: name,
-			Fqbn: fqbn,
-		},
-	}, nil
+	response := make([]*rpc.BoardListItem, len(dat.Items))
+	for i, v := range dat.Items {
+		if v.Name == "" || v.FQBN == "" {
+			return nil, errors.New(i18n.Tr("wrong format in server response"))
+		}
+		response[i] = &rpc.BoardListItem{Name: v.Name, Fqbn: v.FQBN}
+	}
+	return response, nil
 }

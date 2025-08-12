@@ -35,13 +35,15 @@ func TestGetByVidPid(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `
 {
-	"architecture": "samd",
-	"fqbn": "arduino:samd:mkr1000",
-	"href": "/v3/boards/arduino:samd:mkr1000",
-	"id": "mkr1000",
-	"name": "Arduino/Genuino MKR1000",
-	"package": "arduino",
-	"plan": "create-free"
+  "items": [
+    {
+      "fqbn": "arduino:avr:uno",
+      "vendor": "arduino",
+      "architecture": "avr",
+      "board_id": "uno",
+      "name": "Arduino Uno"
+    }
+  ]
 }
 		`)
 	}))
@@ -49,11 +51,11 @@ func TestGetByVidPid(t *testing.T) {
 
 	vidPidURL = ts.URL
 	settings := configuration.NewSettings()
-	res, err := apiByVidPid(context.Background(), "0xf420", "0XF069", settings)
+	res, err := apiByVidPid(context.Background(), "0x2341", "0x0043", settings)
 	require.Nil(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, "Arduino/Genuino MKR1000", res[0].GetName())
-	require.Equal(t, "arduino:samd:mkr1000", res[0].GetFqbn())
+	require.Equal(t, "Arduino Uno", res[0].GetName())
+	require.Equal(t, "arduino:avr:uno", res[0].GetFqbn())
 
 	// wrong vid (too long), wrong pid (not an hex value)
 
@@ -95,7 +97,7 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 	settings := configuration.NewSettings()
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "{}")
+		fmt.Fprintln(w, `{"items":[{}]}`)
 	}))
 	defer ts.Close()
 
