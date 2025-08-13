@@ -181,7 +181,7 @@ type ArduinoCoreServiceClient interface {
 	EnumerateMonitorPortSettings(ctx context.Context, in *EnumerateMonitorPortSettingsRequest, opts ...grpc.CallOption) (*EnumerateMonitorPortSettingsResponse, error)
 	// Start a debug session and communicate with the debugger tool.
 	Debug(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[DebugRequest, DebugResponse], error)
-	// Determine if debugging is suported given a specific configuration.
+	// Determine if debugging is supported given a specific configuration.
 	IsDebugSupported(ctx context.Context, in *IsDebugSupportedRequest, opts ...grpc.CallOption) (*IsDebugSupportedResponse, error)
 	// Query the debugger information given a specific configuration.
 	GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error)
@@ -982,7 +982,7 @@ type ArduinoCoreServiceServer interface {
 	EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error)
 	// Start a debug session and communicate with the debugger tool.
 	Debug(grpc.BidiStreamingServer[DebugRequest, DebugResponse]) error
-	// Determine if debugging is suported given a specific configuration.
+	// Determine if debugging is supported given a specific configuration.
 	IsDebugSupported(context.Context, *IsDebugSupportedRequest) (*IsDebugSupportedResponse, error)
 	// Query the debugger information given a specific configuration.
 	GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error)

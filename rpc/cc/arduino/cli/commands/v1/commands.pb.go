@@ -1001,7 +1001,7 @@ type NewSketchRequest struct {
 	// Default Sketchbook directory "directories.User" is used if sketch_dir is
 	// empty.
 	SketchDir string `protobuf:"bytes,3,opt,name=sketch_dir,json=sketchDir,proto3" json:"sketch_dir,omitempty"`
-	// Specificies if an existing .ino sketch should be overwritten.
+	// Specifies if an existing .ino sketch should be overwritten.
 	Overwrite bool `protobuf:"varint,4,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
 }
 
@@ -1405,7 +1405,7 @@ type SetSketchDefaultsResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The value of default_fqnn that has been written in project file
+	// The value of default_fqbn that has been written in project file
 	// (sketch.yaml).
 	DefaultFqbn string `protobuf:"bytes,1,opt,name=default_fqbn,json=defaultFqbn,proto3" json:"default_fqbn,omitempty"`
 	// The value of default_port that has been written in project file
