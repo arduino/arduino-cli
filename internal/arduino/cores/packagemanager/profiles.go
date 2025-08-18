@@ -79,10 +79,6 @@ func (pmb *Builder) LoadHardwareForProfile(ctx context.Context, p *sketch.Profil
 }
 
 func (pmb *Builder) loadProfilePlatform(ctx context.Context, platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) (*cores.PlatformRelease, error) {
-	targetPackage := pmb.packages.GetOrCreatePackage(platformRef.Packager)
-	platform := targetPackage.GetOrCreatePlatform(platformRef.Architecture)
-	release := platform.GetOrCreateRelease(platformRef.Version)
-
 	uid := platformRef.InternalUniqueIdentifier()
 	destDir := settings.ProfilesCacheDir().Join(uid)
 	if !destDir.IsDir() && installMissing {
@@ -91,6 +87,10 @@ func (pmb *Builder) loadProfilePlatform(ctx context.Context, platformRef *sketch
 			return nil, err
 		}
 	}
+
+	targetPackage := pmb.packages.GetOrCreatePackage(platformRef.Packager)
+	platform := targetPackage.GetOrCreatePlatform(platformRef.Architecture)
+	release := platform.GetOrCreateRelease(platformRef.Version)
 	return release, pmb.loadPlatformRelease(release, destDir)
 }
 
