@@ -286,6 +286,12 @@ that weights a few kilobytes may not be such a good idea.
 The content of the _extras_ folder is totally ignored by the Arduino development software; you are free to put anything
 inside.
 
+#### Unit Tests
+
+A **test** folder can be used by the developer to store any & all files related to unit testing the library.
+
+The content of the _test_ folder is totally ignored by the IDE and will _not_ be bundled with the library.
+
 ### Keywords
 
 A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library
