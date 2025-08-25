@@ -355,7 +355,7 @@ func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buil
 	// search path, but only for the source code of the library, so we temporary
 	// copy the current search path list and add the library' utility directory
 	// if needed.
-	includeFolders := l.includeFolders
+	includeFolders := l.includeFolders.Clone()
 	if extraInclude := sourceFile.ExtraIncludePath; extraInclude != nil {
 		includeFolders = append(includeFolders, extraInclude)
 	}
