@@ -67,7 +67,7 @@ func PreprocessSketchWithCtags(
 	}
 
 	// Run GCC preprocessor
-	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties).Run(ctx)
+	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {

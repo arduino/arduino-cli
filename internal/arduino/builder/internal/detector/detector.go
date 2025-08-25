@@ -360,7 +360,7 @@ func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buil
 		includeFolders = append(includeFolders, extraInclude)
 	}
 
-	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties)
+	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties, nil)
 }
 
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
