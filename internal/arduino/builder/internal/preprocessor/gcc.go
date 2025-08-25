@@ -30,6 +30,7 @@ import (
 func GCC(
 	sourceFilePath, targetFilePath *paths.Path,
 	includes paths.PathList, buildProperties *properties.Map,
+	depFile *paths.Path,
 ) *runner.Task {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
@@ -61,6 +62,11 @@ func GCC(
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
 	args = f.Filter(args, f.NotEquals("-MMD"))
+
+	// If a depFile has been specified add the necessary arguments to generate it
+	if depFile != nil {
+		args = append(args, "-MMD", "-MF", depFile.String())
+	}
 
 	// Limit the stderr output to 100 KiB
 	// https://github.com/arduino/arduino-cli/pull/2883
