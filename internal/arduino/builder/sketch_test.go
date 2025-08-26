@@ -106,3 +106,22 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, info1.ModTime(), info2.ModTime())
 }
+
+func TestStripUTF8BOM(t *testing.T) {
+	// Case 1: Input with BOM
+	inputWithBOM := []byte{0xEF, 0xBB, 0xBF, 'H', 'e', 'l', 'l', 'o'}
+	expected := []byte("Hello")
+
+	output := stripUTF8BOM(inputWithBOM)
+	require.Equal(t, expected, output, "BOM should be stripped")
+
+	// Case 2: Input without BOM
+	inputNoBOM := []byte("Hello")
+	outputNoBOM := stripUTF8BOM(inputNoBOM)
+	require.Equal(t, inputNoBOM, outputNoBOM, "Input without BOM should remain unchanged")
+
+	// Case 3: Input shorter than 3 bytes (edge case)
+	shortInput := []byte{0xEF}
+	outputShort := stripUTF8BOM(shortInput)
+	require.Equal(t, shortInput, outputShort, "Short input should remain unchanged")
+}
