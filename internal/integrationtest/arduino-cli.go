@@ -410,16 +410,16 @@ func (cli *ArduinoCLI) run(ctx context.Context, stdoutBuff, stderrBuff io.Writer
 		}
 	}()
 	if stdinBuff != nil {
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			if _, err := io.Copy(stdin, stdinBuff); err != nil {
 				fmt.Fprintln(terminalErr, color.HiBlackString("<<< stdin copy error:"), err)
 			}
 		}()
 	}
-	cliErr := cliProc.WaitWithinContext(ctx)
 	wg.Wait()
-
-	return cliErr
+	return cliProc.WaitWithinContext(ctx)
 }
 
 // StartDaemon starts the Arduino CLI daemon. It returns the address of the daemon.
