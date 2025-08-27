@@ -172,10 +172,12 @@ func IsValid(inst *rpc.Instance) bool {
 // Delete removes an instance.
 func Delete(inst *rpc.Instance) bool {
 	instancesMux.Lock()
-	defer instancesMux.Unlock()
-	if _, ok := instances[inst.GetId()]; !ok {
+	instance, ok := instances[inst.GetId()]
+	delete(instances, inst.GetId())
+	instancesMux.Unlock()
+	if !ok {
 		return false
 	}
-	delete(instances, inst.GetId())
+	instance.pm.Destroy()
 	return true
 }
