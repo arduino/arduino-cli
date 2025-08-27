@@ -19,9 +19,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 )
@@ -29,10 +31,27 @@ import (
 type mockSerialDiscovery struct {
 	startSyncCount int
 	closeChan      chan<- bool
+	tmpFile        string
 }
 
 func main() {
-	dummy := &mockSerialDiscovery{}
+	// Write a file in a $TMP/mock_serial_discovery folder.
+	// This file will be used by the integration tests to detect if the discovery is running.
+	tmpDir := paths.TempDir().Join("mock_serial_discovery")
+	if err := tmpDir.MkdirAll(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating temp dir: %v\n", err)
+		os.Exit(1)
+	}
+	tmpFile, err := paths.MkTempFile(tmpDir, "")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating temp file: %v\n", err)
+		os.Exit(1)
+	}
+	tmpFile.Close()
+	defer os.Remove(tmpFile.Name())
+
+	// Run mock discovery
+	dummy := &mockSerialDiscovery{tmpFile: tmpFile.Name()}
 	server := discovery.NewServer(dummy)
 	if err := server.Run(os.Stdin, os.Stdout); err != nil {
 		os.Exit(1)
@@ -80,9 +99,10 @@ func (d *mockSerialDiscovery) StartSync(eventCB discovery.EventCallback, errorCB
 			ProtocolLabel: "Serial",
 			HardwareID:    "123456",
 			Properties: properties.NewFromHashmap(map[string]string{
-				"vid":    "0x2341",
-				"pid":    "0x0041",
-				"serial": "123456",
+				"vid":           "0x2341",
+				"pid":           "0x0041",
+				"serial":        "123456",
+				"discovery_tmp": d.tmpFile,
 			}),
 		})
 

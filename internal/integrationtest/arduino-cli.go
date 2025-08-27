@@ -506,6 +506,13 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 	}
 }
 
+// Destroy calls the "Destroy" gRPC method.
+func (inst *ArduinoCLIInstance) Destroy(ctx context.Context) error {
+	logCallf(">>> Destroy(%v)\n", inst.instance.GetId())
+	_, err := inst.cli.daemonClient.Destroy(ctx, &commands.DestroyRequest{Instance: inst.instance})
+	return err
+}
+
 // SetValue calls the "SetValue" gRPC method.
 func (cli *ArduinoCLI) SetValue(key, jsonData string) error {
 	req := &commands.SettingsSetValueRequest{
