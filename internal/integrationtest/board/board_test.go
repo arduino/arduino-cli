@@ -71,23 +71,6 @@ func TestCorrectBoardListOrdering(t *testing.T) {
 	]`)
 }
 
-func TestBoardList(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	cli.InstallMockedSerialDiscovery(t)
-
-	stdout, _, err := cli.Run("board", "list", "--json")
-	require.NoError(t, err)
-	// check is a valid json and contains a list of ports
-	requirejson.Parse(t, stdout).
-		Query(`[ .detected_ports | .[].port | select(.protocol == null or .protocol_label == null) ]`).
-		MustBeEmpty()
-}
-
 func TestBoardListMock(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
@@ -97,11 +80,20 @@ func TestBoardListMock(t *testing.T) {
 
 	cli.InstallMockedSerialDiscovery(t)
 
-	stdout, _, err := cli.Run("board", "list", "--json")
-	require.NoError(t, err)
+	t.Run("IsValidJsonPortList", func(t *testing.T) {
+		// 1. Check is a valid JSON
+		// 2. Check is a valid port list (has address/protocol)
+		stdout, _, err := cli.Run("board", "list", "--json")
+		require.NoError(t, err)
+		requirejson.Parse(t, stdout).
+			Query(`[ .detected_ports | .[].port | select(.address == null or .protocol == null) ]`).
+			MustBeEmpty()
+	})
 
-	// check is a valid json and contains a list of ports
-	requirejson.Contains(t, stdout, `{
+	t.Run("ContainsMockedPorts", func(t *testing.T) {
+		stdout, _, err := cli.Run("board", "list", "--json")
+		require.NoError(t, err)
+		requirejson.Contains(t, stdout, `{
 		  "detected_ports": [
 			{
 			  "matching_boards": [
@@ -124,35 +116,20 @@ func TestBoardListMock(t *testing.T) {
 			  }
 			}
 		  ]
-	}`)
-}
+		}`)
+	})
 
-func TestBoardListWithFqbnFilter(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
+	t.Run("ListWithFqbnFilter", func(t *testing.T) {
+		stdout, _, err := cli.Run("board", "list", "-b", "foo:bar:baz", "--json")
+		require.NoError(t, err)
+		requirejson.Query(t, stdout, `.detected_ports | length`, `0`)
+	})
 
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	cli.InstallMockedSerialDiscovery(t)
-
-	stdout, _, err := cli.Run("board", "list", "-b", "foo:bar:baz", "--json")
-	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.detected_ports | length`, `0`)
-}
-
-func TestBoardListWithFqbnFilterInvalid(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	cli.InstallMockedSerialDiscovery(t)
-
-	_, stderr, err := cli.Run("board", "list", "-b", "yadayada", "--json")
-	require.Error(t, err)
-	requirejson.Query(t, stderr, ".error", `"Invalid FQBN: not an FQBN: yadayada"`)
+	t.Run("ListWithFqbnFilterInvalid", func(t *testing.T) {
+		_, stderr, err := cli.Run("board", "list", "-b", "yadayada", "--json")
+		require.Error(t, err)
+		requirejson.Query(t, stderr, ".error", `"Invalid FQBN: not an FQBN: yadayada"`)
+	})
 }
 
 func TestBoardListall(t *testing.T) {
