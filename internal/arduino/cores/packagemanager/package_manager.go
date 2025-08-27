@@ -197,6 +197,11 @@ func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
 	}, pm.packagesLock.RUnlock
 }
 
+// Destroy releases all resources held by the PackageManager.
+func (pm *PackageManager) Destroy() {
+	pm.discoveryManager.Clear()
+}
+
 // GetProfile returns the active profile for this package manager, or nil if no profile is selected.
 func (pme *Explorer) GetProfile() *sketch.Profile {
 	return pme.profile
