@@ -1,6 +1,6 @@
 ---
 name: github.com/ulikunitz/xz
-version: v0.5.12
+version: v0.5.14
 type: go
 summary: Package xz supports the compression and decompression of xz files.
 homepage: https://pkg.go.dev/github.com/ulikunitz/xz

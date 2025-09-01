@@ -23036,7 +23036,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 *****
-github.com/ulikunitz/xz@v0.5.12
+github.com/ulikunitz/xz@v0.5.14
 
 Copyright (c) 2014-2022  Ulrich Kunitz
 All rights reserved.
@@ -23066,7 +23066,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *****
-github.com/ulikunitz/xz/internal/hash@v0.5.12
+github.com/ulikunitz/xz/internal/hash@v0.5.14
 
 Copyright (c) 2014-2022  Ulrich Kunitz
 All rights reserved.
@@ -23096,7 +23096,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *****
-github.com/ulikunitz/xz/internal/xlog@v0.5.12
+github.com/ulikunitz/xz/internal/xlog@v0.5.14
 
 Copyright (c) 2014-2022  Ulrich Kunitz
 All rights reserved.
@@ -23126,7 +23126,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *****
-github.com/ulikunitz/xz/lzma@v0.5.12
+github.com/ulikunitz/xz/lzma@v0.5.14
 
 Copyright (c) 2014-2022  Ulrich Kunitz
 All rights reserved.
