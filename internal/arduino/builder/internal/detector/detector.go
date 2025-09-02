@@ -41,6 +41,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
 )
 
 type libraryResolutionResult struct {
@@ -140,6 +141,7 @@ func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 // addAndBuildLibrary adds the given library to the imported libraries list and queues its source files
 // for further processing.
 func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSourceFileQueue, librariesBuildPath *paths.Path, library *libraries.Library) {
+	logrus.Tracef("[LD] LIBRARY: %s", library.Name)
 	l.importedLibraries = append(l.importedLibraries, library)
 	if library.Precompiled && library.PrecompiledWithSources {
 		// Fully precompiled libraries should have no dependencies to avoid ABI breakage
@@ -202,6 +204,7 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
+	logrus.Tracef("[LD] INCLUDE-PATH: %s", folder.String())
 	l.includeFolders = append(l.includeFolders, folder)
 	l.cache.Expect(&detectorCacheEntry{AddedIncludePath: folder})
 }
@@ -219,6 +222,11 @@ func (l *SketchLibrariesDetector) FindIncludes(
 	platformArch string,
 	jobs int,
 ) error {
+	logrus.Debug("Finding required libraries for the sketch.")
+	defer func() {
+		logrus.Debugf("Library detection completed. Found %d required libraries.", len(l.importedLibraries))
+	}()
+
 	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch, jobs)
 	if err != nil && l.onlyUpdateCompilationDatabase {
 		l.logger.Info(
@@ -273,7 +281,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
 		if entry.CompileTask != nil {
-			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
+			upToDate, _ := entry.Compile.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
 			if !upToDate {
 				_ = entry.Compile.PrepareBuildPath()
 				l.preRunner.Enqueue(entry.CompileTask)
@@ -387,7 +395,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := sourceFile.ObjFileIsUpToDate()
+	unchanged, err := sourceFile.ObjFileIsUpToDate(logrus.WithField("runner", "main"))
 	if err != nil {
 		return err
 	}
@@ -403,11 +411,13 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		var missingIncludeH string
 		if entry := l.cache.Peek(); unchanged && entry != nil && entry.MissingIncludeH != nil {
 			missingIncludeH = *entry.MissingIncludeH
+			logrus.Tracef("[LD] COMPILE-CACHE: %s", sourceFile.SourcePath)
 			if first && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 			first = false
 		} else {
+			logrus.Tracef("[LD] COMPILE: %s", sourceFile.SourcePath)
 			if l.preRunner != nil {
 				if r := l.preRunner.Results(preprocTask); r != nil {
 					preprocResult = r
@@ -448,6 +458,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			}
 		}
 
+		logrus.Tracef("[LD] MISSING: %s", missingIncludeH)
 		l.cache.Expect(&detectorCacheEntry{MissingIncludeH: &missingIncludeH})
 
 		if missingIncludeH == "" {
@@ -495,6 +506,8 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	buildDir *paths.Path,
 	extraIncludePath ...*paths.Path,
 ) error {
+	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
+
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
 		sourceFileExtensions = append(sourceFileExtensions, k)

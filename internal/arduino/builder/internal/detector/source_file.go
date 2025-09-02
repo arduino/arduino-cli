@@ -62,60 +62,60 @@ func (f *sourceFile) PrepareBuildPath() error {
 }
 
 // ObjFileIsUpToDate checks if the compile object file is up to date.
-func (f *sourceFile) ObjFileIsUpToDate() (unchanged bool, err error) {
-	logrus.Debugf("Checking previous results for %v (dep = %v)", f.SourcePath, f.DepfilePath)
+func (f *sourceFile) ObjFileIsUpToDate(log *logrus.Entry) (unchanged bool, err error) {
 	if f.DepfilePath == nil {
-		logrus.Debugf("  Object file or dependency file not provided")
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: object file or dependency file not provided", f.SourcePath)
 		return false, nil
 	}
 
 	sourceFile := f.SourcePath.Clean()
 	sourceFileStat, err := sourceFile.Stat()
 	if err != nil {
-		logrus.Debugf("  Could not stat source file: %s", err)
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not stat source file: %s", f.SourcePath, err)
 		return false, err
 	}
 	dependencyFile := f.DepfilePath.Clean()
 	dependencyFileStat, err := dependencyFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
-			logrus.Debugf("  Dependency file not found: %v", dependencyFile)
+			log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Dependency file not found: %v", f.SourcePath, dependencyFile)
 			return false, nil
 		}
-		logrus.Debugf("  Could not stat dependency file: %s", err)
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not stat dependency file: %s", f.SourcePath, err)
 		return false, err
 	}
 	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
-		logrus.Debugf("  %v newer than %v", sourceFile, dependencyFile)
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: %v newer than %v", f.SourcePath, sourceFile, dependencyFile)
 		return false, nil
 	}
 	deps, err := cpp.ReadDepFile(dependencyFile)
 	if err != nil {
-		logrus.Debugf("  Could not read dependency file: %s", dependencyFile)
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not read dependency file: %s", f.SourcePath, dependencyFile)
 		return false, err
 	}
 	if len(deps.Dependencies) == 0 {
 		return true, nil
 	}
 	if deps.Dependencies[0] != sourceFile.String() {
-		logrus.Debugf("  Depfile is about different source file: %v (expected %v)", deps.Dependencies[0], sourceFile)
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Depfile is about different source file: %v (expected %v)", f.SourcePath, deps.Dependencies[0], sourceFile)
 		return false, nil
 	}
 	for _, dep := range deps.Dependencies[1:] {
 		depStat, err := os.Stat(dep)
 		if os.IsNotExist(err) {
-			logrus.Debugf("  Not found: %v", dep)
+			log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Not found: %v", f.SourcePath, dep)
 			return false, nil
 		}
 		if err != nil {
-			logrus.WithError(err).Debugf("  Failed to read: %v", dep)
+			logrus.WithError(err).Tracef("[LD] COMPILE-CHECK: REBUILD %v: Failed to read: %v", f.SourcePath, dep)
 			return false, nil
 		}
 		if depStat.ModTime().After(dependencyFileStat.ModTime()) {
-			logrus.Debugf("  %v newer than %v", dep, dependencyFile)
+			log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: %v newer than %v", f.SourcePath, dep, dependencyFile)
 			return false, nil
 		}
 	}
+	log.Tracef("[LD] COMPILE-CHECK: REUSE %v Up-to-date", f.SourcePath)
 	return true, nil
 }
 
@@ -125,6 +125,7 @@ type uniqueSourceFileQueue []sourceFile
 // Push adds a source file to the queue if it is not already present.
 func (queue *uniqueSourceFileQueue) Push(value sourceFile) {
 	if !queue.Contains(value) {
+		logrus.Tracef("[LD] QUEUE: Added %s", value.SourcePath)
 		*queue = append(*queue, value)
 	}
 }
