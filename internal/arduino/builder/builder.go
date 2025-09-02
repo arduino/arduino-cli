@@ -22,6 +22,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/compilation"
@@ -330,7 +331,7 @@ func (b *Builder) preprocess() error {
 		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Info(i18n.Tr("The list of included libraries has been changed... rebuilding all libraries."))
 		}
-		if err := b.librariesBuildPath.RemoveAll(); err != nil {
+		if err := b.removeBuildPathExecptLibsdiscoveryFiles(b.librariesBuildPath); err != nil {
 			return err
 		}
 	}
@@ -542,4 +543,29 @@ func (b *Builder) execCommand(command *paths.Process) error {
 	}
 
 	return command.Wait()
+}
+
+func (b *Builder) removeBuildPathExecptLibsdiscoveryFiles(pathToRemove *paths.Path) error {
+	filesToRemove, err := pathToRemove.ReadDirRecursiveFiltered(nil,
+		paths.FilterOutDirectories(),
+		paths.FilterOutSuffixes(".libsdetect.d"))
+	if err != nil {
+		return err
+	}
+	for _, f := range filesToRemove {
+		if err := f.Remove(); err != nil {
+			return err
+		}
+	}
+
+	dirsToRemove, err := pathToRemove.ReadDirRecursiveFiltered(nil, paths.FilterDirectories())
+	if err != nil {
+		return err
+	}
+	// Remove directories in reverse order (deepest first)
+	sort.Slice(dirsToRemove, func(i, j int) bool { return len(dirsToRemove[i].String()) > len(dirsToRemove[j].String()) })
+	for _, d := range dirsToRemove {
+		_ = d.Remove()
+	}
+	return nil
 }
