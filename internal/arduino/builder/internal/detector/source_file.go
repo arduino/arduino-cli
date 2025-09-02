@@ -46,7 +46,7 @@ func (f *sourceFile) String() string {
 }
 
 // Equals checks if a sourceFile is equal to another.
-func (f *sourceFile) Equals(g *sourceFile) bool {
+func (f *sourceFile) Equals(g sourceFile) bool {
 	return f.SourcePath.EqualsTo(g.SourcePath) &&
 		f.DepfilePath.EqualsTo(g.DepfilePath) &&
 		((f.ExtraIncludePath == nil && g.ExtraIncludePath == nil) ||
@@ -120,22 +120,22 @@ func (f *sourceFile) ObjFileIsUpToDate() (unchanged bool, err error) {
 }
 
 // uniqueSourceFileQueue is a queue of source files that does not allow duplicates.
-type uniqueSourceFileQueue []*sourceFile
+type uniqueSourceFileQueue []sourceFile
 
 // Push adds a source file to the queue if it is not already present.
-func (queue *uniqueSourceFileQueue) Push(value *sourceFile) {
+func (queue *uniqueSourceFileQueue) Push(value sourceFile) {
 	if !queue.Contains(value) {
 		*queue = append(*queue, value)
 	}
 }
 
 // Contains checks if the queue Contains a source file.
-func (queue uniqueSourceFileQueue) Contains(target *sourceFile) bool {
+func (queue uniqueSourceFileQueue) Contains(target sourceFile) bool {
 	return slices.ContainsFunc(queue, target.Equals)
 }
 
 // Pop removes and returns the first element of the queue.
-func (queue *uniqueSourceFileQueue) Pop() *sourceFile {
+func (queue *uniqueSourceFileQueue) Pop() sourceFile {
 	old := *queue
 	x := old[0]
 	*queue = old[1:]

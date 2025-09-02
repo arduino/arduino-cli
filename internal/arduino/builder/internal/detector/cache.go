@@ -30,7 +30,7 @@ type detectorCache struct {
 
 type detectorCacheEntry struct {
 	AddedIncludePath *paths.Path  `json:"added_include_path,omitempty"`
-	Compile          *sourceFile  `json:"compile,omitempty"`
+	Compile          sourceFile   `json:"compile,omitempty"`
 	CompileTask      *runner.Task `json:"compile_task,omitempty"`
 	MissingIncludeH  *string      `json:"missing_include_h,omitempty"`
 }
@@ -39,7 +39,7 @@ func (e *detectorCacheEntry) String() string {
 	if e.AddedIncludePath != nil {
 		return "Added include path: " + e.AddedIncludePath.String()
 	}
-	if e.Compile != nil && e.CompileTask != nil {
+	if e.CompileTask != nil {
 		return "Compiling: " + e.Compile.String() + " / " + e.CompileTask.String()
 	}
 	if e.MissingIncludeH != nil {
