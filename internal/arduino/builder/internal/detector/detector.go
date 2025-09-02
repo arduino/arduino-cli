@@ -272,7 +272,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
-		if entry.Compile != nil && entry.CompileTask != nil {
+		if entry.CompileTask != nil {
 			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
 			if !upToDate {
 				_ = entry.Compile.PrepareBuildPath()
@@ -351,7 +351,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	return nil
 }
 
-func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buildProperties *properties.Map) *runner.Task {
+func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile sourceFile, buildProperties *properties.Map) *runner.Task {
 	// Libraries may require the "utility" directory to be added to the include
 	// search path, but only for the source code of the library, so we temporary
 	// copy the current search path list and add the library' utility directory
@@ -517,7 +517,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 
 // makeSourceFile create a sourceFile object for the given source file path.
 // The given sourceFilePath can be absolute, or relative within the sourceRoot root folder.
-func (l *SketchLibrariesDetector) makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePaths ...*paths.Path) (*sourceFile, error) {
+func (l *SketchLibrariesDetector) makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePaths ...*paths.Path) (sourceFile, error) {
 	if len(extraIncludePaths) > 1 {
 		panic("only one extra include path allowed")
 	}
@@ -530,15 +530,14 @@ func (l *SketchLibrariesDetector) makeSourceFile(sourceRoot, buildRoot, sourceFi
 		var err error
 		sourceFilePath, err = sourceRoot.RelTo(sourceFilePath)
 		if err != nil {
-			return nil, err
+			return sourceFile{}, err
 		}
 	}
-	res := &sourceFile{
+	return sourceFile{
 		SourcePath:       sourceRoot.JoinPath(sourceFilePath),
 		DepfilePath:      buildRoot.Join(fmt.Sprintf("%s.libsdetect.d", sourceFilePath)),
 		ExtraIncludePath: extraIncludePath,
-	}
-	return res, nil
+	}, nil
 }
 
 func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
