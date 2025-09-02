@@ -275,6 +275,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if entry.Compile != nil && entry.CompileTask != nil {
 			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
 			if !upToDate {
+				_ = entry.Compile.PrepareBuildPath()
 				l.preRunner.Enqueue(entry.CompileTask)
 			}
 		}
@@ -360,7 +361,8 @@ func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buil
 		includeFolders = append(includeFolders, extraInclude)
 	}
 
-	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties, nil)
+	_ = sourceFile.PrepareBuildPath()
+	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties, sourceFile.DepfilePath)
 }
 
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
@@ -533,8 +535,7 @@ func (l *SketchLibrariesDetector) makeSourceFile(sourceRoot, buildRoot, sourceFi
 	}
 	res := &sourceFile{
 		SourcePath:       sourceRoot.JoinPath(sourceFilePath),
-		ObjectPath:       buildRoot.Join(sourceFilePath.String() + ".o"),
-		DepfilePath:      buildRoot.Join(sourceFilePath.String() + ".d"),
+		DepfilePath:      buildRoot.Join(fmt.Sprintf("%s.libsdetect.d", sourceFilePath)),
 		ExtraIncludePath: extraIncludePath,
 	}
 	return res, nil
