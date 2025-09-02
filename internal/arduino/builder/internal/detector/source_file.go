@@ -19,16 +19,16 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"os"
+
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 type sourceFile struct {
 	// SourcePath is the path to the source file
 	SourcePath *paths.Path `json:"source_path"`
-
-	// ObjectPath is the path to the object file that will be generated
-	ObjectPath *paths.Path `json:"object_path"`
 
 	// DepfilePath is the path to the dependency file that will be generated
 	DepfilePath *paths.Path `json:"depfile_path"`
@@ -41,22 +41,82 @@ type sourceFile struct {
 }
 
 func (f *sourceFile) String() string {
-	return fmt.Sprintf("SourcePath:%s SourceRoot:%s BuildRoot:%s ExtraInclude:%s",
-		f.SourcePath, f.ObjectPath, f.DepfilePath, f.ExtraIncludePath)
+	return fmt.Sprintf("%s -> dep:%s (ExtraInclude:%s)",
+		f.SourcePath, f.DepfilePath, f.ExtraIncludePath)
 }
 
 // Equals checks if a sourceFile is equal to another.
 func (f *sourceFile) Equals(g *sourceFile) bool {
 	return f.SourcePath.EqualsTo(g.SourcePath) &&
-		f.ObjectPath.EqualsTo(g.ObjectPath) &&
 		f.DepfilePath.EqualsTo(g.DepfilePath) &&
 		((f.ExtraIncludePath == nil && g.ExtraIncludePath == nil) ||
 			(f.ExtraIncludePath != nil && g.ExtraIncludePath != nil && f.ExtraIncludePath.EqualsTo(g.ExtraIncludePath)))
 }
 
+// PrepareBuildPath ensures that the directory for the dependency file exists.
+func (f *sourceFile) PrepareBuildPath() error {
+	if f.DepfilePath != nil {
+		return f.DepfilePath.Parent().MkdirAll()
+	}
+	return nil
+}
+
 // ObjFileIsUpToDate checks if the compile object file is up to date.
 func (f *sourceFile) ObjFileIsUpToDate() (unchanged bool, err error) {
-	return utils.ObjFileIsUpToDate(f.SourcePath, f.ObjectPath, f.DepfilePath)
+	logrus.Debugf("Checking previous results for %v (dep = %v)", f.SourcePath, f.DepfilePath)
+	if f.DepfilePath == nil {
+		logrus.Debugf("  Object file or dependency file not provided")
+		return false, nil
+	}
+
+	sourceFile := f.SourcePath.Clean()
+	sourceFileStat, err := sourceFile.Stat()
+	if err != nil {
+		logrus.Debugf("  Could not stat source file: %s", err)
+		return false, err
+	}
+	dependencyFile := f.DepfilePath.Clean()
+	dependencyFileStat, err := dependencyFile.Stat()
+	if err != nil {
+		if os.IsNotExist(err) {
+			logrus.Debugf("  Dependency file not found: %v", dependencyFile)
+			return false, nil
+		}
+		logrus.Debugf("  Could not stat dependency file: %s", err)
+		return false, err
+	}
+	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
+		logrus.Debugf("  %v newer than %v", sourceFile, dependencyFile)
+		return false, nil
+	}
+	deps, err := cpp.ReadDepFile(dependencyFile)
+	if err != nil {
+		logrus.Debugf("  Could not read dependency file: %s", dependencyFile)
+		return false, err
+	}
+	if len(deps.Dependencies) == 0 {
+		return true, nil
+	}
+	if deps.Dependencies[0] != sourceFile.String() {
+		logrus.Debugf("  Depfile is about different source file: %v (expected %v)", deps.Dependencies[0], sourceFile)
+		return false, nil
+	}
+	for _, dep := range deps.Dependencies[1:] {
+		depStat, err := os.Stat(dep)
+		if os.IsNotExist(err) {
+			logrus.Debugf("  Not found: %v", dep)
+			return false, nil
+		}
+		if err != nil {
+			logrus.WithError(err).Debugf("  Failed to read: %v", dep)
+			return false, nil
+		}
+		if depStat.ModTime().After(dependencyFileStat.ModTime()) {
+			logrus.Debugf("  %v newer than %v", dep, dependencyFile)
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 // uniqueSourceFileQueue is a queue of source files that does not allow duplicates.
