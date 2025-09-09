@@ -37,6 +37,14 @@ var (
 	includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
 )
 
+// stripUTF8BOM removes a UTF-8 BOM if present at the start of the file.
+func stripUTF8BOM(b []byte) []byte {
+	if len(b) >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF {
+		return b[3:]
+	}
+	return b
+}
+
 // prepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
@@ -82,6 +90,7 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 		if err != nil {
 			return "", errors.New(i18n.Tr("reading file %[1]s: %[2]s", f, err))
 		}
+		data = stripUTF8BOM(data)
 		return string(data), nil
 	}
 
@@ -136,7 +145,9 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 			if err != nil {
 				return fmt.Errorf("%s: %w", i18n.Tr("unable to read contents of the source item"), err)
 			}
+			s = stripUTF8BOM(s)
 			sourceBytes = s
+
 		}
 
 		// tag each additional file with the filename of the source it was copied from
