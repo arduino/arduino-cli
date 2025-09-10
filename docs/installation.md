@@ -11,6 +11,14 @@ brew update
 brew install arduino-cli
 ```
 
+## Install via WinGet (Windows)
+
+The Arduino CLI is available as a WinGet:
+
+```sh
+winget install ArduinoSA.CLI
+```
+
 ### Command line completion
 
 [Command line completion](command-line-completion.md#brew) files are already bundled in the homebrew installation.
