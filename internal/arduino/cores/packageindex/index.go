@@ -295,7 +295,10 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
 	// If the variable `isInstallJSON` is false it means that the index we're reading is coming from the additional-urls.
 	// Therefore, the `outPlatform.Indexed` will be set at `true`.
-	outPlatform.Indexed = outPlatform.Indexed || !isInstallJSON
+	if !isInstallJSON {
+		outPlatform.Indexed = true
+		outPlatform.ManuallyInstalled = false
+	}
 
 	// If the latest platform release is deprecated, then deprecate the whole platform.
 	if outPlatform.Latest == nil || outPlatform.Latest.LessThan(inPlatformRelease.Version) {

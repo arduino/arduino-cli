@@ -214,10 +214,10 @@ func TestBoardListallWithManuallyInstalledPlatform(t *testing.T) {
 				"platform": {
 					"metadata": {
 					  "id": "arduino-beta-development:samd",
+					  "manually_installed": true
 					},
 					"release": {
 						"installed": true,
-						"version": "1.8.11",
 						"name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards"
 					},
 				}
@@ -228,10 +228,10 @@ func TestBoardListallWithManuallyInstalledPlatform(t *testing.T) {
       			"platform": {
 					"metadata": {
 					  "id": "arduino-beta-development:samd",
+					  "manually_installed": true
 					},
 					"release": {
 						"installed": true,
-						"version": "1.8.11",
 						"name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards"
 					},
 				}
