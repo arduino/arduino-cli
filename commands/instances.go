@@ -371,7 +371,11 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if libraryRef.InstallDir != nil {
 				libDir := libraryRef.InstallDir
 				if !libDir.IsAbs() {
-					libDir = paths.New(req.GetSketchPath()).JoinPath(libraryRef.InstallDir)
+					sk, err := sketch.New(paths.New(req.GetSketchPath()))
+					if err != nil {
+						return &cmderrors.InvalidArgumentError{Cause: err}
+					}
+					libDir = sk.FullPath.JoinPath(libraryRef.InstallDir)
 				}
 				if !libDir.IsDir() {
 					return &cmderrors.InvalidArgumentError{
