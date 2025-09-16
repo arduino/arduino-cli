@@ -25,23 +25,34 @@ permissions:
 
 jobs:
   create-nightly-artifacts:
+    name: Build ${{ matrix.os.task }}
     outputs:
       version: ${{ steps.get-version.outputs.version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os.runner }}
 
     strategy:
       matrix:
         os:
-          - Windows_32bit
-          - Windows_64bit
-          - Linux_32bit
-          - Linux_64bit
-          - Linux_ARMv6
-          - Linux_ARMv7
-          - Linux_ARM64
-          - macOS_64bit
-          - macOS_ARM64
-          - jsonschema
+          - task: Windows_32bit
+            runner: ubuntu-latest
+          - task: Windows_64bit
+            runner: ubuntu-latest
+          - task: Linux_32bit
+            runner: ubuntu-latest
+          - task: Linux_64bit
+            runner: ubuntu-latest
+          - task: Linux_ARMv6
+            runner: ubuntu-latest
+          - task: Linux_ARMv7
+            runner: ubuntu-latest
+          - task: Linux_ARM64
+            runner: ubuntu-latest
+          - task: macOS_64bit
+            runner: ubuntu-latest
+          - task: macOS_ARM64
+            runner: ubuntu-24.04-arm
+          - task: jsonschema
+            runner: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -56,7 +67,7 @@ jobs:
       - name: Build
         env:
           NIGHTLY: true
-        run: task dist:${{ matrix.os }}
+        run: task dist:${{ matrix.os.task }}
 
       - name: Output Version
         id: get-version
@@ -68,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.os }}
+          name: ${{ env.ARTIFACT_NAME }}-${{ matrix.os.task }}
           path: ${{ env.DIST_DIR }}
 
   notarize-macos:
