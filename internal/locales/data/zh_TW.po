@@ -1,10 +1,10 @@
 # 
 # Translators:
-# coby2023t, 2025
+# yubike, 2025
 # 
 msgid ""
 msgstr ""
-"Last-Translator: coby2023t, 2025\n"
+"Last-Translator: yubike, 2025\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/arduino-1/teams/108174/zh_TW/)\n"
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -70,7 +70,7 @@ msgstr "%s 樣態遺失"
 msgid "'%s' has an invalid signature"
 msgstr "'%s'的簽名無效"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:416
+#: internal/arduino/cores/packagemanager/package_manager.go:421
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -1096,7 +1096,7 @@ msgstr "監聽 TCP 埠: %s 失敗。位址已被使用"
 
 #: internal/arduino/builder/internal/detector/detector.go:269
 msgid "Failed to load library discovery cache: %[1]s"
-msgstr ""
+msgstr "載入程式庫探索快取失敗: %[1]s"
 
 #: commands/service_upload.go:589
 msgid "Failed uploading"
@@ -1327,7 +1327,7 @@ msgstr "無效的程式庫"
 
 #: commands/instances.go:378
 msgid "Invalid library directory in sketch project: %s"
-msgstr ""
+msgstr "sketch 專案程式庫無效: %s"
 
 #: internal/cli/cli.go:265
 msgid "Invalid logging level: %s"
@@ -1353,7 +1353,7 @@ msgstr "%s 內的套件索引無效"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "無效 %s 參數: 版本不允許"
 
-#: commands/service_board_identify.go:169
+#: commands/service_board_identify.go:170
 msgid "Invalid pid value: '%s'"
 msgstr "無效的 pid 值: '%s'"
 
@@ -1367,7 +1367,7 @@ msgstr "無效的大小正規表示式: %s"
 
 #: internal/arduino/builder/sizer.go:207
 msgid "Invalid value for build.warn_data_percentage: %s"
-msgstr ""
+msgstr "build.warn_data_percentage 數值無效: %s"
 
 #: main.go:86
 msgid "Invalid value in configuration"
@@ -1377,7 +1377,7 @@ msgstr "設定裏有無效的數值"
 msgid "Invalid version"
 msgstr "無效的版本"
 
-#: commands/service_board_identify.go:166
+#: commands/service_board_identify.go:167
 msgid "Invalid vid value: '%s'"
 msgstr "無效的 vid 值: '%s'"
 
@@ -1815,7 +1815,7 @@ msgstr "%s 平台已卸載"
 
 #: commands/cmderrors/cmderrors.go:427
 msgid "Platform '%s'"
-msgstr ""
+msgstr "平台 '%s'"
 
 #: commands/cmderrors/cmderrors.go:503
 msgid "Platform '%s' is already at the latest version"
@@ -2359,7 +2359,7 @@ msgstr ""
 
 #: internal/arduino/builder/internal/detector/detector.go:309
 msgid "The library %[1]s has been automatically added from sketch project."
-msgstr ""
+msgstr "程式庫%[1]s 已被自動加入 sketch 專案。."
 
 #: commands/cmderrors/cmderrors.go:879
 msgid "The library %s has multiple installations:"
@@ -2368,7 +2368,7 @@ msgstr "程式庫 %s 有多個安裝"
 #: internal/arduino/builder/builder.go:332
 msgid ""
 "The list of included libraries has been changed... rebuilding all libraries."
-msgstr ""
+msgstr "內含程式庫列表已更動... 重建全部程式庫。"
 
 #: internal/cli/compile/compile.go:119
 msgid ""
@@ -2744,7 +2744,7 @@ msgstr "使用設定集編譯時不能使用  %s 旗標參數"
 #: internal/arduino/sketch/profiles.go:198
 msgid ""
 "all platforms in a profile must either require a specific version or not"
-msgstr ""
+msgstr "設定檔內的所有平台有沒指定版本都沒關係"
 
 #: internal/arduino/resources/checksums.go:79
 msgid "archive hash differs from hash in index"
@@ -2782,7 +2782,7 @@ msgstr "基本搜尋只限於官方維護者的 \"esp32\" 和 \"display\""
 msgid "binary file not found in %s"
 msgstr "%s 裏找不到二進位檔"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:316
+#: internal/arduino/cores/packagemanager/package_manager.go:321
 msgid "board %s not found"
 msgstr "找不到開發板 %s"
 
@@ -2914,7 +2914,7 @@ msgstr "探索 %s找不到 "
 msgid "discovery %s not installed"
 msgstr "探索 %s 未安裝"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:714
+#: internal/arduino/cores/packagemanager/package_manager.go:719
 msgid "discovery release not found: %s"
 msgstr "找不到探索發行: %s"
 
@@ -2950,11 +2950,11 @@ msgstr "錯誤開啟 %s"
 msgid "error parsing version constraints"
 msgstr "錯誤解析版本限制"
 
-#: commands/service_board_identify.go:203
+#: commands/service_board_identify.go:210
 msgid "error processing response from server"
 msgstr "錯誤處理伺服器回應"
 
-#: commands/service_board_identify.go:183
+#: commands/service_board_identify.go:184
 msgid "error querying Arduino Cloud Api"
 msgstr "錯誤查詢 Arduino Cloud Api"
 
@@ -2970,7 +2970,7 @@ msgstr "解開存檔: %s"
 msgid "failed to compute hash of file \"%s\""
 msgstr "計算 “%s” 檔的雜湊值失敗"
 
-#: commands/service_board_identify.go:178
+#: commands/service_board_identify.go:179
 msgid "failed to initialize http client"
 msgstr "初始化 http 客戶端失敗"
 
@@ -3036,7 +3036,7 @@ msgstr "取得存檔資訊: %s"
 msgid "getting archive path: %s"
 msgstr "取得存檔路徑: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:322
+#: internal/arduino/cores/packagemanager/package_manager.go:327
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "取得開發板 %[1]s: %[2]s 的建構屬性"
 
@@ -3142,7 +3142,7 @@ msgstr "無效的程式庫位置: %s"
 #: internal/arduino/sketch/profiles.go:337
 #: internal/arduino/sketch/profiles.go:339
 msgid "invalid library reference: %s"
-msgstr ""
+msgstr "無效的程式庫參照: %s"
 
 #: internal/arduino/libraries/loader.go:140
 msgid "invalid library: no header files found"
@@ -3241,7 +3241,7 @@ msgstr "程式庫無效"
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:242
 msgid "line too long\n"
-msgstr ""
+msgstr "本行太長了\n"
 
 #: internal/arduino/cores/packagemanager/loader.go:255
 #: internal/arduino/cores/packagemanager/loader.go:268
@@ -3253,8 +3253,8 @@ msgstr "載入 %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "載入開發板: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:469
-#: internal/arduino/cores/packagemanager/package_manager.go:484
+#: internal/arduino/cores/packagemanager/package_manager.go:474
+#: internal/arduino/cores/packagemanager/package_manager.go:489
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "載入json 索引檔 %[1]s:%[2]s"
 
@@ -3307,7 +3307,7 @@ msgstr "缺少 '%s' 指令"
 msgid "missing checksum for: %s"
 msgstr "缺少 %s 的校驗碼"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:430
+#: internal/arduino/cores/packagemanager/package_manager.go:435
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "缺少開發板 %[2]s 參照的套件 %[1]s"
 
@@ -3315,11 +3315,11 @@ msgstr "缺少開發板 %[2]s 參照的套件 %[1]s"
 msgid "missing package index for %s, future updates cannot be guaranteed"
 msgstr "缺少 %s 的套件索引, 不保証未來更新與否"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:435
+#: internal/arduino/cores/packagemanager/package_manager.go:440
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少被開發板 %[3]s 參照的平台 %[1]s : %[2]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:440
+#: internal/arduino/cores/packagemanager/package_manager.go:445
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "缺少開發板 %[3]s 參照的平台發行版 %[1]s : %[2]s"
 
@@ -3327,7 +3327,7 @@ msgstr "缺少開發板 %[3]s 參照的平台發行版 %[1]s : %[2]s"
 msgid "missing signature"
 msgstr "找不到簽名"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:725
+#: internal/arduino/cores/packagemanager/package_manager.go:730
 msgid "monitor release not found: %s"
 msgstr "沒找到監視器發行版: %s"
 
@@ -3410,12 +3410,12 @@ msgstr "開啟目標檔: %s"
 msgid "package %s not found"
 msgstr "找不到套件 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:498
+#: internal/arduino/cores/packagemanager/package_manager.go:503
 msgid "package '%s' not found"
 msgstr "找不到套件 '%s'"
 
 #: internal/arduino/cores/board.go:167
-#: internal/arduino/cores/packagemanager/package_manager.go:263
+#: internal/arduino/cores/packagemanager/package_manager.go:268
 msgid "parsing fqbn: %s"
 msgstr "解析 FQBN：%s"
 
@@ -3431,7 +3431,7 @@ msgstr "路徑不是平台目錄: %s"
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "%[2]s 套件裏找不到 %[1]s 平台"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:309
+#: internal/arduino/cores/packagemanager/package_manager.go:314
 msgid "platform %s is not installed"
 msgstr "平台 %s 未安裝"
 
@@ -3525,7 +3525,7 @@ msgstr "讀取 sketch 檔"
 msgid "recipe not found '%s'"
 msgstr "作法未找到 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:574
+#: internal/arduino/cores/packagemanager/package_manager.go:579
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "找不到工具 %[2]s 的發行版 %[1]s"
 
@@ -3617,7 +3617,7 @@ msgstr "本文區已超出開發板的可用空間"
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr "編譯資料庫可能不完整或不準確"
 
-#: commands/service_board_identify.go:190
+#: commands/service_board_identify.go:191
 msgid "the server responded with status %s"
 msgstr "伺服器回應狀態 %s"
 
@@ -3634,7 +3634,7 @@ msgstr "工具 %s 不是由套件管理員管理的"
 msgid "tool %s not found"
 msgstr "找不到工具 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:524
+#: internal/arduino/cores/packagemanager/package_manager.go:529
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "套件 '%[2]s' 裏找不到工具 '%[1]s'"
 
@@ -3642,8 +3642,8 @@ msgstr "套件 '%[2]s' 裏找不到工具 '%[1]s'"
 msgid "tool not installed"
 msgstr "工具未安裝"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:703
-#: internal/arduino/cores/packagemanager/package_manager.go:809
+#: internal/arduino/cores/packagemanager/package_manager.go:708
+#: internal/arduino/cores/packagemanager/package_manager.go:814
 msgid "tool release not found: %s"
 msgstr "工具發行未找到: %s"
 
@@ -3685,11 +3685,11 @@ msgstr "無法讀取來源項目的內容"
 msgid "unable to write to destination file"
 msgstr "無法寫入目標檔"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:297
+#: internal/arduino/cores/packagemanager/package_manager.go:302
 msgid "unknown package %s"
 msgstr "未知的套件 %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:304
+#: internal/arduino/cores/packagemanager/package_manager.go:309
 msgid "unknown platform %s:%s"
 msgstr "未知的平台 %s:%s"
 
@@ -3733,6 +3733,6 @@ msgstr "版本 %s 不適合本作業系統"
 msgid "version %s not found"
 msgstr "沒找到版本 %s "
 
-#: commands/service_board_identify.go:208
+#: commands/service_board_identify.go:216
 msgid "wrong format in server response"
 msgstr "伺服器回應錯誤格式"
