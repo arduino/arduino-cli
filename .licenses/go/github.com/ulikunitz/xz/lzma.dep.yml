@@ -1,12 +1,12 @@
 ---
 name: github.com/ulikunitz/xz/lzma
-version: v0.5.12
+version: v0.5.15
 type: go
 summary: Package lzma supports the decoding and encoding of LZMA streams.
 homepage: https://pkg.go.dev/github.com/ulikunitz/xz/lzma
 license: bsd-3-clause
 licenses:
-- sources: xz@v0.5.12/LICENSE
+- sources: xz@v0.5.15/LICENSE
   text: |
     Copyright (c) 2014-2022  Ulrich Kunitz
     All rights reserved.

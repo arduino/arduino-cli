@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/experimental/stats
-version: v1.74.2
+version: v1.75.1
 type: go
 summary: Package stats contains experimental metrics/stats API's.
 homepage: https://pkg.go.dev/google.golang.org/grpc/experimental/stats
 license: apache-2.0
 licenses:
-- sources: grpc@v1.74.2/LICENSE
+- sources: grpc@v1.75.1/LICENSE
   text: |2
 
                                      Apache License
