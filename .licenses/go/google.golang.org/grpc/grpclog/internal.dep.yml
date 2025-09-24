@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/grpclog/internal
-version: v1.74.2
+version: v1.75.1
 type: go
 summary: Package internal contains functionality internal to the grpclog package.
 homepage: https://pkg.go.dev/google.golang.org/grpc/grpclog/internal
 license: apache-2.0
 licenses:
-- sources: grpc@v1.74.2/LICENSE
+- sources: grpc@v1.75.1/LICENSE
   text: |2
 
                                      Apache License

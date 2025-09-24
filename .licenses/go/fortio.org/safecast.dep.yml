@@ -1,11 +1,11 @@
 ---
 name: fortio.org/safecast
-version: v1.0.0
+version: v1.2.0
 type: go
 summary: Package safecast allows you to safely cast between numeric types in Go and
   return errors (or panic when using the Must* variants) when the cast would result
   in a loss of precision, range or sign.
-homepage: https://godoc.org/fortio.org/safecast
+homepage: https://pkg.go.dev/fortio.org/safecast
 license: apache-2.0
 licenses:
 - sources: LICENSE

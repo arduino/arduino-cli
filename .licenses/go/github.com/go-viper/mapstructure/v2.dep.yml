@@ -1,9 +1,9 @@
 ---
 name: github.com/go-viper/mapstructure/v2
-version: v2.3.0
+version: v2.4.0
 type: go
 summary: Package mapstructure exposes functionality to convert one arbitrary Go type
-  into another, typically to convert a map[string]interface{} into a native Go structure.
+  into another, typically to convert a map[string]any into a native Go structure.
 homepage: https://pkg.go.dev/github.com/go-viper/mapstructure/v2
 license: mit
 licenses:
