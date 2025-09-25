@@ -57,6 +57,7 @@ tasks:
           exit 1
         fi
       - licensed cache
+      - task: update-deb-copyright
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies-task/Taskfile.yml
   general:check-dep-licenses:
