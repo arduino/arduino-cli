@@ -22,8 +22,10 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -125,6 +127,19 @@ func (p *Profile) RequireSystemInstalledPlatform() bool {
 	return p.Platforms[0].RequireSystemInstalledPlatform()
 }
 
+// GetLibrary returns the requested library or an error if not found
+func (p *Profile) GetLibrary(libraryName string, toDelete bool) (*ProfileLibraryReference, error) {
+	for i, l := range p.Libraries {
+		if l.Library == libraryName {
+			if toDelete {
+				p.Libraries = slices.Delete(p.Libraries, i, i+1)
+			}
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
+}
+
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
 	var portConfig *rpc.MonitorPortConfiguration
@@ -180,6 +195,9 @@ type ProfileRequiredPlatforms []*ProfilePlatformReference
 
 // AsYaml outputs the required platforms as Yaml
 func (p *ProfileRequiredPlatforms) AsYaml() string {
+	if len(*p) == 0 {
+		return "    platforms: []\n"
+	}
 	res := "    platforms:\n"
 	for _, platform := range *p {
 		res += platform.AsYaml()
@@ -208,7 +226,7 @@ type ProfileRequiredLibraries []*ProfileLibraryReference
 // AsYaml outputs the required libraries as Yaml
 func (p *ProfileRequiredLibraries) AsYaml() string {
 	if len(*p) == 0 {
-		return ""
+		return "    libraries: []\n"
 	}
 	res := "    libraries:\n"
 	for _, lib := range *p {
