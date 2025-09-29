@@ -200,6 +200,9 @@ service ArduinoCoreService {
   // Remove a library from the build profile.
   rpc ProfileLibRemove(ProfileLibRemoveRequest) returns (ProfileLibRemoveResponse) {}
 
+  // List the libraries in the build profile.
+  rpc ProfileLibList(ProfileLibListRequest) returns (ProfileLibListResponse) {}
+
   // Set the default build profile.
   rpc ProfileSetDefault(ProfileSetDefaultRequest) returns (ProfileSetDefaultResponse) {}
 
@@ -491,6 +494,39 @@ message ProfileLibRemoveResponse {
   string lib_version = 2;
   // Name of the profile.
   string profile_name = 3;
+}
+
+message ProfileLibraryReference {
+  message IndexLibrary {
+    // Name of the library.
+    string name = 1;
+    // Version of the library if taken from the Library Index.
+    string version = 2;
+  }
+  message LocalLibrary {
+    // Absolute path to the library.
+    string path = 1;
+  }
+  oneof library {
+    // The library is installed from the Library Index.
+    IndexLibrary index_library = 1;
+    // The library is a local library.
+    LocalLibrary local_library = 2;
+  }
+}
+
+message ProfileLibListRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // Name of the profile.
+  string profile_name = 2;
+}
+
+message ProfileLibListResponse {
+  // The libraries in the profile.
+  repeated ProfileLibraryReference libraries = 1;
+  // Name of the profile.
+  string profile_name = 2;
 }
 
 message ProfileSetDefaultRequest {

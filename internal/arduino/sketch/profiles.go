@@ -392,6 +392,26 @@ func (l *ProfileLibraryReference) String() string {
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
 }
 
+func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
+	if l.InstallDir != nil {
+		return &rpc.ProfileLibraryReference{
+			Library: &rpc.ProfileLibraryReference_LocalLibrary_{
+				LocalLibrary: &rpc.ProfileLibraryReference_LocalLibrary{
+					Path: l.InstallDir.String(),
+				},
+			},
+		}
+	}
+	return &rpc.ProfileLibraryReference{
+		Library: &rpc.ProfileLibraryReference_IndexLibrary_{
+			IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
+				Name:    l.Library,
+				Version: l.Version.String(),
+			},
+		},
+	}
+}
+
 // InternalUniqueIdentifier returns the unique identifier for this object
 func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
 	f.Assert(l.InstallDir == nil,
