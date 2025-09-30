@@ -48,28 +48,42 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	// Obtain the library index from the manager
-	li, err := instances.GetLibrariesIndex(req.GetInstance())
-	if err != nil {
-		return nil, err
-	}
-	version, err := parseVersion(req.LibVersion)
-	if err != nil {
-		return nil, err
-	}
-	libRelease, err := li.FindRelease(req.GetLibName(), version)
-	if err != nil {
-		return nil, err
-	}
-
-	// If the library has been already added to the profile, just update the version
-	if lib, _ := profile.GetLibrary(req.LibName, false); lib != nil {
-		lib.Version = libRelease.GetVersion()
+	var addedLib *sketch.ProfileLibraryReference
+	if reqLocalLib := req.GetLibrary().GetLocalLibrary(); reqLocalLib != nil {
+		// Add a local library
+		path := paths.New(reqLocalLib.GetPath())
+		if path == nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
+		}
+		addedLib = &sketch.ProfileLibraryReference{InstallDir: path}
+		profile.Libraries = append(profile.Libraries, addedLib)
+	} else if reqIndexLib := req.GetLibrary().GetIndexLibrary(); reqIndexLib != nil {
+		// Obtain the library index from the manager
+		li, err := instances.GetLibrariesIndex(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+		version, err := parseVersion(reqIndexLib.GetVersion())
+		if err != nil {
+			return nil, err
+		}
+		libRelease, err := li.FindRelease(reqIndexLib.GetName(), version)
+		if err != nil {
+			return nil, err
+		}
+		// If the library has been already added to the profile, just update the version
+		if lib, _ := profile.GetLibrary(reqIndexLib.GetName(), false); lib != nil {
+			lib.Version = libRelease.GetVersion()
+			addedLib = lib
+		} else {
+			addedLib = &sketch.ProfileLibraryReference{
+				Library: reqIndexLib.GetName(),
+				Version: libRelease.GetVersion(),
+			}
+			profile.Libraries = append(profile.Libraries, addedLib)
+		}
 	} else {
-		profile.Libraries = append(profile.Libraries, &sketch.ProfileLibraryReference{
-			Library: req.GetLibName(),
-			Version: libRelease.GetVersion(),
-		})
+		return nil, &cmderrors.InvalidArgumentError{Message: "library must be specified"}
 	}
 
 	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
@@ -77,5 +91,5 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	return &rpc.ProfileLibAddResponse{LibName: req.LibName, LibVersion: libRelease.GetVersion().String(), ProfileName: profileName}, nil
+	return &rpc.ProfileLibAddResponse{Library: addedLib.ToRpc(), ProfileName: profileName}, nil
 }

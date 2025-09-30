@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	"github.com/arduino/arduino-cli/internal/cli/lib"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -83,13 +84,21 @@ func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreSer
 			Instance:    instance,
 			SketchPath:  sketchPath.String(),
 			ProfileName: profileArg.Get(),
-			LibName:     lib.Name,
-			LibVersion:  lib.Version,
+			Library: &rpc.ProfileLibraryReference{
+				Library: &rpc.ProfileLibraryReference_IndexLibrary_{
+					IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
+						Name:    lib.Name,
+						Version: lib.Version,
+					},
+				},
+			},
 		})
 		if err != nil {
 			feedback.Fatal(i18n.Tr("Error adding %s to the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(libAddResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: resp.ProfileName})
+		feedback.PrintResult(libAddResult{
+			Library:     result.NewProfileLibraryReference_IndexLibraryResult(resp.GetLibrary().GetIndexLibrary()),
+			ProfileName: resp.ProfileName})
 	}
 }
 
@@ -140,9 +149,8 @@ func runLibRemoveCommand(ctx context.Context, args []string, srv rpc.ArduinoCore
 }
 
 type libAddResult struct {
-	LibName     string `json:"library_name"`
-	LibVersion  string `json:"library_version"`
-	ProfileName string `json:"profile_name"`
+	Library     *result.ProfileLibraryReference_IndexLibraryResult `json:"library"`
+	ProfileName string                                             `json:"profile_name"`
 }
 
 func (lr libAddResult) Data() interface{} {
@@ -150,7 +158,7 @@ func (lr libAddResult) Data() interface{} {
 }
 
 func (lr libAddResult) String() string {
-	return i18n.Tr("Profile %s: %s@%s added successfully", lr.ProfileName, lr.LibName, lr.LibVersion)
+	return i18n.Tr("Profile %s: %s@%s added successfully", lr.ProfileName, lr.Library.Name, lr.Library.Version)
 }
 
 type libRemoveResult struct {
