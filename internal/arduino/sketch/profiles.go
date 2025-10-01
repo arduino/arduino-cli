@@ -127,17 +127,23 @@ func (p *Profile) RequireSystemInstalledPlatform() bool {
 	return p.Platforms[0].RequireSystemInstalledPlatform()
 }
 
-// GetLibrary returns the requested library or an error if not found
-func (p *Profile) GetLibrary(libraryName string, toDelete bool) (*ProfileLibraryReference, error) {
-	for i, l := range p.Libraries {
+func (p *Profile) GetLibrary(libraryName string) (*ProfileLibraryReference, error) {
+	for _, l := range p.Libraries {
 		if l.Library == libraryName {
-			if toDelete {
-				p.Libraries = slices.Delete(p.Libraries, i, i+1)
-			}
 			return l, nil
 		}
 	}
 	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
+}
+
+func (p *Profile) RemoveLibrary(library *ProfileLibraryReference) (*ProfileLibraryReference, error) {
+	for i, l := range p.Libraries {
+		if l.Match(library) {
+			p.Libraries = slices.Delete(p.Libraries, i, i+1)
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: library.String()}
 }
 
 // ToRpc converts this Profile to an rpc.SketchProfile
@@ -392,6 +398,25 @@ func (l *ProfileLibraryReference) String() string {
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
 }
 
+// Match checks if this library reference matches another one.
+// If one reference has the version not set, it matches any version of the other reference.
+func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
+	if l.InstallDir != nil {
+		return other.InstallDir != nil && l.InstallDir.EqualsTo(other.InstallDir)
+	}
+	if other.InstallDir != nil {
+		return false
+	}
+	if l.Library != other.Library {
+		return false
+	}
+	if l.Version == nil || other.Version == nil {
+		return true
+	}
+	return l.Version.Equal(other.Version)
+}
+
+// ToRpc converts this ProfileLibraryReference to an rpc.ProfileLibraryReference
 func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
 	if l.InstallDir != nil {
 		return &rpc.ProfileLibraryReference{
@@ -410,6 +435,29 @@ func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
 			},
 		},
 	}
+}
+
+// FromRpcProfileLibraryReference converts an rpc.ProfileLibraryReference to a ProfileLibraryReference
+func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLibraryReference, error) {
+	if localLib := l.GetLocalLibrary(); localLib != nil {
+		path := paths.New(localLib.GetPath())
+		if path == nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
+		}
+		return &ProfileLibraryReference{InstallDir: path}, nil
+	}
+	if indexLib := l.GetIndexLibrary(); indexLib != nil {
+		var version *semver.Version
+		if indexLib.GetVersion() != "" {
+			v, err := semver.Parse(indexLib.GetVersion())
+			if err != nil {
+				return nil, &cmderrors.InvalidVersionError{Cause: err}
+			}
+			version = v
+		}
+		return &ProfileLibraryReference{Library: indexLib.GetName(), Version: version}, nil
+	}
+	return nil, &cmderrors.InvalidArgumentError{Message: "library not specified"}
 }
 
 // InternalUniqueIdentifier returns the unique identifier for this object

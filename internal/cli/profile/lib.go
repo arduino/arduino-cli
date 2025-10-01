@@ -139,12 +139,21 @@ func runLibRemoveCommand(ctx context.Context, args []string, srv rpc.ArduinoCore
 		resp, err := srv.ProfileLibRemove(ctx, &rpc.ProfileLibRemoveRequest{
 			SketchPath:  sketchPath.String(),
 			ProfileName: profileArg.Get(),
-			LibName:     lib.Name,
+			Library: &rpc.ProfileLibraryReference{
+				Library: &rpc.ProfileLibraryReference_IndexLibrary_{
+					IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
+						Name:    lib.Name,
+						Version: lib.Version,
+					},
+				},
+			},
 		})
 		if err != nil {
 			feedback.Fatal(i18n.Tr("Error removing %s from the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
 		}
-		feedback.PrintResult(libRemoveResult{LibName: resp.GetLibName(), LibVersion: resp.GetLibVersion(), ProfileName: resp.ProfileName})
+		feedback.PrintResult(libRemoveResult{
+			Library:     result.NewProfileLibraryReference_IndexLibraryResult(resp.GetLibrary().GetIndexLibrary()),
+			ProfileName: resp.ProfileName})
 	}
 }
 
@@ -162,9 +171,8 @@ func (lr libAddResult) String() string {
 }
 
 type libRemoveResult struct {
-	LibName     string `json:"library_name"`
-	LibVersion  string `json:"library_version"`
-	ProfileName string `json:"profile_name"`
+	Library     *result.ProfileLibraryReference_IndexLibraryResult `json:"library"`
+	ProfileName string                                             `json:"profile_name"`
 }
 
 func (lr libRemoveResult) Data() interface{} {
@@ -172,5 +180,7 @@ func (lr libRemoveResult) Data() interface{} {
 }
 
 func (lr libRemoveResult) String() string {
-	return i18n.Tr("Profile %s: %s@%s removed successfully", lr.ProfileName, lr.LibName, lr.LibVersion)
+	res := fmt.Sprintln(i18n.Tr("The following libraries were removed from the profile %s:", lr.ProfileName))
+	res += fmt.Sprintf("  - %s@%s\n", lr.Library.Name, lr.Library.Version)
+	return res
 }

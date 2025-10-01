@@ -47,9 +47,13 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 		return nil, err
 	}
 
-	lib, err := profile.GetLibrary(req.LibName, true)
+	libToRemove, err := sketch.FromRpcProfileLibraryReference(req.GetLibrary())
 	if err != nil {
-		return nil, err
+		return nil, &cmderrors.InvalidArgumentError{Message: "invalid library reference", Cause: err}
+	}
+	removedLib, err := profile.RemoveLibrary(libToRemove)
+	if err != nil {
+		return nil, &cmderrors.InvalidArgumentError{Message: "failed to remove library", Cause: err}
 	}
 
 	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
@@ -57,5 +61,5 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 		return nil, err
 	}
 
-	return &rpc.ProfileLibRemoveResponse{LibName: lib.Library, LibVersion: lib.Version.String(), ProfileName: profileName}, nil
+	return &rpc.ProfileLibRemoveResponse{Library: removedLib.ToRpc(), ProfileName: profileName}, nil
 }

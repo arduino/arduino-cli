@@ -72,7 +72,7 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 			return nil, err
 		}
 		// If the library has been already added to the profile, just update the version
-		if lib, _ := profile.GetLibrary(reqIndexLib.GetName(), false); lib != nil {
+		if lib, _ := profile.GetLibrary(reqIndexLib.GetName()); lib != nil {
 			lib.Version = libRelease.GetVersion()
 			addedLib = lib
 		} else {
