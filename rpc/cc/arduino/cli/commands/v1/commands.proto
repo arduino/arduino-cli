@@ -472,6 +472,8 @@ message ProfileLibAddResponse {
   ProfileLibraryReference library = 1;
   // Name of the profile.
   string profile_name = 2;
+  // Set to true to add also all the dependencies of the library.
+  optional bool add_dependencies = 3;
 }
 
 message ProfileLibRemoveRequest {
