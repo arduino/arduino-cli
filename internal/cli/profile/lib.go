@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
+	"go.bug.st/f"
 )
 
 func initLibCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
@@ -96,9 +97,12 @@ func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreSer
 		if err != nil {
 			feedback.Fatal(i18n.Tr("Error adding %s to the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
 		}
+		added := f.Map(resp.GetAddedLibraries(), func(l *rpc.ProfileLibraryReference) *result.ProfileLibraryReference_IndexLibraryResult {
+			return result.NewProfileLibraryReference_IndexLibraryResult(l.GetIndexLibrary())
+		})
 		feedback.PrintResult(libAddResult{
-			Library:     result.NewProfileLibraryReference_IndexLibraryResult(resp.GetLibrary().GetIndexLibrary()),
-			ProfileName: resp.ProfileName})
+			AddedLibraries: added,
+			ProfileName:    resp.ProfileName})
 	}
 }
 
@@ -158,8 +162,9 @@ func runLibRemoveCommand(ctx context.Context, args []string, srv rpc.ArduinoCore
 }
 
 type libAddResult struct {
-	Library     *result.ProfileLibraryReference_IndexLibraryResult `json:"library"`
-	ProfileName string                                             `json:"profile_name"`
+	AddedLibraries   []*result.ProfileLibraryReference_IndexLibraryResult `json:"added_libraries"`
+	SkippedLibraries []*result.ProfileLibraryReference_IndexLibraryResult `json:"skipped_libraries"`
+	ProfileName      string                                               `json:"profile_name"`
 }
 
 func (lr libAddResult) Data() interface{} {
@@ -167,7 +172,14 @@ func (lr libAddResult) Data() interface{} {
 }
 
 func (lr libAddResult) String() string {
-	return i18n.Tr("Profile %s: %s@%s added successfully", lr.ProfileName, lr.Library.Name, lr.Library.Version)
+	res := ""
+	if len(lr.AddedLibraries) > 0 {
+		res += fmt.Sprintln(i18n.Tr("The following libraries were added to the profile %s:", lr.ProfileName))
+		for _, l := range lr.AddedLibraries {
+			res += fmt.Sprintf("  - %s@%s\n", l.Name, l.Version)
+		}
+	}
+	return res
 }
 
 type libRemoveResult struct {

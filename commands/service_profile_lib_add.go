@@ -20,9 +20,11 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"go.bug.st/f"
 )
 
 // ProfileLibAdd adds a library to the specified profile or to the default profile.
@@ -48,15 +50,17 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	var addedLib *sketch.ProfileLibraryReference
+	var addedLibs []*sketch.ProfileLibraryReference
+	var skippedLibs []*sketch.ProfileLibraryReference
 	if reqLocalLib := req.GetLibrary().GetLocalLibrary(); reqLocalLib != nil {
 		// Add a local library
 		path := paths.New(reqLocalLib.GetPath())
 		if path == nil {
 			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
 		}
-		addedLib = &sketch.ProfileLibraryReference{InstallDir: path}
+		addedLib := &sketch.ProfileLibraryReference{InstallDir: path}
 		profile.Libraries = append(profile.Libraries, addedLib)
+		addedLibs = append(addedLibs, addedLib)
 	} else if reqIndexLib := req.GetLibrary().GetIndexLibrary(); reqIndexLib != nil {
 		// Obtain the library index from the manager
 		li, err := instances.GetLibrariesIndex(req.GetInstance())
@@ -71,16 +75,43 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		if err != nil {
 			return nil, err
 		}
-		// If the library has been already added to the profile, just update the version
-		if lib, _ := profile.GetLibrary(reqIndexLib.GetName()); lib != nil {
-			lib.Version = libRelease.GetVersion()
-			addedLib = lib
-		} else {
-			addedLib = &sketch.ProfileLibraryReference{
-				Library: reqIndexLib.GetName(),
-				Version: libRelease.GetVersion(),
+
+		add := func(libReleaseToAdd *librariesindex.Release) {
+			libRefToAdd := &sketch.ProfileLibraryReference{
+				Library: libReleaseToAdd.GetName(),
+				Version: libReleaseToAdd.GetVersion(),
 			}
-			profile.Libraries = append(profile.Libraries, addedLib)
+			existingLibRef, _ := profile.GetLibrary(libReleaseToAdd.GetName())
+			if existingLibRef == nil {
+				profile.Libraries = append(profile.Libraries, libRefToAdd)
+				addedLibs = append(addedLibs, libRefToAdd)
+				return
+			}
+			// If the library has been already added to the profile, just update the version
+			if req.GetNoOverwrite() {
+				skippedLibs = append(skippedLibs, libRefToAdd)
+				return
+			}
+			existingLibRef.Version = libReleaseToAdd.GetVersion()
+			addedLibs = append(addedLibs, existingLibRef)
+		}
+
+		if req.GetAddDependencies() {
+			lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
+			if err != nil {
+				return nil, err
+			}
+			libWithDeps, err := libraryResolveDependencies(lme, li, libRelease.GetName(), libRelease.GetVersion().String(), false)
+			// deps contains the main library as well, so we skip it when adding dependencies
+			release()
+			if err != nil {
+				return nil, err
+			}
+			for _, lib := range libWithDeps {
+				add(lib)
+			}
+		} else {
+			add(libRelease)
 		}
 	} else {
 		return nil, &cmderrors.InvalidArgumentError{Message: "library must be specified"}
@@ -91,5 +122,9 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, err
 	}
 
-	return &rpc.ProfileLibAddResponse{Library: addedLib.ToRpc(), ProfileName: profileName}, nil
+	return &rpc.ProfileLibAddResponse{
+		AddedLibraries:   f.Map(addedLibs, (*sketch.ProfileLibraryReference).ToRpc),
+		SkippedLibraries: f.Map(skippedLibs, (*sketch.ProfileLibraryReference).ToRpc),
+		ProfileName:      profileName,
+	}, nil
 }
