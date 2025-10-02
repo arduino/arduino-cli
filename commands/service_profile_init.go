@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
@@ -51,6 +50,10 @@ func (s *arduinoCoreServerImpl) InitProfile(ctx context.Context, req *rpc.InitPr
 		if req.GetFqbn() == "" {
 			return nil, &cmderrors.MissingFQBNError{}
 		}
+		fqbn, err := fqbn.Parse(req.GetFqbn())
+		if err != nil {
+			return nil, &cmderrors.InvalidFQBNError{Cause: err}
+		}
 
 		// Check that the profile name is unique
 		if profile, _ := sk.GetProfile(req.ProfileName); profile != nil {
@@ -61,16 +64,9 @@ func (s *arduinoCoreServerImpl) InitProfile(ctx context.Context, req *rpc.InitPr
 		if err != nil {
 			return nil, err
 		}
-		release = sync.OnceFunc(release)
 		defer release()
-
 		if pme.Dirty() {
 			return nil, &cmderrors.InstanceNeedsReinitialization{}
-		}
-
-		fqbn, err := fqbn.Parse(req.GetFqbn())
-		if err != nil {
-			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
 
 		// Automatically detect the target platform if it is installed on the user's machine
