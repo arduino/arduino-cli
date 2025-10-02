@@ -87,6 +87,11 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 				addedLibs = append(addedLibs, libRefToAdd)
 				return
 			}
+			// If the same version of the library has been already added to the profile, skip it
+			if existingLibRef.Version.Equal(libReleaseToAdd.GetVersion()) {
+				skippedLibs = append(skippedLibs, libRefToAdd)
+				return
+			}
 			// If the library has been already added to the profile, just update the version
 			if req.GetNoOverwrite() {
 				skippedLibs = append(skippedLibs, libRefToAdd)
