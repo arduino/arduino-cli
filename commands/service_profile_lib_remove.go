@@ -53,7 +53,7 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 	}
 	removedLib, err := profile.RemoveLibrary(libToRemove)
 	if err != nil {
-		return nil, &cmderrors.InvalidArgumentError{Message: "failed to remove library", Cause: err}
+		return nil, &cmderrors.InvalidArgumentError{Cause: err}
 	}
 
 	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))

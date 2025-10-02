@@ -31,6 +31,9 @@ func composeErrorMsg(msg string, cause error) string {
 	if cause == nil {
 		return msg
 	}
+	if msg == "" {
+		return cause.Error()
+	}
 	return fmt.Sprintf("%v: %v", msg, cause)
 }
 

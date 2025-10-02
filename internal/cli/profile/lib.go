@@ -165,7 +165,8 @@ func runLibRemoveCommand(ctx context.Context, args []string, srv rpc.ArduinoCore
 			},
 		})
 		if err != nil {
-			feedback.Fatal(i18n.Tr("Error removing %s from the profile %s: %v", lib.Name, profileArg.Get(), err), feedback.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("%s: %v",
+				i18n.Tr("Error removing library %[1]s from the profile", lib.Name), err), feedback.ErrGeneric)
 		}
 		feedback.PrintResult(libRemoveResult{
 			Library:     result.NewProfileLibraryReference_IndexLibraryResult(resp.GetLibrary().GetIndexLibrary()),

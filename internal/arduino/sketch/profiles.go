@@ -395,6 +395,9 @@ func (l *ProfileLibraryReference) String() string {
 	if l.InstallDir != nil {
 		return fmt.Sprintf("%s@dir:%s", l.Library, l.InstallDir)
 	}
+	if l.Version == nil {
+		return l.Library
+	}
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
 }
 
