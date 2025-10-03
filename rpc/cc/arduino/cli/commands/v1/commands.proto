@@ -190,6 +190,24 @@ service ArduinoCoreService {
 
   // Set a single configuration value.
   rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse);
+
+  // Create the sketch project file and add a build profile to it.
+  rpc InitProfile(InitProfileRequest) returns (InitProfileResponse) {}
+
+  // Add a library to the build profile.
+  rpc ProfileLibAdd(ProfileLibAddRequest) returns (ProfileLibAddResponse) {}
+
+  // Remove a library from the build profile.
+  rpc ProfileLibRemove(ProfileLibRemoveRequest) returns (ProfileLibRemoveResponse) {}
+
+  // List the libraries in the build profile.
+  rpc ProfileLibList(ProfileLibListRequest) returns (ProfileLibListResponse) {}
+
+  // Set the default build profile.
+  rpc ProfileSetDefault(ProfileSetDefaultRequest) returns (ProfileSetDefaultResponse) {}
+
+  // Dump the sketch project file.
+  rpc ProfileDump(ProfileDumpRequest) returns (ProfileDumpResponse) {}
 }
 
 message CreateRequest {}
@@ -419,3 +437,116 @@ message CleanDownloadCacheDirectoryRequest {
 }
 
 message CleanDownloadCacheDirectoryResponse {}
+
+message InitProfileRequest {
+  // An Arduino Core instance.
+  Instance instance = 1;
+  // Absolute path to Sketch folder.
+  string sketch_path = 2;
+  // Name of the profile.
+  string profile_name = 3;
+  // FQBN of the provided profile.
+  string fqbn = 4;
+  // Set the profile as the default one.
+  bool default_profile = 5;
+}
+
+message InitProfileResponse {
+  // Absolute path to the project file.
+  string project_file_path = 1;
+}
+
+message ProfileLibAddRequest {
+  // An Arduino Core instance.
+  Instance instance = 1;
+  // Absolute path to Sketch folder.
+  string sketch_path = 2;
+  // Name of the profile.
+  string profile_name = 3;
+  // The library to add to the profile.
+  ProfileLibraryReference library = 4;
+  // Set to true to add also all the dependencies of the library.
+  optional bool add_dependencies = 5;
+  // Set to true to avoid overwriting an existing library in the profile.
+  optional bool no_overwrite = 6;
+}
+
+message ProfileLibAddResponse {
+  // The library that has been added or overwritten to the profile.
+  repeated ProfileLibraryReference added_libraries = 1;
+  // The libraries that have been skipped because they were already present
+  // in the profile and the no_overwrite option was set to true.
+  repeated ProfileLibraryReference skipped_libraries = 2;
+  // Name of the profile.
+  string profile_name = 3;
+}
+
+message ProfileLibRemoveRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // Name of the profile.
+  string profile_name = 2;
+  // The library to remove from the profile.
+  ProfileLibraryReference library = 3;
+}
+
+message ProfileLibRemoveResponse {
+  // The library that has been removed from the profile.
+  ProfileLibraryReference library = 1;
+  // Name of the profile.
+  string profile_name = 2;
+}
+
+message ProfileLibraryReference {
+  message IndexLibrary {
+    // Name of the library.
+    string name = 1;
+    // Version of the library if taken from the Library Index.
+    string version = 2;
+  }
+  message LocalLibrary {
+    // Absolute path to the library.
+    string path = 1;
+  }
+  oneof library {
+    // The library is installed from the Library Index.
+    IndexLibrary index_library = 1;
+    // The library is a local library.
+    LocalLibrary local_library = 2;
+  }
+}
+
+message ProfileLibListRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // Name of the profile.
+  string profile_name = 2;
+}
+
+message ProfileLibListResponse {
+  // The libraries in the profile.
+  repeated ProfileLibraryReference libraries = 1;
+  // Name of the profile.
+  string profile_name = 2;
+}
+
+message ProfileSetDefaultRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // Name of the profile.
+  string profile_name = 2;
+}
+
+message ProfileSetDefaultResponse {}
+
+message ProfileDumpRequest {
+  // Absolute path to Sketch folder.
+  string sketch_path = 1;
+  // The format of the dump (default is "json", allowed values are "json", and "yaml").
+  string dump_format = 2;
+}
+
+message ProfileDumpResponse {
+  // The encoded profile dump.
+  string encoded_profile = 1;
+}

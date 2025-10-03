@@ -43,11 +43,43 @@ func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, 
 		return nil, err
 	}
 
-	return libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
+	deps, err := libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract all installed libraries
+	installedLibs := map[string]*libraries.Library{}
+	for _, lib := range listLibraries(lme, li, false, false) {
+		installedLibs[lib.Library.Name] = lib.Library
+	}
+
+	res := []*rpc.LibraryDependencyStatus{}
+	for _, dep := range deps {
+		// ...and add information on currently installed versions of the libraries
+		var installed *semver.Version
+		required := dep.GetVersion()
+		if installedLib, has := installedLibs[dep.GetName()]; has {
+			installed = installedLib.Version
+			if installed != nil && required != nil && installed.Equal(required) {
+				// avoid situations like installed=0.53 and required=0.53.0
+				required = installed
+			}
+		}
+		res = append(res, &rpc.LibraryDependencyStatus{
+			Name:             dep.GetName(),
+			VersionRequired:  required.String(),
+			VersionInstalled: installed.String(),
+		})
+	}
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].GetName() < res[j].GetName()
+	})
+	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
 }
 
 func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesindex.Index,
-	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
+	reqName, reqVersion string, noOverwrite bool) ([]*librariesindex.Release, error) {
 	version, err := parseVersion(reqVersion)
 	if err != nil {
 		return nil, err
@@ -57,12 +89,6 @@ func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesind
 	reqLibRelease, err := li.FindRelease(reqName, version)
 	if err != nil {
 		return nil, err
-	}
-
-	// Extract all installed libraries
-	installedLibs := map[string]*libraries.Library{}
-	for _, lib := range listLibraries(lme, li, false, false) {
-		installedLibs[lib.Library.Name] = lib.Library
 	}
 
 	// Resolve all dependencies...
@@ -92,26 +118,5 @@ func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesind
 		return nil, &cmderrors.LibraryDependenciesResolutionFailedError{}
 	}
 
-	res := []*rpc.LibraryDependencyStatus{}
-	for _, dep := range deps {
-		// ...and add information on currently installed versions of the libraries
-		var installed *semver.Version
-		required := dep.GetVersion()
-		if installedLib, has := installedLibs[dep.GetName()]; has {
-			installed = installedLib.Version
-			if installed != nil && required != nil && installed.Equal(required) {
-				// avoid situations like installed=0.53 and required=0.53.0
-				required = installed
-			}
-		}
-		res = append(res, &rpc.LibraryDependencyStatus{
-			Name:             dep.GetName(),
-			VersionRequired:  required.String(),
-			VersionInstalled: installed.String(),
-		})
-	}
-	sort.Slice(res, func(i, j int) bool {
-		return res[i].GetName() < res[j].GetName()
-	})
-	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
+	return deps, nil
 }
