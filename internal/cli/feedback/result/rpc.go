@@ -33,7 +33,7 @@ func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 		return nil
 	}
 
-	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease, string]((*semver.Version).String)
+	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease]((*semver.Version).String)
 	for k, v := range in.GetReleases() {
 		releases.Set(semver.MustParse(k), NewPlatformRelease(v))
 	}
@@ -876,7 +876,7 @@ func NewSearchedLibrary(l *rpc.SearchedLibrary) *SearchedLibrary {
 	if l == nil {
 		return nil
 	}
-	releasesMap := orderedmap.NewWithConversionFunc[*semver.Version, *LibraryRelease, string]((*semver.Version).String)
+	releasesMap := orderedmap.NewWithConversionFunc[*semver.Version, *LibraryRelease]((*semver.Version).String)
 	for k, v := range l.GetReleases() {
 		releasesMap.Set(semver.MustParse(k), NewLibraryRelease(v))
 	}
