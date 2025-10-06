@@ -461,7 +461,7 @@ message ProfileLibAddRequest {
   // Name of the profile.
   string profile_name = 3;
   // The library to add to the profile.
-  ProfileLibraryReference library = 4;
+  SketchProfileLibraryReference library = 4;
   // Set to true to add also all the dependencies of the library.
   optional bool add_dependencies = 5;
   // Set to true to avoid overwriting an existing library in the profile.
@@ -470,10 +470,10 @@ message ProfileLibAddRequest {
 
 message ProfileLibAddResponse {
   // The library that has been added or overwritten to the profile.
-  repeated ProfileLibraryReference added_libraries = 1;
+  repeated SketchProfileLibraryReference added_libraries = 1;
   // The libraries that have been skipped because they were already present
   // in the profile and the no_overwrite option was set to true.
-  repeated ProfileLibraryReference skipped_libraries = 2;
+  repeated SketchProfileLibraryReference skipped_libraries = 2;
   // Name of the profile.
   string profile_name = 3;
 }
@@ -484,33 +484,14 @@ message ProfileLibRemoveRequest {
   // Name of the profile.
   string profile_name = 2;
   // The library to remove from the profile.
-  ProfileLibraryReference library = 3;
+  SketchProfileLibraryReference library = 3;
 }
 
 message ProfileLibRemoveResponse {
   // The library that has been removed from the profile.
-  ProfileLibraryReference library = 1;
+  SketchProfileLibraryReference library = 1;
   // Name of the profile.
   string profile_name = 2;
-}
-
-message ProfileLibraryReference {
-  message IndexLibrary {
-    // Name of the library.
-    string name = 1;
-    // Version of the library if taken from the Library Index.
-    string version = 2;
-  }
-  message LocalLibrary {
-    // Absolute path to the library.
-    string path = 1;
-  }
-  oneof library {
-    // The library is installed from the Library Index.
-    IndexLibrary index_library = 1;
-    // The library is a local library.
-    LocalLibrary local_library = 2;
-  }
 }
 
 message ProfileLibListRequest {
@@ -522,7 +503,7 @@ message ProfileLibListRequest {
 
 message ProfileLibListResponse {
   // The libraries in the profile.
-  repeated ProfileLibraryReference libraries = 1;
+  repeated SketchProfileLibraryReference libraries = 1;
   // Name of the profile.
   string profile_name = 2;
 }

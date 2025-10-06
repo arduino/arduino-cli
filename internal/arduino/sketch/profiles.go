@@ -420,19 +420,19 @@ func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
 }
 
 // ToRpc converts this ProfileLibraryReference to an rpc.ProfileLibraryReference
-func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
+func (l *ProfileLibraryReference) ToRpc() *rpc.SketchProfileLibraryReference {
 	if l.InstallDir != nil {
-		return &rpc.ProfileLibraryReference{
-			Library: &rpc.ProfileLibraryReference_LocalLibrary_{
-				LocalLibrary: &rpc.ProfileLibraryReference_LocalLibrary{
+		return &rpc.SketchProfileLibraryReference{
+			Library: &rpc.SketchProfileLibraryReference_LocalLibrary_{
+				LocalLibrary: &rpc.SketchProfileLibraryReference_LocalLibrary{
 					Path: l.InstallDir.String(),
 				},
 			},
 		}
 	}
-	return &rpc.ProfileLibraryReference{
-		Library: &rpc.ProfileLibraryReference_IndexLibrary_{
-			IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
+	return &rpc.SketchProfileLibraryReference{
+		Library: &rpc.SketchProfileLibraryReference_IndexLibrary_{
+			IndexLibrary: &rpc.SketchProfileLibraryReference_IndexLibrary{
 				Name:    l.Library,
 				Version: l.Version.String(),
 			},
@@ -441,7 +441,7 @@ func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
 }
 
 // FromRpcProfileLibraryReference converts an rpc.ProfileLibraryReference to a ProfileLibraryReference
-func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLibraryReference, error) {
+func FromRpcProfileLibraryReference(l *rpc.SketchProfileLibraryReference) (*ProfileLibraryReference, error) {
 	if localLib := l.GetLocalLibrary(); localLib != nil {
 		path := paths.New(localLib.GetPath())
 		if path == nil {

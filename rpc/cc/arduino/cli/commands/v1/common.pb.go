@@ -1437,6 +1437,194 @@ func (x *SketchProfile) GetProtocol() string {
 	return ""
 }
 
+type SketchProfileLibraryReference struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Library:
+	//
+	//	*SketchProfileLibraryReference_IndexLibrary_
+	//	*SketchProfileLibraryReference_LocalLibrary_
+	Library isSketchProfileLibraryReference_Library `protobuf_oneof:"library"`
+}
+
+func (x *SketchProfileLibraryReference) Reset() {
+	*x = SketchProfileLibraryReference{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_common_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SketchProfileLibraryReference) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SketchProfileLibraryReference) ProtoMessage() {}
+
+func (x *SketchProfileLibraryReference) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_common_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SketchProfileLibraryReference.ProtoReflect.Descriptor instead.
+func (*SketchProfileLibraryReference) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_common_proto_rawDescGZIP(), []int{19}
+}
+
+func (m *SketchProfileLibraryReference) GetLibrary() isSketchProfileLibraryReference_Library {
+	if m != nil {
+		return m.Library
+	}
+	return nil
+}
+
+func (x *SketchProfileLibraryReference) GetIndexLibrary() *SketchProfileLibraryReference_IndexLibrary {
+	if x, ok := x.GetLibrary().(*SketchProfileLibraryReference_IndexLibrary_); ok {
+		return x.IndexLibrary
+	}
+	return nil
+}
+
+func (x *SketchProfileLibraryReference) GetLocalLibrary() *SketchProfileLibraryReference_LocalLibrary {
+	if x, ok := x.GetLibrary().(*SketchProfileLibraryReference_LocalLibrary_); ok {
+		return x.LocalLibrary
+	}
+	return nil
+}
+
+type isSketchProfileLibraryReference_Library interface {
+	isSketchProfileLibraryReference_Library()
+}
+
+type SketchProfileLibraryReference_IndexLibrary_ struct {
+	// The library is installed from the Library Index.
+	IndexLibrary *SketchProfileLibraryReference_IndexLibrary `protobuf:"bytes,1,opt,name=index_library,json=indexLibrary,proto3,oneof"`
+}
+
+type SketchProfileLibraryReference_LocalLibrary_ struct {
+	// The library is a local library.
+	LocalLibrary *SketchProfileLibraryReference_LocalLibrary `protobuf:"bytes,2,opt,name=local_library,json=localLibrary,proto3,oneof"`
+}
+
+func (*SketchProfileLibraryReference_IndexLibrary_) isSketchProfileLibraryReference_Library() {}
+
+func (*SketchProfileLibraryReference_LocalLibrary_) isSketchProfileLibraryReference_Library() {}
+
+type SketchProfileLibraryReference_IndexLibrary struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Name of the library.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the library if taken from the Library Index.
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+}
+
+func (x *SketchProfileLibraryReference_IndexLibrary) Reset() {
+	*x = SketchProfileLibraryReference_IndexLibrary{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_common_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SketchProfileLibraryReference_IndexLibrary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SketchProfileLibraryReference_IndexLibrary) ProtoMessage() {}
+
+func (x *SketchProfileLibraryReference_IndexLibrary) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_common_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SketchProfileLibraryReference_IndexLibrary.ProtoReflect.Descriptor instead.
+func (*SketchProfileLibraryReference_IndexLibrary) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_common_proto_rawDescGZIP(), []int{19, 0}
+}
+
+func (x *SketchProfileLibraryReference_IndexLibrary) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SketchProfileLibraryReference_IndexLibrary) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+type SketchProfileLibraryReference_LocalLibrary struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Absolute path to the library.
+	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+}
+
+func (x *SketchProfileLibraryReference_LocalLibrary) Reset() {
+	*x = SketchProfileLibraryReference_LocalLibrary{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_common_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SketchProfileLibraryReference_LocalLibrary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SketchProfileLibraryReference_LocalLibrary) ProtoMessage() {}
+
+func (x *SketchProfileLibraryReference_LocalLibrary) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_common_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SketchProfileLibraryReference_LocalLibrary.ProtoReflect.Descriptor instead.
+func (*SketchProfileLibraryReference_LocalLibrary) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_common_proto_rawDescGZIP(), []int{19, 1}
+}
+
+func (x *SketchProfileLibraryReference_LocalLibrary) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
 var File_cc_arduino_cli_commands_v1_common_proto protoreflect.FileDescriptor
 
 var file_cc_arduino_cli_commands_v1_common_proto_rawDesc = []byte{
@@ -1637,12 +1825,35 @@ var file_cc_arduino_cli_commands_v1_common_proto_rawDesc = []byte{
 	0x6f, 0x72, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
 	0x52, 0x0a, 0x70, 0x6f, 0x72, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x1a, 0x0a, 0x08,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x42, 0x48, 0x5a, 0x46, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61,
-	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63,
-	0x63, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x2f, 0x63, 0x6f,
-	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e,
-	0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x22, 0xea, 0x02, 0x0a, 0x1d, 0x53, 0x6b, 0x65,
+	0x74, 0x63, 0x68, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72,
+	0x79, 0x52, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x12, 0x6d, 0x0a, 0x0d, 0x69, 0x6e,
+	0x64, 0x65, 0x78, 0x5f, 0x6c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x46, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63,
+	0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x53,
+	0x6b, 0x65, 0x74, 0x63, 0x68, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x69, 0x62, 0x72,
+	0x61, 0x72, 0x79, 0x52, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x49, 0x6e, 0x64,
+	0x65, 0x78, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x48, 0x00, 0x52, 0x0c, 0x69, 0x6e, 0x64,
+	0x65, 0x78, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x12, 0x6d, 0x0a, 0x0d, 0x6c, 0x6f, 0x63,
+	0x61, 0x6c, 0x5f, 0x6c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x46, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
+	0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x6b,
+	0x65, 0x74, 0x63, 0x68, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x69, 0x62, 0x72, 0x61,
+	0x72, 0x79, 0x52, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x4c, 0x6f, 0x63, 0x61,
+	0x6c, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x48, 0x00, 0x52, 0x0c, 0x6c, 0x6f, 0x63, 0x61,
+	0x6c, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x1a, 0x3c, 0x0a, 0x0c, 0x49, 0x6e, 0x64, 0x65,
+	0x78, 0x4c, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07,
+	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x1a, 0x22, 0x0a, 0x0c, 0x4c, 0x6f, 0x63, 0x61, 0x6c, 0x4c,
+	0x69, 0x62, 0x72, 0x61, 0x72, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x74, 0x68, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x61, 0x74, 0x68, 0x42, 0x09, 0x0a, 0x07, 0x6c, 0x69,
+	0x62, 0x72, 0x61, 0x72, 0x79, 0x42, 0x48, 0x5a, 0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75,
+	0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61,
+	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61,
+	0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1657,28 +1868,31 @@ func file_cc_arduino_cli_commands_v1_common_proto_rawDescGZIP() []byte {
 	return file_cc_arduino_cli_commands_v1_common_proto_rawDescData
 }
 
-var file_cc_arduino_cli_commands_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_cc_arduino_cli_commands_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_cc_arduino_cli_commands_v1_common_proto_goTypes = []any{
-	(*Instance)(nil),                   // 0: cc.arduino.cli.commands.v1.Instance
-	(*DownloadProgress)(nil),           // 1: cc.arduino.cli.commands.v1.DownloadProgress
-	(*DownloadProgressStart)(nil),      // 2: cc.arduino.cli.commands.v1.DownloadProgressStart
-	(*DownloadProgressUpdate)(nil),     // 3: cc.arduino.cli.commands.v1.DownloadProgressUpdate
-	(*DownloadProgressEnd)(nil),        // 4: cc.arduino.cli.commands.v1.DownloadProgressEnd
-	(*TaskProgress)(nil),               // 5: cc.arduino.cli.commands.v1.TaskProgress
-	(*Programmer)(nil),                 // 6: cc.arduino.cli.commands.v1.Programmer
-	(*MissingProgrammerError)(nil),     // 7: cc.arduino.cli.commands.v1.MissingProgrammerError
-	(*Platform)(nil),                   // 8: cc.arduino.cli.commands.v1.Platform
-	(*PlatformSummary)(nil),            // 9: cc.arduino.cli.commands.v1.PlatformSummary
-	(*PlatformMetadata)(nil),           // 10: cc.arduino.cli.commands.v1.PlatformMetadata
-	(*PlatformRelease)(nil),            // 11: cc.arduino.cli.commands.v1.PlatformRelease
-	(*InstalledPlatformReference)(nil), // 12: cc.arduino.cli.commands.v1.InstalledPlatformReference
-	(*Board)(nil),                      // 13: cc.arduino.cli.commands.v1.Board
-	(*HelpResources)(nil),              // 14: cc.arduino.cli.commands.v1.HelpResources
-	(*Sketch)(nil),                     // 15: cc.arduino.cli.commands.v1.Sketch
-	(*MonitorPortConfiguration)(nil),   // 16: cc.arduino.cli.commands.v1.MonitorPortConfiguration
-	(*MonitorPortSetting)(nil),         // 17: cc.arduino.cli.commands.v1.MonitorPortSetting
-	(*SketchProfile)(nil),              // 18: cc.arduino.cli.commands.v1.SketchProfile
-	nil,                                // 19: cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry
+	(*Instance)(nil),                                   // 0: cc.arduino.cli.commands.v1.Instance
+	(*DownloadProgress)(nil),                           // 1: cc.arduino.cli.commands.v1.DownloadProgress
+	(*DownloadProgressStart)(nil),                      // 2: cc.arduino.cli.commands.v1.DownloadProgressStart
+	(*DownloadProgressUpdate)(nil),                     // 3: cc.arduino.cli.commands.v1.DownloadProgressUpdate
+	(*DownloadProgressEnd)(nil),                        // 4: cc.arduino.cli.commands.v1.DownloadProgressEnd
+	(*TaskProgress)(nil),                               // 5: cc.arduino.cli.commands.v1.TaskProgress
+	(*Programmer)(nil),                                 // 6: cc.arduino.cli.commands.v1.Programmer
+	(*MissingProgrammerError)(nil),                     // 7: cc.arduino.cli.commands.v1.MissingProgrammerError
+	(*Platform)(nil),                                   // 8: cc.arduino.cli.commands.v1.Platform
+	(*PlatformSummary)(nil),                            // 9: cc.arduino.cli.commands.v1.PlatformSummary
+	(*PlatformMetadata)(nil),                           // 10: cc.arduino.cli.commands.v1.PlatformMetadata
+	(*PlatformRelease)(nil),                            // 11: cc.arduino.cli.commands.v1.PlatformRelease
+	(*InstalledPlatformReference)(nil),                 // 12: cc.arduino.cli.commands.v1.InstalledPlatformReference
+	(*Board)(nil),                                      // 13: cc.arduino.cli.commands.v1.Board
+	(*HelpResources)(nil),                              // 14: cc.arduino.cli.commands.v1.HelpResources
+	(*Sketch)(nil),                                     // 15: cc.arduino.cli.commands.v1.Sketch
+	(*MonitorPortConfiguration)(nil),                   // 16: cc.arduino.cli.commands.v1.MonitorPortConfiguration
+	(*MonitorPortSetting)(nil),                         // 17: cc.arduino.cli.commands.v1.MonitorPortSetting
+	(*SketchProfile)(nil),                              // 18: cc.arduino.cli.commands.v1.SketchProfile
+	(*SketchProfileLibraryReference)(nil),              // 19: cc.arduino.cli.commands.v1.SketchProfileLibraryReference
+	nil,                                                // 20: cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry
+	(*SketchProfileLibraryReference_IndexLibrary)(nil), // 21: cc.arduino.cli.commands.v1.SketchProfileLibraryReference.IndexLibrary
+	(*SketchProfileLibraryReference_LocalLibrary)(nil), // 22: cc.arduino.cli.commands.v1.SketchProfileLibraryReference.LocalLibrary
 }
 var file_cc_arduino_cli_commands_v1_common_proto_depIdxs = []int32{
 	2,  // 0: cc.arduino.cli.commands.v1.DownloadProgress.start:type_name -> cc.arduino.cli.commands.v1.DownloadProgressStart
@@ -1687,7 +1901,7 @@ var file_cc_arduino_cli_commands_v1_common_proto_depIdxs = []int32{
 	10, // 3: cc.arduino.cli.commands.v1.Platform.metadata:type_name -> cc.arduino.cli.commands.v1.PlatformMetadata
 	11, // 4: cc.arduino.cli.commands.v1.Platform.release:type_name -> cc.arduino.cli.commands.v1.PlatformRelease
 	10, // 5: cc.arduino.cli.commands.v1.PlatformSummary.metadata:type_name -> cc.arduino.cli.commands.v1.PlatformMetadata
-	19, // 6: cc.arduino.cli.commands.v1.PlatformSummary.releases:type_name -> cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry
+	20, // 6: cc.arduino.cli.commands.v1.PlatformSummary.releases:type_name -> cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry
 	13, // 7: cc.arduino.cli.commands.v1.PlatformRelease.boards:type_name -> cc.arduino.cli.commands.v1.Board
 	14, // 8: cc.arduino.cli.commands.v1.PlatformRelease.help:type_name -> cc.arduino.cli.commands.v1.HelpResources
 	18, // 9: cc.arduino.cli.commands.v1.Sketch.profiles:type_name -> cc.arduino.cli.commands.v1.SketchProfile
@@ -1695,12 +1909,14 @@ var file_cc_arduino_cli_commands_v1_common_proto_depIdxs = []int32{
 	16, // 11: cc.arduino.cli.commands.v1.Sketch.default_port_config:type_name -> cc.arduino.cli.commands.v1.MonitorPortConfiguration
 	17, // 12: cc.arduino.cli.commands.v1.MonitorPortConfiguration.settings:type_name -> cc.arduino.cli.commands.v1.MonitorPortSetting
 	16, // 13: cc.arduino.cli.commands.v1.SketchProfile.port_config:type_name -> cc.arduino.cli.commands.v1.MonitorPortConfiguration
-	11, // 14: cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry.value:type_name -> cc.arduino.cli.commands.v1.PlatformRelease
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	21, // 14: cc.arduino.cli.commands.v1.SketchProfileLibraryReference.index_library:type_name -> cc.arduino.cli.commands.v1.SketchProfileLibraryReference.IndexLibrary
+	22, // 15: cc.arduino.cli.commands.v1.SketchProfileLibraryReference.local_library:type_name -> cc.arduino.cli.commands.v1.SketchProfileLibraryReference.LocalLibrary
+	11, // 16: cc.arduino.cli.commands.v1.PlatformSummary.ReleasesEntry.value:type_name -> cc.arduino.cli.commands.v1.PlatformRelease
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_cc_arduino_cli_commands_v1_common_proto_init() }
@@ -1937,11 +2153,51 @@ func file_cc_arduino_cli_commands_v1_common_proto_init() {
 				return nil
 			}
 		}
+		file_cc_arduino_cli_commands_v1_common_proto_msgTypes[19].Exporter = func(v any, i int) any {
+			switch v := v.(*SketchProfileLibraryReference); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_common_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*SketchProfileLibraryReference_IndexLibrary); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_common_proto_msgTypes[22].Exporter = func(v any, i int) any {
+			switch v := v.(*SketchProfileLibraryReference_LocalLibrary); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_cc_arduino_cli_commands_v1_common_proto_msgTypes[1].OneofWrappers = []any{
 		(*DownloadProgress_Start)(nil),
 		(*DownloadProgress_Update)(nil),
 		(*DownloadProgress_End)(nil),
+	}
+	file_cc_arduino_cli_commands_v1_common_proto_msgTypes[19].OneofWrappers = []any{
+		(*SketchProfileLibraryReference_IndexLibrary_)(nil),
+		(*SketchProfileLibraryReference_LocalLibrary_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1949,7 +2205,7 @@ func file_cc_arduino_cli_commands_v1_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cc_arduino_cli_commands_v1_common_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
