@@ -288,7 +288,11 @@ func (l *SketchLibrariesDetector) findIncludes(
 			}
 		}
 	}
-	defer l.preRunner.Cancel()
+	defer func() {
+		if l.preRunner != nil {
+			l.preRunner.Cancel()
+		}
+	}()
 
 	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
@@ -430,9 +434,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 
 				// Stop the pre-runner
 				if l.preRunner != nil {
-					preRunner := l.preRunner
+					l.preRunner.Cancel()
 					l.preRunner = nil
-					go preRunner.Cancel()
 				}
 
 				// Run the actual preprocessor
