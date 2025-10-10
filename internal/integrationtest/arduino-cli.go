@@ -389,22 +389,22 @@ func (cli *ArduinoCLI) run(ctx context.Context, stdoutBuff, stderrBuff io.Writer
 
 	cli.t.NoError(cliProc.Start())
 
+	if stdoutBuff == nil {
+		stdoutBuff = io.Discard
+	}
+	if stderrBuff == nil {
+		stderrBuff = io.Discard
+	}
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		if stdoutBuff == nil {
-			stdoutBuff = io.Discard
-		}
 		if _, err := io.Copy(stdoutBuff, io.TeeReader(stdout, terminalOut)); err != nil {
 			fmt.Fprintln(terminalOut, color.HiBlackString("<<< stdout copy error:"), err)
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if stderrBuff == nil {
-			stderrBuff = io.Discard
-		}
 		if _, err := io.Copy(stderrBuff, io.TeeReader(stderr, terminalErr)); err != nil {
 			fmt.Fprintln(terminalErr, color.HiBlackString("<<< stderr copy error:"), err)
 		}
