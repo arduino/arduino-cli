@@ -4,14 +4,14 @@ First of all, thanks for contributing! This document provides some basic guideli
 
 There are several ways you can get involved:
 
-| Type of contribution                              | Contribution method                                     |
-| ------------------------------------------------- | ------------------------------------------------------- |
-| - Support request<br/>- Question<br/>- Discussion | Post on the [Arduino Forum][forum]                      |
-| - Bug report<br/>- Feature request                | Issue report (read the [issue guidelines][issues])      |
-| Testing                                           | Try out the [nightly build][nightly]                    |
-| - Bug fix<br/>- Enhancement                       | Pull Request (read the [pull request guidelines][prs])  |
-| Translations for Arduino CLI                      | Use the [transifex][translate] platform                 |
-| Monetary                                          | - [Donate][donate]<br/>- [Buy official products][store] |
+| Type of contribution                              | Contribution method                                    |
+| ------------------------------------------------- | ------------------------------------------------------ |
+| - Support request<br/>- Question<br/>- Discussion | Post on the [Arduino Forum][forum]                     |
+| - Bug report<br/>- Feature request                | Issue report (read the [issue guidelines][issues])     |
+| Testing                                           | Try out the [nightly build][nightly]                   |
+| - Bug fix<br/>- Enhancement                       | Pull Request (read the [pull request guidelines][prs]) |
+| Translations for Arduino CLI                      | Use the [transifex][translate] platform                |
+| Monetary                                          | [Buy official products][store]                         |
 
 ## Issue Reports
 
@@ -342,7 +342,6 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [nightly]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds
 [prs]: #pull-requests
 [translate]: https://www.transifex.com/arduino-1/arduino-cli/
-[donate]: https://www.arduino.cc/en/Main/Contribute
 [store]: https://store.arduino.cc
 [issue-tracker]: https://github.com/arduino/arduino-cli/issues?q=
 [reactions]: https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments
