@@ -45,28 +45,19 @@ func PreprocessSketchWithCtags(
 	lineOffset int, buildProperties *properties.Map,
 	onlyUpdateCompilationDatabase, verbose bool,
 ) (*runner.Result, error) {
+	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
+	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
+	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
+
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
 		return nil, err
 	}
 	defer tmpDir.RemoveAll()
-	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
-
-	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
-
-	// Check if the preprocessed file is already up-to-date
-	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
-	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	if unpreprocessedStat, err := unpreprocessedSourceFile.Stat(); err != nil {
-		return nil, fmt.Errorf("%s: %w", i18n.Tr("unable to open unpreprocessed source file"), err)
-	} else if sourceStat, err := preprocessedSourceFile.Stat(); err == nil && unpreprocessedStat.ModTime().Before(sourceStat.ModTime()) {
-		fmt.Fprintln(stdout, i18n.Tr("Sketch is unchanged, skipping preprocessing."))
-		res := &runner.Result{Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}
-		return res, nil
-	}
 
 	// Run GCC preprocessor
+	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
 	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
@@ -143,6 +134,13 @@ func PreprocessSketchWithCtags(
 			}
 		}
 		fmt.Println("#END OF PREPROCESSED SOURCE")
+	}
+
+	// Read the existing preprocessed file to check if it's already up-to-date.
+	oldPreprocessedSource, _ := preprocessedSourceFile.ReadFile()
+	if bytes.Equal([]byte(preprocessedSource), oldPreprocessedSource) {
+		// No changes, do nothing
+		return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, nil
 	}
 
 	// Write back arduino-preprocess output to the sourceFile
