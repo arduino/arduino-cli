@@ -79,7 +79,7 @@ msgstr "Manca il pattern %s"
 msgid "'%s' has an invalid signature"
 msgstr "'%s' ha una firma invalida"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:416
+#: internal/arduino/cores/packagemanager/package_manager.go:421
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -275,7 +275,7 @@ msgstr "Nome scheda:"
 msgid "Board version:"
 msgstr "Versione scheda:"
 
-#: internal/arduino/builder/sketch.go:245
+#: internal/arduino/builder/sketch.go:256
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "Il file del bootloader specificato è inesistente: %[1]s"
 
@@ -1480,7 +1480,7 @@ msgstr "Indice del pacchetto non valido in %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Il parametro %s non è valido: versione non consentita"
 
-#: commands/service_board_identify.go:169
+#: commands/service_board_identify.go:170
 msgid "Invalid pid value: '%s'"
 msgstr "Il valore pid non è valido: '%s'"
 
@@ -1494,7 +1494,7 @@ msgstr "La dimensione della regexp non è valida: %s"
 
 #: internal/arduino/builder/sizer.go:207
 msgid "Invalid value for build.warn_data_percentage: %s"
-msgstr ""
+msgstr "Valore non valido per build.warn_data_percentage: %s"
 
 #: main.go:86
 msgid "Invalid value in configuration"
@@ -1504,7 +1504,7 @@ msgstr "Nella configurazione c'è un valore non valido"
 msgid "Invalid version"
 msgstr "Versione non è valida"
 
-#: commands/service_board_identify.go:166
+#: commands/service_board_identify.go:167
 msgid "Invalid vid value: '%s'"
 msgstr "Il valore di vid non è valido: '%s'"
 
@@ -2589,6 +2589,8 @@ msgstr "La libreria %s richiede altre installazioni:"
 msgid ""
 "The list of included libraries has been changed... rebuilding all libraries."
 msgstr ""
+"L'elenco delle librerie incluse è stato modificato... ricompilazione in "
+"corso di tutte le librerie."
 
 #: internal/cli/compile/compile.go:119
 msgid ""
@@ -3043,7 +3045,7 @@ msgstr "ricerca di base per \"esp32\" e \"display\" limitata al manutentore uffi
 msgid "binary file not found in %s"
 msgstr "file binario non trovato in %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:316
+#: internal/arduino/cores/packagemanager/package_manager.go:321
 msgid "board %s not found"
 msgstr "la scheda %s non è stata trovata"
 
@@ -3176,7 +3178,7 @@ msgstr "rilevamento %s non è stato trovato"
 msgid "discovery %s not installed"
 msgstr "il rilevamento %s non è installato"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:714
+#: internal/arduino/cores/packagemanager/package_manager.go:719
 msgid "discovery release not found: %s"
 msgstr "il rilascio del rilevamento non è stato trovato: %s"
 
@@ -3214,12 +3216,12 @@ msgstr "si è verificato un errore durante l'apertura di %s"
 msgid "error parsing version constraints"
 msgstr "si è verificato un errore durante il parsing dei vincoli di versione"
 
-#: commands/service_board_identify.go:203
+#: commands/service_board_identify.go:210
 msgid "error processing response from server"
 msgstr ""
 "si è verificato un errore durante l'elaborazione della risposta del server"
 
-#: commands/service_board_identify.go:183
+#: commands/service_board_identify.go:184
 msgid "error querying Arduino Cloud Api"
 msgstr ""
 "si è verificato un errore durante l'interrogazione di Arduino Cloud Api"
@@ -3236,7 +3238,7 @@ msgstr "estrazione dell'archivio: %s"
 msgid "failed to compute hash of file \"%s\""
 msgstr "Impossibile calcolare l'hash del file \"%s\""
 
-#: commands/service_board_identify.go:178
+#: commands/service_board_identify.go:179
 msgid "failed to initialize http client"
 msgstr "Impossibile inizializzare il client http"
 
@@ -3304,7 +3306,7 @@ msgstr "sto recuperando le informazioni sull'archivio: %s"
 msgid "getting archive path: %s"
 msgstr "sto recuperando il percorso dell'archivio: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:322
+#: internal/arduino/cores/packagemanager/package_manager.go:327
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "sto recuperando le proprietà di costruzione della scheda %[1]s: %[2]s"
 
@@ -3531,8 +3533,8 @@ msgstr "caricamento di %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "caricamento delle schede: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:469
-#: internal/arduino/cores/packagemanager/package_manager.go:484
+#: internal/arduino/cores/packagemanager/package_manager.go:474
+#: internal/arduino/cores/packagemanager/package_manager.go:489
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "caricamento del file indice json %[1]s: %[2]s"
 
@@ -3585,7 +3587,7 @@ msgstr "Manca la direttiva '%s'"
 msgid "missing checksum for: %s"
 msgstr "manca il checksum di: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:430
+#: internal/arduino/cores/packagemanager/package_manager.go:435
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "manca il pacchetto %[1]s a cui fa riferimento la scheda %[2]s"
 
@@ -3595,11 +3597,11 @@ msgstr ""
 "Manca l'indice del pacchetto %s, non possono essere garantiti aggiornamenti "
 "futuri"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:435
+#: internal/arduino/cores/packagemanager/package_manager.go:440
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "manca la piattaforma %[1]s:%[2]s referenziata dalla scheda %[3]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:440
+#: internal/arduino/cores/packagemanager/package_manager.go:445
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "manca la release della piattaforma %[1]s:%[2]s a cui fa riferimento la "
@@ -3609,7 +3611,7 @@ msgstr ""
 msgid "missing signature"
 msgstr "Firma mancante"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:725
+#: internal/arduino/cores/packagemanager/package_manager.go:730
 msgid "monitor release not found: %s"
 msgstr "release del monitor non è stata trovata: %s"
 
@@ -3698,12 +3700,12 @@ msgstr "apertura del file di destinazione: %s"
 msgid "package %s not found"
 msgstr "il pacchetto %s non è stato trovato"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:498
+#: internal/arduino/cores/packagemanager/package_manager.go:503
 msgid "package '%s' not found"
 msgstr "Il pacchetto '%s' non è stato trovato"
 
 #: internal/arduino/cores/board.go:167
-#: internal/arduino/cores/packagemanager/package_manager.go:263
+#: internal/arduino/cores/packagemanager/package_manager.go:268
 msgid "parsing fqbn: %s"
 msgstr "sto facendo il parsing di fqbn: %s"
 
@@ -3719,7 +3721,7 @@ msgstr "il percorso non è una directory della piattaforma: %s"
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "la piattaforma %[1]s non è stata trovata nel pacchetto %[2]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:309
+#: internal/arduino/cores/packagemanager/package_manager.go:314
 msgid "platform %s is not installed"
 msgstr "la piattaforma %s non è installata"
 
@@ -3778,7 +3780,7 @@ msgstr "lettura cartella %s"
 msgid "reading directory %s content"
 msgstr "lettura in corso del contenuto della directory %s"
 
-#: internal/arduino/builder/sketch.go:83
+#: internal/arduino/builder/sketch.go:91
 msgid "reading file %[1]s: %[2]s"
 msgstr "lettura del file %[1]s: %[2]s"
 
@@ -3814,7 +3816,7 @@ msgstr "lettura degli sketch in corso"
 msgid "recipe not found '%s'"
 msgstr "scrittura non trovata '%s'"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:574
+#: internal/arduino/cores/packagemanager/package_manager.go:579
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "il rilascio %[1]s non è stato trovato per il tool %[2]s"
 
@@ -3910,7 +3912,7 @@ msgstr "la sezione del testo supera lo spazio disponibile nella scheda"
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr "il database di compilazione potrebbe essere incompleto o impreciso"
 
-#: commands/service_board_identify.go:190
+#: commands/service_board_identify.go:191
 msgid "the server responded with status %s"
 msgstr "il server ha risposto con lo stato %s"
 
@@ -3927,7 +3929,7 @@ msgstr "il tool %s non è gestito dal gestore dei pacchetti"
 msgid "tool %s not found"
 msgstr "Il tool %s non è stato trovato"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:524
+#: internal/arduino/cores/packagemanager/package_manager.go:529
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "il tool '%[1]s' non è stato trovato nel pacchetto '%[2]s'"
 
@@ -3935,8 +3937,8 @@ msgstr "il tool '%[1]s' non è stato trovato nel pacchetto '%[2]s'"
 msgid "tool not installed"
 msgstr "Il tool non è installato"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:703
-#: internal/arduino/cores/packagemanager/package_manager.go:809
+#: internal/arduino/cores/packagemanager/package_manager.go:708
+#: internal/arduino/cores/packagemanager/package_manager.go:814
 msgid "tool release not found: %s"
 msgstr "il rilascio del tool non è stato trovato: %s"
 
@@ -3950,17 +3952,17 @@ msgid ""
 msgstr ""
 "sono necessarie due versioni diverse della libreria %[1]s: %[2]s e %[3]s"
 
-#: internal/arduino/builder/sketch.go:76
-#: internal/arduino/builder/sketch.go:120
+#: internal/arduino/builder/sketch.go:84
+#: internal/arduino/builder/sketch.go:129
 msgid "unable to compute relative path to the sketch for the item"
 msgstr ""
 "non è possibile calcolare il percorso relativo allo sketch per l'elemento"
 
-#: internal/arduino/builder/sketch.go:45
+#: internal/arduino/builder/sketch.go:53
 msgid "unable to create a folder to save the sketch"
 msgstr "non è possibile creare una cartella per salvare lo sketch"
 
-#: internal/arduino/builder/sketch.go:126
+#: internal/arduino/builder/sketch.go:135
 msgid "unable to create the folder containing the item"
 msgstr "non è possibile creare la cartella contenente l'elemento"
 
@@ -3969,23 +3971,23 @@ msgid "unable to marshal config to YAML: %v"
 msgstr ""
 "non è possibile eseguire il marshalling della configurazione in YAML: %v"
 
-#: internal/arduino/builder/sketch.go:164
+#: internal/arduino/builder/sketch.go:175
 msgid "unable to read contents of the destination item"
 msgstr "non è possibile leggere il contenuto dell'elemento di destinazione"
 
-#: internal/arduino/builder/sketch.go:137
+#: internal/arduino/builder/sketch.go:146
 msgid "unable to read contents of the source item"
 msgstr "non è stato possibile leggere i contenuti della risorsa"
 
-#: internal/arduino/builder/sketch.go:147
+#: internal/arduino/builder/sketch.go:158
 msgid "unable to write to destination file"
 msgstr "non è possibile scrivere sul file di destinazione"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:297
+#: internal/arduino/cores/packagemanager/package_manager.go:302
 msgid "unknown package %s"
 msgstr "pacchetto sconosciuto %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:304
+#: internal/arduino/cores/packagemanager/package_manager.go:309
 msgid "unknown platform %s:%s"
 msgstr "piattaforma sconosciuta %s:%s"
 
@@ -4029,6 +4031,6 @@ msgstr "la versione %s non è disponibile per questo sistema operativo"
 msgid "version %s not found"
 msgstr "la versione %s non è stata trovata"
 
-#: commands/service_board_identify.go:208
+#: commands/service_board_identify.go:216
 msgid "wrong format in server response"
 msgstr "formato errato nella risposta del server"
