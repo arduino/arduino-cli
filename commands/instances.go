@@ -155,11 +155,13 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 	// Try to extract profile if specified
 	var profile *sketch.Profile
+	var profileSketchFullPath *paths.Path
 	if req.GetProfile() != "" {
 		sk, err := sketch.New(paths.New(req.GetSketchPath()))
 		if err != nil {
 			return &cmderrors.InvalidArgumentError{Cause: err}
 		}
+		profileSketchFullPath = sk.FullPath
 		p, err := sk.GetProfile(req.GetProfile())
 		if err != nil {
 			return err
@@ -371,11 +373,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if libraryRef.InstallDir != nil {
 				libDir := libraryRef.InstallDir
 				if !libDir.IsAbs() {
-					sk, err := sketch.New(paths.New(req.GetSketchPath()))
-					if err != nil {
-						return &cmderrors.InvalidArgumentError{Cause: err}
-					}
-					libDir = sk.FullPath.JoinPath(libraryRef.InstallDir)
+					libDir = profileSketchFullPath.JoinPath(libraryRef.InstallDir)
 				}
 				if !libDir.IsDir() {
 					return &cmderrors.InvalidArgumentError{
