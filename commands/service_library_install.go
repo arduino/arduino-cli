@@ -267,9 +267,8 @@ func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 	lmi, release := lm.NewInstaller()
 	defer release()
 
-	// TODO: pass context
-	// ctx := stream.Context()
-	if err := lmi.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
+	ctx := stream.Context()
+	if err := lmi.InstallGitLib(ctx, req.GetUrl(), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: i18n.Tr("Library installed"), Completed: true})
