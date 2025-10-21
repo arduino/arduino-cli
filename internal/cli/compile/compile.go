@@ -332,8 +332,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 					libDir := paths.New(lib.GetInstallDir())
 					// If the library is installed in the sketch path, we want to output the relative path
 					// to the sketch path, so that the sketch is portable.
-					if ok, err := libDir.IsInsideDir(sketchPath); err == nil && ok {
-						if ref, err := libDir.RelFrom(sketchPath); err == nil {
+					sketchDir := paths.New(sk.LocationPath)
+					if ok, err := libDir.IsInsideDir(sketchDir); err == nil && ok {
+						if ref, err := libDir.RelFrom(sketchDir); err == nil {
 							libDir = paths.New(filepath.ToSlash(ref.String()))
 						}
 					}
