@@ -192,7 +192,7 @@ service ArduinoCoreService {
   rpc SettingsSetValue(SettingsSetValueRequest) returns (SettingsSetValueResponse);
 
   // Create the sketch project file and add a build profile to it.
-  rpc InitProfile(InitProfileRequest) returns (InitProfileResponse) {}
+  rpc ProfileCreate(ProfileCreateRequest) returns (ProfileCreateResponse) {}
 
   // Add a library to the build profile.
   rpc ProfileLibAdd(ProfileLibAddRequest) returns (ProfileLibAddResponse) {}
@@ -435,7 +435,7 @@ message CleanDownloadCacheDirectoryRequest {
 
 message CleanDownloadCacheDirectoryResponse {}
 
-message InitProfileRequest {
+message ProfileCreateRequest {
   // An Arduino Core instance.
   Instance instance = 1;
   // Absolute path to Sketch folder.
@@ -448,7 +448,7 @@ message InitProfileRequest {
   bool default_profile = 5;
 }
 
-message InitProfileResponse {
+message ProfileCreateResponse {
   // Absolute path to the project file.
   string project_file_path = 1;
 }
