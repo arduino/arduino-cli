@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal/proxyattributes
-version: v1.75.1
+version: v1.76.0
 type: go
 summary: Package proxyattributes contains functions for getting and setting proxy
   attributes like the CONNECT address and user info.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/proxyattributes
 license: apache-2.0
 licenses:
-- sources: grpc@v1.75.1/LICENSE
+- sources: grpc@v1.76.0/LICENSE
   text: |2
 
                                      Apache License

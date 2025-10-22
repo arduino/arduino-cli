@@ -1,8 +1,8 @@
 ---
 name: github.com/sagikazarmark/locafero
-version: v0.7.0
+version: v0.11.0
 type: go
-summary: Package finder looks for files and directories in an {fs.Fs} filesystem.
+summary: Package locafero looks for files and directories in an {fs.Fs} filesystem.
 homepage: https://pkg.go.dev/github.com/sagikazarmark/locafero
 license: mit
 licenses:

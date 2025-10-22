@@ -1,6 +1,6 @@
 ---
 name: github.com/spf13/cast
-version: v1.7.1
+version: v1.10.0
 type: go
 summary: Package cast provides easy and safe casting in Go.
 homepage: https://pkg.go.dev/github.com/spf13/cast
@@ -29,4 +29,6 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+- sources: README.md
+  text: The project is licensed under the [MIT License](LICENSE).
 notices: []

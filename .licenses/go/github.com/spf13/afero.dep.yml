@@ -1,6 +1,6 @@
 ---
 name: github.com/spf13/afero
-version: v1.12.0
+version: v1.15.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/spf13/afero
@@ -182,8 +182,4 @@ licenses:
           defend, and hold each Contributor harmless for any liability
           incurred by, or claims asserted against, such Contributor by reason
           of your accepting any such warranty or additional liability.
-- sources: README.md
-  text: |-
-    Afero is released under the Apache 2.0 license. See
-    [LICENSE.txt](https://github.com/spf13/afero/blob/master/LICENSE.txt)
 notices: []

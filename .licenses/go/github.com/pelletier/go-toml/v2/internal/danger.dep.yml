@@ -1,12 +1,12 @@
 ---
 name: github.com/pelletier/go-toml/v2/internal/danger
-version: v2.2.3
+version: v2.2.4
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/internal/danger
 license: other
 licenses:
-- sources: v2@v2.2.3/LICENSE
+- sources: v2@v2.2.4/LICENSE
   text: |
     The MIT License (MIT)
 
@@ -30,6 +30,6 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: v2@v2.2.3/README.md
+- sources: v2@v2.2.4/README.md
   text: The MIT License (MIT). Read [LICENSE](LICENSE).
 notices: []

@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/balancer/endpointsharding
-version: v1.75.1
+version: v1.76.0
 type: go
 summary: Package endpointsharding implements a load balancing policy that manages
   homogeneous child policies each owning a single endpoint.
 homepage: https://pkg.go.dev/google.golang.org/grpc/balancer/endpointsharding
 license: apache-2.0
 licenses:
-- sources: grpc@v1.75.1/LICENSE
+- sources: grpc@v1.76.0/LICENSE
   text: |2
 
                                      Apache License

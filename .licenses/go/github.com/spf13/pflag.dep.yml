@@ -1,6 +1,6 @@
 ---
 name: github.com/spf13/pflag
-version: v1.0.9
+version: v1.0.10
 type: go
 summary: Package pflag is a drop-in replacement for Go's flag package, implementing
   POSIX/GNU-style --flags.
