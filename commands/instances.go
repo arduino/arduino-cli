@@ -155,11 +155,13 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 	// Try to extract profile if specified
 	var profile *sketch.Profile
+	var profileSketchFullPath *paths.Path
 	if req.GetProfile() != "" {
 		sk, err := sketch.New(paths.New(req.GetSketchPath()))
 		if err != nil {
 			return &cmderrors.InvalidArgumentError{Cause: err}
 		}
+		profileSketchFullPath = sk.FullPath
 		p, err := sk.GetProfile(req.GetProfile())
 		if err != nil {
 			return err
@@ -371,13 +373,47 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if libraryRef.InstallDir != nil {
 				libDir := libraryRef.InstallDir
 				if !libDir.IsAbs() {
-					libDir = paths.New(req.GetSketchPath()).JoinPath(libraryRef.InstallDir)
+					libDir = profileSketchFullPath.JoinPath(libraryRef.InstallDir)
 				}
 				if !libDir.IsDir() {
 					return &cmderrors.InvalidArgumentError{
 						Message: i18n.Tr("Invalid library directory in sketch project: %s", libraryRef.InstallDir),
 					}
 				}
+				lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
+					Path:            libDir,
+					Location:        libraries.Profile,
+					IsSingleLibrary: true,
+				})
+				continue
+			}
+
+			if libraryRef.GitURL != nil {
+				uid := libraryRef.InternalUniqueIdentifier()
+				libRoot := s.settings.ProfilesCacheDir().Join(uid)
+				libDir := libRoot.Join(libraryRef.Library)
+
+				if !libDir.IsDir() {
+					// Clone repo and install
+					tmpDir, err := librariesmanager.CloneLibraryGitRepository(ctx, libraryRef.GitURL.String())
+					if err != nil {
+						taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
+						e := &cmderrors.FailedLibraryInstallError{Cause: err}
+						responseError(e.GRPCStatus())
+						continue
+					}
+
+					// Install library into profile cache
+					copyErr := tmpDir.CopyDirTo(libDir)
+					_ = tmpDir.RemoveAll()
+					if copyErr != nil {
+						taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
+						e := &cmderrors.FailedLibraryInstallError{Cause: fmt.Errorf("copying library to profile cache: %w", err)}
+						responseError(e.GRPCStatus())
+						continue
+					}
+				}
+
 				lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 					Path:            libDir,
 					Location:        libraries.Profile,
