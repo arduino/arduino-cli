@@ -1126,6 +1126,16 @@ func NewIndexUpdateReport_Status(r rpc.IndexUpdateReport_Status) IndexUpdateRepo
 	}
 }
 
+type SketchProfileLibraryReference_GitLibraryResult struct {
+	Url string `json:"url,omitempty"`
+}
+
+func NewSketchProfileLibraryReference_GitLibraryResult(resp *rpc.SketchProfileLibraryReference_GitLibrary) *SketchProfileLibraryReference_GitLibraryResult {
+	return &SketchProfileLibraryReference_GitLibraryResult{
+		Url: resp.GetUrl(),
+	}
+}
+
 type SketchProfileLibraryReference_LocalLibraryResult struct {
 	Path string `json:"path,omitempty"`
 }

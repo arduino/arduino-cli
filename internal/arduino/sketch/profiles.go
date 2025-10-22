@@ -430,6 +430,9 @@ func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
 	if l.InstallDir != nil {
 		return other.InstallDir != nil && l.InstallDir.EqualsTo(other.InstallDir)
 	}
+	if l.GitURL != nil {
+		return other.GitURL != nil && l.GitURL.String() == other.GitURL.String()
+	}
 	if other.InstallDir != nil {
 		return false
 	}
@@ -453,6 +456,15 @@ func (l *ProfileLibraryReference) ToRpc() *rpc.SketchProfileLibraryReference {
 			},
 		}
 	}
+	if l.GitURL != nil {
+		return &rpc.SketchProfileLibraryReference{
+			Library: &rpc.SketchProfileLibraryReference_GitLibrary_{
+				GitLibrary: &rpc.SketchProfileLibraryReference_GitLibrary{
+					Url: l.GitURL.String(),
+				},
+			},
+		}
+	}
 	return &rpc.SketchProfileLibraryReference{
 		Library: &rpc.SketchProfileLibraryReference_IndexLibrary_{
 			IndexLibrary: &rpc.SketchProfileLibraryReference_IndexLibrary{
@@ -471,6 +483,13 @@ func FromRpcProfileLibraryReference(l *rpc.SketchProfileLibraryReference) (*Prof
 			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
 		}
 		return &ProfileLibraryReference{InstallDir: path}, nil
+	}
+	if gitLib := l.GetGitLibrary(); gitLib != nil {
+		gitURL, err := url.Parse(gitLib.GetUrl())
+		if err != nil {
+			return nil, &cmderrors.InvalidURLError{Cause: err}
+		}
+		return &ProfileLibraryReference{GitURL: gitURL}, nil
 	}
 	if indexLib := l.GetIndexLibrary(); indexLib != nil {
 		var version *semver.Version
