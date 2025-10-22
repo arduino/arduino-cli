@@ -1126,33 +1126,33 @@ func NewIndexUpdateReport_Status(r rpc.IndexUpdateReport_Status) IndexUpdateRepo
 	}
 }
 
-type SketchProfileLibraryReference_GitLibraryResult struct {
+type ProfileLibraryReference_GitLibraryResult struct {
 	Url string `json:"url,omitempty"`
 }
 
-func NewSketchProfileLibraryReference_GitLibraryResult(resp *rpc.SketchProfileLibraryReference_GitLibrary) *SketchProfileLibraryReference_GitLibraryResult {
-	return &SketchProfileLibraryReference_GitLibraryResult{
+func NewProfileLibraryReference_GitLibraryResult(resp *rpc.ProfileLibraryReference_GitLibrary) *ProfileLibraryReference_GitLibraryResult {
+	return &ProfileLibraryReference_GitLibraryResult{
 		Url: resp.GetUrl(),
 	}
 }
 
-type SketchProfileLibraryReference_LocalLibraryResult struct {
+type ProfileLibraryReference_LocalLibraryResult struct {
 	Path string `json:"path,omitempty"`
 }
 
-func NewSketchProfileLibraryReference_LocalLibraryResult(resp *rpc.SketchProfileLibraryReference_LocalLibrary) *SketchProfileLibraryReference_LocalLibraryResult {
-	return &SketchProfileLibraryReference_LocalLibraryResult{
+func NewProfileLibraryReference_LocalLibraryResult(resp *rpc.ProfileLibraryReference_LocalLibrary) *ProfileLibraryReference_LocalLibraryResult {
+	return &ProfileLibraryReference_LocalLibraryResult{
 		Path: resp.GetPath(),
 	}
 }
 
-type SketchProfileLibraryReference_IndexLibraryResult struct {
+type ProfileLibraryReference_IndexLibraryResult struct {
 	Name    string `json:"name,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
-func NewSketchProfileLibraryReference_IndexLibraryResult(resp *rpc.SketchProfileLibraryReference_IndexLibrary) *SketchProfileLibraryReference_IndexLibraryResult {
-	return &SketchProfileLibraryReference_IndexLibraryResult{
+func NewProfileLibraryReference_IndexLibraryResult(resp *rpc.ProfileLibraryReference_IndexLibrary) *ProfileLibraryReference_IndexLibraryResult {
+	return &ProfileLibraryReference_IndexLibraryResult{
 		Name:    resp.GetName(),
 		Version: resp.GetVersion(),
 	}
