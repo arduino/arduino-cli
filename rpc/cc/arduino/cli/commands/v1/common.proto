@@ -251,10 +251,16 @@ message ProfileLibraryReference {
     // Absolute path to the library.
     string path = 1;
   }
+  message GitLibrary {
+    // URL to the git repo (the revision reference is in the fragment part of the URL).
+    string url = 1;
+  }
   oneof library {
     // The library is installed from the Library Index.
     IndexLibrary index_library = 1;
     // The library is a local library.
     LocalLibrary local_library = 2;
+    // The library is installed from a git repository.
+    GitLibrary git_library = 3;
   }
 }

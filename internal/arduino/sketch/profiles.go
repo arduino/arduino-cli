@@ -480,6 +480,15 @@ func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
 			},
 		}
 	}
+	if l.GitURL != nil {
+		return &rpc.ProfileLibraryReference{
+			Library: &rpc.ProfileLibraryReference_GitLibrary_{
+				GitLibrary: &rpc.ProfileLibraryReference_GitLibrary{
+					Url: l.GitURL.String(),
+				},
+			},
+		}
+	}
 	return &rpc.ProfileLibraryReference{
 		Library: &rpc.ProfileLibraryReference_IndexLibrary_{
 			IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
@@ -499,6 +508,13 @@ func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLib
 			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
 		}
 		return &ProfileLibraryReference{InstallDir: path}, nil
+	}
+	if gitLib := l.GetGitLibrary(); gitLib != nil {
+		gitURL, err := url.Parse(gitLib.GetUrl())
+		if err != nil {
+			return nil, &cmderrors.InvalidURLError{Cause: err}
+		}
+		return &ProfileLibraryReference{GitURL: gitURL}, nil
 	}
 	if indexLib := l.GetIndexLibrary(); indexLib != nil {
 		var version *semver.Version
