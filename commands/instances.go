@@ -402,10 +402,11 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 						responseError(e.GRPCStatus())
 						continue
 					}
-					defer tmpDir.RemoveAll()
 
 					// Install library into profile cache
-					if err := tmpDir.CopyDirTo(libDir); err != nil {
+					copyErr := tmpDir.CopyDirTo(libDir)
+					_ = tmpDir.RemoveAll()
+					if copyErr != nil {
 						taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
 						e := &cmderrors.FailedLibraryInstallError{Cause: fmt.Errorf("copying library to profile cache: %w", err)}
 						responseError(e.GRPCStatus())
