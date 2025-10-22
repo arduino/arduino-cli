@@ -85,7 +85,7 @@ const (
 	ArduinoCoreService_SettingsEnumerate_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsEnumerate"
 	ArduinoCoreService_SettingsGetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsGetValue"
 	ArduinoCoreService_SettingsSetValue_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SettingsSetValue"
-	ArduinoCoreService_InitProfile_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/InitProfile"
+	ArduinoCoreService_ProfileCreate_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileCreate"
 	ArduinoCoreService_ProfileLibAdd_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibAdd"
 	ArduinoCoreService_ProfileLibRemove_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibRemove"
 	ArduinoCoreService_ProfileLibList_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibList"
@@ -207,7 +207,7 @@ type ArduinoCoreServiceClient interface {
 	// Set a single configuration value.
 	SettingsSetValue(ctx context.Context, in *SettingsSetValueRequest, opts ...grpc.CallOption) (*SettingsSetValueResponse, error)
 	// Create the sketch project file and add a build profile to it.
-	InitProfile(ctx context.Context, in *InitProfileRequest, opts ...grpc.CallOption) (*InitProfileResponse, error)
+	ProfileCreate(ctx context.Context, in *ProfileCreateRequest, opts ...grpc.CallOption) (*ProfileCreateResponse, error)
 	// Add a library to the build profile.
 	ProfileLibAdd(ctx context.Context, in *ProfileLibAddRequest, opts ...grpc.CallOption) (*ProfileLibAddResponse, error)
 	// Remove a library from the build profile.
@@ -903,10 +903,10 @@ func (c *arduinoCoreServiceClient) SettingsSetValue(ctx context.Context, in *Set
 	return out, nil
 }
 
-func (c *arduinoCoreServiceClient) InitProfile(ctx context.Context, in *InitProfileRequest, opts ...grpc.CallOption) (*InitProfileResponse, error) {
+func (c *arduinoCoreServiceClient) ProfileCreate(ctx context.Context, in *ProfileCreateRequest, opts ...grpc.CallOption) (*ProfileCreateResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(InitProfileResponse)
-	err := c.cc.Invoke(ctx, ArduinoCoreService_InitProfile_FullMethodName, in, out, cOpts...)
+	out := new(ProfileCreateResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_ProfileCreate_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1068,7 +1068,7 @@ type ArduinoCoreServiceServer interface {
 	// Set a single configuration value.
 	SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error)
 	// Create the sketch project file and add a build profile to it.
-	InitProfile(context.Context, *InitProfileRequest) (*InitProfileResponse, error)
+	ProfileCreate(context.Context, *ProfileCreateRequest) (*ProfileCreateResponse, error)
 	// Add a library to the build profile.
 	ProfileLibAdd(context.Context, *ProfileLibAddRequest) (*ProfileLibAddResponse, error)
 	// Remove a library from the build profile.
@@ -1237,8 +1237,8 @@ func (UnimplementedArduinoCoreServiceServer) SettingsGetValue(context.Context, *
 func (UnimplementedArduinoCoreServiceServer) SettingsSetValue(context.Context, *SettingsSetValueRequest) (*SettingsSetValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SettingsSetValue not implemented")
 }
-func (UnimplementedArduinoCoreServiceServer) InitProfile(context.Context, *InitProfileRequest) (*InitProfileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InitProfile not implemented")
+func (UnimplementedArduinoCoreServiceServer) ProfileCreate(context.Context, *ProfileCreateRequest) (*ProfileCreateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProfileCreate not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) ProfileLibAdd(context.Context, *ProfileLibAddRequest) (*ProfileLibAddResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProfileLibAdd not implemented")
@@ -2018,20 +2018,20 @@ func _ArduinoCoreService_SettingsSetValue_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ArduinoCoreService_InitProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InitProfileRequest)
+func _ArduinoCoreService_ProfileCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProfileCreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArduinoCoreServiceServer).InitProfile(ctx, in)
+		return srv.(ArduinoCoreServiceServer).ProfileCreate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ArduinoCoreService_InitProfile_FullMethodName,
+		FullMethod: ArduinoCoreService_ProfileCreate_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArduinoCoreServiceServer).InitProfile(ctx, req.(*InitProfileRequest))
+		return srv.(ArduinoCoreServiceServer).ProfileCreate(ctx, req.(*ProfileCreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2232,8 +2232,8 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ArduinoCoreService_SettingsSetValue_Handler,
 		},
 		{
-			MethodName: "InitProfile",
-			Handler:    _ArduinoCoreService_InitProfile_Handler,
+			MethodName: "ProfileCreate",
+			Handler:    _ArduinoCoreService_ProfileCreate_Handler,
 		},
 		{
 			MethodName: "ProfileLibAdd",
