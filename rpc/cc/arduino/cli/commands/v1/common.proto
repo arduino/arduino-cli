@@ -238,7 +238,7 @@ message SketchProfile {
   string protocol = 6;
 }
 
-message SketchProfileLibraryReference {
+message ProfileLibraryReference {
   message IndexLibrary {
     // Name of the library.
     string name = 1;
