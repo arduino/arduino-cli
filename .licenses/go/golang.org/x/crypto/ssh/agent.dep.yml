@@ -1,13 +1,13 @@
 ---
 name: golang.org/x/crypto/ssh/agent
-version: v0.39.0
+version: v0.40.0
 type: go
 summary: Package agent implements the ssh-agent protocol, and provides both a client
   and a server.
 homepage: https://pkg.go.dev/golang.org/x/crypto/ssh/agent
 license: bsd-3-clause
 licenses:
-- sources: crypto@v0.39.0/LICENSE
+- sources: crypto@v0.40.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: crypto@v0.39.0/PATENTS
+- sources: crypto@v0.40.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 

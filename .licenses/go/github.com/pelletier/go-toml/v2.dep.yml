@@ -1,6 +1,6 @@
 ---
 name: github.com/pelletier/go-toml/v2
-version: v2.2.3
+version: v2.2.4
 type: go
 summary: Package toml is a library to read and write TOML documents.
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2

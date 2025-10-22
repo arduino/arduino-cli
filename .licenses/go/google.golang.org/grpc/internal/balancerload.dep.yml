@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/balancerload
-version: v1.75.1
+version: v1.76.0
 type: go
 summary: Package balancerload defines APIs to parse server loads in trailers.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/balancerload
 license: apache-2.0
 licenses:
-- sources: grpc@v1.75.1/LICENSE
+- sources: grpc@v1.76.0/LICENSE
   text: |2
 
                                      Apache License

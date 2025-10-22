@@ -1,12 +1,12 @@
 ---
-name: github.com/sourcegraph/conc/internal/multierror
-version: v0.3.0
+name: github.com/sourcegraph/conc/pool
+version: v0.3.1-0.20240121214520-5f936abd7ae8
 type: go
 summary: 
-homepage: https://pkg.go.dev/github.com/sourcegraph/conc/internal/multierror
+homepage: https://pkg.go.dev/github.com/sourcegraph/conc/pool
 license: mit
 licenses:
-- sources: conc@v0.3.0/LICENSE
+- sources: conc@v0.3.1-0.20240121214520-5f936abd7ae8/LICENSE
   text: |
     MIT License
 
