@@ -360,23 +360,23 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 	if err := unmarshal(&dataMap); err == nil {
 		if installDir, ok := dataMap["dir"]; ok {
 			if installDir, ok := installDir.(string); !ok {
-				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
 			} else {
 				l.InstallDir = paths.New(installDir)
 				l.Library = l.InstallDir.Base()
 				return nil
 			}
 		} else {
-			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
+			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
 		}
 	} else if err := unmarshal(&data); err != nil {
 		return err
 	}
 
 	if libName, libVersion, ok := parseNameAndVersion(data); !ok {
-		return fmt.Errorf("%s %s", i18n.Tr("invalid library directive:"), data)
+		return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), data)
 	} else if v, err := semver.Parse(libVersion); err != nil {
-		return fmt.Errorf("%s %w", i18n.Tr("invalid version:"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("invalid version"), err)
 	} else {
 		l.Library = libName
 		l.Version = v
