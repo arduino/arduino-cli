@@ -21,9 +21,12 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -125,6 +128,25 @@ func (p *Profile) RequireSystemInstalledPlatform() bool {
 	return p.Platforms[0].RequireSystemInstalledPlatform()
 }
 
+func (p *Profile) GetLibrary(libraryName string) (*ProfileLibraryReference, error) {
+	for _, l := range p.Libraries {
+		if l.Library == libraryName {
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
+}
+
+func (p *Profile) RemoveLibrary(library *ProfileLibraryReference) (*ProfileLibraryReference, error) {
+	for i, l := range p.Libraries {
+		if l.Match(library) {
+			p.Libraries = slices.Delete(p.Libraries, i, i+1)
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: library.String()}
+}
+
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
 	var portConfig *rpc.MonitorPortConfiguration
@@ -180,6 +202,9 @@ type ProfileRequiredPlatforms []*ProfilePlatformReference
 
 // AsYaml outputs the required platforms as Yaml
 func (p *ProfileRequiredPlatforms) AsYaml() string {
+	if len(*p) == 0 {
+		return "    platforms: []\n"
+	}
 	res := "    platforms:\n"
 	for _, platform := range *p {
 		res += platform.AsYaml()
@@ -325,23 +350,39 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 // ProfileLibraryReference is a reference to a library
 type ProfileLibraryReference struct {
 	Library    string
-	InstallDir *paths.Path
 	Version    *semver.Version
+	InstallDir *paths.Path
+	GitURL     *url.URL
 }
 
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var dataMap map[string]any
 	if err := unmarshal(&dataMap); err == nil {
-		if installDir, ok := dataMap["dir"]; !ok {
-			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
-		} else if installDir, ok := installDir.(string); !ok {
-			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
-		} else {
-			l.InstallDir = paths.New(installDir)
-			l.Library = l.InstallDir.Base()
-			return nil
+		if installDir, ok := dataMap["dir"]; ok {
+			if installDir, ok := installDir.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
+			} else {
+				l.InstallDir = paths.New(installDir)
+				l.Library = l.InstallDir.Base()
+				return nil
+			}
 		}
+		if gitUrl, ok := dataMap["git"]; ok {
+			if gitUrlStr, ok := gitUrl.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid git library reference: %s"), dataMap)
+			} else if parsedUrl, err := url.Parse(gitUrlStr); err != nil {
+				return fmt.Errorf("%s: %w", i18n.Tr("invalid git library URL:"), err)
+			} else {
+				l.GitURL = parsedUrl
+				if l.Library = filepath.Base(parsedUrl.Path); l.Library == "" {
+					l.Library = "lib"
+				}
+				l.Library = strings.TrimSuffix(l.Library, ".git")
+				return nil
+			}
+		}
+		return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
 	}
 
 	var data string
@@ -364,20 +405,120 @@ func (l *ProfileLibraryReference) AsYaml() string {
 	if l.InstallDir != nil {
 		return fmt.Sprintf("      - dir: %s\n", l.InstallDir)
 	}
+	if l.GitURL != nil {
+		return fmt.Sprintf("      - git: %s\n", l.GitURL)
+	}
 	return fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
 }
 
 func (l *ProfileLibraryReference) String() string {
 	if l.InstallDir != nil {
-		return fmt.Sprintf("%s@dir:%s", l.Library, l.InstallDir)
+		return "@dir:" + l.InstallDir.String()
+	}
+	if l.GitURL != nil {
+		return "@git:" + l.GitURL.String()
+	}
+	if l.Version == nil {
+		return l.Library
 	}
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
+}
+
+// Match checks if this library reference matches another one.
+// If one reference has the version not set, it matches any version of the other reference.
+func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
+	if l.InstallDir != nil {
+		return other.InstallDir != nil && l.InstallDir.EqualsTo(other.InstallDir)
+	}
+	if l.GitURL != nil {
+		return other.GitURL != nil && l.GitURL.String() == other.GitURL.String()
+	}
+	if other.InstallDir != nil {
+		return false
+	}
+	if l.Library != other.Library {
+		return false
+	}
+	if l.Version == nil || other.Version == nil {
+		return true
+	}
+	return l.Version.Equal(other.Version)
+}
+
+// ToRpc converts this ProfileLibraryReference to an rpc.ProfileLibraryReference
+func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
+	if l.InstallDir != nil {
+		return &rpc.ProfileLibraryReference{
+			Library: &rpc.ProfileLibraryReference_LocalLibrary_{
+				LocalLibrary: &rpc.ProfileLibraryReference_LocalLibrary{
+					Path: l.InstallDir.String(),
+				},
+			},
+		}
+	}
+	if l.GitURL != nil {
+		return &rpc.ProfileLibraryReference{
+			Library: &rpc.ProfileLibraryReference_GitLibrary_{
+				GitLibrary: &rpc.ProfileLibraryReference_GitLibrary{
+					Url: l.GitURL.String(),
+				},
+			},
+		}
+	}
+	return &rpc.ProfileLibraryReference{
+		Library: &rpc.ProfileLibraryReference_IndexLibrary_{
+			IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
+				Name:    l.Library,
+				Version: l.Version.String(),
+			},
+		},
+	}
+}
+
+// FromRpcProfileLibraryReference converts an rpc.ProfileLibraryReference to a ProfileLibraryReference
+func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLibraryReference, error) {
+	if localLib := l.GetLocalLibrary(); localLib != nil {
+		path := paths.New(localLib.GetPath())
+		if path == nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
+		}
+		return &ProfileLibraryReference{InstallDir: path}, nil
+	}
+	if gitLib := l.GetGitLibrary(); gitLib != nil {
+		gitURL, err := url.Parse(gitLib.GetUrl())
+		if err != nil {
+			return nil, &cmderrors.InvalidURLError{Cause: err}
+		}
+		return &ProfileLibraryReference{GitURL: gitURL}, nil
+	}
+	if indexLib := l.GetIndexLibrary(); indexLib != nil {
+		var version *semver.Version
+		if indexLib.GetVersion() != "" {
+			v, err := semver.Parse(indexLib.GetVersion())
+			if err != nil {
+				return nil, &cmderrors.InvalidVersionError{Cause: err}
+			}
+			version = v
+		}
+		return &ProfileLibraryReference{Library: indexLib.GetName(), Version: version}, nil
+	}
+	return nil, &cmderrors.InvalidArgumentError{Message: "library not specified"}
 }
 
 // InternalUniqueIdentifier returns the unique identifier for this object
 func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
 	f.Assert(l.InstallDir == nil,
 		"InternalUniqueIdentifier should not be called for library references with an install directory")
+
+	if l.GitURL != nil {
+		id := "git-" + utils.SanitizeName(l.GitURL.Host+l.GitURL.Path+"#"+l.GitURL.Fragment)
+		if len(id) > 50 {
+			id = id[:50]
+		}
+		h := sha256.Sum256([]byte(l.GitURL.String()))
+		return id + "-" + hex.EncodeToString(h[:])[:8]
+	}
+
 	id := l.String()
 	h := sha256.Sum256([]byte(id))
 	res := fmt.Sprintf("%s_%s", id, hex.EncodeToString(h[:])[:16])
