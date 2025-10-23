@@ -358,6 +358,7 @@ type ProfileLibraryReference struct {
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var dataMap map[string]any
+	var data string
 	if err := unmarshal(&dataMap); err == nil {
 		if installDir, ok := dataMap["dir"]; ok {
 			if installDir, ok := installDir.(string); !ok {
@@ -367,8 +368,7 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 				l.Library = l.InstallDir.Base()
 				return nil
 			}
-		}
-		if gitUrl, ok := dataMap["git"]; ok {
+		} else if gitUrl, ok := dataMap["git"]; ok {
 			if gitUrlStr, ok := gitUrl.(string); !ok {
 				return fmt.Errorf("%s: %s", i18n.Tr("invalid git library reference: %s"), dataMap)
 			} else if parsedUrl, err := url.Parse(gitUrlStr); err != nil {
@@ -381,14 +381,13 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 				l.Library = strings.TrimSuffix(l.Library, ".git")
 				return nil
 			}
+		} else {
+			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
 		}
-		return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
-	}
-
-	var data string
-	if err := unmarshal(&data); err != nil {
+	} else if err := unmarshal(&data); err != nil {
 		return err
 	}
+
 	if libName, libVersion, ok := parseNameAndVersion(data); !ok {
 		return fmt.Errorf("%s %s", i18n.Tr("invalid library directive:"), data)
 	} else if v, err := semver.Parse(libVersion); err != nil {
