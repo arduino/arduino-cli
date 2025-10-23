@@ -356,22 +356,23 @@ type ProfileLibraryReference struct {
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var dataMap map[string]any
-	if err := unmarshal(&dataMap); err == nil {
-		if installDir, ok := dataMap["dir"]; !ok {
-			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
-		} else if installDir, ok := installDir.(string); !ok {
-			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
-		} else {
-			l.InstallDir = paths.New(installDir)
-			l.Library = l.InstallDir.Base()
-			return nil
-		}
-	}
-
 	var data string
-	if err := unmarshal(&data); err != nil {
+	if err := unmarshal(&dataMap); err == nil {
+		if installDir, ok := dataMap["dir"]; ok {
+			if installDir, ok := installDir.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
+			} else {
+				l.InstallDir = paths.New(installDir)
+				l.Library = l.InstallDir.Base()
+				return nil
+			}
+		} else {
+			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
+		}
+	} else if err := unmarshal(&data); err != nil {
 		return err
 	}
+
 	if libName, libVersion, ok := parseNameAndVersion(data); !ok {
 		return fmt.Errorf("%s %s", i18n.Tr("invalid library directive:"), data)
 	} else if v, err := semver.Parse(libVersion); err != nil {
