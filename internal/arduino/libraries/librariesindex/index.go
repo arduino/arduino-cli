@@ -155,7 +155,7 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 // An optional "override" releases may be passed if we want to exclude the same
 // libraries from the index (for example if we want to keep an installed library).
 func (idx *Index) ResolveDependencies(lib *Release, overrides []*Release) []*Release {
-	resolver := semver.NewResolver[*Release, *Dependency]()
+	resolver := semver.NewResolver[*Release]()
 
 	overridden := map[string]bool{}
 	for _, override := range overrides {
