@@ -31,6 +31,9 @@ func composeErrorMsg(msg string, cause error) string {
 	if cause == nil {
 		return msg
 	}
+	if msg == "" {
+		return cause.Error()
+	}
 	return fmt.Sprintf("%v: %v", msg, cause)
 }
 
@@ -210,6 +213,20 @@ func (e *UnknownProfileError) Unwrap() error {
 // GRPCStatus converts the error into a *status.Status
 func (e *UnknownProfileError) GRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
+}
+
+// DuplicateProfileError is returned when the profile is a duplicate of an already existing one
+type DuplicateProfileError struct {
+	Profile string
+}
+
+func (e *DuplicateProfileError) Error() string {
+	return i18n.Tr("Profile '%s' already exists", e.Profile)
+}
+
+// GRPCStatus converts the error into a *status.Status
+func (e *DuplicateProfileError) GRPCStatus() *status.Status {
+	return status.New(codes.AlreadyExists, e.Error())
 }
 
 // InvalidProfileError is returned when the profile has errors
@@ -456,7 +473,7 @@ func (e *PlatformLoadingError) Unwrap() error {
 	return e.Cause
 }
 
-// LibraryNotFoundError is returned when a platform is not found
+// LibraryNotFoundError is returned when a library is not found
 type LibraryNotFoundError struct {
 	Library string
 	Cause   error
@@ -903,4 +920,16 @@ func (e *InstanceNeedsReinitialization) GRPCStatus() *status.Status {
 		New(codes.InvalidArgument, e.Error()).
 		WithDetails(&rpc.InstanceNeedsReinitializationError{})
 	return st
+}
+
+// MissingProfileError is returned when the Profile is mandatory and not specified
+type MissingProfileError struct{}
+
+func (e *MissingProfileError) Error() string {
+	return i18n.Tr("Missing Profile name")
+}
+
+// GRPCStatus converts the error into a *status.Status
+func (e *MissingProfileError) GRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
 }

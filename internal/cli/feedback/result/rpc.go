@@ -1125,3 +1125,25 @@ func NewIndexUpdateReport_Status(r rpc.IndexUpdateReport_Status) IndexUpdateRepo
 		return IndexUpdateReport_StatusUnspecified
 	}
 }
+
+type ProfileLibraryReference_LocalLibraryResult struct {
+	Path string `json:"path,omitempty"`
+}
+
+func NewProfileLibraryReference_LocalLibraryResult(resp *rpc.ProfileLibraryReference_LocalLibrary) *ProfileLibraryReference_LocalLibraryResult {
+	return &ProfileLibraryReference_LocalLibraryResult{
+		Path: resp.GetPath(),
+	}
+}
+
+type ProfileLibraryReference_IndexLibraryResult struct {
+	Name    string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
+func NewProfileLibraryReference_IndexLibraryResult(resp *rpc.ProfileLibraryReference_IndexLibrary) *ProfileLibraryReference_IndexLibraryResult {
+	return &ProfileLibraryReference_IndexLibraryResult{
+		Name:    resp.GetName(),
+		Version: resp.GetVersion(),
+	}
+}
