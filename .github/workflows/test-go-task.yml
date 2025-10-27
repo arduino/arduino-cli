@@ -182,7 +182,7 @@ jobs:
         run: go install github.com/wadey/gocovmerge@b5bfa59
 
       - name: Download coverage data artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: ${{ env.COVERAGE_ARTIFACT }}-*
           merge-multiple: true
