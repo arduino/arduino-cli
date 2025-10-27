@@ -43,7 +43,11 @@ func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, 
 		return nil, err
 	}
 
-	deps, err := libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
+	var overrides []*librariesindex.Release
+	if req.GetDoNotUpdateInstalledLibraries() {
+		overrides = librariesGetAllInstalled(lme, li)
+	}
+	deps, err := libraryResolveDependencies(li, req.GetName(), req.GetVersion(), overrides)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +82,19 @@ func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, 
 	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
 }
 
-func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesindex.Index,
-	reqName, reqVersion string, noOverwrite bool) ([]*librariesindex.Release, error) {
+func librariesGetAllInstalled(lme *librariesmanager.Explorer, li *librariesindex.Index) []*librariesindex.Release {
+	var overrides []*librariesindex.Release
+	libs := lme.FindAllInstalled()
+	libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
+	for _, lib := range libs {
+		if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {
+			overrides = append(overrides, release)
+		}
+	}
+	return overrides
+}
+
+func libraryResolveDependencies(li *librariesindex.Index, reqName, reqVersion string, overrides []*librariesindex.Release) ([]*librariesindex.Release, error) {
 	version, err := parseVersion(reqVersion)
 	if err != nil {
 		return nil, err
@@ -92,16 +107,6 @@ func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesind
 	}
 
 	// Resolve all dependencies...
-	var overrides []*librariesindex.Release
-	if noOverwrite {
-		libs := lme.FindAllInstalled()
-		libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
-		for _, lib := range libs {
-			if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {
-				overrides = append(overrides, release)
-			}
-		}
-	}
 	deps := li.ResolveDependencies(reqLibRelease, overrides)
 
 	// If no solution has been found

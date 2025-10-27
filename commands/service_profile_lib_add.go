@@ -102,13 +102,8 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		}
 
 		if req.GetAddDependencies() {
-			lme, release, err := instances.GetLibraryManagerExplorer(req.GetInstance())
-			if err != nil {
-				return nil, err
-			}
-			libWithDeps, err := libraryResolveDependencies(lme, li, libRelease.GetName(), libRelease.GetVersion().String(), false)
+			libWithDeps, err := libraryResolveDependencies(li, libRelease.GetName(), libRelease.GetVersion().String(), nil)
 			// deps contains the main library as well, so we skip it when adding dependencies
-			release()
 			if err != nil {
 				return nil, err
 			}

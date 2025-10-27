@@ -85,7 +85,11 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 			return err
 		}
 
-		deps, err := libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetNoOverwrite())
+		var overrides []*librariesindex.Release
+		if req.GetNoOverwrite() {
+			overrides = librariesGetAllInstalled(lme, li)
+		}
+		deps, err := libraryResolveDependencies(li, req.GetName(), req.GetVersion(), overrides)
 		releaseLme()
 		if err != nil {
 			return err
