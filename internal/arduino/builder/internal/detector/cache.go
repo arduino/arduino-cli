@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 type detectorCache struct {
@@ -30,7 +31,7 @@ type detectorCache struct {
 
 type detectorCacheEntry struct {
 	AddedIncludePath *paths.Path  `json:"added_include_path,omitempty"`
-	Compile          *sourceFile  `json:"compile,omitempty"`
+	Compile          sourceFile   `json:"compile,omitempty"`
 	CompileTask      *runner.Task `json:"compile_task,omitempty"`
 	MissingIncludeH  *string      `json:"missing_include_h,omitempty"`
 }
@@ -39,7 +40,7 @@ func (e *detectorCacheEntry) String() string {
 	if e.AddedIncludePath != nil {
 		return "Added include path: " + e.AddedIncludePath.String()
 	}
-	if e.Compile != nil && e.CompileTask != nil {
+	if e.CompileTask != nil {
 		return "Compiling: " + e.Compile.String() + " / " + e.CompileTask.String()
 	}
 	if e.MissingIncludeH != nil {
@@ -49,6 +50,13 @@ func (e *detectorCacheEntry) String() string {
 		return "Missing include file: " + *e.MissingIncludeH
 	}
 	return "No operation"
+}
+
+func (e *detectorCacheEntry) LogMsg() string {
+	if e.CompileTask == nil {
+		return e.String()
+	}
+	return "Compiling: " + e.Compile.SourcePath.String()
 }
 
 func (e *detectorCacheEntry) Equals(entry *detectorCacheEntry) bool {
@@ -94,10 +102,15 @@ func (c *detectorCache) Expect(entry *detectorCacheEntry) {
 		if c.entries[c.curr].Equals(entry) {
 			// Cache hit, move to the next entry
 			c.curr++
+			logrus.Tracef("[LD] CACHE: HIT %s", entry.LogMsg())
 			return
 		}
 		// Cache mismatch, invalidate and cut the remainder of the cache
+		logrus.Tracef("[LD] CACHE: INVALIDATE %s", entry.LogMsg())
+		logrus.Tracef("[LD]              (was %s)", c.entries[c.curr])
 		c.entries = c.entries[:c.curr]
+	} else {
+		logrus.Tracef("[LD] CACHE: MISSING %s", entry.LogMsg())
 	}
 	c.curr++
 	c.entries = append(c.entries, entry)
