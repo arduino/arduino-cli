@@ -741,3 +741,69 @@ func (inst *ArduinoCLIInstance) NewSketch(ctx context.Context, sketchName, sketc
 	logCallf(">>> NewSketch(%+v)\n", req)
 	return inst.cli.daemonClient.NewSketch(ctx, req)
 }
+
+func (inst *ArduinoCLIInstance) ProfileCreate(
+	ctx context.Context,
+	profileName, sketchPath string,
+	fqbn string,
+	defaultProfile bool,
+) (*commands.ProfileCreateResponse, error) {
+	req := &commands.ProfileCreateRequest{
+		Instance:       inst.instance,
+		SketchPath:     sketchPath,
+		ProfileName:    profileName,
+		Fqbn:           fqbn,
+		DefaultProfile: defaultProfile,
+	}
+	logCallf(">>> ProfileCreate(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.ProfileCreate(ctx, req)
+	return resp, err
+}
+
+func (inst *ArduinoCLIInstance) ProfileLibList(ctx context.Context, sketchPath, profileName string) (*commands.ProfileLibListResponse, error) {
+	req := &commands.ProfileLibListRequest{
+		SketchPath:  sketchPath,
+		ProfileName: profileName,
+	}
+	logCallf(">>> ProfileListLib(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.ProfileLibList(ctx, req)
+	return resp, err
+}
+
+func (inst *ArduinoCLIInstance) ProfileLibAdd(
+	ctx context.Context,
+	sketchPath, profileName string,
+	library *commands.ProfileLibraryReference,
+	addDependencies, noOverwrite bool,
+) (*commands.ProfileLibAddResponse, error) {
+	req := &commands.ProfileLibAddRequest{
+		Instance:        inst.instance,
+		SketchPath:      sketchPath,
+		ProfileName:     profileName,
+		Library:         library,
+		AddDependencies: &addDependencies,
+		NoOverwrite:     &noOverwrite,
+	}
+	logCallf(">>> ProfileLibAdd(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.ProfileLibAdd(ctx, req)
+	return resp, err
+}
+
+func (inst *ArduinoCLIInstance) ProfileLibRemove(
+	ctx context.Context,
+	sketchPath,
+	profileName string,
+	library *commands.ProfileLibraryReference,
+	removeDependencies bool,
+) (*commands.ProfileLibRemoveResponse, error) {
+	req := &commands.ProfileLibRemoveRequest{
+		Instance:           inst.instance,
+		SketchPath:         sketchPath,
+		ProfileName:        profileName,
+		Library:            library,
+		RemoveDependencies: &removeDependencies,
+	}
+	logCallf(">>> ProfileLibRemove(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.ProfileLibRemove(ctx, req)
+	return resp, err
+}

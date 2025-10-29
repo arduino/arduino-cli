@@ -233,6 +233,18 @@ func TestAllFieldAreMapped(t *testing.T) {
 	indexUpdateReportRpc := &rpc.IndexUpdateReport{}
 	indexUpdateReportResult := result.NewIndexUpdateReportResult(indexUpdateReportRpc)
 	mustContainsAllPropertyOfRpcStruct(t, indexUpdateReportRpc, indexUpdateReportResult)
+
+	profileLibraryReference_IndexLibraryRpc := &rpc.ProfileLibraryReference_IndexLibrary{}
+	profileLibraryReference_IndexLibraryResult := result.NewProfileLibraryReference_IndexLibraryResult(profileLibraryReference_IndexLibraryRpc)
+	mustContainsAllPropertyOfRpcStruct(t, profileLibraryReference_IndexLibraryRpc, profileLibraryReference_IndexLibraryResult)
+
+	profileLibraryReference_GitLibraryRpc := &rpc.ProfileLibraryReference_GitLibrary{}
+	profileLibraryReference_GitLibraryResult := result.NewProfileLibraryReference_GitLibraryResult(profileLibraryReference_GitLibraryRpc)
+	mustContainsAllPropertyOfRpcStruct(t, profileLibraryReference_GitLibraryRpc, profileLibraryReference_GitLibraryResult)
+
+	profileLibraryReference_LocalLibraryRpc := &rpc.ProfileLibraryReference_LocalLibrary{}
+	profileLibraryReference_LocalLibraryResult := result.NewProfileLibraryReference_LocalLibraryResult(profileLibraryReference_LocalLibraryRpc)
+	mustContainsAllPropertyOfRpcStruct(t, profileLibraryReference_LocalLibraryRpc, profileLibraryReference_LocalLibraryResult)
 }
 
 func TestEnumsMapsEveryRpcCounterpart(t *testing.T) {
