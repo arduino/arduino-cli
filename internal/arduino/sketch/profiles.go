@@ -348,15 +348,16 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 
 // ProfileLibraryReference is a reference to a library
 type ProfileLibraryReference struct {
-	Library    string
-	InstallDir *paths.Path
-	Version    *semver.Version
+	Library      string
+	Version      *semver.Version
+	IsDependency bool
+	InstallDir   *paths.Path
 }
 
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var dataMap map[string]any
-	var data string
+	var libReference string
 	if err := unmarshal(&dataMap); err == nil {
 		if installDir, ok := dataMap["dir"]; ok {
 			if installDir, ok := installDir.(string); !ok {
@@ -366,15 +367,24 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 				l.Library = l.InstallDir.Base()
 				return nil
 			}
+		} else if depLib, ok := dataMap["dependency"]; ok {
+			if libReference, ok = depLib.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
+			}
+			l.IsDependency = true
+			// Fallback
 		} else {
 			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
 		}
-	} else if err := unmarshal(&data); err != nil {
+	} else if err := unmarshal(&libReference); err != nil {
 		return err
+	} else {
+		l.IsDependency = false
 	}
 
-	if libName, libVersion, ok := parseNameAndVersion(data); !ok {
-		return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), data)
+	// Parse reference in the format "LIBRARY_NAME (VERSION)"
+	if libName, libVersion, ok := parseNameAndVersion(libReference); !ok {
+		return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), libReference)
 	} else if v, err := semver.Parse(libVersion); err != nil {
 		return fmt.Errorf("%s: %w", i18n.Tr("invalid version"), err)
 	} else {
@@ -389,17 +399,25 @@ func (l *ProfileLibraryReference) AsYaml() string {
 	if l.InstallDir != nil {
 		return fmt.Sprintf("      - dir: %s\n", l.InstallDir)
 	}
-	return fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
+	dep := ""
+	if l.IsDependency {
+		dep = "dependency: "
+	}
+	return fmt.Sprintf("      - %s%s (%s)\n", dep, l.Library, l.Version)
 }
 
 func (l *ProfileLibraryReference) String() string {
 	if l.InstallDir != nil {
-		return fmt.Sprintf("%s@dir:%s", l.Library, l.InstallDir)
+		return "@dir:" + l.InstallDir.String()
+	}
+	dep := ""
+	if l.IsDependency {
+		dep = " (dep)"
 	}
 	if l.Version == nil {
-		return l.Library
+		return l.Library + dep
 	}
-	return fmt.Sprintf("%s@%s", l.Library, l.Version)
+	return fmt.Sprintf("%s@%s%s", l.Library, l.Version, dep)
 }
 
 // Match checks if this library reference matches another one.
@@ -434,8 +452,9 @@ func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
 	return &rpc.ProfileLibraryReference{
 		Library: &rpc.ProfileLibraryReference_IndexLibrary_{
 			IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
-				Name:    l.Library,
-				Version: l.Version.String(),
+				Name:         l.Library,
+				Version:      l.Version.String(),
+				IsDependency: l.IsDependency,
 			},
 		},
 	}
@@ -459,7 +478,11 @@ func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLib
 			}
 			version = v
 		}
-		return &ProfileLibraryReference{Library: indexLib.GetName(), Version: version}, nil
+		return &ProfileLibraryReference{
+			Library:      indexLib.GetName(),
+			Version:      version,
+			IsDependency: indexLib.GetIsDependency(),
+		}, nil
 	}
 	return nil, &cmderrors.InvalidArgumentError{Message: "library not specified"}
 }
@@ -468,7 +491,8 @@ func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLib
 func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
 	f.Assert(l.InstallDir == nil,
 		"InternalUniqueIdentifier should not be called for library references with an install directory")
-	id := l.String()
+
+	id := l.Library + "@" + l.Version.String()
 	h := sha256.Sum256([]byte(id))
 	res := fmt.Sprintf("%s_%s", id, hex.EncodeToString(h[:])[:16])
 	return utils.SanitizeName(res)

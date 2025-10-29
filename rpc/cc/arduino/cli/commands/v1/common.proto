@@ -244,6 +244,8 @@ message ProfileLibraryReference {
     string name = 1;
     // Version of the library if taken from the Library Index.
     string version = 2;
+    // If true, this library is marked as a dependency.
+    bool is_dependency = 3;
   }
   message LocalLibrary {
     // Absolute path to the library.

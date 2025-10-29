@@ -1137,13 +1137,15 @@ func NewProfileLibraryReference_LocalLibraryResult(resp *rpc.ProfileLibraryRefer
 }
 
 type ProfileLibraryReference_IndexLibraryResult struct {
-	Name    string `json:"name,omitempty"`
-	Version string `json:"version,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Version      string `json:"version,omitempty"`
+	IsDependency bool   `json:"is_dependency,omitempty"`
 }
 
 func NewProfileLibraryReference_IndexLibraryResult(resp *rpc.ProfileLibraryReference_IndexLibrary) *ProfileLibraryReference_IndexLibraryResult {
 	return &ProfileLibraryReference_IndexLibraryResult{
-		Name:    resp.GetName(),
-		Version: resp.GetVersion(),
+		Name:         resp.GetName(),
+		Version:      resp.GetVersion(),
+		IsDependency: resp.GetIsDependency(),
 	}
 }
