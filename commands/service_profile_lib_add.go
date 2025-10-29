@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"slices"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
@@ -76,10 +77,11 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 			return nil, err
 		}
 
-		add := func(libReleaseToAdd *librariesindex.Release) {
+		add := func(libReleaseToAdd *librariesindex.Release, isDep bool) {
 			libRefToAdd := &sketch.ProfileLibraryReference{
-				Library: libReleaseToAdd.GetName(),
-				Version: libReleaseToAdd.GetVersion(),
+				Library:      libReleaseToAdd.GetName(),
+				Version:      libReleaseToAdd.GetVersion(),
+				IsDependency: isDep,
 			}
 			existingLibRef, _ := profile.GetLibrary(libReleaseToAdd.GetName())
 			if existingLibRef == nil {
@@ -87,16 +89,23 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 				addedLibs = append(addedLibs, libRefToAdd)
 				return
 			}
-			// If the same version of the library has been already added to the profile, skip it
-			if existingLibRef.Version.Equal(libReleaseToAdd.GetVersion()) {
+
+			// The library is already present in the profile.
+
+			// If the existing library was a dependency, and we are adding a non-dependency,
+			// update the flag to indicate that it's not a dependency anymore.
+			if !isDep && existingLibRef.IsDependency {
+				existingLibRef.IsDependency = false
+			}
+
+			// If no-overwrite is specified, skip updating the library version.
+			// If the same version of the library has been already added to the profile, skip it.
+			if req.GetNoOverwrite() || existingLibRef.Version.Equal(libReleaseToAdd.GetVersion()) {
 				skippedLibs = append(skippedLibs, libRefToAdd)
 				return
 			}
-			// If the library has been already added to the profile, just update the version
-			if req.GetNoOverwrite() {
-				skippedLibs = append(skippedLibs, libRefToAdd)
-				return
-			}
+
+			// otherwise update the version of the library
 			existingLibRef.Version = libReleaseToAdd.GetVersion()
 			addedLibs = append(addedLibs, existingLibRef)
 		}
@@ -107,11 +116,14 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 			if err != nil {
 				return nil, err
 			}
+			// sort to make the output order deterministic
+			slices.SortFunc(libWithDeps, librariesindex.ReleaseCompare)
 			for _, lib := range libWithDeps {
-				add(lib)
+				isDep := libRelease.GetName() != lib.GetName()
+				add(lib, isDep)
 			}
 		} else {
-			add(libRelease)
+			add(libRelease, false)
 		}
 	} else {
 		return nil, &cmderrors.InvalidArgumentError{Message: "library must be specified"}
