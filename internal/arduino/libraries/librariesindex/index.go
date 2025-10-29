@@ -17,6 +17,7 @@ package librariesindex
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
@@ -88,6 +89,14 @@ func (r *Release) GetVersion() *semver.Version {
 // GetDependencies returns the dependencies of this library.
 func (r *Release) GetDependencies() []*Dependency {
 	return r.Dependencies
+}
+
+// ReleaseCompare compares two library releases by name, or by version if the names are equal.
+func ReleaseCompare(r1, r2 *Release) int {
+	if cmp := strings.Compare(r1.GetName(), r2.GetName()); cmp != 0 {
+		return cmp
+	}
+	return r1.GetVersion().CompareTo(r2.GetVersion())
 }
 
 // Dependency is a library dependency

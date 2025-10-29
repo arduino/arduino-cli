@@ -17,8 +17,11 @@ package commands
 
 import (
 	"context"
+	"slices"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -47,13 +50,70 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 		return nil, err
 	}
 
+	var removedLibraries []*rpc.ProfileLibraryReference
+	remove := func(libraryToRemove *sketch.ProfileLibraryReference) error {
+		removedLibrary, err := profile.RemoveLibrary(libraryToRemove)
+		if err != nil {
+			return &cmderrors.InvalidArgumentError{Cause: err}
+		}
+		removedLibraries = append(removedLibraries, removedLibrary.ToRpc())
+		return nil
+	}
+
 	libToRemove, err := sketch.FromRpcProfileLibraryReference(req.GetLibrary())
 	if err != nil {
 		return nil, &cmderrors.InvalidArgumentError{Message: "invalid library reference", Cause: err}
 	}
-	removedLib, err := profile.RemoveLibrary(libToRemove)
-	if err != nil {
-		return nil, &cmderrors.InvalidArgumentError{Cause: err}
+	if err := remove(libToRemove); err != nil {
+		return nil, err
+	}
+
+	// Get the dependencies of the libraries to see if any of them could be removed as well
+	if req.GetRemoveDependencies() {
+		if req.GetLibrary().GetIndexLibrary() == nil {
+			// No dependencies to remove
+			return nil, &cmderrors.InvalidArgumentError{Message: "automatic dependency removal is supported only for IndexLibraries"}
+		}
+		// Obtain the library index from the manager
+		li, err := instances.GetLibrariesIndex(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+
+		// Get all the dependencies required by the profile excluding the removed library
+		requiredDeps := map[string]bool{}
+		requiredDeps[libToRemove.String()] = true
+		for _, profLib := range profile.Libraries {
+			if profLib.IsDependency {
+				continue
+			}
+			if profLib.Library == "" {
+				continue
+			}
+			deps, err := libraryResolveDependencies(li, profLib.Library, profLib.Version.String(), nil)
+			if err != nil {
+				return nil, &cmderrors.InvalidArgumentError{Cause: err, Message: "cannot resolve dependencies for installed libraries"}
+			}
+			for _, dep := range deps {
+				requiredDeps[dep.String()] = true
+			}
+		}
+
+		depsOfLibToRemove, err := libraryResolveDependencies(li, libToRemove.Library, libToRemove.Version.String(), nil)
+		if err != nil {
+			return nil, err
+		}
+		// sort to make the output order deterministic
+		slices.SortFunc(depsOfLibToRemove, librariesindex.ReleaseCompare)
+		// deps contains the main library as well, so we skip it when removing dependencies
+		for _, depToRemove := range depsOfLibToRemove {
+			if requiredDeps[depToRemove.String()] {
+				continue
+			}
+			if err := remove(&sketch.ProfileLibraryReference{Library: depToRemove.Library.Name, Version: depToRemove.Version}); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
@@ -61,5 +121,8 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 		return nil, err
 	}
 
-	return &rpc.ProfileLibRemoveResponse{Library: removedLib.ToRpc(), ProfileName: profileName}, nil
+	return &rpc.ProfileLibRemoveResponse{
+		RemovedLibraries: removedLibraries,
+		ProfileName:      profileName,
+	}, nil
 }

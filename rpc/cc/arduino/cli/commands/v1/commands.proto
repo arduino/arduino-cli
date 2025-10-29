@@ -479,17 +479,22 @@ message ProfileLibAddResponse {
 }
 
 message ProfileLibRemoveRequest {
+  // An Arduino Core instance.
+  Instance instance = 1;
   // Absolute path to Sketch folder.
-  string sketch_path = 1;
+  string sketch_path = 2;
   // Name of the profile.
-  string profile_name = 2;
+  string profile_name = 3;
   // The library to remove from the profile.
-  ProfileLibraryReference library = 3;
+  ProfileLibraryReference library = 4;
+  // Set to true to remove also all the dependencies of the library that are
+  // not used by other libraries in the profile.
+  optional bool remove_dependencies = 5;
 }
 
 message ProfileLibRemoveResponse {
-  // The library that has been removed from the profile.
-  ProfileLibraryReference library = 1;
+  // The libraries that have been removed from the profile.
+  repeated ProfileLibraryReference removed_libraries = 1;
   // Name of the profile.
   string profile_name = 2;
 }
