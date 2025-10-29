@@ -9,5 +9,6 @@ profiles:
       - dir: path/to/sketch/lib
       - git: https://github.com/username/HelloWorld.git#v2.13
       - git: https://github.com/username/HelloWorld.git#v2.14
+      - dependency: DependencyLib (2.3.4)
 
 default_profile: giga_any
