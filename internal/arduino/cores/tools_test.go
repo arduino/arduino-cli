@@ -29,6 +29,7 @@ func TestFlavorCompatibility(t *testing.T) {
 	}
 	windows32 := &os{"windows", "386"}
 	windows64 := &os{"windows", "amd64"}
+	windowsArm64 := &os{"windows", "arm64"}
 	linux32 := &os{"linux", "386"}
 	linux64 := &os{"linux", "amd64"}
 	linuxArm := &os{"linux", "arm"}
@@ -43,6 +44,7 @@ func TestFlavorCompatibility(t *testing.T) {
 	oses := []*os{
 		windows32,
 		windows64,
+		windowsArm64,
 		linux32,
 		linux64,
 		linuxArm,
@@ -64,6 +66,7 @@ func TestFlavorCompatibility(t *testing.T) {
 	tests := []*test{
 		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64}, []*os{windows32}},
 		{&Flavor{OS: "x86_64-mingw32"}, []*os{windows64}, []*os{windows64}},
+		{&Flavor{OS: "arm64-mingw32"}, []*os{windowsArm64}, []*os{windowsArm64}},
 		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwin32, darwin64, darwinArm64}, []*os{darwin32}},
 		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwin64, darwinArm64}, []*os{darwin64}},
 		{&Flavor{OS: "arm64-apple-darwin"}, []*os{darwinArm64}, []*os{darwinArm64}},
