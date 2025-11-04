@@ -828,7 +828,7 @@ func TestCoreListSortedResults(t *testing.T) {
 	require.NoError(t, err)
 
 	// install some core for testing
-	_, _, err = cli.Run("core", "install", "test:x86@2.0.0", "Retrokits-RK002:arm", "Package:x86", "--additional-urls="+url.String())
+	_, _, err = cli.Run("core", "install", "test:x86@2.0.0", "arduino:samd", "Package:x86", "--additional-urls="+url.String())
 	require.NoError(t, err)
 
 	// list all with additional url specified
