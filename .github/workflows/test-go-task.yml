@@ -204,6 +204,13 @@ jobs:
           fi
           echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> "$GITHUB_ENV"
 
+      # There is a bug in the codecov uploader that makes it fail when there are broken symlinks in the repository.
+      # We must keep this workaround until the bug is fixed: https://github.com/codecov/codecov-action/issues/1890
+      - name: Workaround for codecov uploader bug
+        run: |
+          rm internal/integrationtest/compile_4/testdata/ValidSketchWithNonInoBrokenSketchFileSymlink/other_file.c
+          touch internal/integrationtest/compile_4/testdata/ValidSketchWithNonInoBrokenSketchFileSymlink/other_file.c
+
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
