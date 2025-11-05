@@ -64,8 +64,8 @@ func TestFlavorCompatibility(t *testing.T) {
 		ExactMatch  []*os
 	}
 	tests := []*test{
-		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64}, []*os{windows32}},
-		{&Flavor{OS: "x86_64-mingw32"}, []*os{windows64}, []*os{windows64}},
+		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64, windowsArm64}, []*os{windows32}},
+		{&Flavor{OS: "x86_64-mingw32"}, []*os{windows64, windowsArm64}, []*os{windows64}},
 		{&Flavor{OS: "arm64-mingw32"}, []*os{windowsArm64}, []*os{windowsArm64}},
 		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwin32, darwin64, darwinArm64}, []*os{darwin32}},
 		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwin64, darwinArm64}, []*os{darwin64}},
@@ -163,6 +163,7 @@ func TestFlavorPrioritySelection(t *testing.T) {
 		Flavors: []*Flavor{
 			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
 			{OS: "x86_64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+			{OS: "arm64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "3"}},
 		},
 	}).GetFlavourCompatibleWith("windows", "amd64")
 	require.NotNil(t, res)
@@ -170,10 +171,36 @@ func TestFlavorPrioritySelection(t *testing.T) {
 
 	res = (&ToolRelease{
 		Flavors: []*Flavor{
+			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
 			{OS: "x86_64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+			{OS: "arm64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "3"}},
+		},
+	}).GetFlavourCompatibleWith("windows", "arm64")
+	require.NotNil(t, res)
+	require.Equal(t, "3", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
 			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
 		},
 	}).GetFlavourCompatibleWith("windows", "amd64")
 	require.NotNil(t, res)
+	require.Equal(t, "1", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+			{OS: "x86_64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+		},
+	}).GetFlavourCompatibleWith("windows", "arm64")
+	require.NotNil(t, res)
 	require.Equal(t, "2", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+		},
+	}).GetFlavourCompatibleWith("windows", "arm64")
+	require.NotNil(t, res)
+	require.Equal(t, "1", res.ArchiveFileName)
 }

@@ -195,11 +195,12 @@ we recommend to keep it simple and stick to the suggested value in the table.
 
 Some OS allows to run different flavours:
 
-| The OS...    | ...may also run builds for |
-| ------------ | -------------------------- |
-| Windows 64   | Windows 32                 |
-| MacOSX 64    | MacOSX 32                  |
-| MacOSX Arm64 | MacOSX 64 or MacOSX 32     |
+| The OS...     | ...may also run builds for |
+| ------------- | -------------------------- |
+| Windows 64    | Windows 32                 |
+| Windows Arm64 | Windows 32 or Windows 64   |
+| MacOSX 64     | MacOSX 32                  |
+| MacOSX Arm64  | MacOSX 64 or MacOSX 32     |
 
 This is taken into account when the tools are downloaded (for example if we are on a Windows 64 machine and the needed
 tool is available only for the Windows 32 flavour, then the Windows 32 flavour will be downloaded and used).
@@ -214,6 +215,7 @@ For completeness, the previous example `avr-gcc` comes with builds for:
 - Linux 64 (`x86_64-linux-gnu`)
 - MacOSX Arm64 will use the MacOSX 64 flavour
 - Windows 64 will use the Windows 32 flavour
+- Windows Arm64 will use the Windows 32 flavour
 
 Note: this information is not used to select the toolchain during compilation. If you want a specific version to be
 used, you should use the notation `{runtime.tools.TOOLNAME-VERSION.path}` in the platform.txt.

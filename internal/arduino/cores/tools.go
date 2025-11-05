@@ -189,6 +189,13 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 	switch osName + "," + osArch {
 	case "windows,amd64":
 		return regexpWindows32.MatchString(f.OS), 10
+	case "windows,arm64":
+		// Compatibility guaranteed through Prism emulation
+		if regexpWindows64.MatchString(f.OS) {
+			// Prefer amd64 version if available
+			return true, 20
+		}
+		return regexpWindows32.MatchString(f.OS), 10
 	case "darwin,amd64":
 		return regexpMac32.MatchString(f.OS), 10
 	case "darwin,arm64":
