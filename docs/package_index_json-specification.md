@@ -172,21 +172,22 @@ Each tool version may come in different build flavours for different OS. Each fl
 array. The IDE will take care to install the right flavour for the user's OS by matching the `host` value with the
 following table or fail if a needed flavour is missing.
 
-| OS flavour      | `host` regexp                         | suggested `host` value              |
-| --------------- | ------------------------------------- | ----------------------------------- |
-| Linux 32        | `i[3456]86-.*linux-gnu`               | `i686-linux-gnu`                    |
-| Linux 64        | `x86_64-.*linux-gnu`                  | `x86_64-linux-gnu`                  |
-| Linux Arm       | `arm.*-linux-gnueabihf`               | `arm-linux-gnueabihf`               |
-| Linux Arm64     | `(aarch64\|arm64)-linux-gnu`          | `aarch64-linux-gnu`                 |
-| Linux RISC-V 64 | `riscv64-linux-gnu`                   | `riscv64-linux-gnu`                 |
-| Windows 32      | `i[3456]86-.*(mingw32\|cygwin)`       | `i686-mingw32` or `i686-cygwin`     |
-| Windows 64      | `(amd64\|x86_64)-.*(mingw32\|cygwin)` | `x86_64-mingw32` or `x86_64-cygwin` |
-| MacOSX 32       | `i[3456]86-apple-darwin.*`            | `i686-apple-darwin`                 |
-| MacOSX 64       | `x86_64-apple-darwin.*`               | `x86_64-apple-darwin`               |
-| MacOSX Arm64    | `arm64-apple-darwin.*`                | `arm64-apple-darwin`                |
-| FreeBSD 32      | `i?[3456]86-freebsd[0-9]*`            | `i686-freebsd`                      |
-| FreeBSD 64      | `amd64-freebsd[0-9]*`                 | `amd64-freebsd`                     |
-| FreeBSD Arm     | `arm.*-freebsd[0-9]*`                 | `arm-freebsd`                       |
+| OS flavour      | `host` regexp                          | suggested `host` value              |
+| --------------- | -------------------------------------- | ----------------------------------- |
+| Linux 32        | `i[3456]86-.*linux-gnu`                | `i686-linux-gnu`                    |
+| Linux 64        | `x86_64-.*linux-gnu`                   | `x86_64-linux-gnu`                  |
+| Linux Arm       | `arm.*-linux-gnueabihf`                | `arm-linux-gnueabihf`               |
+| Linux Arm64     | `(aarch64\|arm64)-linux-gnu`           | `aarch64-linux-gnu`                 |
+| Linux RISC-V 64 | `riscv64-linux-gnu`                    | `riscv64-linux-gnu`                 |
+| Windows 32      | `i[3456]86-.*(mingw32\|cygwin)`        | `i686-mingw32` or `i686-cygwin`     |
+| Windows 64      | `(amd64\|x86_64)-.*(mingw32\|cygwin)`  | `x86_64-mingw32` or `x86_64-cygwin` |
+| Windows Arm64   | `(aarch64\|arm64)-.*(mingw32\|cygwin)` | `arm64-mingw32` or `arm64-cygwin`   |
+| MacOSX 32       | `i[3456]86-apple-darwin.*`             | `i686-apple-darwin`                 |
+| MacOSX 64       | `x86_64-apple-darwin.*`                | `x86_64-apple-darwin`               |
+| MacOSX Arm64    | `arm64-apple-darwin.*`                 | `arm64-apple-darwin`                |
+| FreeBSD 32      | `i?[3456]86-freebsd[0-9]*`             | `i686-freebsd`                      |
+| FreeBSD 64      | `amd64-freebsd[0-9]*`                  | `amd64-freebsd`                     |
+| FreeBSD Arm     | `arm.*-freebsd[0-9]*`                  | `arm-freebsd`                       |
 
 The `host` value is matched with the regexp, this means that a more specific value for the `host` field is allowed (for
 example you may write `x86_64-apple-darwin14.1` for MacOSX instead of the suggested `x86_64-apple-darwin`), by the way,
@@ -194,11 +195,12 @@ we recommend to keep it simple and stick to the suggested value in the table.
 
 Some OS allows to run different flavours:
 
-| The OS...    | ...may also run builds for |
-| ------------ | -------------------------- |
-| Windows 64   | Windows 32                 |
-| MacOSX 64    | MacOSX 32                  |
-| MacOSX Arm64 | MacOSX 64 or MacOSX 32     |
+| The OS...     | ...may also run builds for |
+| ------------- | -------------------------- |
+| Windows 64    | Windows 32                 |
+| Windows Arm64 | Windows 32 or Windows 64   |
+| MacOSX 64     | MacOSX 32                  |
+| MacOSX Arm64  | MacOSX 64 or MacOSX 32     |
 
 This is taken into account when the tools are downloaded (for example if we are on a Windows 64 machine and the needed
 tool is available only for the Windows 32 flavour, then the Windows 32 flavour will be downloaded and used).
@@ -213,6 +215,7 @@ For completeness, the previous example `avr-gcc` comes with builds for:
 - Linux 64 (`x86_64-linux-gnu`)
 - MacOSX Arm64 will use the MacOSX 64 flavour
 - Windows 64 will use the Windows 32 flavour
+- Windows Arm64 will use the Windows 32 flavour
 
 Note: this information is not used to select the toolchain during compilation. If you want a specific version to be
 used, you should use the notation `{runtime.tools.TOOLNAME-VERSION.path}` in the platform.txt.

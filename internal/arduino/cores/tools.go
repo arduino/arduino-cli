@@ -134,6 +134,7 @@ var (
 	regexpLinux32      = regexp.MustCompile("i[3456]86-.*linux-gnu")
 	regexpWindows32    = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
 	regexpWindows64    = regexp.MustCompile("(amd64|x86_64)-.*(mingw32|cygwin)")
+	regexpWindowsArm64 = regexp.MustCompile("(aarch64|arm64)-.*(mingw32|cygwin)")
 	regexpMac64        = regexp.MustCompile("x86_64-apple-darwin.*")
 	regexpMac32        = regexp.MustCompile("i[3456]86-apple-darwin.*")
 	regexpMacArm64     = regexp.MustCompile("arm64-apple-darwin.*")
@@ -162,6 +163,8 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 		return regexpWindows32.MatchString(f.OS)
 	case "windows,amd64":
 		return regexpWindows64.MatchString(f.OS)
+	case "windows,arm64":
+		return regexpWindowsArm64.MatchString(f.OS)
 	case "darwin,arm64":
 		return regexpMacArm64.MatchString(f.OS)
 	case "darwin,amd64":
@@ -185,6 +188,13 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 
 	switch osName + "," + osArch {
 	case "windows,amd64":
+		return regexpWindows32.MatchString(f.OS), 10
+	case "windows,arm64":
+		// Compatibility guaranteed through Prism emulation
+		if regexpWindows64.MatchString(f.OS) {
+			// Prefer amd64 version if available
+			return true, 20
+		}
 		return regexpWindows32.MatchString(f.OS), 10
 	case "darwin,amd64":
 		return regexpMac32.MatchString(f.OS), 10
