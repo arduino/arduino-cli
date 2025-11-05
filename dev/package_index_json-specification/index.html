@@ -1746,6 +1746,11 @@ following table or fail if a needed flavour is missing.</p>
 <td><code>x86_64-mingw32</code> or <code>x86_64-cygwin</code></td>
 </tr>
 <tr>
+<td>Windows Arm64</td>
+<td><code>(aarch64\|arm64)-.*(mingw32\|cygwin)</code></td>
+<td><code>arm64-mingw32</code> or <code>arm64-cygwin</code></td>
+</tr>
+<tr>
 <td>MacOSX 32</td>
 <td><code>i[3456]86-apple-darwin.*</code></td>
 <td><code>i686-apple-darwin</code></td>
@@ -1794,6 +1799,10 @@ we recommend to keep it simple and stick to the suggested value in the table.</p
 <td>Windows 32</td>
 </tr>
 <tr>
+<td>Windows Arm64</td>
+<td>Windows 32 or Windows 64</td>
+</tr>
+<tr>
 <td>MacOSX 64</td>
 <td>MacOSX 32</td>
 </tr>
@@ -1815,6 +1824,7 @@ tool is available only for the Windows 32 flavour, then the Windows 32 flavour w
 <li>Linux 64 (<code>x86_64-linux-gnu</code>)</li>
 <li>MacOSX Arm64 will use the MacOSX 64 flavour</li>
 <li>Windows 64 will use the Windows 32 flavour</li>
+<li>Windows Arm64 will use the Windows 32 flavour</li>
 </ul>
 <p>Note: this information is not used to select the toolchain during compilation. If you want a specific version to be
 used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</code> in the platform.txt.</p>
