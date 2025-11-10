@@ -13,8 +13,7 @@ brew install arduino-cli
 
 ## Install using mise
 
-If you are an enthusiast user of [mise](https://github.com/jdx/mise), the polyglot tool version manager, you can install
-the version you want by using a command like (here version is latest) :
+You can install Arduino CLI using [mise](https://github.com/jdx/mise) with a command like this (for the latest version):
 
 ```sh
 mise use -g arduino-cli
