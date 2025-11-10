@@ -15,7 +15,7 @@ brew install arduino-cli
 
 You can install Arduino CLI using [mise](https://github.com/jdx/mise) with a command like this (for the latest version):
 
-```sh
+```
 mise use -g arduino-cli
 ```
 
