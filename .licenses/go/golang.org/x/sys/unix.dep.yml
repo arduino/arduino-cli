@@ -1,12 +1,12 @@
 ---
 name: golang.org/x/sys/unix
-version: v0.37.0
+version: v0.38.0
 type: go
 summary: Package unix contains an interface to the low-level operating system primitives.
 homepage: https://pkg.go.dev/golang.org/x/sys/unix
 license: bsd-3-clause
 licenses:
-- sources: sys@v0.37.0/LICENSE
+- sources: sys@v0.38.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: sys@v0.37.0/PATENTS
+- sources: sys@v0.38.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
