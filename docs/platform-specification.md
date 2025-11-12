@@ -138,7 +138,7 @@ The following automatically generated properties can be used globally in all con
 - `{_id}`: [board ID](#boardstxt) of the board being compiled for
 - `{build.fqbn}`: the FQBN (fully qualified board name) of the board being compiled for. The FQBN follows the format:
   `VENDOR:ARCHITECTURE:BOARD_ID[:MENU_ID=OPTION_ID[,MENU2_ID=OPTION_ID ...]]`
-- `{build.source.path}`: Path to the sketch being compiled. If the sketch is in an unsaved state, it will the path of
+- `{build.source.path}`: Path to the sketch being compiled. If the sketch is in an unsaved state, it will be the path of
   its temporary folder.
 - `{build.library_discovery_phase}`: set to 1 during library discovery and to 0 during normal build. A macro defined
   with this property can be used to disable the inclusion of heavyweight headers during discovery to reduce compilation
