@@ -264,7 +264,6 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		extraCoreBuildCachePaths,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
-		s.settings.HardwareDirectories(),
 		librariesDirs,
 		s.settings.IDEBuiltinLibrariesDir(),
 		fqbn,
