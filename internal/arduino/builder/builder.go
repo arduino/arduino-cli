@@ -123,7 +123,6 @@ func NewBuilder(
 	extraCoreBuildCachePaths paths.PathList,
 	jobs int,
 	customBuildProperties []string,
-	hardwareDirs paths.PathList,
 	librariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
 	fqbn *fqbn.FQBN,
@@ -225,7 +224,7 @@ func NewBuilder(
 		buildPlatform:                 buildPlatform,
 		toolEnv:                       toolEnv,
 		buildOptions: newBuildOptions(
-			hardwareDirs,
+			paths.PathList{targetPlatform.InstallDir, buildPlatform.InstallDir},
 			librariesDirs,
 			builtInLibrariesDirs,
 			buildPath,

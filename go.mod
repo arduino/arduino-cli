@@ -21,7 +21,7 @@ require (
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.18.0
 	github.com/go-git/go-git/v5 v5.16.3
-	github.com/gofrs/uuid/v5 v5.3.2
+	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/leonelquinteros/gotext v1.7.2
 	github.com/mailru/easyjson v0.7.7
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
@@ -40,9 +40,9 @@ require (
 	go.bug.st/f v0.4.0
 	go.bug.st/relaxed-semver v0.15.0
 	go.bug.st/testifyjson v1.3.0
-	golang.org/x/sys v0.37.0
-	golang.org/x/term v0.36.0
-	golang.org/x/text v0.30.0
+	golang.org/x/sys v0.38.0
+	golang.org/x/term v0.37.0
+	golang.org/x/text v0.31.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
