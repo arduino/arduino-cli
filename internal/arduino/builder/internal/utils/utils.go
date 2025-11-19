@@ -16,6 +16,8 @@
 package utils
 
 import (
+	"errors"
+	"io/fs"
 	"os"
 	"strings"
 	"unicode"
@@ -93,14 +95,14 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	}
 	for _, dep := range deps.Dependencies[1:] {
 		depStat, err := os.Stat(dep)
-		if err != nil && !os.IsNotExist(err) {
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				logrus.Debugf("Not found: %v", dep)
+				return false, nil
+			}
 			// There is probably a parsing error of the dep file
 			// Ignore the error and trigger a full rebuild anyway
 			logrus.WithError(err).Debugf("Failed to read: %v", dep)
-			return false, nil
-		}
-		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", dep)
 			return false, nil
 		}
 		if depStat.ModTime().After(objectFileStat.ModTime()) {
