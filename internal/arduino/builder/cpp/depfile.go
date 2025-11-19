@@ -59,8 +59,6 @@ func readDepFile(depFile string) (*Dependencies, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows = f.Map(rows, strings.TrimSpace)
-	rows = f.Filter(rows, f.NotEquals(""))
 	if len(rows) == 0 {
 		return &Dependencies{}, nil
 	}
@@ -135,5 +133,7 @@ func unescapeAndSplit(s string) ([]string, error) {
 	if current.Len() > 0 {
 		res = append(res, current.String())
 	}
+	res = f.Map(res, strings.TrimSpace)
+	res = f.Filter(res, f.NotEquals(""))
 	return res, nil
 }
