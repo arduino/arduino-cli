@@ -63,10 +63,6 @@ func readDepFile(depFile string) (*Dependencies, error) {
 		return &Dependencies{}, nil
 	}
 
-	// The first line of the depfile contains the path to the object file to generate.
-	// The second line of the depfile contains the path to the source file.
-	// All subsequent lines contain the header files necessary to compile the object file.
-
 	if !strings.HasSuffix(rows[0], ":") {
 		return nil, errors.New("no colon in first item of depfile")
 	}
