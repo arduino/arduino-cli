@@ -55,7 +55,7 @@ func ReadDepFile(depFilePath *paths.Path) (*Dependencies, error) {
 }
 
 func readDepFile(depFile string) (*Dependencies, error) {
-	rows, err := unescapeAndSplit(strings.ReplaceAll(depFile, "\r\n", "\n"))
+	rows, err := unescapeAndSplit(depFile)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +83,10 @@ func unescapeAndSplit(s string) ([]string, error) {
 	dollar := false
 	current := strings.Builder{}
 	for _, c := range s {
+		if c == '\r' {
+			// Ignore CR (Windows line ending style immediately followed by LF)
+			continue
+		}
 		if backslash {
 			switch c {
 			case ' ':
