@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -325,23 +326,39 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 // ProfileLibraryReference is a reference to a library
 type ProfileLibraryReference struct {
 	Library    string
-	InstallDir *paths.Path
 	Version    *semver.Version
+	InstallDir *paths.Path
+	GitURL     *url.URL
 }
 
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var dataMap map[string]any
 	if err := unmarshal(&dataMap); err == nil {
-		if installDir, ok := dataMap["dir"]; !ok {
-			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
-		} else if installDir, ok := installDir.(string); !ok {
-			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
-		} else {
-			l.InstallDir = paths.New(installDir)
-			l.Library = l.InstallDir.Base()
-			return nil
+		if installDir, ok := dataMap["dir"]; ok {
+			if installDir, ok := installDir.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
+			} else {
+				l.InstallDir = paths.New(installDir)
+				l.Library = l.InstallDir.Base()
+				return nil
+			}
 		}
+		if gitUrl, ok := dataMap["git"]; ok {
+			if gitUrlStr, ok := gitUrl.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid git library reference: %s"), dataMap)
+			} else if parsedUrl, err := url.Parse(gitUrlStr); err != nil {
+				return fmt.Errorf("%s: %w", i18n.Tr("invalid git library URL:"), err)
+			} else {
+				l.GitURL = parsedUrl
+				if l.Library = filepath.Base(parsedUrl.Path); l.Library == "" {
+					l.Library = "lib"
+				}
+				l.Library = strings.TrimSuffix(l.Library, ".git")
+				return nil
+			}
+		}
+		return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
 	}
 
 	var data string
@@ -364,12 +381,18 @@ func (l *ProfileLibraryReference) AsYaml() string {
 	if l.InstallDir != nil {
 		return fmt.Sprintf("      - dir: %s\n", l.InstallDir)
 	}
+	if l.GitURL != nil {
+		return fmt.Sprintf("      - git: %s\n", l.GitURL)
+	}
 	return fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
 }
 
 func (l *ProfileLibraryReference) String() string {
 	if l.InstallDir != nil {
-		return fmt.Sprintf("%s@dir:%s", l.Library, l.InstallDir)
+		return "@dir:" + l.InstallDir.String()
+	}
+	if l.GitURL != nil {
+		return "@git:" + l.GitURL.String()
 	}
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
 }
@@ -378,6 +401,16 @@ func (l *ProfileLibraryReference) String() string {
 func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
 	f.Assert(l.InstallDir == nil,
 		"InternalUniqueIdentifier should not be called for library references with an install directory")
+
+	if l.GitURL != nil {
+		id := "git-" + utils.SanitizeName(l.GitURL.Host+l.GitURL.Path+"#"+l.GitURL.Fragment)
+		if len(id) > 50 {
+			id = id[:50]
+		}
+		h := sha256.Sum256([]byte(l.GitURL.String()))
+		return id + "-" + hex.EncodeToString(h[:])[:8]
+	}
+
 	id := l.String()
 	h := sha256.Sum256([]byte(id))
 	res := fmt.Sprintf("%s_%s", id, hex.EncodeToString(h[:])[:16])
