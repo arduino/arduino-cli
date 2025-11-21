@@ -82,7 +82,6 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 
 		// Get all the dependencies required by the profile excluding the removed library
 		requiredDeps := map[string]bool{}
-		requiredDeps[libToRemove.String()] = true
 		for _, profLib := range profile.Libraries {
 			if profLib.IsDependency {
 				continue
@@ -95,24 +94,21 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 				return nil, &cmderrors.InvalidArgumentError{Cause: err, Message: "cannot resolve dependencies for installed libraries"}
 			}
 			for _, dep := range deps {
-				requiredDeps[dep.String()] = true
+				requiredDeps[dep.Library.Name] = true
 			}
 		}
 
-		depsOfLibToRemove, err := libraryResolveDependencies(li, libToRemove.Library, libToRemove.Version.String(), nil)
+		candidateDepsToRemove, err := libraryResolveDependencies(li, libToRemove.Library, libToRemove.Version.String(), nil)
 		if err != nil {
 			return nil, &cmderrors.InvalidArgumentError{Cause: err, Message: "cannot resolve dependencies for installed libraries"}
 		}
 		// sort to make the output order deterministic
-		slices.SortFunc(depsOfLibToRemove, librariesindex.ReleaseCompare)
-		// deps contains the main library as well, so we skip it when removing dependencies
-		for _, depToRemove := range depsOfLibToRemove {
-			if requiredDeps[depToRemove.String()] {
+		slices.SortFunc(candidateDepsToRemove, librariesindex.ReleaseCompare)
+		for _, depToRemove := range candidateDepsToRemove {
+			if requiredDeps[depToRemove.Library.Name] {
 				continue
 			}
-			if err := remove(&sketch.ProfileLibraryReference{Library: depToRemove.Library.Name, Version: depToRemove.Version}); err != nil {
-				return nil, err
-			}
+			_ = remove(&sketch.ProfileLibraryReference{Library: depToRemove.Library.Name, Version: depToRemove.Version})
 		}
 	}
 

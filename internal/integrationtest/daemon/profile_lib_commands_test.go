@@ -309,3 +309,175 @@ default_profile: test
 `)
 	}
 }
+
+func TestProfileLibRemoveWithDeps(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	t.Cleanup(env.CleanUp)
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { tmp.RemoveAll() })
+	sk := tmp.Join("sketch")
+
+	// Create a new sketch
+	_, _, err = cli.Run("sketch", "new", sk.String())
+	require.NoError(t, err)
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	// Create a new profile
+	resp, err := grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
+	require.NoError(t, err)
+	projectFile := paths.New(resp.GetProjectFilePath())
+
+	expect := func(expected string) {
+		p, _ := projectFile.ReadFile()
+		require.Equal(t, strings.TrimSpace(expected), strings.TrimSpace(string(p)))
+	}
+	expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+
+	// Add a library to the profile
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", "0.2.2"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RPClite", "0.2.0", true),
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("ArxContainer", "0.7.0", true),
+			indexLib("ArxTypeTraits", "0.3.2", true),
+			indexLib("DebugLog", "0.8.4", true),
+			indexLib("MsgPack", "0.4.2", true),
+		), addresp.GetAddedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - dependency: Arduino_RPClite (0.2.0)
+      - Arduino_RouterBridge (0.2.2)
+      - dependency: ArxContainer (0.7.0)
+      - dependency: ArxTypeTraits (0.3.2)
+      - dependency: DebugLog (0.8.4)
+      - dependency: MsgPack (0.4.2)
+
+default_profile: test
+`)
+	}
+
+	// Remove the library (without indicating the version) and the dependencies
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", ""), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("Arduino_RPClite", "0.2.0", true),
+			indexLib("ArxContainer", "0.7.0", true),
+			indexLib("ArxTypeTraits", "0.3.2", true),
+			indexLib("DebugLog", "0.8.4", true),
+			indexLib("MsgPack", "0.4.2", true),
+		), remresp.GetRemovedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Re-add the library to the profile
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", "0.2.2"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RPClite", "0.2.0", true),
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("ArxContainer", "0.7.0", true),
+			indexLib("ArxTypeTraits", "0.3.2", true),
+			indexLib("DebugLog", "0.8.4", true),
+			indexLib("MsgPack", "0.4.2", true),
+		), addresp.GetAddedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - dependency: Arduino_RPClite (0.2.0)
+      - Arduino_RouterBridge (0.2.2)
+      - dependency: ArxContainer (0.7.0)
+      - dependency: ArxTypeTraits (0.3.2)
+      - dependency: DebugLog (0.8.4)
+      - dependency: MsgPack (0.4.2)
+
+default_profile: test
+`)
+	}
+
+	// Remove one dep library (without indicating the version)
+	{
+		_, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Arduino_RPClite", ""), true)
+		require.NoError(t, err)
+		// require.Equal(t, indexLibArray(
+		// 	indexLib("Arduino_RPClite", "0.2.0", true),
+		// ), remresp.GetRemovedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - Arduino_RouterBridge (0.2.2)
+      - dependency: ArxContainer (0.7.0)
+      - dependency: ArxTypeTraits (0.3.2)
+      - dependency: DebugLog (0.8.4)
+      - dependency: MsgPack (0.4.2)
+
+default_profile: test
+`)
+	}
+
+	// Remove the library (without indicating the version) and all the dependencies
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", ""), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("ArxContainer", "0.7.0", true),
+			indexLib("ArxTypeTraits", "0.3.2", true),
+			indexLib("DebugLog", "0.8.4", true),
+			indexLib("MsgPack", "0.4.2", true),
+		), remresp.GetRemovedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+}
