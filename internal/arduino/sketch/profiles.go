@@ -136,14 +136,16 @@ func (p *Profile) GetLibrary(libraryName string) (*ProfileLibraryReference, erro
 	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
 }
 
+// RemoveLibrary removes a library from this profile and returns the removed ProfileLibraryReference.
+// If the library is not found, an error is returned.
 func (p *Profile) RemoveLibrary(library *ProfileLibraryReference) (*ProfileLibraryReference, error) {
-	for i, l := range p.Libraries {
-		if l.Match(library) {
-			p.Libraries = slices.Delete(p.Libraries, i, i+1)
-			return l, nil
-		}
+	i := slices.IndexFunc(p.Libraries, library.Match)
+	if i == -1 {
+		return nil, &cmderrors.LibraryNotFoundError{Library: library.String()}
 	}
-	return nil, &cmderrors.LibraryNotFoundError{Library: library.String()}
+	removedLib := p.Libraries[i]
+	p.Libraries = slices.Delete(p.Libraries, i, i+1)
+	return removedLib, nil
 }
 
 // ToRpc converts this Profile to an rpc.SketchProfile
