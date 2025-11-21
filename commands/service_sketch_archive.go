@@ -66,7 +66,7 @@ func (s *arduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 
 	if !req.GetOverwrite() {
 		if archivePath.Exist() {
-			return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Archive already exists")}
+			return nil, &cmderrors.AlreadyExists{Message: i18n.Tr("Archive already exists")}
 		}
 	}
 

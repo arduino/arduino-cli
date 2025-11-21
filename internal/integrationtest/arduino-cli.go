@@ -741,3 +741,17 @@ func (inst *ArduinoCLIInstance) NewSketch(ctx context.Context, sketchName, sketc
 	logCallf(">>> NewSketch(%+v)\n", req)
 	return inst.cli.daemonClient.NewSketch(ctx, req)
 }
+
+// ArchiveSketch calls the "ArchiveSketch" gRPC method.
+func (cli *ArduinoCLI) ArchiveSketch(ctx context.Context, sketchPath, archivePath string, includeBuildDir, overwrite bool) (*commands.ArchiveSketchResponse, error) {
+	req := &commands.ArchiveSketchRequest{
+		SketchPath:      sketchPath,
+		ArchivePath:     archivePath,
+		IncludeBuildDir: includeBuildDir,
+		Overwrite:       overwrite,
+	}
+	logCallf(">>> ArchiveSketch(%+v)\n", req)
+	resp, err := cli.daemonClient.ArchiveSketch(ctx, req)
+	logCallf("err=%v\n", err)
+	return resp, err
+}
