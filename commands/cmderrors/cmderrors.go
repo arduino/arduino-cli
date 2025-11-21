@@ -772,6 +772,25 @@ func (e *NotFoundError) GRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 
+// AlreadyExists is returned when creating a resource failed because one already exists
+type AlreadyExists struct {
+	Message string
+	Cause   error
+}
+
+func (e *AlreadyExists) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *AlreadyExists) Unwrap() error {
+	return e.Cause
+}
+
+// GRPCStatus converts the error into a *status.Status
+func (e *AlreadyExists) GRPCStatus() *status.Status {
+	return status.New(codes.AlreadyExists, e.Error())
+}
+
 // PermissionDeniedError is returned when a resource cannot be accessed or modified
 type PermissionDeniedError struct {
 	Message string
