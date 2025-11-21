@@ -72,8 +72,9 @@ The following fields are available since Arduino CLI 1.1.0:
   used in the `monitor` command. Typically is used to set the baudrate for the serial port (for example
   `baudrate: 115200`) but any setting/value can be specified. Multiple settings can be set. These fields are optional.
 - `<PORT_PROTOCOL>` is the protocol for the port used to upload and monitor the board. Arduino CLI ignores this value at
-  runtime, so write it only if an external client (for example one using the gRPC [`Port`](/rpc/commands/#port)) needs to restore the `protocol` together with the port `address`. Clients that do not set it should assume their
-  own default (usually `serial`). This field is optional.
+  runtime, so write it only if an external client (for example one using the gRPC [`Port`](/rpc/commands/#port)) needs
+  to restore the `protocol` together with the port `address`. Clients that do not set it should assume their own default
+  (usually `serial`). This field is optional.
 
 #### Using a system-installed platform.
 
