@@ -447,10 +447,13 @@ func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
 	if l.InstallDir != nil {
 		return other.InstallDir != nil && l.InstallDir.EqualsTo(other.InstallDir)
 	}
+	if other.InstallDir != nil {
+		return false
+	}
 	if l.GitURL != nil {
 		return other.GitURL != nil && l.GitURL.String() == other.GitURL.String()
 	}
-	if other.InstallDir != nil {
+	if other.GitURL != nil {
 		return false
 	}
 	if l.Library != other.Library {
