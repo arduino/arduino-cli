@@ -1,0 +1,14 @@
+profiles:
+  giga:
+    fqbn: arduino:mbed_giga:giga
+    platforms:
+      - platform: arduino:mbed_giga (4.3.1)
+    libraries:
+      - FlashStorage (1.2.3)
+      - dir: /path/to/system/lib
+      - dir: path/to/sketch/lib
+      - git: https://github.com/username/HelloWorld.git#v2.13
+      - git: https://github.com/username/HelloWorld.git#v2.14
+      - dependency: DependencyLib (2.3.4)
+
+default_profile: giga_any

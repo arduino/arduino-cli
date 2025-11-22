@@ -67,12 +67,17 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		return err
 	}
 
-	toInstall := map[string]*rpc.LibraryDependencyStatus{}
+	toInstall := map[string]*librariesindex.Release{}
 	if req.GetNoDeps() {
-		toInstall[req.GetName()] = &rpc.LibraryDependencyStatus{
-			Name:            req.GetName(),
-			VersionRequired: req.GetVersion(),
+		version, err := parseVersion(req.GetVersion())
+		if err != nil {
+			return err
 		}
+		libRelease, err := li.FindRelease(req.GetName(), version)
+		if err != nil {
+			return err
+		}
+		toInstall[libRelease.GetName()] = libRelease
 	} else {
 		// Obtain the library explorer from the instance
 		lme, releaseLme, err := instances.GetLibraryManagerExplorer(req.GetInstance())
@@ -80,18 +85,22 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 			return err
 		}
 
-		res, err := libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetNoOverwrite())
+		var overrides []*librariesindex.Release
+		if req.GetNoOverwrite() {
+			overrides = librariesGetAllInstalled(lme, li)
+		}
+		deps, err := libraryResolveDependencies(li, req.GetName(), req.GetVersion(), overrides)
 		releaseLme()
 		if err != nil {
 			return err
 		}
 
-		for _, dep := range res.GetDependencies() {
+		for _, dep := range deps {
 			if existingDep, has := toInstall[dep.GetName()]; has {
-				if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
+				if !existingDep.GetVersion().Equal(dep.GetVersion()) {
 					err := errors.New(
 						i18n.Tr("two different versions of the library %[1]s are required: %[2]s and %[3]s",
-							dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired()))
+							dep.GetName(), dep.GetVersion(), existingDep.GetVersion()))
 					return &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
 				}
 			}
@@ -118,16 +127,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
 	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
-	for _, lib := range toInstall {
-		version, err := parseVersion(lib.GetVersionRequired())
-		if err != nil {
-			return err
-		}
-		libRelease, err := li.FindRelease(lib.GetName(), version)
-		if err != nil {
-			return err
-		}
-
+	for _, libRelease := range toInstall {
 		installTask, err := lmi.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
 		if err != nil {
 			return err
@@ -267,9 +267,8 @@ func (s *arduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 	lmi, release := lm.NewInstaller()
 	defer release()
 
-	// TODO: pass context
-	// ctx := stream.Context()
-	if err := lmi.InstallGitLib(req.GetUrl(), req.GetOverwrite()); err != nil {
+	ctx := stream.Context()
+	if err := lmi.InstallGitLib(ctx, req.GetUrl(), req.GetOverwrite()); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: i18n.Tr("Library installed"), Completed: true})
