@@ -663,6 +663,28 @@ func TestDaemonCreateSketch(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestDaemonArchiveSketchAlreadyExists(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	defer env.CleanUp()
+
+	sketchDir := cli.CopySketch("sketch_simple")
+	archivePath := cli.WorkingDir().Join("ArchiveSketchAlreadyExists.zip")
+	if archivePath.Exist() {
+		require.NoError(t, archivePath.Remove())
+	}
+	t.Cleanup(func() { _ = archivePath.Remove() })
+
+	_, err := cli.ArchiveSketch(context.Background(), sketchDir.String(), archivePath.String(), false, false)
+	require.NoError(t, err)
+
+	_, err = cli.ArchiveSketch(context.Background(), sketchDir.String(), archivePath.String(), false, false)
+	require.Error(t, err)
+	st, ok := status.FromError(err)
+	require.True(t, ok)
+	require.Equal(t, codes.AlreadyExists, st.Code())
+	require.Contains(t, st.Message(), "Archive already exists")
+}
+
 func analyzeUpdateIndexClient(t *testing.T, cl commands.ArduinoCoreService_UpdateIndexClient) (map[string]*commands.DownloadProgressEnd, error) {
 	analyzer := NewDownloadProgressAnalyzer(t)
 	for {
