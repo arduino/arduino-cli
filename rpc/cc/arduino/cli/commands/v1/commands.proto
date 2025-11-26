@@ -444,14 +444,11 @@ message ProfileCreateRequest {
   string profile_name = 3;
   // FQBN of the provided profile.
   string fqbn = 4;
-  // Set the profile as the default one.
+  // Set the created profile as the default one.
   bool default_profile = 5;
 }
 
-message ProfileCreateResponse {
-  // Absolute path to the project file.
-  string project_file_path = 1;
-}
+message ProfileCreateResponse {}
 
 message ProfileLibAddRequest {
   // An Arduino Core instance.

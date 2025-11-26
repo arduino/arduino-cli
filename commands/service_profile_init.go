@@ -101,5 +101,5 @@ func (s *arduinoCoreServerImpl) ProfileCreate(ctx context.Context, req *rpc.Prof
 		}
 	}
 
-	return &rpc.ProfileCreateResponse{ProjectFilePath: projectFilePath.String()}, nil
+	return &rpc.ProfileCreateResponse{}, nil
 }

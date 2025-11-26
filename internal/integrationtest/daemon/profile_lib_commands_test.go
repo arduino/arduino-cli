@@ -66,9 +66,9 @@ func TestProfileLibAddListAndRemov(t *testing.T) {
 	}))
 
 	// Create a new profile
-	resp, err := grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
+	_, err = grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
 	require.NoError(t, err)
-	projectFile := paths.New(resp.GetProjectFilePath())
+	projectFile := sk.Join("sketch.yaml")
 
 	expect := func(expected string) {
 		p, _ := projectFile.ReadFile()
@@ -334,9 +334,9 @@ func TestProfileLibRemoveWithDeps(t *testing.T) {
 	}))
 
 	// Create a new profile
-	resp, err := grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
+	_, err = grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
 	require.NoError(t, err)
-	projectFile := paths.New(resp.GetProjectFilePath())
+	projectFile := sk.Join("sketch.yaml")
 
 	expect := func(expected string) {
 		p, _ := projectFile.ReadFile()
