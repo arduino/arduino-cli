@@ -327,7 +327,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	// Load libraries
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
-			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
+			if platformRelease := pme.GetBestInstalledPlatformRelease(platform); platformRelease != nil {
 				lmb.AddLibrariesDir(librariesmanager.LibrariesDir{
 					PlatformRelease: platformRelease,
 					Path:            platformRelease.GetLibrariesDir(),

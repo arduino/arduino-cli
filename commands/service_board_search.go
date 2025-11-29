@@ -40,7 +40,7 @@ func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 	for _, targetPackage := range pme.GetPackages() {
 		for _, platform := range targetPackage.Platforms {
 			latestPlatformRelease := platform.GetLatestCompatibleRelease()
-			installedPlatformRelease := pme.GetInstalledPlatformRelease(platform)
+			installedPlatformRelease := pme.GetBestInstalledPlatformRelease(platform)
 
 			if latestPlatformRelease == nil && installedPlatformRelease == nil {
 				continue

@@ -22,7 +22,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -63,6 +62,17 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		return append(merr, errors.New(i18n.Tr("%s is not a directory", path)))
 	}
 
+	// If the hardware directory is inside, or equals, the sketchbook/hardware directory
+	// it's not a managed package, otherwise it is.
+	managed := true
+	if pm.userPackagesDir != nil {
+		if path.EquivalentTo(pm.userPackagesDir) {
+			managed = false
+		} else if userInstalled, err := path.IsInsideDir(pm.userPackagesDir); err == nil && userInstalled {
+			managed = false
+		}
+	}
+
 	// Scan subdirs
 	packagersPaths, err := path.ReadDir()
 	if err != nil {
@@ -85,42 +95,38 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 
 	for _, packagerPath := range packagersPaths {
 		packager := packagerPath.Base()
-
 		// Skip tools, they're not packages and don't contain Platforms
 		if packager == "tools" {
 			pm.log.Infof("Excluding directory: %s", packagerPath)
 			continue
 		}
+		targetPackage := pm.packages.GetOrCreatePackage(packager)
 
 		// Follow symlinks
-		err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
-		if err != nil {
+		// (for example: .arduino15/packages/arduino/ could point to a dev directory)
+		if err := packagerPath.FollowSymLink(); err != nil {
 			merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("following symlink %s", path), err))
 			continue
 		}
 
 		// There are two possible package directory structures:
-		// - PACKAGER/ARCHITECTURE-1/boards.txt...                   (ex: arduino/avr/...)
-		//   PACKAGER/ARCHITECTURE-2/boards.txt...                   (ex: arduino/sam/...)
-		//   PACKAGER/ARCHITECTURE-3/boards.txt...                   (ex: arduino/samd/...)
-		// or
-		// - PACKAGER/hardware/ARCHITECTURE-1/VERSION/boards.txt...  (ex: arduino/hardware/avr/1.6.15/...)
-		//   PACKAGER/hardware/ARCHITECTURE-2/VERSION/boards.txt...  (ex: arduino/hardware/sam/1.6.6/...)
-		//   PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
-		//   PACKAGER/tools/...                                      (ex: arduino/tools/...)
-		// in the latter case we just move into "hardware" directory and continue
-		var architectureParentPath *paths.Path
-		hardwareSubdirPath := packagerPath.Join("hardware") // ex: .arduino15/packages/arduino/hardware
-		if hardwareSubdirPath.IsDir() {
-			// we found the "hardware" directory move down into that
-			architectureParentPath = hardwareSubdirPath // ex: .arduino15/packages/arduino/
+		if managed {
+			// 1. Inside the Boards Manager .arduino15/packages directory:
+			//    PACKAGER/hardware/ARCHITECTURE-1/VERSION/boards.txt...  (ex: arduino/hardware/avr/1.6.15/...)
+			//    PACKAGER/hardware/ARCHITECTURE-2/VERSION/boards.txt...  (ex: arduino/hardware/sam/1.6.6/...)
+			//    PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
+			//    PACKAGER/tools/...                                      (ex: arduino/tools/...)
+			if p := packagerPath.Join("hardware"); p.IsDir() {
+				merr = append(merr, pm.loadPlatforms(targetPackage, p, managed)...)
+			}
 		} else {
-			// we are already at the correct level
-			architectureParentPath = packagerPath
+			// 2. Inside the sketchbook/hardware directory:
+			//    PACKAGER/ARCHITECTURE-1/boards.txt...                   (ex: arduino/avr/...)
+			//    PACKAGER/ARCHITECTURE-2/boards.txt...                   (ex: arduino/sam/...)
+			//    PACKAGER/ARCHITECTURE-3/boards.txt...                   (ex: arduino/samd/...)
+			// ex: .arduino15/packages/arduino/hardware/...
+			merr = append(merr, pm.loadPlatforms(targetPackage, packagerPath, managed)...)
 		}
-
-		targetPackage := pm.packages.GetOrCreatePackage(packager)
-		merr = append(merr, pm.loadPlatforms(targetPackage, architectureParentPath)...)
 
 		// Check if we have tools to load, the directory structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
@@ -141,8 +147,8 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
 // A list of gRPC Status error is returned for each Platform failed to load.
-func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) []error {
-	pm.log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
+func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path, managed bool) []error {
+	pm.log.Infof("Loading package %s from: %s (managed=%v)", targetPackage.Name, packageDir, managed)
 
 	var merr []error
 
@@ -162,7 +168,7 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 		if targetArchitecture == "tools" {
 			continue
 		}
-		if err := pm.loadPlatform(targetPackage, targetArchitecture, platformPath); err != nil {
+		if err := pm.loadPlatform(targetPackage, targetArchitecture, platformPath, managed); err != nil {
 			merr = append(merr, err)
 		}
 	}
@@ -173,46 +179,18 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 // loadPlatform loads a single platform and all its installed releases given a platformPath.
 // platformPath must be a directory.
 // Returns a gRPC Status error in case of failures.
-func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path) error {
+func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path, managed bool) error {
 	// This is not a platform
 	if platformPath.IsNotDir() {
 		return errors.New(i18n.Tr("path is not a platform directory: %s", platformPath))
 	}
 
 	// There are two possible platform directory structures:
-	// - ARCHITECTURE/boards.txt
-	// - ARCHITECTURE/VERSION/boards.txt
-	// We identify them by checking where is the bords.txt file
-	possibleBoardTxtPath := platformPath.Join("boards.txt")
-	if exist, err := possibleBoardTxtPath.ExistCheck(); err != nil {
-		return fmt.Errorf("%s: %w", i18n.Tr("looking for boards.txt in %s", possibleBoardTxtPath), err)
-	} else if exist {
-		// case: ARCHITECTURE/boards.txt
+	if managed {
+		// 1. Inside the Boards Manager .arduino15/packages/PACKAGER/hardware/ARCHITECTURE directory:
+		// - ARCHITECTURE/VERSION/boards.txt
 
-		platformTxtPath := platformPath.Join("platform.txt")
-		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.Tr("loading platform.txt"), err)
-		}
-
-		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
-		version, err := semver.Parse(versionString)
-		if err != nil {
-			return &cmderrors.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
-		}
-
-		platform := targetPackage.GetOrCreatePlatform(architecture)
-		platform.ManuallyInstalled = true
-		release := platform.GetOrCreateRelease(version)
-		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
-			return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
-		}
-		pm.log.WithField("platform", release).Infof("Loaded platform")
-
-	} else {
-		// case: ARCHITECTURE/VERSION/boards.txt
 		// let's dive into VERSION directories
-
 		versionDirs, err := platformPath.ReadDir()
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Tr("reading directory %s", platformPath), err)
@@ -237,106 +215,117 @@ func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture strin
 			}
 			pm.log.WithField("platform", release).Infof("Loaded platform")
 		}
+	} else {
+		// 2. Inside the sketchbook/hardware/PACKAGER/ARCHITECTURE directory:
+		// - ARCHITECTURE/boards.txt
+
+		platform := targetPackage.GetOrCreatePlatform(architecture)
+		if !platform.Indexed {
+			platform.ManuallyInstalled = true
+		}
+		release := platform.GetOrCreateRelease(nil)
+		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
+			return fmt.Errorf("%s: %w", i18n.Tr("loading platform release %s", release), err)
+		}
+		pm.log.WithField("platform", release).Infof("Loaded platform")
 	}
 
 	return nil
 }
 
-func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
-	platform.InstallDir = path
-
+func (pm *Builder) loadPlatformRelease(platformRelease *cores.PlatformRelease, platformPath *paths.Path) error {
 	// If the installed.json file is found load it, this is done to handle the
 	// case in which the platform's index and its url have been deleted locally,
 	// if we don't load it some information about the platform is lost
-	installedJSONPath := path.Join("installed.json")
-	platform.Timestamps.AddFile(installedJSONPath)
+	installedJSONPath := platformPath.Join("installed.json")
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
 			return errors.New(i18n.Tr("loading %[1]s: %[2]s", installedJSONPath, err))
 		}
 	}
 
-	// TODO: why CLONE?
-	platform.Properties = platform.Properties.Clone()
+	platformRelease.InstallDir = platformPath
+	platformRelease.Timestamps.AddFile(installedJSONPath)
+	platformRelease.Properties = platformRelease.Properties.Clone() // TODO: why CLONE?
 
 	// Create platform properties
-	platformTxtPath := path.Join("platform.txt")
-	platform.Timestamps.AddFile(platformTxtPath)
+	platformTxtPath := platformPath.Join("platform.txt")
+	platformRelease.Timestamps.AddFile(platformTxtPath)
 	if p, err := properties.SafeLoadFromPath(platformTxtPath); err == nil {
-		platform.Properties.Merge(p)
+		platformRelease.Properties.Merge(p)
 	} else {
 		return errors.New(i18n.Tr("loading %[1]s: %[2]s", platformTxtPath, err))
 	}
 
-	platformTxtLocalPath := path.Join("platform.local.txt")
-	platform.Timestamps.AddFile(platformTxtLocalPath)
+	platformTxtLocalPath := platformPath.Join("platform.local.txt")
+	platformRelease.Timestamps.AddFile(platformTxtLocalPath)
 	if p, err := properties.SafeLoadFromPath(platformTxtLocalPath); err == nil {
-		platform.Properties.Merge(p)
+		platformRelease.Properties.Merge(p)
 	} else {
 		return errors.New(i18n.Tr("loading %[1]s: %[2]s", platformTxtLocalPath, err))
 	}
 
-	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 || platform.Properties.SubTree("pluggable_monitor").Size() > 0 {
-		platform.PluggableDiscoveryAware = true
+	if platformRelease.Properties.SubTree("pluggable_discovery").Size() > 0 || platformRelease.Properties.SubTree("pluggable_monitor").Size() > 0 {
+		platformRelease.PluggableDiscoveryAware = true
 	} else {
-		platform.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
-		platform.Properties.Set("pluggable_discovery.required.1", "builtin:mdns-discovery")
-		platform.Properties.Set("pluggable_monitor.required.serial", "builtin:serial-monitor")
+		platformRelease.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
+		platformRelease.Properties.Set("pluggable_discovery.required.1", "builtin:mdns-discovery")
+		platformRelease.Properties.Set("pluggable_monitor.required.serial", "builtin:serial-monitor")
 	}
 
-	if platform.Name == "" {
-		if name, ok := platform.Properties.GetOk("name"); ok {
-			platform.Name = name
+	if platformRelease.Name == "" {
+		if name, ok := platformRelease.Properties.GetOk("name"); ok {
+			platformRelease.Name = name
 		} else {
 			// If the platform.txt file doesn't exist for this platform and it's not in any
 			// package index there is no way of retrieving its name, so we build one using
 			// the available information, that is the packager name and the architecture.
-			platform.Name = fmt.Sprintf("%s-%s", platform.Platform.Package.Name, platform.Platform.Architecture)
+			platformRelease.Name = fmt.Sprintf("%s-%s", platformRelease.Platform.Package.Name, platformRelease.Platform.Architecture)
 		}
 	}
 
 	// Create programmers properties
-	programmersTxtPath := path.Join("programmers.txt")
-	platform.Timestamps.AddFile(programmersTxtPath)
+	programmersTxtPath := platformPath.Join("programmers.txt")
+	platformRelease.Timestamps.AddFile(programmersTxtPath)
 	if programmersProperties, err := properties.SafeLoadFromPath(programmersTxtPath); err == nil {
 		for programmerID, programmerProps := range programmersProperties.FirstLevelOf() {
-			if !platform.PluggableDiscoveryAware {
+			if !platformRelease.PluggableDiscoveryAware {
 				convertUploadToolsToPluggableDiscovery(programmerProps)
 			}
-			platform.Programmers[programmerID] = pm.loadProgrammer(programmerProps)
-			platform.Programmers[programmerID].PlatformRelease = platform
+			platformRelease.Programmers[programmerID] = pm.loadProgrammer(programmerProps)
+			platformRelease.Programmers[programmerID].PlatformRelease = platformRelease
 		}
 	} else {
 		return err
 	}
 
-	if err := pm.loadBoards(platform); err != nil {
+	if err := pm.loadBoards(platformRelease); err != nil {
 		return errors.New(i18n.Tr("loading boards: %s", err))
 	}
 
-	if !platform.PluggableDiscoveryAware {
-		convertLegacyPlatformToPluggableDiscovery(platform)
+	if !platformRelease.PluggableDiscoveryAware {
+		convertLegacyPlatformToPluggableDiscovery(platformRelease)
 	}
 
 	// Build pluggable monitor references
-	platform.Monitors = map[string]*cores.MonitorDependency{}
-	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
+	platformRelease.Monitors = map[string]*cores.MonitorDependency{}
+	for protocol, ref := range platformRelease.Properties.SubTree("pluggable_monitor.required").AsMap() {
 		split := strings.Split(ref, ":")
 		if len(split) != 2 {
 			return errors.New(i18n.Tr("invalid pluggable monitor reference: %s", ref))
 		}
 		pm.log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
-		platform.Monitors[protocol] = &cores.MonitorDependency{
+		platformRelease.Monitors[protocol] = &cores.MonitorDependency{
 			Packager: split[0],
 			Name:     split[1],
 		}
 	}
 
 	// Support for pluggable monitors in debugging/development environments
-	platform.MonitorsDevRecipes = map[string]string{}
-	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
+	platformRelease.MonitorsDevRecipes = map[string]string{}
+	for protocol, recipe := range platformRelease.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
 		pm.log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
-		platform.MonitorsDevRecipes[protocol] = recipe
+		platformRelease.MonitorsDevRecipes[protocol] = recipe
 	}
 
 	return nil

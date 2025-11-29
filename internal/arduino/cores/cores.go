@@ -40,7 +40,7 @@ type Platform struct {
 	Architecture      string                                       // The name of the architecture of this package.
 	Releases          map[semver.NormalizedString]*PlatformRelease // The Releases of this platform, labeled by version.
 	Package           *Package                                     `json:"-"`
-	ManuallyInstalled bool                                         // true if the Platform has been installed without the CLI
+	ManuallyInstalled bool                                         // true if the Platform exists due to a manually installed release
 	Deprecated        bool                                         // true if the latest PlatformRelease of this Platform has been deprecated
 	Indexed           bool                                         // true if the Platform has been indexed from additional-urls
 	Latest            *semver.Version                              `json:"-"`
@@ -115,6 +115,11 @@ func (t *TimestampsStore) Dirty() bool {
 		}
 	}
 	return false
+}
+
+// IsManaged returns true if the platform release is managed by the package manager.
+func (release *PlatformRelease) IsManaged() bool {
+	return release.Version.String() != ""
 }
 
 // Dirty returns true if one of the files of this PlatformRelease has been changed
@@ -238,10 +243,10 @@ func (d *MonitorDependency) String() string {
 // GetOrCreateRelease returns the specified release corresponding the provided version,
 // or creates a new one if not found.
 func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformRelease {
-	var tag semver.NormalizedString
-	if version != nil {
-		tag = version.NormalizedString()
+	if version == nil {
+		version = semver.MustParse("")
 	}
+	tag := version.NormalizedString()
 	if release, ok := platform.Releases[tag]; ok {
 		return release
 	}
@@ -255,6 +260,13 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformR
 	}
 	platform.Releases[tag] = release
 	return release
+}
+
+// GetManuallyInstalledRelease returns (*PlatformRelease, true) if the Platform has
+// a manually installed release or (nil, false) otherwise.
+func (platform *Platform) GetManuallyInstalledRelease() (*PlatformRelease, bool) {
+	res, ok := platform.Releases[semver.MustParse("").NormalizedString()]
+	return res, ok
 }
 
 // FindReleaseWithVersion returns the specified release corresponding the provided version,

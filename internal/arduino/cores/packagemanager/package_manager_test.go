@@ -41,7 +41,7 @@ var dataDir1 = paths.New("testdata", "data_dir_1")
 var extraHardware = paths.New("testdata", "extra_hardware")
 
 func TestFindBoardWithFQBN(t *testing.T) {
-	pmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloader.GetDefaultConfig())
+	pmb := NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -57,116 +57,16 @@ func TestFindBoardWithFQBN(t *testing.T) {
 	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
 }
 
-func TestResolveFQBN(t *testing.T) {
+func TestResolveFQBNWithRefCores(t *testing.T) {
 	// Pass nil, since these paths are only used for installing
-	pmb := NewBuilder(nil, nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
+	pmb := NewBuilder(nil, nil, extraHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	// Hardware from main packages directory
 	pmb.LoadHardwareFromDirectory(dataDir1.Join("packages"))
-	// This contains the arduino:avr core
-	pmb.LoadHardwareFromDirectory(customHardware)
 	// This contains the referenced:avr core
 	pmb.LoadHardwareFromDirectory(extraHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()
-
-	t.Run("NormalizeFQBN", func(t *testing.T) {
-		testNormalization := func(in, expected string) {
-			fqbn, err := fqbn.Parse(in)
-			require.Nil(t, err)
-			require.NotNil(t, fqbn)
-			normalized, err := pme.NormalizeFQBN(fqbn)
-			if expected == "ERROR" {
-				require.Error(t, err)
-				require.Nil(t, normalized)
-			} else {
-				require.NoError(t, err)
-				require.NotNil(t, normalized)
-				require.Equal(t, expected, normalized.String())
-			}
-		}
-		testNormalization("arduino:avr:mega", "arduino:avr:mega")
-		testNormalization("arduino:avr:mega:cpu=atmega2560", "arduino:avr:mega")
-		testNormalization("arduino:avr:mega:cpu=atmega1280", "arduino:avr:mega:cpu=atmega1280")
-		testNormalization("esp8266:esp8266:generic:baud=57600,wipe=sdk", "esp8266:esp8266:generic:baud=57600,wipe=sdk")
-		testNormalization("esp8266:esp8266:generic:baud=115200,wipe=sdk", "esp8266:esp8266:generic:wipe=sdk")
-		testNormalization("arduino:avr:mega:cpu=nonexistent", "ERROR")
-		testNormalization("arduino:avr:mega:nonexistent=blah", "ERROR")
-	})
-
-	t.Run("BoardAndBuildPropertiesArduinoUno", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("arduino:avr:uno")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.NotNil(t, platformRelease)
-		require.NotNil(t, platformRelease.Platform)
-		require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
-		require.NotNil(t, board)
-		require.Equal(t, board.Name(), "Arduino Uno")
-		require.NotNil(t, props)
-		require.Equal(t, platformRelease, buildPlatformRelease)
-
-		require.Equal(t, "arduino", pkg.Name)
-		require.Equal(t, "avr", platformRelease.Platform.Architecture)
-		require.Equal(t, "uno", board.BoardID)
-		require.Equal(t, "atmega328p", props.Get("build.mcu"))
-	})
-
-	t.Run("BoardAndBuildPropertiesArduinoMega", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("arduino:avr:mega")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.NotNil(t, platformRelease)
-		require.NotNil(t, platformRelease.Platform)
-		require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
-		require.NotNil(t, board)
-		require.Equal(t, board.Name(), "Arduino Mega or Mega 2560")
-		require.NotNil(t, props)
-		require.Equal(t, platformRelease, buildPlatformRelease)
-	})
-
-	t.Run("BoardAndBuildPropertiesArduinoMegaWithNonDefaultCpuOption", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("arduino:avr:mega:cpu=atmega1280")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.NotNil(t, platformRelease)
-		require.NotNil(t, platformRelease.Platform)
-		require.Equal(t, platformRelease, buildPlatformRelease)
-
-		require.Equal(t, "arduino", pkg.Name)
-		require.Equal(t, "avr", platformRelease.Platform.Architecture)
-		require.Equal(t, "mega", board.BoardID)
-		require.Equal(t, "atmega1280", props.Get("build.mcu"))
-		require.Equal(t, "AVR_MEGA", props.Get("build.board"))
-	})
-
-	t.Run("BoardAndBuildPropertiesArduinoMegaWithDefaultCpuOption", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("arduino:avr:mega:cpu=atmega2560")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.NotNil(t, platformRelease)
-		require.NotNil(t, platformRelease.Platform)
-		require.Equal(t, platformRelease, buildPlatformRelease)
-
-		require.Equal(t, "arduino", pkg.Name)
-		require.Equal(t, "avr", platformRelease.Platform.Architecture)
-		require.Equal(t, "mega", board.BoardID)
-		require.Equal(t, "atmega2560", props.Get("build.mcu"))
-		require.Equal(t, "AVR_MEGA2560", props.Get("build.board"))
-
-	})
 
 	t.Run("BoardAndBuildPropertiesForReferencedArduinoUno", func(t *testing.T) {
 		// Test a board referenced from the main AVR arduino platform
@@ -185,53 +85,6 @@ func TestResolveFQBN(t *testing.T) {
 		require.NotNil(t, buildPlatformRelease)
 		require.NotNil(t, buildPlatformRelease.Platform)
 		require.Equal(t, buildPlatformRelease.Platform.String(), "arduino:avr")
-	})
-
-	t.Run("BoardAndBuildPropertiesForArduinoDue", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("arduino:sam:arduino_due_x")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.Equal(t, platformRelease, buildPlatformRelease)
-
-		require.Equal(t, "arduino", pkg.Name)
-		require.Equal(t, "sam", platformRelease.Platform.Architecture)
-		require.Equal(t, "arduino_due_x", board.BoardID)
-		require.Equal(t, "cortex-m3", props.Get("build.mcu"))
-	})
-
-	t.Run("BoardAndBuildPropertiesForCustomArduinoYun", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("my_avr_platform:avr:custom_yun")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.NotEqual(t, platformRelease, buildPlatformRelease)
-
-		require.Equal(t, "my_avr_platform", pkg.Name)
-		require.Equal(t, "avr", platformRelease.Platform.Architecture)
-		require.Equal(t, "custom_yun", board.BoardID)
-		require.Equal(t, "atmega32u4", props.Get("build.mcu"))
-		require.Equal(t, "AVR_YUN", props.Get("build.board"))
-	})
-
-	t.Run("BoardAndBuildPropertiesForWatterotCore", func(t *testing.T) {
-		fqbn, err := fqbn.Parse("watterott:avr:attiny841:core=spencekonde,info=info")
-		require.Nil(t, err)
-		require.NotNil(t, fqbn)
-		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
-		require.Nil(t, err)
-		require.Equal(t, pkg, platformRelease.Platform.Package)
-		require.Equal(t, platformRelease, buildPlatformRelease)
-
-		require.Equal(t, "watterott", pkg.Name)
-		require.Equal(t, "avr", platformRelease.Platform.Architecture)
-		require.Equal(t, "attiny841", board.BoardID)
-		require.Equal(t, "tiny841", props.Get("build.core"))
-		require.Equal(t, "tiny14", props.Get("build.variant"))
 	})
 
 	t.Run("BoardAndBuildPropertiesForReferencedFeatherM0", func(t *testing.T) {
@@ -307,6 +160,163 @@ func TestResolveFQBN(t *testing.T) {
 		require.NotNil(t, buildPlatformRelease.Platform)
 		require.Equal(t, buildPlatformRelease.Platform.String(), "arduino:avr")
 	})
+}
+
+func TestResolveFQBN(t *testing.T) {
+	// Pass nil, since these paths are only used for installing
+	pmb := NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
+	// Hardware from main packages directory
+	pmb.LoadHardwareFromDirectory(dataDir1.Join("packages"))
+	// This contains the arduino:avr core
+	pmb.LoadHardwareFromDirectory(customHardware)
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	t.Run("NormalizeFQBN", func(t *testing.T) {
+		testNormalization := func(in, expected string) {
+			fqbn, err := fqbn.Parse(in)
+			require.Nil(t, err)
+			require.NotNil(t, fqbn)
+			normalized, err := pme.NormalizeFQBN(fqbn)
+			if expected == "ERROR" {
+				require.Error(t, err)
+				require.Nil(t, normalized)
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, normalized)
+				require.Equal(t, expected, normalized.String())
+			}
+		}
+		testNormalization("arduino:avr:mega", "arduino:avr:mega")
+		testNormalization("arduino:avr:mega:cpu=atmega2560", "arduino:avr:mega")
+		testNormalization("arduino:avr:mega:cpu=atmega1280", "arduino:avr:mega:cpu=atmega1280")
+		testNormalization("esp8266:esp8266:generic:CpuFrequency=80", "esp8266:esp8266:generic")
+		testNormalization("esp8266:esp8266:generic:CpuFrequency=160", "esp8266:esp8266:generic:CpuFrequency=160")
+		testNormalization("arduino:avr:mega:cpu=nonexistent", "ERROR")
+		testNormalization("arduino:avr:mega:nonexistent=blah", "ERROR")
+	})
+
+	t.Run("BoardAndBuildPropertiesArduinoUno", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("arduino:avr:uno")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.NotNil(t, platformRelease)
+		require.NotNil(t, platformRelease.Platform)
+		require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
+		require.NotNil(t, board)
+		require.Equal(t, board.Name(), "Arduino/Genuino Uno")
+		require.NotNil(t, props)
+		require.Equal(t, platformRelease, buildPlatformRelease)
+
+		require.Equal(t, "arduino", pkg.Name)
+		require.Equal(t, "avr", platformRelease.Platform.Architecture)
+		require.Equal(t, "uno", board.BoardID)
+		require.Equal(t, "atmega328p", props.Get("build.mcu"))
+	})
+
+	t.Run("BoardAndBuildPropertiesArduinoMega", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("arduino:avr:mega")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.NotNil(t, platformRelease)
+		require.NotNil(t, platformRelease.Platform)
+		require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
+		require.NotNil(t, board)
+		require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
+		require.NotNil(t, props)
+		require.Equal(t, platformRelease, buildPlatformRelease)
+	})
+
+	t.Run("BoardAndBuildPropertiesArduinoMegaWithNonDefaultCpuOption", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("arduino:avr:mega:cpu=atmega1280")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.NotNil(t, platformRelease)
+		require.NotNil(t, platformRelease.Platform)
+		require.Equal(t, platformRelease, buildPlatformRelease)
+
+		require.Equal(t, "arduino", pkg.Name)
+		require.Equal(t, "avr", platformRelease.Platform.Architecture)
+		require.Equal(t, "mega", board.BoardID)
+		require.Equal(t, "atmega1280", props.Get("build.mcu"))
+		require.Equal(t, "AVR_MEGA", props.Get("build.board"))
+	})
+
+	t.Run("BoardAndBuildPropertiesArduinoMegaWithDefaultCpuOption", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("arduino:avr:mega:cpu=atmega2560")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.NotNil(t, platformRelease)
+		require.NotNil(t, platformRelease.Platform)
+		require.Equal(t, platformRelease, buildPlatformRelease)
+
+		require.Equal(t, "arduino", pkg.Name)
+		require.Equal(t, "avr", platformRelease.Platform.Architecture)
+		require.Equal(t, "mega", board.BoardID)
+		require.Equal(t, "atmega2560", props.Get("build.mcu"))
+		require.Equal(t, "AVR_MEGA2560", props.Get("build.board"))
+
+	})
+
+	t.Run("BoardAndBuildPropertiesForArduinoDue", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("arduino:sam:arduino_due_x")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.Equal(t, platformRelease, buildPlatformRelease)
+
+		require.Equal(t, "arduino", pkg.Name)
+		require.Equal(t, "sam", platformRelease.Platform.Architecture)
+		require.Equal(t, "arduino_due_x", board.BoardID)
+		require.Equal(t, "cortex-m3", props.Get("build.mcu"))
+	})
+
+	t.Run("BoardAndBuildPropertiesForCustomArduinoYun", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("my_avr_platform:avr:custom_yun")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.NotEqual(t, platformRelease, buildPlatformRelease)
+
+		require.Equal(t, "my_avr_platform", pkg.Name)
+		require.Equal(t, "avr", platformRelease.Platform.Architecture)
+		require.Equal(t, "custom_yun", board.BoardID)
+		require.Equal(t, "atmega32u4", props.Get("build.mcu"))
+		require.Equal(t, "AVR_YUN", props.Get("build.board"))
+	})
+
+	t.Run("BoardAndBuildPropertiesForWatterotCore", func(t *testing.T) {
+		fqbn, err := fqbn.Parse("watterott:avr:attiny841:core=spencekonde,info=info")
+		require.Nil(t, err)
+		require.NotNil(t, fqbn)
+		pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
+		require.Nil(t, err)
+		require.Equal(t, pkg, platformRelease.Platform.Package)
+		require.Equal(t, platformRelease, buildPlatformRelease)
+
+		require.Equal(t, "watterott", pkg.Name)
+		require.Equal(t, "avr", platformRelease.Platform.Architecture)
+		require.Equal(t, "attiny841", board.BoardID)
+		require.Equal(t, "tiny841", props.Get("build.core"))
+		require.Equal(t, "tiny14", props.Get("build.variant"))
+	})
 
 	t.Run("AddBuildBoardPropertyIfMissing", func(t *testing.T) {
 		fqbn, err := fqbn.Parse("my_avr_platform:avr:mymega")
@@ -344,7 +354,7 @@ func TestResolveFQBN(t *testing.T) {
 }
 
 func TestBoardOptionsFunctions(t *testing.T) {
-	pmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloader.GetDefaultConfig())
+	pmb := NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -617,7 +627,7 @@ func TestIndexMerger(t *testing.T) {
 }
 
 func TestIdentifyBoard(t *testing.T) {
-	pmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloader.GetDefaultConfig())
+	pmb := NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -644,12 +654,12 @@ func TestIdentifyBoard(t *testing.T) {
 
 func TestPackageManagerClear(t *testing.T) {
 	// Create a PackageManager and load the harware
-	pmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloader.GetDefaultConfig())
+	pmb := NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 
 	// Creates another PackageManager but don't load the hardware
-	emptyPmb := NewBuilder(customHardware, customHardware, nil, customHardware, customHardware, "test", downloader.GetDefaultConfig())
+	emptyPmb := NewBuilder(nil, nil, customHardware, nil, nil, "test", downloader.GetDefaultConfig())
 	emptyPm := emptyPmb.Build()
 
 	// Verifies they're not equal

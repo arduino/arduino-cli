@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -52,12 +51,16 @@ func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
 		"platforms": [
 			{
 				"id":"DxCore-dev:megaavr",
+				"manually_installed": true,
 				"installed_version":"1.4.10",
 				"releases": {
-					"1.4.10": {
+					"": {
 						"name":"DxCore"
 					}
-				}
+				},
+				"installed_version": "",
+				"latest_version": "",
+				"has_manually_installed_release": true
 			}
 		]
 	}`)
@@ -512,63 +515,9 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "arduino-beta-development:avr",
-			"latest_version": "1.8.3",
+			"latest_version": "",
 			"releases": {
-				"1.8.3": {
-					"name": "Arduino AVR Boards"
-				}
-			}
-		}
-	]}`)
-}
-
-func TestCoreListShowsLatestVersionWhenMultipleReleasesOfAManuallyInstalledCoreArePresent(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Verifies only cores in board manager are shown
-	stdout, _, err := cli.Run("core", "list", "--all", "--json")
-	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.platforms | length > 0`, `true`)
-	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".platforms | length").String())
-	require.NoError(t, err)
-
-	// Manually installs a core in sketchbooks hardware folder
-	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
-	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
-	_, err = git.PlainClone(filepath.Join(repoDir.String(), "1.8.3"), false, &git.CloneOptions{
-		URL:           gitUrl,
-		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
-	})
-	require.NoError(t, err)
-
-	tmp := paths.New(t.TempDir(), "1.8.4")
-	_, err = git.PlainClone(tmp.String(), false, &git.CloneOptions{
-		URL:           gitUrl,
-		ReferenceName: plumbing.NewTagReferenceName("1.8.4"),
-	})
-	require.NoError(t, err)
-
-	err = tmp.Rename(repoDir.Join("1.8.4"))
-	require.NoError(t, err)
-
-	// When manually installing 2 releases of the same core, the newest one takes precedence
-	stdout, _, err = cli.Run("core", "list", "--all", "--json")
-	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.platforms | length`, fmt.Sprint(length+1))
-	requirejson.Contains(t, stdout, `{"platforms":[
-		{
-			"id": "arduino-beta-development:avr",
-			"latest_version": "1.8.4",
-			"installed_version": "1.8.4",
-			"releases": {
-				"1.8.3": {
-					"name": "Arduino AVR Boards"
-				},
-				"1.8.3": {
+				"": {
 					"name": "Arduino AVR Boards"
 				}
 			}
@@ -606,12 +555,15 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 	requirejson.Contains(t, stdout, `{"platforms":[
 		{
 			"id": "arduino-beta-development:avr",
-			"latest_version": "1.8.3",
+			"manually_installed": true,
+			"installed_version": "",
+			"latest_version": "",
 			"releases": {
-				"1.8.3": {
+				"": {
 					"name": "Arduino AVR Boards"
 				}
-			}
+			},
+			"has_manually_installed_release": true
 		}
 	]}`)
 }
@@ -1009,7 +961,7 @@ func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
 		{
 			"id": "arduino-beta-dev:platform_with_missing_custom_board_options",
 			"releases": {
-				"4.2.0": {
+				"": {
 					"boards": [
 						{
 							"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:nessuno"
@@ -1382,4 +1334,51 @@ func TestCoreInstallWithMissingOrInvalidChecksumAndUnsafeInstallEnabled(t *testi
 		map[string]string{"ARDUINO_BOARD_MANAGER_ENABLE_UNSAFE_INSTALL": "true"},
 		"--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "install", "GD32Community:gd32")
 	require.NoError(t, err)
+}
+
+func TestCoreOverrideIfInstalledInSketchbook(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install avr@1.8.5
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.5")
+	require.NoError(t, err)
+
+	// Copy it in the sketchbook hardware folder (simulate a user installed core)
+	avrCore := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5")
+	avrCoreCopy := cli.SketchbookDir().Join("hardware", "arduino", "avr")
+	require.NoError(t, avrCoreCopy.Parent().MkdirAll())
+	require.NoError(t, avrCore.CopyDirTo(avrCoreCopy))
+
+	// Install avr@1.8.6
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	// List cores and check that version 1.8.5 is listed
+	stdout, _, err := cli.Run("core", "list", "--json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{
+		"platforms": [
+			{
+				"id": "arduino:avr",
+				"indexed": true,
+				"releases" : {
+					"": {
+						"name": "Arduino AVR Boards",
+						"installed": true
+					},
+					"1.8.6": {
+						"name": "Arduino AVR Boards",
+						"installed": true
+					}
+				},
+				"installed_version": "1.8.6",
+				"latest_version": "1.8.6",
+				"has_manually_installed_release": true
+			}
+		]
+	}`)
 }

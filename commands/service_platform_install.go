@@ -78,6 +78,7 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 			PlatformArchitecture: req.GetArchitecture(),
 			PlatformVersion:      version,
 		}
+		fmt.Println(ref)
 		platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
 		if err != nil {
 			if errors.Is(err, packagemanager.ErrPlatformNotAvailableForOS) {

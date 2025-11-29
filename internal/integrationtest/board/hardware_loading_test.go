@@ -182,9 +182,9 @@ func TestHardwareLoading(t *testing.T) {
 				"platforms": [
 					{
 						"id": "my_avr_platform:avr",
-						"installed_version": "9.9.9",
+						"installed_version": "",
 						"releases": {
-							"9.9.9": {
+							"": {
 								"name": "My AVR Boards",
 								"boards": [
 									{
@@ -207,7 +207,7 @@ func TestHardwareLoading(t *testing.T) {
 							"id": "my_symlinked_avr_platform:avr",
 							"manually_installed": true,
 							"releases": {
-								"9.9.9": {
+								"": {
 								}
 							}
 						}

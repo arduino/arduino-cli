@@ -40,16 +40,17 @@ func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 	releases.SortKeys((*semver.Version).CompareTo)
 
 	return &PlatformSummary{
-		Id:                in.GetMetadata().GetId(),
-		Maintainer:        in.GetMetadata().GetMaintainer(),
-		Website:           in.GetMetadata().GetWebsite(),
-		Email:             in.GetMetadata().GetEmail(),
-		ManuallyInstalled: in.GetMetadata().GetManuallyInstalled(),
-		Deprecated:        in.GetMetadata().GetDeprecated(),
-		Indexed:           in.GetMetadata().GetIndexed(),
-		Releases:          releases,
-		InstalledVersion:  semver.MustParse(in.GetInstalledVersion()),
-		LatestVersion:     semver.MustParse(in.GetLatestVersion()),
+		Id:                          in.GetMetadata().GetId(),
+		Maintainer:                  in.GetMetadata().GetMaintainer(),
+		Website:                     in.GetMetadata().GetWebsite(),
+		Email:                       in.GetMetadata().GetEmail(),
+		ManuallyInstalled:           in.GetMetadata().GetManuallyInstalled(),
+		Deprecated:                  in.GetMetadata().GetDeprecated(),
+		Indexed:                     in.GetMetadata().GetIndexed(),
+		Releases:                    releases,
+		InstalledVersion:            semver.MustParse(in.GetInstalledVersion()),
+		LatestVersion:               semver.MustParse(in.GetLatestVersion()),
+		HasManuallyInstalledRelease: in.GetHasManuallyInstalledRelease(),
 	}
 }
 
@@ -65,8 +66,9 @@ type PlatformSummary struct {
 
 	Releases orderedmap.Map[*semver.Version, *PlatformRelease] `json:"releases,omitempty"`
 
-	InstalledVersion *semver.Version `json:"installed_version,omitempty"`
-	LatestVersion    *semver.Version `json:"latest_version,omitempty"`
+	InstalledVersion            *semver.Version `json:"installed_version,omitempty"`
+	LatestVersion               *semver.Version `json:"latest_version,omitempty"`
+	HasManuallyInstalledRelease bool            `json:"has_manually_installed_release,omitempty"`
 }
 
 // GetLatestRelease returns the latest relase of this platform or nil if none available.
