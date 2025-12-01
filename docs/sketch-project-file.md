@@ -59,12 +59,12 @@ otherwise below). The available fields are:
 - `libraries:` is a section where the required libraries to build the project are defined. This section is optional.
   - `<INDEX_LIB_NAME> (<INDEX_LIB_VERSION>)` represents a library from the Arduino Libraries Index that is a direct
     dependency of the sketch, for example, `MyLib (1.0.0)`.
-  - `dependency: <INDEX_LIB_NAME> (<INDEX_LIB_VERSION>)` represents a library from the Arduino Libraries Index that is
-    an "indirect dependency", i.e., a library that is not used directly by the sketch, but is required by other
-    libraries used by the sketch. For example, if `LibUsedInSketch` requires `UtilLib`, this information can be recorded
-    in the profile with the declaration `dependency: UtilLib (1.3.4)`. During sketch compilation, a dependency library
-    is treated the same as a non-dependency library; the only difference is in automatic library management, where a
-    dependency library can be installed or removed together with the library that uses it.
+  - `dependency: <INDEX_LIB_NAME> (<INDEX_LIB_VERSION>)` represents a library from the Arduino Libraries Index that is a
+    "transitive dependency", i.e., a library that is not used directly by the sketch, but is required by other libraries
+    used by the sketch. For example, if `LibUsedInSketch` requires `UtilLib`, this information can be recorded in the
+    profile with the declaration `dependency: UtilLib (1.3.4)`. During sketch compilation, a `dependency` library is
+    treated the same as a non-`dependency` library; the only difference is in automatic library management, where a
+    `dependency` library can be installed or removed together with the library that uses it.
   - `dir: <LOCAL_LIB_PATH>` represents a library installed in the filesystem and `<LOCAL_LIB_PATH>` is the path to the
     library. The path could be absolute or relative to the sketch folder. This option is available since Arduino CLI
     1.3.0.
