@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"cmp"
 	"context"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -33,10 +34,7 @@ func (s *arduinoCoreServerImpl) ProfileLibList(ctx context.Context, req *rpc.Pro
 	}
 
 	// If no profile is specified, try to use the default one
-	profileName := sk.Project.DefaultProfile
-	if req.GetProfileName() != "" {
-		profileName = req.GetProfileName()
-	}
+	profileName := cmp.Or(req.GetProfileName(), sk.Project.DefaultProfile)
 	if profileName == "" {
 		return nil, &cmderrors.MissingProfileError{}
 	}

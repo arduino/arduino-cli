@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"cmp"
 	"context"
 	"slices"
 
@@ -37,10 +38,7 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 	}
 
 	// If no profile is specified, try to use the default one
-	profileName := sk.Project.DefaultProfile
-	if req.GetProfileName() != "" {
-		profileName = req.GetProfileName()
-	}
+	profileName := cmp.Or(req.GetProfileName(), sk.Project.DefaultProfile)
 	if profileName == "" {
 		return nil, &cmderrors.MissingProfileError{}
 	}
