@@ -34,7 +34,6 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 	if err != nil {
 		return nil, err
 	}
-	projectFilePath := sk.GetProjectPath()
 
 	// If no profile is specified, try to use the default one
 	profileName := sk.Project.DefaultProfile
@@ -112,8 +111,8 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 		}
 	}
 
-	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
-	if err != nil {
+	projectFilePath := sk.GetProjectPath()
+	if err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml())); err != nil {
 		return nil, &cmderrors.CantUpdateSketchError{Cause: err}
 	}
 

@@ -35,7 +35,6 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 	if err != nil {
 		return nil, err
 	}
-	projectFilePath := sk.GetProjectPath()
 
 	// If no profile is specified, try to use the default one
 	profileName := sk.Project.DefaultProfile
@@ -129,8 +128,8 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 		return nil, &cmderrors.InvalidArgumentError{Message: "library must be specified"}
 	}
 
-	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
-	if err != nil {
+	projectFilePath := sk.GetProjectPath()
+	if err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml())); err != nil {
 		return nil, err
 	}
 
