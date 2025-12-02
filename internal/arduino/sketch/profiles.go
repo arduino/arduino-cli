@@ -22,8 +22,10 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -125,6 +127,27 @@ func (p *Profile) RequireSystemInstalledPlatform() bool {
 	return p.Platforms[0].RequireSystemInstalledPlatform()
 }
 
+func (p *Profile) GetLibrary(libraryName string) (*ProfileLibraryReference, error) {
+	for _, l := range p.Libraries {
+		if l.Library == libraryName {
+			return l, nil
+		}
+	}
+	return nil, &cmderrors.LibraryNotFoundError{Library: libraryName}
+}
+
+// RemoveLibrary removes a library from this profile and returns the removed ProfileLibraryReference.
+// If the library is not found, an error is returned.
+func (p *Profile) RemoveLibrary(library *ProfileLibraryReference) (*ProfileLibraryReference, error) {
+	i := slices.IndexFunc(p.Libraries, library.Match)
+	if i == -1 {
+		return nil, &cmderrors.LibraryNotFoundError{Library: library.String()}
+	}
+	removedLib := p.Libraries[i]
+	p.Libraries = slices.Delete(p.Libraries, i, i+1)
+	return removedLib, nil
+}
+
 // ToRpc converts this Profile to an rpc.SketchProfile
 func (p *Profile) ToRpc() *rpc.SketchProfile {
 	var portConfig *rpc.MonitorPortConfiguration
@@ -180,6 +203,9 @@ type ProfileRequiredPlatforms []*ProfilePlatformReference
 
 // AsYaml outputs the required platforms as Yaml
 func (p *ProfileRequiredPlatforms) AsYaml() string {
+	if len(*p) == 0 {
+		return "    platforms: []\n"
+	}
 	res := "    platforms:\n"
 	for _, platform := range *p {
 		res += platform.AsYaml()
@@ -324,34 +350,45 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 
 // ProfileLibraryReference is a reference to a library
 type ProfileLibraryReference struct {
-	Library    string
-	InstallDir *paths.Path
-	Version    *semver.Version
+	Library      string
+	Version      *semver.Version
+	IsDependency bool
+	InstallDir   *paths.Path
 }
 
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var dataMap map[string]any
+	var libReference string
 	if err := unmarshal(&dataMap); err == nil {
-		if installDir, ok := dataMap["dir"]; !ok {
-			return errors.New(i18n.Tr("invalid library reference: %s", dataMap))
-		} else if installDir, ok := installDir.(string); !ok {
-			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference: %s"), dataMap)
+		if installDir, ok := dataMap["dir"]; ok {
+			if installDir, ok := installDir.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
+			} else {
+				l.InstallDir = paths.New(installDir)
+				l.Library = l.InstallDir.Base()
+				return nil
+			}
+		} else if depLib, ok := dataMap["dependency"]; ok {
+			if libReference, ok = depLib.(string); !ok {
+				return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
+			}
+			l.IsDependency = true
+			// Fallback
 		} else {
-			l.InstallDir = paths.New(installDir)
-			l.Library = l.InstallDir.Base()
-			return nil
+			return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), dataMap)
 		}
+	} else if err := unmarshal(&libReference); err != nil {
+		return err
+	} else {
+		l.IsDependency = false
 	}
 
-	var data string
-	if err := unmarshal(&data); err != nil {
-		return err
-	}
-	if libName, libVersion, ok := parseNameAndVersion(data); !ok {
-		return fmt.Errorf("%s %s", i18n.Tr("invalid library directive:"), data)
+	// Parse reference in the format "LIBRARY_NAME (VERSION)"
+	if libName, libVersion, ok := parseNameAndVersion(libReference); !ok {
+		return fmt.Errorf("%s: %s", i18n.Tr("invalid library reference"), libReference)
 	} else if v, err := semver.Parse(libVersion); err != nil {
-		return fmt.Errorf("%s %w", i18n.Tr("invalid version:"), err)
+		return fmt.Errorf("%s: %w", i18n.Tr("invalid version"), err)
 	} else {
 		l.Library = libName
 		l.Version = v
@@ -364,21 +401,100 @@ func (l *ProfileLibraryReference) AsYaml() string {
 	if l.InstallDir != nil {
 		return fmt.Sprintf("      - dir: %s\n", l.InstallDir)
 	}
-	return fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
+	dep := ""
+	if l.IsDependency {
+		dep = "dependency: "
+	}
+	return fmt.Sprintf("      - %s%s (%s)\n", dep, l.Library, l.Version)
 }
 
 func (l *ProfileLibraryReference) String() string {
 	if l.InstallDir != nil {
-		return fmt.Sprintf("%s@dir:%s", l.Library, l.InstallDir)
+		return "@dir:" + l.InstallDir.String()
 	}
-	return fmt.Sprintf("%s@%s", l.Library, l.Version)
+	dep := ""
+	if l.IsDependency {
+		dep = " (dep)"
+	}
+	if l.Version == nil {
+		return l.Library + dep
+	}
+	return fmt.Sprintf("%s@%s%s", l.Library, l.Version, dep)
+}
+
+// Match checks if this library reference matches another one.
+// If one reference has the version not set, it matches any version of the other reference.
+func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
+	if l.InstallDir != nil {
+		return other.InstallDir != nil && l.InstallDir.EqualsTo(other.InstallDir)
+	}
+	if other.InstallDir != nil {
+		return false
+	}
+	if l.Library != other.Library {
+		return false
+	}
+	if l.Version == nil || other.Version == nil {
+		return true
+	}
+	return l.Version.Equal(other.Version)
+}
+
+// ToRpc converts this ProfileLibraryReference to an rpc.ProfileLibraryReference
+func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
+	if l.InstallDir != nil {
+		return &rpc.ProfileLibraryReference{
+			Library: &rpc.ProfileLibraryReference_LocalLibrary_{
+				LocalLibrary: &rpc.ProfileLibraryReference_LocalLibrary{
+					Path: l.InstallDir.String(),
+				},
+			},
+		}
+	}
+	return &rpc.ProfileLibraryReference{
+		Library: &rpc.ProfileLibraryReference_IndexLibrary_{
+			IndexLibrary: &rpc.ProfileLibraryReference_IndexLibrary{
+				Name:         l.Library,
+				Version:      l.Version.String(),
+				IsDependency: l.IsDependency,
+			},
+		},
+	}
+}
+
+// FromRpcProfileLibraryReference converts an rpc.ProfileLibraryReference to a ProfileLibraryReference
+func FromRpcProfileLibraryReference(l *rpc.ProfileLibraryReference) (*ProfileLibraryReference, error) {
+	if localLib := l.GetLocalLibrary(); localLib != nil {
+		path := paths.New(localLib.GetPath())
+		if path == nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
+		}
+		return &ProfileLibraryReference{InstallDir: path}, nil
+	}
+	if indexLib := l.GetIndexLibrary(); indexLib != nil {
+		var version *semver.Version
+		if indexLib.GetVersion() != "" {
+			v, err := semver.Parse(indexLib.GetVersion())
+			if err != nil {
+				return nil, &cmderrors.InvalidVersionError{Cause: err}
+			}
+			version = v
+		}
+		return &ProfileLibraryReference{
+			Library:      indexLib.GetName(),
+			Version:      version,
+			IsDependency: indexLib.GetIsDependency(),
+		}, nil
+	}
+	return nil, &cmderrors.InvalidArgumentError{Message: "library not specified"}
 }
 
 // InternalUniqueIdentifier returns the unique identifier for this object
 func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
 	f.Assert(l.InstallDir == nil,
 		"InternalUniqueIdentifier should not be called for library references with an install directory")
-	id := l.String()
+
+	id := l.Library + "@" + l.Version.String()
 	h := sha256.Sum256([]byte(id))
 	res := fmt.Sprintf("%s_%s", id, hex.EncodeToString(h[:])[:16])
 	return utils.SanitizeName(res)

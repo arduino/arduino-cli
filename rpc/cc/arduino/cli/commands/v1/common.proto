@@ -237,3 +237,24 @@ message SketchProfile {
   // Default Protocol in this profile.
   string protocol = 6;
 }
+
+message ProfileLibraryReference {
+  message IndexLibrary {
+    // Name of the library.
+    string name = 1;
+    // Version of the library if taken from the Library Index.
+    string version = 2;
+    // If true, this library is marked as a dependency.
+    bool is_dependency = 3;
+  }
+  message LocalLibrary {
+    // Absolute path to the library.
+    string path = 1;
+  }
+  oneof library {
+    // The library is installed from the Library Index.
+    IndexLibrary index_library = 1;
+    // The library is a local library.
+    LocalLibrary local_library = 2;
+  }
+}

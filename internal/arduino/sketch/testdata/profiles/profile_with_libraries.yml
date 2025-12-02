@@ -1,0 +1,12 @@
+profiles:
+  giga:
+    fqbn: arduino:mbed_giga:giga
+    platforms:
+      - platform: arduino:mbed_giga (4.3.1)
+    libraries:
+      - FlashStorage (1.2.3)
+      - dir: /path/to/system/lib
+      - dir: path/to/sketch/lib
+      - dependency: DependencyLib (2.3.4)
+
+default_profile: giga_any
