@@ -1507,6 +1507,7 @@ multiple profiles.</p>
         platform_index_url: &lt;3RD_PARTY_PLATFORM_DEPENDENCY_URL&gt;
     libraries:
       - &lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)
+      - dependency: &lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)
       - dir: &lt;LOCAL_LIB_PATH&gt;
     port: &lt;PORT_NAME&gt;
     port_config:
@@ -1528,8 +1529,14 @@ otherwise below). The available fields are:</p>
   information as <code>&lt;PLATFORM&gt;</code>, <code>&lt;PLATFORM_VERSION&gt;</code>, and <code>&lt;3RD_PARTY_PLATFORM_URL&gt;</code> respectively but for the core
   platform dependency of the main core platform. These fields are optional.</li>
 <li><code>libraries:</code> is a section where the required libraries to build the project are defined. This section is optional.<ul>
-<li><code>&lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)</code> represents a library from the Arduino Libraries Index, for example,
-  <code>MyLib (1.0.0)</code>.</li>
+<li><code>&lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)</code> represents a library from the Arduino Libraries Index that is a direct
+  dependency of the sketch, for example, <code>MyLib (1.0.0)</code>.</li>
+<li><code>dependency: &lt;INDEX_LIB_NAME&gt; (&lt;INDEX_LIB_VERSION&gt;)</code> represents a library from the Arduino Libraries Index that is a
+  "transitive dependency", i.e., a library that is not used directly by the sketch, but is required by other libraries
+  used by the sketch. For example, if <code>LibUsedInSketch</code> requires <code>UtilLib</code>, this information can be recorded in the
+  profile with the declaration <code>dependency: UtilLib (1.3.4)</code>. During sketch compilation, a <code>dependency</code> library is
+  treated the same as a non-<code>dependency</code> library; the only difference is in automatic library management, where a
+  <code>dependency</code> library can be installed or removed together with the library that uses it.</li>
 <li><code>dir: &lt;LOCAL_LIB_PATH&gt;</code> represents a library installed in the filesystem and <code>&lt;LOCAL_LIB_PATH&gt;</code> is the path to the
   library. The path could be absolute or relative to the sketch folder. This option is available since Arduino CLI
   1.3.0.</li>
