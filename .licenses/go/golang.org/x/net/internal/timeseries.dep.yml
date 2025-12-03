@@ -1,12 +1,12 @@
 ---
 name: golang.org/x/net/internal/timeseries
-version: v0.46.1-0.20251013234738-63d1a5100f82
+version: v0.47.0
 type: go
 summary: Package timeseries implements a time series structure for stats collection.
 homepage: https://pkg.go.dev/golang.org/x/net/internal/timeseries
 license: bsd-3-clause
 licenses:
-- sources: net@v0.46.1-0.20251013234738-63d1a5100f82/LICENSE
+- sources: net@v0.47.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: net@v0.46.1-0.20251013234738-63d1a5100f82/PATENTS
+- sources: net@v0.47.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
