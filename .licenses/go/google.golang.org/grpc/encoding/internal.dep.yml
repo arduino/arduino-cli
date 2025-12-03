@@ -1,13 +1,12 @@
 ---
-name: google.golang.org/grpc/balancer/pickfirst/pickfirstleaf
-version: v1.76.0
+name: google.golang.org/grpc/encoding/internal
+version: v1.77.0
 type: go
-summary: Package pickfirstleaf contains the pick_first load balancing policy which
-  will be the universal leaf policy after dualstack changes are implemented.
-homepage: https://pkg.go.dev/google.golang.org/grpc/balancer/pickfirst/pickfirstleaf
+summary: Package internal contains code internal to the encoding package.
+homepage: https://pkg.go.dev/google.golang.org/grpc/encoding/internal
 license: apache-2.0
 licenses:
-- sources: grpc@v1.76.0/LICENSE
+- sources: grpc@v1.77.0/LICENSE
   text: |2
 
                                      Apache License
