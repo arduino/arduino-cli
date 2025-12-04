@@ -29,7 +29,9 @@ import (
 )
 
 func initProfileCreateCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
-	var defaultProfile bool
+	var setAsDefault bool
+	var fqbnArg arguments.Fqbn
+	var profileArg arguments.Profile
 	initCommand := &cobra.Command{
 		Use:   "init",
 		Short: i18n.Tr("Create or update the sketch project file."),
@@ -40,16 +42,16 @@ func initProfileCreateCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " profile init --profile uno_profile -b arduino:avr:uno",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runInitCommand(cmd.Context(), args, srv, defaultProfile)
+			runInitCommand(cmd.Context(), args, srv, profileArg.Get(), fqbnArg.String(), setAsDefault)
 		},
 	}
 	fqbnArg.AddToCommand(initCommand, srv)
 	profileArg.AddToCommand(initCommand, srv)
-	initCommand.Flags().BoolVar(&defaultProfile, "default", false, i18n.Tr("Set the profile as the default one."))
+	initCommand.Flags().BoolVar(&setAsDefault, "set-default", false, i18n.Tr("Set the profile as the default one."))
 	return initCommand
 }
 
-func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, defaultProfile bool) {
+func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, profile, fqbn string, setAsDefault bool) {
 	path := ""
 	if len(args) > 0 {
 		path = args[0]
@@ -62,9 +64,9 @@ func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServi
 	_, err := srv.ProfileCreate(ctx, &rpc.ProfileCreateRequest{
 		Instance:       inst,
 		SketchPath:     sketchPath.String(),
-		ProfileName:    profileArg.Get(),
-		Fqbn:           fqbnArg.String(),
-		DefaultProfile: defaultProfile})
+		ProfileName:    profile,
+		Fqbn:           fqbn,
+		DefaultProfile: setAsDefault})
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Error initializing the project file: %v", err), feedback.ErrGeneric)
 	}
@@ -75,7 +77,7 @@ type profileResult struct {
 	ProjectFilePath *paths.Path `json:"project_path"`
 }
 
-func (ir profileResult) Data() interface{} {
+func (ir profileResult) Data() any {
 	return ir
 }
 

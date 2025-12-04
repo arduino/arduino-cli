@@ -18,15 +18,9 @@ package profile
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
-)
-
-var (
-	fqbnArg    arguments.Fqbn    // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	profileArg arguments.Profile // Name of the profile to add to the project
 )
 
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
@@ -40,7 +34,5 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	profileCommand.AddCommand(initProfileCreateCommand(srv))
 	profileCommand.AddCommand(initProfileLibCommand(srv))
 	profileCommand.AddCommand(initProfileSetDefaultCommand(srv))
-	// profileCommand.AddCommand(initDumpCommand(srv))
-
 	return profileCommand
 }

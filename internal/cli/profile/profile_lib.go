@@ -31,9 +31,7 @@ func initProfileLibCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " profile lib add AudioZero -m my_profile\n" +
 			"  " + os.Args[0] + " profile lib remove Arduino_JSON --profile my_profile\n",
 	}
-
 	libCommand.AddCommand(initLibAddCommand(srv))
 	libCommand.AddCommand(initLibRemoveCommand(srv))
-
 	return libCommand
 }

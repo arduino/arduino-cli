@@ -39,9 +39,7 @@ func initProfileSetDefaultCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Comma
 			runSetDefaultCommand(cmd.Context(), args, srv, destDir)
 		},
 	}
-
 	setDefaultCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
-
 	return setDefaultCommand
 }
 
