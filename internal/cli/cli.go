@@ -36,6 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/lib"
 	"github.com/arduino/arduino-cli/internal/cli/monitor"
 	"github.com/arduino/arduino-cli/internal/cli/outdated"
+	"github.com/arduino/arduino-cli/internal/cli/profile"
 	"github.com/arduino/arduino-cli/internal/cli/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/update"
 	"github.com/arduino/arduino-cli/internal/cli/updater"
@@ -162,6 +163,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.AddCommand(burnbootloader.NewCommand(srv))
 	cmd.AddCommand(version.NewCommand(srv))
 	cmd.AddCommand(feedback.NewCommand())
+	cmd.AddCommand(profile.NewCommand(srv))
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Print the logs on the standard output."))
 	cmd.Flag("verbose").Hidden = true
