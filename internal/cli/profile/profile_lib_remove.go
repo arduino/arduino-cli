@@ -46,7 +46,10 @@ func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			runLibRemoveCommand(cmd.Context(), srv, args, profileArg.Get(), destDir, noDeps)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
+			ctx := cmd.Context()
+			sketchPath := arguments.InitSketchPath(destDir)
+			completions := arguments.GetProfileLibraries(ctx, srv, sketchPath, profileArg.Get())
+			return completions, cobra.ShellCompDirectiveNoFileComp
 		},
 	}
 	profileArg.AddToCommand(removeCommand, srv)
