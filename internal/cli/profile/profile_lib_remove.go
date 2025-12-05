@@ -34,15 +34,16 @@ import (
 func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var destDir string
 	var profileArg arguments.Profile
+	var noDeps bool
 	removeCommand := &cobra.Command{
 		Use:   fmt.Sprintf("remove %s[@%s]...", i18n.Tr("LIBRARY"), i18n.Tr("VERSION_NUMBER")),
-		Short: i18n.Tr("Removes a library from a sketch profile."),
+		Short: i18n.Tr("Removes a library from a sketch profile with its dependencies if no longer needed."),
 		Example: "" +
 			"  " + os.Args[0] + " profile lib remove AudioZero -m my_profile\n" +
 			"  " + os.Args[0] + " profile lib remove Arduino_JSON@0.2.0 --profile my_profile\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runLibRemoveCommand(cmd.Context(), srv, args, profileArg.Get(), destDir)
+			runLibRemoveCommand(cmd.Context(), srv, args, profileArg.Get(), destDir, noDeps)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
@@ -50,10 +51,11 @@ func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	}
 	profileArg.AddToCommand(removeCommand, srv)
 	removeCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
+	removeCommand.Flags().BoolVar(&noDeps, "no-deps", false, i18n.Tr("Do not remove unused dependencies."))
 	return removeCommand
 }
 
-func runLibRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, profile, destDir string) {
+func runLibRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, profile, destDir string, noDeps bool) {
 	sketchPath := arguments.InitSketchPath(destDir)
 
 	instance := instance.CreateAndInit(ctx, srv)
@@ -61,8 +63,10 @@ func runLibRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, 
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
+	removeDeps := !noDeps
 	for _, lib := range libRefs {
 		resp, err := srv.ProfileLibRemove(ctx, &rpc.ProfileLibRemoveRequest{
+			Instance:    instance,
 			SketchPath:  sketchPath.String(),
 			ProfileName: profile,
 			Library: &rpc.ProfileLibraryReference{
@@ -73,6 +77,7 @@ func runLibRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, 
 					},
 				},
 			},
+			RemoveDependencies: &removeDeps,
 		})
 		if err != nil {
 			feedback.Fatal(fmt.Sprintf("%s: %v",
