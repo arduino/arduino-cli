@@ -32,26 +32,25 @@ func initProfileCreateCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var setAsDefault bool
 	var fqbnArg arguments.Fqbn
 	var profileArg arguments.Profile
-	initCommand := &cobra.Command{
-		Use:   "init",
-		Short: i18n.Tr("Create or update the sketch project file."),
-		Long:  i18n.Tr("Create or update the sketch project file."),
+	createCommand := &cobra.Command{
+		Use:   "create",
+		Short: i18n.Tr("Create or update a profile in the sketch project file."),
 		Example: "" +
 			"  # " + i18n.Tr("Creates or updates the sketch project file in the current directory.") + "\n" +
-			"  " + os.Args[0] + " profile init\n" +
-			"  " + os.Args[0] + " profile init --profile uno_profile -b arduino:avr:uno",
+			"  " + os.Args[0] + " profile create\n" +
+			"  " + os.Args[0] + " profile create --profile uno_profile -b arduino:avr:uno",
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runInitCommand(cmd.Context(), args, srv, profileArg.Get(), fqbnArg.String(), setAsDefault)
+			runProfileCreateCommand(cmd.Context(), args, srv, profileArg.Get(), fqbnArg.String(), setAsDefault)
 		},
 	}
-	fqbnArg.AddToCommand(initCommand, srv)
-	profileArg.AddToCommand(initCommand, srv)
-	initCommand.Flags().BoolVar(&setAsDefault, "set-default", false, i18n.Tr("Set the profile as the default one."))
-	return initCommand
+	fqbnArg.AddToCommand(createCommand, srv)
+	profileArg.AddToCommand(createCommand, srv)
+	createCommand.Flags().BoolVar(&setAsDefault, "set-default", false, i18n.Tr("Set the profile as the default one."))
+	return createCommand
 }
 
-func runInitCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, profile, fqbn string, setAsDefault bool) {
+func runProfileCreateCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, profile, fqbn string, setAsDefault bool) {
 	path := ""
 	if len(args) > 0 {
 		path = args[0]
