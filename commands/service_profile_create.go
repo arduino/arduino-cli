@@ -32,72 +32,67 @@ import (
 // ProfileCreate creates a new project file if it does not exist. If a profile name with the associated FQBN is specified,
 // it is added to the project.
 func (s *arduinoCoreServerImpl) ProfileCreate(ctx context.Context, req *rpc.ProfileCreateRequest) (*rpc.ProfileCreateResponse, error) {
+	if req.GetProfileName() == "" {
+		return nil, &cmderrors.MissingProfileError{}
+	}
+	if req.GetFqbn() == "" {
+		return nil, &cmderrors.MissingFQBNError{}
+	}
+
 	// Returns an error if the main file is missing from the sketch so there is no need to check if the path exists
 	sk, err := sketch.New(paths.New(req.GetSketchPath()))
 	if err != nil {
 		return nil, err
 	}
-	projectFilePath := sk.GetProjectPath()
 
-	if !projectFilePath.Exist() {
-		err := projectFilePath.WriteFile([]byte("profiles: {}\n"))
-		if err != nil {
-			return nil, err
-		}
+	fqbn, err := fqbn.Parse(req.GetFqbn())
+	if err != nil {
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
 	}
 
-	if req.GetProfileName() != "" {
-		if req.GetFqbn() == "" {
-			return nil, &cmderrors.MissingFQBNError{}
-		}
-		fqbn, err := fqbn.Parse(req.GetFqbn())
-		if err != nil {
-			return nil, &cmderrors.InvalidFQBNError{Cause: err}
-		}
+	// Check that the profile name is unique
+	if profile, _ := sk.GetProfile(req.ProfileName); profile != nil {
+		return nil, &cmderrors.ProfileAlreadyExitsError{Profile: req.ProfileName}
+	}
 
-		// Check that the profile name is unique
-		if profile, _ := sk.GetProfile(req.ProfileName); profile != nil {
-			return nil, &cmderrors.ProfileAlreadyExitsError{Profile: req.ProfileName}
-		}
+	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+	if pme.Dirty() {
+		return nil, &cmderrors.InstanceNeedsReinitialization{}
+	}
 
-		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
-		if err != nil {
-			return nil, err
-		}
-		defer release()
-		if pme.Dirty() {
-			return nil, &cmderrors.InstanceNeedsReinitialization{}
-		}
-
-		// Automatically detect the target platform if it is installed on the user's machine
-		_, targetPlatform, _, _, _, err := pme.ResolveFQBN(fqbn)
-		if err != nil {
-			if targetPlatform == nil {
-				return nil, &cmderrors.PlatformNotFoundError{
-					Platform: fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture),
-					Cause:    errors.New(i18n.Tr("platform not installed")),
-				}
+	// Automatically detect the target platform if it is installed on the user's machine
+	_, targetPlatform, _, _, _, err := pme.ResolveFQBN(fqbn)
+	if err != nil {
+		if targetPlatform == nil {
+			return nil, &cmderrors.PlatformNotFoundError{
+				Platform: fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture),
+				Cause:    errors.New(i18n.Tr("platform not installed")),
 			}
-			return nil, &cmderrors.InvalidFQBNError{Cause: err}
 		}
+		return nil, &cmderrors.InvalidFQBNError{Cause: err}
+	}
 
-		newProfile := &sketch.Profile{Name: req.GetProfileName(), FQBN: req.GetFqbn()}
-		// TODO: what to do with the PlatformIndexURL?
-		newProfile.Platforms = append(newProfile.Platforms, &sketch.ProfilePlatformReference{
-			Packager:     targetPlatform.Platform.Package.Name,
-			Architecture: targetPlatform.Platform.Architecture,
-			Version:      targetPlatform.Version,
-		})
+	newProfile := &sketch.Profile{Name: req.GetProfileName(), FQBN: req.GetFqbn()}
+	// TODO: what to do with the PlatformIndexURL?
+	newProfile.Platforms = append(newProfile.Platforms, &sketch.ProfilePlatformReference{
+		Packager:     targetPlatform.Platform.Package.Name,
+		Architecture: targetPlatform.Platform.Architecture,
+		Version:      targetPlatform.Version,
+	})
 
-		sk.Project.Profiles = append(sk.Project.Profiles, newProfile)
-		if req.DefaultProfile {
-			sk.Project.DefaultProfile = newProfile.Name
-		}
+	sk.Project.Profiles = append(sk.Project.Profiles, newProfile)
+	if req.DefaultProfile {
+		sk.Project.DefaultProfile = newProfile.Name
+	}
 
-		err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
-		if err != nil {
-			return nil, err
-		}
+	projectFilePath := sk.GetProjectPath()
+	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
+	if err != nil {
+		return nil, err
 	}
 
 	return &rpc.ProfileCreateResponse{}, nil
