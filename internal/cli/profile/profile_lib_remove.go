@@ -32,7 +32,7 @@ import (
 )
 
 func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
-	var destDir string
+	var sketchDir string
 	var profileArg arguments.Profile
 	var noDeps bool
 	removeCommand := &cobra.Command{
@@ -43,23 +43,23 @@ func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " profile lib remove Arduino_JSON@0.2.0 --profile my_profile\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runLibRemoveCommand(cmd.Context(), srv, args, profileArg.Get(), destDir, noDeps)
+			runLibRemoveCommand(cmd.Context(), srv, args, profileArg.Get(), sketchDir, noDeps)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			ctx := cmd.Context()
-			sketchPath := arguments.InitSketchPath(destDir)
+			sketchPath := arguments.InitSketchPath(sketchDir)
 			completions := arguments.GetProfileLibraries(ctx, srv, sketchPath, profileArg.Get())
 			return completions, cobra.ShellCompDirectiveNoFileComp
 		},
 	}
 	profileArg.AddToCommand(removeCommand, srv)
-	removeCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
+	removeCommand.Flags().StringVar(&sketchDir, "sketch-path", "", i18n.Tr("Location of the sketch."))
 	removeCommand.Flags().BoolVar(&noDeps, "no-deps", false, i18n.Tr("Do not remove unused dependencies."))
 	return removeCommand
 }
 
-func runLibRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, profile, destDir string, noDeps bool) {
-	sketchPath := arguments.InitSketchPath(destDir)
+func runLibRemoveCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, profile, sketchDir string, noDeps bool) {
+	sketchPath := arguments.InitSketchPath(sketchDir)
 
 	instance := instance.CreateAndInit(ctx, srv)
 	libRefs, err := lib.ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)

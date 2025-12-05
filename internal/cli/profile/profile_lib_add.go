@@ -32,7 +32,7 @@ import (
 )
 
 func initLibAddCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
-	var destDir string
+	var sketchDir string
 	var noDeps bool
 	var noOverwrite bool
 	var profileArg arguments.Profile
@@ -44,21 +44,21 @@ func initLibAddCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  " + os.Args[0] + " profile lib add Arduino_JSON@0.2.0 --profile my_profile\n",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runLibAddCommand(cmd.Context(), args, srv, profileArg.Get(), destDir, noDeps, noOverwrite)
+			runLibAddCommand(cmd.Context(), args, srv, profileArg.Get(), sketchDir, noDeps, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstallableLibs(cmd.Context(), srv), cobra.ShellCompDirectiveDefault
 		},
 	}
 	profileArg.AddToCommand(addCommand, srv)
-	addCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
+	addCommand.Flags().StringVar(&sketchDir, "sketch-path", "", i18n.Tr("Location of the sketch."))
 	addCommand.Flags().BoolVar(&noDeps, "no-deps", false, i18n.Tr("Do not add dependencies."))
 	addCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, i18n.Tr("Do not overwrite already added libraries."))
 	return addCommand
 }
 
-func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, profile, destDir string, noAddDeps, noOverwrite bool) {
-	sketchPath := arguments.InitSketchPath(destDir)
+func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, profile, sketchDir string, noAddDeps, noOverwrite bool) {
+	sketchPath := arguments.InitSketchPath(sketchDir)
 
 	instance := instance.CreateAndInit(ctx, srv)
 	libRefs, err := lib.ParseLibraryReferenceArgsAndAdjustCase(ctx, srv, instance, args)

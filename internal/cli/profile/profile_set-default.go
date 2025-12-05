@@ -27,7 +27,7 @@ import (
 )
 
 func initProfileSetDefaultCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
-	var destDir string
+	var sketchDir string
 	setDefaultCommand := &cobra.Command{
 		Use:   "set-default",
 		Short: i18n.Tr("Set the default build profile."),
@@ -36,16 +36,16 @@ func initProfileSetDefaultCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Comma
 			"  " + os.Args[0] + " profile set-default my_profile\n",
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runSetDefaultCommand(cmd.Context(), args, srv, destDir)
+			runSetDefaultCommand(cmd.Context(), args, srv, sketchDir)
 		},
 	}
-	setDefaultCommand.Flags().StringVar(&destDir, "dest-dir", "", i18n.Tr("Location of the sketch project file."))
+	setDefaultCommand.Flags().StringVar(&sketchDir, "sketch-path", "", i18n.Tr("Location of the sketch."))
 	return setDefaultCommand
 }
 
-func runSetDefaultCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, destDir string) {
+func runSetDefaultCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, sketchDir string) {
 	profileName := args[0]
-	sketchPath := arguments.InitSketchPath(destDir)
+	sketchPath := arguments.InitSketchPath(sketchDir)
 
 	_, err := srv.ProfileSetDefault(ctx, &rpc.ProfileSetDefaultRequest{SketchPath: sketchPath.String(), ProfileName: profileName})
 	if err != nil {

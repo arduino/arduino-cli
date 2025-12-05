@@ -262,7 +262,7 @@ func TestProfileLib(t *testing.T) {
 		_, _, err = cli.Run("profile", "create", sk.String(), "-m", "uno", "-b", "arduino:avr:uno", "--set-default")
 		require.NoError(t, err)
 
-		out, _, err := cli.Run("profile", "lib", "add", "Arduino_Modulino@0.7.0", "--dest-dir", sk.String(), "--json")
+		out, _, err := cli.Run("profile", "lib", "add", "Arduino_Modulino@0.7.0", "--sketch-path", sk.String(), "--json")
 		require.NoError(t, err)
 		requirejson.Parse(t, out).Query(".added_libraries").MustContain(`
 			[
@@ -278,7 +278,7 @@ func TestProfileLib(t *testing.T) {
 		require.Contains(t, string(fileContent), "      - dependency: Arduino_LSM6DSOX (")
 
 		t.Run("ChangeLibVersionToDefaultProfile", func(t *testing.T) {
-			out, _, err := cli.Run("profile", "lib", "add", "Arduino_Modulino@0.6.0", "--dest-dir", sk.String(), "--json")
+			out, _, err := cli.Run("profile", "lib", "add", "Arduino_Modulino@0.6.0", "--sketch-path", sk.String(), "--json")
 			require.NoError(t, err)
 			outjson := requirejson.Parse(t, out)
 			outjson.Query(".added_libraries").MustContain(`
@@ -300,7 +300,7 @@ func TestProfileLib(t *testing.T) {
 		})
 
 		t.Run("RemoveLibFromDefaultProfile", func(t *testing.T) {
-			_, _, err = cli.Run("profile", "lib", "remove", "Arduino_Modulino", "--dest-dir", sk.String())
+			_, _, err = cli.Run("profile", "lib", "remove", "Arduino_Modulino", "--sketch-path", sk.String())
 			require.NoError(t, err)
 			fileContent, err := sk.Join("sketch.yaml").ReadFile()
 			require.NoError(t, err)
@@ -310,13 +310,13 @@ func TestProfileLib(t *testing.T) {
 		})
 
 		t.Run("AddInexistentLibToDefaultProfile", func(t *testing.T) {
-			_, stderr, err := cli.Run("profile", "lib", "add", "foobar123", "--dest-dir", sk.String())
+			_, stderr, err := cli.Run("profile", "lib", "add", "foobar123", "--sketch-path", sk.String())
 			require.Error(t, err)
 			require.Equal(t, "Error adding foobar123: Library 'foobar123@latest' not found\n", string(stderr))
 		})
 
 		t.Run("RemoveLibNotInProfile", func(t *testing.T) {
-			_, stderr, err := cli.Run("profile", "lib", "remove", "Arduino_JSON", "--dest-dir", sk.String())
+			_, stderr, err := cli.Run("profile", "lib", "remove", "Arduino_JSON", "--sketch-path", sk.String())
 			require.Error(t, err)
 			require.Equal(t, "Error removing library Arduino_JSON from the profile: could not remove library: Library 'Arduino_JSON' not found\n", string(stderr))
 		})
@@ -342,14 +342,14 @@ func TestProfileLibAddRemoveFromSpecificProfile(t *testing.T) {
 	require.NoError(t, err)
 
 	// Add library to a specific profile
-	_, _, err = cli.Run("profile", "lib", "add", "Arduino_Modulino@0.7.0", "-m", "my_profile", "--dest-dir", sk.String(), "--no-deps")
+	_, _, err = cli.Run("profile", "lib", "add", "Arduino_Modulino@0.7.0", "-m", "my_profile", "--sketch-path", sk.String(), "--no-deps")
 	require.NoError(t, err)
 	fileContent, err := sk.Join("sketch.yaml").ReadFile()
 	require.NoError(t, err)
 	require.Contains(t, string(fileContent), "  my_profile:\n    fqbn: arduino:avr:uno\n    platforms:\n      - platform: arduino:avr (1.8.6)\n    libraries:\n      - Arduino_Modulino (0.7.0)\n")
 
 	// Remove library from a specific profile
-	_, _, err = cli.Run("profile", "lib", "remove", "Arduino_Modulino", "-m", "my_profile", "--dest-dir", sk.String())
+	_, _, err = cli.Run("profile", "lib", "remove", "Arduino_Modulino", "-m", "my_profile", "--sketch-path", sk.String())
 	require.NoError(t, err)
 	fileContent, err = sk.Join("sketch.yaml").ReadFile()
 	require.NoError(t, err)
@@ -379,7 +379,7 @@ func TestProfileSetDefault(t *testing.T) {
 	require.NotContains(t, fileContent, "default_profile: my_profile")
 
 	// Change default profile
-	_, _, err = cli.Run("profile", "set-default", "my_profile", "--dest-dir", sk.String())
+	_, _, err = cli.Run("profile", "set-default", "my_profile", "--sketch-path", sk.String())
 	require.NoError(t, err)
 	fileContent, err = sk.Join("sketch.yaml").ReadFileAsLines()
 	require.NoError(t, err)
@@ -387,7 +387,7 @@ func TestProfileSetDefault(t *testing.T) {
 	require.Contains(t, fileContent, "default_profile: my_profile")
 
 	// Changing to an inexistent profile returns an error
-	_, stderr, err := cli.Run("profile", "set-default", "inexistent_profile", "--dest-dir", sk.String())
+	_, stderr, err := cli.Run("profile", "set-default", "inexistent_profile", "--sketch-path", sk.String())
 	require.Error(t, err)
 	require.Equal(t, "Cannot set inexistent_profile as default profile: Profile 'inexistent_profile' not found\n", string(stderr))
 }
