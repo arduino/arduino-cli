@@ -83,7 +83,7 @@ func runLibAddCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreSer
 			NoOverwrite:     &noOverwrite,
 		})
 		if err != nil {
-			feedback.Fatal(i18n.Tr("Error adding %s to the profile %s: %v", lib.Name, profile, err), feedback.ErrGeneric)
+			feedback.Fatal(i18n.Tr("Error adding %s: %v", lib.Name, err), feedback.ErrGeneric)
 		}
 		feedback.PrintResult(libAddResult{
 			AddedLibraries:   f.Map(resp.GetAddedLibraries(), result.NewProfileLibraryReference),
