@@ -37,8 +37,7 @@ func initLibAddCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var noOverwrite bool
 	addCommand := &cobra.Command{
 		Use:   fmt.Sprintf("add %s[@%s]...", i18n.Tr("LIBRARY"), i18n.Tr("VERSION_NUMBER")),
-		Short: i18n.Tr("Adds a library to the profile."),
-		Long:  i18n.Tr("Adds a library to the profile."),
+		Short: i18n.Tr("Adds a library to a sketch profile."),
 		Example: "" +
 			"  " + os.Args[0] + " profile lib add AudioZero -m my_profile\n" +
 			"  " + os.Args[0] + " profile lib add Arduino_JSON@0.2.0 --profile my_profile\n",

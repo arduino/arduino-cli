@@ -36,8 +36,7 @@ func initLibRemoveCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 
 	removeCommand := &cobra.Command{
 		Use:   fmt.Sprintf("remove %s[@%s]...", i18n.Tr("LIBRARY"), i18n.Tr("VERSION_NUMBER")),
-		Short: i18n.Tr("Removes a library from the profile."),
-		Long:  i18n.Tr("Removes a library from the profile."),
+		Short: i18n.Tr("Removes a library from a sketch profile."),
 		Example: "" +
 			"  " + os.Args[0] + " profile lib remove AudioZero -m my_profile\n" +
 			"  " + os.Args[0] + " profile lib remove Arduino_JSON@0.2.0 --profile my_profile\n",

@@ -26,8 +26,7 @@ import (
 func initProfileLibCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
-		Short: i18n.Tr("Commands related to build profile libraries."),
-		Long:  i18n.Tr("Commands related to the library dependencies of build profiles."),
+		Short: i18n.Tr("Commands to manage libraries in sketch profiles."),
 		Example: "" +
 			"  " + os.Args[0] + " profile lib add AudioZero -m my_profile\n" +
 			"  " + os.Args[0] + " profile lib remove Arduino_JSON --profile my_profile\n",
