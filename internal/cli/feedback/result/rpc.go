@@ -1130,6 +1130,12 @@ type ProfileLibraryReference_LocalLibraryResult struct {
 	Path string `json:"path,omitempty"`
 }
 
+func (*ProfileLibraryReference_LocalLibraryResult) isProfileLibraryReference() {}
+
+func (l *ProfileLibraryReference_LocalLibraryResult) String() string {
+	return fmt.Sprintf("lib: %s", l.Path)
+}
+
 func NewProfileLibraryReference_LocalLibraryResult(resp *rpc.ProfileLibraryReference_LocalLibrary) *ProfileLibraryReference_LocalLibraryResult {
 	return &ProfileLibraryReference_LocalLibraryResult{
 		Path: resp.GetPath(),
@@ -1142,10 +1148,49 @@ type ProfileLibraryReference_IndexLibraryResult struct {
 	IsDependency bool   `json:"is_dependency,omitempty"`
 }
 
+func (*ProfileLibraryReference_IndexLibraryResult) isProfileLibraryReference() {}
+
+func (l *ProfileLibraryReference_IndexLibraryResult) String() string {
+	if l.IsDependency {
+		return fmt.Sprintf("dependency: %s@%s", l.Name, l.Version)
+	}
+	return fmt.Sprintf("%s@%s", l.Name, l.Version)
+}
+
 func NewProfileLibraryReference_IndexLibraryResult(resp *rpc.ProfileLibraryReference_IndexLibrary) *ProfileLibraryReference_IndexLibraryResult {
 	return &ProfileLibraryReference_IndexLibraryResult{
 		Name:         resp.GetName(),
 		Version:      resp.GetVersion(),
 		IsDependency: resp.GetIsDependency(),
 	}
+}
+
+type ProfileLibraryReference struct {
+	Kind    string                          `json:"kind,omitempty"`
+	Library ProfileLibraryReference_Library `json:"library,omitempty"`
+}
+
+type ProfileLibraryReference_Library interface {
+	isProfileLibraryReference()
+	fmt.Stringer
+}
+
+func NewProfileLibraryReference(resp *rpc.ProfileLibraryReference) *ProfileLibraryReference {
+	if lib := resp.GetIndexLibrary(); lib != nil {
+		return &ProfileLibraryReference{
+			Library: NewProfileLibraryReference_IndexLibraryResult(lib),
+			Kind:    "index",
+		}
+	}
+	if lib := resp.GetLocalLibrary(); lib != nil {
+		return &ProfileLibraryReference{
+			Library: NewProfileLibraryReference_LocalLibraryResult(lib),
+			Kind:    "local",
+		}
+	}
+	return nil
+}
+
+func (p *ProfileLibraryReference) String() string {
+	return p.Library.String()
 }
