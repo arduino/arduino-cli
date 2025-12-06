@@ -53,3 +53,24 @@ func TestProjectFileLoading(t *testing.T) {
 		require.Error(t, err)
 	}
 }
+
+func TestProjectFileLibraries(t *testing.T) {
+	sketchProj := paths.New("testdata", "profiles", "profile_with_libraries.yml")
+	proj, err := LoadProjectFile(sketchProj)
+	require.NoError(t, err)
+	require.Len(t, proj.Profiles, 1)
+	prof := proj.Profiles[0]
+	require.Len(t, prof.Libraries, 4)
+	require.Equal(t, "FlashStorage@1.2.3", prof.Libraries[0].String())
+	require.Equal(t, "@dir:/path/to/system/lib", prof.Libraries[1].String())
+	require.Equal(t, "@dir:path/to/sketch/lib", prof.Libraries[2].String())
+	require.Equal(t, "DependencyLib@2.3.4 (dep)", prof.Libraries[3].String())
+	require.Equal(t, "FlashStorage_1.2.3_e525d7c96b27788f", prof.Libraries[0].InternalUniqueIdentifier())
+	require.Panics(t, func() { prof.Libraries[1].InternalUniqueIdentifier() })
+	require.Panics(t, func() { prof.Libraries[2].InternalUniqueIdentifier() })
+	require.Equal(t, "DependencyLib_2.3.4_ecde631facb47ae5", prof.Libraries[3].InternalUniqueIdentifier())
+
+	orig, err := sketchProj.ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, string(orig), proj.AsYaml())
+}

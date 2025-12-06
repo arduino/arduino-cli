@@ -33,7 +33,7 @@ func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 		return nil
 	}
 
-	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease, string]((*semver.Version).String)
+	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease]((*semver.Version).String)
 	for k, v := range in.GetReleases() {
 		releases.Set(semver.MustParse(k), NewPlatformRelease(v))
 	}
@@ -876,7 +876,7 @@ func NewSearchedLibrary(l *rpc.SearchedLibrary) *SearchedLibrary {
 	if l == nil {
 		return nil
 	}
-	releasesMap := orderedmap.NewWithConversionFunc[*semver.Version, *LibraryRelease, string]((*semver.Version).String)
+	releasesMap := orderedmap.NewWithConversionFunc[*semver.Version, *LibraryRelease]((*semver.Version).String)
 	for k, v := range l.GetReleases() {
 		releasesMap.Set(semver.MustParse(k), NewLibraryRelease(v))
 	}
@@ -1123,5 +1123,29 @@ func NewIndexUpdateReport_Status(r rpc.IndexUpdateReport_Status) IndexUpdateRepo
 		return IndexUpdateReport_StatusSkipped
 	default:
 		return IndexUpdateReport_StatusUnspecified
+	}
+}
+
+type ProfileLibraryReference_LocalLibraryResult struct {
+	Path string `json:"path,omitempty"`
+}
+
+func NewProfileLibraryReference_LocalLibraryResult(resp *rpc.ProfileLibraryReference_LocalLibrary) *ProfileLibraryReference_LocalLibraryResult {
+	return &ProfileLibraryReference_LocalLibraryResult{
+		Path: resp.GetPath(),
+	}
+}
+
+type ProfileLibraryReference_IndexLibraryResult struct {
+	Name         string `json:"name,omitempty"`
+	Version      string `json:"version,omitempty"`
+	IsDependency bool   `json:"is_dependency,omitempty"`
+}
+
+func NewProfileLibraryReference_IndexLibraryResult(resp *rpc.ProfileLibraryReference_IndexLibrary) *ProfileLibraryReference_IndexLibraryResult {
+	return &ProfileLibraryReference_IndexLibraryResult{
+		Name:         resp.GetName(),
+		Version:      resp.GetVersion(),
+		IsDependency: resp.GetIsDependency(),
 	}
 }

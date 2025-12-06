@@ -43,18 +43,11 @@ func (s *arduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, 
 		return nil, err
 	}
 
-	return libraryResolveDependencies(lme, li, req.GetName(), req.GetVersion(), req.GetDoNotUpdateInstalledLibraries())
-}
-
-func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesindex.Index,
-	reqName, reqVersion string, noOverwrite bool) (*rpc.LibraryResolveDependenciesResponse, error) {
-	version, err := parseVersion(reqVersion)
-	if err != nil {
-		return nil, err
+	var overrides []*librariesindex.Release
+	if req.GetDoNotUpdateInstalledLibraries() {
+		overrides = librariesGetAllInstalled(lme, li)
 	}
-
-	// Search the requested lib
-	reqLibRelease, err := li.FindRelease(reqName, version)
+	deps, err := libraryResolveDependencies(li, req.GetName(), req.GetVersion(), overrides)
 	if err != nil {
 		return nil, err
 	}
@@ -63,33 +56,6 @@ func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesind
 	installedLibs := map[string]*libraries.Library{}
 	for _, lib := range listLibraries(lme, li, false, false) {
 		installedLibs[lib.Library.Name] = lib.Library
-	}
-
-	// Resolve all dependencies...
-	var overrides []*librariesindex.Release
-	if noOverwrite {
-		libs := lme.FindAllInstalled()
-		libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
-		for _, lib := range libs {
-			if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {
-				overrides = append(overrides, release)
-			}
-		}
-	}
-	deps := li.ResolveDependencies(reqLibRelease, overrides)
-
-	// If no solution has been found
-	if len(deps) == 0 {
-		// Check if there is a problem with the first level deps
-		for _, directDep := range reqLibRelease.GetDependencies() {
-			if _, ok := li.Libraries[directDep.GetName()]; !ok {
-				err := errors.New(i18n.Tr("dependency '%s' is not available", directDep.GetName()))
-				return nil, &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
-			}
-		}
-
-		// Otherwise there is no possible solution, the depends field has an invalid formula
-		return nil, &cmderrors.LibraryDependenciesResolutionFailedError{}
 	}
 
 	res := []*rpc.LibraryDependencyStatus{}
@@ -114,4 +80,48 @@ func libraryResolveDependencies(lme *librariesmanager.Explorer, li *librariesind
 		return res[i].GetName() < res[j].GetName()
 	})
 	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
+}
+
+func librariesGetAllInstalled(lme *librariesmanager.Explorer, li *librariesindex.Index) []*librariesindex.Release {
+	var overrides []*librariesindex.Release
+	libs := lme.FindAllInstalled()
+	libs = libs.FilterByVersionAndInstallLocation(nil, libraries.User)
+	for _, lib := range libs {
+		if release, err := li.FindRelease(lib.Name, lib.Version); err == nil {
+			overrides = append(overrides, release)
+		}
+	}
+	return overrides
+}
+
+func libraryResolveDependencies(li *librariesindex.Index, reqName, reqVersion string, overrides []*librariesindex.Release) ([]*librariesindex.Release, error) {
+	version, err := parseVersion(reqVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	// Search the requested lib
+	reqLibRelease, err := li.FindRelease(reqName, version)
+	if err != nil {
+		return nil, err
+	}
+
+	// Resolve all dependencies...
+	deps := li.ResolveDependencies(reqLibRelease, overrides)
+
+	// If no solution has been found
+	if len(deps) == 0 {
+		// Check if there is a problem with the first level deps
+		for _, directDep := range reqLibRelease.GetDependencies() {
+			if _, ok := li.Libraries[directDep.GetName()]; !ok {
+				err := errors.New(i18n.Tr("dependency '%s' is not available", directDep.GetName()))
+				return nil, &cmderrors.LibraryDependenciesResolutionFailedError{Cause: err}
+			}
+		}
+
+		// Otherwise there is no possible solution, the depends field has an invalid formula
+		return nil, &cmderrors.LibraryDependenciesResolutionFailedError{}
+	}
+
+	return deps, nil
 }
