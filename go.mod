@@ -42,7 +42,7 @@ require (
 	go.bug.st/testifyjson v1.3.0
 	golang.org/x/sys v0.38.0
 	golang.org/x/term v0.37.0
-	golang.org/x/text v0.31.0
+	golang.org/x/text v0.32.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
