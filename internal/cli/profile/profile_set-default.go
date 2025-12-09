@@ -51,5 +51,19 @@ func runSetDefaultCommand(ctx context.Context, args []string, srv rpc.ArduinoCor
 	if err != nil {
 		feedback.Fatal(i18n.Tr("Cannot set %s as default profile: %v", profileName, err), feedback.ErrGeneric)
 	}
-	feedback.Print(i18n.Tr("Default profile set to: %s", profileName))
+	feedback.PrintResult(&profileSetDefaultResult{
+		DefaultProfile: profileName,
+	})
+}
+
+type profileSetDefaultResult struct {
+	DefaultProfile string `json:"default_profile"`
+}
+
+func (r *profileSetDefaultResult) String() string {
+	return i18n.Tr("Default profile set to: %s", r.DefaultProfile)
+}
+
+func (r *profileSetDefaultResult) Data() any {
+	return r
 }

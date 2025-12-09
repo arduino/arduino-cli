@@ -378,13 +378,14 @@ func TestProfileSetDefault(t *testing.T) {
 	require.Contains(t, fileContent, "default_profile: uno")
 	require.NotContains(t, fileContent, "default_profile: my_profile")
 
-	// Change default profile
-	_, _, err = cli.Run("profile", "set-default", "my_profile", "--sketch-path", sk.String())
+	// Change default profile, and test JSON output
+	out, _, err := cli.Run("profile", "set-default", "my_profile", "--sketch-path", sk.String(), "--json")
 	require.NoError(t, err)
 	fileContent, err = sk.Join("sketch.yaml").ReadFileAsLines()
 	require.NoError(t, err)
 	require.NotContains(t, fileContent, "default_profile: uno")
 	require.Contains(t, fileContent, "default_profile: my_profile")
+	requirejson.Parse(t, out).Query(".default_profile").MustEqual(`"my_profile"`)
 
 	// Changing to an inexistent profile returns an error
 	_, stderr, err := cli.Run("profile", "set-default", "inexistent_profile", "--sketch-path", sk.String())
