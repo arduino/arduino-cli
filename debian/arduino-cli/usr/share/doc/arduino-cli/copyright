@@ -7553,7 +7553,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5@v5.16.3
+github.com/go-git/go-git/v5@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -7762,7 +7762,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/config@v5.16.3
+github.com/go-git/go-git/v5/config@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -7971,7 +7971,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/internal/path_util@v5.16.3
+github.com/go-git/go-git/v5/internal/path_util@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -8180,7 +8180,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/internal/revision@v5.16.3
+github.com/go-git/go-git/v5/internal/revision@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -8389,7 +8389,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/internal/url@v5.16.3
+github.com/go-git/go-git/v5/internal/url@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -8598,7 +8598,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing@v5.16.3
+github.com/go-git/go-git/v5/plumbing@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -8807,7 +8807,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/cache@v5.16.3
+github.com/go-git/go-git/v5/plumbing/cache@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -9016,7 +9016,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/color@v5.16.3
+github.com/go-git/go-git/v5/plumbing/color@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -9225,7 +9225,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/filemode@v5.16.3
+github.com/go-git/go-git/v5/plumbing/filemode@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -9434,7 +9434,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/config@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/config@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -9643,7 +9643,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/diff@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/diff@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -9852,7 +9852,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/gitignore@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/gitignore@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -10061,7 +10061,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/idxfile@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/idxfile@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -10270,7 +10270,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/index@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/index@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -10479,7 +10479,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/objfile@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/objfile@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -10688,7 +10688,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/packfile@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/packfile@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -10897,7 +10897,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/pktline@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/pktline@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -11106,7 +11106,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/hash@v5.16.3
+github.com/go-git/go-git/v5/plumbing/hash@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -11315,7 +11315,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/object@v5.16.3
+github.com/go-git/go-git/v5/plumbing/object@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -11524,7 +11524,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/protocol/packp@v5.16.3
+github.com/go-git/go-git/v5/plumbing/protocol/packp@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -11733,7 +11733,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/protocol/packp/capability@v5.16.3
+github.com/go-git/go-git/v5/plumbing/protocol/packp/capability@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -11942,7 +11942,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband@v5.16.3
+github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -12151,7 +12151,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/revlist@v5.16.3
+github.com/go-git/go-git/v5/plumbing/revlist@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -12360,7 +12360,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/storer@v5.16.3
+github.com/go-git/go-git/v5/plumbing/storer@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -12569,7 +12569,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -12778,7 +12778,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/client@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/client@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -12987,7 +12987,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/file@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/file@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -13196,7 +13196,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/git@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/git@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -13405,7 +13405,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/http@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/http@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -13614,7 +13614,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/internal/common@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/internal/common@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -13823,7 +13823,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/server@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/server@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -14032,7 +14032,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/ssh@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/ssh@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -14241,7 +14241,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage@v5.16.3
+github.com/go-git/go-git/v5/storage@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -14450,7 +14450,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage/filesystem@v5.16.3
+github.com/go-git/go-git/v5/storage/filesystem@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -14659,7 +14659,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage/filesystem/dotgit@v5.16.3
+github.com/go-git/go-git/v5/storage/filesystem/dotgit@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -14868,7 +14868,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage/memory@v5.16.3
+github.com/go-git/go-git/v5/storage/memory@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -15077,7 +15077,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/binary@v5.16.3
+github.com/go-git/go-git/v5/utils/binary@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -15286,7 +15286,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/diff@v5.16.3
+github.com/go-git/go-git/v5/utils/diff@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -15495,7 +15495,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/ioutil@v5.16.3
+github.com/go-git/go-git/v5/utils/ioutil@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -15704,7 +15704,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -15913,7 +15913,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/filesystem@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/filesystem@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -16122,7 +16122,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/index@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/index@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -16331,7 +16331,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/internal/frame@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/internal/frame@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -16540,7 +16540,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/noder@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/noder@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -16749,7 +16749,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/sync@v5.16.3
+github.com/go-git/go-git/v5/utils/sync@v5.16.4
 
 Apache License
                            Version 2.0, January 2004
@@ -16958,7 +16958,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/trace@v5.16.3
+github.com/go-git/go-git/v5/utils/trace@v5.16.4
 
 Apache License
                            Version 2.0, January 2004

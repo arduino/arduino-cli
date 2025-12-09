@@ -1,6 +1,6 @@
 ---
 name: github.com/go-git/go-git/v5
-version: v5.16.3
+version: v5.16.4
 type: go
 summary: A highly extensible git implementation in pure Go.
 homepage: https://pkg.go.dev/github.com/go-git/go-git/v5
