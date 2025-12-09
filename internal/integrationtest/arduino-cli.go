@@ -807,3 +807,17 @@ func (inst *ArduinoCLIInstance) ProfileLibRemove(
 	resp, err := inst.cli.daemonClient.ProfileLibRemove(ctx, req)
 	return resp, err
 }
+
+// ArchiveSketch calls the "ArchiveSketch" gRPC method.
+func (cli *ArduinoCLI) ArchiveSketch(ctx context.Context, sketchPath, archivePath string, includeBuildDir, overwrite bool) (*commands.ArchiveSketchResponse, error) {
+	req := &commands.ArchiveSketchRequest{
+		SketchPath:      sketchPath,
+		ArchivePath:     archivePath,
+		IncludeBuildDir: includeBuildDir,
+		Overwrite:       overwrite,
+	}
+	logCallf(">>> ArchiveSketch(%+v)\n", req)
+	resp, err := cli.daemonClient.ArchiveSketch(ctx, req)
+	logCallf("err=%v\n", err)
+	return resp, err
+}
