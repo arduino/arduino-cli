@@ -17,6 +17,7 @@ package daemon
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -66,8 +67,15 @@ func TestBoardListMock(t *testing.T) {
 		}))
 
 		// Run a BoardList
-		resp, err := grpcInst.BoardList(time.Second)
-		require.NoError(t, err)
+		var resp *commands.BoardListResponse
+		for range 5 { // wait up to 5 seconds
+			resp, err = grpcInst.BoardList(time.Second)
+			require.NoError(t, err)
+			if len(resp.Ports) > 0 {
+				break
+			}
+			time.Sleep(time.Second)
+		}
 		require.NotEmpty(t, resp.Ports)
 		for _, port := range resp.Ports {
 			if port.GetPort().GetProtocol() == "serial" {
@@ -81,6 +89,14 @@ func TestBoardListMock(t *testing.T) {
 	}
 
 	// Check if the discoveries have been successfully close
+	for range 5 { // wait up to 5 seconds
+		_, err1 := os.Lstat(tmp1)
+		_, err2 := os.Lstat(tmp2)
+		if err1 != nil && err2 != nil {
+			break
+		}
+		time.Sleep(time.Second)
+	}
 	require.NoFileExists(t, tmp1, "discovery has not been closed")
 	require.NoFileExists(t, tmp2, "discovery has not been closed")
 }
