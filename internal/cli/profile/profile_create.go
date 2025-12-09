@@ -1,0 +1,86 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2025 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
+package profile
+
+import (
+	"context"
+	"os"
+
+	"github.com/arduino/arduino-cli/internal/cli/arguments"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/instance"
+	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
+	"github.com/spf13/cobra"
+)
+
+func initProfileCreateCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
+	var setAsDefault bool
+	var fqbnArg arguments.Fqbn
+	var profileArg arguments.Profile
+	createCommand := &cobra.Command{
+		Use:   "create --profile <PROFILE_NAME> --fqbn <FQBN> [flags] [<SKETCH_PATH>]",
+		Short: i18n.Tr("Create or update a profile in the sketch project file."),
+		Example: "" +
+			"  # " + i18n.Tr("Creates or updates the sketch project file in the current directory.") + "\n" +
+			"  " + os.Args[0] + " profile create -m uno -b arduino:avr:uno",
+		Args: cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			runProfileCreateCommand(cmd.Context(), args, srv, profileArg.Get(), fqbnArg.String(), setAsDefault)
+		},
+	}
+	fqbnArg.AddToCommand(createCommand, srv)
+	profileArg.AddToCommand(createCommand, srv)
+	createCommand.MarkFlagRequired("profile")
+	createCommand.MarkFlagRequired("fqbn")
+	createCommand.Flags().BoolVar(&setAsDefault, "set-default", false, i18n.Tr("Set the profile as the default one."))
+	return createCommand
+}
+
+func runProfileCreateCommand(ctx context.Context, args []string, srv rpc.ArduinoCoreServiceServer, profile, fqbn string, setAsDefault bool) {
+	path := ""
+	if len(args) > 0 {
+		path = args[0]
+	}
+
+	sketchPath := arguments.InitSketchPath(path)
+
+	inst := instance.CreateAndInit(ctx, srv)
+
+	_, err := srv.ProfileCreate(ctx, &rpc.ProfileCreateRequest{
+		Instance:       inst,
+		SketchPath:     sketchPath.String(),
+		ProfileName:    profile,
+		Fqbn:           fqbn,
+		DefaultProfile: setAsDefault})
+	if err != nil {
+		feedback.Fatal(i18n.Tr("Error initializing the project file: %v", err), feedback.ErrGeneric)
+	}
+	feedback.PrintResult(profileResult{ProjectFilePath: sketchPath.Join("sketch.yaml")})
+}
+
+type profileResult struct {
+	ProjectFilePath *paths.Path `json:"project_path"`
+}
+
+func (ir profileResult) Data() any {
+	return ir
+}
+
+func (ir profileResult) String() string {
+	return i18n.Tr("Project file created in: %s", ir.ProjectFilePath)
+}
