@@ -1,12 +1,12 @@
 ---
 name: github.com/go-git/go-git/v5/storage/filesystem
-version: v5.16.3
+version: v5.16.4
 type: go
 summary: Package filesystem is a storage backend base on filesystems
 homepage: https://pkg.go.dev/github.com/go-git/go-git/v5/storage/filesystem
 license: apache-2.0
 licenses:
-- sources: v5@v5.16.3/LICENSE
+- sources: v5@v5.16.4/LICENSE
   text: |2
                                      Apache License
                                Version 2.0, January 2004
@@ -209,6 +209,6 @@ licenses:
        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
        See the License for the specific language governing permissions and
        limitations under the License.
-- sources: v5@v5.16.3/README.md
+- sources: v5@v5.16.4/README.md
   text: Apache License Version 2.0, see [LICENSE](LICENSE)
 notices: []
