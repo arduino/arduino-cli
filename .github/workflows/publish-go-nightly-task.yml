@@ -37,6 +37,8 @@ jobs:
             runner: ubuntu-latest
           - task: Windows_64bit
             runner: ubuntu-latest
+          - task: Windows_Arm_64bit
+            runner: ubuntu-latest
           - task: Linux_32bit
             runner: ubuntu-latest
           - task: Linux_64bit
