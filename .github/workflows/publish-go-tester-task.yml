@@ -151,7 +151,7 @@ jobs:
 
       # Transfer builds to artifacts job
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           path: ${{ env.DIST_DIR }}/${{ matrix.artifact.path }}
           name: ${{ matrix.artifact.name }}
@@ -178,7 +178,7 @@ jobs:
           done
 
       - name: Upload checksum artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           path: ./*checksums.txt
           name: checksums
