@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/protobuf/types/known/anypb
-version: v1.36.10
+version: v1.36.11
 type: go
 summary: Package anypb contains generated types for google/protobuf/any.proto.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb
 license: bsd-3-clause
 licenses:
-- sources: protobuf@v1.36.10/LICENSE
+- sources: protobuf@v1.36.11/LICENSE
   text: |
     Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -35,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: protobuf@v1.36.10/PATENTS
+- sources: protobuf@v1.36.11/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
