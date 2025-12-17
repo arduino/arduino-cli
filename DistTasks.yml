@@ -52,6 +52,21 @@ tasks:
       PACKAGE_PLATFORM: "Windows_64bit"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.zip"
 
+  Windows_ARM64:
+    desc: Builds Windows ARM 64 bit binaries
+    cmds:
+      - |
+        CGO_ENABLED=0 GOOS=windows GOARCH=arm64 {{.BUILD_COMMAND}}
+
+        cd {{.DIST_DIR}}
+        zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
+
+    vars:
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_arm64"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}"
+      PACKAGE_PLATFORM: "Windows_ARM64"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.zip"
+
   Linux_32bit:
     desc: Builds Linux 32 bit binaries
     cmds:
