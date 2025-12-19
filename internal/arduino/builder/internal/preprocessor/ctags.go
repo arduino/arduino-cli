@@ -45,19 +45,20 @@ func PreprocessSketchWithCtags(
 	lineOffset int, buildProperties *properties.Map,
 	onlyUpdateCompilationDatabase, verbose bool,
 ) (*runner.Result, error) {
+	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
+	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
+	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
+
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
 		return nil, err
 	}
 	defer tmpDir.RemoveAll()
-	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
-
-	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 
 	// Run GCC preprocessor
-	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	result := GCC(sourceFile, ctagsTarget, includes, buildProperties).Run(ctx)
+	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
+	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {
@@ -69,7 +70,7 @@ func PreprocessSketchWithCtags(
 		fmt.Fprintf(stderr, "%s: %s",
 			i18n.Tr("An error occurred adding prototypes"),
 			i18n.Tr("the compilation database may be incomplete or inaccurate"))
-		if err := sourceFile.CopyTo(ctagsTarget); err != nil {
+		if err := unpreprocessedSourceFile.CopyTo(ctagsTarget); err != nil {
 			return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 		}
 	}
@@ -102,7 +103,7 @@ func PreprocessSketchWithCtags(
 
 	// Add prototypes to the original sketch source
 	var source string
-	if sourceData, err := sourceFile.ReadFile(); err == nil {
+	if sourceData, err := unpreprocessedSourceFile.ReadFile(); err == nil {
 		source = string(sourceData)
 	} else {
 		return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
@@ -135,8 +136,15 @@ func PreprocessSketchWithCtags(
 		fmt.Println("#END OF PREPROCESSED SOURCE")
 	}
 
+	// Read the existing preprocessed file to check if it's already up-to-date.
+	oldPreprocessedSource, _ := preprocessedSourceFile.ReadFile()
+	if bytes.Equal([]byte(preprocessedSource), oldPreprocessedSource) {
+		// No changes, do nothing
+		return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, nil
+	}
+
 	// Write back arduino-preprocess output to the sourceFile
-	err = sourceFile.WriteFile([]byte(preprocessedSource))
+	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 }
 
