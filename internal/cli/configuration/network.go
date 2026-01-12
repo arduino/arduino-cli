@@ -34,7 +34,7 @@ import (
 )
 
 // UserAgent returns the user agent (mainly used by HTTP clients)
-func (settings *Settings) UserAgent() string {
+func (settings *Settings) UserAgent(ctx context.Context) string {
 	subComponent := ""
 	if settings != nil {
 		subComponent = settings.GetString("network.user_agent_ext")
@@ -46,6 +46,12 @@ func (settings *Settings) UserAgent() string {
 	extendedUA := os.Getenv("ARDUINO_CLI_USER_AGENT_EXTENSION")
 	if extendedUA != "" {
 		extendedUA = " " + extendedUA
+	}
+
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if ctxUserAgent := strings.Join(md.Get("user-agent"), " "); ctxUserAgent != "" {
+			extendedUA += " " + ctxUserAgent
+		}
 	}
 
 	return fmt.Sprintf("%s/%s%s (%s; %s; %s) Commit:%s%s",
@@ -92,18 +98,12 @@ func (settings *Settings) NewHttpClient(ctx context.Context) (*http.Client, erro
 	if err != nil {
 		return nil, err
 	}
-	userAgent := settings.UserAgent()
-	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if extraUserAgent := strings.Join(md.Get("user-agent"), " "); extraUserAgent != "" {
-			userAgent += " " + extraUserAgent
-		}
-	}
 	return &http.Client{
 		Transport: &httpClientRoundTripper{
 			transport: &http.Transport{
 				Proxy: http.ProxyURL(proxy),
 			},
-			userAgent: userAgent,
+			userAgent: settings.UserAgent(ctx),
 		},
 		Timeout: settings.ConnectionTimeout(),
 	}, nil
