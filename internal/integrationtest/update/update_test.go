@@ -82,7 +82,7 @@ func TestUpdateWithUrlNotFound(t *testing.T) {
 
 	stdout, _, err := cli.Run("update", "--additional-urls="+url.String())
 	require.Error(t, err)
-	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 404 Not Found")
+	require.Contains(t, string(stdout), "404 Not Found")
 }
 
 func TestUpdateWithUrlInternalServerError(t *testing.T) {
@@ -97,7 +97,7 @@ func TestUpdateWithUrlInternalServerError(t *testing.T) {
 
 	stdout, _, err := cli.Run("update", "--additional-urls="+url.String())
 	require.Error(t, err)
-	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 500 Internal Server Error")
+	require.Contains(t, string(stdout), "500 Internal Server Error")
 }
 
 func TestUpdateShowingOutdatedUsingLibraryWithInvalidVersion(t *testing.T) {

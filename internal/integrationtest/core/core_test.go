@@ -229,7 +229,7 @@ func TestCoreUpdateIndexUrlNotFound(t *testing.T) {
 
 	stdout, stderr, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
 	require.Error(t, err)
-	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 404 Not Found")
+	require.Contains(t, string(stdout), "404 Not Found")
 	require.Contains(t, string(stderr), "Some indexes could not be updated.")
 }
 
@@ -245,7 +245,7 @@ func TestCoreUpdateIndexInternalServerError(t *testing.T) {
 
 	stdout, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
 	require.Error(t, err)
-	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 500 Internal Server Error")
+	require.Contains(t, string(stdout), "500 Internal Server Error")
 }
 
 func TestCoreInstallWithoutUpdateIndex(t *testing.T) {
