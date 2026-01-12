@@ -26,7 +26,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/version"
 	"go.bug.st/downloader/v3"
@@ -121,13 +120,20 @@ func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, e
 
 // DownloaderConfig returns the downloader configuration based on current settings.
 func (settings *Settings) DownloaderConfig(ctx context.Context) (downloader.Config, error) {
-	httpClient, err := settings.NewHttpClient(ctx)
+	proxy, err := settings.NetworkProxy()
 	if err != nil {
-		return downloader.Config{}, &cmderrors.InvalidArgumentError{
-			Message: i18n.Tr("Could not connect via HTTP"),
-			Cause:   err}
+		return downloader.Config{}, err
 	}
+
 	return downloader.Config{
-		HttpClient: *httpClient,
+		HttpClient: http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(proxy),
+			},
+		},
+		InactivityTimeout: settings.ConnectionTimeout(),
+		ExtraHeaders: map[string]string{
+			"User-Agent": settings.UserAgent(ctx),
+		},
 	}, nil
 }
