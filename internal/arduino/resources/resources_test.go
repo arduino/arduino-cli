@@ -28,7 +28,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 func TestDownloadAndChecksums(t *testing.T) {

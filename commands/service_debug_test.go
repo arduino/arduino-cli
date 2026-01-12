@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 func TestGetCommandLine(t *testing.T) {

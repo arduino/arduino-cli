@@ -29,7 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/version"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 	"google.golang.org/grpc/metadata"
 )
 

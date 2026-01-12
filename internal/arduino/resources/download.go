@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 // Download performs a download loop using the provided downloader.Config.

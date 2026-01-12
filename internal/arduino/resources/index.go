@@ -30,7 +30,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v4"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 // IndexResource is a reference to an index file URL with an optional signature.
