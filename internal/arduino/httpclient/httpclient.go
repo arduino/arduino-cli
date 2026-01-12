@@ -44,16 +44,10 @@ func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParame
 		}
 	}()
 
-	d, err := downloader.DownloadWithConfig(ctx, path.String(), URL, config)
-	if err != nil {
-		return err
-	}
-
-	err = d.RunAndPoll(func(downloaded int64) {
-		downloadCB.Update(downloaded, d.Size())
-	}, 250*time.Millisecond)
-	if err != nil {
-		return err
+	config.PollFunction = downloadCB.Update
+	config.PollInterval = 250 * time.Millisecond
+	if err := downloader.DownloadWithConfig(ctx, path.String(), URL, config); err != nil {
+		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Download failed"), Cause: err}
 	}
 
 	// The URL is not reachable for some reason
