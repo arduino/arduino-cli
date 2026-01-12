@@ -60,6 +60,9 @@ func (res *IndexResource) IndexFileName() (string, error) {
 // Download will download the index and possibly check the signature using the Arduino's public key.
 // If the file is in .gz format it will be unpacked first.
 func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, config downloader.Config) error {
+	// Disable resuming downloads for index files
+	config.DoNotResumeDownload = true
+
 	// Create destination directory
 	if err := destDir.MkdirAll(); err != nil {
 		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Can't create data directory %s", destDir), Cause: err}
@@ -79,7 +82,7 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		return err
 	}
 	tmpIndexPath := tmp.Join(downloadFileName)
-	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config, downloader.NoResume); err != nil {
+	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config); err != nil {
 		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
@@ -134,7 +137,7 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		// Download signature
 		signaturePath = destDir.Join(signatureFileName)
 		tmpSignaturePath = tmp.Join(signatureFileName)
-		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", i18n.Tr("Downloading index signature: %s", signatureFileName), downloadCB, config, downloader.NoResume); err != nil {
+		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", i18n.Tr("Downloading index signature: %s", signatureFileName), downloadCB, config); err != nil {
 			return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 

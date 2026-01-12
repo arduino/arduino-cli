@@ -30,7 +30,7 @@ import (
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
 // If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
-func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config) (returnedError error) {
 	if queryParameter != "" {
 		URL = URL + "?query=" + queryParameter
 	}
@@ -44,7 +44,7 @@ func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParame
 		}
 	}()
 
-	d, err := downloader.DownloadWithConfigAndContext(ctx, path.String(), URL, config, options...)
+	d, err := downloader.DownloadWithConfig(ctx, path.String(), URL, config)
 	if err != nil {
 		return err
 	}
