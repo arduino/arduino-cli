@@ -49,12 +49,5 @@ func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParame
 	if err := downloader.DownloadWithConfig(ctx, path.String(), URL, config); err != nil {
 		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Download failed"), Cause: err}
 	}
-
-	// The URL is not reachable for some reason
-	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		msg := i18n.Tr("Server responded with: %s", d.Resp.Status)
-		return &cmderrors.FailedDownloadError{Message: msg}
-	}
-
 	return nil
 }
