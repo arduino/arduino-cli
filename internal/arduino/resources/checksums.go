@@ -119,14 +119,7 @@ func (r *DownloadResource) TestLocalArchiveIntegrity(downloadDir *paths.Path) (b
 	return ok, nil
 }
 
-const (
-	filePermissions = 0644
-	packageFileName = "package.json"
-)
-
-type packageFile struct {
-	Checksum string `json:"checksum"`
-}
+const packageFileName = "package.json"
 
 func computeDirChecksum(root string) (string, error) {
 	hash := sha256.New()
@@ -156,7 +149,9 @@ func CheckDirChecksum(root string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	var file packageFile
+	var file struct {
+		Checksum string `json:"checksum"`
+	}
 	json.Unmarshal(packageJSON, &file)
 	checksum, err := computeDirChecksum(root)
 	if err != nil {
