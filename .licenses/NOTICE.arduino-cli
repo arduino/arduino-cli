@@ -25153,7 +25153,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/genproto/googleapis/rpc/status@v0.0.0-20251022142026-3a174f9686a8
+google.golang.org/genproto/googleapis/rpc/status@v0.0.0-20251029180050-ab9386a59fda
 
 Apache License
                            Version 2.0, January 2004
@@ -25358,7 +25358,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc@v1.77.0
+google.golang.org/grpc@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -25583,7 +25583,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 *****
-google.golang.org/grpc/attributes@v1.77.0
+google.golang.org/grpc/attributes@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -25788,7 +25788,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/backoff@v1.77.0
+google.golang.org/grpc/backoff@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -25993,7 +25993,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer@v1.77.0
+google.golang.org/grpc/balancer@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -26198,7 +26198,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/base@v1.77.0
+google.golang.org/grpc/balancer/base@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -26403,7 +26403,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/endpointsharding@v1.77.0
+google.golang.org/grpc/balancer/endpointsharding@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -26608,7 +26608,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/grpclb/state@v1.77.0
+google.golang.org/grpc/balancer/grpclb/state@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -26813,7 +26813,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/pickfirst@v1.77.0
+google.golang.org/grpc/balancer/pickfirst@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -27018,7 +27018,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/pickfirst/internal@v1.77.0
+google.golang.org/grpc/balancer/pickfirst/internal@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -27223,7 +27223,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/roundrobin@v1.77.0
+google.golang.org/grpc/balancer/roundrobin@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -27428,7 +27428,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/binarylog/grpc_binarylog_v1@v1.77.0
+google.golang.org/grpc/binarylog/grpc_binarylog_v1@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -27633,7 +27633,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/channelz@v1.77.0
+google.golang.org/grpc/channelz@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -27838,7 +27838,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/codes@v1.77.0
+google.golang.org/grpc/codes@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -28043,7 +28043,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/connectivity@v1.77.0
+google.golang.org/grpc/connectivity@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -28248,7 +28248,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/credentials@v1.77.0
+google.golang.org/grpc/credentials@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -28453,7 +28453,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/credentials/insecure@v1.77.0
+google.golang.org/grpc/credentials/insecure@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -28658,7 +28658,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/encoding@v1.77.0
+google.golang.org/grpc/encoding@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -28863,7 +28863,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/encoding/internal@v1.77.0
+google.golang.org/grpc/encoding/internal@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -29068,7 +29068,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/encoding/proto@v1.77.0
+google.golang.org/grpc/encoding/proto@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -29273,7 +29273,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/experimental/stats@v1.77.0
+google.golang.org/grpc/experimental/stats@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -29478,7 +29478,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/grpclog@v1.77.0
+google.golang.org/grpc/grpclog@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -29683,7 +29683,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/grpclog/internal@v1.77.0
+google.golang.org/grpc/grpclog/internal@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -29888,7 +29888,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal@v1.77.0
+google.golang.org/grpc/internal@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -30093,7 +30093,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/backoff@v1.77.0
+google.golang.org/grpc/internal/backoff@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -30298,7 +30298,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/balancer/gracefulswitch@v1.77.0
+google.golang.org/grpc/internal/balancer/gracefulswitch@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -30503,7 +30503,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/balancerload@v1.77.0
+google.golang.org/grpc/internal/balancerload@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -30708,7 +30708,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/binarylog@v1.77.0
+google.golang.org/grpc/internal/binarylog@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -30913,7 +30913,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/buffer@v1.77.0
+google.golang.org/grpc/internal/buffer@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -31118,7 +31118,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/channelz@v1.77.0
+google.golang.org/grpc/internal/channelz@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -31323,7 +31323,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/credentials@v1.77.0
+google.golang.org/grpc/internal/credentials@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -31528,7 +31528,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/envconfig@v1.77.0
+google.golang.org/grpc/internal/envconfig@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -31733,7 +31733,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/grpclog@v1.77.0
+google.golang.org/grpc/internal/grpclog@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -31938,7 +31938,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/grpcsync@v1.77.0
+google.golang.org/grpc/internal/grpcsync@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -32143,7 +32143,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/grpcutil@v1.77.0
+google.golang.org/grpc/internal/grpcutil@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -32348,7 +32348,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/idle@v1.77.0
+google.golang.org/grpc/internal/idle@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -32553,7 +32553,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/metadata@v1.77.0
+google.golang.org/grpc/internal/metadata@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -32758,7 +32758,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/pretty@v1.77.0
+google.golang.org/grpc/internal/pretty@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -32963,7 +32963,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/proxyattributes@v1.77.0
+google.golang.org/grpc/internal/proxyattributes@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -33168,7 +33168,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver@v1.77.0
+google.golang.org/grpc/internal/resolver@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -33373,7 +33373,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/delegatingresolver@v1.77.0
+google.golang.org/grpc/internal/resolver/delegatingresolver@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -33578,7 +33578,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/dns@v1.77.0
+google.golang.org/grpc/internal/resolver/dns@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -33783,7 +33783,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/dns/internal@v1.77.0
+google.golang.org/grpc/internal/resolver/dns/internal@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -33988,7 +33988,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/passthrough@v1.77.0
+google.golang.org/grpc/internal/resolver/passthrough@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -34193,7 +34193,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/unix@v1.77.0
+google.golang.org/grpc/internal/resolver/unix@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -34398,7 +34398,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/serviceconfig@v1.77.0
+google.golang.org/grpc/internal/serviceconfig@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -34603,7 +34603,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/stats@v1.77.0
+google.golang.org/grpc/internal/stats@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -34808,7 +34808,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/status@v1.77.0
+google.golang.org/grpc/internal/status@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -35013,7 +35013,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/syscall@v1.77.0
+google.golang.org/grpc/internal/syscall@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -35218,7 +35218,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/transport@v1.77.0
+google.golang.org/grpc/internal/transport@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -35423,7 +35423,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/transport/networktype@v1.77.0
+google.golang.org/grpc/internal/transport/networktype@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -35628,7 +35628,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/keepalive@v1.77.0
+google.golang.org/grpc/keepalive@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -35833,7 +35833,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/mem@v1.77.0
+google.golang.org/grpc/mem@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -36038,7 +36038,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/metadata@v1.77.0
+google.golang.org/grpc/metadata@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -36243,7 +36243,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/peer@v1.77.0
+google.golang.org/grpc/peer@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -36448,7 +36448,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/resolver@v1.77.0
+google.golang.org/grpc/resolver@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -36653,7 +36653,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/resolver/dns@v1.77.0
+google.golang.org/grpc/resolver/dns@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -36858,7 +36858,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/serviceconfig@v1.77.0
+google.golang.org/grpc/serviceconfig@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -37063,7 +37063,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/stats@v1.77.0
+google.golang.org/grpc/stats@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -37268,7 +37268,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/status@v1.77.0
+google.golang.org/grpc/status@v1.78.0
 
 Apache License
                            Version 2.0, January 2004
@@ -37473,7 +37473,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/tap@v1.77.0
+google.golang.org/grpc/tap@v1.78.0
 
 Apache License
                            Version 2.0, January 2004

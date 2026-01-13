@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/balancer/pickfirst
-version: v1.77.0
+version: v1.78.0
 type: go
 summary: Package pickfirst contains the pick_first load balancing policy which is
   the universal leaf policy.
 homepage: https://pkg.go.dev/google.golang.org/grpc/balancer/pickfirst
 license: apache-2.0
 licenses:
-- sources: grpc@v1.77.0/LICENSE
+- sources: grpc@v1.78.0/LICENSE
   text: |2
 
                                      Apache License

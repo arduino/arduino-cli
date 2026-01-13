@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/mem
-version: v1.77.0
+version: v1.78.0
 type: go
 summary: Package mem provides utilities that facilitate memory reuse in byte slices
   that are used as buffers.
 homepage: https://pkg.go.dev/google.golang.org/grpc/mem
 license: apache-2.0
 licenses:
-- sources: grpc@v1.77.0/LICENSE
+- sources: grpc@v1.78.0/LICENSE
   text: |2
 
                                      Apache License
