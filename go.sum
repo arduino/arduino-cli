@@ -193,8 +193,8 @@ github.com/xeipuuv/gojsonschema v1.2.0 h1:LhYJRs+L4fBtjZUfuSZIKGeVu0QRy8e5Xi7D17
 github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQluxsYJ78Id3Y=
 go.bug.st/cleanup v1.0.0 h1:XVj1HZxkBXeq3gMT7ijWUpHyIC1j8XAoNSyQ06CskgA=
 go.bug.st/cleanup v1.0.0/go.mod h1:EqVmTg2IBk4znLbPD28xne3abjsJftMdqqJEjhn70bk=
-go.bug.st/downloader/v2 v2.2.0 h1:Y0jSuDISNhrzePkrAWqz9xUC3xol9hqZo/+tz1D4EqY=
-go.bug.st/downloader/v2 v2.2.0/go.mod h1:VZW2V1iGKV8rJL2ZEGIDzzBeKowYv34AedJz13RzVII=
+go.bug.st/downloader/v3 v3.0.0 h1:yXYamyDwQZonT8j2LD9i6hviqYQu7SuPEU1o5leMJak=
+go.bug.st/downloader/v3 v3.0.0/go.mod h1:iwxwrxxREdx2e2BihdZZlX4uP15hq5DuIpwNHK7tjpk=
 go.bug.st/f v0.4.0 h1:Vstqb950nMA+PhAlRxUw8QL1ntHy/gXHNyyzjkQLJ10=
 go.bug.st/f v0.4.0/go.mod h1:bMo23205ll7UW63KwO1ut5RdlJ9JK8RyEEr88CmOF5Y=
 go.bug.st/relaxed-semver v0.15.0 h1:w37+SYQPxF53RQO7QZZuPIMaPouOifdaP0B1ktst2nA=

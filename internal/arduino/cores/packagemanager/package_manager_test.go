@@ -29,7 +29,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )

@@ -23393,9 +23393,9 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 *****
-go.bug.st/downloader/v2@v2.2.0
+go.bug.st/downloader/v3@v3.0.0
 
-Copyright (c) 2018, Cristian Maglie.
+Copyright (c) 2018-2025, Cristian Maglie.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23426,6 +23426,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
+-----
+
+This library is released under the permissive BSD-3-CLAUSE.
 
 *****
 go.bug.st/f@v0.4.0

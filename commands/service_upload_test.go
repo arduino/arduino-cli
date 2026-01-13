@@ -31,7 +31,7 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 func TestDetectSketchNameFromBuildPath(t *testing.T) {

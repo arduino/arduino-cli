@@ -38,7 +38,7 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/arduino/go-timeutils"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 	semver "go.bug.st/relaxed-semver"
 )
 
