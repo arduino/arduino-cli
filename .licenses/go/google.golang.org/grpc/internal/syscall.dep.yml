@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal/syscall
-version: v1.77.0
+version: v1.78.0
 type: go
 summary: Package syscall provides functionalities that grpc uses to get low-level
   operating system stats/info.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/syscall
 license: apache-2.0
 licenses:
-- sources: grpc@v1.77.0/LICENSE
+- sources: grpc@v1.78.0/LICENSE
   text: |2
 
                                      Apache License

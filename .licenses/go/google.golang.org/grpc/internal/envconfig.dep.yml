@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/envconfig
-version: v1.77.0
+version: v1.78.0
 type: go
 summary: Package envconfig contains grpc settings configured by environment variables.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/envconfig
 license: apache-2.0
 licenses:
-- sources: grpc@v1.77.0/LICENSE
+- sources: grpc@v1.78.0/LICENSE
   text: |2
 
                                      Apache License
