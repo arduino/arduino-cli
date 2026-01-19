@@ -69,7 +69,7 @@ msgstr "%s‎deve ser instalado.‎"
 msgid "%s pattern is missing"
 msgstr "%spadrão está faltando"
 
-#: commands/cmderrors/cmderrors.go:856
+#: commands/cmderrors/cmderrors.go:875
 msgid "'%s' has an invalid signature"
 msgstr "%s‎tem uma assinatura inválida‎"
 
@@ -135,6 +135,10 @@ msgstr "MANUAL DE LINHA DE COMANDO ARDUINO"
 msgid "Additional help topics:"
 msgstr "Tópicos de ajuda adicionais:"
 
+#: internal/cli/profile/profile_lib_add.go:41
+msgid "Adds a library to a sketch profile."
+msgstr ""
+
 #: internal/cli/config/add.go:34 internal/cli/config/add.go:35
 msgid "Adds one or more values to a setting."
 msgstr "Adicionar um ou mais valores para uma configuração."
@@ -188,11 +192,11 @@ msgstr "%[1]sArquivando núcleo construído (cache) em:"
 msgid "Arduino CLI sketch commands."
 msgstr "Comandos de esboço da Linha de Comando Arduino"
 
-#: internal/cli/cli.go:88
+#: internal/cli/cli.go:89
 msgid "Arduino CLI."
 msgstr "Linha de Comando Arduino."
 
-#: internal/cli/cli.go:89
+#: internal/cli/cli.go:90
 msgid "Arduino Command Line Interface (arduino-cli)."
 msgstr "Interface de Linha de Comando Arduino (arduino-cli)."
 
@@ -217,6 +221,8 @@ msgid "Arduino core operations."
 msgstr "Operações centrais Arduino."
 
 #: internal/cli/lib/check_deps.go:62 internal/cli/lib/install.go:130
+#: internal/cli/profile/profile_lib_add.go:66
+#: internal/cli/profile/profile_lib_remove.go:67
 msgid "Arguments error: %v"
 msgstr "%vErro nos argumentos:"
 
@@ -274,6 +280,10 @@ msgid "Bootloader file specified but missing: %[1]s"
 msgstr ""
 "Um Arquivo carregador de inicialização definido, mas está faltando: %[1]s"
 
+#: internal/cli/profile/profile.go:29 internal/cli/profile/profile.go:30
+msgid "Build profile operations."
+msgstr ""
+
 #: internal/cli/compile/compile.go:105
 msgid ""
 "Builds of cores and sketches are saved into this path to be cached and "
@@ -330,11 +340,11 @@ msgstr "Não é possível criar diretório de arquivo de configuração: %v"
 msgid "Cannot create config file: %v"
 msgstr "Não é possível criar arquivo de configuração: %v"
 
-#: commands/cmderrors/cmderrors.go:819
+#: commands/cmderrors/cmderrors.go:838
 msgid "Cannot create temp dir"
 msgstr "Não é possível criar diretório temporário"
 
-#: commands/cmderrors/cmderrors.go:837
+#: commands/cmderrors/cmderrors.go:856
 msgid "Cannot create temp file"
 msgstr "Não é possível criar arquivo temporário"
 
@@ -373,6 +383,10 @@ msgstr "Não é possível realizar redefinição de porta: %s"
 msgid "Cannot remove the configuration key %[1]s: %[2]v"
 msgstr "Não é possível remover a chave de configuração %[1]s: %[2]v"
 
+#: internal/cli/profile/profile_set-default.go:52
+msgid "Cannot set %s as default profile: %v"
+msgstr ""
+
 #: internal/arduino/cores/packagemanager/install_uninstall.go:163
 msgid "Cannot upgrade platform"
 msgstr "Não é possível realizar Upgrade na plataforma"
@@ -390,7 +404,7 @@ msgid "Check if the given board/programmer combination supports debugging."
 msgstr ""
 "Verifique se a combinação placa/programador fornecida suporta depuração."
 
-#: internal/arduino/resources/checksums.go:166
+#: internal/arduino/resources/checksums.go:161
 msgid "Checksum differs from checksum in package.json"
 msgstr "Checksum difere da Checksum em packages.json"
 
@@ -402,7 +416,7 @@ msgstr "Checksum: "
 msgid "Clean caches."
 msgstr "Limpar Caches."
 
-#: internal/cli/cli.go:181
+#: internal/cli/cli.go:183
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr ""
 "Lista de valores separados por vírgula para URLs adicionais para o "
@@ -415,6 +429,10 @@ msgid ""
 msgstr ""
 "Comando continua a executar e a imprimir lista de placas conectadas sempre "
 "que ocorrer uma mudança."
+
+#: internal/cli/profile/profile_lib.go:29
+msgid "Commands to manage libraries in sketch profiles."
+msgstr ""
 
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
@@ -487,10 +505,6 @@ msgstr "Conectando a %s. Pressione CTRL-C para sair."
 msgid "Core"
 msgstr "Núcleo"
 
-#: internal/cli/configuration/network.go:127
-msgid "Could not connect via HTTP"
-msgstr "Não foi possível conectar via HTTP"
-
 #: commands/instances.go:512
 msgid "Could not create index directory"
 msgstr "Não foi possível criar diretório Index"
@@ -515,6 +529,10 @@ msgstr "Criar novo Esboço"
 msgid "Create and print a profile configuration from the build."
 msgstr "Criar e imprimir perfil de configuração da Build."
 
+#: internal/cli/profile/profile_create.go:37
+msgid "Create or update a profile in the sketch project file."
+msgstr ""
+
 #: internal/cli/sketch/archive.go:37 internal/cli/sketch/archive.go:38
 msgid "Creates a zip file containing all sketch files."
 msgstr "Cria um arquivo .zip contendo todos os arquivos de esboço."
@@ -526,6 +544,10 @@ msgid ""
 msgstr ""
 "Cria ou atualiza o arquivo de configuração no diretório de dados ou em um "
 "diretório customizado com as definições de configuração atuais."
+
+#: internal/cli/profile/profile_create.go:39
+msgid "Creates or updates the sketch project file in the current directory."
+msgstr ""
 
 #: internal/cli/debug/debug.go:266
 msgid "Custom configuration for %s:"
@@ -570,6 +592,10 @@ msgstr "Padrão FQBN definido como"
 #: internal/cli/board/attach.go:114
 msgid "Default port set to"
 msgstr "Porta padrão definida como"
+
+#: internal/cli/profile/profile_set-default.go:64
+msgid "Default profile set to: %s"
+msgstr ""
 
 #: internal/cli/board/attach.go:116
 msgid "Default programmer set to"
@@ -635,9 +661,17 @@ msgstr "Desconectado"
 msgid "Display only the provided gRPC calls"
 msgstr "Mostrar apenas as chamadas gRPC oferecidas"
 
+#: internal/cli/profile/profile_lib_add.go:55
+msgid "Do not add dependencies."
+msgstr ""
+
 #: internal/cli/lib/install.go:62
 msgid "Do not install dependencies."
 msgstr "Não instale dependências."
+
+#: internal/cli/profile/profile_lib_add.go:56
+msgid "Do not overwrite already added libraries."
+msgstr ""
 
 #: internal/cli/lib/install.go:63
 msgid "Do not overwrite already installed libraries."
@@ -652,6 +686,10 @@ msgstr "Não sobrescreva plataformas já instaladas."
 msgid "Do not perform the actual upload, just log out actions"
 msgstr "Não faça um envio verdadeiro, apenas registre as ações."
 
+#: internal/cli/profile/profile_lib_remove.go:57
+msgid "Do not remove unused dependencies."
+msgstr ""
+
 #: internal/cli/daemon/daemon.go:81
 msgid "Do not terminate daemon process if the parent process dies"
 msgstr "Não encerre o processo Daemon se o processo relacionado morrer."
@@ -660,17 +698,21 @@ msgstr "Não encerre o processo Daemon se o processo relacionado morrer."
 msgid "Do not try to update library dependencies if already installed."
 msgstr ""
 
+#: internal/arduino/httpclient/httpclient.go:50
+msgid "Download failed"
+msgstr ""
+
 #: commands/service_library_download.go:92
 msgid "Downloading %s"
 msgstr "Baixando %s"
 
-#: internal/arduino/resources/index.go:137
+#: internal/arduino/resources/index.go:139
 msgid "Downloading index signature: %s"
 msgstr "Baixando assinatura Indes: %s"
 
 #: commands/instances.go:589 commands/instances.go:607
 #: commands/instances.go:621 commands/instances.go:638
-#: internal/arduino/resources/index.go:82
+#: internal/arduino/resources/index.go:83
 msgid "Downloading index: %s"
 msgstr "Baixando Index: %s"
 
@@ -714,6 +756,10 @@ msgstr "Insira caminho para arquivo zip"
 #: internal/cli/lib/install.go:64
 msgid "Enter git url for libraries hosted on repositories"
 msgstr "Insira URL git para bibliotecas hospedadas em repositórios"
+
+#: internal/cli/profile/profile_lib_add.go:86
+msgid "Error adding %s: %v"
+msgstr ""
 
 #: commands/service_sketch_archive.go:105
 msgid "Error adding file to sketch archive"
@@ -778,11 +824,11 @@ msgstr "Erro ao baixar %[1]s: %[2]v"
 msgid "Error downloading %s"
 msgstr "Erro ao baixar %s"
 
-#: commands/instances.go:686 internal/arduino/resources/index.go:83
+#: commands/instances.go:686 internal/arduino/resources/index.go:84
 msgid "Error downloading index '%s'"
 msgstr "Erro ao baixar índice '%s'"
 
-#: internal/arduino/resources/index.go:138
+#: internal/arduino/resources/index.go:140
 msgid "Error downloading index signature '%s'"
 msgstr "Erro ao baixar assinatura de índice '%s'"
 
@@ -835,8 +881,8 @@ msgstr "Erro durante desinstalação: %v"
 msgid "Error during upgrade: %v"
 msgstr "Erro durante atualização: %v"
 
-#: internal/arduino/resources/index.go:105
-#: internal/arduino/resources/index.go:124
+#: internal/arduino/resources/index.go:106
+#: internal/arduino/resources/index.go:125
 msgid "Error extracting %s"
 msgstr "Erro ao extrair %s"
 
@@ -891,6 +937,10 @@ msgstr "Erro ao obter entrada do usuário"
 msgid "Error initializing instance: %v"
 msgstr "Erro ao inicializar instância: %v"
 
+#: internal/cli/profile/profile_create.go:71
+msgid "Error initializing the project file: %v"
+msgstr ""
+
 #: internal/cli/lib/install.go:148
 msgid "Error installing %s: %v"
 msgstr "Erro ao instalar %s: %v"
@@ -939,7 +989,7 @@ msgstr "Erro ao carregar plataformas de hardware"
 msgid "Error loading index %s"
 msgstr "Erro ao carregar índice %s"
 
-#: internal/arduino/resources/index.go:99
+#: internal/arduino/resources/index.go:100
 msgid "Error opening %s"
 msgstr "Erro ao abrir %s"
 
@@ -963,6 +1013,10 @@ msgstr "Erro ao ler diretório de build"
 msgid "Error reading sketch files"
 msgstr "Erro ao ler arquivos de esboço"
 
+#: internal/cli/profile/profile_lib_remove.go:87
+msgid "Error removing library %[1]s from the profile"
+msgstr ""
+
 #: internal/cli/lib/check_deps.go:72
 msgid "Error resolving dependencies for %[1]s: %[2]s"
 msgstr "Erro ao esclarecer dependências para %[1]s: %[2]s"
@@ -975,13 +1029,13 @@ msgstr "Erro ao adquirir lista de núcleos: %v"
 msgid "Error rolling-back changes: %s"
 msgstr "Erro ao reverter mudanças: %s"
 
-#: internal/arduino/resources/index.go:165
-#: internal/arduino/resources/index.go:177
+#: internal/arduino/resources/index.go:167
+#: internal/arduino/resources/index.go:179
 msgid "Error saving downloaded index"
 msgstr "Erro ao salvar índice baixado"
 
-#: internal/arduino/resources/index.go:172
-#: internal/arduino/resources/index.go:181
+#: internal/arduino/resources/index.go:174
+#: internal/arduino/resources/index.go:183
 msgid "Error saving downloaded index signature"
 msgstr "Erro ao salvar assinatura de índice baixado"
 
@@ -1029,8 +1083,8 @@ msgstr "Erro ao atualizar bibliotecas"
 msgid "Error upgrading platform: %s"
 msgstr "Erro ao atualizar plataforma: %s"
 
-#: internal/arduino/resources/index.go:147
-#: internal/arduino/resources/index.go:153
+#: internal/arduino/resources/index.go:149
+#: internal/arduino/resources/index.go:155
 msgid "Error verifying signature"
 msgstr "Erro ao verificar assinatura"
 
@@ -1187,7 +1241,7 @@ msgid ""
 "Force skip of pre-uninstall scripts (if the CLI is running interactively)."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:877
+#: commands/cmderrors/cmderrors.go:896
 msgid "Found %d platforms matching \"%s\": %s"
 msgstr ""
 
@@ -1337,7 +1391,7 @@ msgstr "URL inválida"
 msgid "Invalid additional URL: %v"
 msgstr "URL adicional inválida: %v"
 
-#: internal/arduino/resources/index.go:111
+#: internal/arduino/resources/index.go:112
 msgid "Invalid archive: file %[1]s not found in archive %[2]s"
 msgstr ""
 
@@ -1379,7 +1433,7 @@ msgstr "Biblioteca inválida"
 msgid "Invalid library directory in sketch project: %s"
 msgstr ""
 
-#: internal/cli/cli.go:265
+#: internal/cli/cli.go:267
 msgid "Invalid logging level: %s"
 msgstr ""
 
@@ -1387,11 +1441,11 @@ msgstr ""
 msgid "Invalid network configuration: %s"
 msgstr ""
 
-#: internal/cli/configuration/network.go:83
+#: internal/cli/configuration/network.go:88
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "network.proxy inválido: '%[1]s':%[2]s"
 
-#: internal/cli/cli.go:222
+#: internal/cli/cli.go:224
 msgid "Invalid output format: %s"
 msgstr "Formato de saída inválido: %s"
 
@@ -1444,6 +1498,8 @@ msgid "LIBNAME"
 msgstr "NOMEBIBL"
 
 #: internal/cli/lib/check_deps.go:38 internal/cli/lib/install.go:45
+#: internal/cli/profile/profile_lib_add.go:40
+#: internal/cli/profile/profile_lib_remove.go:39
 msgid "LIBRARY"
 msgstr "BIBLIOTECA"
 
@@ -1564,6 +1620,12 @@ msgstr "Carregando arquivo Index: %v"
 msgid "Location"
 msgstr "Localização"
 
+#: internal/cli/profile/profile_lib_add.go:54
+#: internal/cli/profile/profile_lib_remove.go:56
+#: internal/cli/profile/profile_set-default.go:42
+msgid "Location of the sketch."
+msgstr ""
+
 #: internal/arduino/builder/sizer.go:211
 msgid "Low memory available, stability problems may occur."
 msgstr "Pouca memória disponível, podem ocorrer problemas de estabilidade."
@@ -1582,7 +1644,7 @@ msgstr ""
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Tempo máximo para esperar a descoberta de porta. E.g.: 30s, 1m"
 
-#: internal/cli/cli.go:170
+#: internal/cli/cli.go:172
 msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr ""
@@ -1596,7 +1658,7 @@ msgstr "'%[1]s' está faltando da biblioteca em %[2]s"
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr "FQBN (Nome de Placa Totalmente Qualificado) está faltando"
 
-#: commands/cmderrors/cmderrors.go:929
+#: commands/cmderrors/cmderrors.go:948
 msgid "Missing Profile name"
 msgstr ""
 
@@ -1862,7 +1924,7 @@ msgstr ""
 "Caminho para o diretório raíz de uma biblioteca. Pode ser utilizado "
 "múltiplas vezes. Entradas podem ser separadas por vírgulas."
 
-#: internal/cli/cli.go:172
+#: internal/cli/cli.go:174
 msgid "Path to the file where logs will be written."
 msgstr "Caminho para o arquivo onde os registros de dados serão escritos."
 
@@ -1988,11 +2050,11 @@ msgstr "Imprimir detalhes sobre a placa."
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "Imprimir código pré-processado para stdout ao invés de compilar."
 
-#: internal/cli/cli.go:166 internal/cli/cli.go:168
+#: internal/cli/cli.go:168 internal/cli/cli.go:170
 msgid "Print the logs on the standard output."
 msgstr "Imprimir as informações de registro para a saída padrão."
 
-#: internal/cli/cli.go:180
+#: internal/cli/cli.go:182
 msgid "Print the output in JSON format."
 msgstr ""
 
@@ -2028,6 +2090,10 @@ msgstr "Programador para utilizar, ex: atmel_ice"
 msgid "Programmers:"
 msgstr "Programadores:"
 
+#: internal/cli/profile/profile_create.go:85
+msgid "Project file created in: %s"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:409
 msgid "Property '%s' is undefined"
 msgstr "Propriedade '%s' não definida"
@@ -2039,6 +2105,12 @@ msgstr "Protocolo"
 #: internal/cli/lib/search.go:212
 msgid "Provides includes: %s"
 msgstr "Providenciar includes: %s"
+
+#: internal/cli/profile/profile_lib_remove.go:40
+msgid ""
+"Removes a library from a sketch profile with its dependencies if no longer "
+"needed."
+msgstr ""
 
 #: internal/cli/config/remove.go:34 internal/cli/config/remove.go:35
 msgid "Removes one or more values from a setting."
@@ -2165,10 +2237,6 @@ msgstr "Sentença: %s"
 msgid "Server path"
 msgstr ""
 
-#: internal/arduino/httpclient/httpclient.go:61
-msgid "Server responded with: %s"
-msgstr "Servidor respondeu com: %s"
-
 #: internal/cli/debug/debug.go:245
 msgid "Server type"
 msgstr ""
@@ -2181,11 +2249,20 @@ msgstr ""
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr ""
 
+#: internal/cli/profile/profile_set-default.go:33
+#: internal/cli/profile/profile_set-default.go:34
+msgid "Set the default build profile."
+msgstr ""
+
+#: internal/cli/profile/profile_create.go:50
+msgid "Set the profile as the default one."
+msgstr ""
+
 #: internal/cli/config/set.go:34 internal/cli/config/set.go:35
 msgid "Sets a setting value."
 msgstr "Define um valor de configuração."
 
-#: internal/cli/cli.go:189
+#: internal/cli/cli.go:191
 msgid ""
 "Sets the default data directory (Arduino CLI will look for configuration "
 "file in this directory)."
@@ -2209,7 +2286,7 @@ msgstr "Define onde o arquivo de configuração deve ser salvo."
 msgid "Setting"
 msgstr "Configuração"
 
-#: internal/cli/cli.go:101
+#: internal/cli/cli.go:102
 msgid "Should show help message, but it is available only in TEXT mode."
 msgstr ""
 
@@ -2404,11 +2481,11 @@ msgstr ""
 msgid "The TCP port the daemon will listen to"
 msgstr "O daemon da porta TCP irá ouvir em"
 
-#: internal/cli/cli.go:177
+#: internal/cli/cli.go:179
 msgid "The command output format, can be: %s"
 msgstr ""
 
-#: internal/cli/cli.go:187
+#: internal/cli/cli.go:189
 msgid "The custom config file (if not specified the default will be used)."
 msgstr ""
 "O arquivo de configuração customizado (caso não seja definido, o padrão vai "
@@ -2424,6 +2501,20 @@ msgstr ""
 msgid "The flag --debug-file must be used with --debug."
 msgstr "A flag --debug-file deve ser usada junto de --debug."
 
+#: internal/cli/profile/profile_lib_add.go:109
+msgid "The following libraries were added to the profile %s:"
+msgstr ""
+
+#: internal/cli/profile/profile_lib_add.go:115
+msgid ""
+"The following libraries were already present in the profile %s and were not "
+"modified:"
+msgstr ""
+
+#: internal/cli/profile/profile_lib_remove.go:105
+msgid "The following libraries were removed from the profile %s:"
+msgstr ""
+
 #: internal/cli/debug/debug_check.go:94
 msgid "The given board/programmer configuration does NOT support debugging."
 msgstr ""
@@ -2432,7 +2523,7 @@ msgstr ""
 msgid "The given board/programmer configuration supports debugging."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:914
+#: commands/cmderrors/cmderrors.go:933
 msgid "The instance is no longer valid and needs to be reinitialized"
 msgstr ""
 
@@ -2456,7 +2547,7 @@ msgstr ""
 msgid "The library %[1]s has been automatically added from sketch project."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:896
+#: commands/cmderrors/cmderrors.go:915
 msgid "The library %s has multiple installations:"
 msgstr "A biblioteca %s possui múltiplas instalações:"
 
@@ -2483,7 +2574,7 @@ msgstr ""
 "resultados binários durante o processo de compilação. Usado apenas por "
 "plataformas que possuem suporte."
 
-#: internal/cli/cli.go:174
+#: internal/cli/cli.go:176
 msgid "The output format for the logs, can be: %s"
 msgstr "Os formatos de saída para os arquivos de registro podem ser: %s"
 
@@ -2588,7 +2679,7 @@ msgstr ""
 msgid "Unable to get user home dir: %v"
 msgstr ""
 
-#: internal/cli/cli.go:252
+#: internal/cli/cli.go:254
 msgid "Unable to open file for logging: %s"
 msgstr ""
 
@@ -2781,6 +2872,8 @@ msgid "VERSION"
 msgstr ""
 
 #: internal/cli/lib/check_deps.go:38 internal/cli/lib/install.go:45
+#: internal/cli/profile/profile_lib_add.go:40
+#: internal/cli/profile/profile_lib_remove.go:39
 msgid "VERSION_NUMBER"
 msgstr ""
 
@@ -2933,7 +3026,7 @@ msgstr ""
 msgid "cleaning build path"
 msgstr ""
 
-#: internal/cli/cli.go:90
+#: internal/cli/cli.go:91
 msgid "command"
 msgstr ""
 
@@ -3076,7 +3169,7 @@ msgstr ""
 msgid "extracting archive: %s"
 msgstr ""
 
-#: internal/arduino/resources/checksums.go:143
+#: internal/arduino/resources/checksums.go:136
 msgid "failed to compute hash of file \"%s\""
 msgstr ""
 
@@ -3096,7 +3189,7 @@ msgstr ""
 msgid "finding absolute path of %s"
 msgstr ""
 
-#: internal/cli/cli.go:90
+#: internal/cli/cli.go:91
 msgid "flags"
 msgstr ""
 
@@ -3431,7 +3524,7 @@ msgstr ""
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 
-#: internal/arduino/resources/index.go:153
+#: internal/arduino/resources/index.go:155
 msgid "missing signature"
 msgstr ""
 
@@ -3547,7 +3640,7 @@ msgstr ""
 msgid "platform is not available for your OS"
 msgstr ""
 
-#: commands/service_compile.go:130 commands/service_profile_init.go:78
+#: commands/service_compile.go:130 commands/service_profile_create.go:73
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
 #: internal/arduino/cores/packagemanager/loader.go:417

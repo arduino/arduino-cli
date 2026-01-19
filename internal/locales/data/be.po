@@ -68,7 +68,7 @@ msgstr "%s павінен быць усталяваны."
 msgid "%s pattern is missing"
 msgstr "Шаблон %s адсутнічае"
 
-#: commands/cmderrors/cmderrors.go:856
+#: commands/cmderrors/cmderrors.go:875
 msgid "'%s' has an invalid signature"
 msgstr "'%s' мае несапраўдную сігнатуру"
 
@@ -135,6 +135,10 @@ msgstr "Кіраўніцтва карыстальніка каманднага �
 msgid "Additional help topics:"
 msgstr "Дадатковыя падзелы даведкі:"
 
+#: internal/cli/profile/profile_lib_add.go:41
+msgid "Adds a library to a sketch profile."
+msgstr ""
+
 #: internal/cli/config/add.go:34 internal/cli/config/add.go:35
 msgid "Adds one or more values to a setting."
 msgstr "Дадае адно ці некалькі значэнняў да налады."
@@ -188,11 +192,11 @@ msgstr "Архіваванне ўбудаванага ядра (кэшаванн
 msgid "Arduino CLI sketch commands."
 msgstr "Каманды сцэнараў Arduino CLI."
 
-#: internal/cli/cli.go:88
+#: internal/cli/cli.go:89
 msgid "Arduino CLI."
 msgstr "Arduino CLI."
 
-#: internal/cli/cli.go:89
+#: internal/cli/cli.go:90
 msgid "Arduino Command Line Interface (arduino-cli)."
 msgstr "Інтэрфейс каманднага радка Arduino (arduino-cli)."
 
@@ -217,6 +221,8 @@ msgid "Arduino core operations."
 msgstr "Аперацыі ядра Arduino."
 
 #: internal/cli/lib/check_deps.go:62 internal/cli/lib/install.go:130
+#: internal/cli/profile/profile_lib_add.go:66
+#: internal/cli/profile/profile_lib_remove.go:67
 msgid "Arguments error: %v"
 msgstr "Памылка ў аргументах: %v"
 
@@ -272,6 +278,10 @@ msgstr "Версія платы:"
 #: internal/arduino/builder/sketch.go:256
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "Паказаны файл загрузніка адсутнічае: %[1]s"
+
+#: internal/cli/profile/profile.go:29 internal/cli/profile/profile.go:30
+msgid "Build profile operations."
+msgstr ""
 
 #: internal/cli/compile/compile.go:105
 msgid ""
@@ -331,11 +341,11 @@ msgstr "Не атрымалася стварыць каталог канфігу
 msgid "Cannot create config file: %v"
 msgstr "Не атрымалася стварыць файл кафігурацыі: %v"
 
-#: commands/cmderrors/cmderrors.go:819
+#: commands/cmderrors/cmderrors.go:838
 msgid "Cannot create temp dir"
 msgstr "Не атрымалася стварыць часовы каталог"
 
-#: commands/cmderrors/cmderrors.go:837
+#: commands/cmderrors/cmderrors.go:856
 msgid "Cannot create temp file"
 msgstr "Не атрымалася стварыць часовы файл"
 
@@ -374,6 +384,10 @@ msgstr "Не атрымалася скінуць порт: %s"
 msgid "Cannot remove the configuration key %[1]s: %[2]v"
 msgstr "Не атрымалася выдаліць канфігурацыйны ключ %[1]s: %[2]v"
 
+#: internal/cli/profile/profile_set-default.go:52
+msgid "Cannot set %s as default profile: %v"
+msgstr ""
+
 #: internal/arduino/cores/packagemanager/install_uninstall.go:163
 msgid "Cannot upgrade platform"
 msgstr "Не атрымалася абнавіць платформу"
@@ -391,7 +405,7 @@ msgid "Check if the given board/programmer combination supports debugging."
 msgstr ""
 "Праверыць, ці падтрымлівае дадзеная камбінацыя платы і праграматара адладку."
 
-#: internal/arduino/resources/checksums.go:166
+#: internal/arduino/resources/checksums.go:161
 msgid "Checksum differs from checksum in package.json"
 msgstr ""
 "Кантрольная сума адрозніваецца ад кантрольнай сумы ў файле package.json"
@@ -404,7 +418,7 @@ msgstr "Кантрольная сума:"
 msgid "Clean caches."
 msgstr "Чысціць кэш."
 
-#: internal/cli/cli.go:181
+#: internal/cli/cli.go:183
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr ""
 "Спіс дадатковых адрасоў URL для кіраўніка плат, які падзелены коскамі."
@@ -416,6 +430,10 @@ msgid ""
 msgstr ""
 "Каманда працягвае выконвацца і друкуе спіс злучаных плат кожны раз, калі "
 "адбываюцца змяненні."
+
+#: internal/cli/profile/profile_lib.go:29
+msgid "Commands to manage libraries in sketch profiles."
+msgstr ""
 
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
@@ -489,10 +507,6 @@ msgstr ""
 msgid "Core"
 msgstr "Ядро"
 
-#: internal/cli/configuration/network.go:127
-msgid "Could not connect via HTTP"
-msgstr "Не атрымалася злучыцца па пратаколе HTTP"
-
 #: commands/instances.go:512
 msgid "Could not create index directory"
 msgstr "Не атрымалася стварыць індэксны каталог"
@@ -517,6 +531,10 @@ msgstr "Стварыць новы сцэнар"
 msgid "Create and print a profile configuration from the build."
 msgstr "Стварыць і надрукаваць канфігурацыі профілю з зборкі."
 
+#: internal/cli/profile/profile_create.go:37
+msgid "Create or update a profile in the sketch project file."
+msgstr ""
+
 #: internal/cli/sketch/archive.go:37 internal/cli/sketch/archive.go:38
 msgid "Creates a zip file containing all sketch files."
 msgstr "Стварэнне файлу zip, які змяшчае ўсе файлы сцэнара."
@@ -528,6 +546,10 @@ msgid ""
 msgstr ""
 "Стварэнне ці абнаўленне файлу канфігурацыі ў каталогу дадзеных або "
 "карыстальніцкім каталогу з бягучымі наладамі канфігурацыі."
+
+#: internal/cli/profile/profile_create.go:39
+msgid "Creates or updates the sketch project file in the current directory."
+msgstr ""
 
 #: internal/cli/debug/debug.go:266
 msgid "Custom configuration for %s:"
@@ -571,6 +593,10 @@ msgstr "Першапачатковы FQBN роўны"
 #: internal/cli/board/attach.go:114
 msgid "Default port set to"
 msgstr "Першапачатковы порт усталяваны на"
+
+#: internal/cli/profile/profile_set-default.go:64
+msgid "Default profile set to: %s"
+msgstr ""
 
 #: internal/cli/board/attach.go:116
 msgid "Default programmer set to"
@@ -638,9 +664,17 @@ msgstr "Раз'яднаны"
 msgid "Display only the provided gRPC calls"
 msgstr "Адлюстраваць толькі прадстаўленыя выклікі gRPC"
 
+#: internal/cli/profile/profile_lib_add.go:55
+msgid "Do not add dependencies."
+msgstr ""
+
 #: internal/cli/lib/install.go:62
 msgid "Do not install dependencies."
 msgstr "Не ўсталёўваць залежнасці."
+
+#: internal/cli/profile/profile_lib_add.go:56
+msgid "Do not overwrite already added libraries."
+msgstr ""
 
 #: internal/cli/lib/install.go:63
 msgid "Do not overwrite already installed libraries."
@@ -655,6 +689,10 @@ msgstr "Ня перазапісваць ужо ўсталяваныя платф
 msgid "Do not perform the actual upload, just log out actions"
 msgstr "Не выконваць фактычную выгрузку, проста выйсці з сістэмы"
 
+#: internal/cli/profile/profile_lib_remove.go:57
+msgid "Do not remove unused dependencies."
+msgstr ""
+
 #: internal/cli/daemon/daemon.go:81
 msgid "Do not terminate daemon process if the parent process dies"
 msgstr "Не завяршаць дэманічны працэс, калі бацькоўскі працэс памірае"
@@ -664,17 +702,21 @@ msgid "Do not try to update library dependencies if already installed."
 msgstr ""
 "Не спрабаваць абнаўляць залежнасці бібліятэкі, калі яны ўжо ўсталяваныя."
 
+#: internal/arduino/httpclient/httpclient.go:50
+msgid "Download failed"
+msgstr ""
+
 #: commands/service_library_download.go:92
 msgid "Downloading %s"
 msgstr "Спампоўка %s"
 
-#: internal/arduino/resources/index.go:137
+#: internal/arduino/resources/index.go:139
 msgid "Downloading index signature: %s"
 msgstr "Спампоўка індэкснай сігнатуры: %s"
 
 #: commands/instances.go:589 commands/instances.go:607
 #: commands/instances.go:621 commands/instances.go:638
-#: internal/arduino/resources/index.go:82
+#: internal/arduino/resources/index.go:83
 msgid "Downloading index: %s"
 msgstr "Спамоўка індэксаў: %s"
 
@@ -718,6 +760,10 @@ msgstr "Увясці шлях да файлу zip"
 #: internal/cli/lib/install.go:64
 msgid "Enter git url for libraries hosted on repositories"
 msgstr "Увясць адрас URL git для бібліятэк, якія размешчаныя ў сховішчах"
+
+#: internal/cli/profile/profile_lib_add.go:86
+msgid "Error adding %s: %v"
+msgstr ""
 
 #: commands/service_sketch_archive.go:105
 msgid "Error adding file to sketch archive"
@@ -782,11 +828,11 @@ msgstr "Памылка пры спампоўцы %[1]s: %[2]v"
 msgid "Error downloading %s"
 msgstr "Памылка пры спампоўцы %s"
 
-#: commands/instances.go:686 internal/arduino/resources/index.go:83
+#: commands/instances.go:686 internal/arduino/resources/index.go:84
 msgid "Error downloading index '%s'"
 msgstr "Памылка пры спампоўцы індэксу '%s'"
 
-#: internal/arduino/resources/index.go:138
+#: internal/arduino/resources/index.go:140
 msgid "Error downloading index signature '%s'"
 msgstr "Памылка пры спампоўцы індэкснай сігнатуры '%s'"
 
@@ -839,8 +885,8 @@ msgstr "Памылка падчас выдалення: %v"
 msgid "Error during upgrade: %v"
 msgstr "Памылка падчас абнаўлення: %v"
 
-#: internal/arduino/resources/index.go:105
-#: internal/arduino/resources/index.go:124
+#: internal/arduino/resources/index.go:106
+#: internal/arduino/resources/index.go:125
 msgid "Error extracting %s"
 msgstr "Памылка пыр выманні %s"
 
@@ -897,6 +943,10 @@ msgstr "Памылка пры атрыманні карыстальніцкаг�
 msgid "Error initializing instance: %v"
 msgstr "Памылка пры ініцыялізацыі асобніка: %v"
 
+#: internal/cli/profile/profile_create.go:71
+msgid "Error initializing the project file: %v"
+msgstr ""
+
 #: internal/cli/lib/install.go:148
 msgid "Error installing %s: %v"
 msgstr "Памылка пры ўсталяванні %s: %v"
@@ -945,7 +995,7 @@ msgstr "Памылка пры загрузцы апаратнай платфор
 msgid "Error loading index %s"
 msgstr "Памылка пры загрузцы індэкса %s"
 
-#: internal/arduino/resources/index.go:99
+#: internal/arduino/resources/index.go:100
 msgid "Error opening %s"
 msgstr "Памылка пры адкрыцці %s"
 
@@ -970,6 +1020,10 @@ msgstr "Памылка пры чытанні каталога зборкі"
 msgid "Error reading sketch files"
 msgstr "Памылка пры чытанні файлаў сцэнара"
 
+#: internal/cli/profile/profile_lib_remove.go:87
+msgid "Error removing library %[1]s from the profile"
+msgstr ""
+
 #: internal/cli/lib/check_deps.go:72
 msgid "Error resolving dependencies for %[1]s: %[2]s"
 msgstr "Памылка пры выпраўленні ў залежнасці для %[1]s: %[2]s"
@@ -982,13 +1036,13 @@ msgstr "Памылка пры выманні спісу ядраў: %v"
 msgid "Error rolling-back changes: %s"
 msgstr "Памылка пры адкаце змяненняў: %s"
 
-#: internal/arduino/resources/index.go:165
-#: internal/arduino/resources/index.go:177
+#: internal/arduino/resources/index.go:167
+#: internal/arduino/resources/index.go:179
 msgid "Error saving downloaded index"
 msgstr "Памылка пры захаванні спампаванага індэкса"
 
-#: internal/arduino/resources/index.go:172
-#: internal/arduino/resources/index.go:181
+#: internal/arduino/resources/index.go:174
+#: internal/arduino/resources/index.go:183
 msgid "Error saving downloaded index signature"
 msgstr "Памылка пры захаванні спампаванай індэкснай сігнатуры"
 
@@ -1036,8 +1090,8 @@ msgstr "Памылка пры абнаўленні бібліятэк"
 msgid "Error upgrading platform: %s"
 msgstr "Памылка пры абнаўленні платформы: %s"
 
-#: internal/arduino/resources/index.go:147
-#: internal/arduino/resources/index.go:153
+#: internal/arduino/resources/index.go:149
+#: internal/arduino/resources/index.go:155
 msgid "Error verifying signature"
 msgstr "Памылка пры праверцы сігнатуры"
 
@@ -1207,7 +1261,7 @@ msgstr ""
 "Прымусовы пропуск сцэнараў папярэдняга выдалення (калі CLI запушчаны ў "
 "інтэрактыўным рэжыме)."
 
-#: commands/cmderrors/cmderrors.go:877
+#: commands/cmderrors/cmderrors.go:896
 msgid "Found %d platforms matching \"%s\": %s"
 msgstr "Знойдзены платформы %d, якія адпаведныя \"%s\": %s"
 
@@ -1357,7 +1411,7 @@ msgstr "Хібны адрас URL"
 msgid "Invalid additional URL: %v"
 msgstr "Хібны дадатковы адрас URL: %v"
 
-#: internal/arduino/resources/index.go:111
+#: internal/arduino/resources/index.go:112
 msgid "Invalid archive: file %[1]s not found in archive %[2]s"
 msgstr "Хібны архіў: файл %[1]s не знойдзены ў архіве %[2]s"
 
@@ -1399,7 +1453,7 @@ msgstr "Хібная бібліятэка"
 msgid "Invalid library directory in sketch project: %s"
 msgstr "Хібны каталог бібліятэкі ў праекце сцэнара: %s"
 
-#: internal/cli/cli.go:265
+#: internal/cli/cli.go:267
 msgid "Invalid logging level: %s"
 msgstr "Хібны ўзровень вядзення часопіса: %s"
 
@@ -1407,11 +1461,11 @@ msgstr "Хібны ўзровень вядзення часопіса: %s"
 msgid "Invalid network configuration: %s"
 msgstr "Хібная канфігурацыя сеткі: %s"
 
-#: internal/cli/configuration/network.go:83
+#: internal/cli/configuration/network.go:88
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "Хібны network.proxy '%[1]s': %[2]s"
 
-#: internal/cli/cli.go:222
+#: internal/cli/cli.go:224
 msgid "Invalid output format: %s"
 msgstr "Хібны фармат вываду: %s"
 
@@ -1464,6 +1518,8 @@ msgid "LIBNAME"
 msgstr "Назва бібліятэкі"
 
 #: internal/cli/lib/check_deps.go:38 internal/cli/lib/install.go:45
+#: internal/cli/profile/profile_lib_add.go:40
+#: internal/cli/profile/profile_lib_remove.go:39
 msgid "LIBRARY"
 msgstr "Бібліятэка"
 
@@ -1583,6 +1639,12 @@ msgstr "Загрузка індэкснага файла: %v"
 msgid "Location"
 msgstr "Месцазнаходжанне"
 
+#: internal/cli/profile/profile_lib_add.go:54
+#: internal/cli/profile/profile_lib_remove.go:56
+#: internal/cli/profile/profile_set-default.go:42
+msgid "Location of the sketch."
+msgstr ""
+
 #: internal/arduino/builder/sizer.go:211
 msgid "Low memory available, stability problems may occur."
 msgstr ""
@@ -1604,7 +1666,7 @@ msgstr ""
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Найбольшы час чакання выяўлення порта, напрыклад: 30 с, 1 м"
 
-#: internal/cli/cli.go:170
+#: internal/cli/cli.go:172
 msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr ""
@@ -1619,7 +1681,7 @@ msgstr "Адсутнічае '%[1]s' з бібліятэкі ў %[2]s"
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr "Адсутнічае FQBN  (поўная назва платы)"
 
-#: commands/cmderrors/cmderrors.go:929
+#: commands/cmderrors/cmderrors.go:948
 msgid "Missing Profile name"
 msgstr ""
 
@@ -1887,7 +1949,7 @@ msgstr ""
 "Шлях да каранёвага каталогу адной бібліятэкі.\n"
 "Можа ўжывацца некалькі разоў ці запісы могуць быць праз коску."
 
-#: internal/cli/cli.go:172
+#: internal/cli/cli.go:174
 msgid "Path to the file where logs will be written."
 msgstr "Шлях да файла, у які будуць запісвацца логі."
 
@@ -2014,11 +2076,11 @@ msgid "Print preprocessed code to stdout instead of compiling."
 msgstr ""
 "Надрукаваць папярэдне апрацаваны код у стандартны вывад замест кампіляцыі."
 
-#: internal/cli/cli.go:166 internal/cli/cli.go:168
+#: internal/cli/cli.go:168 internal/cli/cli.go:170
 msgid "Print the logs on the standard output."
 msgstr "Надрукаваць часопісы ў стандартным фармаце вываду."
 
-#: internal/cli/cli.go:180
+#: internal/cli/cli.go:182
 msgid "Print the output in JSON format."
 msgstr "Надрукаваць выходныя дадзеныя ў фармаце Json."
 
@@ -2054,6 +2116,10 @@ msgstr "Праграматар, які ўжываецца, напрыклад: a
 msgid "Programmers:"
 msgstr "Праграматары:"
 
+#: internal/cli/profile/profile_create.go:85
+msgid "Project file created in: %s"
+msgstr ""
+
 #: commands/cmderrors/cmderrors.go:409
 msgid "Property '%s' is undefined"
 msgstr "Уласцівасць '%s' не вызначана"
@@ -2065,6 +2131,12 @@ msgstr "Пратакол"
 #: internal/cli/lib/search.go:212
 msgid "Provides includes: %s"
 msgstr "Правайдэр уключэнняў: %s"
+
+#: internal/cli/profile/profile_lib_remove.go:40
+msgid ""
+"Removes a library from a sketch profile with its dependencies if no longer "
+"needed."
+msgstr ""
 
 #: internal/cli/config/remove.go:34 internal/cli/config/remove.go:35
 msgid "Removes one or more values from a setting."
@@ -2218,10 +2290,6 @@ msgstr "Прапанова: %s"
 msgid "Server path"
 msgstr "Шлях да сервера"
 
-#: internal/arduino/httpclient/httpclient.go:61
-msgid "Server responded with: %s"
-msgstr "Сервер адказаў паведамленнем: %s"
-
 #: internal/cli/debug/debug.go:245
 msgid "Server type"
 msgstr "Тып сервера"
@@ -2234,11 +2302,20 @@ msgstr "Задаць значэнне для поля, які неабходны
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr "Задаць тэрмінал у неапрацаваным рэжыме (без буферызацыі)."
 
+#: internal/cli/profile/profile_set-default.go:33
+#: internal/cli/profile/profile_set-default.go:34
+msgid "Set the default build profile."
+msgstr ""
+
+#: internal/cli/profile/profile_create.go:50
+msgid "Set the profile as the default one."
+msgstr ""
+
 #: internal/cli/config/set.go:34 internal/cli/config/set.go:35
 msgid "Sets a setting value."
 msgstr "Задаць значэнне налады"
 
-#: internal/cli/cli.go:189
+#: internal/cli/cli.go:191
 msgid ""
 "Sets the default data directory (Arduino CLI will look for configuration "
 "file in this directory)."
@@ -2266,7 +2343,7 @@ msgstr "Задае месца для захавання файла канфіг�
 msgid "Setting"
 msgstr "Налады"
 
-#: internal/cli/cli.go:101
+#: internal/cli/cli.go:102
 msgid "Should show help message, but it is available only in TEXT mode."
 msgstr ""
 "Павінна з'явіцца даведачнае паведамленне, але яно даступнае толькі ў "
@@ -2457,11 +2534,11 @@ msgstr ""
 msgid "The TCP port the daemon will listen to"
 msgstr "Порт TCP, які будзе праслухоўвацца дэманам"
 
-#: internal/cli/cli.go:177
+#: internal/cli/cli.go:179
 msgid "The command output format, can be: %s"
 msgstr "Фармат вываду каманды можа быць наступным: %s"
 
-#: internal/cli/cli.go:187
+#: internal/cli/cli.go:189
 msgid "The custom config file (if not specified the default will be used)."
 msgstr ""
 "Карыстальніцкі канфігурацыйны файл (калі ён не пазначаны, будзе ўжывацца "
@@ -2479,6 +2556,20 @@ msgstr ""
 msgid "The flag --debug-file must be used with --debug."
 msgstr "Аргумент --debug-file павінен ужывацца з аргументам --debug."
 
+#: internal/cli/profile/profile_lib_add.go:109
+msgid "The following libraries were added to the profile %s:"
+msgstr ""
+
+#: internal/cli/profile/profile_lib_add.go:115
+msgid ""
+"The following libraries were already present in the profile %s and were not "
+"modified:"
+msgstr ""
+
+#: internal/cli/profile/profile_lib_remove.go:105
+msgid "The following libraries were removed from the profile %s:"
+msgstr ""
+
 #: internal/cli/debug/debug_check.go:94
 msgid "The given board/programmer configuration does NOT support debugging."
 msgstr "Дадзеная канфігурацыя платы/праграматара не падтрымлівае адладку."
@@ -2487,7 +2578,7 @@ msgstr "Дадзеная канфігурацыя платы/праграмат�
 msgid "The given board/programmer configuration supports debugging."
 msgstr "Дадзеная канфігурацыя платы/праграматара падтрымлівае адладку."
 
-#: commands/cmderrors/cmderrors.go:914
+#: commands/cmderrors/cmderrors.go:933
 msgid "The instance is no longer valid and needs to be reinitialized"
 msgstr "Асобнік больш несапраўдны і мае патрэбу ў паўторнай ініцыялізацыі"
 
@@ -2511,7 +2602,7 @@ msgstr ""
 msgid "The library %[1]s has been automatically added from sketch project."
 msgstr "Бібліятэка %[1]s была аўтаматычна дададзеная з праекту сцэнара."
 
-#: commands/cmderrors/cmderrors.go:896
+#: commands/cmderrors/cmderrors.go:915
 msgid "The library %s has multiple installations:"
 msgstr "Бібліятэка %s мае некалькі ўсталяванняў:"
 
@@ -2536,7 +2627,7 @@ msgstr ""
 "Назва карыстальніцкага ключа подпісу, які ўжываецца для подпісу двайковага файла ў працэсе кампіляцыі.\n"
 "Ужываецца толькі тымі платформамі, якія яго падтрымліваюць."
 
-#: internal/cli/cli.go:174
+#: internal/cli/cli.go:176
 msgid "The output format for the logs, can be: %s"
 msgstr "Фармат вываду часопісаў можа быць наступным: %s"
 
@@ -2640,7 +2731,7 @@ msgstr "Няма доступу да лакальнага каталогу да�
 msgid "Unable to get user home dir: %v"
 msgstr "Няма доступу да хатняга каталогу карыстальніка: %v"
 
-#: internal/cli/cli.go:252
+#: internal/cli/cli.go:254
 msgid "Unable to open file for logging: %s"
 msgstr "Не атрымалася адчыніць файл для вядзення часопіса: %s"
 
@@ -2844,6 +2935,8 @@ msgid "VERSION"
 msgstr "Версія"
 
 #: internal/cli/lib/check_deps.go:38 internal/cli/lib/install.go:45
+#: internal/cli/profile/profile_lib_add.go:40
+#: internal/cli/profile/profile_lib_remove.go:39
 msgid "VERSION_NUMBER"
 msgstr "Нумар версіі"
 
@@ -3001,7 +3094,7 @@ msgstr "праверка цэласнасці лакальнага архіва"
 msgid "cleaning build path"
 msgstr "ачыстка шляху зборкі"
 
-#: internal/cli/cli.go:90
+#: internal/cli/cli.go:91
 msgid "command"
 msgstr "каманда"
 
@@ -3144,7 +3237,7 @@ msgstr "выманне архіва"
 msgid "extracting archive: %s"
 msgstr "выманне архіва: %s"
 
-#: internal/arduino/resources/checksums.go:143
+#: internal/arduino/resources/checksums.go:136
 msgid "failed to compute hash of file \"%s\""
 msgstr "не атрымалася вылічыць хэш файла \"%s\""
 
@@ -3165,7 +3258,7 @@ msgstr "файлы ў архіве павінны быць змешчаныя ў
 msgid "finding absolute path of %s"
 msgstr "знаходжанне абсалютнага шляху да %s"
 
-#: internal/cli/cli.go:90
+#: internal/cli/cli.go:91
 msgid "flags"
 msgstr "аргументы"
 
@@ -3506,7 +3599,7 @@ msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr ""
 "адсутнічае выпуск платформы %[1]s: %[2]s на які спасылаецца плата %[3]s"
 
-#: internal/arduino/resources/index.go:153
+#: internal/arduino/resources/index.go:155
 msgid "missing signature"
 msgstr "адсутнічае сігнатура"
 
@@ -3627,7 +3720,7 @@ msgstr "платформа %s не ўсталяваная"
 msgid "platform is not available for your OS"
 msgstr "платформа недаступная для вашай аперацыйнай сістэмы"
 
-#: commands/service_compile.go:130 commands/service_profile_init.go:78
+#: commands/service_compile.go:130 commands/service_profile_create.go:73
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
 #: internal/arduino/cores/packagemanager/loader.go:417
