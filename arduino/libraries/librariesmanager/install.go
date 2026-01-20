@@ -29,9 +29,9 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v4"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 type alreadyInstalledError struct{}
