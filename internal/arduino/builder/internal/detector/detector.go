@@ -627,7 +627,7 @@ func LibrariesLoader(
 
 		newLm, libsLoadingWarnings := lmb.Build()
 		for _, status := range libsLoadingWarnings {
-			verboseOut.Write([]byte(status.Message()))
+			verboseOut.Write([]byte(status.Message() + "\n"))
 		}
 		lm = newLm
 	}
