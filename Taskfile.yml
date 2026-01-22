@@ -27,6 +27,33 @@ tasks:
           exit 1
         fi
       - licensed cache
+      - task: get:license-info
+
+  get:license-info:
+    desc: Get license from website for dependencies with "other" license
+    cmds:
+      - |
+        mapfile -t files < <(find .licenses -type f -name '*.yml' -exec sh -c 'yq -e ".license == \"other\"" "$1" > /dev/null 2>&1 && echo "$1"' _ {} \;)
+        total=${#files[@]}
+        if (( total == 0 )); then
+          echo "No files to process."
+          exit 0
+        fi
+        count=0
+        for file in "${files[@]}"; do
+          count=$((count + 1))
+          echo "Processing $file ($count/$total), remaining: $((total - count))"
+          homepage=$(yq -r '.homepage' "$file")
+          got=$(curl --max-time 10 -s "$homepage" | \
+          grep 'aria-describedby="license-description"' | \
+          sed -n 's/.*aria-describedby="license-description"[^>]*>\([^<]*\)<.*/\1/p')
+          if [ -n "$got" ]; then
+            # Write license in lowercase and remove ", + 1 more" suffix if present
+            yq -y -i ".license = \"$(echo "$got" | sed 's/, + 1 more//' | tr '[:upper:]' '[:lower:]')\"" "$file"
+          else
+            echo "Could not fetch license info for $file from $homepage"
+          fi
+        done
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies-task/Taskfile.yml
   general:check-dep-licenses:

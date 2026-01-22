@@ -3,7 +3,7 @@ name: Test Go
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.17"
+  GO_VERSION: "1.23"
   COVERAGE_ARTIFACT: coverage-data
 
 # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
@@ -150,7 +150,7 @@ jobs:
 
       - name: Upload coverage data to workflow artifact
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: ${{ env.COVERAGE_ARTIFACT }}
@@ -163,7 +163,7 @@ jobs:
     needs: test
     steps:
       - name: Download coverage data artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.COVERAGE_ARTIFACT }}
 

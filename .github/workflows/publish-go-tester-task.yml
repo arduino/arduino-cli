@@ -130,7 +130,7 @@ jobs:
 
       # Transfer builds to artifacts job
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ${{ env.DIST_DIR }}/${{ matrix.artifact.path }}
           name: ${{ matrix.artifact.name }}
@@ -143,7 +143,7 @@ jobs:
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Output checksum
         run: |
@@ -158,7 +158,7 @@ jobs:
           done
 
       - name: Upload checksum artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ./*checksums.txt
           name: checksums

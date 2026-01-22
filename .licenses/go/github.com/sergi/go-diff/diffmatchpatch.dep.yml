@@ -1,15 +1,13 @@
 ---
 name: github.com/sergi/go-diff/diffmatchpatch
-version: v1.1.0
+version: v1.3.2-0.20230802210424-5b0b94c5c0d3
 type: go
 summary: Package diffmatchpatch offers robust algorithms to perform the operations
   required for synchronizing plain text.
 homepage: https://pkg.go.dev/github.com/sergi/go-diff/diffmatchpatch
-# Apache-2.0 subsumes MIT
-# https://www.gnu.org/licenses/license-compatibility.html#combining
 license: apache-2.0
 licenses:
-- sources: go-diff@v1.1.0/LICENSE
+- sources: go-diff@v1.3.2-0.20230802210424-5b0b94c5c0d3/LICENSE
   text: |+
     Copyright (c) 2012-2016 The go-diff Authors. All rights reserved.
 
@@ -31,7 +29,7 @@ licenses:
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
 
-- sources: go-diff@v1.1.0/APACHE-LICENSE-2.0
+- sources: go-diff@v1.3.2-0.20230802210424-5b0b94c5c0d3/APACHE-LICENSE-2.0
   text: |2
 
                                      Apache License

@@ -3,7 +3,7 @@ name: Check Go Dependencies
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.17"
+  GO_VERSION: "1.23"
 
 # See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
 on:
@@ -102,7 +102,7 @@ jobs:
       # Some might find it convenient to have CI generate the cache rather than setting up for it locally
       - name: Upload cache to workflow artifact
         if: failure() && steps.diff.outcome == 'failure'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: dep-licenses-cache

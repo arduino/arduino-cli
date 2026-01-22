@@ -69,9 +69,9 @@ func (f *Fqbn) Set(fqbn string) {
 // - it tries to autodetect the board connected to the given port flags
 // If all above methods fails, it returns the empty string.
 // The Port metadata are always returned except if:
-// - the port is not found, in this case nil is returned
-// - the FQBN autodetection fail, in this case the function prints an error and
-//   terminates the execution
+//   - the port is not found, in this case nil is returned
+//   - the FQBN autodetection fail, in this case the function prints an error and
+//     terminates the execution
 func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, sk *sketch.Sketch) (string, *rpc.Port) {
 	// TODO: REMOVE sketch.Sketch from here
 

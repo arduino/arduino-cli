@@ -377,16 +377,16 @@ def test_install_with_git_url_fragment_as_branch(run_command, data_dir, download
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
 
     # Test that a bad ref fails
-    res = run_command(["lib", "install", "--git-url", git_url + "#x-ref-does-not-exist"])
+    res = run_command(["lib", "install", "--git-url", git_url + "#x-ref-does-not-exist"], custom_env=env)
     assert res.failed
 
     # Verifies library is installed in expected path
-    res = run_command(["lib", "install", "--git-url", git_url + "#0.16.0"])
+    res = run_command(["lib", "install", "--git-url", git_url + "#0.16.0"], custom_env=env)
     assert res.ok
     assert lib_install_dir.exists()
 
     # Reinstall library at an existing ref
-    assert run_command(["lib", "install", "--git-url", git_url + "#master"])
+    res = run_command(["lib", "install", "--git-url", git_url + "#master"], custom_env=env)
     assert res.ok
 
     # Verifies library remains installed
@@ -500,7 +500,7 @@ def test_search(run_command):
     assert "Downloading index: library_index.tar.bz2 downloaded" in lines
     libs = [l[6:].strip('"') for l in lines if "Name:" in l]
 
-    expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101"}
+    expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
     assert expected == {lib for lib in libs if "WiFi101" in lib}
 
     result = run_command(["lib", "search", "--names", "--format", "json"])

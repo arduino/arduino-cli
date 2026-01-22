@@ -42,7 +42,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 		CachePath:       "cache",
 		Checksum:        "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
 		Size:            486,
-		URL:             "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+		URL:             "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/core.zip",
 	}
 	digest, err := hex.DecodeString("6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092")
 	require.NoError(t, err)

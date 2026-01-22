@@ -2,7 +2,7 @@ name: Check Protocol Buffers
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.17"
+  GO_VERSION: "1.23"
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
