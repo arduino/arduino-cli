@@ -4,7 +4,7 @@ version: v0.33.0
 type: go
 summary: Package unicode provides Unicode encodings such as UTF-16.
 homepage: https://pkg.go.dev/golang.org/x/text/encoding/unicode
-license: other
+license: bsd-3-clause
 licenses:
 - sources: text@v0.33.0/LICENSE
   text: |

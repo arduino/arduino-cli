@@ -5,7 +5,7 @@ type: go
 summary: Package sha3 implements the SHA-3 fixed-output-length hash functions and
   the SHAKE variable-output-length hash functions defined by FIPS-202.
 homepage: https://pkg.go.dev/github.com/cloudflare/circl/internal/sha3
-license: other
+license: bsd-3-clause
 licenses:
 - sources: circl@v1.6.1/LICENSE
   text: |

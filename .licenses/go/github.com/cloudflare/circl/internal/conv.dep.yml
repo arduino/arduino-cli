@@ -4,7 +4,7 @@ version: v1.6.1
 type: go
 summary:
 homepage: https://pkg.go.dev/github.com/cloudflare/circl/internal/conv
-license: other
+license: bsd-3-clause
 licenses:
 - sources: circl@v1.6.1/LICENSE
   text: |

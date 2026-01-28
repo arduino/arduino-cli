@@ -7,7 +7,7 @@ summary: 'Package ocb provides an implementation of the OCB (offset codebook) mo
   and Krovetz - OCB: A BLOCK-CIPHER MODE OF OPERATION FOR EFFICIENT AUTHENTICATED
   ENCRYPTION (2003).'
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/ocb
-license: other
+license: bsd-3-clause
 licenses:
 - sources: go-crypto@v1.3.0/LICENSE
   text: |

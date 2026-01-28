@@ -4,7 +4,7 @@ version: v1.36.11
 type: go
 summary: 
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/encoding/json
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.36.11/LICENSE
   text: |

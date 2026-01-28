@@ -5,7 +5,7 @@ type: go
 summary: Package goldilocks provides elliptic curve operations over the goldilocks
   curve.
 homepage: https://pkg.go.dev/github.com/cloudflare/circl/ecc/goldilocks
-license: other
+license: bsd-3-clause
 licenses:
 - sources: circl@v1.6.1/LICENSE
   text: |
