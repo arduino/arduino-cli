@@ -392,3 +392,21 @@ func TestProfileSetDefault(t *testing.T) {
 	require.Error(t, err)
 	require.Equal(t, "Cannot set inexistent_profile as default profile: Profile 'inexistent_profile' not found\n", string(stderr))
 }
+
+func TestProfileLoadingIssue3081(t *testing.T) {
+	// https://github.com/arduino/arduino-cli/issues/3081
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	// Compile problematic sketch
+	sk, err := paths.New("testdata", "Issue3081").Abs()
+	require.NoError(t, err)
+	_, _, err = cli.Run("compile", sk.String())
+	require.NoError(t, err)
+}
