@@ -331,7 +331,7 @@ func TestProfileLibAddRemoveFromSpecificProfile(t *testing.T) {
 	// Init the environment explicitly
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
-	_, _, err = cli.Run("core", "install", "arduino:avr")
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 	sk := createTempSketch(t, cli, "Simple")
 

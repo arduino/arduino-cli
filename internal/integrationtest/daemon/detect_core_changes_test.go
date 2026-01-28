@@ -43,7 +43,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	}))
 
 	// Install avr core
-	installCl, err := grpcInst.PlatformInstall(context.Background(), "arduino", "avr", "", true)
+	installCl, err := grpcInst.PlatformInstall(context.Background(), "arduino", "avr", "1.8.6", true)
 	require.NoError(t, err)
 	for {
 		installResp, err := installCl.Recv()
