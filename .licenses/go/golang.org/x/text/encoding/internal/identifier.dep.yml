@@ -8,7 +8,7 @@ summary: Package identifier defines the contract between implementations of Enco
   as encodings, for which Encoding implementations provide converters to and from
   UTF-8.
 homepage: https://pkg.go.dev/golang.org/x/text/encoding/internal/identifier
-license: other
+license: bsd-3-clause
 licenses:
 - sources: text@v0.33.0/LICENSE
   text: |

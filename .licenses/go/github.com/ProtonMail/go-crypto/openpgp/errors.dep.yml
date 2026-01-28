@@ -4,7 +4,7 @@ version: v1.3.0
 type: go
 summary: Package errors contains common error types for the OpenPGP packages.
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/errors
-license: other
+license: bsd-3-clause
 licenses:
 - sources: go-crypto@v1.3.0/LICENSE
   text: |
