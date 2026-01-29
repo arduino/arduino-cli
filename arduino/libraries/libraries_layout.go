@@ -62,7 +62,7 @@ func (d *LibraryLayout) UnmarshalJSON(b []byte) error {
 		*d = RecursiveLayout
 		return nil
 	default:
-		return fmt.Errorf(tr("invalid library layout: %s"), s)
+		return fmt.Errorf("invalid library layout: %s", s)
 	}
 }
 

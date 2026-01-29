@@ -130,14 +130,14 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 	// Check for residual invalid options...
 	for option, value := range config.AsMap() {
 		if option == "" {
-			return nil, fmt.Errorf(tr("invalid empty option found"))
+			return nil, fmt.Errorf("invalid empty option found")
 		}
 		if _, ok := b.configOptions.GetOk(option); !ok {
-			return nil, fmt.Errorf(tr("invalid option '%s'"), option)
+			return nil, fmt.Errorf("invalid option '%s'", option)
 		}
 		optionsConf, ok := b.configOptionProperties[option+"="+value]
 		if !ok {
-			return nil, fmt.Errorf(tr("invalid value '%[1]s' for option '%[2]s'"), value, option)
+			return nil, fmt.Errorf("invalid value '%[1]s' for option '%[2]s'", value, option)
 		}
 		buildProperties.Merge(optionsConf)
 	}
@@ -153,7 +153,7 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.Map, error) {
 	fqbn, err := ParseFQBN(b.String() + ":" + config)
 	if err != nil {
-		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
+		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 	return b.GetBuildProperties(fqbn.Configs)
 }

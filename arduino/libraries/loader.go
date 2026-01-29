@@ -44,7 +44,7 @@ func addUtilityDirectory(library *Library) {
 func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library, error) {
 	libProperties, err := properties.Load(libraryDir.Join("library.properties").String())
 	if err != nil {
-		return nil, fmt.Errorf(tr("loading library.properties: %s"), err)
+		return nil, fmt.Errorf("loading library.properties: %s", err)
 	}
 
 	if libProperties.Get("maintainer") == "" && libProperties.Get("email") != "" {

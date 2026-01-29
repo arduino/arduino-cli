@@ -181,13 +181,13 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
 	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
-		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		resErr = fmt.Errorf("error while determining sketch size: %s", err)
 		return
 	}
 
 	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		resErr = fmt.Errorf("error while determining sketch size: %s", err)
 		return
 	}
 
@@ -196,7 +196,7 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 
 	textSize, err = computeSize(properties.Get("recipe.size.regex"), out)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Invalid size regexp: %s"), err)
+		resErr = fmt.Errorf("Invalid size regexp: %s", err)
 		return
 	}
 	if textSize == -1 {
@@ -206,13 +206,13 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 
 	dataSize, err = computeSize(properties.Get("recipe.size.regex.data"), out)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Invalid data size regexp: %s"), err)
+		resErr = fmt.Errorf("invalid data size regexp: %s", err)
 		return
 	}
 
 	eepromSize, err = computeSize(properties.Get("recipe.size.regex.eeprom"), out)
 	if err != nil {
-		resErr = fmt.Errorf(tr("Invalid eeprom size regexp: %s"), err)
+		resErr = fmt.Errorf("invalid eeprom size regexp: %s", err)
 		return
 	}
 

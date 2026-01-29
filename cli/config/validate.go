@@ -49,7 +49,7 @@ var validMap = map[string]reflect.Kind{
 func typeOf(key string) (reflect.Kind, error) {
 	t, ok := validMap[key]
 	if !ok {
-		return reflect.Invalid, fmt.Errorf(tr("Settings key doesn't exist"))
+		return reflect.Invalid, fmt.Errorf("Settings key doesn't exist")
 	}
 	return t, nil
 }

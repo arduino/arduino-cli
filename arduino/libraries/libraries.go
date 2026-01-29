@@ -113,7 +113,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		var err error
 		headers, err = library.SourceHeaders()
 		if err != nil {
-			return nil, fmt.Errorf(tr("reading library headers: %w"), err)
+			return nil, fmt.Errorf("reading library headers: %w", err)
 		}
 	}
 
@@ -233,7 +233,7 @@ func (library *Library) SourceHeaders() ([]string, error) {
 	if library.sourceHeaders == nil {
 		cppHeaders, err := library.SourceDir.ReadDir()
 		if err != nil {
-			return nil, fmt.Errorf(tr("reading lib src dir: %s"), err)
+			return nil, fmt.Errorf("reading lib src dir: %s", err)
 		}
 		headerExtensions := []string{}
 		for k := range globals.HeaderFilesValidExtensions {

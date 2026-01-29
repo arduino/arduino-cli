@@ -71,16 +71,16 @@ func VerifyDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path, 
 func VerifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoKeyringFile io.Reader) (bool, *openpgp.Entity, error) {
 	keyRing, err := openpgp.ReadKeyRing(arduinoKeyringFile)
 	if err != nil {
-		return false, nil, fmt.Errorf(tr("retrieving Arduino public keys: %s"), err)
+		return false, nil, fmt.Errorf("retrieving Arduino public keys: %s", err)
 	}
 	target, err := targetPath.Open()
 	if err != nil {
-		return false, nil, fmt.Errorf(tr("opening target file: %s"), err)
+		return false, nil, fmt.Errorf("opening target file: %s", err)
 	}
 	defer target.Close()
 	signature, err := signaturePath.Open()
 	if err != nil {
-		return false, nil, fmt.Errorf(tr("opening signature file: %s"), err)
+		return false, nil, fmt.Errorf("opening signature file: %s", err)
 	}
 	defer signature.Close()
 	signer, err := openpgp.CheckDetachedSignature(keyRing, target, signature)

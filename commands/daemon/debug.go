@@ -43,7 +43,7 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 	// Ensure it's a config message and not data
 	req := msg.GetDebugRequest()
 	if req == nil {
-		return errors.Errorf(tr("First message must contain debug request, not data"))
+		return errors.Errorf("First message must contain debug request, not data")
 	}
 
 	// Launch debug recipe attaching stdin and out to grpc streaming

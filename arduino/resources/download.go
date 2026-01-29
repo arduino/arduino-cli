@@ -30,7 +30,7 @@ import (
 func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB rpc.DownloadProgressCB) error {
 	path, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return fmt.Errorf(tr("getting archive path: %s"), err)
+		return fmt.Errorf("getting archive path: %s", err)
 	}
 
 	if _, err := path.Stat(); os.IsNotExist(err) {
@@ -40,7 +40,7 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 		ok, err := r.TestLocalArchiveIntegrity(downloadDir)
 		if err != nil || !ok {
 			if err := path.Remove(); err != nil {
-				return fmt.Errorf(tr("removing corrupted archive file: %s"), err)
+				return fmt.Errorf("removing corrupted archive file: %s", err)
 			}
 		} else {
 			// File is cached, nothing to do here
@@ -49,7 +49,7 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 			return nil
 		}
 	} else {
-		return fmt.Errorf(tr("getting archive file info: %s"), err)
+		return fmt.Errorf("getting archive file info: %s", err)
 	}
 	return httpclient.DownloadFile(path, r.URL, label, downloadCB, config)
 }

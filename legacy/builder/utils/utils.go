@@ -427,7 +427,7 @@ func CopyDir(src string, dst string, extensions []string) (err error) {
 		return err
 	}
 	if !si.IsDir() {
-		return fmt.Errorf(tr("source is not a directory"))
+		return fmt.Errorf("source is not a directory")
 	}
 
 	_, err = os.Stat(dst)
@@ -435,7 +435,7 @@ func CopyDir(src string, dst string, extensions []string) (err error) {
 		return
 	}
 	if err == nil {
-		return fmt.Errorf(tr("destination already exists"))
+		return fmt.Errorf("destination already exists")
 	}
 
 	err = os.MkdirAll(dst, si.Mode())

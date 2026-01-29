@@ -481,18 +481,18 @@ func runProgramAction(pme *packagemanager.Explorer,
 func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {
 	recipe, ok := props.GetOk(recipeID)
 	if !ok {
-		return fmt.Errorf(tr("recipe not found '%s'"), recipeID)
+		return fmt.Errorf("recipe not found '%s'", recipeID)
 	}
 	if strings.TrimSpace(recipe) == "" {
 		return nil // Nothing to run
 	}
 	if props.IsPropertyMissingInExpandPropsInString("serial.port", recipe) || props.IsPropertyMissingInExpandPropsInString("serial.port.file", recipe) {
-		return fmt.Errorf(tr("no upload port provided"))
+		return fmt.Errorf("no upload port provided")
 	}
 	cmdLine := props.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
-		return fmt.Errorf(tr("invalid recipe '%[1]s': %[2]s"), recipe, err)
+		return fmt.Errorf("invalid recipe '%[1]s': %[2]s", recipe, err)
 	}
 
 	// Run Tool
@@ -505,18 +505,18 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	}
 	cmd, err := executils.NewProcess(toolEnv, cmdArgs...)
 	if err != nil {
-		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
+		return fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	cmd.RedirectStdoutTo(outStream)
 	cmd.RedirectStderrTo(errStream)
 
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
+		return fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf(tr("uploading error: %s"), err)
+		return fmt.Errorf("uploading error: %s", err)
 	}
 
 	return nil
@@ -538,7 +538,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 	// Case 1: importFile flag has been specified
 	if importFile != "" {
 		if importDir != "" {
-			return nil, "", fmt.Errorf(tr("%s and %s cannot be used together", "importFile", "importDir"))
+			return nil, "", fmt.Errorf("%s and %s cannot be used together", "importFile", "importDir")
 		}
 
 		// We have a path like "path/to/my/build/SketchName.ino.bin". We are going to
@@ -548,7 +548,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 
 		importFilePath := paths.New(importFile)
 		if !importFilePath.Exist() {
-			return nil, "", fmt.Errorf(tr("binary file not found in %s"), importFilePath)
+			return nil, "", fmt.Errorf("binary file not found in %s", importFilePath)
 		}
 		return importFilePath.Parent(), strings.TrimSuffix(importFilePath.Base(), importFilePath.Ext()), nil
 	}
@@ -570,7 +570,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 
 	// Case 3: nothing given...
 	if sk == nil {
-		return nil, "", fmt.Errorf(tr("no sketch or build directory/file specified"))
+		return nil, "", fmt.Errorf("no sketch or build directory/file specified")
 	}
 
 	// Case 4: only sketch specified. In this case we use the generated build path

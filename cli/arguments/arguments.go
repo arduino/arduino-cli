@@ -34,7 +34,7 @@ func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
 			return
 		}
 	}
-	feedback.Errorf(tr("Can't use %s flags at the same time.", "--"+strings.Join(flagNames, " "+tr("and")+" --")))
+	feedback.Errorf("Can't use %s flags at the same time.", "--"+strings.Join(flagNames, " "+tr("and")+" --"))
 	os.Exit(errorcodes.ErrBadArgument)
 }
 
@@ -44,7 +44,7 @@ func CheckFlagsMandatory(command *cobra.Command, flagNames ...string) {
 		if command.Flag(flagName).Changed {
 			continue
 		} else {
-			feedback.Errorf(tr("Flag %[1]s is mandatory when used in conjunction with flag %[2]s.", "--"+flagName, "--"+strings.Join(flagNames, " "+tr("and")+" --")))
+			feedback.Errorf("Flag %[1]s is mandatory when used in conjunction with flag %[2]s.", "--"+flagName, "--"+strings.Join(flagNames, " "+tr("and")+" --"))
 			os.Exit(errorcodes.ErrBadArgument)
 		}
 	}

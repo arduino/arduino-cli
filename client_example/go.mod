@@ -1,6 +1,6 @@
 module github.com/arduino/arduino-cli/client_example
 
-go 1.23
+go 1.24.4
 
 replace github.com/arduino/arduino-cli => ../
 

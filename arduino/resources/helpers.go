@@ -35,7 +35,7 @@ func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, er
 func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 	archivePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return false, fmt.Errorf(tr("getting archive path: %s"), err)
+		return false, fmt.Errorf("getting archive path: %s", err)
 	}
 	return archivePath.Exist(), nil
 }

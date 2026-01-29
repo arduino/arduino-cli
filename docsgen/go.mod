@@ -1,7 +1,7 @@
 // Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/cobra/docsgen/go.mod
 module github.com/arduino/arduino-cli/docsgen
 
-go 1.23
+go 1.24.4
 
 replace github.com/arduino/arduino-cli => ../
 

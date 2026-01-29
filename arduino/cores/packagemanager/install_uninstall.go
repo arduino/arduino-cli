@@ -273,20 +273,20 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
 
 	if platformRelease.InstallDir == nil {
-		err := fmt.Errorf(tr("platform not installed"))
+		err := fmt.Errorf("platform not installed")
 		log.WithError(err).Error("Error uninstalling")
 		return &arduino.FailedUninstallError{Message: err.Error()}
 	}
 
 	// Safety measure
 	if !pme.IsManagedPlatformRelease(platformRelease) {
-		err := fmt.Errorf(tr("%s is not managed by package manager"), platformRelease)
+		err := fmt.Errorf("%s is not managed by package manager", platformRelease)
 		log.WithError(err).Error("Error uninstalling")
 		return &arduino.FailedUninstallError{Message: err.Error()}
 	}
 
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
-		err = fmt.Errorf(tr("removing platform files: %s"), err)
+		err = fmt.Errorf("removing platform files: %s", err)
 		log.WithError(err).Error("Error uninstalling")
 		return &arduino.FailedUninstallError{Message: err.Error()}
 	}
@@ -313,7 +313,7 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return fmt.Errorf(tr("no compatible version of %s tools found for the current os"), toolRelease.Tool.Name)
+		return fmt.Errorf("no compatible version of %s tools found for the current os", toolRelease.Tool.Name)
 	}
 	destDir := pme.PackagesDir.Join(
 		toolRelease.Tool.Package.Name,
@@ -357,7 +357,7 @@ func (pme *Explorer) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Ta
 	log.Info("Uninstalling tool")
 
 	if toolRelease.InstallDir == nil {
-		return fmt.Errorf(tr("tool not installed"))
+		return fmt.Errorf("tool not installed")
 	}
 
 	// Safety measure

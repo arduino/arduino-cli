@@ -64,7 +64,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		Version:  libRef.Version,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err))
+		feedback.Errorf("Error resolving dependencies for %[1]s: %[2]s", libRef, err)
 	}
 
 	feedback.PrintResult(&checkDepResult{deps: deps})

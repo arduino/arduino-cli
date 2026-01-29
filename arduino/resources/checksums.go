@@ -38,15 +38,15 @@ var tr = i18n.Tr
 // TestLocalArchiveChecksum test if the checksum of the local archive match the checksum of the DownloadResource
 func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bool, error) {
 	if r.Checksum == "" {
-		return false, fmt.Errorf(tr("missing checksum for: %s"), r.ArchiveFileName)
+		return false, fmt.Errorf("missing checksum for: %s", r.ArchiveFileName)
 	}
 	split := strings.SplitN(r.Checksum, ":", 2)
 	if len(split) != 2 {
-		return false, fmt.Errorf(tr("invalid checksum format: %s"), r.Checksum)
+		return false, fmt.Errorf("invalid checksum format: %s", r.Checksum)
 	}
 	digest, err := hex.DecodeString(split[1])
 	if err != nil {
-		return false, fmt.Errorf(tr("invalid hash '%[1]s': %[2]s"), split[1], err)
+		return false, fmt.Errorf("invalid hash '%[1]s': %[2]s", split[1], err)
 	}
 
 	// names based on: https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#MessageDigest
@@ -59,25 +59,25 @@ func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bo
 	case "MD5":
 		algo = crypto.MD5.New()
 	default:
-		return false, fmt.Errorf(tr("unsupported hash algorithm: %s"), split[0])
+		return false, fmt.Errorf("unsupported hash algorithm: %s", split[0])
 	}
 
 	filePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return false, fmt.Errorf(tr("getting archive path: %s"), err)
+		return false, fmt.Errorf("getting archive path: %s", err)
 	}
 
 	file, err := os.Open(filePath.String())
 	if err != nil {
-		return false, fmt.Errorf(tr("opening archive file: %s"), err)
+		return false, fmt.Errorf("opening archive file: %s", err)
 	}
 	defer file.Close()
 	if _, err := io.Copy(algo, file); err != nil {
-		return false, fmt.Errorf(tr("computing hash: %s"), err)
+		return false, fmt.Errorf("computing hash: %s", err)
 	}
 
 	if !bytes.Equal(algo.Sum(nil), digest) {
-		return false, fmt.Errorf(tr("archive hash differs from hash in index"))
+		return false, fmt.Errorf("archive hash differs from hash in index")
 	}
 
 	return true, nil
@@ -87,11 +87,11 @@ func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bo
 func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, error) {
 	filePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return false, fmt.Errorf(tr("getting archive path: %s"), err)
+		return false, fmt.Errorf("getting archive path: %s", err)
 	}
 	info, err := filePath.Stat()
 	if err != nil {
-		return false, fmt.Errorf(tr("getting archive info: %s"), err)
+		return false, fmt.Errorf("getting archive info: %s", err)
 	}
 	if info.Size() != r.Size {
 		return false, fmt.Errorf("%s: %d != %d", tr("fetched archive size differs from size specified in index"), info.Size(), r.Size)
@@ -103,20 +103,20 @@ func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, 
 // TestLocalArchiveIntegrity checks for integrity of the local archive.
 func (r *DownloadResource) TestLocalArchiveIntegrity(downloadDir *paths.Path) (bool, error) {
 	if cached, err := r.IsCached(downloadDir); err != nil {
-		return false, fmt.Errorf(tr("testing if archive is cached: %s"), err)
+		return false, fmt.Errorf("testing if archive is cached: %s", err)
 	} else if !cached {
 		return false, nil
 	}
 
 	if ok, err := r.TestLocalArchiveSize(downloadDir); err != nil {
-		return false, fmt.Errorf(tr("testing archive size: %s"), err)
+		return false, fmt.Errorf("testing archive size: %s", err)
 	} else if !ok {
 		return false, nil
 	}
 
 	ok, err := r.TestLocalArchiveChecksum(downloadDir)
 	if err != nil {
-		return false, fmt.Errorf(tr("testing archive checksum: %s"), err)
+		return false, fmt.Errorf("testing archive checksum: %s", err)
 	}
 	return ok, nil
 }
@@ -142,7 +142,7 @@ func computeDirChecksum(root string) (string, error) {
 		}
 		defer f.Close()
 		if _, err := io.Copy(hash, f); err != nil {
-			return fmt.Errorf(tr("failed to compute hash of file \"%s\""), info.Name())
+			return fmt.Errorf("failed to compute hash of file %q", info.Name())
 		}
 		return nil
 	})
@@ -165,7 +165,7 @@ func CheckDirChecksum(root string) (bool, error) {
 		return false, err
 	}
 	if file.Checksum != checksum {
-		return false, fmt.Errorf(tr("Checksum differs from checksum in package.json"))
+		return false, fmt.Errorf("Checksum differs from checksum in package.json")
 	}
 
 	return true, nil

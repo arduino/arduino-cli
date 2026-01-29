@@ -109,7 +109,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 				continue
 			}
 
-			feedback.Errorf(tr("Error during upgrade: %v", err))
+			feedback.Errorf("Error during upgrade: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

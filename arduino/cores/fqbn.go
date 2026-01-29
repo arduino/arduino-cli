@@ -45,18 +45,18 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 		Configs:      properties.NewMap(),
 	}
 	if fqbn.BoardID == "" {
-		return nil, fmt.Errorf(tr("empty board identifier"))
+		return nil, fmt.Errorf("empty board identifier")
 	}
 	if len(fqbnParts) > 3 {
 		for _, pair := range strings.Split(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf(tr("invalid config option: %s"), pair)
+				return nil, fmt.Errorf("invalid config option: %s", pair)
 			}
 			k := strings.TrimSpace(parts[0])
 			v := strings.TrimSpace(parts[1])
 			if k == "" {
-				return nil, fmt.Errorf(tr("invalid config option: %s"), pair)
+				return nil, fmt.Errorf("invalid config option: %s", pair)
 			}
 			fqbn.Configs.Set(k, v)
 		}

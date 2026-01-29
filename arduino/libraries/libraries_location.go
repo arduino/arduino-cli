@@ -85,7 +85,7 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 		*d = Unmanaged
 		return nil
 	default:
-		return fmt.Errorf(tr("invalid library location: %s"), s)
+		return fmt.Errorf("invalid library location: %s", s)
 	}
 }
 

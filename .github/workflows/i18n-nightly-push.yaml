@@ -18,7 +18,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v3
         with:
-          go-version: "1.23"
+          go-version: "1.24"
 
       - name: Install Taskfile
         uses: arduino/setup-task@v1

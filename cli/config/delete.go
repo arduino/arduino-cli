@@ -59,7 +59,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if !exists {
-		feedback.Errorf(tr("Settings key doesn't exist"))
+		feedback.Errorf("Settings key doesn't exist")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 

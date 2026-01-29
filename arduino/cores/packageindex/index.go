@@ -275,7 +275,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 
 	size, err := inPlatformRelease.Size.Int64()
 	if err != nil {
-		return fmt.Errorf(tr("invalid platform archive size: %s"), err)
+		return fmt.Errorf("invalid platform archive size: %s", err)
 	}
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.IsTrusted = trusted

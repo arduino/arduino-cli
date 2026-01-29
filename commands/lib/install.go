@@ -93,7 +93,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 		if req.GetNoOverwrite() {
 			if libReplaced != nil {
-				return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, libReplaced))
+				return fmt.Errorf("library %[1]s is already installed, but with a different version: %[2]s", libRelease, libReplaced)
 			}
 		}
 	}

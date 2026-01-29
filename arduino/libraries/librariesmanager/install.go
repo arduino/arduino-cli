@@ -55,9 +55,9 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 	installDir := lm.getLibrariesDir(installLocation)
 	if installDir == nil {
 		if installLocation == libraries.User {
-			return nil, nil, fmt.Errorf(tr("User directory not set"))
+			return nil, nil, fmt.Errorf("user directory not set")
 		}
-		return nil, nil, fmt.Errorf(tr("Builtin libraries directory not set"))
+		return nil, nil, fmt.Errorf("builtin libraries directory not set")
 	}
 
 	name := indexLibrary.Library.Name
@@ -89,7 +89,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
 		return libPath, replaced, nil
 	} else if libPath.IsDir() {
-		return nil, nil, fmt.Errorf(tr("destination dir %s already exists, cannot install"), libPath)
+		return nil, nil, fmt.Errorf("destination dir %s already exists, cannot install", libPath)
 	}
 	return libPath, replaced, nil
 }
@@ -102,10 +102,10 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPat
 // Uninstall removes a Library
 func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 	if lib == nil || lib.InstallDir == nil {
-		return fmt.Errorf(tr("install directory not set"))
+		return fmt.Errorf("install directory not set")
 	}
 	if err := lib.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf(tr("removing lib directory: %s"), err)
+		return fmt.Errorf("removing lib directory: %s", err)
 	}
 
 	alternatives := lm.Libraries[lib.Name]
@@ -118,7 +118,7 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error {
 	libsDir := lm.getLibrariesDir(libraries.User)
 	if libsDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
+		return fmt.Errorf("user directory not set")
 	}
 
 	tmpDir, err := paths.MkTempDir(paths.TempDir().String(), "arduino-cli-lib-")
@@ -137,7 +137,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	// Extract to a temporary directory so we can check if the zip is structured correctly.
 	// We also use the top level folder from the archive to infer the library name.
 	if err := extract.Archive(ctx, file, tmpDir.String(), nil); err != nil {
-		return fmt.Errorf(tr("extracting archive: %w"), err)
+		return fmt.Errorf("extracting archive: %w", err)
 	}
 
 	paths, err := tmpDir.ReadDir()
@@ -149,7 +149,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	paths.FilterOutPrefix("__MACOSX")
 
 	if len(paths) > 1 {
-		return fmt.Errorf(tr("archive is not valid: multiple files found in zip file top level"))
+		return fmt.Errorf("archive is not valid: multiple files found in zip file top level")
 	}
 
 	extractionPath := paths[0]
@@ -175,7 +175,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	// Delete library folder if already installed
 	if installPath.IsDir() {
 		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), libraryName)
+			return fmt.Errorf("library %s already installed", libraryName)
 		}
 		logrus.
 			WithField("library name", libraryName).
@@ -192,7 +192,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 
 	// Copy extracted library in the destination directory
 	if err := extractionPath.CopyDirTo(installPath); err != nil {
-		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
+		return fmt.Errorf("moving extracted archive to destination dir: %s", err)
 	}
 
 	return nil
@@ -202,7 +202,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	installDir := lm.getLibrariesDir(libraries.User)
 	if installDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
+		return fmt.Errorf("user directory not set")
 	}
 
 	libraryName, gitURL, ref, err := parseGitArgURL(gitURL)
@@ -217,7 +217,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	installPath := installDir.Join(libraryName)
 	if installPath.IsDir() {
 		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), libraryName)
+			return fmt.Errorf("library %s already installed", libraryName)
 		}
 		logrus.
 			WithField("library name", libraryName).
@@ -226,7 +226,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		installPath.RemoveAll()
 	}
 	if installPath.Exist() {
-		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
+		return fmt.Errorf("could not create directory %s: a file with the same name exists", installPath)
 	}
 
 	logrus.
@@ -235,37 +235,28 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		WithField("git url", gitURL).
 		Trace("Installing library")
 
-	depth := 1
-	if ref != "" {
-		depth = 0
-	}
-	repo, err := git.PlainClone(installPath.String(), false, &git.CloneOptions{
-		URL:      gitURL,
-		Depth:    depth,
-		Progress: os.Stdout,
+	_, err = git.PlainClone(installPath.String(), false, &git.CloneOptions{
+		URL:           gitURL,
+		ReferenceName: plumbing.ReferenceName(ref),
 	})
 	if err != nil {
-		logrus.
-			WithError(err).
-			Warn("Cloning git repository")
-		return err
-	}
+		if err.Error() != "reference not found" {
+			return err
+		}
 
-	if ref != "" {
-		if h, err := repo.ResolveRevision(plumbing.Revision(ref)); err != nil {
-			logrus.
-				WithError(err).
-				Warnf("Resolving revision %s", ref)
+		// We did not find the requested reference, let's do a PlainClone and use
+		// "ResolveRevision" to find and checkout the requested revision
+		if repo, err := git.PlainClone(installPath.String(), false, &git.CloneOptions{
+			URL: gitURL,
+		}); err != nil {
+			return err
+		} else if h, err := repo.ResolveRevision(plumbing.Revision(ref)); err != nil {
 			return err
 		} else if w, err := repo.Worktree(); err != nil {
-			logrus.
-				WithError(err).
-				Warn("Finding worktree")
 			return err
-		} else if err := w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())}); err != nil {
-			logrus.
-				WithError(err).
-				Warnf("Checking out %s", h)
+		} else if err := w.Checkout(&git.CheckoutOptions{
+			Force: true, // workaround for: https://github.com/go-git/go-git/issues/1411
+			Hash:  plumbing.NewHash(h.String())}); err != nil {
 			return err
 		}
 	}
@@ -334,7 +325,7 @@ func parseGitArgURL(argURL string) (string, string, string, error) {
 // Returns nil if dir contains a valid library, error on all other cases.
 func validateLibrary(dir *paths.Path) error {
 	if dir.NotExist() {
-		return fmt.Errorf(tr("directory doesn't exist: %s", dir))
+		return fmt.Errorf("directory doesn't exist: %s", dir)
 	}
 
 	searchHeaderFile := func(d *paths.Path) (bool, error) {
@@ -344,7 +335,7 @@ func validateLibrary(dir *paths.Path) error {
 		}
 		dirContent, err := d.ReadDir()
 		if err != nil {
-			return false, fmt.Errorf(tr("reading directory %s content: %w", dir, err))
+			return false, fmt.Errorf("reading directory %s content: %w", dir, err)
 		}
 		dirContent.FilterOutDirs()
 		headerExtensions := []string{}
@@ -371,5 +362,5 @@ func validateLibrary(dir *paths.Path) error {
 		return nil
 	}
 
-	return fmt.Errorf(tr("library not valid"))
+	return fmt.Errorf("library not valid")
 }

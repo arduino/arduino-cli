@@ -135,7 +135,7 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 					Protocol: "serial",
 				}, nil
 			}
-			return nil, fmt.Errorf(tr("port not found: %[1]s %[2]s"), address, protocol)
+			return nil, fmt.Errorf("port not found: %[1]s %[2]s", address, protocol)
 		}
 	}
 }
@@ -154,7 +154,7 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error during FQBN detection: %v", err))
+		feedback.Errorf("Error during FQBN detection: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	for _, detectedPort := range detectedPorts {

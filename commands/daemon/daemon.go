@@ -96,7 +96,7 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 	}
 
 	if msg.Instance == nil {
-		err = fmt.Errorf(tr("no instance specified"))
+		err = fmt.Errorf("no instance specified")
 		stream.Send(&rpc.BoardListWatchResponse{
 			EventType: "error",
 			Error:     err.Error(),

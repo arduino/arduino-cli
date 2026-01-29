@@ -298,7 +298,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	// if we don't load it some information about the platform is lost
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
-			return fmt.Errorf(tr("loading %[1]s: %[2]s"), installedJSONPath, err)
+			return fmt.Errorf("loading %[1]s: %[2]s", installedJSONPath, err)
 		}
 	}
 
@@ -307,12 +307,12 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	if p, err := properties.SafeLoad(platformTxtPath.String()); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtPath, err)
+		return fmt.Errorf("loading %[1]s: %[2]s", platformTxtPath, err)
 	}
 	if p, err := properties.SafeLoad(platformTxtLocalPath.String()); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
+		return fmt.Errorf("loading %[1]s: %[2]s", platformTxtLocalPath, err)
 	}
 
 	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 {
@@ -348,7 +348,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	}
 
 	if err := pm.loadBoards(platform); err != nil {
-		return fmt.Errorf(tr("loading boards: %s"), err)
+		return fmt.Errorf("loading boards: %s", err)
 	}
 
 	if !platform.PluggableDiscoveryAware {
@@ -360,7 +360,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
 		split := strings.Split(ref, ":")
 		if len(split) != 2 {
-			return fmt.Errorf(tr("invalid pluggable monitor reference: %s"), ref)
+			return fmt.Errorf("invalid pluggable monitor reference: %s", ref)
 		}
 		pm.log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
 		platform.Monitors[protocol] = &cores.MonitorDependency{
@@ -454,7 +454,7 @@ func (pm *Builder) loadProgrammer(programmerProperties *properties.Map) *cores.P
 
 func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.InstallDir == nil {
-		return fmt.Errorf(tr("platform not installed"))
+		return fmt.Errorf("platform not installed")
 	}
 
 	boardsTxtPath := platform.InstallDir.Join("boards.txt")
@@ -699,7 +699,7 @@ func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 		return nil
 	}
 	if err := filepath.Walk(toolsPath.String(), findBuiltInToolsVersionsTxt); err != nil {
-		return fmt.Errorf(tr("searching for builtin_tools_versions.txt in %[1]s: %[2]s"), toolsPath, err)
+		return fmt.Errorf("searching for builtin_tools_versions.txt in %[1]s: %[2]s", toolsPath, err)
 	}
 
 	if builtinToolsVersionsTxtPath != "" {
@@ -708,12 +708,12 @@ func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 		pm.log.Infof("Found builtin_tools_versions.txt")
 		toolPath, err := paths.New(builtinToolsVersionsTxtPath).Parent().Abs()
 		if err != nil {
-			return fmt.Errorf(tr("getting parent dir of %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
+			return fmt.Errorf("getting parent dir of %[1]s: %[2]s", builtinToolsVersionsTxtPath, err)
 		}
 
 		all, err := properties.Load(builtinToolsVersionsTxtPath)
 		if err != nil {
-			return fmt.Errorf(tr("reading %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
+			return fmt.Errorf("reading %[1]s: %[2]s", builtinToolsVersionsTxtPath, err)
 		}
 
 		for packager, toolsData := range all.FirstLevelOf() {

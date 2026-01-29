@@ -185,12 +185,12 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 // An error is returned if the path doesn't exist or loading of the library fails.
 func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location libraries.LibraryLocation) error {
 	if libRootDir.NotExist() {
-		return fmt.Errorf(tr("library path does not exist: %s"), libRootDir)
+		return fmt.Errorf("library path does not exist: %s", libRootDir)
 	}
 
 	library, err := libraries.Load(libRootDir, location)
 	if err != nil {
-		return fmt.Errorf(tr("loading library from %[1]s: %[2]s"), libRootDir, err)
+		return fmt.Errorf("loading library from %[1]s: %[2]s", libRootDir, err)
 	}
 
 	alternatives := lm.Libraries[library.Name]

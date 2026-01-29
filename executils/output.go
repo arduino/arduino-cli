@@ -31,7 +31,7 @@ type OutputListener interface {
 func AttachStdoutListener(cmd *exec.Cmd, listener OutputListener) error {
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf(tr("can't retrieve standard output stream: %s"), err)
+		return fmt.Errorf("can't retrieve standard output stream: %s", err)
 	}
 
 	stdoutCopy := bufio.NewScanner(stdout)
@@ -49,7 +49,7 @@ func AttachStdoutListener(cmd *exec.Cmd, listener OutputListener) error {
 func AttachStderrListener(cmd *exec.Cmd, listener OutputListener) error {
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf(tr("can't retrieve standard error stream: %s"), err)
+		return fmt.Errorf("can't retrieve standard error stream: %s", err)
 	}
 
 	stderrCopy := bufio.NewScanner(stderr)

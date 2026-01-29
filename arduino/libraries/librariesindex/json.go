@@ -63,13 +63,13 @@ var tr = i18n.Tr
 func LoadIndex(indexFile *paths.Path) (*Index, error) {
 	buff, err := indexFile.ReadFile()
 	if err != nil {
-		return nil, fmt.Errorf(tr("reading library_index.json: %s"), err)
+		return nil, fmt.Errorf("reading library_index.json: %s", err)
 	}
 
 	var i indexJSON
 	err = easyjson.Unmarshal(buff, &i)
 	if err != nil {
-		return nil, fmt.Errorf(tr("parsing library_index.json: %s"), err)
+		return nil, fmt.Errorf("parsing library_index.json: %s", err)
 	}
 
 	return i.extractIndex()

@@ -149,16 +149,16 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli compile`")
 
 	if dumpProfile && feedback.GetFormat() != feedback.Text {
-		feedback.Errorf(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"))
+		feedback.Errorf("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json")
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
-			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"))
+			feedback.Errorf("You cannot use the %s flag while compiling with a profile.", "--libraries")
 			os.Exit(errorcodes.ErrBadArgument)
 		}
 		if len(library) > 0 {
-			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--library"))
+			feedback.Errorf("You cannot use the %s flag while compiling with a profile.", "--library")
 			os.Exit(errorcodes.ErrBadArgument)
 		}
 	}
@@ -242,7 +242,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Protocol: port.Protocol,
 		})
 		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v", err))
+			feedback.Errorf("Error during Upload: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
@@ -355,9 +355,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 			if profileArg.String() == "" {
 				if platform != nil {
-					feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
+					feedback.Errorf("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform))
 				} else {
-					feedback.Errorf(tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform))
+					feedback.Errorf("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 				}
 			}
 		}

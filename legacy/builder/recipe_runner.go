@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -35,14 +34,14 @@ type RecipeByPrefixSuffixRunner struct {
 }
 
 func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
-	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", s.Prefix+"*"+s.Suffix))
+	logrus.Debugf("Looking for recipes like %s", s.Prefix+"*"+s.Suffix)
 
 	buildProperties := ctx.BuildProperties.Clone()
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
 
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
+		logrus.Debugf("Running recipe: %s", recipe)
 
 		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 		if err != nil {

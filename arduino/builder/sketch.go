@@ -73,7 +73,7 @@ func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		}
 		data, err := f.ReadFile()
 		if err != nil {
-			return "", fmt.Errorf(tr("reading file %[1]s: %[2]s"), f, err)
+			return "", fmt.Errorf("reading file %[1]s: %[2]s", f, err)
 		}
 		return string(data), nil
 	}

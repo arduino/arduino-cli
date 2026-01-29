@@ -187,7 +187,7 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 	}()
 
 	if err := d.Run(); err != nil {
-		return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
+		return fmt.Errorf("discovery %[1]s process not started: %[2]w", d.GetID(), err)
 	}
 	eventCh, err := d.StartSync(5)
 	if err != nil {

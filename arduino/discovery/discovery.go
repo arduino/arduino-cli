@@ -210,7 +210,7 @@ func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMe
 		}
 		return msg, nil
 	case <-time.After(timeout):
-		return nil, fmt.Errorf(tr("timeout waiting for message from %s"), disc.id)
+		return nil, fmt.Errorf("timeout waiting for message from %s", disc.id)
 	}
 }
 
@@ -305,7 +305,7 @@ func (disc *PluggableDiscovery) Run() (err error) {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
+		return fmt.Errorf("calling %[1]s: %[2]w", "HELLO", err)
 	} else if msg.EventType != "hello" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "hello", msg.EventType)
 	} else if msg.Error {
@@ -328,7 +328,7 @@ func (disc *PluggableDiscovery) Start() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "START", err)
+		return fmt.Errorf("calling %[1]s: %[2]w", "START", err)
 	} else if msg.EventType != "start" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "start", msg.EventType)
 	} else if msg.Error {
@@ -350,7 +350,7 @@ func (disc *PluggableDiscovery) Stop() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "STOP", err)
+		return fmt.Errorf("calling %[1]s: %[2]w", "STOP", err)
 	} else if msg.EventType != "stop" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "stop", msg.EventType)
 	} else if msg.Error {
@@ -389,7 +389,7 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 		return nil, err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "LIST", err)
+		return nil, fmt.Errorf("calling %[1]s: %[2]w", "LIST", err)
 	} else if msg.EventType != "list" {
 		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "list", msg.EventType)
 	} else if msg.Error {
@@ -415,7 +415,7 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 	}
 
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "START_SYNC", err)
+		return nil, fmt.Errorf("calling %[1]s: %[2]w", "START_SYNC", err)
 	} else if msg.EventType != "start_sync" {
 		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "start_sync", msg.EventType)
 	} else if msg.Error {

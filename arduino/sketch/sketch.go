@@ -60,7 +60,7 @@ var tr = i18n.Tr
 // by file type.
 func New(path *paths.Path) (*Sketch, error) {
 	if path == nil {
-		return nil, fmt.Errorf(tr("sketch path is not valid"))
+		return nil, fmt.Errorf("sketch path is not valid")
 	}
 
 	path = path.Canonical()
@@ -88,7 +88,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		}
 	}
 	if mainFile == nil {
-		return nil, fmt.Errorf(tr("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension)))
+		return nil, fmt.Errorf("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension))
 	}
 
 	sketch := &Sketch{
@@ -123,7 +123,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	}
 
 	if mainFile == nil {
-		return nil, fmt.Errorf(tr("can't find main Sketch file in %s"), path)
+		return nil, fmt.Errorf("can't find main Sketch file in %s", path)
 	}
 
 	sketchFolderFiles, err := sketch.supportedFiles()
@@ -173,7 +173,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	sort.Sort(&sketch.RootFolderFiles)
 
 	if err := sketch.importMetadata(); err != nil {
-		return nil, fmt.Errorf(tr("importing sketch metadata: %s"), err)
+		return nil, fmt.Errorf("importing sketch metadata: %s", err)
 	}
 	return sketch, nil
 }
@@ -210,7 +210,7 @@ func (s *Sketch) importMetadata() error {
 
 	content, err := sketchJSON.ReadFile()
 	if err != nil {
-		return fmt.Errorf(tr("reading sketch metadata %[1]s: %[2]s"), sketchJSON, err)
+		return fmt.Errorf("reading sketch metadata %[1]s: %[2]s", sketchJSON, err)
 	}
 	var meta Metadata
 	err = json.Unmarshal(content, &meta)
@@ -218,7 +218,7 @@ func (s *Sketch) importMetadata() error {
 		if s.Metadata == nil {
 			s.Metadata = new(Metadata)
 		}
-		return fmt.Errorf(tr("encoding sketch metadata: %s"), err)
+		return fmt.Errorf("encoding sketch metadata: %s", err)
 	}
 	s.Metadata = &meta
 	return nil
@@ -229,12 +229,12 @@ func (s *Sketch) importMetadata() error {
 func (s *Sketch) ExportMetadata() error {
 	d, err := json.MarshalIndent(&s.Metadata, "", "  ")
 	if err != nil {
-		return fmt.Errorf(tr("decoding sketch metadata: %s"), err)
+		return fmt.Errorf("decoding sketch metadata: %s", err)
 	}
 
 	sketchJSON := s.FullPath.Join("sketch.json")
 	if err := sketchJSON.WriteFile(d); err != nil {
-		return fmt.Errorf(tr("writing sketch metadata %[1]s: %[2]s"), sketchJSON, err)
+		return fmt.Errorf("writing sketch metadata %[1]s: %[2]s", sketchJSON, err)
 	}
 	return nil
 }

@@ -135,11 +135,11 @@ func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, dow
 	defer release()
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
 	if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
+		return fmt.Errorf("downloading %[1]s tool: %[2]s", tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	if err := pme.InstallTool(tool, taskCB); err != nil {
-		return fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
+		return fmt.Errorf("installing %[1]s tool: %[2]s", tool, err)
 	}
 	return nil
 }
@@ -153,7 +153,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: "Failed to create downloads directory", Cause: err}
 		}
 	}
 
@@ -163,7 +163,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: "Failed to create data directory", Cause: err}
 		}
 	}
 
@@ -303,7 +303,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		for _, u := range urls {
 			URL, err := utils.URLParse(u)
 			if err != nil {
-				s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
+				s := status.Newf(codes.InvalidArgument, "Invalid additional URL: %v", err)
 				responseError(s)
 				continue
 			}
@@ -311,14 +311,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			if URL.Scheme == "file" {
 				_, err := pmb.LoadPackageIndexFromFile(paths.New(URL.Path))
 				if err != nil {
-					s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+					s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
 					responseError(s)
 				}
 				continue
 			}
 
 			if err := pmb.LoadPackageIndex(URL); err != nil {
-				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+				s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
 				responseError(s)
 			}
 		}
@@ -331,7 +331,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		for name, tool := range pmb.GetOrCreatePackage("builtin").Tools {
 			latest := tool.LatestRelease()
 			if latest == nil {
-				s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
+				s := status.Newf(codes.Internal, "can't find latest release of tool %s", name)
 				responseError(s)
 			} else if !latest.IsInstalled() {
 				builtinToolsToInstall = append(builtinToolsToInstall, latest)
@@ -342,7 +342,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if len(builtinToolsToInstall) > 0 {
 			for _, toolRelease := range builtinToolsToInstall {
 				if err := installTool(pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
-					s := status.Newf(codes.Internal, err.Error())
+					s := status.New(codes.Internal, err.Error())
 					responseError(s)
 				}
 			}
@@ -383,7 +383,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	if err := lm.LoadIndex(); err != nil {
-		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+		s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
 		responseError(s)
 	}
 
@@ -439,7 +439,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	for _, err := range lm.RescanLibraries() {
-		s := status.Newf(codes.FailedPrecondition, tr("Loading libraries: %v"), err)
+		s := status.Newf(codes.FailedPrecondition, "Loading libraries: %v", err)
 		responseError(s)
 	}
 
@@ -506,7 +506,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		URL, err := utils.URLParse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
-			msg := fmt.Sprintf("%s: %v", tr("Unable to parse URL"), err)
+			msg := fmt.Sprintf("%s: %v", "Unable to parse URL", err)
 			downloadCB.Start(u, tr("Downloading index: %s", u))
 			downloadCB.End(false, msg)
 			failed = true
@@ -519,7 +519,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 			downloadCB.Start(u, tr("Downloading index: %s", filepath.Base(URL.Path)))
 			path := paths.New(URL.Path)
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
-				msg := fmt.Sprintf("%s: %v", tr("Invalid package index in %s", path), err)
+				msg := fmt.Sprintf("Invalid package index in %s: %v", path, err)
 				downloadCB.End(false, msg)
 				failed = true
 			} else {

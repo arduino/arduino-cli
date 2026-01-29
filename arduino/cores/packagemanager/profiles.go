@@ -152,7 +152,7 @@ func (pmb *Builder) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url
 		// Try installing the missing tool
 		toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
 		if toolRelease == nil {
-			return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not found", toolRef.ToolVersion))}
+			return &arduino.InvalidVersionError{Cause: fmt.Errorf("version %s not found", toolRef.ToolVersion)}
 		}
 		if err := pmb.installMissingProfileTool(toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
@@ -173,7 +173,7 @@ func (pmb *Builder) installMissingProfileTool(toolRelease *cores.ToolRelease, de
 	// Download the tool
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not available for this operating system", toolRelease))}
+		return &arduino.InvalidVersionError{Cause: fmt.Errorf("version %s not available for this operating system", toolRelease)}
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading tool %s", toolRelease)})
 	if err := toolResource.Download(pmb.DownloadDir, nil, toolRelease.String(), downloadCB); err != nil {

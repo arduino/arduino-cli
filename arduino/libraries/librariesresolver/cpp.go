@@ -101,7 +101,7 @@ func (resolver *Cpp) ScanPlatformLibraries(lm *librariesmanager.LibrariesManager
 func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
 	cppHeaders, err := lib.SourceHeaders()
 	if err != nil {
-		return fmt.Errorf(tr("reading lib headers: %s"), err)
+		return fmt.Errorf("reading lib headers: %s", err)
 	}
 	for _, cppHeader := range cppHeaders {
 		l := resolver.headers[cppHeader]
@@ -137,7 +137,7 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 		logrus.
 			WithField("lib", lib.Name).
 			WithField("prio", fmt.Sprintf("%03X", libPriority)).
-			Infof(msg)
+			Info(msg)
 	}
 	if found == nil {
 		return nil

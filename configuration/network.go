@@ -60,7 +60,7 @@ func NetworkProxy(settings *viper.Viper) (*url.URL, error) {
 		// https://github.com/spf13/viper/pull/519
 		return nil, nil
 	} else if proxy, err := url.Parse(proxyConfig); err != nil {
-		return nil, fmt.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
+		return nil, fmt.Errorf("invalid network.proxy '%[1]s': %[2]s", proxyConfig, err)
 	} else {
 		return proxy, nil
 	}

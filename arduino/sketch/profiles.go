@@ -174,9 +174,9 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 		return err
 	}
 	if platformID, ok := data["platform"]; !ok {
-		return fmt.Errorf(tr("missing '%s' directive", "platform"))
+		return fmt.Errorf("missing '%s' directive", "platform")
 	} else if platformID, platformVersion, ok := parseNameAndVersion(platformID); !ok {
-		return fmt.Errorf(tr("invalid '%s' directive", "platform"))
+		return fmt.Errorf("invalid '%s' directive", "platform")
 	} else if c, err := semver.Parse(platformVersion); err != nil {
 		return fmt.Errorf("%s: %w", tr("error parsing version constraints"), err)
 	} else if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {

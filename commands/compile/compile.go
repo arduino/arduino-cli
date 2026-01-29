@@ -95,7 +95,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if targetPlatform == nil || pme.GetInstalledPlatformRelease(targetPlatform) == nil {
 		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
-			Cause:    fmt.Errorf(tr("platform not installed")),
+			Cause:    fmt.Errorf("platform not installed"),
 		}
 	}
 
