@@ -124,6 +124,9 @@ type Profile struct {
 
 // UsesSystemPlatform checks if this profile requires a system installed platform.
 func (p *Profile) RequireSystemInstalledPlatform() bool {
+	if len(p.Platforms) == 0 {
+		return true
+	}
 	return p.Platforms[0].RequireSystemInstalledPlatform()
 }
 

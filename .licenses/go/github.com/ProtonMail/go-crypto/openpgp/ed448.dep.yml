@@ -5,7 +5,7 @@ type: go
 summary: Package ed448 implements the ed448 signature algorithm for OpenPGP as defined
   in the Open PGP crypto refresh.
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/ed448
-license: other
+license: bsd-3-clause
 licenses:
 - sources: go-crypto@v1.3.0/LICENSE
   text: |

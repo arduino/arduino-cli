@@ -50,13 +50,13 @@ func latestVersion(t *testing.T, cli *integrationtest.ArduinoCLI, name string) s
 	return strings.Trim(v, `"`)
 }
 
-func TestProfileLibAddListAndRemov(t *testing.T) {
+func TestProfileLibAddListAndRemove(t *testing.T) {
 	env, cli := integrationtest.CreateEnvForDaemon(t)
 	t.Cleanup(func() { env.CleanUp() })
 
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
-	_, _, err = cli.Run("core", "install", "arduino:avr")
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 
 	tmp, err := paths.MkTempDir("", "")
@@ -330,7 +330,7 @@ func TestProfileLibRemoveWithDeps(t *testing.T) {
 
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
-	_, _, err = cli.Run("core", "install", "arduino:avr")
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 
 	tmp, err := paths.MkTempDir("", "")

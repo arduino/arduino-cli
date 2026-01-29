@@ -4,7 +4,7 @@ version: v1.3.0
 type: go
 summary:
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/openpgp/x25519
-license: other
+license: bsd-3-clause
 licenses:
 - sources: go-crypto@v1.3.0/LICENSE
   text: |

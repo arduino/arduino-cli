@@ -4,7 +4,7 @@ version: v1.3.0
 type: go
 summary: Package brainpool implements Brainpool elliptic curves.
 homepage: https://pkg.go.dev/github.com/ProtonMail/go-crypto/brainpool
-license: other
+license: bsd-3-clause
 licenses:
 - sources: go-crypto@v1.3.0/LICENSE
   text: |
