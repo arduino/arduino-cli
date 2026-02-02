@@ -7,11 +7,11 @@
 # Gabriel F., 2022
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # Gaia Castronovo <g.castronovo@arduino.cc>, 2023
-# Giovanni Scafora <scafora.giovanni@gmail.com>, 2025
+# Giovanni Scafora <scafora.giovanni@gmail.com>, 2026
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Giovanni Scafora <scafora.giovanni@gmail.com>, 2025\n"
+"Last-Translator: Giovanni Scafora <scafora.giovanni@gmail.com>, 2026\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/arduino-1/teams/108174/it_IT/)\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
@@ -716,7 +716,7 @@ msgstr ""
 
 #: internal/arduino/httpclient/httpclient.go:50
 msgid "Download failed"
-msgstr ""
+msgstr "Download non riuscito"
 
 #: commands/service_library_download.go:92
 msgid "Downloading %s"
@@ -3108,7 +3108,7 @@ msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 "Non puoi utilizzare il flag %s durante la compilazione con un profilo."
 
-#: internal/arduino/sketch/profiles.go:224
+#: internal/arduino/sketch/profiles.go:227
 msgid ""
 "all platforms in a profile must either require a specific version or not"
 msgstr ""
@@ -3322,7 +3322,7 @@ msgstr ""
 msgid "error opening %s"
 msgstr "si è verificato un errore durante l'apertura di %s"
 
-#: internal/arduino/sketch/profiles.go:326
+#: internal/arduino/sketch/profiles.go:329
 msgid "error parsing version constraints"
 msgstr "si è verificato un errore durante il parsing dei vincoli di versione"
 
@@ -3453,7 +3453,7 @@ msgid "interactive terminal not supported for the '%s' output format"
 msgstr ""
 "il terminale interattivo non è supportato per il formato dell'output  '%s'"
 
-#: internal/arduino/sketch/profiles.go:321
+#: internal/arduino/sketch/profiles.go:324
 msgid "invalid '%s' directive"
 msgstr "la direttiva '%s' non è valida"
 
@@ -3520,10 +3520,10 @@ msgstr "il layout della libreria non è valido: %s"
 msgid "invalid library location: %s"
 msgstr "la posizione della libreria non è valida: %s"
 
-#: internal/arduino/sketch/profiles.go:366
-#: internal/arduino/sketch/profiles.go:374
-#: internal/arduino/sketch/profiles.go:379
-#: internal/arduino/sketch/profiles.go:389
+#: internal/arduino/sketch/profiles.go:369
+#: internal/arduino/sketch/profiles.go:377
+#: internal/arduino/sketch/profiles.go:382
+#: internal/arduino/sketch/profiles.go:392
 msgid "invalid library reference"
 msgstr "Riferimento alla libreria non valido"
 
@@ -3549,11 +3549,11 @@ msgstr ""
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr "path non valido per la scrittura del file di inventario: errore %[1]s"
 
-#: internal/arduino/sketch/profiles.go:333
+#: internal/arduino/sketch/profiles.go:336
 msgid "invalid platform identifier"
 msgstr "l'identificatore della piattaforma non è valido"
 
-#: internal/arduino/sketch/profiles.go:344
+#: internal/arduino/sketch/profiles.go:347
 msgid "invalid platform index URL:"
 msgstr "URL dell'indice della piattaforma non è valido:"
 
@@ -3583,7 +3583,7 @@ msgstr ""
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr "il valore '%[1]s' non è valido per l'opzione '%[2]s'"
 
-#: internal/arduino/sketch/profiles.go:391
+#: internal/arduino/sketch/profiles.go:394
 msgid "invalid version"
 msgstr "Versione non valida"
 
@@ -3687,7 +3687,7 @@ msgstr "ricerca degli artefatti di compilazione in corso"
 msgid "main file missing from sketch: %s"
 msgstr "il file principale manca dallo sketch: %s"
 
-#: internal/arduino/sketch/profiles.go:319
+#: internal/arduino/sketch/profiles.go:322
 msgid "missing '%s' directive"
 msgstr "Manca la direttiva '%s'"
 
