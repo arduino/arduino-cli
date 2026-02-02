@@ -2810,7 +2810,7 @@ msgstr ""
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:224
+#: internal/arduino/sketch/profiles.go:227
 msgid ""
 "all platforms in a profile must either require a specific version or not"
 msgstr ""
@@ -3015,7 +3015,7 @@ msgstr ""
 msgid "error opening %s"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:326
+#: internal/arduino/sketch/profiles.go:329
 msgid "error parsing version constraints"
 msgstr ""
 
@@ -3137,7 +3137,7 @@ msgstr ""
 msgid "interactive terminal not supported for the '%s' output format"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:321
+#: internal/arduino/sketch/profiles.go:324
 msgid "invalid '%s' directive"
 msgstr ""
 
@@ -3204,10 +3204,10 @@ msgstr ""
 msgid "invalid library location: %s"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:366
-#: internal/arduino/sketch/profiles.go:374
-#: internal/arduino/sketch/profiles.go:379
-#: internal/arduino/sketch/profiles.go:389
+#: internal/arduino/sketch/profiles.go:369
+#: internal/arduino/sketch/profiles.go:377
+#: internal/arduino/sketch/profiles.go:382
+#: internal/arduino/sketch/profiles.go:392
 msgid "invalid library reference"
 msgstr ""
 
@@ -3231,11 +3231,11 @@ msgstr ""
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:333
+#: internal/arduino/sketch/profiles.go:336
 msgid "invalid platform identifier"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:344
+#: internal/arduino/sketch/profiles.go:347
 msgid "invalid platform index URL:"
 msgstr ""
 
@@ -3262,7 +3262,7 @@ msgstr ""
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:391
+#: internal/arduino/sketch/profiles.go:394
 msgid "invalid version"
 msgstr ""
 
@@ -3366,7 +3366,7 @@ msgstr ""
 msgid "main file missing from sketch: %s"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:319
+#: internal/arduino/sketch/profiles.go:322
 msgid "missing '%s' directive"
 msgstr ""
 

@@ -2852,7 +2852,7 @@ msgstr "将当前配置写入数据目录中的配置文件。"
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr "在用配置文件编译时，你不能使用 %s 参数。"
 
-#: internal/arduino/sketch/profiles.go:224
+#: internal/arduino/sketch/profiles.go:227
 msgid ""
 "all platforms in a profile must either require a specific version or not"
 msgstr ""
@@ -3057,7 +3057,7 @@ msgstr "加载项目文件时错误："
 msgid "error opening %s"
 msgstr " 开启 %s 时错误"
 
-#: internal/arduino/sketch/profiles.go:326
+#: internal/arduino/sketch/profiles.go:329
 msgid "error parsing version constraints"
 msgstr "解析版本约束时错误"
 
@@ -3179,7 +3179,7 @@ msgstr "安装 %[1]s 平台: %[2]s"
 msgid "interactive terminal not supported for the '%s' output format"
 msgstr "“%s” 的输出格式不支持交互式终端"
 
-#: internal/arduino/sketch/profiles.go:321
+#: internal/arduino/sketch/profiles.go:324
 msgid "invalid '%s' directive"
 msgstr "无效的 ‘%s’ 指令"
 
@@ -3246,10 +3246,10 @@ msgstr "无效的库 layout：%s"
 msgid "invalid library location: %s"
 msgstr "无效的库 location：%s"
 
-#: internal/arduino/sketch/profiles.go:366
-#: internal/arduino/sketch/profiles.go:374
-#: internal/arduino/sketch/profiles.go:379
-#: internal/arduino/sketch/profiles.go:389
+#: internal/arduino/sketch/profiles.go:369
+#: internal/arduino/sketch/profiles.go:377
+#: internal/arduino/sketch/profiles.go:382
+#: internal/arduino/sketch/profiles.go:392
 msgid "invalid library reference"
 msgstr ""
 
@@ -3273,11 +3273,11 @@ msgstr ""
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:333
+#: internal/arduino/sketch/profiles.go:336
 msgid "invalid platform identifier"
 msgstr "无效的平台标识符"
 
-#: internal/arduino/sketch/profiles.go:344
+#: internal/arduino/sketch/profiles.go:347
 msgid "invalid platform index URL:"
 msgstr "无效的平台索引网址："
 
@@ -3304,7 +3304,7 @@ msgstr "无效的工程命名 \"%[1]s\":  第一个字符必须是字母数字�
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr "‘%[2]s’ 选项的 ‘%[1]s’ 值无效"
 
-#: internal/arduino/sketch/profiles.go:391
+#: internal/arduino/sketch/profiles.go:394
 msgid "invalid version"
 msgstr ""
 
@@ -3408,7 +3408,7 @@ msgstr "寻找构建产物"
 msgid "main file missing from sketch: %s"
 msgstr "项目中缺少主文件：%s"
 
-#: internal/arduino/sketch/profiles.go:319
+#: internal/arduino/sketch/profiles.go:322
 msgid "missing '%s' directive"
 msgstr "缺少 ‘%s’ 指令"
 

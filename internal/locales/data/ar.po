@@ -2910,7 +2910,7 @@ msgstr ""
 "لا يمكنك استخدام flag %s اثناء الترجمة باستخدام بروفايل (while compiling "
 "with a profile)"
 
-#: internal/arduino/sketch/profiles.go:224
+#: internal/arduino/sketch/profiles.go:227
 msgid ""
 "all platforms in a profile must either require a specific version or not"
 msgstr ""
@@ -3119,7 +3119,7 @@ msgstr "خطا اثناء تحميل ملفات المشروع :"
 msgid "error opening %s"
 msgstr "تعذر فتح %s"
 
-#: internal/arduino/sketch/profiles.go:326
+#: internal/arduino/sketch/profiles.go:329
 msgid "error parsing version constraints"
 msgstr "تعذر تقطيع قيود النسخة"
 
@@ -3242,7 +3242,7 @@ msgstr "جار تثبيت المنصة %[1]s : %[2]s"
 msgid "interactive terminal not supported for the '%s' output format"
 msgstr "الطرفية \"terminal \" التفاعلية لا تدعم تنسيق الخرج التالي %s"
 
-#: internal/arduino/sketch/profiles.go:321
+#: internal/arduino/sketch/profiles.go:324
 msgid "invalid '%s' directive"
 msgstr "يوجد directive \"عبارة برمجية بداخل الكود المصدري\" غير صالحة %s"
 
@@ -3309,10 +3309,10 @@ msgstr "تخطيط المكتبة غير صالح : %s"
 msgid "invalid library location: %s"
 msgstr "موقع المكتبة غير صالح : %s"
 
-#: internal/arduino/sketch/profiles.go:366
-#: internal/arduino/sketch/profiles.go:374
-#: internal/arduino/sketch/profiles.go:379
-#: internal/arduino/sketch/profiles.go:389
+#: internal/arduino/sketch/profiles.go:369
+#: internal/arduino/sketch/profiles.go:377
+#: internal/arduino/sketch/profiles.go:382
+#: internal/arduino/sketch/profiles.go:392
 msgid "invalid library reference"
 msgstr ""
 
@@ -3336,11 +3336,11 @@ msgstr ""
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:333
+#: internal/arduino/sketch/profiles.go:336
 msgid "invalid platform identifier"
 msgstr "معرف المنصة غير صالح"
 
-#: internal/arduino/sketch/profiles.go:344
+#: internal/arduino/sketch/profiles.go:347
 msgid "invalid platform index URL:"
 msgstr "عنوان url لفهرس المنصة غير صالح"
 
@@ -3370,7 +3370,7 @@ msgstr ""
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr "قيمة خاطئة '%[1]s' من اجل الخيار %[2]s"
 
-#: internal/arduino/sketch/profiles.go:391
+#: internal/arduino/sketch/profiles.go:394
 msgid "invalid version"
 msgstr ""
 
@@ -3474,7 +3474,7 @@ msgstr ""
 msgid "main file missing from sketch: %s"
 msgstr "الملف الرئيسي مفقود من  المشروع : %s"
 
-#: internal/arduino/sketch/profiles.go:319
+#: internal/arduino/sketch/profiles.go:322
 msgid "missing '%s' directive"
 msgstr "يوجد directive \"عبارة برمجية بداخل الكود المصدري\" مفقودة %s"
 
