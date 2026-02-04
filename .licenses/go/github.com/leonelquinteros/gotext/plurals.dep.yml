@@ -1,11 +1,11 @@
 ---
 name: github.com/leonelquinteros/gotext/plurals
 version: v1.7.2
-type: go
+type: mit
 summary: Package plurals is the pluralform compiler to get the correct translation
   id of the plural string
 homepage: https://pkg.go.dev/github.com/leonelquinteros/gotext/plurals
-license: other
+license: mit
 licenses:
 - sources: gotext@v1.7.2/LICENSE
   text: |

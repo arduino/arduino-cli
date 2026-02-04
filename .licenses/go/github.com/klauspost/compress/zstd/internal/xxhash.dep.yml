@@ -4,7 +4,7 @@ version: v1.17.2
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/klauspost/compress/zstd/internal/xxhash
-license: other
+license: bsd-3-clause
 licenses:
 - sources: compress@v1.17.2/LICENSE
   text: |

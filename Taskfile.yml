@@ -64,7 +64,13 @@ tasks:
     deps:
       - task: general:cache-dep-licenses
     cmds:
-      - licensed status
+      - |
+        if grep --files-with-matches -r "license: other" .licenses/go; then \
+          echo "The libraries cache file above have the license set to 'other'. Please fix the cached license and retry."; \
+          exit 1; \
+        else \
+          licensed status; \
+        fi
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
   general:format-prettier:
