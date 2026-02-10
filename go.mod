@@ -11,9 +11,11 @@ require (
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
 	github.com/cmaglie/pb v1.0.27
+	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/djherbis/buffer v1.1.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.7.0
+	github.com/go-git/go-git/v5 v5.16.5
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
@@ -26,6 +28,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
+	github.com/rogpeppe/go-internal v1.14.1
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/sirupsen/logrus v1.9.3
@@ -37,21 +40,15 @@ require (
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.9.0
 	go.bug.st/serial v1.3.2
-	golang.org/x/crypto v0.37.0
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/text v0.24.0
+	go.bug.st/testifyjson v1.1.1
+	golang.org/x/crypto v0.45.0
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/text v0.31.0
 	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.33.0
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/yaml.v2 v2.4.0
-)
-
-require (
-	github.com/codeclysm/extract/v4 v4.0.0
-	github.com/go-git/go-git/v5 v5.16.4
-	github.com/rogpeppe/go-internal v1.14.1
-	go.bug.st/testifyjson v1.1.1
 )
 
 require (
@@ -93,8 +90,8 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
