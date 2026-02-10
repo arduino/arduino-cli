@@ -1,10 +1,9 @@
 ---
-name: google.golang.org/grpc/internal/syscall
+name: google.golang.org/grpc/internal/balancer/gracefulswitch
 version: v1.64.1
 type: go
-summary: Package syscall provides functionalities that grpc uses to get low-level
-  operating system stats/info.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/syscall
+summary: Package gracefulswitch implements a graceful switch load balancer.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/balancer/gracefulswitch
 license: apache-2.0
 licenses:
 - sources: grpc@v1.64.1/LICENSE

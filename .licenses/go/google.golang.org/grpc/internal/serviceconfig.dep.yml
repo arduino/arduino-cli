@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/serviceconfig
-version: v1.38.0
+version: v1.64.1
 type: go
 summary: Package serviceconfig contains utility functions to parse service config.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/serviceconfig
 license: apache-2.0
 licenses:
-- sources: grpc@v1.38.0/LICENSE
+- sources: grpc@v1.64.1/LICENSE
   text: |2
 
                                      Apache License

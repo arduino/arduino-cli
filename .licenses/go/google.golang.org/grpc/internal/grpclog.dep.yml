@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/grpclog
-version: v1.38.0
+version: v1.64.1
 type: go
 summary: Package grpclog (internal) defines depth logging for grpc.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/grpclog
 license: apache-2.0
 licenses:
-- sources: grpc@v1.38.0/LICENSE
+- sources: grpc@v1.64.1/LICENSE
   text: |2
 
                                      Apache License

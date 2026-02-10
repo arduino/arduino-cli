@@ -6,7 +6,7 @@ replace github.com/arduino/arduino-cli => ../
 
 require (
 	github.com/arduino/arduino-cli v0.0.0-20200109150215-ffa84fdaab21
-	google.golang.org/grpc v1.38.0
+	google.golang.org/grpc v1.64.1
 )
 
 require (

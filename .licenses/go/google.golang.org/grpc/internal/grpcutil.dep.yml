@@ -1,13 +1,12 @@
 ---
 name: google.golang.org/grpc/internal/grpcutil
-version: v1.38.0
+version: v1.64.1
 type: go
-summary: Package grpcutil provides a bunch of utility functions to be used across
-  the gRPC codebase.
+summary: Package grpcutil provides utility functions used across the gRPC codebase.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/grpcutil
 license: apache-2.0
 licenses:
-- sources: grpc@v1.38.0/LICENSE
+- sources: grpc@v1.64.1/LICENSE
   text: |2
 
                                      Apache License

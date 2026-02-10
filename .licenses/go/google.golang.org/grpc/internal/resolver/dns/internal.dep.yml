@@ -1,10 +1,9 @@
 ---
-name: google.golang.org/grpc/internal/syscall
+name: google.golang.org/grpc/internal/resolver/dns/internal
 version: v1.64.1
 type: go
-summary: Package syscall provides functionalities that grpc uses to get low-level
-  operating system stats/info.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/syscall
+summary: Package internal contains functionality internal to the dns resolver package.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/resolver/dns/internal
 license: apache-2.0
 licenses:
 - sources: grpc@v1.64.1/LICENSE

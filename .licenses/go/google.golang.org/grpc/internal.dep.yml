@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal
-version: v1.38.0
+version: v1.64.1
 type: go
 summary: Package internal contains gRPC-internal code, to avoid polluting the godoc
   of the top-level grpc package.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal
 license: apache-2.0
 licenses:
-- sources: grpc@v1.38.0/LICENSE
+- sources: grpc@v1.64.1/LICENSE
   text: |2
 
                                      Apache License

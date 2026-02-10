@@ -1,10 +1,9 @@
 ---
-name: google.golang.org/grpc/internal/syscall
+name: google.golang.org/grpc/internal/pretty
 version: v1.64.1
 type: go
-summary: Package syscall provides functionalities that grpc uses to get low-level
-  operating system stats/info.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/syscall
+summary: Package pretty defines helper functions to pretty-print structs for logging.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/pretty
 license: apache-2.0
 licenses:
 - sources: grpc@v1.64.1/LICENSE
