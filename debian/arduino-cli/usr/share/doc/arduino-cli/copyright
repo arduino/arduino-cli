@@ -24668,7 +24668,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/sys/execabs@v0.40.0
+golang.org/x/sys/execabs@v0.41.0
 
 Copyright 2009 The Go Authors.
 
@@ -24724,7 +24724,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/sys/unix@v0.40.0
+golang.org/x/sys/unix@v0.41.0
 
 Copyright 2009 The Go Authors.
 
@@ -24780,7 +24780,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/term@v0.39.0
+golang.org/x/term@v0.40.0
 
 Copyright 2009 The Go Authors.
 
