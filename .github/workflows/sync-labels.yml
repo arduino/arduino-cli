@@ -19,7 +19,7 @@ on:
 
 env:
   CONFIGURATIONS_FOLDER: .github/label-configuration-files
-  CONFIGURATIONS_ARTIFACT: label-configuration-files
+  CONFIGURATIONS_ARTIFACT_PREFIX: label-configuration-file-
 
 jobs:
   check:
@@ -80,7 +80,7 @@ jobs:
             *.yaml
             *.yml
           if-no-files-found: error
-          name: ${{ env.CONFIGURATIONS_ARTIFACT }}-${{ matrix.filename }}
+          name: ${{ env.CONFIGURATIONS_ARTIFACT_PREFIX }}${{ matrix.filename }}
 
   sync:
     needs: download
@@ -117,14 +117,14 @@ jobs:
       - name: Download configuration file artifacts
         uses: actions/download-artifact@v7
         with:
-          pattern: ${{ env.CONFIGURATIONS_ARTIFACT }}-*
           merge-multiple: true
+          pattern: ${{ env.CONFIGURATIONS_ARTIFACT_PREFIX }}*
           path: ${{ env.CONFIGURATIONS_FOLDER }}
 
       - name: Remove unneeded artifacts
         uses: geekyeggo/delete-artifact@v5
         with:
-          name: ${{ env.CONFIGURATIONS_ARTIFACT }}-*
+          name: ${{ env.CONFIGURATIONS_ARTIFACT_PREFIX }}*
 
       - name: Merge label configuration files
         run: |
