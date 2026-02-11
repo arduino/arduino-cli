@@ -1,7 +1,7 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/sync-labels.md
 name: Sync Labels
 
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
   push:
     paths:
@@ -86,8 +86,8 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          # See: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
-          echo "MERGED_CONFIGURATION_PATH=${{ runner.temp }}/labels.yml" >> "$GITHUB_ENV"
+          # See: https://docs.github.com/actions/reference/workflows-and-actions/workflow-commands#setting-an-environment-variable
+          echo "MERGED_CONFIGURATION_PATH=${{ runner.temp }}/labels.yml" >>"$GITHUB_ENV"
 
       - name: Determine whether to dry run
         id: dry-run
@@ -103,19 +103,19 @@ jobs:
         run: |
           # Use of this flag in the github-label-sync command will cause it to only check the validity of the
           # configuration.
-          echo "flag=--dry-run" >> $GITHUB_OUTPUT
+          echo "flag=--dry-run" >>$GITHUB_OUTPUT
 
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Download configuration files artifact
+      - name: Download configuration file artifacts
         uses: actions/download-artifact@v7
         with:
           pattern: ${{ env.CONFIGURATIONS_ARTIFACT }}-*
           merge-multiple: true
           path: ${{ env.CONFIGURATIONS_FOLDER }}
 
-      - name: Remove unneeded artifact
+      - name: Remove unneeded artifacts
         uses: geekyeggo/delete-artifact@v5
         with:
           name: ${{ env.CONFIGURATIONS_ARTIFACT }}-*
@@ -124,7 +124,7 @@ jobs:
         run: |
           # Merge all configuration files
           shopt -s extglob
-          cat "${{ env.CONFIGURATIONS_FOLDER }}"/*.@(yml|yaml) > "${{ env.MERGED_CONFIGURATION_PATH }}"
+          cat "${{ env.CONFIGURATIONS_FOLDER }}"/*.@(yml|yaml) >"${{ env.MERGED_CONFIGURATION_PATH }}"
 
       - name: Install github-label-sync
         run: sudo npm install --global github-label-sync
