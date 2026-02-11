@@ -37,7 +37,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v3 v3.0.0
-	go.bug.st/f v0.4.0
+	go.bug.st/f v0.5.0
 	go.bug.st/relaxed-semver v0.15.0
 	go.bug.st/testifyjson v1.3.0
 	golang.org/x/sys v0.41.0
