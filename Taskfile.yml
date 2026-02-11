@@ -65,12 +65,12 @@ tasks:
       - task: general:cache-dep-licenses
     cmds:
       - |
-        if grep --files-with-matches -r "license: other" .licenses/go; then \
-          echo "The libraries cache file above have the license set to 'other'. Please fix the cached license and retry."; \
-          exit 1; \
-        else \
-          licensed status; \
+        if grep --files-with-matches -r "license: other" .licenses; then
+          echo "The license cache files above have the license set to 'other'. Please manually define the license type and retry."
+          echo "See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#unrecognized-licenses"
+          exit 1
         fi
+      - licensed status
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
   general:format-prettier:
