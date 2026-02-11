@@ -24,6 +24,8 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -55,6 +57,7 @@ jobs:
   download:
     needs: check
     runs-on: ubuntu-latest
+    permissions: {}
 
     strategy:
       matrix:
@@ -82,6 +85,9 @@ jobs:
   sync:
     needs: download
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
 
     steps:
       - name: Set environment variables
