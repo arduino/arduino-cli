@@ -1,13 +1,13 @@
 ---
 name: golang.org/x/text/encoding
-version: v0.33.0
+version: v0.34.0
 type: go
 summary: Package encoding defines an interface for character encodings, such as Shift
   JIS and Windows 1252, that can convert to and from UTF-8.
 homepage: https://pkg.go.dev/golang.org/x/text/encoding
 license: bsd-3-clause
 licenses:
-- sources: text@v0.33.0/LICENSE
+- sources: text@v0.34.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: text@v0.33.0/PATENTS
+- sources: text@v0.34.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
