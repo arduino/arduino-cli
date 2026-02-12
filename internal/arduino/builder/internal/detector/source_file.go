@@ -19,16 +19,16 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
+	"os"
+
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 type sourceFile struct {
 	// SourcePath is the path to the source file
 	SourcePath *paths.Path `json:"source_path"`
-
-	// ObjectPath is the path to the object file that will be generated
-	ObjectPath *paths.Path `json:"object_path"`
 
 	// DepfilePath is the path to the dependency file that will be generated
 	DepfilePath *paths.Path `json:"depfile_path"`
@@ -41,68 +41,102 @@ type sourceFile struct {
 }
 
 func (f *sourceFile) String() string {
-	return fmt.Sprintf("SourcePath:%s SourceRoot:%s BuildRoot:%s ExtraInclude:%s",
-		f.SourcePath, f.ObjectPath, f.DepfilePath, f.ExtraIncludePath)
+	return fmt.Sprintf("%s -> dep:%s (ExtraInclude:%s)",
+		f.SourcePath, f.DepfilePath, f.ExtraIncludePath)
 }
 
 // Equals checks if a sourceFile is equal to another.
-func (f *sourceFile) Equals(g *sourceFile) bool {
+func (f *sourceFile) Equals(g sourceFile) bool {
 	return f.SourcePath.EqualsTo(g.SourcePath) &&
-		f.ObjectPath.EqualsTo(g.ObjectPath) &&
 		f.DepfilePath.EqualsTo(g.DepfilePath) &&
 		((f.ExtraIncludePath == nil && g.ExtraIncludePath == nil) ||
 			(f.ExtraIncludePath != nil && g.ExtraIncludePath != nil && f.ExtraIncludePath.EqualsTo(g.ExtraIncludePath)))
 }
 
-// makeSourceFile create a sourceFile object for the given source file path.
-// The given sourceFilePath can be absolute, or relative within the sourceRoot root folder.
-func makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePaths ...*paths.Path) (*sourceFile, error) {
-	if len(extraIncludePaths) > 1 {
-		panic("only one extra include path allowed")
+// PrepareBuildPath ensures that the directory for the dependency file exists.
+func (f *sourceFile) PrepareBuildPath() error {
+	if f.DepfilePath != nil {
+		return f.DepfilePath.Parent().MkdirAll()
 	}
-	var extraIncludePath *paths.Path
-	if len(extraIncludePaths) > 0 {
-		extraIncludePath = extraIncludePaths[0]
-	}
-
-	if sourceFilePath.IsAbs() {
-		var err error
-		sourceFilePath, err = sourceRoot.RelTo(sourceFilePath)
-		if err != nil {
-			return nil, err
-		}
-	}
-	res := &sourceFile{
-		SourcePath:       sourceRoot.JoinPath(sourceFilePath),
-		ObjectPath:       buildRoot.Join(sourceFilePath.String() + ".o"),
-		DepfilePath:      buildRoot.Join(sourceFilePath.String() + ".d"),
-		ExtraIncludePath: extraIncludePath,
-	}
-	return res, nil
+	return nil
 }
 
 // ObjFileIsUpToDate checks if the compile object file is up to date.
-func (f *sourceFile) ObjFileIsUpToDate() (unchanged bool, err error) {
-	return utils.ObjFileIsUpToDate(f.SourcePath, f.ObjectPath, f.DepfilePath)
+func (f *sourceFile) ObjFileIsUpToDate(log *logrus.Entry) (unchanged bool, err error) {
+	if f.DepfilePath == nil {
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: object file or dependency file not provided", f.SourcePath)
+		return false, nil
+	}
+
+	sourceFile := f.SourcePath.Clean()
+	sourceFileStat, err := sourceFile.Stat()
+	if err != nil {
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not stat source file: %s", f.SourcePath, err)
+		return false, err
+	}
+	dependencyFile := f.DepfilePath.Clean()
+	dependencyFileStat, err := dependencyFile.Stat()
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Dependency file not found: %v", f.SourcePath, dependencyFile)
+			return false, nil
+		}
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not stat dependency file: %s", f.SourcePath, err)
+		return false, err
+	}
+	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: %v newer than %v", f.SourcePath, sourceFile, dependencyFile)
+		return false, nil
+	}
+	deps, err := cpp.ReadDepFile(dependencyFile)
+	if err != nil {
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not read dependency file: %s", f.SourcePath, dependencyFile)
+		return false, err
+	}
+	if len(deps.Dependencies) == 0 {
+		return true, nil
+	}
+	if deps.Dependencies[0] != sourceFile.String() {
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Depfile is about different source file: %v (expected %v)", f.SourcePath, deps.Dependencies[0], sourceFile)
+		return false, nil
+	}
+	for _, dep := range deps.Dependencies[1:] {
+		depStat, err := os.Stat(dep)
+		if os.IsNotExist(err) {
+			log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Not found: %v", f.SourcePath, dep)
+			return false, nil
+		}
+		if err != nil {
+			logrus.WithError(err).Tracef("[LD] COMPILE-CHECK: REBUILD %v: Failed to read: %v", f.SourcePath, dep)
+			return false, nil
+		}
+		if depStat.ModTime().After(dependencyFileStat.ModTime()) {
+			log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: %v newer than %v", f.SourcePath, dep, dependencyFile)
+			return false, nil
+		}
+	}
+	log.Tracef("[LD] COMPILE-CHECK: REUSE %v Up-to-date", f.SourcePath)
+	return true, nil
 }
 
 // uniqueSourceFileQueue is a queue of source files that does not allow duplicates.
-type uniqueSourceFileQueue []*sourceFile
+type uniqueSourceFileQueue []sourceFile
 
 // Push adds a source file to the queue if it is not already present.
-func (queue *uniqueSourceFileQueue) Push(value *sourceFile) {
+func (queue *uniqueSourceFileQueue) Push(value sourceFile) {
 	if !queue.Contains(value) {
+		logrus.Tracef("[LD] QUEUE: Added %s", value.SourcePath)
 		*queue = append(*queue, value)
 	}
 }
 
 // Contains checks if the queue Contains a source file.
-func (queue uniqueSourceFileQueue) Contains(target *sourceFile) bool {
+func (queue uniqueSourceFileQueue) Contains(target sourceFile) bool {
 	return slices.ContainsFunc(queue, target.Equals)
 }
 
 // Pop removes and returns the first element of the queue.
-func (queue *uniqueSourceFileQueue) Pop() *sourceFile {
+func (queue *uniqueSourceFileQueue) Pop() sourceFile {
 	old := *queue
 	x := old[0]
 	*queue = old[1:]

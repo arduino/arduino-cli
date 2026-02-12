@@ -41,6 +41,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
 )
 
 type libraryResolutionResult struct {
@@ -140,6 +141,7 @@ func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 // addAndBuildLibrary adds the given library to the imported libraries list and queues its source files
 // for further processing.
 func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSourceFileQueue, librariesBuildPath *paths.Path, library *libraries.Library) {
+	logrus.Tracef("[LD] LIBRARY: %s", library.Name)
 	l.importedLibraries = append(l.importedLibraries, library)
 	if library.Precompiled && library.PrecompiledWithSources {
 		// Fully precompiled libraries should have no dependencies to avoid ABI breakage
@@ -202,8 +204,9 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
+	logrus.Tracef("[LD] INCLUDE-PATH: %s", folder.String())
 	l.includeFolders = append(l.includeFolders, folder)
-	l.cache.Expect(&detectorCacheEntry{AddedIncludePath: folder})
+	l.cache.ExpectAddedIncludePath(folder)
 }
 
 // FindIncludes todo
@@ -219,6 +222,11 @@ func (l *SketchLibrariesDetector) FindIncludes(
 	platformArch string,
 	jobs int,
 ) error {
+	logrus.Debug("Finding required libraries for the sketch.")
+	defer func() {
+		logrus.Debugf("Library detection completed. Found %d required libraries.", len(l.importedLibraries))
+	}()
+
 	err := l.findIncludes(ctx, buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch, jobs)
 	if err != nil && l.onlyUpdateCompilationDatabase {
 		l.logger.Info(
@@ -255,13 +263,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err := json.Unmarshal(d, &cachedIncludeFolders); err != nil {
 			return err
 		}
-	}
-	if l.useCachedLibrariesResolution && librariesResolutionCachePath.Exist() {
-		l.includeFolders = cachedIncludeFolders
-		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())
+		if l.useCachedLibrariesResolution {
+			l.includeFolders = cachedIncludeFolders
+			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+				l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())
+			}
+			return nil
 		}
-		return nil
 	}
 
 	cachePath := buildPath.Join("includes.cache")
@@ -272,14 +280,19 @@ func (l *SketchLibrariesDetector) findIncludes(
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
-		if entry.Compile != nil && entry.CompileTask != nil {
-			upToDate, _ := entry.Compile.ObjFileIsUpToDate()
+		if entry.CompileTask != nil {
+			upToDate, _ := entry.Compile.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
 			if !upToDate {
+				_ = entry.Compile.PrepareBuildPath()
 				l.preRunner.Enqueue(entry.CompileTask)
 			}
 		}
 	}
-	defer l.preRunner.Cancel()
+	defer func() {
+		if l.preRunner != nil {
+			l.preRunner.Cancel()
+		}
+	}()
 
 	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
@@ -290,7 +303,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 	if !l.useCachedLibrariesResolution {
 		sketch := sketch
-		mergedfile, err := makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
+		mergedfile, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
 			return err
 		}
@@ -350,17 +363,18 @@ func (l *SketchLibrariesDetector) findIncludes(
 	return nil
 }
 
-func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile *sourceFile, buildProperties *properties.Map) *runner.Task {
+func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile sourceFile, buildProperties *properties.Map) *runner.Task {
 	// Libraries may require the "utility" directory to be added to the include
 	// search path, but only for the source code of the library, so we temporary
 	// copy the current search path list and add the library' utility directory
 	// if needed.
-	includeFolders := l.includeFolders
+	includeFolders := l.includeFolders.Clone()
 	if extraInclude := sourceFile.ExtraIncludePath; extraInclude != nil {
 		includeFolders = append(includeFolders, extraInclude)
 	}
 
-	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties)
+	_ = sourceFile.PrepareBuildPath()
+	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties, sourceFile.DepfilePath)
 }
 
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
@@ -385,7 +399,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := sourceFile.ObjFileIsUpToDate()
+	unchanged, err := sourceFile.ObjFileIsUpToDate(logrus.WithField("runner", "main"))
 	if err != nil {
 		return err
 	}
@@ -393,7 +407,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	first := true
 	for {
 		preprocTask := l.gccPreprocessTask(sourceFile, buildProperties)
-		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile, CompileTask: preprocTask})
+		l.cache.ExpectCompile(sourceFile, preprocTask)
 
 		var preprocErr error
 		var preprocResult *runner.Result
@@ -401,11 +415,13 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		var missingIncludeH string
 		if entry := l.cache.Peek(); unchanged && entry != nil && entry.MissingIncludeH != nil {
 			missingIncludeH = *entry.MissingIncludeH
+			logrus.Tracef("[LD] COMPILE-CACHE: %s", sourceFile.SourcePath)
 			if first && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info(i18n.Tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 			first = false
 		} else {
+			logrus.Tracef("[LD] COMPILE: %s", sourceFile.SourcePath)
 			if l.preRunner != nil {
 				if r := l.preRunner.Results(preprocTask); r != nil {
 					preprocResult = r
@@ -418,9 +434,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 
 				// Stop the pre-runner
 				if l.preRunner != nil {
-					preRunner := l.preRunner
+					l.preRunner.Cancel()
 					l.preRunner = nil
-					go preRunner.Cancel()
 				}
 
 				// Run the actual preprocessor
@@ -446,7 +461,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			}
 		}
 
-		l.cache.Expect(&detectorCacheEntry{MissingIncludeH: &missingIncludeH})
+		logrus.Tracef("[LD] MISSING: %s", missingIncludeH)
+		l.cache.ExpectMissingIncludeH(missingIncludeH)
 
 		if missingIncludeH == "" {
 			// No missing includes found, we're done
@@ -493,6 +509,8 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	buildDir *paths.Path,
 	extraIncludePath ...*paths.Path,
 ) error {
+	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
+
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
 		sourceFileExtensions = append(sourceFileExtensions, k)
@@ -503,7 +521,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
+		sourceFile, err := l.makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
 		if err != nil {
 			return err
 		}
@@ -511,6 +529,31 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	return nil
+}
+
+// makeSourceFile create a sourceFile object for the given source file path.
+// The given sourceFilePath can be absolute, or relative within the sourceRoot root folder.
+func (l *SketchLibrariesDetector) makeSourceFile(sourceRoot, buildRoot, sourceFilePath *paths.Path, extraIncludePaths ...*paths.Path) (sourceFile, error) {
+	if len(extraIncludePaths) > 1 {
+		panic("only one extra include path allowed")
+	}
+	var extraIncludePath *paths.Path
+	if len(extraIncludePaths) > 0 {
+		extraIncludePath = extraIncludePaths[0]
+	}
+
+	if sourceFilePath.IsAbs() {
+		var err error
+		sourceFilePath, err = sourceRoot.RelTo(sourceFilePath)
+		if err != nil {
+			return sourceFile{}, err
+		}
+	}
+	return sourceFile{
+		SourcePath:       sourceRoot.JoinPath(sourceFilePath),
+		DepfilePath:      buildRoot.Join(fmt.Sprintf("%s.libsdetect.d", sourceFilePath)),
+		ExtraIncludePath: extraIncludePath,
+	}, nil
 }
 
 func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {

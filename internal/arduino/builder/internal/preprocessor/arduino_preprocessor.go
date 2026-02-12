@@ -45,7 +45,7 @@ func PreprocessSketchWithArduinoPreprocessor(
 
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
-	gccResult := GCC(sourceFile, targetFile, includeFolders, buildProperties).Run(ctx)
+	gccResult := GCC(sourceFile, targetFile, includeFolders, buildProperties, nil).Run(ctx)
 	verboseOut.Write(gccResult.Stdout)
 	verboseOut.Write(gccResult.Stderr)
 	if gccResult.Error != nil {

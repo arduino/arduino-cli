@@ -20,7 +20,7 @@ require (
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.18.0
-	github.com/go-git/go-git/v5 v5.16.4
+	github.com/go-git/go-git/v5 v5.16.5
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/leonelquinteros/gotext v1.7.2
 	github.com/mailru/easyjson v0.7.7
@@ -30,19 +30,19 @@ require (
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/schollz/closestmatch v2.1.0+incompatible
-	github.com/sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v3 v3.0.0
-	go.bug.st/f v0.4.0
+	go.bug.st/f v0.5.0
 	go.bug.st/relaxed-semver v0.15.0
 	go.bug.st/testifyjson v1.3.0
-	golang.org/x/sys v0.40.0
-	golang.org/x/term v0.39.0
-	golang.org/x/text v0.33.0
+	golang.org/x/sys v0.41.0
+	golang.org/x/term v0.40.0
+	golang.org/x/text v0.34.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
