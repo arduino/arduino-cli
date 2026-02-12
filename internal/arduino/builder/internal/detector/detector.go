@@ -407,7 +407,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	first := true
 	for {
 		preprocTask := l.gccPreprocessTask(sourceFile, buildProperties)
-		l.cache.Expect(&detectorCacheEntry{Compile: sourceFile, CompileTask: preprocTask})
+		l.cache.ExpectCompile(sourceFile, preprocTask)
 
 		var preprocErr error
 		var preprocResult *runner.Result

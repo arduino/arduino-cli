@@ -31,7 +31,7 @@ type detectorCache struct {
 
 type detectorCacheEntry struct {
 	AddedIncludePath *paths.Path  `json:"added_include_path,omitempty"`
-	Compile          sourceFile   `json:"compile,omitempty"`
+	Compile          *sourceFile  `json:"compile,omitempty"`
 	CompileTask      *runner.Task `json:"compile_task,omitempty"`
 	MissingIncludeH  *string      `json:"missing_include_h,omitempty"`
 }
@@ -94,6 +94,14 @@ func (c *detectorCache) Load(cacheFile *paths.Path) error {
 	c.curr = 0
 	c.entries = entries
 	return nil
+}
+
+// ExpectCompile adds a compile entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) ExpectCompile(sourceFile sourceFile, compileTask *runner.Task) {
+	c.Expect(&detectorCacheEntry{
+		Compile:     &sourceFile,
+		CompileTask: compileTask,
+	})
 }
 
 // Expect adds an entry to the cache and checks if it matches the next expected entry.
