@@ -206,7 +206,7 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	logrus.Tracef("[LD] INCLUDE-PATH: %s", folder.String())
 	l.includeFolders = append(l.includeFolders, folder)
-	l.cache.Expect(&detectorCacheEntry{AddedIncludePath: folder})
+	l.cache.ExpectAddedIncludePath(folder)
 }
 
 // FindIncludes todo
@@ -462,7 +462,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		}
 
 		logrus.Tracef("[LD] MISSING: %s", missingIncludeH)
-		l.cache.Expect(&detectorCacheEntry{MissingIncludeH: &missingIncludeH})
+		l.cache.ExpectMissingIncludeH(missingIncludeH)
 
 		if missingIncludeH == "" {
 			// No missing includes found, we're done

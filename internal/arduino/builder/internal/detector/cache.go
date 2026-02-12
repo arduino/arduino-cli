@@ -98,14 +98,28 @@ func (c *detectorCache) Load(cacheFile *paths.Path) error {
 
 // ExpectCompile adds a compile entry to the cache and checks if it matches the next expected entry.
 func (c *detectorCache) ExpectCompile(sourceFile sourceFile, compileTask *runner.Task) {
-	c.Expect(&detectorCacheEntry{
+	c.expect(&detectorCacheEntry{
 		Compile:     &sourceFile,
 		CompileTask: compileTask,
 	})
 }
 
-// Expect adds an entry to the cache and checks if it matches the next expected entry.
-func (c *detectorCache) Expect(entry *detectorCacheEntry) {
+// ExpectAddedIncludePath adds an added include path entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) ExpectAddedIncludePath(includePath *paths.Path) {
+	c.expect(&detectorCacheEntry{
+		AddedIncludePath: includePath,
+	})
+}
+
+// ExpectMissingIncludeH adds a missing include file entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) ExpectMissingIncludeH(missingIncludeH string) {
+	c.expect(&detectorCacheEntry{
+		MissingIncludeH: &missingIncludeH,
+	})
+}
+
+// expect adds an entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) expect(entry *detectorCacheEntry) {
 	if c.curr < len(c.entries) {
 		if c.entries[c.curr].Equals(entry) {
 			// Cache hit, move to the next entry
