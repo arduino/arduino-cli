@@ -14,6 +14,7 @@ on:
       - ".licenses/**"
       - ".licensed.json"
       - ".licensed.ya?ml"
+      - "debian/arduino-cli/usr/share/doc/arduino-cli/copyright"
       - "Taskfile.ya?ml"
       - "**/.gitmodules"
       - "**/go.mod"
@@ -24,6 +25,7 @@ on:
       - ".licenses/**"
       - ".licensed.json"
       - ".licensed.ya?ml"
+      - "debian/arduino-cli/usr/share/doc/arduino-cli/copyright"
       - "Taskfile.ya?ml"
       - "**/.gitmodules"
       - "**/go.mod"
@@ -139,8 +141,3 @@ jobs:
 
       - name: Check for dependencies with unapproved licenses
         run: task --silent general:check-dep-licenses
-
-      - name: Check debian copyright file
-        run: |
-          task update-deb-copyright
-          git diff --color --exit-code
