@@ -263,13 +263,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err := json.Unmarshal(d, &cachedIncludeFolders); err != nil {
 			return err
 		}
-	}
-	if l.useCachedLibrariesResolution && librariesResolutionCachePath.Exist() {
-		l.includeFolders = cachedIncludeFolders
-		if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
-			l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())
+		if l.useCachedLibrariesResolution {
+			l.includeFolders = cachedIncludeFolders
+			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+				l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())
+			}
+			return nil
 		}
-		return nil
 	}
 
 	cachePath := buildPath.Join("includes.cache")
