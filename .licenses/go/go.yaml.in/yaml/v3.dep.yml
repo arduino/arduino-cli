@@ -4,7 +4,7 @@ version: v3.0.4
 type: go
 summary: Package yaml implements YAML support for the Go language.
 homepage: https://pkg.go.dev/go.yaml.in/yaml/v3
-license: other
+license: mit
 licenses:
 - sources: LICENSE
   text: |2
