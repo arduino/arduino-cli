@@ -293,7 +293,7 @@ jobs:
           sha256sum ${{ env.PROJECT_NAME }}_${VERSION}* > ${VERSION}-checksums.txt
 
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: "github_${{ env.PROJECT_NAME }}"
