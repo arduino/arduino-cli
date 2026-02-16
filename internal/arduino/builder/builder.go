@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/detector"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
+	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/progress"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
@@ -341,7 +342,22 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 
 	b.logIfVerbose(false, i18n.Tr("Generating function prototypes..."))
-	if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
+	ctagsResult, err := preprocessor.PreprocessSketchWithCtags(
+		b.ctx, b.sketch,
+		b.buildPath,
+		b.libsDetector.IncludeFolders(),
+		b.lineOffset,
+		b.buildProperties,
+		b.onlyUpdateCompilationDatabase,
+		b.logger.VerbosityLevel() == logger.VerbosityVerbose)
+	if ctagsResult != nil {
+		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
+			b.logger.WriteStdout(ctagsResult.Stdout)
+		}
+		b.logger.WriteStderr(ctagsResult.Stderr)
+		b.diagnosticStore.Parse(ctagsResult.Args, ctagsResult.Stderr)
+	}
+	if err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
