@@ -19,9 +19,11 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -32,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 )
 
 // DebugPreprocessor when set to true the CTags preprocessor will output debugging info to stdout
@@ -47,6 +50,8 @@ func PreprocessSketchWithCtags(
 ) (*runner.Result, error) {
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
+	preprocessedSourceDepsFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged.d")
+	preprocessCmdCacheFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged.cmd")
 	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
 
 	// Create a temporary working directory
@@ -58,7 +63,14 @@ func PreprocessSketchWithCtags(
 
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
-	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
+	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, preprocessedSourceDepsFile)
+	// Verify if the preprocessed file is up-to-date with respect to the dependencies.
+	if unchanged, err := checkIfCompileCommandIsUnchanged(preprocessCmdCacheFile, ctagsTarget, gccTask.Args); err == nil && unchanged {
+		if upToDate, err := checkIfCompileTargetIsUpToDate(preprocessedSourceFile, preprocessedSourceDepsFile); err == nil && upToDate {
+			return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
+		}
+	}
+	result := gccTask.Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {
@@ -146,6 +158,62 @@ func PreprocessSketchWithCtags(
 	// Write back arduino-preprocess output to the sourceFile
 	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
+}
+
+func checkIfCompileCommandIsUnchanged(ctagsCmdCacheFile, ctagsTarget *paths.Path, _args []string) (bool, error) {
+	// Replace tmp file path with a placeholder to avoid cache misses due to different tmp paths across runs
+	args := f.Map(_args, func(a string) string {
+		if a == ctagsTarget.String() {
+			return "{ctags_target}"
+		}
+		return a
+	})
+	// Always update the cache at the end of the function
+	defer func() {
+		_ = ctagsCmdCacheFile.WriteFile(f.Must(json.Marshal(args)))
+	}()
+
+	if !ctagsCmdCacheFile.Exist() {
+		return false, nil
+	}
+	var cachedArgs []string
+	if d, err := ctagsCmdCacheFile.ReadFile(); err != nil {
+		return false, err
+	} else if err := json.Unmarshal(d, &cachedArgs); err != nil {
+		return false, err
+	}
+	return slices.Compare(cachedArgs, args) == 0, nil
+}
+
+func checkIfCompileTargetIsUpToDate(preprocessedSourceFile, ctagsDeps *paths.Path) (bool, error) {
+	if !ctagsDeps.Exist() {
+		return false, nil
+	}
+	targetStat, err := preprocessedSourceFile.Stat()
+	if err != nil {
+		return false, err
+	}
+	depsFileStat, err := ctagsDeps.Stat()
+	if err != nil {
+		return false, err
+	}
+	if !targetStat.ModTime().After(depsFileStat.ModTime()) {
+		return true, nil
+	}
+	deps, err := cpp.ReadDepFile(ctagsDeps)
+	if err != nil {
+		return false, err
+	}
+	for _, dep := range deps.Dependencies {
+		depStat, err := paths.New(dep).Stat()
+		if err != nil {
+			return false, err
+		}
+		if !targetStat.ModTime().After(depStat.ModTime()) {
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
