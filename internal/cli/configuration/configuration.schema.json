@@ -155,7 +155,7 @@
           "type": "string"
         },
         "connection_timeout": {
-          "description": "timeout for network connections, defaults to '30s'",
+          "description": "timeout for network connections, defaults to '900s'",
           "type": "string",
           "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?|(\\.[0-9]+))(ns|us|µs|μs|ms|s|m|h))+$"
         },
