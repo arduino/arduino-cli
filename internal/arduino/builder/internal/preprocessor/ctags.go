@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"sort"
 	"strconv"
@@ -64,7 +65,7 @@ func PreprocessSketchWithCtags(
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
 	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil)
-	if !IsGCCTaskChanged(gccTask.Args, hashGCCTaskFile.String(), ctagsTarget.String()) {
+	if !IsGCCTaskChanged(gccTask.Args, hashGCCTaskFile.String(), ctagsTarget.String(), unpreprocessedSourceFile.String()) {
 		return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
 	}
 
@@ -157,17 +158,23 @@ func PreprocessSketchWithCtags(
 	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 }
-func IsGCCTaskChanged(gccArgs []string, hashFileName string, privatePath string) bool {
+func IsGCCTaskChanged(gccArgs []string, hashFileName string, privatePath string, sketch string) bool {
 	currentHash := computeTaskHash(gccArgs, privatePath)
+	hashedFile, err := hashFile(sketch)
+	if err != nil {
+		slog.Warn("Error hashing file: %v\n", err)
+
+	}
+	currentHash += "," + hashedFile
 	if data, err := os.ReadFile(hashFileName); err == nil {
 		oldHash := string(data)
 		if strings.Compare(string(oldHash), currentHash) == 0 {
 			return false
 		}
 	}
-	err := os.WriteFile(hashFileName, []byte(currentHash), 0644)
+	err = os.WriteFile(hashFileName, []byte(currentHash), 0644)
 	if err != nil {
-		fmt.Println("Error writing file:", err)
+		slog.Warn("Error writing file: %v\n", err)
 	}
 
 	return true
@@ -179,6 +186,24 @@ func computeTaskHash(args []string, privatePath string) string {
 	gccTaskHashed := xxh3.Hash128([]byte(serialized))
 
 	return fmt.Sprintf("%x", gccTaskHashed)
+}
+
+func hashFile(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hasher := xxh3.New()
+
+	if _, err := io.Copy(hasher, file); err != nil {
+		return "", err
+	}
+
+	sum := hasher.Sum128()
+
+	return fmt.Sprintf("%x", sum), nil
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
