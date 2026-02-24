@@ -173,16 +173,11 @@ func IsGCCTaskChanged(gccArgs []string, hashFileName string, privatePath string)
 	return true
 }
 func computeTaskHash(args []string, privatePath string) string {
-
-	// Use the negative matcher
 	args = f.Filter(args, f.NotEquals(privatePath))
-
 	sort.Strings(args)
-	// Join strings with a separator
 	serialized := strings.Join(args, ";") // ";" prevents accidental collisions
-	// Compute xxh3 128-bit hash
 	gccTaskHashed := xxh3.Hash128([]byte(serialized))
-	// Convert hash to hex string
+
 	return fmt.Sprintf("%x", gccTaskHashed)
 }
 
