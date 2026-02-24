@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -32,6 +34,8 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/zeebo/xxh3"
+	"go.bug.st/f"
 )
 
 // DebugPreprocessor when set to true the CTags preprocessor will output debugging info to stdout
@@ -48,6 +52,7 @@ func PreprocessSketchWithCtags(
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
 	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
+	hashGCCTaskFile := buildPath.Join("sketch", sketch.MainFile.Base()+".txt")
 
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")
@@ -58,7 +63,12 @@ func PreprocessSketchWithCtags(
 
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
-	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
+	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil)
+	if !IsGCCTaskChanged(gccTask.Args, hashGCCTaskFile.String(), ctagsTarget.String()) {
+		return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
+	}
+
+	result := gccTask.Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {
@@ -146,6 +156,34 @@ func PreprocessSketchWithCtags(
 	// Write back arduino-preprocess output to the sourceFile
 	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
+}
+func IsGCCTaskChanged(gccArgs []string, hashFileName string, privatePath string) bool {
+	currentHash := computeTaskHash(gccArgs, privatePath)
+	if data, err := os.ReadFile(hashFileName); err == nil {
+		oldHash := string(data)
+		if strings.Compare(string(oldHash), currentHash) == 0 {
+			return false
+		}
+	}
+	err := os.WriteFile(hashFileName, []byte(currentHash), 0644)
+	if err != nil {
+		fmt.Println("Error writing file:", err)
+	}
+
+	return true
+}
+func computeTaskHash(args []string, privatePath string) string {
+
+	// Use the negative matcher
+	args = f.Filter(args, f.NotEquals(privatePath))
+
+	sort.Strings(args)
+	// Join strings with a separator
+	serialized := strings.Join(args, ";") // ";" prevents accidental collisions
+	// Compute xxh3 128-bit hash
+	gccTaskHashed := xxh3.Hash128([]byte(serialized))
+	// Convert hash to hex string
+	return fmt.Sprintf("%x", gccTaskHashed)
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
