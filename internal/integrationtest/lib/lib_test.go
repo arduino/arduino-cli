@@ -299,13 +299,14 @@ func TestUpgradeLibraryWithDependencies(t *testing.T) {
 	err = json.Unmarshal(stdOut, &jsonDeps)
 	require.NoError(t, err)
 
-	require.Len(t, jsonDeps.Dependencies, 6)
+	require.Len(t, jsonDeps.Dependencies, 7)
 	require.Equal(t, "Arduino_ConnectionHandler", jsonDeps.Dependencies[0].Name)
 	require.Equal(t, "Arduino_DebugUtils", jsonDeps.Dependencies[1].Name)
-	require.Equal(t, "MKRGSM", jsonDeps.Dependencies[2].Name)
-	require.Equal(t, "MKRNB", jsonDeps.Dependencies[3].Name)
-	require.Equal(t, "WiFi101", jsonDeps.Dependencies[4].Name)
-	require.Equal(t, "WiFiNINA", jsonDeps.Dependencies[5].Name)
+	require.Equal(t, "Arduino_SpiNINA", jsonDeps.Dependencies[2].Name)
+	require.Equal(t, "MKRGSM", jsonDeps.Dependencies[3].Name)
+	require.Equal(t, "MKRNB", jsonDeps.Dependencies[4].Name)
+	require.Equal(t, "WiFi101", jsonDeps.Dependencies[5].Name)
+	require.Equal(t, "WiFiNINA", jsonDeps.Dependencies[6].Name)
 
 	// Test lib upgrade also install new dependencies of already installed library
 	_, _, err = cli.Run("lib", "upgrade", "Arduino_ConnectionHandler")
