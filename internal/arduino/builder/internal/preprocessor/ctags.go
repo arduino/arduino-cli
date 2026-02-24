@@ -66,7 +66,7 @@ func PreprocessSketchWithCtags(
 	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, preprocessedSourceDepsFile)
 	// Verify if the preprocessed file is up-to-date with respect to the dependencies.
 	if unchanged, err := checkIfCompileCommandIsUnchanged(preprocessCmdCacheFile, ctagsTarget, gccTask.Args); err == nil && unchanged {
-		if upToDate, err := checkIfCompileTargetIsUpToDate(preprocessedSourceFile, preprocessedSourceDepsFile); err == nil && upToDate {
+		if upToDate, err := checkIfCompileTargetIsUpToDate(unpreprocessedSourceFile, preprocessedSourceDepsFile); err == nil && upToDate {
 			return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
 		}
 	}
@@ -189,7 +189,7 @@ func checkIfCompileTargetIsUpToDate(preprocessedSourceFile, ctagsDeps *paths.Pat
 	if !ctagsDeps.Exist() {
 		return false, nil
 	}
-	targetStat, err := preprocessedSourceFile.Stat()
+	sourceStat, err := preprocessedSourceFile.Stat()
 	if err != nil {
 		return false, err
 	}
@@ -197,8 +197,8 @@ func checkIfCompileTargetIsUpToDate(preprocessedSourceFile, ctagsDeps *paths.Pat
 	if err != nil {
 		return false, err
 	}
-	if !targetStat.ModTime().After(depsFileStat.ModTime()) {
-		return true, nil
+	if sourceStat.ModTime().After(depsFileStat.ModTime()) {
+		return false, nil
 	}
 	deps, err := cpp.ReadDepFile(ctagsDeps)
 	if err != nil {
@@ -209,7 +209,7 @@ func checkIfCompileTargetIsUpToDate(preprocessedSourceFile, ctagsDeps *paths.Pat
 		if err != nil {
 			return false, err
 		}
-		if !targetStat.ModTime().After(depStat.ModTime()) {
+		if depStat.ModTime().After(depsFileStat.ModTime()) {
 			return false, nil
 		}
 	}
