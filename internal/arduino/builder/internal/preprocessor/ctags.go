@@ -19,12 +19,11 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
-	"os"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -35,7 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/zeebo/xxh3"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/f"
 )
 
@@ -65,7 +64,7 @@ func PreprocessSketchWithCtags(
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
 	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil)
-	if !IsGCCTaskChanged(gccTask.Args, hashGCCTaskFile.String(), ctagsTarget.String(), unpreprocessedSourceFile.String()) {
+	if !isGCCTaskChanged(gccTask.Args, hashGCCTaskFile, ctagsTarget, unpreprocessedSourceFile) {
 		return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
 	}
 
@@ -158,52 +157,29 @@ func PreprocessSketchWithCtags(
 	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 }
-func IsGCCTaskChanged(gccArgs []string, hashFileName string, privatePath string, sketch string) bool {
-	currentHash := computeTaskHash(gccArgs, privatePath)
-	hashedFile, err := hashFile(sketch)
-	if err != nil {
-		slog.Warn("Error hashing file: %v\n", err)
 
+func isGCCTaskChanged(gccArgs []string, hashPath *paths.Path, privatePath *paths.Path, sketchPath *paths.Path) bool {
+	// Compute hash of the GCC task arguments
+	cleanGccArgs := f.Filter(gccArgs, f.NotEquals(privatePath.String()))
+	gccTaskHash := sha256.Sum256([]byte(strings.Join(cleanGccArgs, ";")))
+	// Compute hash of the GCC input sketch file
+	sketchData, err := sketchPath.ReadFile()
+	if err != nil {
+		return true
 	}
-	currentHash += "," + hashedFile
-	if data, err := os.ReadFile(hashFileName); err == nil {
-		oldHash := string(data)
-		if strings.Compare(string(oldHash), currentHash) == 0 {
+	sketchHash := sha256.Sum256(sketchData)
+
+	// Compare with existing hash
+	fullHash := []byte(hex.EncodeToString(gccTaskHash[:]) + "," + hex.EncodeToString(sketchHash[:]))
+	if oldHash, err := hashPath.ReadFile(); err == nil {
+		if bytes.Equal(oldHash, fullHash) {
 			return false
 		}
 	}
-	err = os.WriteFile(hashFileName, []byte(currentHash), 0644)
-	if err != nil {
-		slog.Warn("Error writing file: %v\n", err)
+	if err := hashPath.WriteFile(fullHash); err != nil {
+		logrus.Errorf("Error writing file: %v", err)
 	}
-
 	return true
-}
-func computeTaskHash(args []string, privatePath string) string {
-	args = f.Filter(args, f.NotEquals(privatePath))
-	sort.Strings(args)
-	serialized := strings.Join(args, ";") // ";" prevents accidental collisions
-	gccTaskHashed := xxh3.Hash128([]byte(serialized))
-
-	return fmt.Sprintf("%x", gccTaskHashed)
-}
-
-func hashFile(path string) (string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	hasher := xxh3.New()
-
-	if _, err := io.Copy(hasher, file); err != nil {
-		return "", err
-	}
-
-	sum := hasher.Sum128()
-
-	return fmt.Sprintf("%x", sum), nil
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
