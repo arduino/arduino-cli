@@ -47,7 +47,7 @@ func PreprocessSketchWithCtags(
 	ctx context.Context,
 	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
 	lineOffset int, buildProperties *properties.Map,
-	onlyUpdateCompilationDatabase, verbose bool,
+	onlyUpdateCompilationDatabase, verbose bool, force bool,
 ) (*runner.Result, error) {
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
@@ -64,7 +64,7 @@ func PreprocessSketchWithCtags(
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
 	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil)
-	if !isGCCTaskChanged(gccTask.Args, hashGCCTaskFile, ctagsTarget, unpreprocessedSourceFile) {
+	if !isGCCTaskChanged(gccTask.Args, hashGCCTaskFile, ctagsTarget, unpreprocessedSourceFile, force) {
 		return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
 	}
 
@@ -158,7 +158,7 @@ func PreprocessSketchWithCtags(
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
 }
 
-func isGCCTaskChanged(gccArgs []string, hashPath *paths.Path, privatePath *paths.Path, sketchPath *paths.Path) bool {
+func isGCCTaskChanged(gccArgs []string, hashPath *paths.Path, privatePath *paths.Path, sketchPath *paths.Path, force bool) bool {
 	// Compute hash of the GCC task arguments
 	cleanGccArgs := f.Filter(gccArgs, f.NotEquals(privatePath.String()))
 	gccTaskHash := sha256.Sum256([]byte(strings.Join(cleanGccArgs, ";")))
@@ -173,7 +173,7 @@ func isGCCTaskChanged(gccArgs []string, hashPath *paths.Path, privatePath *paths
 	fullHash := []byte(hex.EncodeToString(gccTaskHash[:]) + "," + hex.EncodeToString(sketchHash[:]))
 	if oldHash, err := hashPath.ReadFile(); err == nil {
 		if bytes.Equal(oldHash, fullHash) {
-			return false
+			return force
 		}
 	}
 	if err := hashPath.WriteFile(fullHash); err != nil {

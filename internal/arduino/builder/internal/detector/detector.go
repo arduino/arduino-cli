@@ -63,6 +63,7 @@ type SketchLibrariesDetector struct {
 	diagnosticStore               *diagnostics.Store
 	preRunner                     *runner.Runner
 	detectedChangeInLibraries     bool
+	sketchIsUnchanged             bool
 }
 
 // NewSketchLibrariesDetector todo
@@ -202,6 +203,11 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 	return l.detectedChangeInLibraries
 }
 
+// IsSketchUnchanged returns true if the sketch or any of its dependencies is up-to-date
+func (l *SketchLibrariesDetector) IsSketchUnchanged() bool {
+	return l.sketchIsUnchanged
+}
+
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	logrus.Tracef("[LD] INCLUDE-PATH: %s", folder.String())
@@ -302,14 +308,27 @@ func (l *SketchLibrariesDetector) findIncludes(
 	sourceFileQueue := &uniqueSourceFileQueue{}
 
 	if !l.useCachedLibrariesResolution {
-		sketch := sketch
-		mergedfile, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
+		mergedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
 		if err != nil {
 			return err
 		}
-		sourceFileQueue.Push(mergedfile)
+		preprocessedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
+		if err != nil {
+			return err
+		}
 
+		l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
+
+		// Queue all sources from sketch folder, except the preprocessed sketch "sketch.ino.cpp".
+		// The library discovery is performed on the `sketch.ino.cpp.merged` file.
+		// The `sketch.ino.cpp` file is generated in a later stage from `sketch.ino.cpp.merged` by the
+		// Arduino Preprocessor, and it is used for the actual compilation, but it is not
+		// used for the library discovery.
+		sourceFileQueue.Push(mergedSketch) // add `sketch.ino.cpp.merged`
 		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath)
+		sourceFileQueue.Remove(preprocessedSketch) // remove `sketch.ino.cpp`
+
+		// Queue all sources from the src subfolder if it exists.
 		srcSubfolderPath := sketchBuildPath.Join("src")
 		if srcSubfolderPath.IsDir() {
 			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
