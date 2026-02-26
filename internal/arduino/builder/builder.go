@@ -341,7 +341,7 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 
 	b.logIfVerbose(false, i18n.Tr("Generating function prototypes..."))
-	if err := b.preprocessSketch(b.libsDetector.IncludeFolders(), !b.libsDetector.IsSketchUnchanged()); err != nil {
+	if err := b.preprocessSketch(b.libsDetector.IncludeFolders(), b.libsDetector.IsSketchUnchanged()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()

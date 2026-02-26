@@ -19,8 +19,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -34,8 +32,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/sirupsen/logrus"
-	"go.bug.st/f"
 )
 
 // DebugPreprocessor when set to true the CTags preprocessor will output debugging info to stdout
@@ -47,12 +43,11 @@ func PreprocessSketchWithCtags(
 	ctx context.Context,
 	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
 	lineOffset int, buildProperties *properties.Map,
-	onlyUpdateCompilationDatabase, verbose bool, force bool,
+	onlyUpdateCompilationDatabase, verbose bool, sketchUnedit bool,
 ) (*runner.Result, error) {
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
 	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
-	hashGCCTaskFile := buildPath.Join("sketch", sketch.MainFile.Base()+".txt")
 
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")
@@ -64,7 +59,7 @@ func PreprocessSketchWithCtags(
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
 	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil)
-	if !isGCCTaskChanged(gccTask.Args, hashGCCTaskFile, ctagsTarget, unpreprocessedSourceFile, force) {
+	if sketchUnedit {
 		return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
 	}
 
@@ -156,30 +151,6 @@ func PreprocessSketchWithCtags(
 	// Write back arduino-preprocess output to the sourceFile
 	err = preprocessedSourceFile.WriteFile([]byte(preprocessedSource))
 	return &runner.Result{Args: result.Args, Stdout: stdout.Bytes(), Stderr: stderr.Bytes()}, err
-}
-
-func isGCCTaskChanged(gccArgs []string, hashPath *paths.Path, privatePath *paths.Path, sketchPath *paths.Path, force bool) bool {
-	// Compute hash of the GCC task arguments
-	cleanGccArgs := f.Filter(gccArgs, f.NotEquals(privatePath.String()))
-	gccTaskHash := sha256.Sum256([]byte(strings.Join(cleanGccArgs, ";")))
-	// Compute hash of the GCC input sketch file
-	sketchData, err := sketchPath.ReadFile()
-	if err != nil {
-		return true
-	}
-	sketchHash := sha256.Sum256(sketchData)
-
-	// Compare with existing hash
-	fullHash := []byte(hex.EncodeToString(gccTaskHash[:]) + "," + hex.EncodeToString(sketchHash[:]))
-	if oldHash, err := hashPath.ReadFile(); err == nil {
-		if bytes.Equal(oldHash, fullHash) {
-			return force
-		}
-	}
-	if err := hashPath.WriteFile(fullHash); err != nil {
-		logrus.Errorf("Error writing file: %v", err)
-	}
-	return true
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
