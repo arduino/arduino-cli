@@ -74,6 +74,74 @@ void loop() {}
 		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
 	})
 
+	t.Run("SketchWithInoAndCppFiles", func(t *testing.T) {
+		// Create a tmp sketch
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void myFunction();
+
+void setup() {}
+void loop() {
+	myFunction();
+}
+`)))
+
+		cppFile := sketch.Join("myfile.cpp")
+		require.NoError(t, cppFile.WriteFile([]byte(`
+#include <SPI.h>
+
+void myFunction() {
+	SPI.begin();
+}
+`)))
+
+		// Run compile two times in a row and check that the second time the cache is used
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Generating function prototypes...")
+		require.NotContains(t, string(out), "Using cached sketch with function prototypes.")
+
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Generating function prototypes...")
+		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
+
+		// Updates to the cpp file should not invalidate the sketch preprocessing cache
+		require.NoError(t, cppFile.WriteFile([]byte(`
+#include <SPI.h>
+void myFunction() {
+	SPI.begin();
+}
+`)))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Generating function prototypes...")
+		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
+
+		// Updates to the ino file should invalidate the sketch preprocessing cache
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void myFunction();
+void setup() {}
+void loop() {
+	myFunction();
+}
+`)))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Generating function prototypes...")
+		require.NotContains(t, string(out), "Using cached sketch with function prototypes.")
+
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Generating function prototypes...")
+		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
+	})
+
 	t.Run("ChangesToLibraryInvalidateCache", func(t *testing.T) {
 		// Create a tmp sketch
 		tmp, err := paths.MkTempDir("", "")
