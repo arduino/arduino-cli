@@ -42,6 +42,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/f"
 )
 
 type libraryResolutionResult struct {
@@ -312,11 +313,6 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err != nil {
 			return err
 		}
-		// preprocessedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
-		// if err != nil {
-		// 	return err
-		// }
-
 		l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
 
 		// Queue all sources from sketch folder, except the preprocessed sketch "sketch.ino.cpp".
@@ -324,9 +320,9 @@ func (l *SketchLibrariesDetector) findIncludes(
 		// The `sketch.ino.cpp` file is generated in a later stage from `sketch.ino.cpp.merged` by the
 		// Arduino Preprocessor, and it is used for the actual compilation, but it is not
 		// used for the library discovery.
-		sourceFileQueue.Push(mergedSketch) // add `sketch.ino.cpp.merged`
-		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath, nil)
-		//sourceFileQueue.Remove(preprocessedSketch) // remove `sketch.ino.cpp`
+		sourceFileQueue.Push(mergedSketch)                                       // add `sketch.ino.cpp.merged`
+		excludeFile := []*paths.Path{paths.New(sketch.MainFile.Base() + ".cpp")} // remove `sketch.ino.cpp`
+		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath, excludeFile, nil)
 
 		// Queue all sources from the src subfolder if it exists.
 		srcSubfolderPath := sketchBuildPath.Join("src")
@@ -526,18 +522,21 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	recurse bool,
 	sourceDir *paths.Path,
 	buildDir *paths.Path,
-	exluceExtensions *[]string,
+	excludeFile []*paths.Path,
 	extraIncludePath ...*paths.Path,
 ) error {
 	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
 
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
-		if exluceExtensions == nil || !slices.Contains(*exluceExtensions, k) {
-			sourceFileExtensions = append(sourceFileExtensions, k)
-		}
+		sourceFileExtensions = append(sourceFileExtensions, k)
+
 	}
-	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions...)
+
+	excludeNames := f.Map(excludeFile, func(p *paths.Path) string {
+		return p.String()
+	})
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, &excludeNames, sourceFileExtensions...)
 	if err != nil {
 		return err
 	}
