@@ -43,7 +43,7 @@ func PreprocessSketchWithCtags(
 	ctx context.Context,
 	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
 	lineOffset int, buildProperties *properties.Map,
-	onlyUpdateCompilationDatabase, verbose bool, sketchUnchanged bool,
+	onlyUpdateCompilationDatabase, verbose bool,
 ) (*runner.Result, error) {
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
 	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
@@ -58,12 +58,7 @@ func PreprocessSketchWithCtags(
 
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
-	gccTask := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil)
-	if sketchUnchanged {
-		return &runner.Result{Stdout: fmt.Appendf(nil, "%s\n", i18n.Tr("Using cached sketch with function prototypes."))}, nil
-	}
-
-	result := gccTask.Run(ctx)
+	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {

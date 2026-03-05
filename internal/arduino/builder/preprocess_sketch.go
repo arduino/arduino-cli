@@ -22,14 +22,13 @@ import (
 )
 
 // preprocessSketch fixdoc
-func (b *Builder) preprocessSketch(includes paths.PathList, sketchUnchanged bool) error {
+func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
 		b.ctx,
 		b.sketch, b.buildPath, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 		b.logger.VerbosityLevel() == logger.VerbosityVerbose,
-		sketchUnchanged,
 	)
 	if result != nil {
 		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {

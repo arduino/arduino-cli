@@ -341,15 +341,15 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 
 	b.logIfVerbose(false, i18n.Tr("Generating function prototypes..."))
-      if b.libsDetector.IsSketchUnchanged() {
-		// log skip unchanged
+	if !b.libsDetector.IsSketchUnchanged() {
+		if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
+			return err
+		}
 		b.Progress.CompleteStep()
-		return nli
-    }	
-   if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
-		return err
+		return nil
+	} else {
+		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
 	}
-	b.Progress.CompleteStep()
 
 	return nil
 }
