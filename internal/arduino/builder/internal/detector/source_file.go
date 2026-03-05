@@ -132,6 +132,10 @@ func (queue *uniqueSourceFileQueue) Push(value sourceFile) {
 
 // Remove removes a source file from the queue.
 func (queue *uniqueSourceFileQueue) Remove(target sourceFile) {
+	if !queue.Contains(target) {
+		return
+	}
+	logrus.Tracef("[LD] QUEUE: Removed %s", target.SourcePath)
 	*queue = slices.DeleteFunc(*queue, target.Equals)
 }
 
