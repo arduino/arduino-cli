@@ -131,14 +131,8 @@ func (queue *uniqueSourceFileQueue) Push(value sourceFile) {
 }
 
 // Remove removes a source file from the queue.
-func (queue *uniqueSourceFileQueue) Remove(value sourceFile) {
-	for i, v := range *queue {
-		if v.Equals(value) {
-			logrus.Tracef("[LD] QUEUE: Removed %s", value.SourcePath)
-			*queue = append((*queue)[:i], (*queue)[i+1:]...)
-			return
-		}
-	}
+func (queue *uniqueSourceFileQueue) Remove(target sourceFile) {
+	*queue = slices.DeleteFunc(*queue, target.Equals)
 }
 
 // Contains checks if the queue Contains a source file.
