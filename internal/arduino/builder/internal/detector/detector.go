@@ -155,7 +155,7 @@ func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSour
 				sourceFileQueue,
 				sourceDir.Dir, sourceDir.Recurse,
 				library.SourceDir,
-				librariesBuildPath.Join(library.DirName),
+				librariesBuildPath.Join(library.DirName), nil,
 				library.UtilityDir)
 		}
 	}
@@ -312,10 +312,10 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err != nil {
 			return err
 		}
-		preprocessedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
-		if err != nil {
-			return err
-		}
+		// preprocessedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
+		// if err != nil {
+		// 	return err
+		// }
 
 		l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
 
@@ -325,13 +325,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 		// Arduino Preprocessor, and it is used for the actual compilation, but it is not
 		// used for the library discovery.
 		sourceFileQueue.Push(mergedSketch) // add `sketch.ino.cpp.merged`
-		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath)
-		sourceFileQueue.Remove(preprocessedSketch) // remove `sketch.ino.cpp`
+		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath, nil)
+		//sourceFileQueue.Remove(preprocessedSketch) // remove `sketch.ino.cpp`
 
 		// Queue all sources from the src subfolder if it exists.
 		srcSubfolderPath := sketchBuildPath.Join("src")
 		if srcSubfolderPath.IsDir() {
-			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
+			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath, nil)
 		}
 
 		allInstalledSorted := l.librariesManager.FindAllInstalled()
@@ -526,13 +526,16 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	recurse bool,
 	sourceDir *paths.Path,
 	buildDir *paths.Path,
+	exluceExtensions *[]string,
 	extraIncludePath ...*paths.Path,
 ) error {
 	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
 
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
-		sourceFileExtensions = append(sourceFileExtensions, k)
+		if exluceExtensions == nil || !slices.Contains(*exluceExtensions, k) {
+			sourceFileExtensions = append(sourceFileExtensions, k)
+		}
 	}
 	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions...)
 	if err != nil {
