@@ -1,8 +1,8 @@
 ---
 name: github.com/klauspost/compress
-version: v1.17.2
+version: v1.18.2
 type: go
-summary: 
+summary:
 homepage: https://pkg.go.dev/github.com/klauspost/compress
 license: bsd-3-clause
 licenses:
