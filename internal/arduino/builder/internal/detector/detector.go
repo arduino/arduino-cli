@@ -530,7 +530,6 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
 		sourceFileExtensions = append(sourceFileExtensions, k)
-
 	}
 
 	filePaths, err := utils.FindFilesInFolder(folder, recurse, excludeFile, sourceFileExtensions...)
