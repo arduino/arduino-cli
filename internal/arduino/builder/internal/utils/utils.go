@@ -132,7 +132,7 @@ func filterOutSCCS(file *paths.Path) bool {
 var filterOutHiddenFiles = paths.FilterOutPrefixes(".")
 
 // FindFilesInFolder fixdoc
-func FindFilesInFolder(dir *paths.Path, recurse bool, filterOutFile *[]string, extensions ...string) (paths.PathList, error) {
+func FindFilesInFolder(dir *paths.Path, recurse bool, excludeFileNames []string, extensions ...string) (paths.PathList, error) {
 	fileFilter := paths.AndFilter(
 		filterOutHiddenFiles,
 		filterOutSCCS,
