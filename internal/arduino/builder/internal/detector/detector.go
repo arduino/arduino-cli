@@ -533,10 +533,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 
 	}
 
-	excludeNames := f.Map(excludeFile, func(p *paths.Path) string {
-		return p.String()
-	})
-	filePaths, err := utils.FindFilesInFolder(folder, recurse, &excludeNames, sourceFileExtensions...)
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, excludeFile, sourceFileExtensions...)
 	if err != nil {
 		return err
 	}
