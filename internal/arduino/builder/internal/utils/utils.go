@@ -136,14 +136,9 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, filterOutFile *[]string, e
 	fileFilter := paths.AndFilter(
 		filterOutHiddenFiles,
 		filterOutSCCS,
-		paths.FilterOutDirectories(),
-	)
-	if filterOutFile != nil {
-		fileFilter = paths.AndFilter(
-			paths.FilterOutNames(*filterOutFile...),
-			fileFilter,
-		)
-	}
+paths.FilterOutDirectories(),
+paths.FilterOutNames(excludeName...),
+)
 	if len(extensions) > 0 {
 		fileFilter = paths.AndFilter(
 			paths.FilterSuffixes(extensions...),
