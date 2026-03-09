@@ -321,7 +321,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		// Arduino Preprocessor, and it is used for the actual compilation, but it is not
 		// used for the library discovery.
 		sourceFileQueue.Push(mergedSketch)                                       // add `sketch.ino.cpp.merged`
-		excludeFile := []*paths.Path{paths.New(sketch.MainFile.Base() + ".cpp")} // remove `sketch.ino.cpp`
+		excludeFile := []string{sketch.MainFile.Base() + ".cpp"} // remove `sketch.ino.cpp`
 		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath, excludeFile, nil)
 
 		// Queue all sources from the src subfolder if it exists.
