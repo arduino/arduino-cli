@@ -522,7 +522,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	recurse bool,
 	sourceDir *paths.Path,
 	buildDir *paths.Path,
-	excludeFile []*paths.Path,
+	excludeFile []string,
 	extraIncludePath ...*paths.Path,
 ) error {
 	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
