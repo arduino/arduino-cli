@@ -42,7 +42,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/f"
 )
 
 type libraryResolutionResult struct {
@@ -320,7 +319,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 		// The `sketch.ino.cpp` file is generated in a later stage from `sketch.ino.cpp.merged` by the
 		// Arduino Preprocessor, and it is used for the actual compilation, but it is not
 		// used for the library discovery.
-		sourceFileQueue.Push(mergedSketch)                                       // add `sketch.ino.cpp.merged`
+		sourceFileQueue.Push(mergedSketch)                       // add `sketch.ino.cpp.merged`
 		excludeFile := []string{sketch.MainFile.Base() + ".cpp"} // remove `sketch.ino.cpp`
 		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath, excludeFile, nil)
 
@@ -522,7 +521,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	recurse bool,
 	sourceDir *paths.Path,
 	buildDir *paths.Path,
-	excludeFile []string,
+	excludeFileNames []string,
 	extraIncludePath ...*paths.Path,
 ) error {
 	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
@@ -532,7 +531,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 		sourceFileExtensions = append(sourceFileExtensions, k)
 	}
 
-	filePaths, err := utils.FindFilesInFolder(folder, recurse, excludeFile, sourceFileExtensions...)
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, excludeFileNames, sourceFileExtensions...)
 	if err != nil {
 		return err
 	}

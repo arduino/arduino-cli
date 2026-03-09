@@ -136,9 +136,9 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, excludeFileNames []string,
 	fileFilter := paths.AndFilter(
 		filterOutHiddenFiles,
 		filterOutSCCS,
-paths.FilterOutDirectories(),
-paths.FilterOutNames(excludeName...),
-)
+		paths.FilterOutDirectories(),
+		paths.FilterOutNames(excludeFileNames...),
+	)
 	if len(extensions) > 0 {
 		fileFilter = paths.AndFilter(
 			paths.FilterSuffixes(extensions...),
