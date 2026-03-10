@@ -70,6 +70,7 @@ type indexPlatformRelease struct {
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
 	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
 	MonitorDependencies   []indexMonitorDependency   `json:"monitorDependencies"`
+	LibrariesDependencies []indexLibraryDependency   `json:"librariesDependencies"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -95,6 +96,14 @@ type indexDiscoveryDependency struct {
 type indexMonitorDependency struct {
 	Packager string `json:"packager"`
 	Name     string `json:"name"`
+}
+
+// indexLibraryDependency represents a single dependency of a core from a library.
+//
+//easyjson:json
+type indexLibraryDependency struct {
+	Name    string          `json:"name"`
+	Version *semver.Version `json:"version"`
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
