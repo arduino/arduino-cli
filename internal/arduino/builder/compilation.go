@@ -40,7 +40,7 @@ func (b *Builder) compileFiles(
 		validExtensions = append(validExtensions, ext)
 	}
 
-	sources, err := utils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
+	sources, err := utils.FindFilesInFolder(sourceDir, recurse, nil, validExtensions...)
 	if err != nil {
 		return nil, err
 	}
