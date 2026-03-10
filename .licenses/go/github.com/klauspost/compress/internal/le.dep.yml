@@ -1,9 +1,9 @@
 ---
-name: github.com/klauspost/compress/internal/cpuinfo
+name: github.com/klauspost/compress/internal/le
 version: v1.18.2
 type: go
-summary: Package cpuinfo gives runtime info about the current CPU.
-homepage: https://pkg.go.dev/github.com/klauspost/compress/internal/cpuinfo
+summary:
+homepage: https://pkg.go.dev/github.com/klauspost/compress/internal/le
 license: bsd-3-clause
 licenses:
 - sources: compress@v1.18.2/LICENSE
