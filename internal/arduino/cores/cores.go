@@ -61,6 +61,7 @@ type PlatformRelease struct {
 	ToolDependencies        ToolDependencies
 	DiscoveryDependencies   DiscoveryDependencies
 	MonitorDependencies     MonitorDependencies
+	LibrariesDependencies   LibrariesDependencies
 	Deprecated              bool
 	Help                    PlatformReleaseHelp           `json:"-"`
 	Platform                *Platform                     `json:"-"`
@@ -233,6 +234,26 @@ type MonitorDependency struct {
 
 func (d *MonitorDependency) String() string {
 	return fmt.Sprintf("%s:%s", d.Packager, d.Name)
+}
+
+// LibrariesDependencies is a list of LibraryDependency
+type LibrariesDependencies []*LibraryDependency
+
+// Sort the LibrariesDependencies by name.
+func (d LibrariesDependencies) Sort() {
+	sort.Slice(d, func(i, j int) bool {
+		return d[i].Name < d[j].Name
+	})
+}
+
+// LibraryDependency identifies a specific library.
+type LibraryDependency struct {
+	Name    string
+	Version *semver.Version
+}
+
+func (d *LibraryDependency) String() string {
+	return fmt.Sprintf("%s@%s", d.Name, d.Version)
 }
 
 // GetOrCreateRelease returns the specified release corresponding the provided version,
