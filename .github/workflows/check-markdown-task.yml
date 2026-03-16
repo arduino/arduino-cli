@@ -1,19 +1,16 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-markdown-task.md
 name: Check Markdown
 
-env:
-  # See: https://github.com/actions/setup-node/#readme
-  NODE_VERSION: 16.x
-  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
-
-# See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
   create:
   push:
     paths:
       - ".github/workflows/check-markdown-task.ya?ml"
       - ".markdown-link-check.json"
+      - ".npmrc"
+      - "go.mod"
+      - "go.sum"
       - "package.json"
       - "package-lock.json"
       - "Taskfile.ya?ml"
@@ -28,6 +25,9 @@ on:
     paths:
       - ".github/workflows/check-markdown-task.ya?ml"
       - ".markdown-link-check.json"
+      - ".npmrc"
+      - "go.mod"
+      - "go.sum"
       - "package.json"
       - "package-lock.json"
       - "Taskfile.ya?ml"
@@ -47,6 +47,7 @@ on:
 jobs:
   run-determination:
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       result: ${{ steps.determination.outputs.result }}
     steps:
@@ -66,52 +67,57 @@ jobs:
             RESULT="false"
           fi
 
-          echo "result=$RESULT" >> $GITHUB_OUTPUT
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
 
   lint:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: package.json
 
       - name: Initialize markdownlint-cli problem matcher
         uses: xt0rted/markdownlint-problem-matcher@v3
 
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
       - name: Lint
-        run: task markdown:lint
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task markdown:lint
 
   links:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
 
       - name: Install Go dependencies
         run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
@@ -120,11 +126,9 @@ jobs:
         with:
           setup_only: true
 
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
       - name: Check links
-        run: task --silent markdown:check-links
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              markdown:check-links
