@@ -309,7 +309,7 @@ jobs:
 
     steps:
       - name: Report failure
-        uses: masci/datadog@v1
+        uses: masci/datadog@v2
         with:
           api-key: ${{ secrets.DD_API_KEY }}
           events: |
