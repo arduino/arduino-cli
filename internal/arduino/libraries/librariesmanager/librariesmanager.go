@@ -113,14 +113,14 @@ func (lm *LibrariesManager) Clone() *Builder {
 // to release the lock on the LibrariesManager.
 func (lm *LibrariesManager) NewExplorer() (*Explorer, func()) {
 	lm.librariesLock.RLock()
-	return &Explorer{lm}, lm.librariesLock.RUnlock
+	return &Explorer{lm}, sync.OnceFunc(lm.librariesLock.RUnlock)
 }
 
 // NewInstaller returns a new Installer. The returned function must be called
 // to release the lock on the LibrariesManager.
 func (lm *LibrariesManager) NewInstaller() (*Installer, func()) {
 	lm.librariesLock.Lock()
-	return &Installer{lm}, lm.librariesLock.Unlock
+	return &Installer{lm}, sync.OnceFunc(lm.librariesLock.Unlock)
 }
 
 // Build builds a new LibrariesManager.
