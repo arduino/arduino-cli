@@ -120,7 +120,7 @@ jobs:
           path: ${{ env.CONFIGURATIONS_FOLDER }}
 
       - name: Remove unneeded artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: ${{ env.CONFIGURATIONS_ARTIFACT_PREFIX }}*
 
