@@ -40,6 +40,12 @@
               "packager": "test",
               "name": "monitor-tool"
             }
+          ],
+          "librariesDependencies": [
+            {
+              "name": "some-library",
+              "version": "1.0.0"
+            }
           ]
         }
       ],

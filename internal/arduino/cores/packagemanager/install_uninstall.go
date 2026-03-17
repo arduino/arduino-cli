@@ -62,7 +62,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	}
 	platformRef.PlatformVersion = latest.Version
 
-	platformRelease, tools, err := pme.FindPlatformReleaseDependencies(platformRef)
+	platformRelease, tools, _, err := pme.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
 		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
 	}
@@ -133,7 +133,7 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 		// This must be done so tools used by the currently installed version are
 		// removed if not used also by the newly installed version.
 		var err error
-		_, installedTools, err = pme.FindPlatformReleaseDependencies(platformRef)
+		_, installedTools, _, err = pme.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
 			return &cmderrors.NotFoundError{Message: i18n.Tr("Can't find dependencies for platform %s", platformRef), Cause: err}
 		}
