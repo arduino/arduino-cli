@@ -109,7 +109,7 @@ jobs:
           path: ${{ env.DIST_DIR }}
 
       - name: Remove non-notarized artifact
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: ${{ env.ARTIFACT_NAME }}-${{ matrix.artifact.artifact-suffix }}
 
