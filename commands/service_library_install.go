@@ -67,6 +67,13 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		return err
 	}
 
+	// Obtain the library installer from the manager
+	lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
+	if err != nil {
+		return err
+	}
+	defer releaseLmi()
+
 	toInstall := map[string]*librariesindex.Release{}
 	if req.GetNoDeps() {
 		version, err := parseVersion(req.GetVersion())
@@ -79,18 +86,11 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		}
 		toInstall[libRelease.GetName()] = libRelease
 	} else {
-		// Obtain the library explorer from the instance
-		lme, releaseLme, err := instances.GetLibraryManagerExplorer(req.GetInstance())
-		if err != nil {
-			return err
-		}
-
 		var overrides []*librariesindex.Release
 		if req.GetNoOverwrite() {
-			overrides = librariesGetAllInstalled(lme, li)
+			overrides = librariesGetAllInstalled(lmi.Explorer, li)
 		}
 		deps, err := libraryResolveDependencies(li, req.GetName(), req.GetVersion(), overrides)
-		releaseLme()
 		if err != nil {
 			return err
 		}
@@ -116,13 +116,6 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		downloadsDir = pme.DownloadDir
 		releasePme()
 	}
-
-	// Obtain the library installer from the manager
-	lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
-	if err != nil {
-		return err
-	}
-	defer releaseLmi()
 
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}

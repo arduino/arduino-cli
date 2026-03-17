@@ -48,7 +48,7 @@ type Explorer struct {
 
 // Installer is used to rescan installed libraries after install/uninstall.
 type Installer struct {
-	*LibrariesManager
+	*Explorer
 }
 
 // LibrariesManager keeps the current status of the libraries in the system
@@ -120,7 +120,7 @@ func (lm *LibrariesManager) NewExplorer() (*Explorer, func()) {
 // to release the lock on the LibrariesManager.
 func (lm *LibrariesManager) NewInstaller() (*Installer, func()) {
 	lm.librariesLock.Lock()
-	return &Installer{lm}, sync.OnceFunc(lm.librariesLock.Unlock)
+	return &Installer{&Explorer{lm}}, sync.OnceFunc(lm.librariesLock.Unlock)
 }
 
 // Build builds a new LibrariesManager.
@@ -237,8 +237,8 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 // FindByReference return the installed libraries matching the Reference
 // name and version or, if the version is nil, the libraries installed
 // in the installLocation.
-func (lmi *Installer) FindByReference(name string, version *semver.Version, installLocation libraries.LibraryLocation) libraries.List {
-	alternatives := lmi.libraries[name]
+func (lm *Explorer) FindByReference(name string, version *semver.Version, installLocation libraries.LibraryLocation) libraries.List {
+	alternatives := lm.libraries[name]
 	if alternatives == nil {
 		return nil
 	}
@@ -246,7 +246,7 @@ func (lmi *Installer) FindByReference(name string, version *semver.Version, inst
 }
 
 // FindAllInstalled returns all the installed libraries
-func (lm *LibrariesManager) FindAllInstalled() libraries.List {
+func (lm *Explorer) FindAllInstalled() libraries.List {
 	var res libraries.List
 	for _, libAlternatives := range lm.libraries {
 		for _, libRelease := range libAlternatives {

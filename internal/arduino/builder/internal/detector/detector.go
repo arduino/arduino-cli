@@ -329,7 +329,9 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath, nil)
 		}
 
-		allInstalledSorted := l.librariesManager.FindAllInstalled()
+		lme, release := l.librariesManager.NewExplorer()
+		allInstalledSorted := lme.FindAllInstalled()
+		release()
 		allInstalledSorted.SortByName() // Sort libraries to ensure consistent ordering
 		for _, library := range allInstalledSorted {
 			if library.Location == libraries.Profile {
@@ -691,7 +693,9 @@ func LibrariesLoader(
 		lm = newLm
 	}
 
-	allLibs := lm.FindAllInstalled()
+	lme, release := lm.NewExplorer()
+	allLibs := lme.FindAllInstalled()
+	release()
 	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, buildPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
