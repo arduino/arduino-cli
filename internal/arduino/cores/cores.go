@@ -380,6 +380,19 @@ func (platform *Platform) String() string {
 	return platform.Package.Name + ":" + platform.Architecture
 }
 
+// ToRPCPlatformMetadata makes a gRPC PlatformMetadata message out of this Platform.
+func (platform *Platform) ToRPCPlatformMetadata() *rpc.PlatformMetadata {
+	return &rpc.PlatformMetadata{
+		Id:                platform.String(),
+		Maintainer:        platform.Package.Maintainer,
+		Website:           platform.Package.WebsiteURL,
+		Email:             platform.Package.Email,
+		ManuallyInstalled: platform.ManuallyInstalled,
+		Deprecated:        platform.Deprecated,
+		Indexed:           platform.Indexed,
+	}
+}
+
 // GetOrCreateBoard returns the Board object with the specified boardID
 // or creates a new one if not found
 func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
