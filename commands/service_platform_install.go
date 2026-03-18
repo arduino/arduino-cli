@@ -61,6 +61,11 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 		})
 	}
 
+	version, err := parseVersion(req.GetVersion())
+	if err != nil {
+		return &cmderrors.InvalidVersionError{Cause: err}
+	}
+
 	install := func() error {
 		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
 		if err != nil {
@@ -68,17 +73,12 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 		}
 		defer release()
 
-		version, err := parseVersion(req.GetVersion())
-		if err != nil {
-			return &cmderrors.InvalidVersionError{Cause: err}
-		}
-
 		ref := &packagemanager.PlatformReference{
 			Package:              req.GetPlatformPackage(),
 			PlatformArchitecture: req.GetArchitecture(),
 			PlatformVersion:      version,
 		}
-		platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
+		platformRelease, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
 		if err != nil {
 			if errors.Is(err, packagemanager.ErrPlatformNotAvailableForOS) {
 				return &cmderrors.PlatformNotAvailableForOSError{Platform: ref.String()}
@@ -115,11 +115,7 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 		return err
 	}
 
-	err := s.Init(
-		&rpc.InitRequest{Instance: req.GetInstance()},
-		InitStreamResponseToCallbackFunction(ctx, nil),
-	)
-	if err != nil {
+	if err := s.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
 		return err
 	}
 

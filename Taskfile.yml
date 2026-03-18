@@ -165,9 +165,8 @@ tasks:
   go:easyjson-generate:
     desc: Run easyjson code generation
     cmds:
-      - go install github.com/mailru/easyjson/...@v0.7.7
-      - easyjson internal/arduino/cores/packageindex/index.go
-      - easyjson internal/arduino/libraries/librariesindex/json.go
+      - go run github.com/mailru/easyjson/easyjson internal/arduino/cores/packageindex/index.go
+      - go run github.com/mailru/easyjson/easyjson internal/arduino/libraries/librariesindex/json.go
 
   go:add-license-headers:
     desc: Add missing go license headers

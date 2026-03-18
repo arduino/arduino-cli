@@ -67,30 +67,73 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		return err
 	}
 
+	// Obtain the library installer from the manager
+	lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
+	if err != nil {
+		return err
+	}
+	defer releaseLmi()
+
+	// Obtain the download directory
+	var downloadsDir *paths.Path
+	if pme, releasePme, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
+		return err
+	} else {
+		downloadsDir = pme.DownloadDir
+		releasePme()
+	}
+
+	if err := s.downloadAndInstallLibrary(
+		ctx, li, lmi,
+		req.GetName(), req.GetVersion(),
+		libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation()),
+		req.GetNoDeps(), req.GetNoOverwrite(),
+		downloadsDir,
+		taskCB, downloadCB,
+	); err != nil {
+		return err
+	}
+
+	if err = s.Init(
+		&rpc.InitRequest{Instance: req.GetInstance()},
+		InitStreamResponseToCallbackFunction(ctx, nil),
+	); err != nil {
+		return err
+	}
+
+	syncSend.Send(&rpc.LibraryInstallResponse{
+		Message: &rpc.LibraryInstallResponse_Result_{
+			Result: &rpc.LibraryInstallResponse_Result{},
+		},
+	})
+	return nil
+}
+
+func (s *arduinoCoreServerImpl) downloadAndInstallLibrary(
+	ctx context.Context, li *librariesindex.Index, lmi *librariesmanager.Installer,
+	name, version string,
+	installLocation libraries.LibraryLocation,
+	noDeps, noOverwrite bool,
+	downloadsDir *paths.Path,
+	taskCB rpc.TaskProgressCB, downloadCB rpc.DownloadProgressCB,
+) error {
 	toInstall := map[string]*librariesindex.Release{}
-	if req.GetNoDeps() {
-		version, err := parseVersion(req.GetVersion())
+	if noDeps {
+		version, err := parseVersion(version)
 		if err != nil {
 			return err
 		}
-		libRelease, err := li.FindRelease(req.GetName(), version)
+		libRelease, err := li.FindRelease(name, version)
 		if err != nil {
 			return err
 		}
 		toInstall[libRelease.GetName()] = libRelease
 	} else {
-		// Obtain the library explorer from the instance
-		lme, releaseLme, err := instances.GetLibraryManagerExplorer(req.GetInstance())
-		if err != nil {
-			return err
-		}
-
 		var overrides []*librariesindex.Release
-		if req.GetNoOverwrite() {
-			overrides = librariesGetAllInstalled(lme, li)
+		if noOverwrite {
+			overrides = librariesGetAllInstalled(lmi.Explorer, li)
 		}
-		deps, err := libraryResolveDependencies(li, req.GetName(), req.GetVersion(), overrides)
-		releaseLme()
+		deps, err := libraryResolveDependencies(li, name, version, overrides)
 		if err != nil {
 			return err
 		}
@@ -108,25 +151,8 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		}
 	}
 
-	// Obtain the download directory
-	var downloadsDir *paths.Path
-	if pme, releasePme, err := instances.GetPackageManagerExplorer(req.GetInstance()); err != nil {
-		return err
-	} else {
-		downloadsDir = pme.DownloadDir
-		releasePme()
-	}
-
-	// Obtain the library installer from the manager
-	lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
-	if err != nil {
-		return err
-	}
-	defer releaseLmi()
-
 	// Find the libReleasesToInstall to install
 	libReleasesToInstall := map[*librariesindex.Release]*librariesmanager.LibraryInstallPlan{}
-	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	for _, libRelease := range toInstall {
 		installTask, err := lmi.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
 		if err != nil {
@@ -137,7 +163,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 			continue
 		}
 
-		if req.GetNoOverwrite() {
+		if noOverwrite {
 			if installTask.ReplacedLib != nil {
 				return errors.New(i18n.Tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, installTask.ReplacedLib))
 			}
@@ -148,7 +174,7 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 	for libRelease, installTask := range libReleasesToInstall {
 		// Checks if libRelease is the requested library and not a dependency
 		downloadReason := "depends"
-		if libRelease.GetName() == req.GetName() {
+		if libRelease.GetName() == name {
 			downloadReason = "install"
 			if installTask.ReplacedLib != nil {
 				downloadReason = "upgrade"
@@ -165,18 +191,6 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		}
 	}
 
-	err = s.Init(
-		&rpc.InitRequest{Instance: req.GetInstance()},
-		InitStreamResponseToCallbackFunction(ctx, nil))
-	if err != nil {
-		return err
-	}
-
-	syncSend.Send(&rpc.LibraryInstallResponse{
-		Message: &rpc.LibraryInstallResponse_Result_{
-			Result: &rpc.LibraryInstallResponse_Result{},
-		},
-	})
 	return nil
 }
 

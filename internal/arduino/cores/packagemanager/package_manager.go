@@ -194,7 +194,7 @@ func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
 		discoveryManager:               pm.discoveryManager,
 		userAgent:                      pm.userAgent,
 		downloaderConfig:               pm.downloaderConfig,
-	}, pm.packagesLock.RUnlock
+	}, sync.OnceFunc(pm.packagesLock.RUnlock)
 }
 
 // Destroy releases all resources held by the PackageManager.

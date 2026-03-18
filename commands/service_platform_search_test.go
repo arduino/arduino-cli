@@ -59,7 +59,7 @@ func TestPlatformSearch(t *testing.T) {
 		require.NotNil(t, res)
 
 		require.Len(t, res.GetSearchOutput(), 1)
-		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
+		require.Equal(t, res.GetSearchOutput()[0], &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -69,22 +69,24 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.5",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 				"1.0.6": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.6",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 			},
 			InstalledVersion: "",
@@ -99,7 +101,7 @@ func TestPlatformSearch(t *testing.T) {
 		require.Nil(t, stat)
 		require.NotNil(t, res)
 		require.Len(t, res.GetSearchOutput(), 1)
-		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
+		require.Equal(t, res.GetSearchOutput()[0], &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -109,22 +111,24 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.5",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 				"1.0.6": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.6",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 			},
 			InstalledVersion: "",
@@ -139,7 +143,7 @@ func TestPlatformSearch(t *testing.T) {
 		require.Nil(t, stat)
 		require.NotNil(t, res)
 		require.Len(t, res.GetSearchOutput(), 1)
-		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
+		require.Equal(t, res.GetSearchOutput()[0], &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -149,22 +153,24 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.5",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 				"1.0.6": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.6",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 			},
 			InstalledVersion: "",
@@ -179,7 +185,7 @@ func TestPlatformSearch(t *testing.T) {
 		require.Nil(t, stat)
 		require.NotNil(t, res)
 		require.Len(t, res.GetSearchOutput(), 1)
-		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
+		require.Equal(t, res.GetSearchOutput()[0], &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "Retrokits-RK002:arm",
 				Maintainer: "Retrokits (www.retrokits.com)",
@@ -189,22 +195,24 @@ func TestPlatformSearch(t *testing.T) {
 			},
 			Releases: map[string]*rpc.PlatformRelease{
 				"1.0.5": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.5",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 				"1.0.6": {
-					Name:       "RK002",
-					Types:      []string{"Contributed"},
-					Installed:  false,
-					Version:    "1.0.6",
-					Boards:     []*rpc.Board{{Name: "RK002"}},
-					Help:       &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-					Compatible: false,
+					Name:            "RK002",
+					Types:           []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 			},
 			InstalledVersion: "",
@@ -219,7 +227,7 @@ func TestPlatformSearch(t *testing.T) {
 		require.Nil(t, stat)
 		require.NotNil(t, res)
 		require.Len(t, res.GetSearchOutput(), 1)
-		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
+		require.Equal(t, res.GetSearchOutput()[0], &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "arduino:avr",
 				Maintainer: "Arduino",
@@ -261,8 +269,9 @@ func TestPlatformSearch(t *testing.T) {
 						{Name: "Arduino Industrial 101"},
 						{Name: "Linino One"},
 					},
-					Help:       &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
-					Compatible: false,
+					Help:            &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 			},
 			InstalledVersion: "",
@@ -277,7 +286,7 @@ func TestPlatformSearch(t *testing.T) {
 		require.Nil(t, stat)
 		require.NotNil(t, res)
 		require.Len(t, res.GetSearchOutput(), 1)
-		require.Contains(t, res.GetSearchOutput(), &rpc.PlatformSummary{
+		require.Equal(t, res.GetSearchOutput()[0], &rpc.PlatformSummary{
 			Metadata: &rpc.PlatformMetadata{
 				Id:         "arduino:avr",
 				Indexed:    true,
@@ -319,8 +328,9 @@ func TestPlatformSearch(t *testing.T) {
 						{Name: "Arduino Industrial 101"},
 						{Name: "Linino One"},
 					},
-					Help:       &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
-					Compatible: false,
+					Help:            &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					Compatible:      false,
+					MissingMetadata: true,
 				},
 			},
 			InstalledVersion: "",
