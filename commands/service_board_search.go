@@ -68,7 +68,7 @@ func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 						IsHidden: board.IsHidden(),
 						Platform: &rpc.Platform{
 							Metadata: platformToRPCPlatformMetadata(platform),
-							Release:  platformReleaseToRPC(installedPlatformRelease),
+							Release:  installedPlatformRelease.ToRPC(),
 						},
 					})
 				}
@@ -83,7 +83,7 @@ func (s *arduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 						Name: strings.Trim(board.Name, " \n"),
 						Platform: &rpc.Platform{
 							Metadata: platformToRPCPlatformMetadata(platform),
-							Release:  platformReleaseToRPC(latestPlatformRelease),
+							Release:  latestPlatformRelease.ToRPC(),
 						},
 					})
 				}

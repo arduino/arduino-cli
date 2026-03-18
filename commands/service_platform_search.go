@@ -92,7 +92,7 @@ func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.Platf
 			rpcPlatformSummary.LatestVersion = latestCompatible.Version.String()
 		}
 		for _, platformRelease := range platform.GetAllReleases() {
-			rpcPlatformRelease := platformReleaseToRPC(platformRelease)
+			rpcPlatformRelease := platformRelease.ToRPC()
 			rpcPlatformSummary.Releases[rpcPlatformRelease.GetVersion()] = rpcPlatformRelease
 		}
 		out = append(out, rpcPlatformSummary)
