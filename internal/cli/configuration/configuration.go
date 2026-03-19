@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/go-configmap"
@@ -118,26 +119,21 @@ func getDefaultBuildCacheDir() string {
 // or looking in the current working dir
 func FindConfigFlagsInArgsOrFallbackOnEnv(args []string) string {
 	// Look for '--config-dir' argument
-	for i, arg := range args {
-		if arg == "--config-dir" {
-			if len(args) > i+1 {
-				absArgs, err := paths.New(args[i+1]).Abs()
-				if err != nil {
-					feedback.FatalError(fmt.Errorf("invalid --config-dir value: %w", err), feedback.ErrBadArgument)
-				}
-				configDir := absArgs.String()
-				userProvidedDefaultDataDir = &configDir
-				break
+	if i := slices.Index(args, "--config-dir"); i != -1 {
+		if len(args) > i+1 {
+			absArgs, err := paths.New(args[i+1]).Abs()
+			if err != nil {
+				feedback.FatalError(fmt.Errorf("invalid --config-dir value: %w", err), feedback.ErrBadArgument)
 			}
+			configDir := absArgs.String()
+			userProvidedDefaultDataDir = &configDir
 		}
 	}
 
 	// Look for '--config-file' argument
-	for i, arg := range args {
-		if arg == "--config-file" {
-			if len(args) > i+1 {
-				return args[i+1]
-			}
+	if i := slices.Index(args, "--config-file"); i != -1 {
+		if len(args) > i+1 {
+			return args[i+1]
 		}
 	}
 	if p, ok := os.LookupEnv("ARDUINO_CONFIG_FILE"); ok {
