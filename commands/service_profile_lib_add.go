@@ -18,6 +18,7 @@ package commands
 import (
 	"cmp"
 	"context"
+	"net/url"
 	"slices"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -57,6 +58,15 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 			return nil, &cmderrors.InvalidArgumentError{Message: "invalid library path"}
 		}
 		addedLib := &sketch.ProfileLibraryReference{InstallDir: path}
+		profile.Libraries = append(profile.Libraries, addedLib)
+		addedLibs = append(addedLibs, addedLib)
+	} else if reqGitLib := req.GetLibrary().GetGitLibrary(); reqGitLib != nil {
+		// Add a git library
+		gitURL, err := url.Parse(reqGitLib.GetUrl())
+		if err != nil {
+			return nil, &cmderrors.InvalidURLError{Cause: err}
+		}
+		addedLib := &sketch.ProfileLibraryReference{GitURL: gitURL}
 		profile.Libraries = append(profile.Libraries, addedLib)
 		addedLibs = append(addedLibs, addedLib)
 	} else if reqIndexLib := req.GetLibrary().GetIndexLibrary(); reqIndexLib != nil {
