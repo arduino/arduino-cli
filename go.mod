@@ -7,7 +7,7 @@ replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
 	fortio.org/safecast v1.2.0
-	github.com/ProtonMail/go-crypto v1.3.0
+	github.com/ProtonMail/go-crypto v1.4.1
 	github.com/arduino/go-paths-helper v1.14.0
 	github.com/arduino/go-properties-orderedmap v1.8.1
 	github.com/arduino/go-serial-utils v0.1.2
@@ -100,7 +100,7 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/cloudflare/circl v1.6.2 // indirect
 	github.com/cncf/xds/go v0.0.0-20251210132809-ee656c7534f5 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
