@@ -63,30 +63,30 @@ func (p *Project) AsYaml() string {
 	res.WriteString("profiles:\n")
 
 	for _, profile := range p.Profiles {
-		res.WriteString(fmt.Sprintf("  %s:\n", profile.Name))
+		fmt.Fprintf(&res, "  %s:\n", profile.Name)
 		res.WriteString(profile.AsYaml())
 		res.WriteString("\n")
 	}
 	if p.DefaultProfile != "" {
-		res.WriteString(fmt.Sprintf("default_profile: %s\n", p.DefaultProfile))
+		fmt.Fprintf(&res, "default_profile: %s\n", p.DefaultProfile)
 	}
 	if p.DefaultFqbn != "" {
-		res.WriteString(fmt.Sprintf("default_fqbn: %s\n", p.DefaultFqbn))
+		fmt.Fprintf(&res, "default_fqbn: %s\n", p.DefaultFqbn)
 	}
 	if p.DefaultPort != "" {
-		res.WriteString(fmt.Sprintf("default_port: %s\n", p.DefaultPort))
+		fmt.Fprintf(&res, "default_port: %s\n", p.DefaultPort)
 	}
 	if len(p.DefaultPortConfig) > 0 {
 		res.WriteString("default_port_config:\n")
 		for k, v := range p.DefaultPortConfig {
-			res.WriteString(fmt.Sprintf("  %s: %s\n", k, v))
+			fmt.Fprintf(&res, "  %s: %s\n", k, v)
 		}
 	}
 	if p.DefaultProtocol != "" {
-		res.WriteString(fmt.Sprintf("default_protocol: %s\n", p.DefaultProtocol))
+		fmt.Fprintf(&res, "default_protocol: %s\n", p.DefaultProtocol)
 	}
 	if p.DefaultProgrammer != "" {
-		res.WriteString(fmt.Sprintf("default_programmer: %s\n", p.DefaultProgrammer))
+		fmt.Fprintf(&res, "default_programmer: %s\n", p.DefaultProgrammer)
 	}
 	return res.String()
 }
@@ -178,22 +178,22 @@ func (p *Profile) ToRpc() *rpc.SketchProfile {
 func (p *Profile) AsYaml() string {
 	var res strings.Builder
 	if p.Notes != "" {
-		res.WriteString(fmt.Sprintf("    notes: %s\n", p.Notes))
+		fmt.Fprintf(&res, "    notes: %s\n", p.Notes)
 	}
-	res.WriteString(fmt.Sprintf("    fqbn: %s\n", p.FQBN))
+	fmt.Fprintf(&res, "    fqbn: %s\n", p.FQBN)
 	if p.Programmer != "" {
-		res.WriteString(fmt.Sprintf("    programmer: %s\n", p.Programmer))
+		fmt.Fprintf(&res, "    programmer: %s\n", p.Programmer)
 	}
 	if p.Port != "" {
-		res.WriteString(fmt.Sprintf("    port: %s\n", p.Port))
+		fmt.Fprintf(&res, "    port: %s\n", p.Port)
 	}
 	if p.Protocol != "" {
-		res.WriteString(fmt.Sprintf("    protocol: %s\n", p.Protocol))
+		fmt.Fprintf(&res, "    protocol: %s\n", p.Protocol)
 	}
 	if len(p.PortConfig) > 0 {
 		res.WriteString("     port_config:\n")
 		for k, v := range p.PortConfig {
-			res.WriteString(fmt.Sprintf("       %s: %s\n", k, v))
+			fmt.Fprintf(&res, "       %s: %s\n", k, v)
 		}
 	}
 	res.WriteString(p.Platforms.AsYaml())

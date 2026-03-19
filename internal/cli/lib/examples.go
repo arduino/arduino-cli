@@ -127,9 +127,9 @@ func (ir libraryExamplesResult) String() string {
 		})
 		for _, example := range lib.Examples {
 			examplePath := paths.New(example)
-			r.WriteString(fmt.Sprintf("  - %s%s\n",
+			fmt.Fprintf(&r, "  - %s%s\n",
 				color.New(color.Faint).Sprintf("%s%c", examplePath.Parent(), os.PathSeparator),
-				examplePath.Base()))
+				examplePath.Base())
 		}
 		res = append(res, r.String())
 	}

@@ -71,7 +71,7 @@ func newDetectorCache() *detectorCache {
 func (c *detectorCache) String() string {
 	var res strings.Builder
 	for _, entry := range c.entries {
-		res.WriteString(fmt.Sprintln(entry))
+		fmt.Fprintln(&res, entry)
 	}
 	return res.String()
 }

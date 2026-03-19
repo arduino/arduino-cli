@@ -128,7 +128,7 @@ func (t *Table) Render() string {
 
 	var res strings.Builder
 	for _, row := range t.rows {
-		line := ""
+		var line strings.Builder
 		for x, cell := range row.cells {
 			selectedWidth := widths[x]
 			if x < len(t.columnsWidthMode) {
@@ -143,12 +143,12 @@ func (t *Table) Render() string {
 				selectedWidth = minimum[x]
 			}
 			if x > 0 {
-				line += " "
+				line.WriteString(" ")
 			}
-			line += cell.Pad(selectedWidth)
+			line.WriteString(cell.Pad(selectedWidth))
 		}
 
-		res.WriteString(strings.TrimRight(line, " ") + "\n")
+		res.WriteString(strings.TrimRight(line.String(), " ") + "\n")
 	}
 	return res.String()
 }

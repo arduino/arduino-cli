@@ -338,9 +338,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 							libDir = paths.New(filepath.ToSlash(ref.String()))
 						}
 					}
-					libs.WriteString(fmt.Sprintln("      - dir: " + libDir.String()))
+					fmt.Fprintln(&libs, "      - dir: "+libDir.String())
 				} else {
-					libs.WriteString(fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")"))
+					fmt.Fprintln(&libs, "      - "+lib.GetName()+" ("+lib.GetVersion()+")")
 				}
 			}
 

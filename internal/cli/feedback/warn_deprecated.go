@@ -39,7 +39,7 @@ func WarnAboutDeprecatedFiles(s *rpc.Sketch) {
 		var msg strings.Builder
 		msg.WriteString(i18n.Tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
 		for _, f := range files {
-			msg.WriteString(fmt.Sprintf("\n - %s", f))
+			fmt.Fprintf(&msg, "\n - %s", f)
 		}
 		Warning(msg.String())
 	}

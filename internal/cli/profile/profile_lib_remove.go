@@ -104,9 +104,9 @@ func (lr libRemoveResult) Data() any {
 
 func (lr libRemoveResult) String() string {
 	var res strings.Builder
-	res.WriteString(fmt.Sprintln(i18n.Tr("The following libraries were removed from the profile %s:", lr.ProfileName)))
+	fmt.Fprintln(&res, i18n.Tr("The following libraries were removed from the profile %s:", lr.ProfileName))
 	for _, lib := range lr.RemovedLibraries {
-		res.WriteString(fmt.Sprintf("  - %s\n", lib))
+		fmt.Fprintf(&res, "  - %s\n", lib)
 	}
 	return res.String()
 }

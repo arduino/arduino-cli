@@ -102,7 +102,7 @@ func (dr detailsResult) String() string {
 	if dr.showProperties {
 		var res strings.Builder
 		for _, prop := range details.BuildProperties {
-			res.WriteString(fmt.Sprintln(prop))
+			fmt.Fprintln(&res, prop)
 		}
 		return res.String()
 	}
