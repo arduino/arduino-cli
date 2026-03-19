@@ -912,12 +912,13 @@ type MultipleLibraryInstallDetected struct {
 }
 
 func (e *MultipleLibraryInstallDetected) Error() string {
-	res := i18n.Tr("The library %s has multiple installations:", e.LibName) + "\n"
+	var res strings.Builder
+	res.WriteString(i18n.Tr("The library %s has multiple installations:", e.LibName) + "\n")
 	for _, lib := range e.LibsDir {
-		res += fmt.Sprintf("- %s\n", lib)
+		res.WriteString(fmt.Sprintf("- %s\n", lib))
 	}
-	res += e.Message
-	return res
+	res.WriteString(e.Message)
+	return res.String()
 }
 
 // GRPCStatus converts the error into a *status.Status

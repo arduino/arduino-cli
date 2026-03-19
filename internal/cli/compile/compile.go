@@ -323,7 +323,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		if successful {
 			// Output profile
 
-			libs := ""
+			var libs strings.Builder
 			for _, lib := range builderRes.GetUsedLibraries() {
 				if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
 					continue
@@ -338,9 +338,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 							libDir = paths.New(filepath.ToSlash(ref.String()))
 						}
 					}
-					libs += fmt.Sprintln("      - dir: " + libDir.String())
+					libs.WriteString(fmt.Sprintln("      - dir: " + libDir.String()))
 				} else {
-					libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
+					libs.WriteString(fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")"))
 				}
 			}
 
@@ -366,9 +366,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 					profileOut += fmt.Sprintln("        platform_index_url: " + url)
 				}
 			}
-			if len(libs) > 0 {
+			if len(libs.String()) > 0 {
 				profileOut += fmt.Sprintln("    libraries:")
-				profileOut += fmt.Sprint(libs)
+				profileOut += fmt.Sprint(libs.String())
 			}
 			profileOut += fmt.Sprintln()
 		} else {
@@ -442,7 +442,7 @@ type compileResult struct {
 	hideStats          bool
 }
 
-func (r *compileResult) Data() interface{} {
+func (r *compileResult) Data() any {
 	return r
 }
 

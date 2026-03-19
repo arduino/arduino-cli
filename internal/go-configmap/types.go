@@ -159,7 +159,7 @@ func (c Map) GetStringSliceOk(key string) ([]string, bool, error) {
 	if genArray, ok := v.([]string); ok {
 		return genArray, true, nil
 	}
-	if genArray, ok := v.([]interface{}); ok {
+	if genArray, ok := v.([]any); ok {
 		// transform []interface{} to []string
 		var strArray []string
 		for i, gen := range genArray {

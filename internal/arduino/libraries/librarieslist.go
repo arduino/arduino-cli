@@ -16,6 +16,7 @@
 package libraries
 
 import (
+	"slices"
 	"sort"
 
 	semver "go.bug.st/relaxed-semver"
@@ -26,12 +27,7 @@ type List []*Library
 
 // Contains check if a lib is contained in the list
 func (list *List) Contains(lib *Library) bool {
-	for _, l := range *list {
-		if l == lib {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(*list, lib)
 }
 
 // Add appends all libraries passed as parameter in the list

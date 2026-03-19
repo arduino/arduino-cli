@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -104,18 +105,18 @@ func (lr libAddResult) Data() any {
 }
 
 func (lr libAddResult) String() string {
-	res := ""
+	var res strings.Builder
 	if len(lr.AddedLibraries) > 0 {
-		res += fmt.Sprintln(i18n.Tr("The following libraries were added to the profile %s:", lr.ProfileName))
+		res.WriteString(fmt.Sprintln(i18n.Tr("The following libraries were added to the profile %s:", lr.ProfileName)))
 		for _, l := range lr.AddedLibraries {
-			res += fmt.Sprintf("  - %s\n", l)
+			res.WriteString(fmt.Sprintf("  - %s\n", l))
 		}
 	}
 	if len(lr.SkippedLibraries) > 0 {
-		res += fmt.Sprintln(i18n.Tr("The following libraries were already present in the profile %s and were not modified:", lr.ProfileName))
+		res.WriteString(fmt.Sprintln(i18n.Tr("The following libraries were already present in the profile %s and were not modified:", lr.ProfileName)))
 		for _, l := range lr.SkippedLibraries {
-			res += fmt.Sprintf("  - %s\n", l)
+			res.WriteString(fmt.Sprintf("  - %s\n", l))
 		}
 	}
-	return res
+	return res.String()
 }

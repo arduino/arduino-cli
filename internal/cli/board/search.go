@@ -72,7 +72,7 @@ type searchResults struct {
 	Boards []*result.BoardListItem `json:"boards"`
 }
 
-func (r searchResults) Data() interface{} {
+func (r searchResults) Data() any {
 	return r
 }
 

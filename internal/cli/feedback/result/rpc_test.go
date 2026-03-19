@@ -33,8 +33,8 @@ func getStructJsonTags(t *testing.T, a any) []string {
 		rt = rt.Elem()
 		require.Equal(t, reflect.Struct, rt.Kind())
 	}
-	for i := 0; i < rt.NumField(); i++ {
-		tag := rt.Field(i).Tag.Get("json")
+	for field := range rt.Fields() {
+		tag := field.Tag.Get("json")
 		if tag == "" {
 			continue
 		}

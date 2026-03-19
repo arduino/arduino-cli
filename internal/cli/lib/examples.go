@@ -99,7 +99,7 @@ type libraryExamplesResult struct {
 	Examples []*libraryExamples `json:"examples"`
 }
 
-func (ir libraryExamplesResult) Data() interface{} {
+func (ir libraryExamplesResult) Data() any {
 	return ir
 }
 
@@ -120,17 +120,18 @@ func (ir libraryExamplesResult) String() string {
 		} else if lib.Library.Location != result.LibraryLocationUser {
 			name += " (" + string(lib.Library.Location) + ")"
 		}
-		r := i18n.Tr("Examples for library %s", color.GreenString("%s", name)) + "\n"
+		var r strings.Builder
+		r.WriteString(i18n.Tr("Examples for library %s", color.GreenString("%s", name)) + "\n")
 		sort.Slice(lib.Examples, func(i, j int) bool {
 			return strings.ToLower(lib.Examples[i]) < strings.ToLower(lib.Examples[j])
 		})
 		for _, example := range lib.Examples {
 			examplePath := paths.New(example)
-			r += fmt.Sprintf("  - %s%s\n",
+			r.WriteString(fmt.Sprintf("  - %s%s\n",
 				color.New(color.Faint).Sprintf("%s%c", examplePath.Parent(), os.PathSeparator),
-				examplePath.Base())
+				examplePath.Base()))
 		}
-		res = append(res, r)
+		res = append(res, r.String())
 	}
 
 	return strings.Join(res, "\n")

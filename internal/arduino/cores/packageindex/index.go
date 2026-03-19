@@ -49,7 +49,7 @@ type indexPackage struct {
 	Email      string                  `json:"email"`
 	Platforms  []*indexPlatformRelease `json:"platforms"`
 	Tools      []*indexToolRelease     `json:"tools"`
-	Help       indexHelp               `json:"help,omitempty"`
+	Help       indexHelp               `json:"help"`
 }
 
 // indexPlatformRelease represents a single Core Platform from package_index.json file.
@@ -66,7 +66,7 @@ type indexPlatformRelease struct {
 	Checksum              string                     `json:"checksum"`
 	Size                  json.Number                `json:"size"`
 	Boards                []indexBoard               `json:"boards"`
-	Help                  indexHelp                  `json:"help,omitempty"`
+	Help                  indexHelp                  `json:"help"`
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
 	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
 	MonitorDependencies   []indexMonitorDependency   `json:"monitorDependencies"`

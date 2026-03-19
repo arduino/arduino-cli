@@ -86,7 +86,7 @@ func newOutdatedResult(inPlatforms []*rpc.PlatformSummary, inLibraries []*rpc.In
 	return res
 }
 
-func (ir outdatedResult) Data() interface{} {
+func (ir outdatedResult) Data() any {
 	return &ir
 }
 

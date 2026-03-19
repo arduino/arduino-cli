@@ -465,8 +465,8 @@ func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 	if indexFileName == "." || indexFileName == "" {
 		return &cmderrors.InvalidURLError{Cause: errors.New(URL.String())}
 	}
-	if strings.HasSuffix(indexFileName, ".tar.bz2") {
-		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json"
+	if before, ok := strings.CutSuffix(indexFileName, ".tar.bz2"); ok {
+		indexFileName = before + ".json"
 	}
 	indexPath := pmb.IndexDir.Join(indexFileName)
 	index, err := packageindex.LoadIndex(indexPath)

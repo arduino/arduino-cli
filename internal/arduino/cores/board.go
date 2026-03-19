@@ -17,6 +17,7 @@ package cores
 
 import (
 	"errors"
+	"slices"
 	"strings"
 	"sync"
 
@@ -193,12 +194,7 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 	}
 
 	// First check the identification properties with sub index "upload_port.N.xxx"
-	for _, idProps := range b.GetIdentificationProperties() {
-		if check(idProps) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(b.GetIdentificationProperties(), check)
 }
 
 // GetMonitorSettings returns the settings for the pluggable monitor of the given protocol
@@ -220,12 +216,7 @@ func (b *Board) IdentifyBoardConfiguration(query *properties.Map) *properties.Ma
 		return true
 	}
 	checkAll := func(allP []*properties.Map) bool {
-		for _, p := range allP {
-			if check(p) {
-				return true
-			}
-		}
-		return false
+		return slices.ContainsFunc(allP, check)
 	}
 
 	res := properties.NewMap()

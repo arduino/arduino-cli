@@ -65,7 +65,7 @@ type updateIndexResult struct {
 	*result.UpdateIndexResponse_ResultResult
 }
 
-func (r *updateIndexResult) Data() interface{} {
+func (r *updateIndexResult) Data() any {
 	return r
 }
 

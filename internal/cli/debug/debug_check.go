@@ -83,7 +83,7 @@ type debugCheckResult struct {
 	Result *result.IsDebugSupportedResponse
 }
 
-func (d *debugCheckResult) Data() interface{} {
+func (d *debugCheckResult) Data() any {
 	return d.Result
 }
 

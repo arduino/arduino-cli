@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"slices"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
@@ -50,11 +51,8 @@ func (s *arduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context
 	// Apply default settings for this board and protocol
 	for setting, value := range boardSettings.AsMap() {
 		if param, ok := desc.ConfigurationParameters[setting]; ok {
-			for _, v := range param.Values {
-				if v == value {
-					param.Selected = value
-					break
-				}
+			if slices.Contains(param.Values, value) {
+				param.Selected = value
 			}
 		}
 	}

@@ -90,7 +90,7 @@ type sketchResult struct {
 	SketchDirPath *paths.Path `json:"sketch_path"`
 }
 
-func (ir sketchResult) Data() interface{} {
+func (ir sketchResult) Data() any {
 	return ir
 }
 

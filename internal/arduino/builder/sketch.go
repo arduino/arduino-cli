@@ -83,7 +83,7 @@ func (b *Builder) prepareSketchBuildPath() error {
 // a single .cpp file.
 func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, error) {
 	lineOffset := 0
-	mergedSource := ""
+	var mergedSource strings.Builder
 
 	getSource := func(f *paths.Path) (string, error) {
 		path, err := b.sketch.FullPath.RelTo(f)
@@ -107,12 +107,12 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 		return 0, "", err
 	}
 	if !includesArduinoH.MatchString(mainSrc) {
-		mergedSource += "#include <Arduino.h>\n"
+		mergedSource.WriteString("#include <Arduino.h>\n")
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + cpp.QuoteString(b.sketch.MainFile.String()) + "\n"
-	mergedSource += mainSrc + "\n"
+	mergedSource.WriteString("#line 1 " + cpp.QuoteString(b.sketch.MainFile.String()) + "\n")
+	mergedSource.WriteString(mainSrc + "\n")
 	lineOffset++
 
 	for _, file := range b.sketch.OtherSketchFiles {
@@ -120,11 +120,11 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 		if err != nil {
 			return 0, "", err
 		}
-		mergedSource += "#line 1 " + cpp.QuoteString(file.String()) + "\n"
-		mergedSource += src + "\n"
+		mergedSource.WriteString("#line 1 " + cpp.QuoteString(file.String()) + "\n")
+		mergedSource.WriteString(src + "\n")
 	}
 
-	return lineOffset, mergedSource, nil
+	return lineOffset, mergedSource.String(), nil
 }
 
 // sketchCopyAdditionalFiles copies the additional files for a sketch to the

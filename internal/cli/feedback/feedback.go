@@ -95,7 +95,7 @@ func reset() {
 // for the user.
 type Result interface {
 	fmt.Stringer
-	Data() interface{}
+	Data() any
 }
 
 // ErrorResult is a result embedding also an error. In case of textual output
@@ -145,7 +145,7 @@ func GetFormat() OutputFormat {
 }
 
 // Printf behaves like fmt.Printf but writes on the out writer and adds a newline.
-func Printf(format string, v ...interface{}) {
+func Printf(format string, v ...any) {
 	Print(fmt.Sprintf(format, v...))
 }
 
@@ -205,7 +205,7 @@ func Fatal(errorMsg string, exitCode ExitCode) {
 	os.Exit(int(exitCode))
 }
 
-func augment(data interface{}) interface{} {
+func augment(data any) any {
 	if len(bufferWarnings) == 0 {
 		return data
 	}
@@ -213,11 +213,11 @@ func augment(data interface{}) interface{} {
 	if err != nil {
 		return data
 	}
-	var res interface{}
+	var res any
 	if err := json.Unmarshal(d, &res); err != nil {
 		return data
 	}
-	if m, ok := res.(map[string]interface{}); ok {
+	if m, ok := res.(map[string]any); ok {
 		m["warnings"] = bufferWarnings
 	}
 	return res

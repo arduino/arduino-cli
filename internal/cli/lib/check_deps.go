@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -81,7 +82,7 @@ type checkDepResult struct {
 	deps *result.LibraryResolveDependenciesResponse
 }
 
-func (dr checkDepResult) Data() interface{} {
+func (dr checkDepResult) Data() any {
 	return dr.deps
 }
 
@@ -89,7 +90,7 @@ func (dr checkDepResult) String() string {
 	if dr.deps == nil || dr.deps.Dependencies == nil {
 		return ""
 	}
-	res := ""
+	var res strings.Builder
 	deps := dr.deps.Dependencies
 
 	// Sort dependencies alphabetically and then puts installed ones on top
@@ -104,9 +105,9 @@ func (dr checkDepResult) String() string {
 		if dep == nil {
 			continue
 		}
-		res += outputDep(dep)
+		res.WriteString(outputDep(dep))
 	}
-	return res
+	return res.String()
 }
 
 func outputDep(dep *result.LibraryDependencyStatus) string {

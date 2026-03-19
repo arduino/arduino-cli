@@ -75,11 +75,11 @@ func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 
 	// Validate the new yaml
 	dstYaml := []byte(strings.Join(srcYaml, fmt.Sprintln()) + fmt.Sprintln())
-	var dst interface{}
+	var dst any
 	if err := yaml.Unmarshal(dstYaml, &dst); err != nil {
 		return fmt.Errorf("%s: %w", i18n.Tr("could not update sketch project file"), err)
 	}
-	dstMap, ok := dst.(map[string]interface{})
+	dstMap, ok := dst.(map[string]any)
 	if !ok {
 		return errors.New(i18n.Tr("could not update sketch project file"))
 	}

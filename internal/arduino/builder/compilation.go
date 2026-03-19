@@ -80,13 +80,11 @@ func (b *Builder) compileFiles(
 		b.jobs = runtime.NumCPU()
 	}
 	for i := 0; i < b.jobs; i++ {
-		wg.Add(1)
-		go func() {
+		wg.Go(func() {
 			for source := range queue {
 				job(source)
 			}
-			wg.Done()
-		}()
+		})
 	}
 
 	// Feed jobs until error or done
