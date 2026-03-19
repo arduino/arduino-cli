@@ -2,7 +2,6 @@ name: i18n-weekly-pull
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
   COVERAGE_ARTIFACT: coverage-data
 
 on:
@@ -18,6 +17,9 @@ jobs:
     # would always fail in forks
     if: github.repository == 'arduino/arduino-cli'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -25,16 +27,10 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: "${{ env.GO_VERSION }}"
-
-      - name: Install Taskfile
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          go-version-file: go.mod
 
       - name: Run task i18n:pull
-        run: task i18n:pull
+        run: go tool github.com/go-task/task/v3/cmd/task i18n:pull
         env:
           TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
           TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
