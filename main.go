@@ -88,7 +88,7 @@ func main() {
 		}
 	}
 
-	// Execute the command line
+	// Execute the command line.
 	if err := arduinoCmd.ExecuteContext(ctx); err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

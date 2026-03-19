@@ -29,7 +29,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	os.MkdirAll(os.Args[1], 0755) // Create the output folder if it doesn't already exist
+	// Create the output folder if it doesn't already exist
+	os.MkdirAll(os.Args[1], 0755) // nolint: gosec
 
 	srv := commands.NewArduinoCoreServer()
 	cli := cli.NewCommand(srv)

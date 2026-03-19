@@ -67,7 +67,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 
 	commaSeparatedToList := func(in string) []string {
 		res := []string{}
-		for _, e := range strings.Split(in, ",") {
+		for e := range strings.SplitSeq(in, ",") {
 			res = append(res, strings.TrimSpace(e))
 		}
 		return res

@@ -18,6 +18,7 @@ package detector
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/go-paths-helper"
@@ -68,11 +69,11 @@ func newDetectorCache() *detectorCache {
 }
 
 func (c *detectorCache) String() string {
-	res := ""
+	var res strings.Builder
 	for _, entry := range c.entries {
-		res += fmt.Sprintln(entry)
+		fmt.Fprintln(&res, entry)
 	}
-	return res
+	return res.String()
 }
 
 // Load reads a saved cache from the given file.

@@ -186,7 +186,7 @@ type daemonResult struct {
 	Port string
 }
 
-func (r daemonResult) Data() interface{} {
+func (r daemonResult) Data() any {
 	return r
 }
 

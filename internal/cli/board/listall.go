@@ -75,7 +75,7 @@ type resultAll struct {
 	list *result.BoardListAllResponse
 }
 
-func (dr resultAll) Data() interface{} {
+func (dr resultAll) Data() any {
 	return dr.list
 }
 

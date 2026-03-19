@@ -265,9 +265,9 @@ func parseGitArgURL(argURL string) (string, string, string, error) {
 		"git@bitbucket.org:": "https://bitbucket.org/",
 	}
 	for prefix, replacement := range prefixes {
-		if strings.HasPrefix(argURL, prefix) {
+		if after, ok := strings.CutPrefix(argURL, prefix); ok {
 			// We can't parse these as URLs
-			argURL = replacement + strings.TrimPrefix(argURL, prefix)
+			argURL = replacement + after
 		}
 	}
 

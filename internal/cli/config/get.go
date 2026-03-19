@@ -71,10 +71,10 @@ func runGetCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args [
 // create a dedicated feedback.Result implementation to safely handle
 // any changes to the configuration.Settings struct.
 type getResult struct {
-	resp interface{}
+	resp any
 }
 
-func (gr getResult) Data() interface{} {
+func (gr getResult) Data() any {
 	return gr.resp
 }
 

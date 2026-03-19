@@ -63,13 +63,13 @@ func Parse(fqbnIn string) (*FQBN, error) {
 		return nil, errors.New(i18n.Tr("empty board identifier"))
 	}
 	// Check if the fqbn contains invalid characters
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if !fqbnValidationRegex.MatchString(fqbnParts[i]) {
 			return nil, errors.New(i18n.Tr("fqbn's field %s contains an invalid character", fqbnParts[i]))
 		}
 	}
 	if len(fqbnParts) > 3 {
-		for _, pair := range strings.Split(fqbnParts[3], ",") {
+		for pair := range strings.SplitSeq(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
 			if len(parts) != 2 {
 				return nil, errors.New(i18n.Tr("invalid config option: %s", pair))
@@ -127,13 +127,14 @@ func (fqbn *FQBN) StringWithoutConfig() string {
 
 // String returns the FQBN as a string
 func (fqbn *FQBN) String() string {
-	res := fqbn.StringWithoutConfig()
+	var res strings.Builder
+	res.WriteString(fqbn.StringWithoutConfig())
 	if fqbn.Configs.Size() > 0 {
 		sep := ":"
 		for _, k := range fqbn.Configs.Keys() {
-			res += sep + k + "=" + fqbn.Configs.Get(k)
+			res.WriteString(sep + k + "=" + fqbn.Configs.Get(k))
 			sep = ","
 		}
 	}
-	return res
+	return res.String()
 }

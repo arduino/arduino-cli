@@ -69,6 +69,6 @@ func (l *libUpdateIndexResult) String() string {
 	return ""
 }
 
-func (l *libUpdateIndexResult) Data() interface{} {
+func (l *libUpdateIndexResult) Data() any {
 	return l
 }

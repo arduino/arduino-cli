@@ -51,7 +51,7 @@ func SetRawModeStdin() error {
 	if !IsInteractive() {
 		return errors.New(i18n.Tr("not running in a terminal"))
 	}
-	old, err := term.MakeRaw(int(os.Stdin.Fd()))
+	old, err := term.MakeRaw(int(os.Stdin.Fd())) // nolint: gosec
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func RestoreModeStdin() {
 	if oldStateStdin == nil {
 		return
 	}
-	_ = term.Restore(int(os.Stdin.Fd()), oldStateStdin)
+	_ = term.Restore(int(os.Stdin.Fd()), oldStateStdin) // nolint: gosec
 	oldStateStdin = nil
 }
 
@@ -101,7 +101,7 @@ func InputUserField(prompt string, secret bool) (string, error) {
 
 	if secret {
 		// Read and return a password (no characted echoed on terminal)
-		value, err := term.ReadPassword(int(os.Stdin.Fd()))
+		value, err := term.ReadPassword(int(os.Stdin.Fd())) // nolint: gosec
 		fmt.Fprintln(stdOut)
 		return string(value), err
 	}

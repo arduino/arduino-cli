@@ -484,14 +484,14 @@ func convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(boardProperties *pr
 		boardProperties.Set("monitor_port.serial.rts", disabledToOnOff("serial.disableRTS"))
 	}
 	for _, k := range boardProperties.Keys() {
-		if strings.HasSuffix(k, ".serial.disableDTR") {
+		if before, ok := strings.CutSuffix(k, ".serial.disableDTR"); ok {
 			boardProperties.Set(
-				strings.TrimSuffix(k, ".serial.disableDTR")+".monitor_port.serial.dtr",
+				before+".monitor_port.serial.dtr",
 				disabledToOnOff(k))
 		}
-		if strings.HasSuffix(k, ".serial.disableRTS") {
+		if before, ok := strings.CutSuffix(k, ".serial.disableRTS"); ok {
 			boardProperties.Set(
-				strings.TrimSuffix(k, ".serial.disableRTS")+".monitor_port.serial.rts",
+				before+".monitor_port.serial.rts",
 				disabledToOnOff(k))
 		}
 	}

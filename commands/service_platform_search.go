@@ -59,18 +59,19 @@ func (s *arduinoCoreServerImpl) PlatformSearch(_ context.Context, req *rpc.Platf
 				}
 
 				// Gather all strings that can be used for searching
-				toTest := platform.String() + " " +
+				var toTest strings.Builder
+				toTest.WriteString(platform.String() + " " +
 					latestRelease.Name + " " +
 					platform.Architecture + " " +
 					targetPackage.Name + " " +
 					targetPackage.Maintainer + " " +
-					targetPackage.WebsiteURL
+					targetPackage.WebsiteURL)
 				for _, board := range latestRelease.BoardsManifest {
-					toTest += board.Name + " "
+					toTest.WriteString(board.Name + " ")
 				}
 
 				// Search
-				if !utils.Match(toTest, searchArgs) {
+				if !utils.Match(toTest.String(), searchArgs) {
 					continue
 				}
 

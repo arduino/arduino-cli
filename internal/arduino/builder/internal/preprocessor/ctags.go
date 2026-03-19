@@ -223,7 +223,7 @@ func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarke
 	fileNames.AddAll(sketch.OtherSketchFiles)
 
 	inSketch := false
-	filtered := ""
+	var filtered strings.Builder
 
 	scanner := bufio.NewScanner(source)
 
@@ -241,7 +241,7 @@ func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarke
 		}
 
 		if inSketch {
-			filtered += line + "\n"
+			filtered.WriteString(line + "\n")
 		}
 	}
 	if errors.Is(scanner.Err(), bufio.ErrTooLong) {
@@ -250,5 +250,5 @@ func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarke
 			i18n.Tr("line too long\n"))
 	}
 
-	return filtered
+	return filtered.String()
 }

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -91,7 +92,7 @@ type detailsResult struct {
 	showProperties  bool
 }
 
-func (dr detailsResult) Data() interface{} {
+func (dr detailsResult) Data() any {
 	return dr.details
 }
 
@@ -99,11 +100,11 @@ func (dr detailsResult) String() string {
 	details := dr.details
 
 	if dr.showProperties {
-		res := ""
+		var res strings.Builder
 		for _, prop := range details.BuildProperties {
-			res += fmt.Sprintln(prop)
+			fmt.Fprintln(&res, prop)
 		}
-		return res
+		return res.String()
 	}
 
 	if dr.listProgrammers {

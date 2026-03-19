@@ -171,7 +171,7 @@ type initResult struct {
 	ConfigFileAbsPath *paths.Path `json:"config_path"`
 }
 
-func (dr initResult) Data() interface{} {
+func (dr initResult) Data() any {
 	return dr
 }
 

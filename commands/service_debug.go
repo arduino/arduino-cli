@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -301,21 +302,22 @@ func (s *arduinoCoreServerImpl) getDebugCommandLine(req *rpc.GetDebugConfigReque
 			return nil, err
 		}
 
-		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.GetServerPath())
+		var serverCmd strings.Builder
+		fmt.Fprintf(&serverCmd, `target extended-remote | "%s"`, debugInfo.GetServerPath())
 
 		if cfg := openocdConf.GetScriptsDir(); cfg != "" {
-			serverCmd += fmt.Sprintf(` -s "%s"`, cfg)
+			fmt.Fprintf(&serverCmd, ` -s "%s"`, cfg)
 		}
 
 		for _, script := range openocdConf.GetScripts() {
-			serverCmd += fmt.Sprintf(` --file "%s"`, script)
+			fmt.Fprintf(&serverCmd, ` --file "%s"`, script)
 		}
 
-		serverCmd += ` -c "gdb_port pipe"`
-		serverCmd += ` -c "telnet_port 0"`
+		serverCmd.WriteString(` -c "gdb_port pipe"`)
+		serverCmd.WriteString(` -c "telnet_port 0"`)
 
 		add("-ex")
-		add(serverCmd)
+		add(serverCmd.String())
 
 	default:
 		return nil, &cmderrors.FailedDebugError{Message: i18n.Tr("GDB server '%s' is not supported", debugInfo.GetServer())}

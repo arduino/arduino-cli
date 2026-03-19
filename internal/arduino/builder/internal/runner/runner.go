@@ -58,11 +58,9 @@ func New(inCtx context.Context, workers int) *Runner {
 		workers = runtime.NumCPU()
 	}
 	for i := 0; i < workers; i++ {
-		r.wg.Add(1)
-		go func() {
+		r.wg.Go(func() {
 			worker(ctx, queue)
-			r.wg.Done()
-		}()
+		})
 	}
 
 	return r

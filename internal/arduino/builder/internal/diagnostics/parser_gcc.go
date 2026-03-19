@@ -63,15 +63,15 @@ func parseGccOutput(output []string) ([]*Diagnostic, error) {
 
 	for _, in := range output {
 		isTrace := false
-		if strings.HasPrefix(in, "In file included from ") {
-			in = strings.TrimPrefix(in, "In file included from ")
+		if after, ok := strings.CutPrefix(in, "In file included from "); ok {
+			in = after
 			// 1. include trace
 			isTrace = true
 			inFileContext = nil
 			fullContext = nil
 			fullContextRefersTo = ""
-		} else if strings.HasPrefix(in, "                 from ") {
-			in = strings.TrimPrefix(in, "                 from ")
+		} else if after, ok := strings.CutPrefix(in, "                 from "); ok {
+			in = after
 			// 1. include trace continuation
 			isTrace = true
 		}
@@ -103,8 +103,8 @@ func parseGccOutput(output []string) ([]*Diagnostic, error) {
 				continue
 			}
 
-			if strings.HasPrefix(msg, "note: ") {
-				msg = strings.TrimPrefix(msg, "note: ")
+			if after, ok := strings.CutPrefix(msg, "note: "); ok {
+				msg = after
 				// 4. annotations or suggestions
 				if currentDiagnostic != nil {
 					suggestion := &Note{
@@ -120,14 +120,14 @@ func parseGccOutput(output []string) ([]*Diagnostic, error) {
 			}
 
 			severity := SeverityUnspecified
-			if strings.HasPrefix(msg, "error: ") {
-				msg = strings.TrimPrefix(msg, "error: ")
+			if after, ok := strings.CutPrefix(msg, "error: "); ok {
+				msg = after
 				severity = SeverityError
-			} else if strings.HasPrefix(msg, "warning: ") {
-				msg = strings.TrimPrefix(msg, "warning: ")
+			} else if after, ok := strings.CutPrefix(msg, "warning: "); ok {
+				msg = after
 				severity = SeverityWarning
-			} else if strings.HasPrefix(msg, "fatal error: ") {
-				msg = strings.TrimPrefix(msg, "fatal error: ")
+			} else if after, ok := strings.CutPrefix(msg, "fatal error: "); ok {
+				msg = after
 				severity = SeverityFatal
 			}
 			if severity != SeverityUnspecified {

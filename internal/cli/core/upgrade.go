@@ -148,7 +148,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 type platformUpgradeResult struct{}
 
 // Data implements feedback.Result.
-func (r *platformUpgradeResult) Data() interface{} {
+func (r *platformUpgradeResult) Data() any {
 	return r
 }
 
