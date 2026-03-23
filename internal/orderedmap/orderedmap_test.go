@@ -347,15 +347,16 @@ func TestMarshallJSON(t *testing.T) {
 			}
 			return *i
 		})
-		m.Set(toPtr(1), true)
-		m.Set(toPtr(2), true)
-		m.Set(toPtr(3), true)
+		m.Set(new(1), true)
+		m.Set(new(2), true)
+		m.Set(new(3), true)
 		mapJSON, err := m.MarshalJSON()
 		require.NoError(t, err)
 		require.JSONEq(t, `{"1":true,"2":true,"3":true}`, string(mapJSON))
 	})
 }
 
+//go:fix inline
 func toPtr[V any](v V) *V {
-	return &v
+	return new(v)
 }

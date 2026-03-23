@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/go-configmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"go.bug.st/f"
-	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
 
@@ -71,14 +70,14 @@ func (s *arduinoCoreServerImpl) ConfigurationGet(ctx context.Context, req *rpc.C
 	}
 
 	if builtinLibs := s.settings.IDEBuiltinLibrariesDir(); builtinLibs != nil {
-		conf.Directories.Builtin.Libraries = proto.String(builtinLibs.String())
+		conf.Directories.Builtin.Libraries = new(builtinLibs.String())
 	}
 
 	if ua := s.settings.ExtraUserAgent(); ua != "" {
 		conf.Network.ExtraUserAgent = &ua
 	}
 	if proxy, err := s.settings.NetworkProxy(); err == nil && proxy != nil {
-		conf.Network.Proxy = proto.String(proxy.String())
+		conf.Network.Proxy = new(proxy.String())
 	}
 
 	if logFile := s.settings.LoggingFile(); logFile != nil {

@@ -18,6 +18,7 @@ package libraries
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
@@ -165,12 +166,7 @@ func (library *Library) SupportsAnyArchitectureIn(archs ...string) bool {
 // explicitly compatible for a specific architecture (the `architecture` field
 // in library.properties contains the architecture passed as parameter)
 func (library *Library) IsOptimizedForArchitecture(arch string) bool {
-	for _, libArch := range library.Architectures {
-		if libArch == arch {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(library.Architectures, arch)
 }
 
 // IsArchitectureIndependent returns true if the library declares to be

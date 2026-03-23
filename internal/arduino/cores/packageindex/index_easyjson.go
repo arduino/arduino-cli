@@ -750,7 +750,7 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawByte(']')
 		}
 	}
-	if true {
+	{
 		const prefix string = ",\"help\":"
 		out.RawString(prefix)
 		(in.Help).MarshalEasyJSON(out)
@@ -1078,7 +1078,7 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawByte(']')
 		}
 	}
-	if true {
+	{
 		const prefix string = ",\"help\":"
 		out.RawString(prefix)
 		(in.Help).MarshalEasyJSON(out)

@@ -123,7 +123,7 @@ type listResult struct {
 	Ports []*result.DetectedPort `json:"detected_ports"`
 }
 
-func (dr listResult) Data() interface{} {
+func (dr listResult) Data() any {
 	return dr
 }
 
@@ -187,7 +187,7 @@ type watchEventResult struct {
 	Error  string                  `json:"error,omitempty"`
 }
 
-func (dr watchEventResult) Data() interface{} {
+func (dr watchEventResult) Data() any {
 	return dr
 }
 

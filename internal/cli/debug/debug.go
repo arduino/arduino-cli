@@ -186,8 +186,8 @@ type openOcdServerConfigResult struct {
 }
 
 func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
-	var toolchainConfig interface{}
-	var serverConfig interface{}
+	var toolchainConfig any
+	var serverConfig any
 	switch info.GetServer() {
 	case "openocd":
 		var openocdConf rpc.DebugOpenOCDServerConfiguration
@@ -222,7 +222,7 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 	}
 }
 
-func (r *debugInfoResult) Data() interface{} {
+func (r *debugInfoResult) Data() any {
 	return r
 }
 

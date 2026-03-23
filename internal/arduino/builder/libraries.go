@@ -158,18 +158,19 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 			}
 
 			// Add required LD flags
-			libsCmd := library.LDflags + " "
+			var libsCmd strings.Builder
+			libsCmd.WriteString(library.LDflags + " ")
 			dynAndStaticLibs := libs.Clone()
 			dynAndStaticLibs.FilterSuffix(".a", ".so")
 			for _, lib := range dynAndStaticLibs {
 				name := strings.TrimSuffix(lib.Base(), lib.Ext())
 				if strings.HasPrefix(name, "lib") {
-					libsCmd += "-l" + name[3:] + " "
+					libsCmd.WriteString("-l" + name[3:] + " ")
 				}
 			}
 
 			currLDFlags := b.buildProperties.Get("compiler.libraries.ldflags")
-			b.buildProperties.Set("compiler.libraries.ldflags", currLDFlags+" \"-L"+precompiledPath.String()+"\" "+libsCmd+" ")
+			b.buildProperties.Set("compiler.libraries.ldflags", currLDFlags+" \"-L"+precompiledPath.String()+"\" "+libsCmd.String()+" ")
 
 			// TODO: This codepath is just taken for .a with unusual names that would
 			// be ignored by -L / -l methods.

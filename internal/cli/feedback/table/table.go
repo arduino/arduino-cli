@@ -59,7 +59,7 @@ func (t *Table) SetColumnWidthMode(x int, mode ColumnWidthMode) {
 }
 
 // SetHeader FIXMEDOC
-func (t *Table) SetHeader(columns ...interface{}) {
+func (t *Table) SetHeader(columns ...any) {
 	row := t.makeTableRow(columns...)
 	if t.hasHeader {
 		t.rows[0] = row
@@ -70,7 +70,7 @@ func (t *Table) SetHeader(columns ...interface{}) {
 }
 
 // AddRow FIXMEDOC
-func (t *Table) AddRow(columns ...interface{}) {
+func (t *Table) AddRow(columns ...any) {
 	row := t.makeTableRow(columns...)
 	t.rows = append(t.rows, row)
 }
@@ -126,9 +126,9 @@ func (t *Table) Render() string {
 		}
 	}
 
-	res := ""
+	var res strings.Builder
 	for _, row := range t.rows {
-		line := ""
+		var line strings.Builder
 		for x, cell := range row.cells {
 			selectedWidth := widths[x]
 			if x < len(t.columnsWidthMode) {
@@ -143,18 +143,18 @@ func (t *Table) Render() string {
 				selectedWidth = minimum[x]
 			}
 			if x > 0 {
-				line += " "
+				line.WriteString(" ")
 			}
-			line += cell.Pad(selectedWidth)
+			line.WriteString(cell.Pad(selectedWidth))
 		}
 
-		res += strings.TrimRight(line, " ") + "\n"
+		res.WriteString(strings.TrimRight(line.String(), " ") + "\n")
 	}
-	return res
+	return res.String()
 }
 
-func makeCell(format string, args ...interface{}) *Cell {
-	cleanArgs := make([]interface{}, len(args))
+func makeCell(format string, args ...any) *Cell {
+	cleanArgs := make([]any, len(args))
 	for i, arg := range args {
 		if text, ok := arg.(*Cell); ok {
 			cleanArgs[i], args[i] = text.clean, text.raw
@@ -169,7 +169,7 @@ func makeCell(format string, args ...interface{}) *Cell {
 	}
 }
 
-func (t *Table) makeTableRow(columns ...interface{}) *tableRow {
+func (t *Table) makeTableRow(columns ...any) *tableRow {
 	columnsCount := len(columns)
 	if t.columnsCount < columnsCount {
 		t.columnsCount = columnsCount

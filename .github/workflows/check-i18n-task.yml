@@ -1,9 +1,5 @@
 name: Check Internationalization
 
-env:
-  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
-
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
   push:
@@ -16,6 +12,8 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -24,16 +22,12 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          go-version-file: go.mod
 
       - name: Check i18n source and translation files are up to date
-        run: task i18n:check
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task i18n:check
         env:
           TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
           TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}

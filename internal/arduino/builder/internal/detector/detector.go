@@ -104,10 +104,8 @@ func (l *SketchLibrariesDetector) resolveLibrary(header, platformArch string) *l
 		return nil
 	}
 
-	for _, candidate := range candidates {
-		if importedLibraries.Contains(candidate) {
-			return nil
-		}
+	if slices.ContainsFunc(candidates, importedLibraries.Contains) {
+		return nil
 	}
 
 	selected := l.librariesResolver.ResolveFor(header, platformArch)
@@ -610,8 +608,8 @@ func IncludesFinderWithRegExp(source string) string {
 }
 
 func findIncludeForOldCompilers(source string) string {
-	lines := strings.Split(source, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(source, "\n")
+	for line := range lines {
 		splittedLine := strings.Split(line, ":")
 		for i := range splittedLine {
 			if strings.Contains(splittedLine[i], "fatal error") {

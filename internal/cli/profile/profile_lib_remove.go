@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -97,14 +98,15 @@ type libRemoveResult struct {
 	ProfileName      string                            `json:"profile_name"`
 }
 
-func (lr libRemoveResult) Data() interface{} {
+func (lr libRemoveResult) Data() any {
 	return lr
 }
 
 func (lr libRemoveResult) String() string {
-	res := fmt.Sprintln(i18n.Tr("The following libraries were removed from the profile %s:", lr.ProfileName))
+	var res strings.Builder
+	fmt.Fprintln(&res, i18n.Tr("The following libraries were removed from the profile %s:", lr.ProfileName))
 	for _, lib := range lr.RemovedLibraries {
-		res += fmt.Sprintf("  - %s\n", lib)
+		fmt.Fprintf(&res, "  - %s\n", lib)
 	}
-	return res
+	return res.String()
 }

@@ -127,7 +127,7 @@ func computeDirChecksum(root string) (string, error) {
 		if err != nil || info.IsDir() || (info.Name() == packageFileName && filepath.Dir(path) == root) {
 			return nil
 		}
-		f, err := os.Open(path)
+		f, err := os.Open(path) // nolint: gosec
 		if err != nil {
 			return nil
 		}

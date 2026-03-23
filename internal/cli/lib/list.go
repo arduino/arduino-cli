@@ -118,7 +118,7 @@ type installedResult struct {
 	onlyUpdates   bool
 }
 
-func (ir installedResult) Data() interface{} {
+func (ir installedResult) Data() any {
 	return ir
 }
 

@@ -57,7 +57,7 @@ func (i *Info) String() string {
 }
 
 // Data implements feedback.Result interface
-func (i *Info) Data() interface{} {
+func (i *Info) Data() any {
 	return i
 }
 

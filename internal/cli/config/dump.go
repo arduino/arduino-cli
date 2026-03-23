@@ -71,7 +71,7 @@ type dumpResult struct {
 	Config *rawResult `json:"config"`
 }
 
-func (dr dumpResult) Data() interface{} {
+func (dr dumpResult) Data() any {
 	return dr
 }
 
