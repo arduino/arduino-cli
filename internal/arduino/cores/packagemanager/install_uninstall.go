@@ -31,48 +31,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-// DownloadAndInstallPlatformUpgrades runs a full installation process to upgrade the given platform.
-// This method takes care of downloading missing archives, upgrading platforms and tools, and
-// removing the previously installed platform/tools that are no longer needed after the upgrade.
-func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
-	ctx context.Context,
-	platformRef *PlatformReference,
-	downloadCB rpc.DownloadProgressCB,
-	taskCB rpc.TaskProgressCB,
-	skipPostInstall bool,
-	skipPreUninstall bool,
-	checks resources.IntegrityCheckMode,
-) (*cores.PlatformRelease, error) {
-	if platformRef.PlatformVersion != nil {
-		return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Upgrade doesn't accept parameters with version")}
-	}
-
-	// Search the latest version for all specified platforms
-	platform := pme.FindPlatform(platformRef)
-	if platform == nil {
-		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
-	}
-	installed := pme.GetInstalledPlatformRelease(platform)
-	if installed == nil {
-		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
-	}
-	latest := platform.GetLatestCompatibleRelease()
-	if !latest.Version.GreaterThan(installed.Version) {
-		return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
-	}
-	platformRef.PlatformVersion = latest.Version
-
-	platformRelease, tools, _, err := pme.FindPlatformReleaseDependencies(platformRef)
-	if err != nil {
-		return nil, &cmderrors.PlatformNotFoundError{Platform: platformRef.String()}
-	}
-	if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, skipPostInstall, skipPreUninstall, checks); err != nil {
-		return nil, err
-	}
-
-	return platformRelease, nil
-}
-
 // DownloadAndInstallPlatformAndTools runs a full installation process for the given platform and tools.
 // This method takes care of downloading missing archives, installing/upgrading platforms and tools, and
 // removing the previously installed platform/tools that are no longer needed after the upgrade.
