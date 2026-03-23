@@ -67,11 +67,11 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 	}
 
 	install := func() error {
-		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+		pme, releasePme, err := instances.GetPackageManagerExplorer(req.GetInstance())
 		if err != nil {
 			return err
 		}
-		defer release()
+		defer releasePme()
 
 		ref := &packagemanager.PlatformReference{
 			Package:              req.GetPlatformPackage(),
