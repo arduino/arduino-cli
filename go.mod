@@ -7,7 +7,7 @@ replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
 	fortio.org/safecast v1.2.0
-	github.com/ProtonMail/go-crypto v1.3.0
+	github.com/ProtonMail/go-crypto v1.4.1
 	github.com/arduino/go-paths-helper v1.14.0
 	github.com/arduino/go-properties-orderedmap v1.8.1
 	github.com/arduino/go-serial-utils v0.1.2
@@ -19,8 +19,8 @@ require (
 	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
-	github.com/fatih/color v1.18.0
-	github.com/go-git/go-git/v5 v5.16.5
+	github.com/fatih/color v1.19.0
+	github.com/go-git/go-git/v5 v5.17.0
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/leonelquinteros/gotext v1.7.2
 	github.com/mailru/easyjson v0.7.7
@@ -40,11 +40,11 @@ require (
 	go.bug.st/f v0.5.0
 	go.bug.st/relaxed-semver v0.15.0
 	go.bug.st/testifyjson v1.3.0
-	golang.org/x/sys v0.41.0
-	golang.org/x/term v0.40.0
-	golang.org/x/text v0.34.0
+	golang.org/x/sys v0.42.0
+	golang.org/x/term v0.41.0
+	golang.org/x/text v0.35.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217
-	google.golang.org/grpc v1.79.2
+	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -100,7 +100,7 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cncf/xds/go v0.0.0-20251210132809-ee656c7534f5 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
@@ -116,7 +116,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
-	github.com/go-git/go-billy/v5 v5.6.2 // indirect
+	github.com/go-git/go-billy/v5 v5.8.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -193,7 +193,7 @@ require (
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/api v0.256.0 // indirect
 	google.golang.org/genproto v0.0.0-20250922171735-9219d122eba9 // indirect
