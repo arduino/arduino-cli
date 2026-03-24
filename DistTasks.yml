@@ -20,7 +20,7 @@ version: "3"
 vars:
   CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
   GO_VERSION:
-    sh: go list -m -f '{{.GoVersion}}'
+    sh: go list -m -f '{{"{{.GoVersion}}"}}'
 
 tasks:
   Windows_32bit:

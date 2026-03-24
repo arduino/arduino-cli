@@ -414,7 +414,6 @@ vars:
     -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # test vars
-  GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSION: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
   TEST_LDFLAGS: >-
