@@ -72,40 +72,40 @@ func (pme *Explorer) FindPlatformRelease(ref *PlatformReference) *cores.Platform
 
 // FindPlatformReleaseDependencies takes a PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
-func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
+func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, cores.LibrariesDependencies, error) {
 	targetPackage, exists := pme.packages[item.Package]
 	if !exists {
-		return nil, nil, errors.New(i18n.Tr("package %s not found", item.Package))
+		return nil, nil, nil, errors.New(i18n.Tr("package %s not found", item.Package))
 	}
 	platform, exists := targetPackage.Platforms[item.PlatformArchitecture]
 	if !exists {
-		return nil, nil, errors.New(i18n.Tr("platform %[1]s not found in package %[2]s", item.PlatformArchitecture, targetPackage))
+		return nil, nil, nil, errors.New(i18n.Tr("platform %[1]s not found in package %[2]s", item.PlatformArchitecture, targetPackage))
 	}
 
 	var release *cores.PlatformRelease
 	if item.PlatformVersion != nil {
 		release = platform.FindReleaseWithVersion(item.PlatformVersion)
 		if release == nil {
-			return nil, nil, errors.New(i18n.Tr("required version %[1]s not found for platform %[2]s", item.PlatformVersion, platform))
+			return nil, nil, nil, errors.New(i18n.Tr("required version %[1]s not found for platform %[2]s", item.PlatformVersion, platform))
 		}
 	} else {
 		release = platform.GetLatestCompatibleRelease()
 		if release == nil {
-			return nil, nil, ErrPlatformNotAvailableForOS
+			return nil, nil, nil, ErrPlatformNotAvailableForOS
 		}
 	}
 
 	// replaces "latest" with latest version too
 	toolDeps, err := pme.packages.GetPlatformReleaseToolDependencies(release)
 	if err != nil {
-		return nil, nil, errors.New(i18n.Tr("getting tool dependencies for platform %[1]s: %[2]s", release, err))
+		return nil, nil, nil, errors.New(i18n.Tr("getting tool dependencies for platform %[1]s: %[2]s", release, err))
 	}
 
 	// discovery dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
 	discoveryDependencies, err := pme.packages.GetPlatformReleaseDiscoveryDependencies(release)
 	if err != nil {
-		return nil, nil, errors.New(i18n.Tr("getting discovery dependencies for platform %[1]s: %[2]s", release, err))
+		return nil, nil, nil, errors.New(i18n.Tr("getting discovery dependencies for platform %[1]s: %[2]s", release, err))
 	}
 	toolDeps = append(toolDeps, discoveryDependencies...)
 
@@ -113,11 +113,11 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 	// available version for the platform package
 	monitorDependencies, err := pme.packages.GetPlatformReleaseMonitorDependencies(release)
 	if err != nil {
-		return nil, nil, errors.New(i18n.Tr("getting monitor dependencies for platform %[1]s: %[2]s", release, err))
+		return nil, nil, nil, errors.New(i18n.Tr("getting monitor dependencies for platform %[1]s: %[2]s", release, err))
 	}
 	toolDeps = append(toolDeps, monitorDependencies...)
 
-	return release, toolDeps, nil
+	return release, toolDeps, release.LibrariesDependencies, nil
 }
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader

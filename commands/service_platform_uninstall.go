@@ -84,7 +84,7 @@ func platformUninstall(_ context.Context, req *rpc.PlatformUninstallRequest, tas
 		ref.PlatformVersion = platformRelease.Version
 	}
 
-	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
+	platform, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return &cmderrors.NotFoundError{Message: i18n.Tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
