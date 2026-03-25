@@ -272,7 +272,10 @@ func (p *ProfilePlatformReference) InternalUniqueIdentifier() string {
 }
 
 func (p *ProfilePlatformReference) String() string {
-	res := fmt.Sprintf("%s:%s@%s", p.Packager, p.Architecture, p.Version)
+	res := fmt.Sprintf("%s:%s", p.Packager, p.Architecture)
+	if p.Version != nil {
+		res += "@" + p.Version.String()
+	}
 	if p.PlatformIndexURL != nil {
 		res += fmt.Sprintf(" (%s)", p.PlatformIndexURL)
 	}
