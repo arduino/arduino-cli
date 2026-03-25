@@ -200,47 +200,12 @@ func (lmi *Installer) InstallZipLib(ctx context.Context, archivePath *paths.Path
 }
 
 // InstallGitLib installs a library hosted on a git repository on the specified path.
-func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
-	libraryName, gitURL, ref, err := parseGitArgURL(argURL)
+func (lmi *Installer) InstallGitLib(ctx context.Context, argURL string, overwrite bool) error {
+	tmpInstallPath, err := CloneLibraryGitRepository(ctx, argURL)
 	if err != nil {
 		return err
 	}
-
-	// Clone library in a temporary directory
-	tmp, err := paths.MkTempDir("", "")
-	if err != nil {
-		return err
-	}
-	defer tmp.RemoveAll()
-	tmpInstallPath := tmp.Join(libraryName)
-
-	if _, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
-		URL:           gitURL,
-		ReferenceName: plumbing.ReferenceName(ref),
-	}); err != nil {
-		if err.Error() != "reference not found" {
-			return err
-		}
-
-		// We did not find the requested reference, let's do a PlainClone and use
-		// "ResolveRevision" to find and checkout the requested revision
-		if repo, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
-			URL: gitURL,
-		}); err != nil {
-			return err
-		} else if h, err := repo.ResolveRevision(plumbing.Revision(ref)); err != nil {
-			return err
-		} else if w, err := repo.Worktree(); err != nil {
-			return err
-		} else if err := w.Checkout(&git.CheckoutOptions{
-			Force: true, // workaround for: https://github.com/go-git/go-git/issues/1411
-			Hash:  plumbing.NewHash(h.String())}); err != nil {
-			return err
-		}
-	}
-
-	// We don't want the installed library to be a git repository thus we delete this folder
-	tmpInstallPath.Join(".git").RemoveAll()
+	defer tmpInstallPath.RemoveAll()
 
 	// Install extracted library in the destination directory
 	if err := lmi.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
@@ -248,6 +213,51 @@ func (lmi *Installer) InstallGitLib(argURL string, overwrite bool) error {
 	}
 
 	return nil
+}
+
+// CloneLibraryGitRepository clones a git repository containing a library
+// into a temporary directory and returns the path to the cloned library.
+func CloneLibraryGitRepository(ctx context.Context, argURL string) (*paths.Path, error) {
+	libraryName, gitURL, ref, err := parseGitArgURL(argURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// Clone library in a temporary directory
+	tmp, err := paths.MkTempDir("", "")
+	if err != nil {
+		return nil, err
+	}
+	tmpInstallPath := tmp.Join(libraryName)
+
+	if _, err := git.PlainCloneContext(ctx, tmpInstallPath.String(), false, &git.CloneOptions{
+		URL:           gitURL,
+		ReferenceName: plumbing.ReferenceName(ref),
+	}); err != nil {
+		if err.Error() != "reference not found" {
+			return nil, err
+		}
+
+		// We did not find the requested reference, let's do a PlainClone and use
+		// "ResolveRevision" to find and checkout the requested revision
+		if repo, err := git.PlainCloneContext(ctx, tmpInstallPath.String(), false, &git.CloneOptions{
+			URL: gitURL,
+		}); err != nil {
+			return nil, err
+		} else if h, err := repo.ResolveRevision(plumbing.Revision(ref)); err != nil {
+			return nil, err
+		} else if w, err := repo.Worktree(); err != nil {
+			return nil, err
+		} else if err := w.Checkout(&git.CheckoutOptions{
+			Force: true, // workaround for: https://github.com/go-git/go-git/issues/1411
+			Hash:  plumbing.NewHash(h.String())}); err != nil {
+			return nil, err
+		}
+	}
+
+	// We don't want the installed library to be a git repository thus we delete this folder
+	tmpInstallPath.Join(".git").RemoveAll()
+	return tmpInstallPath, nil
 }
 
 // parseGitArgURL tries to recover a library name from a git URL.
