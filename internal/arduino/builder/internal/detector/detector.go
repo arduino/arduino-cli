@@ -21,12 +21,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os/exec"
 	"regexp"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
@@ -56,6 +58,7 @@ type SketchLibrariesDetector struct {
 	useCachedLibrariesResolution  bool
 	cache                         *detectorCache
 	onlyUpdateCompilationDatabase bool
+	maybeImportedLibraries        map[*paths.Path]*libraries.Library
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
 	includeFolders                paths.PathList
@@ -81,6 +84,7 @@ func NewSketchLibrariesDetector(
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
 		cache:                         newDetectorCache(),
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
+		maybeImportedLibraries:        map[*paths.Path]*libraries.Library{},
 		importedLibraries:             libraries.List{},
 		includeFolders:                paths.PathList{},
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
@@ -157,6 +161,22 @@ func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSour
 				library.UtilityDir)
 		}
 	}
+}
+
+// trackLibraryForFutureInclusion
+func (l *SketchLibrariesDetector) trackLibraryForFutureInclusion(library *libraries.Library) {
+	l.maybeImportedLibraries[library.InstallDir] = library
+}
+
+func (l *SketchLibrariesDetector) popTrackedLibraryThatRequires(p *paths.Path) *libraries.Library {
+	for libPath := range maps.Keys(l.maybeImportedLibraries) {
+		if inside, _ := p.IsInsideDir(libPath); inside {
+			library := l.maybeImportedLibraries[libPath]
+			delete(l.maybeImportedLibraries, libPath)
+			return library
+		}
+	}
+	return nil
 }
 
 // PrintUsedAndNotUsedLibraries todo
@@ -333,8 +353,10 @@ func (l *SketchLibrariesDetector) findIncludes(
 		allInstalledSorted.SortByName() // Sort libraries to ensure consistent ordering
 		for _, library := range allInstalledSorted {
 			if library.Location == libraries.Profile {
-				l.logger.Info(i18n.Tr("The library %[1]s has been automatically added from sketch project.", library.Name))
-				l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+					l.logger.Info(i18n.Tr("The library %[1]s has been queued for inclusion from sketch project.", library.Name))
+				}
+				l.trackLibraryForFutureInclusion(library)
 				l.addIncludeFolder(library.SourceDir)
 			}
 		}
@@ -479,7 +501,20 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		l.cache.ExpectMissingIncludeH(missingIncludeH)
 
 		if missingIncludeH == "" {
-			// No missing includes found, we're done
+			// No missing includes found, we're done.
+
+			// Check if the compilation unit requires a library that was previously marked for inclusion.
+			deps, err := cpp.ReadDepFile(sourceFile.DepfilePath)
+			if err != nil {
+				return fmt.Errorf("failed to read dependency file: %w", err)
+			}
+			for _, dep := range deps.Dependencies {
+				if library := l.popTrackedLibraryThatRequires(paths.New(dep)); library != nil {
+					l.logger.Info(i18n.Tr("The library %[1]s has been added from sketch project.", library.Name))
+					l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+				}
+			}
+
 			return nil
 		}
 
