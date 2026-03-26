@@ -1,3 +1,4 @@
 #!/bin/sh
 
-arduino-cli completion bash > /etc/bash_completion.d/arduino-cli.bash
+mkdir -p /etc/bash_completion.d
+arduino-cli completion bash > /etc/bash_completion.d/arduino-cli.bash || true
