@@ -1,0 +1,3 @@
+#!/bin/sh
+
+arduino-cli completion bash > /etc/bash_completion.d/arduino-cli.bash
