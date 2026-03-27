@@ -327,7 +327,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	lmb := librariesmanager.NewBuilder()
 
 	// Load libraries
-	var allPlatformsLibrariesDependencies cores.LibrariesDependencies
+	var allPlatformsLibraryDependencies cores.LibraryDependencies
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
 			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
@@ -336,7 +336,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					Path:            platformRelease.GetLibrariesDir(),
 					Location:        libraries.PlatformBuiltIn,
 				})
-				allPlatformsLibrariesDependencies = append(allPlatformsLibrariesDependencies, platformRelease.LibrariesDependencies...)
+				allPlatformsLibraryDependencies = append(allPlatformsLibraryDependencies, platformRelease.LibraryDependencies...)
 			}
 		}
 	}
@@ -446,7 +446,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		}
 
 		// Add libraries dependencies from platforms (unless overridden in profile)
-		for _, libDep := range allPlatformsLibrariesDependencies {
+		for _, libDep := range allPlatformsLibraryDependencies {
 			if i := slices.IndexFunc(profile.Libraries, func(l *sketch.ProfileLibraryReference) bool {
 				return l.Library == libDep.Name
 			}); i != -1 {

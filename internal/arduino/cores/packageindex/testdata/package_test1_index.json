@@ -121,7 +121,7 @@
               "version": "8.0.0-arduino1"
             }
           ],
-          "librariesDependencies": [
+          "libraryDependencies": [
             {
               "name": "FlashStorage",
               "version": "1.0.0"

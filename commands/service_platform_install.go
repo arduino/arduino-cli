@@ -151,7 +151,7 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 // If a library is already installed, but with an older version, it will be updated to the required version.
 func (s *arduinoCoreServerImpl) installLibraries(
 	ctx context.Context, li *librariesindex.Index, lmi *librariesmanager.Installer,
-	requiredLibraries cores.LibrariesDependencies,
+	requiredLibraries cores.LibraryDependencies,
 	downloadsDir *paths.Path,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
 ) error {
