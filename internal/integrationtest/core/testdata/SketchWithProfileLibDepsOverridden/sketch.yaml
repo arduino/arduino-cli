@@ -1,0 +1,10 @@
+profiles:
+  mkrzero:
+    fqbn: Test:samd:mkrzero
+    platforms:
+      - platform: Test:samd
+    libraries:
+      - ArduinoBearSSL (1.7.5)
+      - ArduinoECCX08 (1.4.0)
+
+default_profile: mkrzero

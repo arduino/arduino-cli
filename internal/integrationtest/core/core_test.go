@@ -1383,3 +1383,42 @@ func TestCoreInstallWithMissingOrInvalidChecksumAndUnsafeInstallEnabled(t *testi
 		"--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "install", "GD32Community:gd32")
 	require.NoError(t, err)
 }
+
+func TestCoreInstallWithLibDeps(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := env.HTTPServeFile(8080, paths.New("testdata", "package_with_lib_deps_index.json"))
+
+	_, _, err := cli.Run("core", "update-index", "--additional-urls", url.String())
+	require.NoError(t, err)
+
+	// Checks that the post_install script is correctly skipped on the CI
+	stdout, _, err := cli.Run("core", "install", "Test:samd", "--additional-urls", url.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Installed ArduinoBearSSL@1.7.6", "did not install direct dependencies")
+	require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
+
+	t.Run("ProfileWithPlatformLibDep", func(t *testing.T) {
+		sketch, err := paths.New("testdata", "SketchWithProfileLibDeps").Abs()
+		require.NoError(t, err)
+
+		stdout, _, err := cli.Run("compile", sketch.String(), "--json")
+		resjson := requirejson.Parse(t, stdout).Query(".builder_result")
+		resjson.Query(".used_libraries").MustContain(`[{"name":"ArduinoBearSSL","version":"1.7.6"}]`, "should contain direct dependency")
+		resjson.Query(".used_libraries").MustNotContain(`[{"name":"ArduinoECCX08"}]`, "should not contain transitive dependency")
+		require.Error(t, err)
+	})
+
+	t.Run("ProfileWithPlatformLibDepOverridden", func(t *testing.T) {
+		sketch, err := paths.New("testdata", "SketchWithProfileLibDepsOverridden").Abs()
+		require.NoError(t, err)
+
+		stdout, _, err := cli.Run("compile", sketch.String(), "--json")
+		require.NoError(t, err)
+		resjson := requirejson.Parse(t, stdout)
+		resjson.Query(".builder_result.used_libraries").MustContain(`[{"name":"ArduinoBearSSL","version":"1.7.5"}]`, "should contain overridden direct dependency")
+		resjson.Query(".builder_result.used_libraries").MustContain(`[{"name":"ArduinoECCX08","version":"1.4.0"}]`, "should contain overridden transitive dependency")
+		resjson.Query(".warnings").MustContain(`["The platform requires library ArduinoBearSSL@1.7.6, but profile forces version 1.7.5."]`)
+	})
+}

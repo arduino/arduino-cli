@@ -1,0 +1,7 @@
+profiles:
+  mkrzero:
+    fqbn: Test:samd:mkrzero
+    platforms:
+      - platform: Test:samd
+
+default_profile: mkrzero

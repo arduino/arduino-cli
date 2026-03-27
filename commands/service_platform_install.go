@@ -19,13 +19,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 )
 
 // UpdateIndexStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformInstall that sends
@@ -78,7 +84,7 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 			PlatformArchitecture: req.GetArchitecture(),
 			PlatformVersion:      version,
 		}
-		platformRelease, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
+		platformRelease, tools, libs, err := pme.FindPlatformReleaseDependencies(ref)
 		if err != nil {
 			if errors.Is(err, packagemanager.ErrPlatformNotAvailableForOS) {
 				return &cmderrors.PlatformNotAvailableForOSError{Platform: ref.String()}
@@ -90,6 +96,21 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 		if platformRelease.IsInstalled() {
 			taskCB(&rpc.TaskProgress{Name: i18n.Tr("Platform %s already installed", platformRelease), Completed: true})
 			return nil
+		}
+
+		li, err := instances.GetLibrariesIndex(req.GetInstance())
+		if err != nil {
+			return err
+		}
+
+		lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
+		if err != nil {
+			return err
+		}
+		defer releaseLmi()
+
+		if err := s.installLibraries(ctx, li, lmi, libs, pme.DownloadDir, downloadCB, taskCB); err != nil {
+			return err
 		}
 
 		if req.GetNoOverwrite() {
@@ -124,4 +145,44 @@ func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 			Result: &rpc.PlatformInstallResponse_Result{},
 		},
 	})
+}
+
+// Downloads and installs all libraries in the given list of dependencies, if not already installed.
+// If a library is already installed, but with an older version, it will be updated to the required version.
+func (s *arduinoCoreServerImpl) installLibraries(
+	ctx context.Context, li *librariesindex.Index, lmi *librariesmanager.Installer,
+	requiredLibraries cores.LibraryDependencies,
+	downloadsDir *paths.Path,
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
+) error {
+	installedLibs := listLibraries(lmi.Explorer, li, false, false)
+	for _, libDep := range requiredLibraries {
+		matcher := func(lib *installedLib) bool {
+			return lib.Library.Name == libDep.Name
+		}
+		if idx := slices.IndexFunc(installedLibs, matcher); idx != -1 {
+			installedVersion := installedLibs[idx].Library.Version
+			if installedVersion.Equal(libDep.Version) {
+				taskCB(&rpc.TaskProgress{Name: i18n.Tr("Library %s already installed", libDep.Name), Completed: true})
+				continue
+			}
+			if installedVersion.GreaterThanOrEqual(libDep.Version) {
+				taskCB(&rpc.TaskProgress{
+					Name: i18n.Tr("Skipping installation of library %[1]s, because %[2]s is already installed", libDep, installedVersion), Completed: true})
+				continue
+			}
+		}
+
+		if err := s.downloadAndInstallLibrary(
+			ctx, li, lmi,
+			libDep.Name, libDep.Version.String(), libraries.User,
+			true,  // Do not install deps
+			false, // Allow overwrite
+			downloadsDir,
+			taskCB, downloadCB,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
 }

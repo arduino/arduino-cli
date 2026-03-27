@@ -72,7 +72,7 @@ func (pme *Explorer) FindPlatformRelease(ref *PlatformReference) *cores.Platform
 
 // FindPlatformReleaseDependencies takes a PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
-func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, cores.LibrariesDependencies, error) {
+func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, cores.LibraryDependencies, error) {
 	targetPackage, exists := pme.packages[item.Package]
 	if !exists {
 		return nil, nil, nil, errors.New(i18n.Tr("package %s not found", item.Package))
@@ -117,7 +117,7 @@ func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*
 	}
 	toolDeps = append(toolDeps, monitorDependencies...)
 
-	return release, toolDeps, release.LibrariesDependencies, nil
+	return release, toolDeps, release.LibraryDependencies, nil
 }
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader

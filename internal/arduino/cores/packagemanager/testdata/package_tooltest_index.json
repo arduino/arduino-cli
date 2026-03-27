@@ -41,7 +41,7 @@
               "name": "monitor-tool"
             }
           ],
-          "librariesDependencies": [
+          "libraryDependencies": [
             {
               "name": "some-library",
               "version": "1.0.0"
