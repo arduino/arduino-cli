@@ -256,6 +256,9 @@ Finally, let's see how `PLATFORMS` are made.
           ],
           "monitorDependencies": [
             { "packager": "arduino", "name": "serial-monitor" }
+          ],
+          "libraryDependencies": [
+            { "name": "LibraryName", "version": "1.0.0" }
           ]
         },
 ```
@@ -290,6 +293,13 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
   pair (`packager`, `name`). The `version` is not specified because the latest installed monitor tool will always be
   used. Like `toolsDependencies` they will be installed by Boards Manager along with the platform and can reference
   tools available in other packages as well, even if no platform of that package is installed.
+- `libraryDependencies`: the libraries needed by this platform that will be installed together with the platform. These
+  are [libraries](library-specification.md) that must be present in the
+  [Arduino Libraries Manager index](https://docs.arduino.cc/libraries/). The `version` is the minimum required version
+  of the library: if a version greater than or equal to the required version is already installed, the installed version
+  will be left unchanged; otherwise the installed library will be upgraded to the required version.
+
+  This field is supported since Arduino CLI 1.5.0 and Arduino IDE 2.4.0.
 
 The `version` field is validated by both Arduino IDE and [JSemVer](https://github.com/zafarkhaja/jsemver). Here are the
 rules Arduino IDE follows for parsing versions
