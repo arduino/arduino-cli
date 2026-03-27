@@ -1383,3 +1383,19 @@ func TestCoreInstallWithMissingOrInvalidChecksumAndUnsafeInstallEnabled(t *testi
 		"--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "install", "GD32Community:gd32")
 	require.NoError(t, err)
 }
+
+func TestCoreInstallWithLibDeps(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := env.HTTPServeFile(8080, paths.New("testdata", "package_with_lib_deps_index.json"))
+
+	_, _, err := cli.Run("core", "update-index", "--additional-urls", url.String())
+	require.NoError(t, err)
+
+	// Checks that the post_install script is correctly skipped on the CI
+	stdout, _, err := cli.Run("core", "install", "Test:samd", "--additional-urls", url.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Installed ArduinoBearSSL@1.7.6", "did not install direct dependencies")
+	require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
+}

@@ -173,7 +173,14 @@ func (s *arduinoCoreServerImpl) installLibraries(
 			}
 		}
 
-		if err := s.downloadAndInstallLibrary(ctx, li, lmi, libDep.Name, libDep.Version.String(), libraries.User, false, false, downloadsDir, taskCB, downloadCB); err != nil {
+		if err := s.downloadAndInstallLibrary(
+			ctx, li, lmi,
+			libDep.Name, libDep.Version.String(), libraries.User,
+			true,  // Do not install deps
+			false, // Allow overwrite
+			downloadsDir,
+			taskCB, downloadCB,
+		); err != nil {
 			return err
 		}
 	}
