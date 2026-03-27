@@ -504,14 +504,12 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			// No missing includes found, we're done.
 
 			// Check if the compilation unit requires a library that was previously marked for inclusion.
-			deps, err := cpp.ReadDepFile(sourceFile.DepfilePath)
-			if err != nil {
-				return fmt.Errorf("failed to read dependency file: %w", err)
-			}
-			for _, dep := range deps.Dependencies {
-				if library := l.popTrackedLibraryThatRequires(paths.New(dep)); library != nil {
-					l.logger.Info(i18n.Tr("The library %[1]s has been added from sketch project.", library.Name))
-					l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+			if deps, err := cpp.ReadDepFile(sourceFile.DepfilePath); err == nil {
+				for _, dep := range deps.Dependencies {
+					if library := l.popTrackedLibraryThatRequires(paths.New(dep)); library != nil {
+						l.logger.Info(i18n.Tr("The library %[1]s has been added from sketch project.", library.Name))
+						l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+					}
 				}
 			}
 
