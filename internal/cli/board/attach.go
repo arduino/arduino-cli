@@ -103,7 +103,7 @@ type boardAttachResult struct {
 	Port       *boardAttachPortResult `json:"port,omitempty"`
 }
 
-func (b *boardAttachResult) Data() interface{} {
+func (b *boardAttachResult) Data() any {
 	return b
 }
 

@@ -30,7 +30,7 @@ var debugStdOut io.Writer
 var debugSeq uint32
 var debugFilters []string
 
-func log(isRequest bool, seq uint32, msg interface{}) {
+func log(isRequest bool, seq uint32, msg any) {
 	prefix := fmt.Sprint(seq, " |  ")
 	j, _ := json.MarshalIndent(msg, prefix, "  ")
 	inOut := "RESP: "
@@ -58,7 +58,7 @@ func logSelector(method string) bool {
 	return false
 }
 
-func unaryLoggerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func unaryLoggerInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	if !logSelector(info.FullMethod) {
 		return handler(ctx, req)
 	}
@@ -73,7 +73,7 @@ func unaryLoggerInterceptor(ctx context.Context, req interface{}, info *grpc.Una
 	return resp, err
 }
 
-func streamLoggerInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func streamLoggerInterceptor(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	if !logSelector(info.FullMethod) {
 		return handler(srv, stream)
 	}
@@ -98,14 +98,14 @@ type loggingServerStream struct {
 	seq uint32
 }
 
-func (l *loggingServerStream) RecvMsg(m interface{}) error {
+func (l *loggingServerStream) RecvMsg(m any) error {
 	err := l.ServerStream.RecvMsg(m)
 	logError(l.seq, err)
 	log(true, l.seq, m)
 	return err
 }
 
-func (l *loggingServerStream) SendMsg(m interface{}) error {
+func (l *loggingServerStream) SendMsg(m any) error {
 	err := l.ServerStream.SendMsg(m)
 	logError(l.seq, err)
 	log(false, l.seq, m)

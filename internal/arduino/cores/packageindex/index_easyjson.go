@@ -546,6 +546,29 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 				}
 				in.Delim(']')
 			}
+		case "librariesDependencies":
+			if in.IsNull() {
+				in.Skip()
+				out.LibrariesDependencies = nil
+			} else {
+				in.Delim('[')
+				if out.LibrariesDependencies == nil {
+					if !in.IsDelim(']') {
+						out.LibrariesDependencies = make([]indexLibraryDependency, 0, 2)
+					} else {
+						out.LibrariesDependencies = []indexLibraryDependency{}
+					}
+				} else {
+					out.LibrariesDependencies = (out.LibrariesDependencies)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v9 indexLibraryDependency
+					(v9).UnmarshalEasyJSON(in)
+					out.LibrariesDependencies = append(out.LibrariesDependencies, v9)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		default:
 			switch strings.ToLower(key) {
 			case "name":
@@ -592,9 +615,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.Boards = (out.Boards)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v9 indexBoard
-						(v9).UnmarshalEasyJSON(in)
-						out.Boards = append(out.Boards, v9)
+						var v10 indexBoard
+						(v10).UnmarshalEasyJSON(in)
+						out.Boards = append(out.Boards, v10)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -617,9 +640,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.ToolDependencies = (out.ToolDependencies)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v10 indexToolDependency
-						(v10).UnmarshalEasyJSON(in)
-						out.ToolDependencies = append(out.ToolDependencies, v10)
+						var v11 indexToolDependency
+						(v11).UnmarshalEasyJSON(in)
+						out.ToolDependencies = append(out.ToolDependencies, v11)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -640,9 +663,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.DiscoveryDependencies = (out.DiscoveryDependencies)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v11 indexDiscoveryDependency
-						(v11).UnmarshalEasyJSON(in)
-						out.DiscoveryDependencies = append(out.DiscoveryDependencies, v11)
+						var v12 indexDiscoveryDependency
+						(v12).UnmarshalEasyJSON(in)
+						out.DiscoveryDependencies = append(out.DiscoveryDependencies, v12)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -663,9 +686,32 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.MonitorDependencies = (out.MonitorDependencies)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v12 indexMonitorDependency
-						(v12).UnmarshalEasyJSON(in)
-						out.MonitorDependencies = append(out.MonitorDependencies, v12)
+						var v13 indexMonitorDependency
+						(v13).UnmarshalEasyJSON(in)
+						out.MonitorDependencies = append(out.MonitorDependencies, v13)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "librariesdependencies":
+				if in.IsNull() {
+					in.Skip()
+					out.LibrariesDependencies = nil
+				} else {
+					in.Delim('[')
+					if out.LibrariesDependencies == nil {
+						if !in.IsDelim(']') {
+							out.LibrariesDependencies = make([]indexLibraryDependency, 0, 2)
+						} else {
+							out.LibrariesDependencies = []indexLibraryDependency{}
+						}
+					} else {
+						out.LibrariesDependencies = (out.LibrariesDependencies)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v14 indexLibraryDependency
+						(v14).UnmarshalEasyJSON(in)
+						out.LibrariesDependencies = append(out.LibrariesDependencies, v14)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -741,16 +787,16 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v13, v14 := range in.Boards {
-				if v13 > 0 {
+			for v15, v16 := range in.Boards {
+				if v15 > 0 {
 					out.RawByte(',')
 				}
-				(v14).MarshalEasyJSON(out)
+				(v16).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
 	}
-	if true {
+	{
 		const prefix string = ",\"help\":"
 		out.RawString(prefix)
 		(in.Help).MarshalEasyJSON(out)
@@ -762,11 +808,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v15, v16 := range in.ToolDependencies {
-				if v15 > 0 {
+			for v17, v18 := range in.ToolDependencies {
+				if v17 > 0 {
 					out.RawByte(',')
 				}
-				(v16).MarshalEasyJSON(out)
+				(v18).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -778,11 +824,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v17, v18 := range in.DiscoveryDependencies {
-				if v17 > 0 {
+			for v19, v20 := range in.DiscoveryDependencies {
+				if v19 > 0 {
 					out.RawByte(',')
 				}
-				(v18).MarshalEasyJSON(out)
+				(v20).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -794,11 +840,27 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v19, v20 := range in.MonitorDependencies {
-				if v19 > 0 {
+			for v21, v22 := range in.MonitorDependencies {
+				if v21 > 0 {
 					out.RawByte(',')
 				}
-				(v20).MarshalEasyJSON(out)
+				(v22).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	{
+		const prefix string = ",\"librariesDependencies\":"
+		out.RawString(prefix)
+		if in.LibrariesDependencies == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v23, v24 := range in.LibrariesDependencies {
+				if v23 > 0 {
+					out.RawByte(',')
+				}
+				(v24).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -874,17 +936,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 					out.Platforms = (out.Platforms)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v21 *indexPlatformRelease
+					var v25 *indexPlatformRelease
 					if in.IsNull() {
 						in.Skip()
-						v21 = nil
+						v25 = nil
 					} else {
-						if v21 == nil {
-							v21 = new(indexPlatformRelease)
+						if v25 == nil {
+							v25 = new(indexPlatformRelease)
 						}
-						(*v21).UnmarshalEasyJSON(in)
+						(*v25).UnmarshalEasyJSON(in)
 					}
-					out.Platforms = append(out.Platforms, v21)
+					out.Platforms = append(out.Platforms, v25)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -905,17 +967,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 					out.Tools = (out.Tools)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v22 *indexToolRelease
+					var v26 *indexToolRelease
 					if in.IsNull() {
 						in.Skip()
-						v22 = nil
+						v26 = nil
 					} else {
-						if v22 == nil {
-							v22 = new(indexToolRelease)
+						if v26 == nil {
+							v26 = new(indexToolRelease)
 						}
-						(*v22).UnmarshalEasyJSON(in)
+						(*v26).UnmarshalEasyJSON(in)
 					}
-					out.Tools = append(out.Tools, v22)
+					out.Tools = append(out.Tools, v26)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -950,17 +1012,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.Platforms = (out.Platforms)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v23 *indexPlatformRelease
+						var v27 *indexPlatformRelease
 						if in.IsNull() {
 							in.Skip()
-							v23 = nil
+							v27 = nil
 						} else {
-							if v23 == nil {
-								v23 = new(indexPlatformRelease)
+							if v27 == nil {
+								v27 = new(indexPlatformRelease)
 							}
-							(*v23).UnmarshalEasyJSON(in)
+							(*v27).UnmarshalEasyJSON(in)
 						}
-						out.Platforms = append(out.Platforms, v23)
+						out.Platforms = append(out.Platforms, v27)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -981,17 +1043,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.Tools = (out.Tools)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v24 *indexToolRelease
+						var v28 *indexToolRelease
 						if in.IsNull() {
 							in.Skip()
-							v24 = nil
+							v28 = nil
 						} else {
-							if v24 == nil {
-								v24 = new(indexToolRelease)
+							if v28 == nil {
+								v28 = new(indexToolRelease)
 							}
-							(*v24).UnmarshalEasyJSON(in)
+							(*v28).UnmarshalEasyJSON(in)
 						}
-						out.Tools = append(out.Tools, v24)
+						out.Tools = append(out.Tools, v28)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -1045,14 +1107,14 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v25, v26 := range in.Platforms {
-				if v25 > 0 {
+			for v29, v30 := range in.Platforms {
+				if v29 > 0 {
 					out.RawByte(',')
 				}
-				if v26 == nil {
+				if v30 == nil {
 					out.RawString("null")
 				} else {
-					(*v26).MarshalEasyJSON(out)
+					(*v30).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
@@ -1065,20 +1127,20 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v27, v28 := range in.Tools {
-				if v27 > 0 {
+			for v31, v32 := range in.Tools {
+				if v31 > 0 {
 					out.RawByte(',')
 				}
-				if v28 == nil {
+				if v32 == nil {
 					out.RawString("null")
 				} else {
-					(*v28).MarshalEasyJSON(out)
+					(*v32).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
 		}
 	}
-	if true {
+	{
 		const prefix string = ",\"help\":"
 		out.RawString(prefix)
 		(in.Help).MarshalEasyJSON(out)
@@ -1189,7 +1251,111 @@ func (v *indexMonitorDependency) UnmarshalJSON(data []byte) error {
 func (v *indexMonitorDependency) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex5(l, v)
 }
-func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(in *jlexer.Lexer, out *indexHelp) {
+func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(in *jlexer.Lexer, out *indexLibraryDependency) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "name":
+			out.Name = string(in.String())
+		case "version":
+			if in.IsNull() {
+				in.Skip()
+				out.Version = nil
+			} else {
+				if out.Version == nil {
+					out.Version = new(relaxed_semver.Version)
+				}
+				if data := in.Raw(); in.Ok() {
+					in.AddError((*out.Version).UnmarshalJSON(data))
+				}
+			}
+		default:
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "version":
+				if in.IsNull() {
+					in.Skip()
+					out.Version = nil
+				} else {
+					if out.Version == nil {
+						out.Version = new(relaxed_semver.Version)
+					}
+					if data := in.Raw(); in.Ok() {
+						in.AddError((*out.Version).UnmarshalJSON(data))
+					}
+				}
+			default:
+				in.SkipRecursive()
+			}
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(out *jwriter.Writer, in indexLibraryDependency) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"name\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.Name))
+	}
+	{
+		const prefix string = ",\"version\":"
+		out.RawString(prefix)
+		if in.Version == nil {
+			out.RawString("null")
+		} else {
+			out.Raw((*in.Version).MarshalJSON())
+		}
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v indexLibraryDependency) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v indexLibraryDependency) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *indexLibraryDependency) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *indexLibraryDependency) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(l, v)
+}
+func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(in *jlexer.Lexer, out *indexHelp) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1225,7 +1391,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		in.Consumed()
 	}
 }
-func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(out *jwriter.Writer, in indexHelp) {
+func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(out *jwriter.Writer, in indexHelp) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1241,27 +1407,27 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 // MarshalJSON supports json.Marshaler interface
 func (v indexHelp) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(&w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexHelp) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexHelp) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(&r, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexHelp) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex6(l, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(l, v)
 }
-func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(in *jlexer.Lexer, out *indexDiscoveryDependency) {
+func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(in *jlexer.Lexer, out *indexDiscoveryDependency) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1301,7 +1467,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		in.Consumed()
 	}
 }
-func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(out *jwriter.Writer, in indexDiscoveryDependency) {
+func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(out *jwriter.Writer, in indexDiscoveryDependency) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1321,27 +1487,27 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 // MarshalJSON supports json.Marshaler interface
 func (v indexDiscoveryDependency) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(&w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexDiscoveryDependency) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexDiscoveryDependency) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(&r, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexDiscoveryDependency) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex7(l, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(l, v)
 }
-func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(in *jlexer.Lexer, out *indexBoardID) {
+func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(in *jlexer.Lexer, out *indexBoardID) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1377,7 +1543,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		in.Consumed()
 	}
 }
-func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(out *jwriter.Writer, in indexBoardID) {
+func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(out *jwriter.Writer, in indexBoardID) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1392,27 +1558,27 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 // MarshalJSON supports json.Marshaler interface
 func (v indexBoardID) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(&w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexBoardID) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexBoardID) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(&r, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexBoardID) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex8(l, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(l, v)
 }
-func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(in *jlexer.Lexer, out *indexBoard) {
+func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(in *jlexer.Lexer, out *indexBoard) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1449,9 +1615,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 					out.ID = (out.ID)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v29 indexBoardID
-					(v29).UnmarshalEasyJSON(in)
-					out.ID = append(out.ID, v29)
+					var v33 indexBoardID
+					(v33).UnmarshalEasyJSON(in)
+					out.ID = append(out.ID, v33)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1476,9 +1642,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.ID = (out.ID)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v30 indexBoardID
-						(v30).UnmarshalEasyJSON(in)
-						out.ID = append(out.ID, v30)
+						var v34 indexBoardID
+						(v34).UnmarshalEasyJSON(in)
+						out.ID = append(out.ID, v34)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -1494,7 +1660,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		in.Consumed()
 	}
 }
-func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(out *jwriter.Writer, in indexBoard) {
+func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(out *jwriter.Writer, in indexBoard) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1508,11 +1674,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		out.RawString(prefix)
 		{
 			out.RawByte('[')
-			for v31, v32 := range in.ID {
-				if v31 > 0 {
+			for v35, v36 := range in.ID {
+				if v35 > 0 {
 					out.RawByte(',')
 				}
-				(v32).MarshalEasyJSON(out)
+				(v36).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -1523,27 +1689,27 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 // MarshalJSON supports json.Marshaler interface
 func (v indexBoard) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(&w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v indexBoard) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *indexBoard) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(&r, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *indexBoard) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex9(l, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(l, v)
 }
-func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(in *jlexer.Lexer, out *Index) {
+func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex11(in *jlexer.Lexer, out *Index) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1578,17 +1744,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 					out.Packages = (out.Packages)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v33 *indexPackage
+					var v37 *indexPackage
 					if in.IsNull() {
 						in.Skip()
-						v33 = nil
+						v37 = nil
 					} else {
-						if v33 == nil {
-							v33 = new(indexPackage)
+						if v37 == nil {
+							v37 = new(indexPackage)
 						}
-						(*v33).UnmarshalEasyJSON(in)
+						(*v37).UnmarshalEasyJSON(in)
 					}
-					out.Packages = append(out.Packages, v33)
+					out.Packages = append(out.Packages, v37)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1613,17 +1779,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 						out.Packages = (out.Packages)[:0]
 					}
 					for !in.IsDelim(']') {
-						var v34 *indexPackage
+						var v38 *indexPackage
 						if in.IsNull() {
 							in.Skip()
-							v34 = nil
+							v38 = nil
 						} else {
-							if v34 == nil {
-								v34 = new(indexPackage)
+							if v38 == nil {
+								v38 = new(indexPackage)
 							}
-							(*v34).UnmarshalEasyJSON(in)
+							(*v38).UnmarshalEasyJSON(in)
 						}
-						out.Packages = append(out.Packages, v34)
+						out.Packages = append(out.Packages, v38)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -1641,7 +1807,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		in.Consumed()
 	}
 }
-func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(out *jwriter.Writer, in Index) {
+func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex11(out *jwriter.Writer, in Index) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1652,14 +1818,14 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v35, v36 := range in.Packages {
-				if v35 > 0 {
+			for v39, v40 := range in.Packages {
+				if v39 > 0 {
 					out.RawByte(',')
 				}
-				if v36 == nil {
+				if v40 == nil {
 					out.RawString("null")
 				} else {
-					(*v36).MarshalEasyJSON(out)
+					(*v40).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
@@ -1676,23 +1842,23 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 // MarshalJSON supports json.Marshaler interface
 func (v Index) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(&w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex11(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Index) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(w, v)
+	easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex11(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Index) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(&r, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex11(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Index) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex10(l, v)
+	easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackageindex11(l, v)
 }

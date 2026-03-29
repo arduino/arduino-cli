@@ -30,7 +30,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v4"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 // IndexResource is a reference to an index file URL with an optional signature.
@@ -79,7 +79,8 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		return err
 	}
 	tmpIndexPath := tmp.Join(downloadFileName)
-	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config, downloader.NoResume); err != nil {
+	config.DoNotResumeDownload = true // Disable resuming downloads for index files
+	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config); err != nil {
 		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
@@ -134,7 +135,8 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		// Download signature
 		signaturePath = destDir.Join(signatureFileName)
 		tmpSignaturePath = tmp.Join(signatureFileName)
-		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", i18n.Tr("Downloading index signature: %s", signatureFileName), downloadCB, config, downloader.NoResume); err != nil {
+		config.DoNotResumeDownload = true // Disable resuming downloads for index files
+		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", i18n.Tr("Downloading index signature: %s", signatureFileName), downloadCB, config); err != nil {
 			return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 

@@ -19,7 +19,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (c Map) MarshalYAML() (interface{}, error) {
+func (c Map) MarshalYAML() (any, error) {
 	return c.values, nil
 }
 

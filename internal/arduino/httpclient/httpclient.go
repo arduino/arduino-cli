@@ -24,13 +24,13 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
 // If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
-func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config) (returnedError error) {
 	if queryParameter != "" {
 		URL = URL + "?query=" + queryParameter
 	}
@@ -44,23 +44,10 @@ func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParame
 		}
 	}()
 
-	d, err := downloader.DownloadWithConfigAndContext(ctx, path.String(), URL, config, options...)
-	if err != nil {
-		return err
+	config.PollFunction = downloadCB.Update
+	config.PollInterval = 250 * time.Millisecond
+	if err := downloader.DownloadWithConfig(ctx, path.String(), URL, config); err != nil {
+		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Download failed"), Cause: err}
 	}
-
-	err = d.RunAndPoll(func(downloaded int64) {
-		downloadCB.Update(downloaded, d.Size())
-	}, 250*time.Millisecond)
-	if err != nil {
-		return err
-	}
-
-	// The URL is not reachable for some reason
-	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		msg := i18n.Tr("Server responded with: %s", d.Resp.Status)
-		return &cmderrors.FailedDownloadError{Message: msg}
-	}
-
 	return nil
 }

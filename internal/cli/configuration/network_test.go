@@ -26,6 +26,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/metadata"
 )
 
 func TestUserAgentHeader(t *testing.T) {
@@ -34,9 +35,15 @@ func TestUserAgentHeader(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Test user agent from gRPC metadata in context
+	md := metadata.New(map[string]string{"user-agent": "context-user-agent"})
+	ctx := metadata.NewIncomingContext(t.Context(), md)
+
+	// Test user agent from settings
 	settings := configuration.NewSettings()
 	require.NoError(t, settings.Set("network.user_agent_ext", "test-user-agent"))
-	client, err := settings.NewHttpClient(context.Background())
+
+	client, err := settings.NewHttpClient(ctx)
 	require.NoError(t, err)
 
 	request, err := http.NewRequest("GET", ts.URL, nil)
@@ -50,6 +57,7 @@ func TestUserAgentHeader(t *testing.T) {
 
 	fmt.Println("RESPONSE:", string(b))
 	require.Contains(t, string(b), "test-user-agent")
+	require.Contains(t, string(b), "context-user-agent")
 }
 
 func TestProxy(t *testing.T) {

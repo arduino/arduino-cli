@@ -1,11 +1,7 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md
 name: Check Go Dependencies
 
-env:
-  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
-
-# See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
   create:
   push:
@@ -14,6 +10,7 @@ on:
       - ".licenses/**"
       - ".licensed.json"
       - ".licensed.ya?ml"
+      - "debian/arduino-cli/usr/share/doc/arduino-cli/copyright"
       - "Taskfile.ya?ml"
       - "**/.gitmodules"
       - "**/go.mod"
@@ -24,6 +21,7 @@ on:
       - ".licenses/**"
       - ".licensed.json"
       - ".licensed.ya?ml"
+      - "debian/arduino-cli/usr/share/doc/arduino-cli/copyright"
       - "Taskfile.ya?ml"
       - "**/.gitmodules"
       - "**/go.mod"
@@ -37,6 +35,7 @@ on:
 jobs:
   run-determination:
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       result: ${{ steps.determination.outputs.result }}
     steps:
@@ -56,12 +55,14 @@ jobs:
             RESULT="false"
           fi
 
-          echo "result=$RESULT" >> $GITHUB_OUTPUT
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
 
   check-cache:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -69,31 +70,40 @@ jobs:
         with:
           submodules: recursive
 
+      # This is required to allow licensee/setup-licensed to install Licensed via Ruby gem.
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby # Install latest version
+
       - name: Install licensed
-        uses: jonabc/setup-licensed@v1
+        uses: licensee/setup-licensed@v1.3.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          version: 5.x
 
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          go-version-file: go.mod
 
       - name: Update dependencies license metadata cache
-        run: task --silent general:cache-dep-licenses
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              general:cache-dep-licenses
 
       - name: Check for outdated cache
         id: diff
         run: |
           git add .
-          if ! git diff --cached --color --exit-code; then
+          if
+            ! git diff \
+              --cached \
+              --color \
+              --exit-code
+          then
             echo
             echo "::error::Dependency license metadata out of sync. See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#metadata-cache"
             exit 1
@@ -102,7 +112,7 @@ jobs:
       # Some might find it convenient to have CI generate the cache rather than setting up for it locally
       - name: Upload cache to workflow artifact
         if: failure() && steps.diff.outcome == 'failure'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
           include-hidden-files: true
@@ -113,6 +123,8 @@ jobs:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -120,27 +132,26 @@ jobs:
         with:
           submodules: recursive
 
+      # This is required to allow licensee/setup-licensed to install Licensed via Ruby gem.
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby # Install latest version
+
       - name: Install licensed
-        uses: jonabc/setup-licensed@v1
+        uses: licensee/setup-licensed@v1.3.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          version: 5.x
 
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          go-version-file: go.mod
 
       - name: Check for dependencies with unapproved licenses
-        run: task --silent general:check-dep-licenses
-
-      - name: Check debian copyright file
         run: |
-          task update-deb-copyright
-          git diff --color --exit-code
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              general:check-dep-licenses

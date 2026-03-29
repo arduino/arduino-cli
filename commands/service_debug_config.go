@@ -354,7 +354,7 @@ func convertToRawValue(v string) any {
 		}
 	case strings.HasPrefix(v, "[object]"):
 		v = strings.TrimPrefix(v, "[object]")
-		var o interface{}
+		var o any
 		if err := json.Unmarshal([]byte(v), &o); err == nil {
 			return o
 		}

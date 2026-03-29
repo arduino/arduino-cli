@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func format(format string, a ...interface{}) string {
+func format(format string, a ...any) string {
 	format = FromJavaToGoSyntax(format)
 	message := fmt.Sprintf(format, a...)
 	return message

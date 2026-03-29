@@ -132,11 +132,12 @@ func filterOutSCCS(file *paths.Path) bool {
 var filterOutHiddenFiles = paths.FilterOutPrefixes(".")
 
 // FindFilesInFolder fixdoc
-func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (paths.PathList, error) {
+func FindFilesInFolder(dir *paths.Path, recurse bool, excludeFileNames []string, extensions ...string) (paths.PathList, error) {
 	fileFilter := paths.AndFilter(
 		filterOutHiddenFiles,
 		filterOutSCCS,
 		paths.FilterOutDirectories(),
+		paths.FilterOutNames(excludeFileNames...),
 	)
 	if len(extensions) > 0 {
 		fileFilter = paths.AndFilter(
@@ -181,7 +182,7 @@ func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...st
 	}
 	targetModTime := targetStat.ModTime()
 
-	files, err := FindFilesInFolder(dir, true, extensions...)
+	files, err := FindFilesInFolder(dir, true, nil, extensions...)
 	if err != nil {
 		return false, err
 	}

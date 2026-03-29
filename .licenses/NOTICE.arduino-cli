@@ -244,7 +244,7 @@ Apache License
    limitations under the License.
 
 *****
-github.com/ProtonMail/go-crypto/bitcurves@v1.3.0
+github.com/ProtonMail/go-crypto/bitcurves@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -300,7 +300,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/brainpool@v1.3.0
+github.com/ProtonMail/go-crypto/brainpool@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -356,7 +356,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/eax@v1.3.0
+github.com/ProtonMail/go-crypto/eax@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -412,7 +412,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/internal/byteutil@v1.3.0
+github.com/ProtonMail/go-crypto/internal/byteutil@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -468,7 +468,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/ocb@v1.3.0
+github.com/ProtonMail/go-crypto/ocb@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -524,7 +524,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -580,7 +580,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/aes/keywrap@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/aes/keywrap@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -636,7 +636,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/armor@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/armor@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -692,7 +692,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/ecdh@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/ecdh@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -748,7 +748,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/ecdsa@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/ecdsa@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -804,7 +804,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/ed25519@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/ed25519@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -860,7 +860,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/ed448@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/ed448@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -916,7 +916,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/eddsa@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/eddsa@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -972,7 +972,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/elgamal@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/elgamal@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1028,7 +1028,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/errors@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/errors@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1084,7 +1084,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/internal/algorithm@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/internal/algorithm@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1140,7 +1140,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/internal/ecc@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/internal/ecc@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1196,7 +1196,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/internal/encoding@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/internal/encoding@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1252,7 +1252,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/packet@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/packet@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1308,7 +1308,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/s2k@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/s2k@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1364,7 +1364,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/x25519@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/x25519@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -1420,7 +1420,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-github.com/ProtonMail/go-crypto/openpgp/x448@v1.3.0
+github.com/ProtonMail/go-crypto/openpgp/x448@v1.4.1
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -4977,7 +4977,32 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
 See [LICENSE.txt](https://github.com/arduino/pluggable-discovery-protocol-handler/blob/master/LICENSE.txt) for details.
 
 *****
-github.com/cloudflare/circl/dh/x25519@v1.6.1
+github.com/clipperhouse/uax29/v2/graphemes@v2.7.0
+
+MIT License
+
+Copyright (c) 2020 Matt Sherman
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*****
+github.com/cloudflare/circl/dh/x25519@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5042,7 +5067,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/dh/x448@v1.6.1
+github.com/cloudflare/circl/dh/x448@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5107,7 +5132,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/ecc/goldilocks@v1.6.1
+github.com/cloudflare/circl/ecc/goldilocks@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5172,7 +5197,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/internal/conv@v1.6.1
+github.com/cloudflare/circl/internal/conv@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5237,7 +5262,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/internal/sha3@v1.6.1
+github.com/cloudflare/circl/internal/sha3@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5302,7 +5327,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/math@v1.6.1
+github.com/cloudflare/circl/math@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5367,7 +5392,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/math/fp25519@v1.6.1
+github.com/cloudflare/circl/math/fp25519@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5432,7 +5457,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/math/fp448@v1.6.1
+github.com/cloudflare/circl/math/fp448@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5497,7 +5522,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/math/mlsbset@v1.6.1
+github.com/cloudflare/circl/math/mlsbset@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5562,7 +5587,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/sign@v1.6.1
+github.com/cloudflare/circl/sign@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5627,7 +5652,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/sign/ed25519@v1.6.1
+github.com/cloudflare/circl/sign/ed25519@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -5692,7 +5717,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The project is licensed under the [BSD-3-Clause License](./LICENSE).
 
 *****
-github.com/cloudflare/circl/sign/ed448@v1.6.1
+github.com/cloudflare/circl/sign/ed448@v1.6.3
 
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
@@ -6279,7 +6304,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 This library is distributed under the BSD-style license found in the [LICENSE](https://github.com/emirpasic/gods/blob/master/LICENSE) file.
 
 *****
-github.com/fatih/color@v1.18.0
+github.com/fatih/color@v1.19.0
 
 The MIT License (MIT)
 
@@ -6493,7 +6518,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *****
-github.com/go-git/go-billy/v5@v5.6.2
+github.com/go-git/go-billy/v5@v5.8.0
 
 Apache License
                            Version 2.0, January 2004
@@ -6702,7 +6727,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-billy/v5/helper/chroot@v5.6.2
+github.com/go-git/go-billy/v5/helper/chroot@v5.8.0
 
 Apache License
                            Version 2.0, January 2004
@@ -6911,7 +6936,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-billy/v5/helper/polyfill@v5.6.2
+github.com/go-git/go-billy/v5/helper/polyfill@v5.8.0
 
 Apache License
                            Version 2.0, January 2004
@@ -7120,7 +7145,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-billy/v5/osfs@v5.6.2
+github.com/go-git/go-billy/v5/osfs@v5.8.0
 
 Apache License
                            Version 2.0, January 2004
@@ -7329,7 +7354,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-billy/v5/util@v5.6.2
+github.com/go-git/go-billy/v5/util@v5.8.0
 
 Apache License
                            Version 2.0, January 2004
@@ -7538,7 +7563,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5@v5.16.3
+github.com/go-git/go-git/v5@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -7747,7 +7772,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/config@v5.16.3
+github.com/go-git/go-git/v5/config@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -7956,7 +7981,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/internal/path_util@v5.16.3
+github.com/go-git/go-git/v5/internal/path_util@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -8165,7 +8190,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/internal/revision@v5.16.3
+github.com/go-git/go-git/v5/internal/revision@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -8374,7 +8399,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/internal/url@v5.16.3
+github.com/go-git/go-git/v5/internal/url@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -8583,7 +8608,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing@v5.16.3
+github.com/go-git/go-git/v5/plumbing@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -8792,7 +8817,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/cache@v5.16.3
+github.com/go-git/go-git/v5/plumbing/cache@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -9001,7 +9026,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/color@v5.16.3
+github.com/go-git/go-git/v5/plumbing/color@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -9210,7 +9235,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/filemode@v5.16.3
+github.com/go-git/go-git/v5/plumbing/filemode@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -9419,7 +9444,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/config@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/config@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -9628,7 +9653,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/diff@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/diff@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -9837,7 +9862,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/gitignore@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/gitignore@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -10046,7 +10071,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/idxfile@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/idxfile@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -10255,7 +10280,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/index@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/index@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -10464,7 +10489,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/objfile@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/objfile@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -10673,7 +10698,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/packfile@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/packfile@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -10882,7 +10907,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/format/pktline@v5.16.3
+github.com/go-git/go-git/v5/plumbing/format/pktline@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -11091,7 +11116,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/hash@v5.16.3
+github.com/go-git/go-git/v5/plumbing/hash@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -11300,7 +11325,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/object@v5.16.3
+github.com/go-git/go-git/v5/plumbing/object@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -11509,7 +11534,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/protocol/packp@v5.16.3
+github.com/go-git/go-git/v5/plumbing/protocol/packp@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -11718,7 +11743,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/protocol/packp/capability@v5.16.3
+github.com/go-git/go-git/v5/plumbing/protocol/packp/capability@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -11927,7 +11952,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband@v5.16.3
+github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -12136,7 +12161,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/revlist@v5.16.3
+github.com/go-git/go-git/v5/plumbing/revlist@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -12345,7 +12370,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/storer@v5.16.3
+github.com/go-git/go-git/v5/plumbing/storer@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -12554,7 +12579,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -12763,7 +12788,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/client@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/client@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -12972,7 +12997,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/file@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/file@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -13181,7 +13206,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/git@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/git@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -13390,7 +13415,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/http@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/http@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -13599,7 +13624,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/internal/common@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/internal/common@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -13808,7 +13833,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/server@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/server@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -14017,7 +14042,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/plumbing/transport/ssh@v5.16.3
+github.com/go-git/go-git/v5/plumbing/transport/ssh@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -14226,7 +14251,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage@v5.16.3
+github.com/go-git/go-git/v5/storage@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -14435,7 +14460,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage/filesystem@v5.16.3
+github.com/go-git/go-git/v5/storage/filesystem@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -14644,7 +14669,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage/filesystem/dotgit@v5.16.3
+github.com/go-git/go-git/v5/storage/filesystem/dotgit@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -14853,7 +14878,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/storage/memory@v5.16.3
+github.com/go-git/go-git/v5/storage/memory@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -15062,7 +15087,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/binary@v5.16.3
+github.com/go-git/go-git/v5/utils/binary@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -15271,7 +15296,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/diff@v5.16.3
+github.com/go-git/go-git/v5/utils/diff@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -15480,7 +15505,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/ioutil@v5.16.3
+github.com/go-git/go-git/v5/utils/ioutil@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -15689,7 +15714,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -15898,7 +15923,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/filesystem@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/filesystem@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -16107,7 +16132,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/index@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/index@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -16316,7 +16341,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/internal/frame@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/internal/frame@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -16525,7 +16550,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/merkletrie/noder@v5.16.3
+github.com/go-git/go-git/v5/utils/merkletrie/noder@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -16734,7 +16759,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/sync@v5.16.3
+github.com/go-git/go-git/v5/utils/sync@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -16943,7 +16968,7 @@ Apache License
 Apache License Version 2.0, see [LICENSE](LICENSE)
 
 *****
-github.com/go-git/go-git/v5/utils/trace@v5.16.3
+github.com/go-git/go-git/v5/utils/trace@v5.17.0
 
 Apache License
                            Version 2.0, January 2004
@@ -17873,7 +17898,7 @@ Wayne Ashley Berry <wayneashleyberry@gmail.com>
 santosh653 <70637961+santosh653@users.noreply.github.com>
 
 *****
-github.com/klauspost/compress@v1.17.2
+github.com/klauspost/compress@v1.18.2
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -18185,7 +18210,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 This code is licensed under the same conditions as the original Go code. See LICENSE file.
 
 *****
-github.com/klauspost/compress/fse@v1.17.2
+github.com/klauspost/compress/fse@v1.18.2
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -18493,7 +18518,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****
-github.com/klauspost/compress/huff0@v1.17.2
+github.com/klauspost/compress/huff0@v1.18.2
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -18801,349 +18826,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****
-github.com/klauspost/compress/internal/cpuinfo@v1.17.2
-
-Copyright (c) 2012 The Go Authors. All rights reserved.
-Copyright (c) 2019 Klaus Post. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-------------------
-
-Files: gzhttp/*
-
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-
-   1. Definitions.
-
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
-
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
-
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
-
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
-
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
-
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
-
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
-
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
-
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
-
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
-
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
-
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
-
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
-
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
-
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
-
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
-
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
-
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
-
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
-
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
-
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
-
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
-
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
-
-   END OF TERMS AND CONDITIONS
-
-   APPENDIX: How to apply the Apache License to your work.
-
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
-
-   Copyright 2016-2017 The New York Times Company
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-------------------
-
-Files: s2/cmd/internal/readahead/*
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Klaus Post
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
----------------------
-Files: snappy/*
-Files: internal/snapref/*
-
-Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
------------------
-
-Files: s2/cmd/internal/filepathx/*
-
-Copyright 2016 The filepathx Authors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
------
-
-This code is licensed under the same conditions as the original Go code. See LICENSE file.
-
-*****
-github.com/klauspost/compress/internal/snapref@v1.17.2
-
-Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
------
+github.com/klauspost/compress/internal/cpuinfo@v1.18.2
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -19455,7 +19138,661 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 This code is licensed under the same conditions as the original Go code. See LICENSE file.
 
 *****
-github.com/klauspost/compress/zstd@v1.17.2
+github.com/klauspost/compress/internal/le@v1.18.2
+
+Copyright (c) 2012 The Go Authors. All rights reserved.
+Copyright (c) 2019 Klaus Post. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------
+
+Files: gzhttp/*
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2016-2017 The New York Times Company
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+------------------
+
+Files: s2/cmd/internal/readahead/*
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Klaus Post
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---------------------
+Files: snappy/*
+Files: internal/snapref/*
+
+Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-----------------
+
+Files: s2/cmd/internal/filepathx/*
+
+Copyright 2016 The filepathx Authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-----
+
+This code is licensed under the same conditions as the original Go code. See LICENSE file.
+
+*****
+github.com/klauspost/compress/internal/snapref@v1.18.2
+
+Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-----
+
+Copyright (c) 2012 The Go Authors. All rights reserved.
+Copyright (c) 2019 Klaus Post. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------
+
+Files: gzhttp/*
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2016-2017 The New York Times Company
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+------------------
+
+Files: s2/cmd/internal/readahead/*
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Klaus Post
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---------------------
+Files: snappy/*
+Files: internal/snapref/*
+
+Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-----------------
+
+Files: s2/cmd/internal/filepathx/*
+
+Copyright 2016 The filepathx Authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-----
+
+This code is licensed under the same conditions as the original Go code. See LICENSE file.
+
+*****
+github.com/klauspost/compress/zstd@v1.18.2
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -19763,7 +20100,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****
-github.com/klauspost/compress/zstd/internal/xxhash@v1.17.2
+github.com/klauspost/compress/zstd/internal/xxhash@v1.18.2
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -20266,7 +20603,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****
-github.com/marcinbor85/gohex@v0.0.0-20210308104911-55fb1c624d84
+github.com/marcinbor85/gohex@v0.1.0
 
 MIT License
 
@@ -20337,7 +20674,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 MIT
 
 *****
-github.com/mattn/go-runewidth@v0.0.15
+github.com/mattn/go-runewidth@v0.0.20
 
 The MIT License (MIT)
 
@@ -21156,31 +21493,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 *****
-github.com/rivo/uniseg@v0.4.4
-
-MIT License
-
-Copyright (c) 2019 Oliver Kuederle
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*****
 github.com/russross/blackfriday/v2@v2.1.0
 
 Blackfriday is distributed under the Simplified BSD License:
@@ -21488,7 +21800,7 @@ Apache License
    END OF TERMS AND CONDITIONS
 
 *****
-github.com/sirupsen/logrus@v1.9.3
+github.com/sirupsen/logrus@v1.9.4
 
 The MIT License (MIT)
 
@@ -23378,9 +23690,9 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 *****
-go.bug.st/downloader/v2@v2.2.0
+go.bug.st/downloader/v3@v3.0.0
 
-Copyright (c) 2018, Cristian Maglie.
+Copyright (c) 2018-2025, Cristian Maglie.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23411,11 +23723,15 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
+-----
+
+This library is released under the permissive BSD-3-CLAUSE.
 
 *****
-go.bug.st/f@v0.4.0
+go.bug.st/f@v0.5.0
 
-Copyright (c) 2024, Cristian Maglie.
+Copyright (c) 2024, go-algorithms (go.bug.st/f) authors.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23446,6 +23762,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
+-----
+
+This package is released under the permissive BSD-3-CLAUSE.
 
 *****
 go.bug.st/relaxed-semver@v0.15.0
@@ -23641,7 +23961,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 *****
-golang.org/x/crypto/argon2@v0.45.0
+golang.org/x/crypto/argon2@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -23697,7 +24017,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/blake2b@v0.45.0
+golang.org/x/crypto/blake2b@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -23753,7 +24073,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/blowfish@v0.45.0
+golang.org/x/crypto/blowfish@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -23809,7 +24129,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/cast5@v0.45.0
+golang.org/x/crypto/cast5@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -23865,7 +24185,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/curve25519@v0.45.0
+golang.org/x/crypto/curve25519@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -23921,7 +24241,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/hkdf@v0.45.0
+golang.org/x/crypto/hkdf@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -23977,7 +24297,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/sha3@v0.45.0
+golang.org/x/crypto/sha3@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -24033,7 +24353,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/ssh@v0.45.0
+golang.org/x/crypto/ssh@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -24089,7 +24409,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/ssh/agent@v0.45.0
+golang.org/x/crypto/ssh/agent@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -24145,7 +24465,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/ssh/internal/bcrypt_pbkdf@v0.45.0
+golang.org/x/crypto/ssh/internal/bcrypt_pbkdf@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -24201,7 +24521,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/crypto/ssh/knownhosts@v0.45.0
+golang.org/x/crypto/ssh/knownhosts@v0.46.0
 
 Copyright 2009 The Go Authors.
 
@@ -24257,7 +24577,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/context@v0.47.0
+golang.org/x/net/context@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24313,7 +24633,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/http2@v0.47.0
+golang.org/x/net/http2@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24369,7 +24689,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/internal/httpcommon@v0.47.0
+golang.org/x/net/internal/httpcommon@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24425,7 +24745,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/internal/socks@v0.47.0
+golang.org/x/net/internal/socks@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24481,7 +24801,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/internal/timeseries@v0.47.0
+golang.org/x/net/internal/timeseries@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24537,7 +24857,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/proxy@v0.47.0
+golang.org/x/net/proxy@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24593,7 +24913,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/net/trace@v0.47.0
+golang.org/x/net/trace@v0.48.0
 
 Copyright 2009 The Go Authors.
 
@@ -24649,7 +24969,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/sys/execabs@v0.38.0
+golang.org/x/sys/execabs@v0.42.0
 
 Copyright 2009 The Go Authors.
 
@@ -24705,7 +25025,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/sys/unix@v0.38.0
+golang.org/x/sys/unix@v0.42.0
 
 Copyright 2009 The Go Authors.
 
@@ -24761,7 +25081,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/term@v0.37.0
+golang.org/x/term@v0.41.0
 
 Copyright 2009 The Go Authors.
 
@@ -24817,7 +25137,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/text/encoding@v0.31.0
+golang.org/x/text/encoding@v0.35.0
 
 Copyright 2009 The Go Authors.
 
@@ -24873,7 +25193,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/text/encoding/internal@v0.31.0
+golang.org/x/text/encoding/internal@v0.35.0
 
 Copyright 2009 The Go Authors.
 
@@ -24929,7 +25249,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/text/encoding/internal/identifier@v0.31.0
+golang.org/x/text/encoding/internal/identifier@v0.35.0
 
 Copyright 2009 The Go Authors.
 
@@ -24985,7 +25305,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/text/encoding/unicode@v0.31.0
+golang.org/x/text/encoding/unicode@v0.35.0
 
 Copyright 2009 The Go Authors.
 
@@ -25041,7 +25361,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/text/internal/utf8internal@v0.31.0
+golang.org/x/text/internal/utf8internal@v0.35.0
 
 Copyright 2009 The Go Authors.
 
@@ -25097,7 +25417,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-golang.org/x/text/runes@v0.31.0
+golang.org/x/text/runes@v0.35.0
 
 Copyright 2009 The Go Authors.
 
@@ -25153,7 +25473,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/genproto/googleapis/rpc/status@v0.0.0-20251022142026-3a174f9686a8
+google.golang.org/genproto/googleapis/rpc/status@v0.0.0-20251202230838-ff82c1b0f217
 
 Apache License
                            Version 2.0, January 2004
@@ -25358,7 +25678,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc@v1.77.0
+google.golang.org/grpc@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -25583,7 +25903,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 *****
-google.golang.org/grpc/attributes@v1.77.0
+google.golang.org/grpc/attributes@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -25788,7 +26108,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/backoff@v1.77.0
+google.golang.org/grpc/backoff@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -25993,7 +26313,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer@v1.77.0
+google.golang.org/grpc/balancer@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -26198,7 +26518,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/base@v1.77.0
+google.golang.org/grpc/balancer/base@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -26403,7 +26723,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/endpointsharding@v1.77.0
+google.golang.org/grpc/balancer/endpointsharding@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -26608,7 +26928,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/grpclb/state@v1.77.0
+google.golang.org/grpc/balancer/grpclb/state@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -26813,7 +27133,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/pickfirst@v1.77.0
+google.golang.org/grpc/balancer/pickfirst@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -27018,7 +27338,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/pickfirst/internal@v1.77.0
+google.golang.org/grpc/balancer/pickfirst/internal@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -27223,7 +27543,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/balancer/roundrobin@v1.77.0
+google.golang.org/grpc/balancer/roundrobin@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -27428,7 +27748,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/binarylog/grpc_binarylog_v1@v1.77.0
+google.golang.org/grpc/binarylog/grpc_binarylog_v1@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -27633,7 +27953,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/channelz@v1.77.0
+google.golang.org/grpc/channelz@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -27838,7 +28158,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/codes@v1.77.0
+google.golang.org/grpc/codes@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -28043,7 +28363,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/connectivity@v1.77.0
+google.golang.org/grpc/connectivity@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -28248,7 +28568,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/credentials@v1.77.0
+google.golang.org/grpc/credentials@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -28453,7 +28773,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/credentials/insecure@v1.77.0
+google.golang.org/grpc/credentials/insecure@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -28658,7 +28978,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/encoding@v1.77.0
+google.golang.org/grpc/encoding@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -28863,7 +29183,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/encoding/internal@v1.77.0
+google.golang.org/grpc/encoding/internal@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -29068,7 +29388,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/encoding/proto@v1.77.0
+google.golang.org/grpc/encoding/proto@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -29273,7 +29593,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/experimental/stats@v1.77.0
+google.golang.org/grpc/experimental/stats@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -29478,7 +29798,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/grpclog@v1.77.0
+google.golang.org/grpc/grpclog@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -29683,7 +30003,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/grpclog/internal@v1.77.0
+google.golang.org/grpc/grpclog/internal@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -29888,7 +30208,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal@v1.77.0
+google.golang.org/grpc/internal@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -30093,7 +30413,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/backoff@v1.77.0
+google.golang.org/grpc/internal/backoff@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -30298,7 +30618,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/balancer/gracefulswitch@v1.77.0
+google.golang.org/grpc/internal/balancer/gracefulswitch@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -30503,7 +30823,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/balancerload@v1.77.0
+google.golang.org/grpc/internal/balancer/weight@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -30708,7 +31028,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/binarylog@v1.77.0
+google.golang.org/grpc/internal/balancerload@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -30913,7 +31233,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/buffer@v1.77.0
+google.golang.org/grpc/internal/binarylog@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -31118,7 +31438,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/channelz@v1.77.0
+google.golang.org/grpc/internal/buffer@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -31323,7 +31643,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/credentials@v1.77.0
+google.golang.org/grpc/internal/channelz@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -31528,7 +31848,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/envconfig@v1.77.0
+google.golang.org/grpc/internal/credentials@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -31733,7 +32053,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/grpclog@v1.77.0
+google.golang.org/grpc/internal/envconfig@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -31938,7 +32258,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/grpcsync@v1.77.0
+google.golang.org/grpc/internal/grpclog@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -32143,7 +32463,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/grpcutil@v1.77.0
+google.golang.org/grpc/internal/grpcsync@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -32348,7 +32668,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/idle@v1.77.0
+google.golang.org/grpc/internal/grpcutil@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -32553,7 +32873,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/metadata@v1.77.0
+google.golang.org/grpc/internal/idle@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -32758,7 +33078,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/pretty@v1.77.0
+google.golang.org/grpc/internal/metadata@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -32963,7 +33283,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/proxyattributes@v1.77.0
+google.golang.org/grpc/internal/pretty@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -33168,7 +33488,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver@v1.77.0
+google.golang.org/grpc/internal/proxyattributes@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -33373,7 +33693,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/delegatingresolver@v1.77.0
+google.golang.org/grpc/internal/resolver@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -33578,7 +33898,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/dns@v1.77.0
+google.golang.org/grpc/internal/resolver/delegatingresolver@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -33783,7 +34103,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/dns/internal@v1.77.0
+google.golang.org/grpc/internal/resolver/dns@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -33988,7 +34308,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/passthrough@v1.77.0
+google.golang.org/grpc/internal/resolver/dns/internal@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -34193,7 +34513,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/resolver/unix@v1.77.0
+google.golang.org/grpc/internal/resolver/passthrough@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -34398,7 +34718,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/serviceconfig@v1.77.0
+google.golang.org/grpc/internal/resolver/unix@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -34603,7 +34923,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/stats@v1.77.0
+google.golang.org/grpc/internal/serviceconfig@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -34808,7 +35128,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/status@v1.77.0
+google.golang.org/grpc/internal/stats@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -35013,7 +35333,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/syscall@v1.77.0
+google.golang.org/grpc/internal/status@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -35218,7 +35538,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/transport@v1.77.0
+google.golang.org/grpc/internal/syscall@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -35423,7 +35743,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/internal/transport/networktype@v1.77.0
+google.golang.org/grpc/internal/transport@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -35628,7 +35948,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/keepalive@v1.77.0
+google.golang.org/grpc/internal/transport/networktype@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -35833,7 +36153,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/mem@v1.77.0
+google.golang.org/grpc/keepalive@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -36038,7 +36358,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/metadata@v1.77.0
+google.golang.org/grpc/mem@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -36243,7 +36563,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/peer@v1.77.0
+google.golang.org/grpc/metadata@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -36448,7 +36768,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/resolver@v1.77.0
+google.golang.org/grpc/peer@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -36653,7 +36973,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/resolver/dns@v1.77.0
+google.golang.org/grpc/resolver@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -36858,7 +37178,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/serviceconfig@v1.77.0
+google.golang.org/grpc/resolver/dns@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -37063,7 +37383,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/stats@v1.77.0
+google.golang.org/grpc/serviceconfig@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -37268,7 +37588,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/status@v1.77.0
+google.golang.org/grpc/stats@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -37473,7 +37793,7 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/grpc/tap@v1.77.0
+google.golang.org/grpc/status@v1.79.3
 
 Apache License
                            Version 2.0, January 2004
@@ -37678,7 +37998,212 @@ Apache License
    limitations under the License.
 
 *****
-google.golang.org/protobuf/encoding/protojson@v1.36.10
+google.golang.org/grpc/tap@v1.79.3
+
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+*****
+google.golang.org/protobuf/encoding/protojson@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -37734,7 +38259,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/encoding/prototext@v1.36.10
+google.golang.org/protobuf/encoding/prototext@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -37790,7 +38315,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/encoding/protowire@v1.36.10
+google.golang.org/protobuf/encoding/protowire@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -37846,7 +38371,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/descfmt@v1.36.10
+google.golang.org/protobuf/internal/descfmt@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -37902,7 +38427,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/descopts@v1.36.10
+google.golang.org/protobuf/internal/descopts@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -37958,7 +38483,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/detrand@v1.36.10
+google.golang.org/protobuf/internal/detrand@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38014,7 +38539,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/editiondefaults@v1.36.10
+google.golang.org/protobuf/internal/editiondefaults@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38070,7 +38595,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/encoding/defval@v1.36.10
+google.golang.org/protobuf/internal/encoding/defval@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38126,7 +38651,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/encoding/json@v1.36.10
+google.golang.org/protobuf/internal/encoding/json@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38182,7 +38707,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/encoding/messageset@v1.36.10
+google.golang.org/protobuf/internal/encoding/messageset@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38238,7 +38763,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/encoding/tag@v1.36.10
+google.golang.org/protobuf/internal/encoding/tag@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38294,7 +38819,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/encoding/text@v1.36.10
+google.golang.org/protobuf/internal/encoding/text@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38350,7 +38875,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/errors@v1.36.10
+google.golang.org/protobuf/internal/errors@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38406,7 +38931,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/filedesc@v1.36.10
+google.golang.org/protobuf/internal/filedesc@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38462,7 +38987,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/filetype@v1.36.10
+google.golang.org/protobuf/internal/filetype@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38518,7 +39043,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/flags@v1.36.10
+google.golang.org/protobuf/internal/flags@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38574,7 +39099,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/genid@v1.36.10
+google.golang.org/protobuf/internal/genid@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38630,7 +39155,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/impl@v1.36.10
+google.golang.org/protobuf/internal/impl@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38686,7 +39211,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/order@v1.36.10
+google.golang.org/protobuf/internal/order@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38742,7 +39267,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/pragma@v1.36.10
+google.golang.org/protobuf/internal/pragma@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38798,7 +39323,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/protolazy@v1.36.10
+google.golang.org/protobuf/internal/protolazy@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38854,7 +39379,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/set@v1.36.10
+google.golang.org/protobuf/internal/set@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38910,7 +39435,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/strs@v1.36.10
+google.golang.org/protobuf/internal/strs@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38966,7 +39491,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/internal/version@v1.36.10
+google.golang.org/protobuf/internal/version@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39022,7 +39547,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/proto@v1.36.10
+google.golang.org/protobuf/proto@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39078,7 +39603,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/protoadapt@v1.36.10
+google.golang.org/protobuf/protoadapt@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39134,7 +39659,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/reflect/protoreflect@v1.36.10
+google.golang.org/protobuf/reflect/protoreflect@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39190,7 +39715,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/reflect/protoregistry@v1.36.10
+google.golang.org/protobuf/reflect/protoregistry@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39246,7 +39771,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/runtime/protoiface@v1.36.10
+google.golang.org/protobuf/runtime/protoiface@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39302,7 +39827,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/runtime/protoimpl@v1.36.10
+google.golang.org/protobuf/runtime/protoimpl@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39358,7 +39883,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/types/known/anypb@v1.36.10
+google.golang.org/protobuf/types/known/anypb@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39414,7 +39939,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/types/known/durationpb@v1.36.10
+google.golang.org/protobuf/types/known/durationpb@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -39470,7 +39995,7 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 *****
-google.golang.org/protobuf/types/known/timestamppb@v1.36.10
+google.golang.org/protobuf/types/known/timestamppb@v1.36.11
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 

@@ -16,6 +16,7 @@
 package cores
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
@@ -93,22 +94,18 @@ func TestFlavorCompatibility(t *testing.T) {
 	checkCompatible := func(test *test, os *os) {
 		// if the os is in the "positive" set iCompatibleWith must return true...
 		res, _ := test.Flavour.isCompatibleWith(os.Os, os.Arch)
-		for _, compatibleOs := range test.Compatibles {
-			if compatibleOs == os {
-				require.True(t, res, "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
-				return
-			}
+		if slices.Contains(test.Compatibles, os) {
+			require.True(t, res, "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+			return
 		}
 		// ...otherwise false
 		require.False(t, res, "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
 	}
 	checkExactMatch := func(test *test, os *os) {
 		// if the os is in the "positive" set iExactMatchWith must return true...
-		for _, positiveOs := range test.ExactMatch {
-			if positiveOs == os {
-				require.True(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
-				return
-			}
+		if slices.Contains(test.ExactMatch, os) {
+			require.True(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+			return
 		}
 		// ...otherwise false
 		require.False(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)

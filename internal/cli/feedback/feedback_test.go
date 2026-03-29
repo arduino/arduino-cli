@@ -111,7 +111,7 @@ type testResult struct {
 	Output  *OutputStreamsResult `json:"output,omitempty"`
 }
 
-func (r *testResult) Data() interface{} {
+func (r *testResult) Data() any {
 	return r
 }
 

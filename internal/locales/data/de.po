@@ -9,12 +9,12 @@
 # Jannis Lämmle, 2023
 # Jens Wulf, 2023
 # Ralf Krause, 2024
-# Ettore Atalan <atalanttore@googlemail.com>, 2025
 # Per Tillisch <p.tillisch@arduino.cc>, 2025
+# Ettore Atalan <atalanttore@googlemail.com>, 2025
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Per Tillisch <p.tillisch@arduino.cc>, 2025\n"
+"Last-Translator: Ettore Atalan <atalanttore@googlemail.com>, 2025\n"
 "Language-Team: German (https://app.transifex.com/arduino-1/teams/108174/de/)\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -37,7 +37,7 @@ msgstr "%[1]s ungültig, alles wird neu gebaut"
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s wird benötigt, aber %[2]s ist aktuell installiert."
 
-#: internal/arduino/builder/builder.go:496
+#: internal/arduino/builder/builder.go:495
 msgid "%[1]s pattern is missing"
 msgstr "Muster %[1]s fehlt"
 
@@ -78,11 +78,11 @@ msgstr "%s muss installiert sein."
 msgid "%s pattern is missing"
 msgstr "Muster %s fehlt"
 
-#: commands/cmderrors/cmderrors.go:839
+#: commands/cmderrors/cmderrors.go:875
 msgid "'%s' has an invalid signature"
 msgstr "'%s' hat eine ungültige Signatur"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:416
+#: internal/arduino/cores/packagemanager/package_manager.go:421
 msgid ""
 "'build.core' and 'build.variant' refer to different platforms: %[1]s and "
 "%[2]s"
@@ -128,7 +128,7 @@ msgstr ".ino-Datei existiert bereits"
 msgid "A new release of Arduino CLI is available:"
 msgstr "Eine neue Version von Arduino CLI ist verfügbar:"
 
-#: commands/cmderrors/cmderrors.go:300
+#: commands/cmderrors/cmderrors.go:317
 msgid "A programmer is required to upload"
 msgstr "Zum Hochladen ist ein Programmer benötigt"
 
@@ -144,6 +144,10 @@ msgstr "Arduino CLI Handbuch"
 #: internal/cli/usage.go:28
 msgid "Additional help topics:"
 msgstr "Weitere Hilfethemen:"
+
+#: internal/cli/profile/profile_lib_add.go:41
+msgid "Adds a library to a sketch profile."
+msgstr ""
 
 #: internal/cli/config/add.go:34 internal/cli/config/add.go:35
 msgid "Adds one or more values to a setting."
@@ -198,11 +202,11 @@ msgstr "Gebauter Kern wird archiviert (zwischengespeichert) in: %[1]s"
 msgid "Arduino CLI sketch commands."
 msgstr "Arduino CLI Sketch Befehle."
 
-#: internal/cli/cli.go:88
+#: internal/cli/cli.go:89
 msgid "Arduino CLI."
 msgstr "Arduino CLI."
 
-#: internal/cli/cli.go:89
+#: internal/cli/cli.go:90
 msgid "Arduino Command Line Interface (arduino-cli)."
 msgstr "Arduino Befehlszeilen-Schnittstelle (arduino-cli)."
 
@@ -227,6 +231,8 @@ msgid "Arduino core operations."
 msgstr "Arduino-Kern-Operationen."
 
 #: internal/cli/lib/check_deps.go:62 internal/cli/lib/install.go:130
+#: internal/cli/profile/profile_lib_add.go:66
+#: internal/cli/profile/profile_lib_remove.go:67
 msgid "Arguments error: %v"
 msgstr "Argumentefehler: %v"
 
@@ -279,9 +285,13 @@ msgstr "Platinenname:"
 msgid "Board version:"
 msgstr "Platinenversion:"
 
-#: internal/arduino/builder/sketch.go:245
+#: internal/arduino/builder/sketch.go:256
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "Bootloader-Datei angegeben, aber nicht vorhanden: %[1]s"
+
+#: internal/cli/profile/profile.go:29 internal/cli/profile/profile.go:30
+msgid "Build profile operations."
+msgstr ""
 
 #: internal/cli/compile/compile.go:105
 msgid ""
@@ -295,7 +305,7 @@ msgstr ""
 msgid "Can't create data directory %s"
 msgstr "Datenverzeichnis %s kann nicht erstellt werden"
 
-#: commands/cmderrors/cmderrors.go:532
+#: commands/cmderrors/cmderrors.go:549
 msgid "Can't create sketch"
 msgstr "Sketch kann nicht erstellt werden"
 
@@ -309,11 +319,11 @@ msgstr "Bibliothek kann nicht heruntergeladen werden"
 msgid "Can't find dependencies for platform %s"
 msgstr "Abhängigkeiten für die Plattform %s können nicht gefunden werden"
 
-#: commands/cmderrors/cmderrors.go:558
+#: commands/cmderrors/cmderrors.go:575
 msgid "Can't open sketch"
 msgstr "Sketch kann nicht geöffnet werden"
 
-#: commands/cmderrors/cmderrors.go:545
+#: commands/cmderrors/cmderrors.go:562
 msgid "Can't update sketch"
 msgstr "Sketch kann nicht aktualisiert werden"
 
@@ -341,11 +351,11 @@ msgstr "Verzeichnis der Konfigurationsdatei kann nicht erstellt werden: %v"
 msgid "Cannot create config file: %v"
 msgstr "Konfigurationsdatei kann nicht erstellt werden: %v"
 
-#: commands/cmderrors/cmderrors.go:802
+#: commands/cmderrors/cmderrors.go:838
 msgid "Cannot create temp dir"
 msgstr "Temporärer Ordner kann nicht erstellt werden"
 
-#: commands/cmderrors/cmderrors.go:820
+#: commands/cmderrors/cmderrors.go:856
 msgid "Cannot create temp file"
 msgstr "Temporäre Datei kann nicht erstellt werden"
 
@@ -384,6 +394,10 @@ msgstr "Port-Reset konnte nicht ausgeführt werden: %s"
 msgid "Cannot remove the configuration key %[1]s: %[2]v"
 msgstr "Der Konfigurationsschlüssel %[1]s kann nicht entfernt werden: %[2]v"
 
+#: internal/cli/profile/profile_set-default.go:52
+msgid "Cannot set %s as default profile: %v"
+msgstr ""
+
 #: internal/arduino/cores/packagemanager/install_uninstall.go:163
 msgid "Cannot upgrade platform"
 msgstr "Plattform kann nicht upgegraded werden"
@@ -402,7 +416,7 @@ msgstr ""
 "Prüfung, ob die angegebene Board-/Programmer--Kombination das Debugging "
 "unterstützt."
 
-#: internal/arduino/resources/checksums.go:166
+#: internal/arduino/resources/checksums.go:161
 msgid "Checksum differs from checksum in package.json"
 msgstr "Prüfsumme unterscheidet sich von der Prüfsumme in package.json"
 
@@ -414,7 +428,7 @@ msgstr "Prüfsumme:"
 msgid "Clean caches."
 msgstr "Caches bereinigen."
 
-#: internal/cli/cli.go:181
+#: internal/cli/cli.go:183
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr "Durch Kommata getrennte Liste mit URLs für die Board-Manager."
 
@@ -425,6 +439,10 @@ msgid ""
 msgstr ""
 "Befehl läuft weiter und gibt die Liste der verbundenen Platinen aus, sobald "
 "sich eine Änderung ergibt."
+
+#: internal/cli/profile/profile_lib.go:29
+msgid "Commands to manage libraries in sketch profiles."
+msgstr ""
 
 #: commands/service_debug_config.go:178 commands/service_upload.go:452
 msgid "Compiled sketch not found in %s"
@@ -438,11 +456,11 @@ msgstr ""
 msgid "Compiles Arduino sketches."
 msgstr "Kompiliert Arduino-Sketche."
 
-#: internal/arduino/builder/builder.go:430
+#: internal/arduino/builder/builder.go:429
 msgid "Compiling core..."
 msgstr "Kern wird kompiliert ..."
 
-#: internal/arduino/builder/builder.go:409
+#: internal/arduino/builder/builder.go:408
 msgid "Compiling libraries..."
 msgstr "Bibliotheken werden kompiliert ..."
 
@@ -450,7 +468,7 @@ msgstr "Bibliotheken werden kompiliert ..."
 msgid "Compiling library \"%[1]s\""
 msgstr "Bibliothek \"%[1]s\" wird kompiliert"
 
-#: internal/arduino/builder/builder.go:393
+#: internal/arduino/builder/builder.go:392
 msgid "Compiling sketch..."
 msgstr "Sketch wird kompiliert ..."
 
@@ -497,11 +515,7 @@ msgstr "Verbindung zu %s wird hergestellt. Abbrechen mit STRG-C."
 msgid "Core"
 msgstr "Kern"
 
-#: internal/cli/configuration/network.go:127
-msgid "Could not connect via HTTP"
-msgstr "Konnte nicht über HTTP verbinden"
-
-#: commands/instances.go:510
+#: commands/instances.go:512
 msgid "Could not create index directory"
 msgstr "Indexverzeichnis konnte nicht erstellt werden"
 
@@ -525,6 +539,10 @@ msgstr "Einen neuen Sketch erstellen"
 msgid "Create and print a profile configuration from the build."
 msgstr "Erstelle und drucke ein Konfigurations-Profil aus dem Build"
 
+#: internal/cli/profile/profile_create.go:37
+msgid "Create or update a profile in the sketch project file."
+msgstr ""
+
 #: internal/cli/sketch/archive.go:37 internal/cli/sketch/archive.go:38
 msgid "Creates a zip file containing all sketch files."
 msgstr "Erstellt eine ZIP-Datei, die alle Sketch-Dateien enthält."
@@ -537,6 +555,10 @@ msgstr ""
 "Erstellt oder aktualisiert die Konfigurationsdatei im Datenverzeichnis oder "
 "einem benutzerdefinierten Verzeichnis mit den aktuellen "
 "Konfigurationseinstellungen."
+
+#: internal/cli/profile/profile_create.go:39
+msgid "Creates or updates the sketch project file in the current directory."
+msgstr ""
 
 #: internal/cli/debug/debug.go:266
 msgid "Custom configuration for %s:"
@@ -582,6 +604,10 @@ msgstr "Standard-FQBN gesetzt auf"
 msgid "Default port set to"
 msgstr "Standard-Port gesetzt auf"
 
+#: internal/cli/profile/profile_set-default.go:64
+msgid "Default profile set to: %s"
+msgstr "Standard-Profil festgelegt auf: %s"
+
 #: internal/cli/board/attach.go:116
 msgid "Default programmer set to"
 msgstr "Standardmäßiger Programmer ist gesetzt auf"
@@ -611,7 +637,7 @@ msgstr "Abhängigkeiten: %s"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: internal/arduino/builder/builder.go:314
+#: internal/arduino/builder/builder.go:313
 msgid "Detecting libraries used..."
 msgstr "Verwendete Bibliotheken erkennen ..."
 
@@ -651,9 +677,17 @@ msgstr "Verbindung getrennt"
 msgid "Display only the provided gRPC calls"
 msgstr "Nur die bereitgestellten gRPC-Aufrufe anzeigen"
 
+#: internal/cli/profile/profile_lib_add.go:55
+msgid "Do not add dependencies."
+msgstr "Abhängigkeiten nicht hinzufügen."
+
 #: internal/cli/lib/install.go:62
 msgid "Do not install dependencies."
 msgstr "Abhängigkeiten nicht installieren."
+
+#: internal/cli/profile/profile_lib_add.go:56
+msgid "Do not overwrite already added libraries."
+msgstr "Bereits hinzugefügte Bibliotheken nicht überschreiben."
 
 #: internal/cli/lib/install.go:63
 msgid "Do not overwrite already installed libraries."
@@ -670,6 +704,10 @@ msgstr ""
 "Den eigentlichen Hochladevorgang nicht durchführen, sondern nur die "
 "Abmeldeaktionen"
 
+#: internal/cli/profile/profile_lib_remove.go:57
+msgid "Do not remove unused dependencies."
+msgstr "Nicht benutzte Abhängigkeiten nicht entfernen."
+
 #: internal/cli/daemon/daemon.go:81
 msgid "Do not terminate daemon process if the parent process dies"
 msgstr "Den Daemon-Prozess nicht mit dem Elternprozess beenden."
@@ -680,21 +718,25 @@ msgstr ""
 "Keine Bibliotheksabhängigkeiten aktualisieren, wenn diese bereits "
 "installiert sind."
 
+#: internal/arduino/httpclient/httpclient.go:50
+msgid "Download failed"
+msgstr ""
+
 #: commands/service_library_download.go:92
 msgid "Downloading %s"
 msgstr "%s wird heruntergeladen"
 
-#: internal/arduino/resources/index.go:137
+#: internal/arduino/resources/index.go:139
 msgid "Downloading index signature: %s"
 msgstr "Indexsignatur wird heruntergeladen: %s"
 
-#: commands/instances.go:587 commands/instances.go:605
-#: commands/instances.go:619 commands/instances.go:636
-#: internal/arduino/resources/index.go:82
+#: commands/instances.go:589 commands/instances.go:607
+#: commands/instances.go:621 commands/instances.go:638
+#: internal/arduino/resources/index.go:83
 msgid "Downloading index: %s"
 msgstr "Index wird heruntergeladen: %s"
 
-#: commands/instances.go:395
+#: commands/instances.go:397
 msgid "Downloading library %s"
 msgstr "Bibliothek %s wird heruntergeladen"
 
@@ -737,6 +779,10 @@ msgstr "Geben Sie einen Pfad zur ZIP-Datei an"
 msgid "Enter git url for libraries hosted on repositories"
 msgstr "Gib eine git-URL mit den Bibliotheken aus Repositories ein"
 
+#: internal/cli/profile/profile_lib_add.go:86
+msgid "Error adding %s: %v"
+msgstr ""
+
 #: commands/service_sketch_archive.go:105
 msgid "Error adding file to sketch archive"
 msgstr "Fehler beim Hinzufügen einer Datei zum Sketch-Archiv"
@@ -761,7 +807,7 @@ msgstr "Fehler beim bereinigen des Caches: %v"
 msgid "Error converting path to absolute: %v"
 msgstr "Fehler beim konvertieren des Pfads zum Absolutpfad: %v"
 
-#: commands/service_compile.go:422
+#: commands/service_compile.go:421
 msgid "Error copying output file %s"
 msgstr "Fehler beim Kopieren der Ausgabedatei %s"
 
@@ -775,7 +821,7 @@ msgstr "Fehler beim Erstellen der Konfiguration: %v"
 msgid "Error creating instance: %v"
 msgstr "Fehler beim Erstellen der Instanz: %v"
 
-#: commands/service_compile.go:405
+#: commands/service_compile.go:404
 msgid "Error creating output dir"
 msgstr "Fehler beim Erstellen des Ausgabeverzeichnisses"
 
@@ -800,15 +846,15 @@ msgstr "Fehler beim Herunterladen von %[1]s: %[2]v"
 msgid "Error downloading %s"
 msgstr "Fehler beim Herunterladen von %s"
 
-#: commands/instances.go:684 internal/arduino/resources/index.go:83
+#: commands/instances.go:686 internal/arduino/resources/index.go:84
 msgid "Error downloading index '%s'"
 msgstr "Fehler beim Herunterladen des Index '%s'"
 
-#: internal/arduino/resources/index.go:138
+#: internal/arduino/resources/index.go:140
 msgid "Error downloading index signature '%s'"
 msgstr "Fehler beim Herunterladen der Indexsignatur '%s'"
 
-#: commands/instances.go:405 commands/instances.go:411
+#: commands/instances.go:407 commands/instances.go:413
 msgid "Error downloading library %s"
 msgstr "Fehler beim Herunterladen der Bibliothek %s"
 
@@ -841,7 +887,7 @@ msgstr "Fehler während dem Hochladen: %v"
 msgid "Error during board detection"
 msgstr "Fehler bei der Board-Erkennung"
 
-#: internal/cli/compile/compile.go:396
+#: internal/cli/compile/compile.go:397
 msgid "Error during build: %v"
 msgstr "Fehler beim Build: %v"
 
@@ -857,8 +903,8 @@ msgstr "Fehler während der Deinstallation: %v"
 msgid "Error during upgrade: %v"
 msgstr "Fehler beim Upgrade %v"
 
-#: internal/arduino/resources/index.go:105
-#: internal/arduino/resources/index.go:124
+#: internal/arduino/resources/index.go:106
+#: internal/arduino/resources/index.go:125
 msgid "Error extracting %s"
 msgstr "Fehler beim Extrahieren von %s"
 
@@ -891,7 +937,7 @@ msgstr ""
 "Fehler beim ermitteln des Standard-Ports aus 'sketch.yaml' Prüfe, ob di im "
 "richtigen Sketch-Verzeichnis bist oder verwende das --port Attribut: %s"
 
-#: commands/service_compile.go:340 commands/service_library_list.go:115
+#: commands/service_compile.go:339 commands/service_library_list.go:115
 msgid "Error getting information for library %s"
 msgstr "Fehler beim Abrufen von Informationen für die Bibliothek %s"
 
@@ -915,6 +961,10 @@ msgstr "Fehler beim lesen der Benutzereingaben."
 msgid "Error initializing instance: %v"
 msgstr "Fehler beim Initialisieren der Instanz: %v"
 
+#: internal/cli/profile/profile_create.go:71
+msgid "Error initializing the project file: %v"
+msgstr ""
+
 #: internal/cli/lib/install.go:148
 msgid "Error installing %s: %v"
 msgstr "Fehler beim Installieren von %s: %v"
@@ -927,7 +977,7 @@ msgstr "Fehler beim Installieren der Git-Bibliothek: %v"
 msgid "Error installing Zip Library: %v"
 msgstr "Fehler beim Installieren der Zip-Bibliothek: %v"
 
-#: commands/instances.go:421
+#: commands/instances.go:423
 msgid "Error installing library %s"
 msgstr "Fehler beim Installieren der Bibliothek %s"
 
@@ -954,7 +1004,7 @@ msgstr "Fehler beim Auflisten der Bibliotheken: %v"
 msgid "Error listing platforms: %v"
 msgstr "Fehler beim Auflisten von Plattformen: %v"
 
-#: commands/cmderrors/cmderrors.go:445
+#: commands/cmderrors/cmderrors.go:462
 msgid "Error loading hardware platform"
 msgstr "Fehler beim Laden der Hardware-Plattform"
 
@@ -963,7 +1013,7 @@ msgstr "Fehler beim Laden der Hardware-Plattform"
 msgid "Error loading index %s"
 msgstr "Fehler beim Laden des Index %s"
 
-#: internal/arduino/resources/index.go:99
+#: internal/arduino/resources/index.go:100
 msgid "Error opening %s"
 msgstr "Fehler beim Öffnen von %s"
 
@@ -979,13 +1029,17 @@ msgstr "Fehler, öffnen der Quellcodes überschreibt die Datendatei: %v"
 msgid "Error parsing --show-properties flag: %v"
 msgstr "Fehler bei der Auswertung des --show-Property Attributs: %v"
 
-#: commands/service_compile.go:414
+#: commands/service_compile.go:413
 msgid "Error reading build directory"
 msgstr "Fehler bel Lesen des Build-Verzechnisses"
 
 #: commands/service_sketch_archive.go:75
 msgid "Error reading sketch files"
 msgstr "Fehler beim Lesen von Sketch-Dateien"
+
+#: internal/cli/profile/profile_lib_remove.go:87
+msgid "Error removing library %[1]s from the profile"
+msgstr ""
 
 #: internal/cli/lib/check_deps.go:72
 msgid "Error resolving dependencies for %[1]s: %[2]s"
@@ -999,13 +1053,13 @@ msgstr "Fehler beim Abrufen der Kernliste: %v"
 msgid "Error rolling-back changes: %s"
 msgstr "Fehler beim Rückgängmachen der Änderungen: %s"
 
-#: internal/arduino/resources/index.go:165
-#: internal/arduino/resources/index.go:177
+#: internal/arduino/resources/index.go:167
+#: internal/arduino/resources/index.go:179
 msgid "Error saving downloaded index"
 msgstr "Fehler beim Speichern des heruntergeladenen Index"
 
-#: internal/arduino/resources/index.go:172
-#: internal/arduino/resources/index.go:181
+#: internal/arduino/resources/index.go:174
+#: internal/arduino/resources/index.go:183
 msgid "Error saving downloaded index signature"
 msgstr "Fehler beim Speichern der heruntergeladenen Indexsignatur"
 
@@ -1053,8 +1107,8 @@ msgstr "Fehler beim Upgraden der Bibliothken"
 msgid "Error upgrading platform: %s"
 msgstr "Fehler beim Upgraden der Plattform: %s"
 
-#: internal/arduino/resources/index.go:147
-#: internal/arduino/resources/index.go:153
+#: internal/arduino/resources/index.go:149
+#: internal/arduino/resources/index.go:155
 msgid "Error verifying signature"
 msgstr "Fehler beim Verifizieren der Signatur"
 
@@ -1219,7 +1273,7 @@ msgstr ""
 "Ausführung der Pre-Uninstall-Scripts überspringen (wenn die CLI nicht "
 "interaktiv läuft)"
 
-#: commands/cmderrors/cmderrors.go:860
+#: commands/cmderrors/cmderrors.go:896
 msgid "Found %d platforms matching \"%s\": %s"
 msgstr "%d Platformen passend zu \"%s\":%s gefunden"
 
@@ -1244,7 +1298,7 @@ msgstr "Erzeugt Komplettierungs-Skripte"
 msgid "Generates completion scripts for various shells"
 msgstr "Erzeugt Komplettierungs-Skripte für verschiedene Shells"
 
-#: internal/arduino/builder/builder.go:343
+#: internal/arduino/builder/builder.go:342
 msgid "Generating function prototypes..."
 msgstr "Funktionsprototypen werden generiert ..."
 
@@ -1324,7 +1378,7 @@ msgstr "%s installiert"
 msgid "Installing %s"
 msgstr "%s wird installiert"
 
-#: commands/instances.go:419
+#: commands/instances.go:421
 msgid "Installing library %s"
 msgstr "Bibliothek %s wird installiert"
 
@@ -1351,11 +1405,11 @@ msgstr "Installiert eine oder mehrere angegebene Bibliotheken in das System."
 msgid "Internal error in cache"
 msgstr "Interner Fehler im Cache"
 
-#: commands/cmderrors/cmderrors.go:378
+#: commands/cmderrors/cmderrors.go:395
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "Ungültige '%[1]s' Eigenschaft: %[2]s"
 
-#: commands/cmderrors/cmderrors.go:61
+#: commands/cmderrors/cmderrors.go:64
 msgid "Invalid FQBN"
 msgstr "Ungültiger FQBN"
 
@@ -1363,15 +1417,15 @@ msgstr "Ungültiger FQBN"
 msgid "Invalid TCP address: port is missing"
 msgstr "Ungültige TCP-Adresse: Port fehlt"
 
-#: commands/cmderrors/cmderrors.go:79
+#: commands/cmderrors/cmderrors.go:82
 msgid "Invalid URL"
 msgstr "Ungültige URL"
 
-#: commands/instances.go:184
+#: commands/instances.go:186
 msgid "Invalid additional URL: %v"
 msgstr "Ungültige zusätzliche URL: %v"
 
-#: internal/arduino/resources/index.go:111
+#: internal/arduino/resources/index.go:112
 msgid "Invalid archive: file %[1]s not found in archive %[2]s"
 msgstr "Ungültiges Archiv: Datei %[1]s nicht im Archiv %[2]s gefunden"
 
@@ -1381,7 +1435,7 @@ msgstr "Ungültiges Archiv: Datei %[1]s nicht im Archiv %[2]s gefunden"
 msgid "Invalid argument passed: %v"
 msgstr "Ungültiges Argument übergeben: %v"
 
-#: commands/service_compile.go:284
+#: commands/service_compile.go:283
 msgid "Invalid build properties"
 msgstr "Ungültige Build-Eigenschaften"
 
@@ -1393,11 +1447,11 @@ msgstr "Ungültige Datengröße regexp: %s"
 msgid "Invalid eeprom size regexp: %s"
 msgstr "Ungültige EEPROM-Größe: %s"
 
-#: commands/instances.go:620
+#: commands/instances.go:622
 msgid "Invalid index URL: %s"
 msgstr "Ungültige Index-URL: %s"
 
-#: commands/cmderrors/cmderrors.go:47
+#: commands/cmderrors/cmderrors.go:50
 msgid "Invalid instance"
 msgstr "Ungültige Instanz"
 
@@ -1405,31 +1459,31 @@ msgstr "Ungültige Instanz"
 msgid "Invalid item %s"
 msgstr "Ungültiges Element %s"
 
-#: commands/cmderrors/cmderrors.go:97
+#: commands/cmderrors/cmderrors.go:100
 msgid "Invalid library"
 msgstr "Ungültige Bibliothek"
 
-#: commands/instances.go:378
+#: commands/instances.go:380
 msgid "Invalid library directory in sketch project: %s"
 msgstr ""
 
-#: internal/cli/cli.go:265
+#: internal/cli/cli.go:267
 msgid "Invalid logging level: %s"
 msgstr "Ungültiger Protokoll-Level: %s"
 
-#: commands/instances.go:637
+#: commands/instances.go:639
 msgid "Invalid network configuration: %s"
 msgstr "Ungültige Netzwerk-Konfiguration: %s"
 
-#: internal/cli/configuration/network.go:83
+#: internal/cli/configuration/network.go:88
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "Ungültiger network.proxy '%[1]s':%[2]s"
 
-#: internal/cli/cli.go:222
+#: internal/cli/cli.go:224
 msgid "Invalid output format: %s"
 msgstr "Ungültiges Ausgabeformat: %s"
 
-#: commands/instances.go:604
+#: commands/instances.go:606
 msgid "Invalid package index in %s"
 msgstr "Ungültiger Paketindex in %s"
 
@@ -1437,11 +1491,11 @@ msgstr "Ungültiger Paketindex in %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Ungültiger Parameter %s: Version nicht erlaubt"
 
-#: commands/service_board_identify.go:169
+#: commands/service_board_identify.go:170
 msgid "Invalid pid value: '%s'"
 msgstr "Ungültiger pid-Wert: '%s'"
 
-#: commands/cmderrors/cmderrors.go:221
+#: commands/cmderrors/cmderrors.go:238
 msgid "Invalid profile"
 msgstr "Ungültiges Profil"
 
@@ -1457,11 +1511,11 @@ msgstr ""
 msgid "Invalid value in configuration"
 msgstr "Ungültiger Wert in der Konfiguration"
 
-#: commands/cmderrors/cmderrors.go:115
+#: commands/cmderrors/cmderrors.go:118
 msgid "Invalid version"
 msgstr "Ungültige Version"
 
-#: commands/service_board_identify.go:166
+#: commands/service_board_identify.go:167
 msgid "Invalid vid value: '%s'"
 msgstr "Ungültiger vid-Wert:'%s'"
 
@@ -1478,6 +1532,8 @@ msgid "LIBNAME"
 msgstr "BIBLIOTHEKSNAME"
 
 #: internal/cli/lib/check_deps.go:38 internal/cli/lib/install.go:45
+#: internal/cli/profile/profile_lib_add.go:40
+#: internal/cli/profile/profile_lib_remove.go:39
 msgid "LIBRARY"
 msgstr "BIBLIOTHEK"
 
@@ -1510,11 +1566,11 @@ msgstr "Bibliothek %s ist bereits die neueste Version"
 msgid "Library %s is not installed"
 msgstr "Bibliothek %s ist nicht installiert"
 
-#: commands/instances.go:398
+#: commands/instances.go:400
 msgid "Library %s not found"
 msgstr "Bibliothek %s nicht gefunden"
 
-#: commands/cmderrors/cmderrors.go:466
+#: commands/cmderrors/cmderrors.go:483
 msgid "Library '%s' not found"
 msgstr "Bibliothek '%s' nicht gefunden"
 
@@ -1525,7 +1581,7 @@ msgstr ""
 "Die Bibliothek kann nicht die Verzeichnisse '%[1]s' und '%[2]s' gleichzeitig"
 " verwenden. Prüfe nochmal in '%[3]s'"
 
-#: commands/cmderrors/cmderrors.go:595
+#: commands/cmderrors/cmderrors.go:612
 msgid "Library install failed"
 msgstr "Installation der Bibliothek fehlgeschlagen"
 
@@ -1538,7 +1594,7 @@ msgstr "Bibliothek installiert"
 msgid "License: %s"
 msgstr "Lizenz: %s"
 
-#: internal/arduino/builder/builder.go:446
+#: internal/arduino/builder/builder.go:445
 msgid "Linking everything together..."
 msgstr "Alles zusammenlinken..."
 
@@ -1590,14 +1646,20 @@ msgstr "Listet alle verbundenen Platinen auf."
 msgid "Lists cores and libraries that can be upgraded"
 msgstr "Auflisten der upgradebaren Cores und Bibliotheken"
 
-#: commands/instances.go:222 commands/instances.go:233
-#: commands/instances.go:348
+#: commands/instances.go:224 commands/instances.go:235
+#: commands/instances.go:350
 msgid "Loading index file: %v"
 msgstr "Indexdatei wird geladen: %v"
 
 #: internal/cli/lib/list.go:138 internal/cli/outdated/outdated.go:105
 msgid "Location"
 msgstr "Ort"
+
+#: internal/cli/profile/profile_lib_add.go:54
+#: internal/cli/profile/profile_lib_remove.go:56
+#: internal/cli/profile/profile_set-default.go:42
+msgid "Location of the sketch."
+msgstr ""
 
 #: internal/arduino/builder/sizer.go:211
 msgid "Low memory available, stability problems may occur."
@@ -1620,7 +1682,7 @@ msgstr ""
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Maximale Wartezeit für Portermittlung z.B. 30s, 1m"
 
-#: internal/cli/cli.go:170
+#: internal/cli/cli.go:172
 msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr ""
@@ -1631,23 +1693,27 @@ msgstr ""
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "'%[1]s' aus der Bibliothek in %[2]s fehlt"
 
-#: commands/cmderrors/cmderrors.go:170
+#: commands/cmderrors/cmderrors.go:173
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr "Fehlender FQBN (Fully Qualified Board Name)"
 
-#: commands/cmderrors/cmderrors.go:261
+#: commands/cmderrors/cmderrors.go:948
+msgid "Missing Profile name"
+msgstr "Fehlender Profilname"
+
+#: commands/cmderrors/cmderrors.go:278
 msgid "Missing port"
 msgstr "Fehlender Port"
 
-#: commands/cmderrors/cmderrors.go:237
+#: commands/cmderrors/cmderrors.go:254
 msgid "Missing port address"
 msgstr "Fehlende Port-Adresse"
 
-#: commands/cmderrors/cmderrors.go:249
+#: commands/cmderrors/cmderrors.go:266
 msgid "Missing port protocol"
 msgstr "Fehlendes Port-Protokoll"
 
-#: commands/cmderrors/cmderrors.go:287
+#: commands/cmderrors/cmderrors.go:304
 msgid "Missing programmer"
 msgstr "Fehlender Programmer"
 
@@ -1659,11 +1725,11 @@ msgstr "Fehlendes benötigtes Upload-Feld: %s"
 msgid "Missing size regexp"
 msgstr "Fehlende Größe regexp"
 
-#: commands/cmderrors/cmderrors.go:518
+#: commands/cmderrors/cmderrors.go:535
 msgid "Missing sketch path"
 msgstr "Fehlender Sketch-Pfad"
 
-#: commands/cmderrors/cmderrors.go:359
+#: commands/cmderrors/cmderrors.go:376
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' wurde nicht gefunden"
 
@@ -1721,7 +1787,7 @@ msgstr ""
 msgid "No libraries update is available."
 msgstr "Kein Bibliotheksupdate verfügbar"
 
-#: commands/cmderrors/cmderrors.go:275
+#: commands/cmderrors/cmderrors.go:292
 msgid "No monitor available for the port protocol %s"
 msgstr "Kein Monitor für das Port-Protokoll %s verfügbar"
 
@@ -1741,7 +1807,7 @@ msgstr "Die Suche fand keine passenden Plattformen"
 msgid "No upload port found, using %s as fallback"
 msgstr "Kein Upload-Port gefunden, verwende %s stattdessen"
 
-#: commands/cmderrors/cmderrors.go:485
+#: commands/cmderrors/cmderrors.go:502
 msgid "No valid dependencies solution found"
 msgstr "Keine gültige Auflösung der Abhängigkeiten gefunden"
 
@@ -1880,7 +1946,7 @@ msgstr "Webseite für das Paket:"
 msgid "Paragraph: %s"
 msgstr "Absatz: %s"
 
-#: internal/cli/compile/compile.go:475 internal/cli/compile/compile.go:490
+#: internal/cli/compile/compile.go:476 internal/cli/compile/compile.go:491
 msgid "Path"
 msgstr "Pfad"
 
@@ -1900,7 +1966,7 @@ msgstr ""
 "Pfad zum Wurzelverzeichnis einer einzelnen Bibliothek. Kann mehrfach "
 "verwendet werden oder die Einträge können durch Kommata getrennt werden."
 
-#: internal/cli/cli.go:172
+#: internal/cli/cli.go:174
 msgid "Path to the file where logs will be written."
 msgstr "Pfad in welchem die Log-Dateien abgelegt werden sollen."
 
@@ -1925,7 +1991,7 @@ msgstr "Plattform %s bereits installiert"
 msgid "Platform %s installed"
 msgstr "Plattform %s installiert"
 
-#: internal/cli/compile/compile.go:419 internal/cli/upload/upload.go:148
+#: internal/cli/compile/compile.go:420 internal/cli/upload/upload.go:148
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1937,15 +2003,15 @@ msgstr ""
 msgid "Platform %s uninstalled"
 msgstr "Plattform %s deinstalliert"
 
-#: commands/cmderrors/cmderrors.go:427
+#: commands/cmderrors/cmderrors.go:444
 msgid "Platform '%s'"
-msgstr ""
+msgstr "Plattform '%s'"
 
-#: commands/cmderrors/cmderrors.go:503
+#: commands/cmderrors/cmderrors.go:520
 msgid "Platform '%s' is already at the latest version"
 msgstr "Plattform '%s' ist bereits aktuell"
 
-#: commands/cmderrors/cmderrors.go:407
+#: commands/cmderrors/cmderrors.go:424
 msgid "Platform '%s' not found"
 msgstr "Plattform '%s' nicht gefunden"
 
@@ -1953,7 +2019,7 @@ msgstr "Plattform '%s' nicht gefunden"
 msgid "Platform ID"
 msgstr "Plattform ID"
 
-#: internal/cli/compile/compile.go:404 internal/cli/upload/upload.go:136
+#: internal/cli/compile/compile.go:405 internal/cli/upload/upload.go:136
 msgid "Platform ID is not correct"
 msgstr "Plattform ID ist nicht korrekt"
 
@@ -1985,7 +2051,7 @@ msgstr "Plattformname:"
 msgid "Platform size (bytes):"
 msgstr "Plattformgröße (Bytes):"
 
-#: commands/cmderrors/cmderrors.go:154
+#: commands/cmderrors/cmderrors.go:157
 msgid ""
 "Please specify an FQBN. Multiple possible boards detected on port %[1]s with"
 " protocol %[2]s"
@@ -1993,7 +2059,7 @@ msgstr ""
 "Bitte gib ein FQBN an. Mehrere mögliche Boards wurden an Port %[1]s mit "
 "Protokoll %[2]s entdeckt"
 
-#: commands/cmderrors/cmderrors.go:134
+#: commands/cmderrors/cmderrors.go:137
 msgid ""
 "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be"
 " identified"
@@ -2009,7 +2075,7 @@ msgstr "Port"
 msgid "Port closed: %v"
 msgstr "Port geschlossen: %v"
 
-#: commands/cmderrors/cmderrors.go:689
+#: commands/cmderrors/cmderrors.go:706
 msgid "Port monitor error"
 msgstr "Port-Monitor-Fehler"
 
@@ -2026,11 +2092,11 @@ msgstr "Details zu dem Board ausgeben"
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "Gebe den vorverarbeiteten Code aus anstatt zu kompilieren."
 
-#: internal/cli/cli.go:166 internal/cli/cli.go:168
+#: internal/cli/cli.go:168 internal/cli/cli.go:170
 msgid "Print the logs on the standard output."
 msgstr "Gebe die logs auf der Standardausgabe aus."
 
-#: internal/cli/cli.go:180
+#: internal/cli/cli.go:182
 msgid "Print the output in JSON format."
 msgstr "Ausgabe im JSON-Format schreiben"
 
@@ -2042,11 +2108,15 @@ msgstr "Gibt die aktuelle Konfiguration aus."
 msgid "Prints the current configuration."
 msgstr "Gibt die aktuelle Konfiguration aus."
 
-#: commands/cmderrors/cmderrors.go:203
+#: commands/cmderrors/cmderrors.go:224
+msgid "Profile '%s' already exists"
+msgstr "Profil '%s' existiert bereits"
+
+#: commands/cmderrors/cmderrors.go:206
 msgid "Profile '%s' not found"
 msgstr "Profil '%s' nicht gefunden"
 
-#: commands/cmderrors/cmderrors.go:340
+#: commands/cmderrors/cmderrors.go:357
 msgid "Programmer '%s' not found"
 msgstr "Programmer '%s' nicht gefunden"
 
@@ -2062,7 +2132,11 @@ msgstr "Zu verwendender Programmer, z.B. atmel_ice"
 msgid "Programmers:"
 msgstr "Programmers:"
 
-#: commands/cmderrors/cmderrors.go:392
+#: internal/cli/profile/profile_create.go:85
+msgid "Project file created in: %s"
+msgstr "Projektdatei erstellt in: %s"
+
+#: commands/cmderrors/cmderrors.go:409
 msgid "Property '%s' is undefined"
 msgstr "Eigenschaft '%s' ist nicht definiert"
 
@@ -2073,6 +2147,12 @@ msgstr "Protokoll"
 #: internal/cli/lib/search.go:212
 msgid "Provides includes: %s"
 msgstr "Stellt die Includes %s zur Verfügung"
+
+#: internal/cli/profile/profile_lib_remove.go:40
+msgid ""
+"Removes a library from a sketch profile with its dependencies if no longer "
+"needed."
+msgstr ""
 
 #: internal/cli/config/remove.go:34 internal/cli/config/remove.go:35
 msgid "Removes one or more values from a setting."
@@ -2227,10 +2307,6 @@ msgstr "Satz: %s"
 msgid "Server path"
 msgstr "Server-Pfad"
 
-#: internal/arduino/httpclient/httpclient.go:61
-msgid "Server responded with: %s"
-msgstr "Server hat mit: %s geantwortet"
-
 #: internal/cli/debug/debug.go:245
 msgid "Server type"
 msgstr "Server-Typ"
@@ -2243,11 +2319,20 @@ msgstr "Setze einen Wert für ein zum Upload benötigtes Feld."
 msgid "Set terminal in raw mode (unbuffered)."
 msgstr "Aktiviere den Raw-Modus im Terminal (ungepuffert)"
 
+#: internal/cli/profile/profile_set-default.go:33
+#: internal/cli/profile/profile_set-default.go:34
+msgid "Set the default build profile."
+msgstr ""
+
+#: internal/cli/profile/profile_create.go:50
+msgid "Set the profile as the default one."
+msgstr ""
+
 #: internal/cli/config/set.go:34 internal/cli/config/set.go:35
 msgid "Sets a setting value."
 msgstr "Legt einen Einstellungswert fest."
 
-#: internal/cli/cli.go:189
+#: internal/cli/cli.go:191
 msgid ""
 "Sets the default data directory (Arduino CLI will look for configuration "
 "file in this directory)."
@@ -2278,7 +2363,7 @@ msgstr "Legt fest, wo die Konfigurationsdatei gespeichert werden soll."
 msgid "Setting"
 msgstr "Einstellung"
 
-#: internal/cli/cli.go:101
+#: internal/cli/cli.go:102
 msgid "Should show help message, but it is available only in TEXT mode."
 msgstr ""
 "Eine Hilfemeldung sollte angezeigt werden, ist aber nur im TEXT-Modus "
@@ -2383,7 +2468,7 @@ msgstr "Zeigt die Versionsnummer des Arduino CLI an."
 msgid "Size (bytes):"
 msgstr "Größe (Bytes):"
 
-#: commands/service_compile.go:288
+#: commands/service_compile.go:287
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
@@ -2461,7 +2546,7 @@ msgstr "Überspringe die Werkzeugkonfiguration."
 msgid "Skipping: %[1]s"
 msgstr "Wird übersprungen: %[1]s"
 
-#: commands/instances.go:657
+#: commands/instances.go:659
 msgid "Some indexes could not be updated."
 msgstr "Einige Indizes konnten nicht aktualisiert werden."
 
@@ -2475,13 +2560,13 @@ msgstr ""
 msgid "The TCP port the daemon will listen to"
 msgstr "TCP-Port, der vom Daemon überwacht wird"
 
-#: internal/cli/cli.go:177
+#: internal/cli/cli.go:179
 msgid "The command output format, can be: %s"
 msgstr ""
 "Das Ausgabeformat für Befehle kann sein:\n"
 "%s "
 
-#: internal/cli/cli.go:187
+#: internal/cli/cli.go:189
 msgid "The custom config file (if not specified the default will be used)."
 msgstr ""
 "Die benutzerdefinierte Konfigurationsdatei (wenn nicht angegeben, wird der "
@@ -2500,6 +2585,20 @@ msgstr ""
 msgid "The flag --debug-file must be used with --debug."
 msgstr "Das Flag --debug-file muss mit --debug benutzt werden."
 
+#: internal/cli/profile/profile_lib_add.go:109
+msgid "The following libraries were added to the profile %s:"
+msgstr "Die folgenden Bibliotheken wurden zum Profil %s hinzugefügt:"
+
+#: internal/cli/profile/profile_lib_add.go:115
+msgid ""
+"The following libraries were already present in the profile %s and were not "
+"modified:"
+msgstr ""
+
+#: internal/cli/profile/profile_lib_remove.go:105
+msgid "The following libraries were removed from the profile %s:"
+msgstr "Die folgenden Bibliotheken wurden aus dem Profil %s entfernt:"
+
 #: internal/cli/debug/debug_check.go:94
 msgid "The given board/programmer configuration does NOT support debugging."
 msgstr ""
@@ -2510,7 +2609,7 @@ msgid "The given board/programmer configuration supports debugging."
 msgstr ""
 "Die angegebene Board-/Programmer-Konfiguration unterstützt das Debugging."
 
-#: commands/cmderrors/cmderrors.go:897
+#: commands/cmderrors/cmderrors.go:933
 msgid "The instance is no longer valid and needs to be reinitialized"
 msgstr "Die Instanz ist nicht mehr gültig und muss neu initialisiert werden."
 
@@ -2534,11 +2633,11 @@ msgstr ""
 msgid "The library %[1]s has been automatically added from sketch project."
 msgstr ""
 
-#: commands/cmderrors/cmderrors.go:879
+#: commands/cmderrors/cmderrors.go:915
 msgid "The library %s has multiple installations:"
 msgstr "Die Bibliothek %s hat mehrere Installationen:"
 
-#: internal/arduino/builder/builder.go:332
+#: internal/arduino/builder/builder.go:331
 msgid ""
 "The list of included libraries has been changed... rebuilding all libraries."
 msgstr ""
@@ -2561,7 +2660,7 @@ msgstr ""
 "Binärdatei während des Kompilierungsprozesses verwendet wird. Wird nur von "
 "den Plattformen verwendet, die ihn unterstützen."
 
-#: internal/cli/cli.go:174
+#: internal/cli/cli.go:176
 msgid "The output format for the logs, can be: %s"
 msgstr "Das Ausgabeformat für die Logs kann %s sein"
 
@@ -2629,7 +2728,7 @@ msgstr "Toolchain-Prefix"
 msgid "Toolchain type"
 msgstr "Toolchain-Typ"
 
-#: internal/cli/compile/compile.go:417 internal/cli/upload/upload.go:146
+#: internal/cli/compile/compile.go:418 internal/cli/upload/upload.go:146
 msgid "Try running %s"
 msgstr "Versuche %s zu starten"
 
@@ -2669,11 +2768,11 @@ msgstr "Lokaler App-Datenordner kann nicht abgerufen werden: %v"
 msgid "Unable to get user home dir: %v"
 msgstr "Das Home-Verzeichnis des Benutzers kann nicht abgerufen werden: %v"
 
-#: internal/cli/cli.go:252
+#: internal/cli/cli.go:254
 msgid "Unable to open file for logging: %s"
 msgstr "Die Datei kann nicht für die Protokollierung geöffnet werden: %s"
 
-#: commands/instances.go:586
+#: commands/instances.go:588
 msgid "Unable to parse URL"
 msgstr "URL kann nicht geparst werden"
 
@@ -2703,7 +2802,7 @@ msgstr "Deinstalliert eine oder mehrere Bibliotheken."
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: commands/cmderrors/cmderrors.go:184
+#: commands/cmderrors/cmderrors.go:187
 msgid "Unknown FQBN"
 msgstr "Unbekannter FQBN"
 
@@ -2816,11 +2915,11 @@ msgstr "Verwendung:"
 msgid "Use %s for more information about a command."
 msgstr "Benutze %s für mehr Informationen über einen Befehl."
 
-#: internal/cli/compile/compile.go:473
+#: internal/cli/compile/compile.go:474
 msgid "Used library"
 msgstr "Benutzte Bibliothek"
 
-#: internal/cli/compile/compile.go:488
+#: internal/cli/compile/compile.go:489
 msgid "Used platform"
 msgstr "Verwendete Plattform"
 
@@ -2828,7 +2927,7 @@ msgstr "Verwendete Plattform"
 msgid "Used: %[1]s"
 msgstr "Benutzt: %[1]s"
 
-#: commands/service_compile.go:363
+#: commands/service_compile.go:362
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "Verwende das Board '%[1]s' von der Plattform im Ordner: %[2]s"
 
@@ -2838,7 +2937,7 @@ msgstr ""
 "Verwendung von zwischengespeicherten Bibliotheksabhängigkeiten für die "
 "Datei: %[1]s"
 
-#: commands/service_compile.go:364
+#: commands/service_compile.go:363
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr "Verwendung des Kerns '%[1]s' von Platform im Ordner: %[2]s"
 
@@ -2884,6 +2983,8 @@ msgid "VERSION"
 msgstr "VERSION"
 
 #: internal/cli/lib/check_deps.go:38 internal/cli/lib/install.go:45
+#: internal/cli/profile/profile_lib_add.go:40
+#: internal/cli/profile/profile_lib_remove.go:39
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMMER"
 
@@ -2896,7 +2997,7 @@ msgstr "Werte"
 msgid "Verify uploaded binary after the upload."
 msgstr "Überprüfe die hochgeladene Binärdatei nach dem Upload."
 
-#: internal/cli/compile/compile.go:474 internal/cli/compile/compile.go:489
+#: internal/cli/compile/compile.go:475 internal/cli/compile/compile.go:490
 #: internal/cli/core/search.go:117
 msgid "Version"
 msgstr "Version"
@@ -2931,7 +3032,7 @@ msgstr ""
 msgid "Waiting for upload port..."
 msgstr "Warten auf Upload-Port ..."
 
-#: commands/service_compile.go:369
+#: commands/service_compile.go:368
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -2959,7 +3060,7 @@ msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 "Du kannst das %s Flag nicht verwenden, wenn du mit einem Profil kompilierst."
 
-#: internal/arduino/sketch/profiles.go:198
+#: internal/arduino/sketch/profiles.go:224
 msgid ""
 "all platforms in a profile must either require a specific version or not"
 msgstr ""
@@ -3006,7 +3107,7 @@ msgstr ""
 msgid "binary file not found in %s"
 msgstr "Binärdatei wurde nicht in %s gefunden "
 
-#: internal/arduino/cores/packagemanager/package_manager.go:316
+#: internal/arduino/cores/packagemanager/package_manager.go:321
 msgid "board %s not found"
 msgstr "Platine %s nicht gefunden"
 
@@ -3022,7 +3123,7 @@ msgstr "Verzeichnis der eingebauten Bibliotheken nicht festgelegt"
 msgid "can't find latest release of %s"
 msgstr "Die neueste Version von %s wurde nicht gefunden"
 
-#: commands/instances.go:278
+#: commands/instances.go:280
 msgid "can't find latest release of tool %s"
 msgstr "Die neueste Version des Tools %s wurde nicht gefunden"
 
@@ -3047,7 +3148,7 @@ msgstr "Überprüfung der Integrität des lokalen Archivs"
 msgid "cleaning build path"
 msgstr "Build-Pfad bereinigen"
 
-#: internal/cli/cli.go:90
+#: internal/cli/cli.go:91
 msgid "command"
 msgstr "Befehl"
 
@@ -3110,7 +3211,7 @@ msgstr "Erstellen eines temporären Verzeichnisses für die Extraktion: %s"
 msgid "data section exceeds available space in board"
 msgstr "Datenbereich überschreitet den verfügbaren Platz auf der Platine"
 
-#: commands/service_library_resolve_deps.go:86
+#: commands/service_library_resolve_deps.go:117
 msgid "dependency '%s' is not available"
 msgstr "Abhängigkeit '%s' ist nicht verfügbar"
 
@@ -3138,7 +3239,7 @@ msgstr "Discovery %s wurde nicht gefunden"
 msgid "discovery %s not installed"
 msgstr "Discovery %s wurde nicht installiert"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:714
+#: internal/arduino/cores/packagemanager/package_manager.go:719
 msgid "discovery release not found: %s"
 msgstr "Discovery-Release %s wurde nicht gefunden"
 
@@ -3170,15 +3271,15 @@ msgstr "Fehler beim Laden der Sketch-Projektdatei:"
 msgid "error opening %s"
 msgstr "Fehler beim Öffnen von %s"
 
-#: internal/arduino/sketch/profiles.go:300
+#: internal/arduino/sketch/profiles.go:326
 msgid "error parsing version constraints"
 msgstr "Fehler beim Parsen von Versionsbeschränkungen"
 
-#: commands/service_board_identify.go:203
+#: commands/service_board_identify.go:210
 msgid "error processing response from server"
 msgstr "Fehler bei der Verarbeitung der Serverantwort"
 
-#: commands/service_board_identify.go:183
+#: commands/service_board_identify.go:184
 msgid "error querying Arduino Cloud Api"
 msgstr "Fehler bei der Abfrage der Arduino Cloud Api"
 
@@ -3190,11 +3291,11 @@ msgstr "Archiv entpacken"
 msgid "extracting archive: %s"
 msgstr "Archiv wird extrahiert: %s"
 
-#: internal/arduino/resources/checksums.go:143
+#: internal/arduino/resources/checksums.go:136
 msgid "failed to compute hash of file \"%s\""
 msgstr "Der Hash der Datei \"%s\" konnte nicht berechnet werden."
 
-#: commands/service_board_identify.go:178
+#: commands/service_board_identify.go:179
 msgid "failed to initialize http client"
 msgstr "Http-Client konnte nicht initialisiert werden"
 
@@ -3212,7 +3313,7 @@ msgstr "Die Archivdateien müssen in einem Unterverzeichnis abgelegt werden"
 msgid "finding absolute path of %s"
 msgstr "Suche den absoluten Pfad zu %s"
 
-#: internal/cli/cli.go:90
+#: internal/cli/cli.go:91
 msgid "flags"
 msgstr "Flags"
 
@@ -3262,7 +3363,7 @@ msgstr "Hole Archiv-Info: %s"
 msgid "getting archive path: %s"
 msgstr "Hole Archiv-Pfad: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:322
+#: internal/arduino/cores/packagemanager/package_manager.go:327
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr "Build-Eigenschaften für das Board %[1]s : %[2]s abrufen"
 
@@ -3295,7 +3396,7 @@ msgid "interactive terminal not supported for the '%s' output format"
 msgstr ""
 "Interaktives Terminal wird für das Ausgabeformat '%s' nicht unterstützt"
 
-#: internal/arduino/sketch/profiles.go:295
+#: internal/arduino/sketch/profiles.go:321
 msgid "invalid '%s' directive"
 msgstr "Ungültige '%s' Richtlinie"
 
@@ -3354,10 +3455,6 @@ msgstr "Ungültiger Hash '%[1]s': %[2]s"
 msgid "invalid item %s"
 msgstr "ungültiges Element %s"
 
-#: internal/arduino/sketch/profiles.go:352
-msgid "invalid library directive:"
-msgstr "Ungültige Bibliotheksrichtlinie:"
-
 #: internal/arduino/libraries/libraries_layout.go:67
 msgid "invalid library layout: %s"
 msgstr "Ungültiges Bibliothekslayout: %s"
@@ -3366,9 +3463,11 @@ msgstr "Ungültiges Bibliothekslayout: %s"
 msgid "invalid library location: %s"
 msgstr "Ungültiger Ort für Bibliothek: %s"
 
-#: internal/arduino/sketch/profiles.go:337
-#: internal/arduino/sketch/profiles.go:339
-msgid "invalid library reference: %s"
+#: internal/arduino/sketch/profiles.go:366
+#: internal/arduino/sketch/profiles.go:374
+#: internal/arduino/sketch/profiles.go:379
+#: internal/arduino/sketch/profiles.go:389
+msgid "invalid library reference"
 msgstr ""
 
 #: internal/arduino/libraries/loader.go:140
@@ -3393,11 +3492,11 @@ msgstr ""
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr "Fehler. Ungültiger Pfad beim Schreiben der Inventardatei: %[1]s"
 
-#: internal/arduino/sketch/profiles.go:307
+#: internal/arduino/sketch/profiles.go:333
 msgid "invalid platform identifier"
 msgstr "ungültiger Plattformidentifikator"
 
-#: internal/arduino/sketch/profiles.go:318
+#: internal/arduino/sketch/profiles.go:344
 msgid "invalid platform index URL:"
 msgstr "Ungültige Plattform-Index-URL:"
 
@@ -3427,13 +3526,13 @@ msgstr ""
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr "Ungültiger Wert '%[1]s' für Option '%[2]s'"
 
+#: internal/arduino/sketch/profiles.go:391
+msgid "invalid version"
+msgstr "ungültige Version"
+
 #: internal/arduino/cores/packagemanager/loader.go:231
 msgid "invalid version directory %s"
 msgstr "Ungültiges Versionsverzeichnis %s"
-
-#: internal/arduino/sketch/profiles.go:354
-msgid "invalid version:"
-msgstr "ungültige Version:"
 
 #: internal/cli/core/search.go:39
 msgid "keywords"
@@ -3473,7 +3572,7 @@ msgstr "Bibliothek nicht gültig"
 
 #: internal/arduino/builder/internal/preprocessor/ctags.go:242
 msgid "line too long\n"
-msgstr ""
+msgstr "Zeile zu lang\n"
 
 #: internal/arduino/cores/packagemanager/loader.go:255
 #: internal/arduino/cores/packagemanager/loader.go:268
@@ -3485,8 +3584,8 @@ msgstr "lade %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "Platinen werden geladen: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:469
-#: internal/arduino/cores/packagemanager/package_manager.go:484
+#: internal/arduino/cores/packagemanager/package_manager.go:474
+#: internal/arduino/cores/packagemanager/package_manager.go:489
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "json-Indexdatei laden %[1]s: %[2]s"
 
@@ -3531,7 +3630,7 @@ msgstr "Suche nach Build-Artefakten"
 msgid "main file missing from sketch: %s"
 msgstr "Hauptdatei fehlt im Sketch: %s"
 
-#: internal/arduino/sketch/profiles.go:293
+#: internal/arduino/sketch/profiles.go:319
 msgid "missing '%s' directive"
 msgstr "Fehlende '%s' Richtlinie"
 
@@ -3539,7 +3638,7 @@ msgstr "Fehlende '%s' Richtlinie"
 msgid "missing checksum for: %s"
 msgstr "Fehlende Prüfsumme für: %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:430
+#: internal/arduino/cores/packagemanager/package_manager.go:435
 msgid "missing package %[1]s referenced by board %[2]s"
 msgstr "Fehlendes Paket %[1]s referenziert von Board %[2]s"
 
@@ -3549,19 +3648,19 @@ msgstr ""
 "Fehlender Paketindex für %s, zukünftige Updates können nicht garantiert "
 "werden"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:435
+#: internal/arduino/cores/packagemanager/package_manager.go:440
 msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgstr "Fehlende Plattform %[1]s:%[2]s referenziert von Board %[3]s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:440
+#: internal/arduino/cores/packagemanager/package_manager.go:445
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "Fehlende Plattformfreigabe %[1]s:%[2]s referenziert von Board %[3]s"
 
-#: internal/arduino/resources/index.go:153
+#: internal/arduino/resources/index.go:155
 msgid "missing signature"
 msgstr "Fehlende Signatur"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:725
+#: internal/arduino/cores/packagemanager/package_manager.go:730
 msgid "monitor release not found: %s"
 msgstr "Monitor-Freigabe nicht gefunden: %s"
 
@@ -3650,12 +3749,12 @@ msgstr "Öffne Zieldatei: %s"
 msgid "package %s not found"
 msgstr "Paket %s nicht gefunden"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:498
+#: internal/arduino/cores/packagemanager/package_manager.go:503
 msgid "package '%s' not found"
 msgstr "Paket '%s' nicht gefunden"
 
 #: internal/arduino/cores/board.go:167
-#: internal/arduino/cores/packagemanager/package_manager.go:263
+#: internal/arduino/cores/packagemanager/package_manager.go:268
 msgid "parsing fqbn: %s"
 msgstr "parse FQBN: %s"
 
@@ -3671,15 +3770,15 @@ msgstr "Pfad ist kein Plattformverzeichnis: %s"
 msgid "platform %[1]s not found in package %[2]s"
 msgstr "Plattform %[1]s nicht im Paket %[2]s gefunden "
 
-#: internal/arduino/cores/packagemanager/package_manager.go:309
+#: internal/arduino/cores/packagemanager/package_manager.go:314
 msgid "platform %s is not installed"
 msgstr "Plattform %s ist nicht installiert"
 
-#: commands/cmderrors/cmderrors.go:427
+#: commands/cmderrors/cmderrors.go:444
 msgid "platform is not available for your OS"
 msgstr "Plattform ist für dieses Betriebssystem nicht verfügbar"
 
-#: commands/service_compile.go:130
+#: commands/service_compile.go:130 commands/service_profile_create.go:73
 #: internal/arduino/cores/packagemanager/install_uninstall.go:181
 #: internal/arduino/cores/packagemanager/install_uninstall.go:285
 #: internal/arduino/cores/packagemanager/loader.go:417
@@ -3729,7 +3828,7 @@ msgstr "Verzeichnis %s wird gelesen"
 msgid "reading directory %s content"
 msgstr "Verzeichnisinhalt lesen %s"
 
-#: internal/arduino/builder/sketch.go:83
+#: internal/arduino/builder/sketch.go:91
 msgid "reading file %[1]s: %[2]s"
 msgstr "Datei %[1]s wird gelesen: %[2]s"
 
@@ -3765,7 +3864,7 @@ msgstr "Sketch-Dateien lesen"
 msgid "recipe not found '%s'"
 msgstr "Rezept nicht gefunden '%s'"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:574
+#: internal/arduino/cores/packagemanager/package_manager.go:579
 msgid "release %[1]s not found for tool %[2]s"
 msgstr "Freigabe %[1]s für Werkzeug %[2]s nicht gefunden "
 
@@ -3858,7 +3957,7 @@ msgstr "Textbereich überschreitet den verfügbaren Platz auf der Platine"
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr "Die Kompilierdatenbank kann unvollständig oder ungenau sein"
 
-#: commands/service_board_identify.go:190
+#: commands/service_board_identify.go:191
 msgid "the server responded with status %s"
 msgstr "Der Server antwortete mit dem Status %s"
 
@@ -3875,7 +3974,7 @@ msgstr "Das Tool %s wird nicht vom Paketmanager verwaltet."
 msgid "tool %s not found"
 msgstr "Tool %s nicht gefunden"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:524
+#: internal/arduino/cores/packagemanager/package_manager.go:529
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "Tool '%[1]s' nicht in Paket '%[2]s' gefunden"
 
@@ -3883,8 +3982,8 @@ msgstr "Tool '%[1]s' nicht in Paket '%[2]s' gefunden"
 msgid "tool not installed"
 msgstr "Werkzeug nicht installiert"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:703
-#: internal/arduino/cores/packagemanager/package_manager.go:809
+#: internal/arduino/cores/packagemanager/package_manager.go:708
+#: internal/arduino/cores/packagemanager/package_manager.go:814
 msgid "tool release not found: %s"
 msgstr "Werkzeugfreigabe nicht gefunden: %s"
 
@@ -3892,24 +3991,24 @@ msgstr "Werkzeugfreigabe nicht gefunden: %s"
 msgid "tool version %s not found"
 msgstr "Werkzeugversion %s nicht gefunden"
 
-#: commands/service_library_install.go:93
+#: commands/service_library_install.go:102
 msgid ""
 "two different versions of the library %[1]s are required: %[2]s and %[3]s"
 msgstr ""
 "zwei verschiedene Versionen der Bibliothek %[1]s sind erforderlich: %[2]s "
 "und %[3]s"
 
-#: internal/arduino/builder/sketch.go:76
-#: internal/arduino/builder/sketch.go:120
+#: internal/arduino/builder/sketch.go:84
+#: internal/arduino/builder/sketch.go:129
 msgid "unable to compute relative path to the sketch for the item"
 msgstr ""
 "Relativer Pfad zum Sketch konnte für das Element nicht berechnet werden"
 
-#: internal/arduino/builder/sketch.go:45
+#: internal/arduino/builder/sketch.go:53
 msgid "unable to create a folder to save the sketch"
 msgstr "Konnte keinen Ordner zum Speichern des Sketchs erstellen"
 
-#: internal/arduino/builder/sketch.go:126
+#: internal/arduino/builder/sketch.go:135
 msgid "unable to create the folder containing the item"
 msgstr "Konnte Ordner, der das Objekt enthält, nicht erstellen"
 
@@ -3917,23 +4016,23 @@ msgstr "Konnte Ordner, der das Objekt enthält, nicht erstellen"
 msgid "unable to marshal config to YAML: %v"
 msgstr "Konnte die Konfiguration nicht in YAML umwandeln: %v"
 
-#: internal/arduino/builder/sketch.go:164
+#: internal/arduino/builder/sketch.go:175
 msgid "unable to read contents of the destination item"
 msgstr "Inhalt des Zielobjekts konnte nicht gelesen werden"
 
-#: internal/arduino/builder/sketch.go:137
+#: internal/arduino/builder/sketch.go:146
 msgid "unable to read contents of the source item"
 msgstr "Inhalt der Quelle konnte nicht gelesen werden"
 
-#: internal/arduino/builder/sketch.go:147
+#: internal/arduino/builder/sketch.go:158
 msgid "unable to write to destination file"
 msgstr "Schreiben in Zieldatei unmöglich"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:297
+#: internal/arduino/cores/packagemanager/package_manager.go:302
 msgid "unknown package %s"
 msgstr "unbekanntes Paket %s"
 
-#: internal/arduino/cores/packagemanager/package_manager.go:304
+#: internal/arduino/cores/packagemanager/package_manager.go:309
 msgid "unknown platform %s:%s"
 msgstr "unbekannte Plattform %s:%s"
 
@@ -3977,6 +4076,6 @@ msgstr "Version %s ist für dieses Betriebssystem nicht verfügbar"
 msgid "version %s not found"
 msgstr "Version %s nicht gefunden"
 
-#: commands/service_board_identify.go:208
+#: commands/service_board_identify.go:216
 msgid "wrong format in server response"
 msgstr "falsches Format in der Serverantwort"

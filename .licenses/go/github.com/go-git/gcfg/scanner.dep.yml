@@ -4,7 +4,7 @@ version: v1.5.1-0.20230307220236-3a3c6141e376
 type: go
 summary: Package scanner implements a scanner for gcfg configuration text.
 homepage: https://pkg.go.dev/github.com/go-git/gcfg/scanner
-license: other
+license: bsd-3-clause
 licenses:
 - sources: gcfg@v1.5.1-0.20230307220236-3a3c6141e376/LICENSE
   text: |

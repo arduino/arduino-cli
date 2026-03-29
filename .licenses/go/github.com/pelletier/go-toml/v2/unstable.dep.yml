@@ -5,7 +5,7 @@ type: go
 summary: Package unstable provides APIs that do not meet the backward compatibility
   guarantees yet.
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/unstable
-license: other
+license: mit
 licenses:
 - sources: v2@v2.2.4/LICENSE
   text: |

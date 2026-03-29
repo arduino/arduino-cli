@@ -29,7 +29,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -799,11 +799,12 @@ func TestFindPlatformReleaseDependencies(t *testing.T) {
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	pl, tools, err := pme.FindPlatformReleaseDependencies(&PlatformReference{Package: "test", PlatformArchitecture: "avr"})
+	pl, tools, libs, err := pme.FindPlatformReleaseDependencies(&PlatformReference{Package: "test", PlatformArchitecture: "avr"})
 	require.NoError(t, err)
 	require.NotNil(t, pl)
 	require.Len(t, tools, 3)
 	require.Equal(t, "[test:some-tool@0.42.0 test:discovery-tool@0.42.0 test:monitor-tool@0.42.0]", fmt.Sprint(tools))
+	require.Equal(t, "[some-library@1.0.0]", fmt.Sprint(libs))
 }
 
 func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {

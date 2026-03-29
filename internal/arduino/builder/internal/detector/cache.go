@@ -18,9 +18,11 @@ package detector
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 type detectorCache struct {
@@ -39,7 +41,7 @@ func (e *detectorCacheEntry) String() string {
 	if e.AddedIncludePath != nil {
 		return "Added include path: " + e.AddedIncludePath.String()
 	}
-	if e.Compile != nil && e.CompileTask != nil {
+	if e.CompileTask != nil {
 		return "Compiling: " + e.Compile.String() + " / " + e.CompileTask.String()
 	}
 	if e.MissingIncludeH != nil {
@@ -51,6 +53,13 @@ func (e *detectorCacheEntry) String() string {
 	return "No operation"
 }
 
+func (e *detectorCacheEntry) LogMsg() string {
+	if e.CompileTask == nil {
+		return e.String()
+	}
+	return "Compiling: " + e.Compile.SourcePath.String()
+}
+
 func (e *detectorCacheEntry) Equals(entry *detectorCacheEntry) bool {
 	return e.String() == entry.String()
 }
@@ -60,11 +69,11 @@ func newDetectorCache() *detectorCache {
 }
 
 func (c *detectorCache) String() string {
-	res := ""
+	var res strings.Builder
 	for _, entry := range c.entries {
-		res += fmt.Sprintln(entry)
+		fmt.Fprintln(&res, entry)
 	}
-	return res
+	return res.String()
 }
 
 // Load reads a saved cache from the given file.
@@ -88,16 +97,43 @@ func (c *detectorCache) Load(cacheFile *paths.Path) error {
 	return nil
 }
 
-// Expect adds an entry to the cache and checks if it matches the next expected entry.
-func (c *detectorCache) Expect(entry *detectorCacheEntry) {
+// ExpectCompile adds a compile entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) ExpectCompile(sourceFile sourceFile, compileTask *runner.Task) {
+	c.expect(&detectorCacheEntry{
+		Compile:     &sourceFile,
+		CompileTask: compileTask,
+	})
+}
+
+// ExpectAddedIncludePath adds an added include path entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) ExpectAddedIncludePath(includePath *paths.Path) {
+	c.expect(&detectorCacheEntry{
+		AddedIncludePath: includePath,
+	})
+}
+
+// ExpectMissingIncludeH adds a missing include file entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) ExpectMissingIncludeH(missingIncludeH string) {
+	c.expect(&detectorCacheEntry{
+		MissingIncludeH: &missingIncludeH,
+	})
+}
+
+// expect adds an entry to the cache and checks if it matches the next expected entry.
+func (c *detectorCache) expect(entry *detectorCacheEntry) {
 	if c.curr < len(c.entries) {
 		if c.entries[c.curr].Equals(entry) {
 			// Cache hit, move to the next entry
 			c.curr++
+			logrus.Tracef("[LD] CACHE: HIT %s", entry.LogMsg())
 			return
 		}
 		// Cache mismatch, invalidate and cut the remainder of the cache
+		logrus.Tracef("[LD] CACHE: INVALIDATE %s", entry.LogMsg())
+		logrus.Tracef("[LD]              (was %s)", c.entries[c.curr])
 		c.entries = c.entries[:c.curr]
+	} else {
+		logrus.Tracef("[LD] CACHE: MISSING %s", entry.LogMsg())
 	}
 	c.curr++
 	c.entries = append(c.entries, entry)

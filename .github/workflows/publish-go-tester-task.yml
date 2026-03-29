@@ -1,7 +1,7 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/publish-go-tester-task.md
 name: Publish Tester Build
 
-# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
   create:
   push:
@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       result: ${{ steps.determination.outputs.result }}
+    permissions: {}
     steps:
       - name: Determine if the rest of the workflow should run
         id: determination
@@ -41,10 +42,10 @@ jobs:
           RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
           TAG_REGEX="refs/tags/.*"
           # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
-          if [[ \
-            ("${{ github.event_name }}" != "create" || \
-            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX) && \
-            ! "${{ github.ref }}" =~ $TAG_REGEX \
+          if [[
+            ("${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX) &&
+            ! "${{ github.ref }}" =~ $TAG_REGEX
           ]]; then
             # Run the other jobs.
             RESULT="true"
@@ -53,12 +54,13 @@ jobs:
             RESULT="false"
           fi
 
-          echo "result=$RESULT" >> $GITHUB_OUTPUT
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
 
   package-name-prefix:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       prefix: ${{ steps.calculation.outputs.prefix }}
     steps:
@@ -71,12 +73,14 @@ jobs:
           fi
           PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
 
-          echo "prefix=$PACKAGE_NAME_PREFIX" >> $GITHUB_OUTPUT
+          echo "prefix=$PACKAGE_NAME_PREFIX" >>$GITHUB_OUTPUT
 
-  create-artifacts:
+  build:
     needs: package-name-prefix
     name: Create artifact ${{ matrix.artifact.name }}
     runs-on: ${{ matrix.artifact.runner }}
+    permissions:
+      contents: read
 
     strategy:
       matrix:
@@ -129,56 +133,60 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
 
       - name: Install buf
         uses: bufbuild/buf-action@v1
         with:
           setup_only: true
 
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
       - name: Build
         run: |
           PACKAGE_NAME_PREFIX=${{ needs.package-name-prefix.outputs.prefix }}
           export PACKAGE_NAME_PREFIX
-          task ${{ matrix.artifact.task }}
+          go tool \
+            github.com/go-task/task/v3/cmd/task ${{ matrix.artifact.task }}
 
       # Transfer builds to artifacts job
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           path: ${{ env.DIST_DIR }}/${{ matrix.artifact.path }}
           name: ${{ matrix.artifact.name }}
 
   checksums:
     needs:
-      - create-artifacts
+      - build
       - package-name-prefix
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v6
-      - name: Output checksum
+        uses: actions/download-artifact@v8
+
+      - name: Create checksum file
         run: |
           TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"
-          declare -a artifacts=($(ls -d */))
-          for artifact in ${artifacts[@]}
-          do
+
+          declare \
+            -a \
+            artifacts=($(ls -d */))
+
+          for artifact in ${artifacts[@]}; do
             cd $artifact
             checksum=$(sha256sum ${{ env.PROJECT_NAME }}_${TAG}*)
             cd ..
-            echo $checksum >> ${TAG}-checksums.txt
+            echo $checksum >>${TAG}-checksums.txt
           done
 
       - name: Upload checksum artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           path: ./*checksums.txt
           name: checksums

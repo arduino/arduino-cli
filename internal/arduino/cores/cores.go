@@ -20,8 +20,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/url"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -32,6 +34,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -61,6 +64,7 @@ type PlatformRelease struct {
 	ToolDependencies        ToolDependencies
 	DiscoveryDependencies   DiscoveryDependencies
 	MonitorDependencies     MonitorDependencies
+	LibrariesDependencies   LibrariesDependencies
 	Deprecated              bool
 	Help                    PlatformReleaseHelp           `json:"-"`
 	Platform                *Platform                     `json:"-"`
@@ -235,6 +239,26 @@ func (d *MonitorDependency) String() string {
 	return fmt.Sprintf("%s:%s", d.Packager, d.Name)
 }
 
+// LibrariesDependencies is a list of LibraryDependency
+type LibrariesDependencies []*LibraryDependency
+
+// Sort the LibrariesDependencies by name.
+func (d LibrariesDependencies) Sort() {
+	sort.Slice(d, func(i, j int) bool {
+		return d[i].Name < d[j].Name
+	})
+}
+
+// LibraryDependency identifies a specific library.
+type LibraryDependency struct {
+	Name    string
+	Version *semver.Version
+}
+
+func (d *LibraryDependency) String() string {
+	return fmt.Sprintf("%s@%s", d.Name, d.Version)
+}
+
 // GetOrCreateRelease returns the specified release corresponding the provided version,
 // or creates a new one if not found.
 func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformRelease {
@@ -356,6 +380,19 @@ func (platform *Platform) String() string {
 	return platform.Package.Name + ":" + platform.Architecture
 }
 
+// ToRPCPlatformMetadata makes a gRPC PlatformMetadata message out of this Platform.
+func (platform *Platform) ToRPCPlatformMetadata() *rpc.PlatformMetadata {
+	return &rpc.PlatformMetadata{
+		Id:                platform.String(),
+		Maintainer:        platform.Package.Maintainer,
+		Website:           platform.Package.WebsiteURL,
+		Email:             platform.Package.Email,
+		ManuallyInstalled: platform.ManuallyInstalled,
+		Deprecated:        platform.Deprecated,
+		Indexed:           platform.Indexed,
+	}
+}
+
 // GetOrCreateBoard returns the Board object with the specified boardID
 // or creates a new one if not found
 func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
@@ -460,6 +497,33 @@ func (release *PlatformRelease) ToRPCPlatformReference() *rpc.InstalledPlatformR
 		Version:    release.Version.String(),
 		InstallDir: release.InstallDir.String(),
 		PackageUrl: url,
+	}
+}
+
+// ToRPC creates a gRPC PlatformRelease message out of this PlatformRelease.
+func (release *PlatformRelease) ToRPC() *rpc.PlatformRelease {
+	// If the boards are not installed yet, the `release.Boards` will be a zero length slice.
+	// In such case, we have to use the `release.BoardsManifest` instead, so that we can retrieve the name of the boards at least.
+	var boards []*rpc.Board
+	if len(release.Boards) > 0 {
+		boards = f.Map(slices.Collect(maps.Values(release.Boards)), func(board *Board) *rpc.Board {
+			return &rpc.Board{Name: board.Name(), Fqbn: board.FQBN()}
+		})
+	} else {
+		boards = f.Map(release.BoardsManifest, func(board *BoardManifest) *rpc.Board {
+			return &rpc.Board{Name: board.Name}
+		})
+	}
+	return &rpc.PlatformRelease{
+		Name:            release.Name,
+		Help:            &rpc.HelpResources{Online: release.Platform.Package.Help.Online},
+		Boards:          boards,
+		Version:         release.Version.String(),
+		Installed:       release.IsInstalled(),
+		MissingMetadata: !release.HasMetadata(),
+		Types:           []string{release.Category},
+		Deprecated:      release.Deprecated,
+		Compatible:      release.IsCompatible(),
 	}
 }
 

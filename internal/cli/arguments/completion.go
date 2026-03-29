@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"go.bug.st/f"
 )
 
@@ -171,4 +172,20 @@ func GetAvailablePorts(ctx context.Context, srv rpc.ArduinoCoreServiceServer) []
 
 	// Transform the data structure for the completion (DetectedPort -> Port)
 	return f.Map(list.GetPorts(), (*rpc.DetectedPort).GetPort)
+}
+
+// GetProfileLibraries is an helper function useful to autocomplete.
+// It returns a list of libraries present in the specified profile.
+func GetProfileLibraries(ctx context.Context, srv rpc.ArduinoCoreServiceServer, sketchPath *paths.Path, profile string) []string {
+	resp, err := srv.ProfileLibList(ctx, &rpc.ProfileLibListRequest{
+		SketchPath:  sketchPath.String(),
+		ProfileName: profile,
+	})
+	if err != nil {
+		return nil
+	}
+	res := f.Map(resp.GetLibraries(), func(lib *rpc.ProfileLibraryReference) string {
+		return lib.GetIndexLibrary().GetName()
+	})
+	return res
 }

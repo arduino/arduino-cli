@@ -1,12 +1,6 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/deploy-cobra-mkdocs-versioned-poetry.md
 name: Deploy Website
 
-env:
-  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
-  # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
-  PYTHON_VERSION: "3.9"
-
 on:
   push:
     branches:
@@ -17,13 +11,18 @@ on:
     paths:
       - "docs/**"
       - ".github/workflows/deploy-cobra-mkdocs-versioned-poetry.ya?ml"
+      - "**/.npmrc"
       - "go.mod"
       - "go.sum"
       - "Taskfile.ya?ml"
       - "**.go"
+      - "docsgen/**"
+      - "ruledocsgen/**"
       - "internal/docsgen/**"
       - "rpc/**"
       - "mkdocs.ya?ml"
+      - "package.json"
+      - "package-lock.json"
       - "poetry.lock"
       - "pyproject.toml"
   # Run on branch or tag creation (will be filtered by the publish-determination job).
@@ -32,6 +31,7 @@ on:
 jobs:
   publish-determination:
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       result: ${{ steps.determination.outputs.result }}
     steps:
@@ -39,18 +39,26 @@ jobs:
         id: determination
         run: |
           RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
-          if [[ "${{ github.event_name }}" == "push" || ( "${{ github.event_name }}" == "create" && "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX ) ]]; then
+          if [[
+            "${{ github.event_name }}" == "push" ||
+            (
+              "${{ github.event_name }}" == "create" &&
+              "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+            )
+          ]]; then
             RESULT="true"
           else
             RESULT="false"
           fi
 
-          echo "result=$RESULT" >> $GITHUB_OUTPUT
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
 
   publish:
     runs-on: ubuntu-latest
     needs: publish-determination
     if: needs.publish-determination.outputs.result == 'true'
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -59,7 +67,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
 
       - name: Install Go dependencies
         run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
@@ -71,7 +79,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version-file: pyproject.toml
 
       - name: Install Poetry
         run: |
@@ -85,25 +93,43 @@ jobs:
           version: 3.x
 
       - name: Create all generated documentation content
-        run: task docs:generate
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task docs:generate
 
-      - name: Install Python dependencies
-        run: poetry install --no-root
+      - name: Install Dependencies
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task poetry:install-deps \
+              POETRY_GROUPS=dev
 
       - name: Determine versioning parameters
         id: determine-versioning
-        run: echo "data=$(poetry run python docs/siteversion/siteversion.py)" >> $GITHUB_OUTPUT
+        run: echo "data=$(poetry run python docs/siteversion/siteversion.py)" >>$GITHUB_OUTPUT
 
       - name: Publish documentation
         if: fromJson(steps.determine-versioning.outputs.data).version != null
         run: |
           # Publishing implies creating a git commit on the gh-pages branch, we let @ArduinoBot own these commits.
-          git config --global user.email "bot@arduino.cc"
-          git config --global user.name "ArduinoBot"
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
-          poetry run mike deploy \
-            --update-aliases \
-            --push \
-            --remote origin \
-            ${{ fromJson(steps.determine-versioning.outputs.data).version }} \
-            ${{ fromJson(steps.determine-versioning.outputs.data).alias }}
+          git config \
+            --global \
+            user.email "bot@arduino.cc"
+
+          git config \
+            --global \
+            user.name "ArduinoBot"
+
+          git fetch \
+            --no-tags \
+            --prune \
+            --depth=1 \
+            origin \
+            +refs/heads/gh-pages:refs/remotes/origin/gh-pages
+
+          poetry run \
+            mike deploy \
+              --update-aliases \
+              --push \
+              --remote origin \
+              ${{ fromJson(steps.determine-versioning.outputs.data).version }} \
+              ${{ fromJson(steps.determine-versioning.outputs.data).alias }}

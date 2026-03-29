@@ -59,35 +59,36 @@ type Project struct {
 
 // AsYaml outputs the sketch project file as YAML
 func (p *Project) AsYaml() string {
-	res := "profiles:\n"
+	var res strings.Builder
+	res.WriteString("profiles:\n")
 
 	for _, profile := range p.Profiles {
-		res += fmt.Sprintf("  %s:\n", profile.Name)
-		res += profile.AsYaml()
-		res += "\n"
+		fmt.Fprintf(&res, "  %s:\n", profile.Name)
+		res.WriteString(profile.AsYaml())
+		res.WriteString("\n")
 	}
 	if p.DefaultProfile != "" {
-		res += fmt.Sprintf("default_profile: %s\n", p.DefaultProfile)
+		fmt.Fprintf(&res, "default_profile: %s\n", p.DefaultProfile)
 	}
 	if p.DefaultFqbn != "" {
-		res += fmt.Sprintf("default_fqbn: %s\n", p.DefaultFqbn)
+		fmt.Fprintf(&res, "default_fqbn: %s\n", p.DefaultFqbn)
 	}
 	if p.DefaultPort != "" {
-		res += fmt.Sprintf("default_port: %s\n", p.DefaultPort)
+		fmt.Fprintf(&res, "default_port: %s\n", p.DefaultPort)
 	}
 	if len(p.DefaultPortConfig) > 0 {
-		res += "default_port_config:\n"
+		res.WriteString("default_port_config:\n")
 		for k, v := range p.DefaultPortConfig {
-			res += fmt.Sprintf("  %s: %s\n", k, v)
+			fmt.Fprintf(&res, "  %s: %s\n", k, v)
 		}
 	}
 	if p.DefaultProtocol != "" {
-		res += fmt.Sprintf("default_protocol: %s\n", p.DefaultProtocol)
+		fmt.Fprintf(&res, "default_protocol: %s\n", p.DefaultProtocol)
 	}
 	if p.DefaultProgrammer != "" {
-		res += fmt.Sprintf("default_programmer: %s\n", p.DefaultProgrammer)
+		fmt.Fprintf(&res, "default_programmer: %s\n", p.DefaultProgrammer)
 	}
-	return res
+	return res.String()
 }
 
 func (p *projectRaw) getProfiles() ([]*Profile, error) {
@@ -124,6 +125,9 @@ type Profile struct {
 
 // UsesSystemPlatform checks if this profile requires a system installed platform.
 func (p *Profile) RequireSystemInstalledPlatform() bool {
+	if len(p.Platforms) == 0 {
+		return true
+	}
 	return p.Platforms[0].RequireSystemInstalledPlatform()
 }
 
@@ -172,29 +176,29 @@ func (p *Profile) ToRpc() *rpc.SketchProfile {
 
 // AsYaml outputs the profile as Yaml
 func (p *Profile) AsYaml() string {
-	res := ""
+	var res strings.Builder
 	if p.Notes != "" {
-		res += fmt.Sprintf("    notes: %s\n", p.Notes)
+		fmt.Fprintf(&res, "    notes: %s\n", p.Notes)
 	}
-	res += fmt.Sprintf("    fqbn: %s\n", p.FQBN)
+	fmt.Fprintf(&res, "    fqbn: %s\n", p.FQBN)
 	if p.Programmer != "" {
-		res += fmt.Sprintf("    programmer: %s\n", p.Programmer)
+		fmt.Fprintf(&res, "    programmer: %s\n", p.Programmer)
 	}
 	if p.Port != "" {
-		res += fmt.Sprintf("    port: %s\n", p.Port)
+		fmt.Fprintf(&res, "    port: %s\n", p.Port)
 	}
 	if p.Protocol != "" {
-		res += fmt.Sprintf("    protocol: %s\n", p.Protocol)
+		fmt.Fprintf(&res, "    protocol: %s\n", p.Protocol)
 	}
 	if len(p.PortConfig) > 0 {
-		res += "     port_config:\n"
+		res.WriteString("     port_config:\n")
 		for k, v := range p.PortConfig {
-			res += fmt.Sprintf("       %s: %s\n", k, v)
+			fmt.Fprintf(&res, "       %s: %s\n", k, v)
 		}
 	}
-	res += p.Platforms.AsYaml()
-	res += p.Libraries.AsYaml()
-	return res
+	res.WriteString(p.Platforms.AsYaml())
+	res.WriteString(p.Libraries.AsYaml())
+	return res.String()
 }
 
 // ProfileRequiredPlatforms is a list of ProfilePlatformReference (platforms
@@ -206,14 +210,15 @@ func (p *ProfileRequiredPlatforms) AsYaml() string {
 	if len(*p) == 0 {
 		return "    platforms: []\n"
 	}
-	res := "    platforms:\n"
+	var res strings.Builder
+	res.WriteString("    platforms:\n")
 	for _, platform := range *p {
-		res += platform.AsYaml()
+		res.WriteString(platform.AsYaml())
 	}
-	return res
+	return res.String()
 }
 
-func (p *ProfileRequiredPlatforms) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (p *ProfileRequiredPlatforms) UnmarshalYAML(unmarshal func(any) error) error {
 	_p := (*[]*ProfilePlatformReference)(p)
 	if err := unmarshal(_p); err != nil {
 		return err
@@ -236,11 +241,12 @@ func (p *ProfileRequiredLibraries) AsYaml() string {
 	if len(*p) == 0 {
 		return ""
 	}
-	res := "    libraries:\n"
+	var res strings.Builder
+	res.WriteString("    libraries:\n")
 	for _, lib := range *p {
-		res += lib.AsYaml()
+		res.WriteString(lib.AsYaml())
 	}
-	return res
+	return res.String()
 }
 
 // ProfilePlatformReference is a reference to a platform
@@ -310,7 +316,7 @@ func parseNameAndVersion(in string) (string, string, bool) {
 }
 
 // UnmarshalYAML decodes a ProfilePlatformReference from YAML source.
-func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(any) error) error {
 	var data map[string]string
 	if err := unmarshal(&data); err != nil {
 		return err
@@ -357,7 +363,7 @@ type ProfileLibraryReference struct {
 }
 
 // UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
-func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(any) error) error {
 	var dataMap map[string]any
 	var libReference string
 	if err := unmarshal(&dataMap); err == nil {

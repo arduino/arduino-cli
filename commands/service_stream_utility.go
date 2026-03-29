@@ -47,9 +47,7 @@ func (w *implWriteCloser) Close() error {
 func feedStreamTo(writer func(data []byte)) io.WriteCloser {
 	r, w := nio.Pipe(buffer.New(32 * 1024))
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		data := make([]byte, 16384)
 		for {
 			if n, err := r.Read(data); err == nil {
@@ -65,7 +63,7 @@ func feedStreamTo(writer func(data []byte)) io.WriteCloser {
 				return
 			}
 		}
-	}()
+	})
 	return &implWriteCloser{
 		write: w.Write,
 		close: func() error {

@@ -1,9 +1,5 @@
 name: Check Protocol Buffers
 
-env:
-  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
-
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
   create:
@@ -23,6 +19,7 @@ on:
 jobs:
   run-determination:
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       result: ${{ steps.determination.outputs.result }}
     steps:
@@ -47,6 +44,8 @@ jobs:
   build:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
@@ -58,21 +57,23 @@ jobs:
         with:
           setup_only: true
 
-      - name: Install Task
-        uses: arduino/setup-task@v2
+      - name: Install Go
+        uses: actions/setup-go@v6
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          go-version-file: go.mod
 
       - name: Check protocol buffers compile correctly
         if: runner.os == 'Linux'
         run: |
-          task protoc:compile
+          go tool \
+            github.com/go-task/task/v3/cmd/task protoc:compile
           git diff --color --exit-code
 
   check:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:

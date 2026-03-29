@@ -389,22 +389,22 @@ func (cli *ArduinoCLI) run(ctx context.Context, stdoutBuff, stderrBuff io.Writer
 
 	cli.t.NoError(cliProc.Start())
 
+	if stdoutBuff == nil {
+		stdoutBuff = io.Discard
+	}
+	if stderrBuff == nil {
+		stderrBuff = io.Discard
+	}
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		if stdoutBuff == nil {
-			stdoutBuff = io.Discard
-		}
 		if _, err := io.Copy(stdoutBuff, io.TeeReader(stdout, terminalOut)); err != nil {
 			fmt.Fprintln(terminalOut, color.HiBlackString("<<< stdout copy error:"), err)
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if stderrBuff == nil {
-			stderrBuff = io.Discard
-		}
 		if _, err := io.Copy(stderrBuff, io.TeeReader(stderr, terminalErr)); err != nil {
 			fmt.Fprintln(terminalErr, color.HiBlackString("<<< stderr copy error:"), err)
 		}
@@ -805,5 +805,19 @@ func (inst *ArduinoCLIInstance) ProfileLibRemove(
 	}
 	logCallf(">>> ProfileLibRemove(%+v)\n", req)
 	resp, err := inst.cli.daemonClient.ProfileLibRemove(ctx, req)
+	return resp, err
+}
+
+// ArchiveSketch calls the "ArchiveSketch" gRPC method.
+func (cli *ArduinoCLI) ArchiveSketch(ctx context.Context, sketchPath, archivePath string, includeBuildDir, overwrite bool) (*commands.ArchiveSketchResponse, error) {
+	req := &commands.ArchiveSketchRequest{
+		SketchPath:      sketchPath,
+		ArchivePath:     archivePath,
+		IncludeBuildDir: includeBuildDir,
+		Overwrite:       overwrite,
+	}
+	logCallf(">>> ArchiveSketch(%+v)\n", req)
+	resp, err := cli.daemonClient.ArchiveSketch(ctx, req)
+	logCallf("err=%v\n", err)
 	return resp, err
 }

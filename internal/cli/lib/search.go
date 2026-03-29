@@ -141,7 +141,7 @@ type librarySearchResult struct {
 	namesOnly bool
 }
 
-func (res librarySearchResult) Data() interface{} {
+func (res librarySearchResult) Data() any {
 	if res.namesOnly {
 		type LibName struct {
 			Name string `json:"name"`

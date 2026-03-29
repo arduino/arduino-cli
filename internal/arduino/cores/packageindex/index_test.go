@@ -39,6 +39,17 @@ func TestIndexParsing(t *testing.T) {
 	}
 }
 
+func TestDecodeOfLibraryDeps(t *testing.T) {
+	idx, err := LoadIndex(paths.New("testdata", "package_test1_index.json"))
+	require.NoError(t, err)
+	require.NotNil(t, idx)
+	require.Len(t, idx.Packages, 1)
+	require.Len(t, idx.Packages[0].Platforms, 1)
+	require.Len(t, idx.Packages[0].Platforms[0].LibrariesDependencies, 1)
+	require.Equal(t, "FlashStorage", idx.Packages[0].Platforms[0].LibrariesDependencies[0].Name)
+	require.Equal(t, "1.0.0", idx.Packages[0].Platforms[0].LibrariesDependencies[0].Version.String())
+}
+
 func TestIndexFromPlatformRelease(t *testing.T) {
 	arduinoTools := map[string]*cores.Tool{
 		"serial-discovery": {
@@ -276,6 +287,9 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			{Packager: "arduino", Name: "ble-monitor"},
 			{Packager: "arduino", Name: "serial-monitor"},
 		},
+		LibrariesDependencies: cores.LibrariesDependencies{
+			{Name: "FlashStorage", Version: semver.MustParse("1.0.0")},
+		},
 		Name:     "Arduino AVR Boards",
 		Category: "Arduino",
 	}
@@ -383,6 +397,9 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				MonitorDependencies: []indexMonitorDependency{
 					{Packager: "arduino", Name: "ble-monitor"},
 					{Packager: "arduino", Name: "serial-monitor"},
+				},
+				LibrariesDependencies: []indexLibraryDependency{
+					{Name: "FlashStorage", Version: semver.MustParse("1.0.0")},
 				},
 			}},
 			Tools: []*indexToolRelease{
@@ -611,6 +628,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			require.ElementsMatch(t, expectedPlatform.ToolDependencies, indexPlatform.ToolDependencies)
 			require.ElementsMatch(t, expectedPlatform.DiscoveryDependencies, indexPlatform.DiscoveryDependencies)
 			require.ElementsMatch(t, expectedPlatform.MonitorDependencies, indexPlatform.MonitorDependencies)
+			require.ElementsMatch(t, expectedPlatform.LibrariesDependencies, indexPlatform.LibrariesDependencies)
 		}
 	}
 }

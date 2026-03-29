@@ -4,7 +4,7 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
-  update-deb-copyright:
+  general:update-deb-copyright:
     desc: Extract project and dependency licenses into debian copyright
     cmds:
       - |
@@ -57,6 +57,7 @@ tasks:
           exit 1
         fi
       - licensed cache
+      - task: general:update-deb-copyright
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies-task/Taskfile.yml
   general:check-dep-licenses:
@@ -64,6 +65,12 @@ tasks:
     deps:
       - task: general:cache-dep-licenses
     cmds:
+      - |
+        if grep --files-with-matches -r "license: other" .licenses; then
+          echo "The license cache files above have the license set to 'other'. Please manually define the license type and retry."
+          echo "See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#unrecognized-licenses"
+          exit 1
+        fi
       - licensed status
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
@@ -158,9 +165,8 @@ tasks:
   go:easyjson-generate:
     desc: Run easyjson code generation
     cmds:
-      - go install github.com/mailru/easyjson/...@v0.7.7
-      - easyjson internal/arduino/cores/packageindex/index.go
-      - easyjson internal/arduino/libraries/librariesindex/json.go
+      - go run github.com/mailru/easyjson/easyjson internal/arduino/cores/packageindex/index.go
+      - go run github.com/mailru/easyjson/easyjson internal/arduino/libraries/librariesindex/json.go
 
   go:add-license-headers:
     desc: Add missing go license headers
@@ -408,7 +414,6 @@ vars:
     -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # test vars
-  GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSION: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
   TEST_LDFLAGS: >-

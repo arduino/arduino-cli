@@ -1,17 +1,14 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-mkdocs-task.md
 name: Check Website
 
-env:
-  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.24"
-  # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
-  PYTHON_VERSION: "3.9"
-
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
+  create:
   push:
     paths:
       - ".github/workflows/check-mkdocs-task.ya?ml"
+      - "go.mod"
+      - "go.sum"
       - "Taskfile.ya?ml"
       - "mkdocs.ya?ml"
       - "poetry.lock"
@@ -20,17 +17,50 @@ on:
   pull_request:
     paths:
       - ".github/workflows/check-mkdocs-task.ya?ml"
+      - "go.mod"
+      - "go.sum"
       - "Taskfile.ya?ml"
       - "mkdocs.ya?ml"
       - "poetry.lock"
       - "pyproject.toml"
       - "docs/**"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 5 * * WED"
   workflow_dispatch:
   repository_dispatch:
 
 jobs:
-  check:
+  run-determination:
     runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  check:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -39,7 +69,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
 
       - name: Install Go dependencies
         run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
@@ -51,16 +81,12 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version-file: pyproject.toml
 
       - name: Install Poetry
         run: pip install poetry
 
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
       - name: Build website
-        run: task website:check
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task website:check

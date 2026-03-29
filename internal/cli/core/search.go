@@ -104,7 +104,7 @@ func newSearchResult(in []*rpc.PlatformSummary, allVersions bool) *searchResults
 	return res
 }
 
-func (sr searchResults) Data() interface{} {
+func (sr searchResults) Data() any {
 	return sr
 }
 

@@ -73,9 +73,10 @@ func (s *kvArrayValue) String() string {
 	if len(*s.value) == 0 {
 		return ""
 	}
-	res := "["
+	var res strings.Builder
+	res.WriteString("[")
 	for k, v := range *s.value {
-		res += fmt.Sprintf("%s=%s, ", k, v)
+		fmt.Fprintf(&res, "%s=%s, ", k, v)
 	}
-	return res[:len(res)-2] + "]"
+	return res.String()[:len(res.String())-2] + "]"
 }

@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	easyjson "github.com/mailru/easyjson"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -49,7 +50,7 @@ type indexPackage struct {
 	Email      string                  `json:"email"`
 	Platforms  []*indexPlatformRelease `json:"platforms"`
 	Tools      []*indexToolRelease     `json:"tools"`
-	Help       indexHelp               `json:"help,omitempty"`
+	Help       indexHelp               `json:"help"`
 }
 
 // indexPlatformRelease represents a single Core Platform from package_index.json file.
@@ -66,10 +67,11 @@ type indexPlatformRelease struct {
 	Checksum              string                     `json:"checksum"`
 	Size                  json.Number                `json:"size"`
 	Boards                []indexBoard               `json:"boards"`
-	Help                  indexHelp                  `json:"help,omitempty"`
+	Help                  indexHelp                  `json:"help"`
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
 	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
 	MonitorDependencies   []indexMonitorDependency   `json:"monitorDependencies"`
+	LibrariesDependencies []indexLibraryDependency   `json:"librariesDependencies"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -95,6 +97,14 @@ type indexDiscoveryDependency struct {
 type indexMonitorDependency struct {
 	Packager string `json:"packager"`
 	Name     string `json:"name"`
+}
+
+// indexLibraryDependency represents a single dependency of a core from a library.
+//
+//easyjson:json
+type indexLibraryDependency struct {
+	Name    string          `json:"name"`
+	Version *semver.Version `json:"version"`
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
@@ -182,6 +192,14 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 		requiredPackages[m.Packager] = true
 	}
 
+	libraries := []indexLibraryDependency{}
+	for _, l := range pr.LibrariesDependencies {
+		libraries = append(libraries, indexLibraryDependency{
+			Name:    l.Name,
+			Version: l.Version,
+		})
+	}
+
 	// Helper functions: those are needed to build an extract of the package_index.json
 	// that is compatible with the one used by the CLI.
 	// The installed.json is a simplified version of the cores.Packages
@@ -248,6 +266,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 			ToolDependencies:      nil,
 			DiscoveryDependencies: nil,
 			MonitorDependencies:   nil,
+			LibrariesDependencies: nil,
 		}
 	}
 
@@ -255,6 +274,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	mainPlatform.ToolDependencies = tools
 	mainPlatform.DiscoveryDependencies = discoveries
 	mainPlatform.MonitorDependencies = monitors
+	mainPlatform.LibrariesDependencies = libraries
 	delete(requiredPackages, pr.Platform.Package.Name)
 
 	mainPackage := extractIndexPackage(pr.Platform.Package)
@@ -324,6 +344,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.ToolDependencies = inPlatformRelease.extractToolDependencies()
 	outPlatformRelease.DiscoveryDependencies = inPlatformRelease.extractDiscoveryDependencies()
 	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
+	outPlatformRelease.LibrariesDependencies = inPlatformRelease.extractLibrariesDependencies()
 	outPlatformRelease.Deprecated = inPlatformRelease.Deprecated
 	return nil
 }
@@ -360,6 +381,15 @@ func (inPlatformRelease indexPlatformRelease) extractMonitorDependencies() cores
 		}
 	}
 	return res
+}
+
+func (inPlatformRelease indexPlatformRelease) extractLibrariesDependencies() cores.LibrariesDependencies {
+	return f.Map(inPlatformRelease.LibrariesDependencies, func(library indexLibraryDependency) *cores.LibraryDependency {
+		return &cores.LibraryDependency{
+			Name:    library.Name,
+			Version: library.Version,
+		}
+	})
 }
 
 func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {

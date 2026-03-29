@@ -18,10 +18,12 @@ package commands
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -80,12 +82,34 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 		if s.settings.BoardManagerEnableUnsafeInstall() {
 			checks = resources.IntegrityCheckNone
 		}
-		platform, err := pme.DownloadAndInstallPlatformUpgrades(ctx, ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall(), checks)
-		if err != nil {
-			return platform, err
+		if ref.PlatformVersion != nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Upgrade doesn't accept parameters with version")}
 		}
 
-		return platform, nil
+		// Search the latest version for all specified platforms
+		platform := pme.FindPlatform(ref)
+		if platform == nil {
+			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
+		}
+		installed := pme.GetInstalledPlatformRelease(platform)
+		if installed == nil {
+			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
+		}
+		latest := platform.GetLatestCompatibleRelease()
+		if !latest.Version.GreaterThan(installed.Version) {
+			return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: ref.String()}
+		}
+		ref.PlatformVersion = latest.Version
+
+		platformRelease, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
+		if err != nil {
+			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
+		}
+		if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall(), checks); err != nil {
+			return nil, err
+		}
+
+		return platformRelease, nil
 	}
 
 	platformRelease, err := upgrade()
@@ -94,8 +118,8 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 			Message: &rpc.PlatformUpgradeResponse_Result_{
 				Result: &rpc.PlatformUpgradeResponse_Result{
 					Platform: &rpc.Platform{
-						Metadata: platformToRPCPlatformMetadata(platformRelease.Platform),
-						Release:  platformReleaseToRPC(platformRelease),
+						Metadata: platformRelease.Platform.ToRPCPlatformMetadata(),
+						Release:  platformRelease.ToRPC(),
 					},
 				},
 			},

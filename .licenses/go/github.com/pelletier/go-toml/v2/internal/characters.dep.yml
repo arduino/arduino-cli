@@ -4,7 +4,7 @@ version: v2.2.4
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/internal/characters
-license: other
+license: mit
 licenses:
 - sources: v2@v2.2.4/LICENSE
   text: |

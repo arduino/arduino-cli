@@ -38,7 +38,7 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/arduino/go-timeutils"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -194,7 +194,7 @@ func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
 		discoveryManager:               pm.discoveryManager,
 		userAgent:                      pm.userAgent,
 		downloaderConfig:               pm.downloaderConfig,
-	}, pm.packagesLock.RUnlock
+	}, sync.OnceFunc(pm.packagesLock.RUnlock)
 }
 
 // Destroy releases all resources held by the PackageManager.
@@ -465,8 +465,8 @@ func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 	if indexFileName == "." || indexFileName == "" {
 		return &cmderrors.InvalidURLError{Cause: errors.New(URL.String())}
 	}
-	if strings.HasSuffix(indexFileName, ".tar.bz2") {
-		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json"
+	if before, ok := strings.CutSuffix(indexFileName, ".tar.bz2"); ok {
+		indexFileName = before + ".json"
 	}
 	indexPath := pmb.IndexDir.Join(indexFileName)
 	index, err := packageindex.LoadIndex(indexPath)

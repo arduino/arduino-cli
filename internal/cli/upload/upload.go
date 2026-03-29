@@ -227,7 +227,7 @@ type uploadResult struct {
 	UpdatedUploadPort *result.Port `json:"updated_upload_port,omitempty"`
 }
 
-func (r *uploadResult) Data() interface{} {
+func (r *uploadResult) Data() any {
 	return r
 }
 

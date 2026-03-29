@@ -56,7 +56,7 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 		PlatformArchitecture: req.GetArchitecture(),
 		PlatformVersion:      version,
 	}
-	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
+	platform, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}

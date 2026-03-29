@@ -17,6 +17,7 @@ package table
 
 import (
 	"fmt"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/fatih/color"
@@ -78,10 +79,10 @@ func (t *Cell) Pad(totalLen int) string {
 }
 
 func spaces(n int) string {
-	res := ""
+	var res strings.Builder
 	for n > 0 {
-		res += " "
+		res.WriteString(" ")
 		n--
 	}
-	return res
+	return res.String()
 }

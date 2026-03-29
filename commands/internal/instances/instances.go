@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/version"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"go.bug.st/downloader/v2"
+	"go.bug.st/downloader/v3"
 )
 
 // coreInstance is an instance of the Arduino Core Services. The user can

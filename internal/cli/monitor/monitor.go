@@ -319,7 +319,7 @@ type detailsResult struct {
 	Settings []*result.MonitorPortSettingDescriptor `json:"settings"`
 }
 
-func (r *detailsResult) Data() interface{} {
+func (r *detailsResult) Data() any {
 	return r
 }
 

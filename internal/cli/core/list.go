@@ -101,7 +101,7 @@ type coreListResult struct {
 }
 
 // Data implements Result interface
-func (ir coreListResult) Data() interface{} {
+func (ir coreListResult) Data() any {
 	return ir
 }
 
