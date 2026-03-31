@@ -445,24 +445,33 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			}
 		}
 
-		// Add libraries dependencies from platforms (unless overridden in profile)
-		for _, libDep := range allPlatformsLibraryDependencies {
-			if i := slices.IndexFunc(profile.Libraries, func(l *sketch.ProfileLibraryReference) bool {
-				return l.Library == libDep.Name
-			}); i != -1 {
-				if profile.Libraries[i].Version != nil && profile.Libraries[i].Version.LessThan(libDep.Version) {
-					feedback.Warning(
-						i18n.Tr("The platform requires library %[1]s, but profile forces version %[2]s.", libDep, profile.Libraries[i].Version),
-					)
+		// Only for unpinned platforms add latest version of platform' library dependencies (unless overridden in profile)
+		if profile.RequireSystemInstalledPlatform() {
+			for _, libDep := range allPlatformsLibraryDependencies {
+				// If the library dependency is already pinned in profile, use that version and skip to next dependency
+				if i := slices.IndexFunc(profile.Libraries, func(l *sketch.ProfileLibraryReference) bool {
+					return l.Library == libDep.Name
+				}); i != -1 {
+					if profile.Libraries[i].Version != nil && profile.Libraries[i].Version.LessThan(libDep.Version) {
+						feedback.Warning(
+							i18n.Tr("The platform requires library %[1]s, but profile forces version %[2]s.", libDep, profile.Libraries[i].Version),
+						)
+					}
+					continue
 				}
-				continue
-			}
-			libRef := &sketch.ProfileLibraryReference{
-				Library: libDep.Name,
-				Version: libDep.Version,
-			}
-			if err := addProfileLibrary(libRef); err != nil {
-				return err
+
+				// Find the latest release of the library dependency and add it.
+				latestLibDep, err := li.FindRelease(libDep.Name, nil)
+				if err != nil {
+					return &cmderrors.InvalidArgumentError{Message: i18n.Tr("the platforms requires library %[1]s, but it was not found", libDep.Name), Cause: err}
+				}
+				libRef := &sketch.ProfileLibraryReference{
+					Library: libDep.Name,
+					Version: latestLibDep.Version,
+				}
+				if err := addProfileLibrary(libRef); err != nil {
+					return err
+				}
 			}
 		}
 	}
