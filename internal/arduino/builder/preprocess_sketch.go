@@ -18,11 +18,17 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
 // preprocessSketch fixdoc
-func (b *Builder) preprocessSketch(includes paths.PathList) error {
+func (b *Builder) preprocessSketch(includes paths.PathList, sketchUnchanged bool) error {
+	if sketchUnchanged {
+		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
+		return nil
+	}
+
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
 		b.ctx,
