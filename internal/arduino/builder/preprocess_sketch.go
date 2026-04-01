@@ -24,7 +24,8 @@ import (
 
 // preprocessSketch fixdoc
 func (b *Builder) preprocessSketch(includes paths.PathList, sketchUnchanged bool) error {
-	if sketchUnchanged {
+	preprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp")
+	if sketchUnchanged && preprocessedSourceFile.Exist() {
 		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
 		return nil
 	}
