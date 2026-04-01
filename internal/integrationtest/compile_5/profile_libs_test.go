@@ -24,11 +24,11 @@ import (
 	"go.bug.st/testifyjson/requirejson"
 )
 
-func TestCompileWithUnusedProfileLibs(t *testing.T) {
+func TestCompileWithNotIncludedProfileLibs(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	t.Cleanup(env.CleanUp)
 
-	sketch, err := paths.New("testdata", "SketchWithUnusedProfileLibs").Abs()
+	sketch, err := paths.New("testdata", "SketchWithNotIncludedProfileLibs").Abs()
 	require.NoError(t, err)
 
 	// Test that the libraries specified in the profile but not actually used in the sketch are not included in the compilation result
