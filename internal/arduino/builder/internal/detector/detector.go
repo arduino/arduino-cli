@@ -484,19 +484,19 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.WriteStdout(preprocResult.Stdout)
 			}
+
 			// Unwrap error and see if it is an ExitError.
-			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || len(preprocResult.Stderr) == 0 {
-				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
-				return preprocErr
-			} else {
+			} else if _, isExitErr := errors.AsType[*exec.ExitError](preprocErr); isExitErr && len(preprocResult.Stderr) > 0 {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocResult.Stderr))
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
+			} else {
+				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
+				return preprocErr
 			}
 		}
 
