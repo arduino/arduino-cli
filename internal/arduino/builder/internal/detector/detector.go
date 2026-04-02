@@ -21,12 +21,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os/exec"
 	"regexp"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
@@ -56,6 +58,7 @@ type SketchLibrariesDetector struct {
 	useCachedLibrariesResolution  bool
 	cache                         *detectorCache
 	onlyUpdateCompilationDatabase bool
+	stagedLibraries               map[*paths.Path]*libraries.Library
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
 	includeFolders                paths.PathList
@@ -81,6 +84,7 @@ func NewSketchLibrariesDetector(
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
 		cache:                         newDetectorCache(),
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
+		stagedLibraries:               map[*paths.Path]*libraries.Library{},
 		importedLibraries:             libraries.List{},
 		includeFolders:                paths.PathList{},
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
@@ -157,6 +161,25 @@ func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSour
 				library.UtilityDir)
 		}
 	}
+}
+
+// stageLibraryForInclusion adds the given library to the staged libraries list,
+// to be later checked for inclusion when processing the source files of the sketch.
+func (l *SketchLibrariesDetector) stageLibraryForInclusion(library *libraries.Library) {
+	l.stagedLibraries[library.InstallDir] = library
+}
+
+// commitStagedLibrary checks if the given path is inside any of the staged libraries,
+// and if so, it removes that library from the staged list and returns it.
+func (l *SketchLibrariesDetector) commitStagedLibrary(p *paths.Path) *libraries.Library {
+	for libPath := range maps.Keys(l.stagedLibraries) {
+		if inside, _ := p.IsInsideDir(libPath); inside {
+			library := l.stagedLibraries[libPath]
+			delete(l.stagedLibraries, libPath)
+			return library
+		}
+	}
+	return nil
 }
 
 // PrintUsedAndNotUsedLibraries todo
@@ -333,8 +356,10 @@ func (l *SketchLibrariesDetector) findIncludes(
 		allInstalledSorted.SortByName() // Sort libraries to ensure consistent ordering
 		for _, library := range allInstalledSorted {
 			if library.Location == libraries.Profile {
-				l.logger.Info(i18n.Tr("The library %[1]s has been automatically added from sketch project.", library.Name))
-				l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+					l.logger.Info(i18n.Tr("The library %[1]s has been queued for inclusion from sketch project.", library.Name))
+				}
+				l.stageLibraryForInclusion(library)
 				l.addIncludeFolder(library.SourceDir)
 			}
 		}
@@ -479,7 +504,17 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		l.cache.ExpectMissingIncludeH(missingIncludeH)
 
 		if missingIncludeH == "" {
-			// No missing includes found, we're done
+			// Check if the compilation unit requires a library that was previously marked for inclusion.
+			if deps, err := cpp.ReadDepFile(sourceFile.DepfilePath); err == nil {
+				for _, dep := range deps.Dependencies {
+					if library := l.commitStagedLibrary(paths.New(dep)); library != nil {
+						l.logger.Info(i18n.Tr("The library %[1]s has been added from sketch project.", library.Name))
+						l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+					}
+				}
+			}
+
+			// No missing includes found, we're done.
 			return nil
 		}
 
