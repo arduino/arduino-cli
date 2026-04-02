@@ -18,6 +18,7 @@ package packagemanager
 import (
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -93,10 +94,12 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		}
 
 		// Follow symlinks
-		err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
-		if err != nil {
-			merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("following symlink %s", path), err))
-			continue
+		if fi, err := os.Lstat(packagerPath.String()); err == nil && fi.Mode()&os.ModeSymlink != 0 {
+			err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
+			if err != nil {
+				merr = append(merr, fmt.Errorf("%s: %w", i18n.Tr("following symlink %s", packagerPath), err))
+				continue
+			}
 		}
 
 		// There are two possible package directory structures:
