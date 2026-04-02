@@ -64,7 +64,7 @@ type PlatformRelease struct {
 	ToolDependencies        ToolDependencies
 	DiscoveryDependencies   DiscoveryDependencies
 	MonitorDependencies     MonitorDependencies
-	LibrariesDependencies   LibrariesDependencies
+	LibraryDependencies     LibraryDependencies
 	Deprecated              bool
 	Help                    PlatformReleaseHelp           `json:"-"`
 	Platform                *Platform                     `json:"-"`
@@ -239,11 +239,11 @@ func (d *MonitorDependency) String() string {
 	return fmt.Sprintf("%s:%s", d.Packager, d.Name)
 }
 
-// LibrariesDependencies is a list of LibraryDependency
-type LibrariesDependencies []*LibraryDependency
+// LibraryDependencies is a list of LibraryDependency
+type LibraryDependencies []*LibraryDependency
 
-// Sort the LibrariesDependencies by name.
-func (d LibrariesDependencies) Sort() {
+// Sort the LibraryDependencies by name.
+func (d LibraryDependencies) Sort() {
 	sort.Slice(d, func(i, j int) bool {
 		return d[i].Name < d[j].Name
 	})

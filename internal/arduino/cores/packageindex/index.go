@@ -71,7 +71,7 @@ type indexPlatformRelease struct {
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
 	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
 	MonitorDependencies   []indexMonitorDependency   `json:"monitorDependencies"`
-	LibrariesDependencies []indexLibraryDependency   `json:"librariesDependencies"`
+	LibraryDependencies   []indexLibraryDependency   `json:"libraryDependencies"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -193,7 +193,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 
 	libraries := []indexLibraryDependency{}
-	for _, l := range pr.LibrariesDependencies {
+	for _, l := range pr.LibraryDependencies {
 		libraries = append(libraries, indexLibraryDependency{
 			Name:    l.Name,
 			Version: l.Version,
@@ -266,7 +266,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 			ToolDependencies:      nil,
 			DiscoveryDependencies: nil,
 			MonitorDependencies:   nil,
-			LibrariesDependencies: nil,
+			LibraryDependencies:   nil,
 		}
 	}
 
@@ -274,7 +274,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	mainPlatform.ToolDependencies = tools
 	mainPlatform.DiscoveryDependencies = discoveries
 	mainPlatform.MonitorDependencies = monitors
-	mainPlatform.LibrariesDependencies = libraries
+	mainPlatform.LibraryDependencies = libraries
 	delete(requiredPackages, pr.Platform.Package.Name)
 
 	mainPackage := extractIndexPackage(pr.Platform.Package)
@@ -344,7 +344,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.ToolDependencies = inPlatformRelease.extractToolDependencies()
 	outPlatformRelease.DiscoveryDependencies = inPlatformRelease.extractDiscoveryDependencies()
 	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
-	outPlatformRelease.LibrariesDependencies = inPlatformRelease.extractLibrariesDependencies()
+	outPlatformRelease.LibraryDependencies = inPlatformRelease.extractLibraryDependencies()
 	outPlatformRelease.Deprecated = inPlatformRelease.Deprecated
 	return nil
 }
@@ -383,8 +383,8 @@ func (inPlatformRelease indexPlatformRelease) extractMonitorDependencies() cores
 	return res
 }
 
-func (inPlatformRelease indexPlatformRelease) extractLibrariesDependencies() cores.LibrariesDependencies {
-	return f.Map(inPlatformRelease.LibrariesDependencies, func(library indexLibraryDependency) *cores.LibraryDependency {
+func (inPlatformRelease indexPlatformRelease) extractLibraryDependencies() cores.LibraryDependencies {
+	return f.Map(inPlatformRelease.LibraryDependencies, func(library indexLibraryDependency) *cores.LibraryDependency {
 		return &cores.LibraryDependency{
 			Name:    library.Name,
 			Version: library.Version,

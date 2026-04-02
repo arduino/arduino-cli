@@ -90,11 +90,6 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return &cmderrors.InstanceNeedsReinitialization{}
 	}
 
-	lm, err := instances.GetLibraryManager(req.GetInstance())
-	if err != nil {
-		return err
-	}
-
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
 		return &cmderrors.MissingSketchPathError{}
@@ -220,11 +215,6 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		return err
 	}
 
-	var libsManager *librariesmanager.LibrariesManager
-	if profile != nil {
-		libsManager = lm
-	}
-
 	outStream := feedStreamTo(func(data []byte) {
 		syncSend.Send(&rpc.CompileResponse{
 			Message: &rpc.CompileResponse_OutStream{OutStream: data},
@@ -253,6 +243,15 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	librariesDirs := paths.NewPathList(req.GetLibraries()...) // Array of collection of libraries directories
 	librariesDirs.Add(s.settings.LibrariesDir())
 	libraryDirs := paths.NewPathList(req.GetLibrary()...) // Array of single-library directories
+
+	var libsManager *librariesmanager.LibrariesManager
+	if profile != nil {
+		lm, err := instances.GetLibraryManager(req.GetInstance())
+		if err != nil {
+			return err
+		}
+		libsManager = lm
+	}
 
 	sketchBuilder, err := builder.NewBuilder(
 		ctx,

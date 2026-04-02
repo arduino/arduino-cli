@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -37,6 +38,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/locales"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -325,6 +327,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	lmb := librariesmanager.NewBuilder()
 
 	// Load libraries
+	var allPlatformsLibraryDependencies cores.LibraryDependencies
 	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
 			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
@@ -333,6 +336,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					Path:            platformRelease.GetLibrariesDir(),
 					Location:        libraries.PlatformBuiltIn,
 				})
+				allPlatformsLibraryDependencies = append(allPlatformsLibraryDependencies, platformRelease.LibraryDependencies...)
 			}
 		}
 	}
@@ -368,8 +372,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			Location: libraries.User,
 		})
 	} else {
-		// Load libraries required for profile
-		for _, libraryRef := range profile.Libraries {
+		addProfileLibrary := func(libraryRef *sketch.ProfileLibraryReference) error {
 			if libraryRef.InstallDir != nil {
 				libDir := libraryRef.InstallDir
 				if !libDir.IsAbs() {
@@ -385,7 +388,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					Location:        libraries.Profile,
 					IsSingleLibrary: true,
 				})
-				continue
+				return nil
 			}
 
 			uid := libraryRef.InternalUniqueIdentifier()
@@ -400,20 +403,20 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Library %s not found", libraryRef)})
 					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
 					responseError(err.GRPCStatus())
-					continue
+					return nil
 				}
 				config, err := s.settings.DownloaderConfig(ctx)
 				if err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
-					continue
+					return nil
 				}
 				if err := libRelease.Resource.Download(ctx, pme.DownloadDir, config, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error downloading library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
-					continue
+					return nil
 				}
 				taskCallback(&rpc.TaskProgress{Completed: true})
 
@@ -423,7 +426,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())
-					continue
+					return nil
 				}
 				taskCallback(&rpc.TaskProgress{Completed: true})
 			}
@@ -432,6 +435,44 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				Path:     libRoot,
 				Location: libraries.Profile,
 			})
+			return nil
+		}
+
+		// Load libraries required for profile
+		for _, libraryRef := range profile.Libraries {
+			if err := addProfileLibrary(libraryRef); err != nil {
+				return err
+			}
+		}
+
+		// Only for unpinned platforms add latest version of platform' library dependencies (unless overridden in profile)
+		if profile.RequireSystemInstalledPlatform() {
+			for _, libDep := range allPlatformsLibraryDependencies {
+				// If the library dependency is already pinned in profile, use that version and skip to next dependency
+				if i := slices.IndexFunc(profile.Libraries, func(l *sketch.ProfileLibraryReference) bool {
+					return l.Library == libDep.Name
+				}); i != -1 {
+					if profile.Libraries[i].Version != nil && profile.Libraries[i].Version.LessThan(libDep.Version) {
+						feedback.Warning(
+							i18n.Tr("The platform requires library %[1]s, but profile forces version %[2]s.", libDep, profile.Libraries[i].Version),
+						)
+					}
+					continue
+				}
+
+				// Find the latest release of the library dependency and add it.
+				latestLibDep, err := li.FindRelease(libDep.Name, nil)
+				if err != nil {
+					return &cmderrors.InvalidArgumentError{Message: i18n.Tr("the platforms requires library %[1]s, but it was not found", libDep.Name), Cause: err}
+				}
+				libRef := &sketch.ProfileLibraryReference{
+					Library: libDep.Name,
+					Version: latestLibDep.Version,
+				}
+				if err := addProfileLibrary(libRef); err != nil {
+					return err
+				}
+			}
 		}
 	}
 

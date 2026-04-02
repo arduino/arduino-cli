@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -30,8 +31,11 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// LoadHardware read all plaforms from the configured paths
-func (pm *Builder) LoadHardware() []error {
+// LoadHardware read all plaforms from the configured paths.
+// If includeList is not empty then only platforms whose "packager:architecture" string
+// is contained in the list will be loaded, this is used to load only a subset of platforms
+// for a profile.
+func (pm *Builder) LoadHardware(includeList ...string) []error {
 	hardwareDirs := paths.NewPathList()
 	if pm.PackagesDir.IsDir() {
 		hardwareDirs.Add(pm.PackagesDir)
@@ -39,20 +43,31 @@ func (pm *Builder) LoadHardware() []error {
 	if pm.userPackagesDir != nil && pm.userPackagesDir.IsDir() {
 		hardwareDirs.Add(pm.userPackagesDir)
 	}
-	return pm.LoadHardwareFromDirectories(hardwareDirs)
+	return pm.LoadHardwareFromDirectories(hardwareDirs, includeList...)
 }
 
-// LoadHardwareFromDirectories load plaforms from a set of directories
-func (pm *Builder) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []error {
+// LoadHardwareFromDirectories load plaforms from a set of directories.
+// If includeList is not empty then only platforms whose "packager:architecture" string
+// is contained in the list will be loaded, this is used to load only a subset of platforms
+// for a profile.
+func (pm *Builder) LoadHardwareFromDirectories(hardwarePaths paths.PathList, includeList ...string) []error {
 	var merr []error
 	for _, path := range hardwarePaths {
-		merr = append(merr, pm.LoadHardwareFromDirectory(path)...)
+		merr = append(merr, pm.LoadHardwareFromDirectory(path, includeList...)...)
 	}
 	return merr
 }
 
-// LoadHardwareFromDirectory read a plaform from the path passed as parameter
-func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
+// LoadHardwareFromDirectory read a plaform from the path passed as parameter.
+// If includeList is not empty then only platforms whose "packager:architecture" string
+// is contained in the list will be loaded, this is used to load only a subset of platforms
+// for a profile.
+func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path, includeList ...string) []error {
+	// Always allow "builtin:" package
+	if len(includeList) > 0 {
+		includeList = append(includeList, "builtin:")
+	}
+
 	var merr []error
 	pm.log.Infof("Loading hardware from: %s", path)
 	if err := path.ToAbs(); err != nil {
@@ -120,7 +135,7 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		}
 
 		targetPackage := pm.packages.GetOrCreatePackage(packager)
-		merr = append(merr, pm.loadPlatforms(targetPackage, architectureParentPath)...)
+		merr = append(merr, pm.loadPlatforms(targetPackage, architectureParentPath, includeList...)...)
 
 		// Check if we have tools to load, the directory structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
@@ -141,7 +156,7 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
 // A list of gRPC Status error is returned for each Platform failed to load.
-func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) []error {
+func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path, includeList ...string) []error {
 	pm.log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
 
 	var merr []error
@@ -155,13 +170,18 @@ func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths
 	platformsDirs.FilterDirs()
 	// Filter out directories like .git and similar things
 	platformsDirs.FilterOutPrefix(".")
+	// Filter out excluded platforms, if requested
+	if len(includeList) > 0 {
+		platformsDirs.Filter(func(platformPath *paths.Path) bool {
+			targetArchitecture := platformPath.Base()
+			return slices.Contains(includeList, targetPackage.Name+":"+targetArchitecture)
+		})
+	}
+	// Tools are not platforms
+	platformsDirs.Filter(paths.FilterOutNames("tools"))
+
 	for _, platformPath := range platformsDirs {
 		targetArchitecture := platformPath.Base()
-
-		// Tools are not a platform
-		if targetArchitecture == "tools" {
-			continue
-		}
 		if err := pm.loadPlatform(targetPackage, targetArchitecture, platformPath); err != nil {
 			merr = append(merr, err)
 		}
