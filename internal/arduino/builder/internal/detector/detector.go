@@ -494,6 +494,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
+				_ = sourceFile.DepfilePath.Remove() // Remove the depfile, since it is not valid
 			} else {
 				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return preprocErr
