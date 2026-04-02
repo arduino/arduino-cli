@@ -1383,3 +1383,98 @@ func TestCoreInstallWithMissingOrInvalidChecksumAndUnsafeInstallEnabled(t *testi
 		"--additional-urls", "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/refs/heads/main/package_gd32_index.json", "core", "install", "GD32Community:gd32")
 	require.NoError(t, err)
 }
+
+func TestPlatformWithLibraryDependencies(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := env.HTTPServeFile(8080, paths.New("testdata", "package_with_lib_deps_index.json"))
+
+	_, _, err := cli.Run("core", "update-index", "--additional-urls", url.String())
+	require.NoError(t, err)
+
+	t.Run("Install", func(t *testing.T) {
+		// Checks that the library dependencies are correctly resolved and installed, but not the transitive ones
+		stdout, _, err := cli.Run("core", "install", "Test:samd", "--additional-urls", url.String())
+		require.NoError(t, err)
+		require.Contains(t, string(stdout), "Installed ArduinoBearSSL@1.7.5", "did not install direct dependencies")
+		require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
+	})
+
+	t.Run("Profile", func(t *testing.T) {
+		sketch := makeSketch(t, map[string]string{
+			"sketch.ino": `
+#include <ArduinoBearSSL.h>
+void setup() {}
+void loop() {}
+`,
+			"sketch.yaml": `
+profiles:
+  unpinned:
+    fqbn: Test:samd:mkrzero
+    platforms:
+      - platform: Test:samd
+
+  pinned:
+    fqbn: Test:samd:mkrzero
+    platforms:
+      - platform: Test:samd (1.8.14)
+        platform_index_url: ` + url.String() + `
+
+  override:
+    fqbn: Test:samd:mkrzero
+    platforms:
+      - platform: Test:samd
+    libraries:
+      - ArduinoBearSSL (1.7.4)
+      - ArduinoECCX08 (1.4.0)
+`,
+		})
+
+		t.Run("UnpinnedPlatform", func(t *testing.T) {
+			{
+				stdout, _, err := cli.Run("compile", sketch.String(), "-m", "unpinned", "--json")
+				resjson := requirejson.Parse(t, stdout).Query(".builder_result")
+				resjson.Query(".used_libraries").MustContain(`[{"name":"ArduinoBearSSL"}]`, "should contain direct dependency")
+				resjson.Query(".used_libraries").MustNotContain(`[{"name":"ArduinoBearSSL","version":"1.7.5"}]`, "should use latest version of direct dependency (>1.7.5)")
+				resjson.Query(".used_libraries").MustNotContain(`[{"name":"ArduinoECCX08"}]`, "should not contain transitive dependency")
+				require.Error(t, err)
+			}
+		})
+
+		t.Run("PinnedPlatform", func(t *testing.T) {
+			{
+				stdout, _, err := cli.Run("compile", sketch.String(), "-m", "pinned", "--json")
+				resjson := requirejson.Parse(t, stdout).Query(".builder_result")
+				resjson.MustNotContain(`{"used_libraries":[]}`, "should not contain direct dependency")
+				require.Error(t, err)
+			}
+		})
+
+		t.Run("UnpinnedWithLibrariesOverride", func(t *testing.T) {
+			stdout, _, err := cli.Run("compile", sketch.String(), "-m", "override", "--json")
+			require.NoError(t, err)
+			resjson := requirejson.Parse(t, stdout)
+			resjson.Query(".builder_result.used_libraries").MustContain(`[{"name":"ArduinoBearSSL","version":"1.7.4"}]`, "should contain overridden direct dependency")
+			resjson.Query(".builder_result.used_libraries").MustContain(`[{"name":"ArduinoECCX08","version":"1.4.0"}]`, "should contain overridden transitive dependency")
+			resjson.Query(".warnings").MustContain(`["The platform requires library ArduinoBearSSL@1.7.5, but profile forces version 1.7.4."]`)
+		})
+	})
+}
+
+func makeSketch(t *testing.T, files map[string]string) *paths.Path {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { tmp.RemoveAll() })
+
+	_, ok := files["sketch.ino"]
+	require.True(t, ok, "sketch.ino file is required")
+
+	sketch := tmp.Join("sketch")
+	require.NoError(t, sketch.MkdirAll())
+	for name, content := range files {
+		require.NoError(t, sketch.Join(name).WriteFile([]byte(content)))
+	}
+
+	return sketch
+}
