@@ -18,15 +18,24 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
 // preprocessSketch fixdoc
-func (b *Builder) preprocessSketch(includes paths.PathList) error {
+func (b *Builder) preprocessSketch(includes paths.PathList, sketchUnchanged bool) error {
+	unpreprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp.merged")
+	preprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp")
+
+	if sketchUnchanged && preprocessedSourceFile.Exist() {
+		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
+		return nil
+	}
+
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
-		b.ctx,
-		b.sketch, b.buildPath, includes, b.lineOffset,
+		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile,
+		b.sketch, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 		b.logger.VerbosityLevel() == logger.VerbosityVerbose,
 	)

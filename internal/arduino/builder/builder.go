@@ -341,12 +341,8 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 
 	b.logIfVerbose(false, i18n.Tr("Generating function prototypes..."))
-	if !b.libsDetector.IsSketchUnchanged() {
-		if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
-			return err
-		}
-	} else {
-		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
+	if err := b.preprocessSketch(b.libsDetector.IncludeFolders(), b.libsDetector.IsSketchUnchanged()); err != nil {
+		return err
 	}
 	b.Progress.CompleteStep()
 

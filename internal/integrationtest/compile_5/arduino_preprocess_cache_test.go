@@ -217,7 +217,7 @@ void myNewFunction() {}
 		require.Contains(t, string(out), "Generating function prototypes...")
 		require.NotContains(t, string(out), "Using cached sketch with function prototypes.")
 
-		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String(), "--log", "--log-level", "trace")
 		require.NoError(t, err)
 		require.Contains(t, string(out), "Generating function prototypes...")
 		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
