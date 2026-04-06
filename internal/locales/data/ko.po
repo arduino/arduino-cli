@@ -1,4 +1,3 @@
-# 
 # Translators:
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # 
@@ -13,7 +12,7 @@ msgstr ""
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:524
+#: internal/arduino/builder/internal/detector/detector.go:583
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr ""
 
@@ -25,7 +24,7 @@ msgstr ""
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr ""
 
-#: internal/arduino/builder/builder.go:495
+#: internal/arduino/builder/builder.go:500
 msgid "%[1]s pattern is missing"
 msgstr "%[1]s 패턴이 없습니다"
 
@@ -62,7 +61,7 @@ msgstr ""
 msgid "%s must be installed."
 msgstr ""
 
-#: internal/arduino/builder/internal/preprocessor/ctags.go:194
+#: internal/arduino/builder/internal/preprocessor/ctags.go:202
 msgid "%s pattern is missing"
 msgstr ""
 
@@ -149,16 +148,16 @@ msgstr ""
 msgid "Already installed %s"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:96
+#: internal/arduino/builder/internal/detector/detector.go:98
 msgid "Alternatives for %[1]s: %[2]s"
 msgstr ""
 
-#: internal/arduino/builder/internal/preprocessor/ctags.go:70
-#: internal/arduino/builder/internal/preprocessor/ctags.go:241
+#: internal/arduino/builder/internal/preprocessor/ctags.go:71
+#: internal/arduino/builder/internal/preprocessor/ctags.go:249
 msgid "An error occurred adding prototypes"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:227
+#: internal/arduino/builder/internal/detector/detector.go:241
 msgid "An error occurred detecting libraries"
 msgstr ""
 
@@ -261,7 +260,7 @@ msgstr ""
 msgid "Board version:"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:256
+#: internal/arduino/builder/sketch.go:263
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "부트로더 파일이 지정되었으나 누락됨: %[1]s"
 
@@ -426,11 +425,11 @@ msgstr ""
 msgid "Compiles Arduino sketches."
 msgstr ""
 
-#: internal/arduino/builder/builder.go:429
+#: internal/arduino/builder/builder.go:434
 msgid "Compiling core..."
 msgstr ""
 
-#: internal/arduino/builder/builder.go:408
+#: internal/arduino/builder/builder.go:413
 msgid "Compiling libraries..."
 msgstr ""
 
@@ -438,7 +437,7 @@ msgstr ""
 msgid "Compiling library \"%[1]s\""
 msgstr ""
 
-#: internal/arduino/builder/builder.go:392
+#: internal/arduino/builder/builder.go:397
 msgid "Compiling sketch..."
 msgstr "스케치를 컴파일 중…"
 
@@ -595,7 +594,7 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: internal/arduino/builder/builder.go:313
+#: internal/arduino/builder/builder.go:314
 msgid "Detecting libraries used..."
 msgstr ""
 
@@ -1055,7 +1054,7 @@ msgstr ""
 msgid "Error verifying signature"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:444
+#: internal/arduino/builder/internal/detector/detector.go:473
 msgid "Error while detecting libraries included by %[1]s"
 msgstr ""
 
@@ -1148,7 +1147,7 @@ msgstr ""
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:269
+#: internal/arduino/builder/internal/detector/detector.go:283
 msgid "Failed to load library discovery cache: %[1]s"
 msgstr ""
 
@@ -1224,7 +1223,7 @@ msgstr ""
 msgid "Generates completion scripts for various shells"
 msgstr ""
 
-#: internal/arduino/builder/builder.go:342
+#: internal/arduino/builder/builder.go:343
 msgid "Generating function prototypes..."
 msgstr ""
 
@@ -1318,7 +1317,7 @@ msgstr ""
 msgid "Installs one or more specified libraries into the system."
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:472
+#: internal/arduino/builder/internal/detector/detector.go:502
 msgid "Internal error in cache"
 msgstr ""
 
@@ -1487,7 +1486,7 @@ msgstr ""
 msgid "Library '%s' not found"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:533
+#: internal/arduino/builder/internal/detector/detector.go:592
 msgid ""
 "Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
 msgstr ""
@@ -1505,7 +1504,7 @@ msgstr ""
 msgid "License: %s"
 msgstr ""
 
-#: internal/arduino/builder/builder.go:445
+#: internal/arduino/builder/builder.go:450
 msgid "Linking everything together..."
 msgstr ""
 
@@ -1589,7 +1588,7 @@ msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:528
+#: internal/arduino/builder/internal/detector/detector.go:587
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "라이브러리 %[2]s에서 '%[1]s'가 없음"
 
@@ -1637,7 +1636,7 @@ msgstr ""
 msgid "Monitor port settings:"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:176
+#: internal/arduino/builder/internal/detector/detector.go:179
 msgid "Multiple libraries were found for \"%[1]s\""
 msgstr "\"%[1]s\"를 위한 복수개의 라이브러리가 발견되었습니다"
 
@@ -1713,7 +1712,7 @@ msgstr ""
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
 msgstr "메모리가 충분하지 않음; 메모리를 줄이기 위한 팁을 위해 다음 링크를 참고하세요%[1]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:179
+#: internal/arduino/builder/internal/detector/detector.go:182
 msgid "Not used: %[1]s"
 msgstr "사용되지 않음: %[1]s"
 
@@ -2327,7 +2326,7 @@ msgstr ""
 msgid "Skipping compile of: %[1]s"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:147
+#: internal/arduino/builder/internal/detector/detector.go:150
 msgid "Skipping dependencies detection for precompiled library %[1]s"
 msgstr ""
 
@@ -2416,7 +2415,7 @@ msgid ""
 "Maybe use '%[2]s'?"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:309
+#: internal/arduino/builder/internal/detector/detector.go:336
 msgid "The library %[1]s has been automatically added from sketch project."
 msgstr ""
 
@@ -2424,7 +2423,7 @@ msgstr ""
 msgid "The library %s has multiple installations:"
 msgstr ""
 
-#: internal/arduino/builder/builder.go:331
+#: internal/arduino/builder/builder.go:332
 msgid ""
 "The list of included libraries has been changed... rebuilding all libraries."
 msgstr ""
@@ -2676,7 +2675,7 @@ msgstr ""
 msgid "Used platform"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:177
+#: internal/arduino/builder/internal/detector/detector.go:180
 msgid "Used: %[1]s"
 msgstr "사용됨: %[1]s"
 
@@ -2684,8 +2683,12 @@ msgstr "사용됨: %[1]s"
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:405
+#: internal/arduino/builder/internal/detector/detector.go:434
 msgid "Using cached library dependencies for file: %[1]s"
+msgstr ""
+
+#: internal/arduino/builder/builder.go:349
+msgid "Using cached sketch with function prototypes."
 msgstr ""
 
 #: commands/service_compile.go:363
@@ -2799,7 +2802,7 @@ msgstr ""
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:224
+#: internal/arduino/sketch/profiles.go:227
 msgid ""
 "all platforms in a profile must either require a specific version or not"
 msgstr ""
@@ -2864,7 +2867,7 @@ msgstr ""
 msgid "can't find pattern for discovery with id %s"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:98
+#: internal/arduino/builder/internal/detector/detector.go:100
 msgid "candidates"
 msgstr ""
 
@@ -3004,7 +3007,7 @@ msgstr ""
 msgid "error opening %s"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:326
+#: internal/arduino/sketch/profiles.go:329
 msgid "error parsing version constraints"
 msgstr ""
 
@@ -3126,7 +3129,7 @@ msgstr ""
 msgid "interactive terminal not supported for the '%s' output format"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:321
+#: internal/arduino/sketch/profiles.go:324
 msgid "invalid '%s' directive"
 msgstr ""
 
@@ -3193,10 +3196,10 @@ msgstr ""
 msgid "invalid library location: %s"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:366
-#: internal/arduino/sketch/profiles.go:374
-#: internal/arduino/sketch/profiles.go:379
-#: internal/arduino/sketch/profiles.go:389
+#: internal/arduino/sketch/profiles.go:369
+#: internal/arduino/sketch/profiles.go:377
+#: internal/arduino/sketch/profiles.go:382
+#: internal/arduino/sketch/profiles.go:392
 msgid "invalid library reference"
 msgstr ""
 
@@ -3220,11 +3223,11 @@ msgstr ""
 msgid "invalid path writing inventory file: %[1]s error"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:333
+#: internal/arduino/sketch/profiles.go:336
 msgid "invalid platform identifier"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:344
+#: internal/arduino/sketch/profiles.go:347
 msgid "invalid platform index URL:"
 msgstr ""
 
@@ -3251,7 +3254,7 @@ msgstr ""
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:391
+#: internal/arduino/sketch/profiles.go:394
 msgid "invalid version"
 msgstr ""
 
@@ -3295,7 +3298,7 @@ msgstr ""
 msgid "library not valid"
 msgstr ""
 
-#: internal/arduino/builder/internal/preprocessor/ctags.go:242
+#: internal/arduino/builder/internal/preprocessor/ctags.go:250
 msgid "line too long\n"
 msgstr ""
 
@@ -3355,7 +3358,7 @@ msgstr ""
 msgid "main file missing from sketch: %s"
 msgstr ""
 
-#: internal/arduino/sketch/profiles.go:319
+#: internal/arduino/sketch/profiles.go:322
 msgid "missing '%s' directive"
 msgstr ""
 
@@ -3545,7 +3548,7 @@ msgstr ""
 msgid "reading directory %s content"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:91
+#: internal/arduino/builder/sketch.go:98
 msgid "reading file %[1]s: %[2]s"
 msgstr ""
 
@@ -3668,8 +3671,8 @@ msgstr ""
 msgid "text section exceeds available space in board"
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:228
-#: internal/arduino/builder/internal/preprocessor/ctags.go:71
+#: internal/arduino/builder/internal/detector/detector.go:242
+#: internal/arduino/builder/internal/preprocessor/ctags.go:72
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr ""
 
@@ -3712,8 +3715,8 @@ msgid ""
 "two different versions of the library %[1]s are required: %[2]s and %[3]s"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:84
-#: internal/arduino/builder/sketch.go:129
+#: internal/arduino/builder/sketch.go:91
+#: internal/arduino/builder/sketch.go:136
 msgid "unable to compute relative path to the sketch for the item"
 msgstr ""
 
@@ -3721,7 +3724,7 @@ msgstr ""
 msgid "unable to create a folder to save the sketch"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:135
+#: internal/arduino/builder/sketch.go:142
 msgid "unable to create the folder containing the item"
 msgstr ""
 
@@ -3729,15 +3732,15 @@ msgstr ""
 msgid "unable to marshal config to YAML: %v"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:175
+#: internal/arduino/builder/sketch.go:182
 msgid "unable to read contents of the destination item"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:146
+#: internal/arduino/builder/sketch.go:153
 msgid "unable to read contents of the source item"
 msgstr ""
 
-#: internal/arduino/builder/sketch.go:158
+#: internal/arduino/builder/sketch.go:165
 msgid "unable to write to destination file"
 msgstr ""
 
