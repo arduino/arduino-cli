@@ -1861,6 +1861,9 @@ used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</c
 <span class="w">          </span><span class="p">],</span>
 <span class="w">          </span><span class="nt">&quot;monitorDependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;packager&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arduino&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;serial-monitor&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;libraryDependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;LibraryName&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="w"> </span><span class="p">}</span>
 <span class="w">          </span><span class="p">]</span>
 <span class="w">        </span><span class="p">},</span>
 </code></pre></div>
@@ -1896,6 +1899,14 @@ used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</c
   pair (<code>packager</code>, <code>name</code>). The <code>version</code> is not specified because the latest installed monitor tool will always be
   used. Like <code>toolsDependencies</code> they will be installed by Boards Manager along with the platform and can reference
   tools available in other packages as well, even if no platform of that package is installed.</li>
+<li>
+<p><code>libraryDependencies</code>: the libraries needed by this platform that will be installed together with the platform. These
+  are <a href="../library-specification/">libraries</a> that must be present in the
+  <a href="https://docs.arduino.cc/libraries/">Arduino Libraries Manager index</a>. The <code>version</code> is the minimum required version
+  of the library: if a version greater than or equal to the required version is already installed, the installed version
+  will be left unchanged; otherwise the installed library will be upgraded to the required version.</p>
+<p>This field is supported since Arduino CLI 1.5.0 and Arduino IDE 2.4.0.</p>
+</li>
 </ul>
 <p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the
 rules Arduino IDE follows for parsing versions
