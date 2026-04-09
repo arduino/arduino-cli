@@ -1761,6 +1761,8 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			}
 		case "IsTrusted":
 			out.IsTrusted = bool(in.Bool())
+		case "version":
+			out.Version = int(in.Int())
 		default:
 			switch strings.ToLower(key) {
 			case "packages":
@@ -1796,6 +1798,8 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 				}
 			case "istrusted":
 				out.IsTrusted = bool(in.Bool())
+			case "version":
+				out.Version = int(in.Int())
 			default:
 				in.SkipRecursive()
 			}
@@ -1835,6 +1839,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		const prefix string = ",\"IsTrusted\":"
 		out.RawString(prefix)
 		out.Bool(bool(in.IsTrusted))
+	}
+	if in.Version != 0 {
+		const prefix string = ",\"version\":"
+		out.RawString(prefix)
+		out.Int(int(in.Version))
 	}
 	out.RawByte('}')
 }

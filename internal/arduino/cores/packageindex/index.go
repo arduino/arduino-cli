@@ -36,6 +36,7 @@ import (
 type Index struct {
 	Packages        []*indexPackage `json:"packages"`
 	IsTrusted       bool
+	Version         int `json:"version,omitempty"`
 	isInstalledJSON bool
 }
 
@@ -289,6 +290,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 
 	return Index{
+		Version:   2,
 		IsTrusted: pr.IsTrusted,
 		Packages:  packages,
 	}
