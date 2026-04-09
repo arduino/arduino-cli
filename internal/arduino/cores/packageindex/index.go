@@ -348,6 +348,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
 	outPlatformRelease.LibraryDependencies = inPlatformRelease.extractLibraryDependencies()
 	outPlatformRelease.Deprecated = inPlatformRelease.Deprecated
+	outPlatformRelease.Indexed = true
 	return nil
 }
 
