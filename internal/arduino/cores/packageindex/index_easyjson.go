@@ -916,7 +916,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.Maintainer = string(in.String())
 		case "websiteUrl":
 			out.WebsiteURL = string(in.String())
-		case "Url":
+		case "url":
 			out.URL = string(in.String())
 		case "email":
 			out.Email = string(in.String())
@@ -1091,7 +1091,7 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		out.String(string(in.WebsiteURL))
 	}
 	{
-		const prefix string = ",\"Url\":"
+		const prefix string = ",\"url\":"
 		out.RawString(prefix)
 		out.String(string(in.URL))
 	}

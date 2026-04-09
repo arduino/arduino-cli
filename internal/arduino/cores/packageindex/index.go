@@ -47,7 +47,7 @@ type indexPackage struct {
 	Name       string                  `json:"name"`
 	Maintainer string                  `json:"maintainer"`
 	WebsiteURL string                  `json:"websiteUrl"`
-	URL        string                  `json:"Url"`
+	URL        string                  `json:"url"`
 	Email      string                  `json:"email"`
 	Platforms  []*indexPlatformRelease `json:"platforms"`
 	Tools      []*indexToolRelease     `json:"tools"`
