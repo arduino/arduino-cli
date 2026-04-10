@@ -30,6 +30,12 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
+// Version is the version of the package_index.json file format
+// generated with IndexFromPlatformRelease. It can be used to determine if
+// an installed.json is up-to-date with the current CLI version or if it
+// needs to be regenarated.
+const Version = 2
+
 // Index represents Cores and Tools struct as seen from package_index.json file.
 //
 //easyjson:json
@@ -290,7 +296,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 
 	return Index{
-		Version:   2,
+		Version:   Version,
 		IsTrusted: pr.IsTrusted,
 		Packages:  packages,
 	}

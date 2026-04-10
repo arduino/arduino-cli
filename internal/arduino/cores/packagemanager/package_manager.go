@@ -509,30 +509,26 @@ func (pmb *Builder) LoadInstalledPlatformMetadataAndMigrateIfPossible(installedJ
 		return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", installedJSONPath, err))
 	}
 
-	switch {
-	case index.Version < 2:
+	if index.Version < packageindex.Version {
 		// Migrate to version 2 if possible
 
 		if platformRelease == nil || !platformRelease.Indexed {
 			logrus.Warnf("%s is in version 1 format, but the platform release is not indexed. Migration to version 2 is not possible.", installedJSONPath)
-			break
-		}
+		} else {
+			logrus.Infof("%s is being updated to version 2", installedJSONPath)
+			updatedIndex := packageindex.IndexFromPlatformRelease(platformRelease)
+			if platformJSON, err := json.MarshalIndent(updatedIndex, "", "  "); err != nil {
+				return nil, errors.New(i18n.Tr("upgdating platform metadata: %s", err))
+			} else if err := installedJSONPath.WriteFile(platformJSON); err != nil {
+				return nil, errors.New(i18n.Tr("updating platform metadata: %s", err))
+			}
 
-		logrus.Infof("%s is being updated to version 2", installedJSONPath)
-		updatedIndex := packageindex.IndexFromPlatformRelease(platformRelease)
-		if platformJSON, err := json.MarshalIndent(updatedIndex, "", "  "); err != nil {
-			return nil, errors.New(i18n.Tr("upgdating platform metadata: %s", err))
-		} else if err := installedJSONPath.WriteFile(platformJSON); err != nil {
-			return nil, errors.New(i18n.Tr("updating platform metadata: %s", err))
+			// Load index again after migration
+			index, err = packageindex.LoadIndex(installedJSONPath)
+			if err != nil {
+				return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", installedJSONPath, err))
+			}
 		}
-
-		// Load index again after migration
-		index, err = packageindex.LoadIndex(installedJSONPath)
-		if err != nil {
-			return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", installedJSONPath, err))
-		}
-	case index.Version >= 2:
-		// Version 2 is already compatible with the current format, no migration needed
 	}
 
 	index.MergeIntoPackages(pmb.packages)
