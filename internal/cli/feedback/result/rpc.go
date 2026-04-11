@@ -1126,6 +1126,22 @@ func NewIndexUpdateReport_Status(r rpc.IndexUpdateReport_Status) IndexUpdateRepo
 	}
 }
 
+type ProfileLibraryReference_GitLibraryResult struct {
+	Url string `json:"url,omitempty"`
+}
+
+func NewProfileLibraryReference_GitLibraryResult(resp *rpc.ProfileLibraryReference_GitLibrary) *ProfileLibraryReference_GitLibraryResult {
+	return &ProfileLibraryReference_GitLibraryResult{
+		Url: resp.GetUrl(),
+	}
+}
+
+func (*ProfileLibraryReference_GitLibraryResult) isProfileLibraryReference() {}
+
+func (l *ProfileLibraryReference_GitLibraryResult) String() string {
+	return fmt.Sprintf("git: %s", l.Url)
+}
+
 type ProfileLibraryReference_LocalLibraryResult struct {
 	Path string `json:"path,omitempty"`
 }
@@ -1180,6 +1196,12 @@ func NewProfileLibraryReference(resp *rpc.ProfileLibraryReference) *ProfileLibra
 		return &ProfileLibraryReference{
 			Library: NewProfileLibraryReference_IndexLibraryResult(lib),
 			Kind:    "index",
+		}
+	}
+	if lib := resp.GetGitLibrary(); lib != nil {
+		return &ProfileLibraryReference{
+			Library: NewProfileLibraryReference_GitLibraryResult(lib),
+			Kind:    "git",
 		}
 	}
 	if lib := resp.GetLocalLibrary(); lib != nil {
