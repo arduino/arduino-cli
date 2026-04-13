@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"encoding/json"
 	"errors"
 	"net/url"
 	"os"
@@ -39,6 +40,7 @@ import (
 	"github.com/arduino/go-timeutils"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v3"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -484,9 +486,49 @@ func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 
 // LoadPackageIndexFromFile load a package index from the specified file
 func (pmb *Builder) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageindex.Index, error) {
+	f.Assert(indexPath.Base() != "installed.json", "installed.json must be loaded with LoadInstalledPlatformMetadataAndMigrateIfPossible method")
+
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
 		return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", indexPath, err))
+	}
+
+	index.MergeIntoPackages(pmb.packages)
+	return index, nil
+}
+
+// LoadInstalledPlatformMetadataAndMigrateIfPossible loads an installed
+// platform metadata from the specified installed.json file, and migrates
+// it to a new version if it is necessary and if it is possible (this is possible if the given platform
+// release is indexed).
+func (pmb *Builder) LoadInstalledPlatformMetadataAndMigrateIfPossible(installedJSONPath *paths.Path, platformRelease *cores.PlatformRelease) (*packageindex.Index, error) {
+	f.Assert(installedJSONPath.Base() == "installed.json", "LoadInstalledPlatformMetadataAndMigrateIfPossible method should be used only for installed.json files")
+
+	index, err := packageindex.LoadIndex(installedJSONPath)
+	if err != nil {
+		return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", installedJSONPath, err))
+	}
+
+	if index.Version < packageindex.Version {
+		// Migrate to new version
+
+		if platformRelease == nil || !platformRelease.Indexed {
+			logrus.Warnf("%s is in version %d format, but the platform release is not indexed. Migration to version %d is not possible.", installedJSONPath, index.Version, packageindex.Version)
+		} else {
+			logrus.Infof("%s is being updated to version %d", installedJSONPath, packageindex.Version)
+			updatedIndex := packageindex.IndexFromPlatformRelease(platformRelease)
+			if platformJSON, err := json.MarshalIndent(updatedIndex, "", "  "); err != nil {
+				return nil, errors.New(i18n.Tr("upgdating platform metadata: %s", err))
+			} else if err := installedJSONPath.WriteFile(platformJSON); err != nil {
+				return nil, errors.New(i18n.Tr("updating platform metadata: %s", err))
+			}
+
+			// Load index again after migration
+			index, err = packageindex.LoadIndex(installedJSONPath)
+			if err != nil {
+				return nil, errors.New(i18n.Tr("loading json index file %[1]s: %[2]s", installedJSONPath, err))
+			}
+		}
 	}
 
 	index.MergeIntoPackages(pmb.packages)
