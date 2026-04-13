@@ -1,9 +1,10 @@
 ---
-name: golang.org/x/net/trace
+name: golang.org/x/net/internal/httpsfv
 version: v0.53.0
 type: go
-summary: Package trace implements tracing of requests and long-lived objects.
-homepage: https://pkg.go.dev/golang.org/x/net/trace
+summary: Package httpsfv provides functionality for dealing with HTTP Structured Field
+  Values.
+homepage: https://pkg.go.dev/golang.org/x/net/internal/httpsfv
 license: bsd-3-clause
 licenses:
 - sources: net@v0.53.0/LICENSE
