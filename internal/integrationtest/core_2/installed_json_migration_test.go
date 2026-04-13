@@ -16,8 +16,10 @@
 package core_test
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -48,15 +50,15 @@ func TestPlatformInstalledJsonMigration(t *testing.T) {
 	// Check that the installed.json is not migrated if the original index is not available
 	stdout, _, err := cli.Run("core", "update-index", "--log", "--log-level", "debug")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout), "Migration to version 2 is not possible.")
+	require.Contains(t, string(stdout), fmt.Sprintf("Migration to version %d is not possible.", packageindex.Version))
 
 	// Check that the installed.json is migrated in the presence of the original index, and that the
 	// "libraryDependencies" field is correctly added to the installed.json file
 	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "core", "update-index", "--log", "--log-level", "debug")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout), "is being updated to version 2")
+	require.Contains(t, string(stdout), fmt.Sprintf("is being updated to version %d", packageindex.Version))
 	jsonout := requirejson.ParseFromFile(t, targetInstalledJson.String())
-	jsonout.Query(".version").MustEqual("2")
+	jsonout.Query(".version").MustEqual(fmt.Sprintf("%d", packageindex.Version))
 	jsonout.Query(".packages[0].platforms[0]").MustContain(`{
 		"libraryDependencies": [
 			{

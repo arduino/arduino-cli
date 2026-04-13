@@ -499,7 +499,7 @@ func (pmb *Builder) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageind
 
 // LoadInstalledPlatformMetadataAndMigrateIfPossible loads an installed
 // platform metadata from the specified installed.json file, and migrates
-// it to version 2 if possible (this is possible if the given platform
+// it to a new version if it is necessary and if it is possible (this is possible if the given platform
 // release is indexed).
 func (pmb *Builder) LoadInstalledPlatformMetadataAndMigrateIfPossible(installedJSONPath *paths.Path, platformRelease *cores.PlatformRelease) (*packageindex.Index, error) {
 	f.Assert(installedJSONPath.Base() == "installed.json", "LoadInstalledPlatformMetadataAndMigrateIfPossible method should be used only for installed.json files")
@@ -510,12 +510,12 @@ func (pmb *Builder) LoadInstalledPlatformMetadataAndMigrateIfPossible(installedJ
 	}
 
 	if index.Version < packageindex.Version {
-		// Migrate to version 2 if possible
+		// Migrate to new version
 
 		if platformRelease == nil || !platformRelease.Indexed {
-			logrus.Warnf("%s is in version 1 format, but the platform release is not indexed. Migration to version 2 is not possible.", installedJSONPath)
+			logrus.Warnf("%s is in version %d format, but the platform release is not indexed. Migration to version %d is not possible.", installedJSONPath, index.Version, packageindex.Version)
 		} else {
-			logrus.Infof("%s is being updated to version 2", installedJSONPath)
+			logrus.Infof("%s is being updated to version %d", installedJSONPath, packageindex.Version)
 			updatedIndex := packageindex.IndexFromPlatformRelease(platformRelease)
 			if platformJSON, err := json.MarshalIndent(updatedIndex, "", "  "); err != nil {
 				return nil, errors.New(i18n.Tr("upgdating platform metadata: %s", err))
