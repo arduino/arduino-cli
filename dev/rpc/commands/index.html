@@ -1262,6 +1262,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#profileplatformreference" class="md-nav__link">
+    ProfilePlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#programmer" class="md-nav__link">
     Programmer
   </a>
@@ -3172,6 +3179,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#profileplatformreference" class="md-nav__link">
+    ProfilePlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#programmer" class="md-nav__link">
     Programmer
   </a>
@@ -4719,6 +4733,7 @@
     - <a href="#cc.arduino.cli.commands.v1.ProfileLibraryReference">ProfileLibraryReference</a>
     - <a href="#cc.arduino.cli.commands.v1.ProfileLibraryReference.IndexLibrary">ProfileLibraryReference.IndexLibrary</a>
     - <a href="#cc.arduino.cli.commands.v1.ProfileLibraryReference.LocalLibrary">ProfileLibraryReference.LocalLibrary</a>
+    - <a href="#cc.arduino.cli.commands.v1.ProfilePlatformReference">ProfilePlatformReference</a>
     - <a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a>
     - <a href="#cc.arduino.cli.commands.v1.Sketch">Sketch</a>
     - <a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a>
@@ -5515,6 +5530,38 @@ a platform and all its available releases.</p>
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.ProfilePlatformReference"></a></p>
+<h3 id="profileplatformreference">ProfilePlatformReference<a class="headerlink" href="#profileplatformreference" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Platform ID (e.g., <code>arduino:avr</code>).</td>
+</tr>
+<tr>
+<td>version</td>
+<td><a href="#string">string</a></td>
+<td>optional</td>
+<td>Version of the platform.</td>
+</tr>
+<tr>
+<td>index_url</td>
+<td><a href="#string">string</a></td>
+<td>optional</td>
+<td>3rd party platform URL.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.Programmer"></a></p>
 <h3 id="programmer">Programmer<a class="headerlink" href="#programmer" title="Permanent link">&para;</a></h3>
 <table>
@@ -5680,6 +5727,18 @@ a platform and all its available releases.</p>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Default Protocol in this profile.</td>
+</tr>
+<tr>
+<td>platforms</td>
+<td><a href="#cc.arduino.cli.commands.v1.ProfilePlatformReference">ProfilePlatformReference</a></td>
+<td>repeated</td>
+<td>Platforms used by the profile.</td>
+</tr>
+<tr>
+<td>libraries</td>
+<td><a href="#cc.arduino.cli.commands.v1.ProfileLibraryReference">ProfileLibraryReference</a></td>
+<td>repeated</td>
+<td>Libraries used by the profile.</td>
 </tr>
 </tbody>
 </table>
