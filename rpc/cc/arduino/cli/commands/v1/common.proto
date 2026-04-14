@@ -236,6 +236,19 @@ message SketchProfile {
   MonitorPortConfiguration port_config = 5;
   // Default Protocol in this profile.
   string protocol = 6;
+  // Platforms used by the profile.
+  repeated ProfilePlatformReference platforms = 7;
+  // Libraries used by the profile.
+  repeated ProfileLibraryReference libraries = 8;
+}
+
+message ProfilePlatformReference {
+  // Platform ID (e.g., `arduino:avr`).
+  string id = 1;
+  // Version of the platform.
+  optional string version = 2;
+  // 3rd party platform URL.
+  optional string index_url = 3;
 }
 
 message ProfileLibraryReference {
