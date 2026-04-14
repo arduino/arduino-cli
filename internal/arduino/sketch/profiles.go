@@ -171,6 +171,8 @@ func (p *Profile) ToRpc() *rpc.SketchProfile {
 		Port:       p.Port,
 		PortConfig: portConfig,
 		Protocol:   p.Protocol,
+		Platforms:  p.Platforms.ToRPC(),
+		Libraries:  p.Libraries.ToRPC(),
 	}
 }
 
@@ -232,6 +234,14 @@ func (p *ProfileRequiredPlatforms) UnmarshalYAML(unmarshal func(any) error) erro
 	return nil
 }
 
+// ToRPC converts this list of ProfilePlatformReference to a []*rpc.ProfilePlatformReference
+func (p *ProfileRequiredPlatforms) ToRPC() []*rpc.ProfilePlatformReference {
+	if len(*p) == 0 {
+		return nil
+	}
+	return f.Map(*p, (*ProfilePlatformReference).ToRPC)
+}
+
 // ProfileRequiredLibraries is a list of ProfileLibraryReference (libraries
 // required to build the sketch using this profile)
 type ProfileRequiredLibraries []*ProfileLibraryReference
@@ -247,6 +257,14 @@ func (p *ProfileRequiredLibraries) AsYaml() string {
 		res.WriteString(lib.AsYaml())
 	}
 	return res.String()
+}
+
+// ToRPC converts this list of ProfileLibraryReference to a []*rpc.ProfileLibraryReference
+func (p *ProfileRequiredLibraries) ToRPC() []*rpc.ProfileLibraryReference {
+	if len(*p) == 0 {
+		return nil
+	}
+	return f.Map(*p, (*ProfileLibraryReference).ToRPC)
 }
 
 // ProfilePlatformReference is a reference to a platform
@@ -294,6 +312,23 @@ func (p *ProfilePlatformReference) AsYaml() string {
 		res += fmt.Sprintf("        platform_index_url: %s\n", p.PlatformIndexURL)
 	}
 	return res
+}
+
+// ToRPC converts this ProfilePlatformReference to an rpc.ProfilePlatformReference
+func (p *ProfilePlatformReference) ToRPC() *rpc.ProfilePlatformReference {
+	var version *string
+	if p.Version != nil {
+		version = new(p.Version.String())
+	}
+	var url *string
+	if p.PlatformIndexURL != nil {
+		url = new(p.PlatformIndexURL.String())
+	}
+	return &rpc.ProfilePlatformReference{
+		Id:       fmt.Sprintf("%s:%s", p.Packager, p.Architecture),
+		Version:  version,
+		IndexUrl: url,
+	}
 }
 
 func parseNameAndVersion(in string) (string, string, bool) {
