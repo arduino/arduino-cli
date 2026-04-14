@@ -1,9 +1,6 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/test-go-task.md
 name: Test Go
 
-env:
-  COVERAGE_ARTIFACT: coverage-data
-
 # See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
   create:
@@ -63,6 +60,8 @@ jobs:
   tests-collector:
     runs-on: ubuntu-latest
     needs: run-determination
+    permissions:
+      contents: read
     if: needs.run-determination.outputs.result == 'true'
     outputs:
       tests-data: ${{ steps.collection.outputs.tests-data }}
@@ -78,8 +77,11 @@ jobs:
 
   test-integration:
     needs: tests-collector
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
+
       matrix:
         operating-system:
           - windows-latest
@@ -114,12 +116,14 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           if-no-files-found: error
-          name: ${{ env.COVERAGE_ARTIFACT }}-test-integration-${{ matrix.operating-system }}-${{ matrix.tests }}
+          name: coverage-data-test-integration-${{ matrix.operating-system }}-${{ matrix.tests }}
           path: |
             ./coverage_integration_*.txt
 
   test:
     needs: run-determination
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -154,7 +158,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           if-no-files-found: error
-          name: ${{ env.COVERAGE_ARTIFACT }}-test-${{ matrix.operating-system }}
+          name: coverage-data-test-${{ matrix.operating-system }}
           path: |
             ./coverage_unit.txt
 
@@ -163,6 +167,8 @@ jobs:
     needs:
       - test
       - test-integration
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -178,7 +184,7 @@ jobs:
       - name: Download coverage data artifact
         uses: actions/download-artifact@v7
         with:
-          pattern: ${{ env.COVERAGE_ARTIFACT }}-*
+          pattern: coverage-data-*
           merge-multiple: true
 
       - name: Merge all code coverage artifacts

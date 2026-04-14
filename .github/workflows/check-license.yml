@@ -1,13 +1,9 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-license.md
 name: Check License
 
-env:
-  EXPECTED_LICENSE_FILENAME: LICENSE.txt
-  # SPDX identifier: https://spdx.org/licenses/
-  EXPECTED_LICENSE_TYPE: GPL-3.0
-
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
+  create:
   push:
     paths:
       - ".github/workflows/check-license.ya?ml"
@@ -25,12 +21,54 @@ on:
       - "[lL][iI][cC][eE][nN][cCsS][eE]*"
       - "[oO][fF][lL]*"
       - "[pP][aA][tT][eE][nN][tT][sS]*"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 6 * * WED"
   workflow_dispatch:
   repository_dispatch:
 
 jobs:
-  check-license:
+  run-determination:
     runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  check-license:
+    name: ${{ matrix.check-license.path }}
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        check-license:
+          - path: .
+            expected-filename: LICENSE.txt
+            # SPDX identifier: https://spdx.org/licenses/
+            expected-type: GPL-3.0
 
     steps:
       - name: Checkout repository
@@ -42,25 +80,43 @@ jobs:
           ruby-version: ruby # Install latest version
 
       - name: Install licensee
-        run: gem install licensee
+        run: |
+          gem install \
+            licensee
 
-      - name: Check license file
+      - name: Check license file for ${{ matrix.check-license.path }}
         run: |
           EXIT_STATUS=0
+
+          # Go into folder path
+          cd ./${{ matrix.check-license.path }}
+
           # See: https://github.com/licensee/licensee
           LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
 
-          DETECTED_LICENSE_FILE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].filename | tr --delete '\r')"
+          DETECTED_LICENSE_FILE="$(
+            echo "$LICENSEE_OUTPUT" \
+            | \
+            jq .matched_files[0].filename \
+            | \
+            tr --delete '\r'
+          )"
           echo "Detected license file: $DETECTED_LICENSE_FILE"
-          if [ "$DETECTED_LICENSE_FILE" != "\"${EXPECTED_LICENSE_FILENAME}\"" ]; then
-            echo "::error file=${DETECTED_LICENSE_FILE}::detected license file $DETECTED_LICENSE_FILE doesn't match expected: $EXPECTED_LICENSE_FILENAME"
+          if [ "$DETECTED_LICENSE_FILE" != "\"${{ matrix.check-license.expected-filename }}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE}::detected license file $DETECTED_LICENSE_FILE doesn't match expected: ${{ matrix.check-license.expected-filename }}"
             EXIT_STATUS=1
           fi
 
-          DETECTED_LICENSE_TYPE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].matched_license | tr --delete '\r')"
+          DETECTED_LICENSE_TYPE="$(
+            echo "$LICENSEE_OUTPUT" \
+            | \
+            jq .matched_files[0].matched_license \
+            | \
+            tr --delete '\r'
+          )"
           echo "Detected license type: $DETECTED_LICENSE_TYPE"
-          if [ "$DETECTED_LICENSE_TYPE" != "\"${EXPECTED_LICENSE_TYPE}\"" ]; then
-            echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${EXPECTED_LICENSE_TYPE}\""
+          if [ "$DETECTED_LICENSE_TYPE" != "\"${{ matrix.check-license.expected-type }}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${{ matrix.check-license.expected-type }}\""
             EXIT_STATUS=1
           fi
 
