@@ -152,8 +152,8 @@ func (p *Profile) RemoveLibrary(library *ProfileLibraryReference) (*ProfileLibra
 	return removedLib, nil
 }
 
-// ToRpc converts this Profile to an rpc.SketchProfile
-func (p *Profile) ToRpc() *rpc.SketchProfile {
+// ToRPC converts this Profile to an rpc.SketchProfile
+func (p *Profile) ToRPC() *rpc.SketchProfile {
 	var portConfig *rpc.MonitorPortConfiguration
 	if len(p.PortConfig) > 0 {
 		portConfig = &rpc.MonitorPortConfiguration{}
@@ -484,8 +484,8 @@ func (l *ProfileLibraryReference) Match(other *ProfileLibraryReference) bool {
 	return l.Version.Equal(other.Version)
 }
 
-// ToRpc converts this ProfileLibraryReference to an rpc.ProfileLibraryReference
-func (l *ProfileLibraryReference) ToRpc() *rpc.ProfileLibraryReference {
+// ToRPC converts this ProfileLibraryReference to an rpc.ProfileLibraryReference
+func (l *ProfileLibraryReference) ToRPC() *rpc.ProfileLibraryReference {
 	if l.InstallDir != nil {
 		return &rpc.ProfileLibraryReference{
 			Library: &rpc.ProfileLibraryReference_LocalLibrary_{
