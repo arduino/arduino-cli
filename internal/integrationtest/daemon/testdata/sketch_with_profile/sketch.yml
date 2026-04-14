@@ -2,19 +2,9 @@ profiles:
   nanorp:
     fqbn: arduino:avr:uno
     platforms:
-      - platform: arduino:mbed_nano (4.0.2)
+      - platform: arduino:mbed_nano
     libraries:
       - ArduinoIoTCloud (1.0.2)
-      - Arduino_ConnectionHandler (0.6.4)
-      - TinyDHT sensor library (1.1.0)
-
-  another_profile_name:
-    notes: testing the limit of the AVR platform, may be unstable
-    fqbn: arduino:avr:uno
-    platforms:
-      - platform: arduino:avr (1.8.4)
-    libraries:
-      - VitconMQTT (1.0.1)
       - Arduino_ConnectionHandler (0.6.4)
       - TinyDHT sensor library (1.1.0)
 
@@ -27,4 +17,5 @@ profiles:
     libraries:
       - ArduinoIoTCloud (1.0.2)
       - dir: libraries/Arduino_ConnectionHandler
+
 default_profile: nanorp

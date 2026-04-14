@@ -132,8 +132,8 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 	}
 
 	return &rpc.ProfileLibAddResponse{
-		AddedLibraries:   f.Map(addedLibs, (*sketch.ProfileLibraryReference).ToRpc),
-		SkippedLibraries: f.Map(skippedLibs, (*sketch.ProfileLibraryReference).ToRpc),
+		AddedLibraries:   f.Map(addedLibs, (*sketch.ProfileLibraryReference).ToRPC),
+		SkippedLibraries: f.Map(skippedLibs, (*sketch.ProfileLibraryReference).ToRPC),
 		ProfileName:      profileName,
 	}, nil
 }

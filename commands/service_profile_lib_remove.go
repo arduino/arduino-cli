@@ -53,7 +53,7 @@ func (s *arduinoCoreServerImpl) ProfileLibRemove(ctx context.Context, req *rpc.P
 		if err != nil {
 			return &cmderrors.InvalidArgumentError{Message: "could not remove library", Cause: err}
 		}
-		removedLibraries = append(removedLibraries, removedLibrary.ToRpc())
+		removedLibraries = append(removedLibraries, removedLibrary.ToRPC())
 		return nil
 	}
 

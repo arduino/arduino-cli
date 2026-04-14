@@ -171,7 +171,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 		profile = p
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Profile{
-				Profile: profile.ToRpc(),
+				Profile: profile.ToRPC(),
 			},
 		})
 	}

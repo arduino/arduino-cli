@@ -30,5 +30,5 @@ func (s *arduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSke
 	if err != nil {
 		return nil, &cmderrors.CantOpenSketchError{Cause: err}
 	}
-	return &rpc.LoadSketchResponse{Sketch: sk.ToRpc()}, nil
+	return &rpc.LoadSketchResponse{Sketch: sk.ToRPC()}, nil
 }
