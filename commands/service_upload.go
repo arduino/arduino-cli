@@ -571,6 +571,8 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		}
 	}
 
+	preUpload := uploadProperties.GetBoolean("upload.use_pre_upload_check")
+
 	// Run recipes for upload
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
@@ -585,6 +587,11 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed programming"), Cause: err}
 		}
 	} else {
+		if preUpload && (runTool(uploadCtx, "pre_upload_check.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv) != nil) {
+			if err := runTool(uploadCtx, "pre_upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
+				return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed uploading"), Cause: err}
+			}
+		}
 		if err := runTool(uploadCtx, "upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed uploading"), Cause: err}
 		}
