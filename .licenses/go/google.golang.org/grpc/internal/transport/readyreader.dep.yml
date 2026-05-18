@@ -1,10 +1,9 @@
 ---
-name: google.golang.org/grpc/attributes
+name: google.golang.org/grpc/internal/transport/readyreader
 version: v1.81.1
 type: go
-summary: Package attributes defines a generic key/value store used in various gRPC
-  components.
-homepage: https://pkg.go.dev/google.golang.org/grpc/attributes
+summary: Package readyreader provides utilities to perform non-memory-pinning reads.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/transport/readyreader
 license: apache-2.0
 licenses:
 - sources: grpc@v1.81.1/LICENSE
