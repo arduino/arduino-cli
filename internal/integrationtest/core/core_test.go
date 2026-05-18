@@ -1393,13 +1393,11 @@ func TestPlatformWithLibraryDependencies(t *testing.T) {
 	_, _, err := cli.Run("core", "update-index", "--additional-urls", url.String())
 	require.NoError(t, err)
 
-	t.Run("Install", func(t *testing.T) {
-		// Checks that the library dependencies are correctly resolved and installed, but not the transitive ones
-		stdout, _, err := cli.Run("core", "install", "Test:samd", "--additional-urls", url.String())
-		require.NoError(t, err)
-		require.Contains(t, string(stdout), "Installed ArduinoBearSSL@1.7.5", "did not install direct dependencies")
-		require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
-	})
+	// Checks that the library dependencies are correctly resolved and installed, but not the transitive ones
+	stdout, _, err := cli.Run("core", "install", "Test:samd", "--additional-urls", url.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Installed ArduinoBearSSL@1.7.5", "did not install direct dependencies")
+	require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
 
 	t.Run("Profile", func(t *testing.T) {
 		sketch := makeSketch(t, map[string]string{
@@ -1438,7 +1436,7 @@ profiles:
 				resjson.Query(".used_libraries").MustContain(`[{"name":"ArduinoBearSSL"}]`, "should contain direct dependency")
 				resjson.Query(".used_libraries").MustNotContain(`[{"name":"ArduinoBearSSL","version":"1.7.5"}]`, "should use latest version of direct dependency (>1.7.5)")
 				resjson.Query(".used_libraries").MustNotContain(`[{"name":"ArduinoECCX08"}]`, "should not contain transitive dependency")
-				require.Error(t, err)
+				require.NoError(t, err) // It compiles successfully with ArduinoBearSSL@1.7.7
 			}
 		})
 
