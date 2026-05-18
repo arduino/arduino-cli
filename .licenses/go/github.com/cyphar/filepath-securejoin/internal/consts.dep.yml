@@ -1,13 +1,13 @@
 ---
-name: github.com/cyphar/filepath-securejoin
+name: github.com/cyphar/filepath-securejoin/internal/consts
 version: v0.6.1
 type: go
-summary: Package securejoin implements a set of helpers to make it easier to write
-  Go code that is safe against symlink-related escape attacks.
-homepage: https://pkg.go.dev/github.com/cyphar/filepath-securejoin
+summary: Package consts contains the definitions of internal constants used throughout
+  filepath-securejoin.
+homepage: https://pkg.go.dev/github.com/cyphar/filepath-securejoin/internal/consts
 license: mpl-2.0
 licenses:
-- sources: COPYING.md
+- sources: filepath-securejoin@v0.6.1/COPYING.md
   text: |
     ## COPYING ##
 
@@ -456,7 +456,7 @@ licenses:
       This Source Code Form is "Incompatible With Secondary Licenses", as
       defined by the Mozilla Public License, v. 2.0.
     ```
-- sources: LICENSE.BSD
+- sources: filepath-securejoin@v0.6.1/LICENSE.BSD
   text: |
     Copyright (C) 2014-2015 Docker Inc & Go Authors. All rights reserved.
     Copyright (C) 2017-2024 SUSE LLC. All rights reserved.
@@ -486,7 +486,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: LICENSE.MPL-2.0
+- sources: filepath-securejoin@v0.6.1/LICENSE.MPL-2.0
   text: |
     Mozilla Public License Version 2.0
     ==================================
@@ -861,7 +861,7 @@ licenses:
 
       This Source Code Form is "Incompatible With Secondary Licenses", as
       defined by the Mozilla Public License, v. 2.0.
-- sources: README.md
+- sources: filepath-securejoin@v0.6.1/README.md
   text: |-
     `SPDX-License-Identifier: BSD-3-Clause AND MPL-2.0`
 
