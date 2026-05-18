@@ -286,8 +286,8 @@ func (s *Sketch) Hash() string {
 	return strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
 }
 
-// ToRpc converts this Sketch into a rpc.LoadSketchResponse
-func (s *Sketch) ToRpc() *rpc.Sketch {
+// ToRPC converts this Sketch into a rpc.LoadSketchResponse
+func (s *Sketch) ToRPC() *rpc.Sketch {
 	defaultPort, defaultProtocol := s.GetDefaultPortAddressAndProtocol()
 	var defaultPortConfig *rpc.MonitorPortConfiguration
 	if len(s.Project.DefaultPortConfig) > 0 {
@@ -310,10 +310,10 @@ func (s *Sketch) ToRpc() *rpc.Sketch {
 		DefaultPortConfig: defaultPortConfig,
 		DefaultProtocol:   defaultProtocol,
 		DefaultProgrammer: s.GetDefaultProgrammer(),
-		Profiles:          f.Map(s.Project.Profiles, (*Profile).ToRpc),
+		Profiles:          f.Map(s.Project.Profiles, (*Profile).ToRPC),
 	}
 	if defaultProfile, err := s.GetProfile(s.Project.DefaultProfile); err == nil {
-		res.DefaultProfile = defaultProfile.ToRpc()
+		res.DefaultProfile = defaultProfile.ToRPC()
 	}
 	return res
 }

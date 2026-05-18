@@ -506,6 +506,13 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 	}
 }
 
+// LoadSketch calls the "LoadSketch" gRPC method.
+func (cli *ArduinoCLI) LoadSketch(sketchPath *paths.Path) (*commands.LoadSketchResponse, error) {
+	return cli.daemonClient.LoadSketch(context.Background(), &commands.LoadSketchRequest{
+		SketchPath: sketchPath.String(),
+	})
+}
+
 // Destroy calls the "Destroy" gRPC method.
 func (inst *ArduinoCLIInstance) Destroy(ctx context.Context) error {
 	logCallf(">>> Destroy(%v)\n", inst.instance.GetId())

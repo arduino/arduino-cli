@@ -271,7 +271,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 	installedJSONPath := path.Join("installed.json")
 	platform.Timestamps.AddFile(installedJSONPath)
 	if installedJSONPath.Exist() {
-		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
+		if _, err := pm.LoadInstalledPlatformMetadataAndMigrateIfPossible(installedJSONPath, platform); err != nil {
 			return errors.New(i18n.Tr("loading %[1]s: %[2]s", installedJSONPath, err))
 		}
 	}
