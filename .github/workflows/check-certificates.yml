@@ -1,8 +1,9 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-certificates.md
 name: Check Certificates
 
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
 on:
+  create:
   push:
     paths:
       - ".github/workflows/check-certificates.ya?ml"
@@ -20,13 +21,52 @@ env:
   EXPIRATION_WARNING_PERIOD: 30
 
 jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    permissions: {}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          REPO_SLUG="arduino/arduino-cli"
+          if [[
+            (
+              # Only run on branch creation when it is a release branch.
+              # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+              "${{ github.event_name }}" != "create" ||
+              "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+            ) &&
+            (
+              # Only run when the workflow will have access to the certificate secrets.
+              # This could be done via a GitHub Actions workflow conditional, but makes more sense to do it here as well.
+              (
+                "${{ github.event_name }}" != "pull_request" &&
+                "${{ github.repository }}" == "$REPO_SLUG"
+              ) ||
+              (
+                "${{ github.event_name }}" == "pull_request" &&
+                "${{ github.event.pull_request.head.repo.full_name }}" == "$REPO_SLUG"
+              )
+            )
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
   check-certificates:
     name: ${{ matrix.certificate.identifier }}
-    # Only run when the workflow will have access to the certificate secrets.
-    if: >
-      (github.event_name != 'pull_request' && github.repository == 'arduino/arduino-cli') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'arduino/arduino-cli')
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions: {}
     strategy:
       fail-fast: false
 
@@ -45,14 +85,18 @@ jobs:
     steps:
       - name: Set certificate path environment variable
         run: |
-          # See: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
-          echo "CERTIFICATE_PATH=${{ runner.temp }}/certificate.p12" >> "$GITHUB_ENV"
+          # See: https://docs.github.com/actions/reference/workflows-and-actions/workflow-commands#setting-an-environment-variable
+          echo "CERTIFICATE_PATH=${{ runner.temp }}/certificate.p12" >>"$GITHUB_ENV"
 
       - name: Decode certificate
         env:
           CERTIFICATE: ${{ secrets[matrix.certificate.certificate-secret] }}
         run: |
-          echo "${{ env.CERTIFICATE }}" | base64 --decode > "${{ env.CERTIFICATE_PATH }}"
+          echo "${{ env.CERTIFICATE }}" \
+          | \
+          base64 \
+            --decode \
+          >"${{ env.CERTIFICATE_PATH }}"
 
       - name: Verify certificate
         env:
@@ -64,7 +108,9 @@ jobs:
               -legacy \
               -noout \
               -passin env:CERTIFICATE_PASSWORD
-          ) || (
+          ) \
+          || \
+          (
             echo "::error::Verification of ${{ matrix.certificate.identifier }} failed!!!"
             exit 1
           )
@@ -88,49 +134,57 @@ jobs:
         run: |
           if [[ ${{ matrix.certificate.type }} == "pkcs12" ]]; then
             EXPIRATION_DATE="$(
-                (
+              (
                 openssl pkcs12 \
-                    -in ${{ env.CERTIFICATE_PATH }} \
-                    -clcerts \
-                    -legacy \
-                    -nodes \
-                    -passin env:CERTIFICATE_PASSWORD
-                ) | (
+                  -in ${{ env.CERTIFICATE_PATH }} \
+                  -clcerts \
+                  -legacy \
+                  -nodes \
+                  -passin env:CERTIFICATE_PASSWORD
+              ) \
+              | \
+              (
                 openssl x509 \
-                    -noout \
-                    -enddate
-                ) | (
+                  -noout \
+                  -enddate
+              ) \
+              | \
+              (
                 grep \
-                    --max-count=1 \
-                    --only-matching \
-                    --perl-regexp \
-                    'notAfter=(\K.*)'
-                )
+                  --max-count=1 \
+                  --only-matching \
+                  --perl-regexp \
+                  'notAfter=(\K.*)'
+              )
             )"
           elif [[ ${{ matrix.certificate.type }} == "x509" ]]; then
             EXPIRATION_DATE="$(
-                (
+              (
                 openssl x509 \
-                    -in ${{ env.CERTIFICATE_PATH }} \
-                    -noout \
-                    -enddate
-                ) | (
+                  -in ${{ env.CERTIFICATE_PATH }} \
+                  -noout \
+                  -enddate
+              ) \
+              | \
+              (
                 grep \
-                    --max-count=1 \
-                    --only-matching \
-                    --perl-regexp \
-                    'notAfter=(\K.*)'
-                )
+                  --max-count=1 \
+                  --only-matching \
+                  --perl-regexp \
+                  'notAfter=(\K.*)'
+              )
             )"
           fi
 
-          DAYS_BEFORE_EXPIRATION="$((($(date --utc --date="$EXPIRATION_DATE" +%s) - $(date --utc +%s)) / 60 / 60 / 24))"
+          DAYS_BEFORE_EXPIRATION="$((
+            ($(date --utc --date="$EXPIRATION_DATE" +%s) - $(date --utc +%s)) / 60 / 60 / 24
+          ))"
 
           # Display the expiration information in the log.
           echo "Certificate expiration date: $EXPIRATION_DATE"
           echo "Days remaining before expiration: $DAYS_BEFORE_EXPIRATION"
 
-          echo "days=$DAYS_BEFORE_EXPIRATION" >> $GITHUB_OUTPUT
+          echo "days=$DAYS_BEFORE_EXPIRATION" >>$GITHUB_OUTPUT
 
       - name: Check if expiration notification period has been reached
         id: check-expiration
