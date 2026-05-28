@@ -65,27 +65,41 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 	buildProperties *properties.Map,
 ) *paths.Path {
 	mcu := buildProperties.Get("build.mcu")
-	// Add fpu specifications if they exist
-	// To do so, resolve recipe.cpp.o.pattern,
-	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
-	command, _ := b.prepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
+
+	// Build the floating-point subfolder spec ("{fpu}-{float-abi}").
+	// Prefer the documented build properties build.fpu and build.float-abi when both
+	// are defined. If either is absent fall back to detecting the values by parsing
+	// recipe.cpp.o.pattern for -mfpu= and -mfloat-abi= compiler flags.
 	fpuSpecs := ""
-	for _, el := range command.GetArgs() {
-		if strings.Contains(el, FpuCflag) {
-			toAdd := strings.Split(el, "=")
-			if len(toAdd) > 1 {
-				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
-				break
+	fpu, hasFpu := buildProperties.GetOk("build.fpu")
+	floatAbi, hasFloatAbi := buildProperties.GetOk("build.float-abi")
+	if hasFpu && hasFloatAbi {
+		fpuSpecs = fpu + "-" + floatAbi
+	} else {
+		// Fallback: resolve recipe.cpp.o.pattern and scan the resulting arguments.
+		command, _ := b.prepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
+		fpuPart := ""
+		floatAbiPart := ""
+		for _, el := range command.GetArgs() {
+			if strings.Contains(el, FpuCflag) {
+				toAdd := strings.Split(el, "=")
+				if len(toAdd) > 1 {
+					fpuPart = strings.TrimSpace(toAdd[1])
+					break
+				}
 			}
 		}
-	}
-	for _, el := range command.GetArgs() {
-		if strings.Contains(el, FloatAbiCflag) {
-			toAdd := strings.Split(el, "=")
-			if len(toAdd) > 1 {
-				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
-				break
+		for _, el := range command.GetArgs() {
+			if strings.Contains(el, FloatAbiCflag) {
+				toAdd := strings.Split(el, "=")
+				if len(toAdd) > 1 {
+					floatAbiPart = strings.TrimSpace(toAdd[1])
+					break
+				}
 			}
+		}
+		if fpuPart != "" && floatAbiPart != "" {
+			fpuSpecs = fpuPart + "-" + floatAbiPart
 		}
 	}
 
@@ -93,7 +107,6 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
-		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
 		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
 		if fullPrecompDir.Exist() && directoryContainsFile(fullPrecompDir) {
 			b.logger.Info(i18n.Tr("Using precompiled library in %[1]s", fullPrecompDir))
