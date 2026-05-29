@@ -190,4 +190,13 @@ func TestMonitorGRPCAppliedSettings(t *testing.T) {
 		updateSettings[s.GetSettingId()] = s.GetValue()
 	}
 	require.Equal(t, "9600", updateSettings["baudrate"], "applied_settings after update must reflect the new baudrate")
+
+	// Close the monitor to allow cleanup of the env (otherwise on Windows the
+	// tmp monitor.exe cannot be deleted because it's still open).
+	cancel()
+	_, err = mon.Recv()
+	require.EqualError(t, err, "rpc error: code = Canceled desc = context canceled")
+	// the mocked serial-monitor is designed to delay 2 seconds before closing,
+	// let's wait a bit to ensure the monitor process has exited before the test ends and the env is cleaned up.
+	time.Sleep(3 * time.Second)
 }
