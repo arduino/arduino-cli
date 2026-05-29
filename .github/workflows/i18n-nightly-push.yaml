@@ -11,6 +11,9 @@ jobs:
     # would always fail in forks
     if: github.repository == 'arduino/arduino-cli'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6

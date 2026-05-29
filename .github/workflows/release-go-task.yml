@@ -235,7 +235,8 @@ jobs:
   create-windows-installer:
     runs-on: windows-sign-pc
     needs: create-release-artifacts
-
+    permissions:
+      contents: read
     defaults:
       run:
         shell: bash
