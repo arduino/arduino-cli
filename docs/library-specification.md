@@ -237,10 +237,19 @@ The filenames of the compiled binaries should start with `lib` (e.g., `libFoo.a`
 **(available from Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0)** The floating point ABI configuration of
 ARM core microcontrollers may be adjusted via compiler flags. An extra subfolder level can be used to provide files
 compiled for a specific floating point configuration: `src/{build.mcu}/{build.fpu}-{build.float-abi}`, where
-`{build.fpu}` is the value of the `-mfpu` compiler flag and `{build.float-abi}` is the value of the `-mfloat-abi`
-compiler flag. **(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)** If floating point
-configuration flags are used but no folder matching that configuration is found, `src/{build.mcu}` is used as a
-fallback.
+`{build.fpu}` is the FPU type and `{build.float-abi}` is the floating-point ABI (e.g., `fpv4-sp-d16-softfp`).
+
+These values are determined as follows:
+
+1. **(available from Arduino CLI 1.6.0)** If the platform defines both `build.fpu` and `build.float-abi` build
+   properties (in `boards.txt` or `platform.txt`), Arduino CLI uses those property values directly to construct the
+   subfolder path.
+1. If either property is absent, Arduino CLI falls back to detecting the values by inspecting the fully expanded
+   `recipe.cpp.o.pattern` compiler command for `-mfpu=` and `-mfloat-abi=` flags. This ensures compatibility with
+   existing platforms that embed these settings inside the recipe rather than exposing them as standalone properties.
+
+**(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)** If floating point configuration flags
+are used but no folder matching that configuration is found, `src/{build.mcu}` is used as a fallback.
 
 Below is an example library `src` folder structure that provides:
 
