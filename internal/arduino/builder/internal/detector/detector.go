@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"os"
 	"os/exec"
 	"regexp"
 	"slices"
@@ -320,6 +321,15 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.preRunner.Cancel()
 		}
 	}()
+
+	// Only for testing purposes
+	if libraryDetector_ForcePrerunnerPriority {
+		// When set to true, it forces the library detector pre-runner (that is normally scheduled
+		// randomly by the goroutine scheduler) to run with priority, in particular before
+		// the library detection starts.
+		fmt.Println("TESTING: Waiting for pre-runner start...")
+		time.Sleep(time.Second)
+	}
 
 	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
@@ -732,3 +742,6 @@ func LibrariesLoader(
 	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, buildPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
+
+// libraryDetector_ForcePrerunnerPriority is used for testing purposes.
+var libraryDetector_ForcePrerunnerPriority = os.Getenv("TESTING_LIBRARY_DETECTOR_FORCE_PRERUNNER_PRIORITY") == "1"
