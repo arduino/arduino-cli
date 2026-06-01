@@ -23,11 +23,13 @@ import (
 )
 
 // preprocessSketch fixdoc
-func (b *Builder) preprocessSketch(includes paths.PathList, sketchUnchanged bool) error {
+func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	unpreprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp.merged")
 	preprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp")
 
-	if sketchUnchanged && preprocessedSourceFile.Exist() {
+	// Skip preprocessing if the sketch and all included library headers are unchanged since
+	// the last preprocessing run.
+	if b.libsDetector.IsSketchUnchanged() && preprocessedSourceFile.Exist() {
 		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
 		return nil
 	}

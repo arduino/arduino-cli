@@ -225,7 +225,8 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 	return l.detectedChangeInLibraries
 }
 
-// IsSketchUnchanged returns true if the sketch or any of its dependencies is up-to-date
+// IsSketchUnchanged returns true if the sketch source and all included library
+// headers are unchanged since the last preprocessing run.
 func (l *SketchLibrariesDetector) IsSketchUnchanged() bool {
 	return l.sketchIsUnchanged
 }
@@ -305,6 +306,16 @@ func (l *SketchLibrariesDetector) findIncludes(
 		l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
 	}
 
+	// Determine if the sketch is unchanged BEFORE starting the preRunner goroutines.
+	// The preRunner may start GCC tasks that write libsdetect.d as a side effect; if we
+	// checked after the preRunner, a fast GCC run could update libsdetect.d's timestamp
+	// and make the sketch appear unchanged even after a modification (issue #3202).
+	mergedSketchForCheck, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
+	if err != nil {
+		return err
+	}
+	l.sketchIsUnchanged, _ = mergedSketchForCheck.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
+
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
@@ -343,7 +354,6 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err != nil {
 			return err
 		}
-		l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
 
 		// Queue all sources from sketch folder, except the preprocessed sketch "sketch.ino.cpp".
 		// The library discovery is performed on the `sketch.ino.cpp.merged` file.
