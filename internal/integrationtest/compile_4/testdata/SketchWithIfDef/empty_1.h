@@ -1,0 +1,4 @@
+#define world
+
+void two() {
+}

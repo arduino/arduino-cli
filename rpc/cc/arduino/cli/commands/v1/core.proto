@@ -1,0 +1,155 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+import "cc/arduino/cli/commands/v1/common.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+message PlatformInstallRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Vendor name of the platform (e.g., `arduino`).
+  string platform_package = 2;
+  // Architecture name of the platform (e.g., `avr`).
+  string architecture = 3;
+  // Platform version to install.
+  string version = 4;
+  // Set to true to not run (eventual) post install scripts for trusted
+  // platforms.
+  bool skip_post_install = 5;
+  // Set to true to skip installation if a different version of the platform
+  // is already installed.
+  bool no_overwrite = 6;
+  // Set to true to not run (eventual) pre uninstall scripts for trusted
+  // platforms when performing platform upgrades.
+  bool skip_pre_uninstall = 7;
+}
+
+message PlatformInstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of the platform and tool files.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // The installation result.
+    Result result = 3;
+  }
+}
+
+message PlatformLoadingError {}
+
+message PlatformDownloadRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Vendor name of the platform (e.g., `arduino`).
+  string platform_package = 2;
+  // Architecture name of the platform (e.g., `avr`).
+  string architecture = 3;
+  // Platform version to download.
+  string version = 4;
+}
+
+message PlatformDownloadResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of platform and tool files.
+    DownloadProgress progress = 1;
+    // The download result.
+    Result result = 2;
+  }
+}
+
+message PlatformUninstallRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Vendor name of the platform (e.g., `arduino`).
+  string platform_package = 2;
+  // Architecture name of the platform (e.g., `avr`).
+  string architecture = 3;
+  // Set to true to not run (eventual) pre uninstall scripts for trusted
+  // platforms.
+  bool skip_pre_uninstall = 4;
+}
+
+message PlatformUninstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the uninstall.
+    TaskProgress task_progress = 1;
+    // The uninstall result.
+    Result result = 2;
+  }
+}
+
+// AlreadyAtLatestVersionError is returned when an upgrade is not possible
+// because already at latest version.
+message AlreadyAtLatestVersionError {}
+
+message PlatformUpgradeRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Vendor name of the platform (e.g., `arduino`).
+  string platform_package = 2;
+  // Architecture name of the platform (e.g., `avr`).
+  string architecture = 3;
+  // Set to true to not run (eventual) post install scripts for trusted
+  // platforms.
+  bool skip_post_install = 4;
+  // Set to true to not run (eventual) pre uninstall scripts for trusted
+  // platforms when performing platform upgrades.
+  bool skip_pre_uninstall = 5;
+}
+
+message PlatformUpgradeResponse {
+  message Result {
+    // The upgraded platform.
+    Platform platform = 1;
+  }
+  oneof message {
+    // Progress of the downloads of the platform and tool files.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the upgrade.
+    TaskProgress task_progress = 2;
+    // The upgrade result.
+    Result result = 3;
+  }
+}
+
+message PlatformSearchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Keywords for the search.
+  string search_args = 2;
+  // Whether to show manually installed platforms. `false` causes to skip
+  // manually installed platforms.
+  bool manually_installed = 3;
+}
+
+message PlatformSearchResponse {
+  // Results of the search.
+  repeated PlatformSummary search_output = 1;
+}

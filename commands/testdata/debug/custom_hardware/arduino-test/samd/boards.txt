@@ -1,0 +1,112 @@
+# Copyright (c) 2014-2017 Arduino LLC.  All right reserved.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# Arduino Zero (Prorgamming Port)
+# ---------------------------------------
+arduino_zero_edbg.name=Arduino Zero (Programming Port)
+arduino_zero_edbg.vid.0=0x03eb
+arduino_zero_edbg.pid.0=0x2157
+
+arduino_zero_edbg.upload.tool=openocd
+arduino_zero_edbg.upload.protocol=sam-ba
+arduino_zero_edbg.upload.maximum_size=262144
+arduino_zero_edbg.upload.use_1200bps_touch=false
+arduino_zero_edbg.upload.wait_for_upload_port=false
+arduino_zero_edbg.upload.native_usb=false
+arduino_zero_edbg.build.mcu=cortex-m0plus
+arduino_zero_edbg.build.f_cpu=48000000L
+arduino_zero_edbg.build.usb_product="Arduino Zero"
+arduino_zero_edbg.build.usb_manufacturer="Arduino LLC"
+arduino_zero_edbg.build.board=SAMD_ZERO
+arduino_zero_edbg.build.core=arduino
+arduino_zero_edbg.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
+arduino_zero_edbg.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+arduino_zero_edbg.build.openocdscript=openocd_scripts/arduino_zero.cfg
+arduino_zero_edbg.build.variant=arduino_zero
+arduino_zero_edbg.build.variant_system_lib=
+arduino_zero_edbg.build.vid=0x2341
+arduino_zero_edbg.build.pid=0x804d
+arduino_zero_edbg.bootloader.tool=openocd
+arduino_zero_edbg.bootloader.file=zero/samd21_sam_ba.bin
+
+# Arduino MKR1000
+# -----------------------
+mkr1000.name=Arduino MKR1000
+mkr1000.vid.0=0x2341
+mkr1000.pid.0=0x804e
+mkr1000.vid.1=0x2341
+mkr1000.pid.1=0x004e
+mkr1000.vid.2=0x2341
+mkr1000.pid.2=0x824e
+mkr1000.vid.3=0x2341
+mkr1000.pid.3=0x024e
+
+mkr1000.upload.tool=bossac
+mkr1000.upload.protocol=sam-ba
+mkr1000.upload.maximum_size=262144
+mkr1000.upload.use_1200bps_touch=true
+mkr1000.upload.wait_for_upload_port=true
+mkr1000.upload.native_usb=true
+mkr1000.build.mcu=cortex-m0plus
+mkr1000.build.f_cpu=48000000L
+mkr1000.build.usb_product="Arduino MKR1000"
+mkr1000.build.usb_manufacturer="Arduino LLC"
+mkr1000.build.board=SAMD_MKR1000
+mkr1000.build.core=arduino
+mkr1000.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags}
+mkr1000.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkr1000.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkr1000.build.variant=mkr1000
+mkr1000.build.vid=0x2341
+mkr1000.build.pid=0x804e
+mkr1000.bootloader.tool=openocd
+mkr1000.bootloader.file=mkr1000/samd21_sam_ba_arduino_mkr1000.bin
+
+# Arduino Tian (with) Bootloader
+# ------------------------------
+tian.name=Arduino Tian
+tian.upload.via_ssh=true
+tian.vid.0=0x10C4
+tian.pid.0=0xEA70
+tian.descriptor.0=Enhanced Com Port
+
+tian.upload.tool=avrdude
+#tian.upload.protocol=stk500v2
+tian.upload.protocol=wiring
+tian.upload.maximum_size=262144
+tian.upload.use_1200bps_touch=true
+tian.upload.wait_for_upload_port=true
+tian.upload.native_usb=true
+tian.upload.speed=57600
+tian.build.mcu=cortex-m0plus
+tian.build.f_cpu=48000000L
+tian.build.usb_product="Arduino Tian"
+tian.build.board=SAMD_TIAN
+tian.build.core=arduino
+tian.build.extra_flags=-D__SAMD21G18A__ -mthumb {build.usb_flags}
+tian.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+tian.build.openocdscript=openocd_scripts/arduino_zero.cfg
+tian.build.variant=arduino_mzero
+tian.build.variant_system_lib=
+tian.build.vid=0x2a03
+tian.build.pid=0x8052
+tian.build.preferred_out_format=hex
+tian.bootloader.size=0x4000
+tian.build.emu.mcu=atmega2560
+tian.bootloader.tool=openocd-withbootsize
+tian.bootloader.low_fuses=0xff
+tian.bootloader.file=sofia/Sofia_Tian_151118.hex
+tian.drivers=SiliconLabs-CP2105/Silicon Labs VCP Driver.pkg

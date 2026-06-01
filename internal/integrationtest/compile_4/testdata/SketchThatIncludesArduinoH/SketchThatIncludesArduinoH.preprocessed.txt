@@ -1,0 +1,21 @@
+#line 1 {{QuoteCppString .sketchMainFile}}
+// Arduino.h should not be automatically included by the Arduino
+// preprocessor before the explicit include line in this sketch.
+
+#if defined(HIGH)
+#error Arduino.h seems to be automatically included
+#endif
+
+   #    include		<Arduino.h>
+
+#line 10 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 13 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 10 {{QuoteCppString .sketchMainFile}}
+void setup() {
+}
+
+void loop() {
+}
+

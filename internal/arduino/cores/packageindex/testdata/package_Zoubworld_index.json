@@ -1,0 +1,253 @@
+{
+  "packages": [
+    {
+      "name": "zoubworld_Arduino",
+      "maintainer": "zoubworld LLC",
+      "websiteURL": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/",
+      "email": "support@zoubworld.com",
+      "help": {
+        "online": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/support/"
+      },
+      "platforms": [
+        {
+          "name": "zoubworld SAM M0+ Boards",
+          "architecture": "samd",
+          "version": "1.6.33",
+          "category": "Contributed",
+          "help": {
+            "online": "https://www.zoubworld.com/support/"
+          },
+          "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/Zoubworld_sam_m0p-1.6.33.tar.bz2",
+          "archiveFileName": "Zoubworld_sam_m0p-1.6.33.tar.bz2",
+          "checksum": "SHA-256:66f6db1f48a422ecfa42e4377a5f7f29bc7550829ab24cbf322f1b184fc77d75",
+          "size": "7397802",
+          "boards": [{ "name": "Pilo" }, { "name": "Captor" }, { "name": "line" }],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "zoubworld_Arduino",
+              "name": "bossac",
+              "version": "1.7.1-zoubworld-4"
+            },
+            {
+              "packager": "arduino",
+              "name": "openocd",
+              "version": "0.9.0-arduino"
+            },
+            {
+              "packager": "arduino",
+              "name": "CMSIS",
+              "version": "4.0.0-atmel"
+            },
+            {
+              "packager": "zoubworld_Arduino",
+              "name": "CMSIS-Atmel",
+              "version": "1.1.7-Zoubworld"
+            },
+            {
+              "packager": "zoubworld_Arduino",
+              "name": "UsbDriver",
+              "version": "1.1.1-Zoubworld"
+            },
+            {
+              "packager": "arduino",
+              "name": "arduinoOTA",
+              "version": "1.2.0"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "bossac",
+          "version": "1.7.1-zoubworld-4",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/bossac-1.7.1-zoubworld-4-i686-mingw32.tar.bz2",
+              "archiveFileName": "bossac-1.7.1-zoubworld-4-i686-mingw32.tar.bz2",
+              "checksum": "SHA-256:7782e0438e1f29e31272a3f6106b55850f5e1613513cdfb7aa7c9fb02c8107e3",
+              "size": "838410"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/bossac-1.7.1-zoubworld-4-x86_64-apple-darwin.tar.bz2",
+              "archiveFileName": "bossac-1.7.1-zoubworld-4-x86_64-apple-darwin.tar.bz2",
+              "checksum": "SHA-256:f57a8c3bc70b51362d93d0e0a6400459ced144dce020a6c0fdda18ba3cf65182",
+              "size": "79340"
+            },
+            {
+              "host": "x86_64-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/bossac-1.7.1-zoubworld-4-x86_64-linux-gnu.tar.bz2",
+              "archiveFileName": "bossac-1.7.1-zoubworld-4-x86_64-linux-gnu.tar.bz2",
+              "checksum": "SHA-256:6db2706e48ffa8194c8f421a3d2baaaaa7eff7349d7b046c80fc467cc90f06fd",
+              "size": "209739"
+            },
+            {
+              "host": "i686-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/bossac-1.7.1-zoubworld-4-i686-linux-gnu.tar.bz2",
+              "archiveFileName": "bossac-1.7.1-zoubworld-4-i686-linux-gnu.tar.bz2",
+              "checksum": "SHA-256:f1bee341c0f62b732f710be3c75d68ca590aa2743c98051b67738f5809d22885",
+              "size": "200191"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/bossac-1.7.1-zoubworld-4-arm-linux-gnueabihf.tar.bz2",
+              "archiveFileName": "bossac-1.7.1-zoubworld-4-arm-linux-gnueabihf.tar.bz2",
+              "checksum": "SHA-256:93c2a45a1b3cd0c2f2ed667c488798db4b15f215124c5adb18227c5dbd70e359",
+              "size": "1922311"
+            }
+          ]
+        },
+        {
+          "name": "CMSIS-Atmel",
+          "version": "1.1.7-Zoubworld",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "archiveFileName": "CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:49c782431ca88652d8d60bbc7999973ba66e479e954413ed02b41cc831a6e376",
+              "size": "9537258"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "archiveFileName": "CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:49c782431ca88652d8d60bbc7999973ba66e479e954413ed02b41cc831a6e376",
+              "size": "9537258"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "archiveFileName": "CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:49c782431ca88652d8d60bbc7999973ba66e479e954413ed02b41cc831a6e376",
+              "size": "9537258"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "archiveFileName": "CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:49c782431ca88652d8d60bbc7999973ba66e479e954413ed02b41cc831a6e376",
+              "size": "9537258"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "archiveFileName": "CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:49c782431ca88652d8d60bbc7999973ba66e479e954413ed02b41cc831a6e376",
+              "size": "9537258"
+            },
+            {
+              "host": "all",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "archiveFileName": "CMSIS-Atmel-1.1.7-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:49c782431ca88652d8d60bbc7999973ba66e479e954413ed02b41cc831a6e376",
+              "size": "9537258"
+            }
+          ]
+        },
+        {
+          "name": "Jlink",
+          "version": "JLink_V630c",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/Jlink-JLink_V630c.tar.bz2",
+              "archiveFileName": "Jlink-JLink_V630c.tar.bz2",
+              "checksum": "SHA-256:b167cd5ce06f95bbef359eabc6ee16630df7c21778b909c734533266792e1e54",
+              "size": "39048586"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_MacOSX_V630c.pkg",
+              "archiveFileName": "JLink_MacOSX_V630c.pkg",
+              "checksum": "SHA-256:",
+              "size": "0"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_Linux_V630c_x86_64.tgz",
+              "archiveFileName": "JLink_Linux_V630c_x86_64.tgz",
+              "checksum": "SHA-256:",
+              "size": "0"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_Linux_V630c_i386.tgz",
+              "archiveFileName": "JLink_Linux_V630c_i386.tgz",
+              "checksum": "SHA-256:",
+              "size": "0"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_Linux_V630c_arm.tgz",
+              "archiveFileName": "JLink_Linux_V630c_arm.tgz",
+              "checksum": "SHA-256:",
+              "size": "0"
+            },
+            {
+              "host": "all",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/Jlink-JLink_V630c.tar.bz2",
+              "archiveFileName": "Jlink-JLink_V630c.tar.bz2",
+              "checksum": "SHA-256:b167cd5ce06f95bbef359eabc6ee16630df7c21778b909c734533266792e1e54",
+              "size": "39048586"
+            }
+          ]
+        },
+        {
+          "name": "UsbDriver",
+          "version": "1.1.1-Zoubworld",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "archiveFileName": "UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:8aa170ddf04ceb1b54603ee1c0de5b70c6ef2cdd357a5d32a3b88767ecec0b0d",
+              "size": "20689329"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "archiveFileName": "UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:8aa170ddf04ceb1b54603ee1c0de5b70c6ef2cdd357a5d32a3b88767ecec0b0d",
+              "size": "20689329"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "archiveFileName": "UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:8aa170ddf04ceb1b54603ee1c0de5b70c6ef2cdd357a5d32a3b88767ecec0b0d",
+              "size": "20689329"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "archiveFileName": "UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:8aa170ddf04ceb1b54603ee1c0de5b70c6ef2cdd357a5d32a3b88767ecec0b0d",
+              "size": "20689329"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "archiveFileName": "UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:8aa170ddf04ceb1b54603ee1c0de5b70c6ef2cdd357a5d32a3b88767ecec0b0d",
+              "size": "20689329"
+            },
+            {
+              "host": "all",
+              "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "archiveFileName": "UsbDriver-1.1.1-Zoubworld.tar.bz2",
+              "checksum": "SHA-256:8aa170ddf04ceb1b54603ee1c0de5b70c6ef2cdd357a5d32a3b88767ecec0b0d",
+              "size": "20689329"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

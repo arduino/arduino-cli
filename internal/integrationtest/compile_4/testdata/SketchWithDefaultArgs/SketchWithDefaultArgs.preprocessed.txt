@@ -1,0 +1,15 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 4 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 7 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 1 {{QuoteCppString .sketchMainFile}}
+void test(int x = 1) {
+}
+
+void setup() {
+}
+
+void loop() {
+}

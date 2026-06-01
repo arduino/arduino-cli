@@ -1,0 +1,41 @@
+{
+    "packages": [
+        {
+            "name": "arduino",
+            "maintainer": "Arduino",
+            "websiteURL": "http://www.arduino.cc/",
+            "email": "packages@arduino.cc",
+            "help": {
+                "online": "http://www.arduino.cc/en/Reference/HomePage"
+            },
+            "platforms": [],
+            "tools": [
+                {
+                    "name": "test-tool",
+                    "version": "1.0.0",
+                    "systems": [
+                        {
+                            "host": "i386-apple-darwin11",
+                            "url": "INVALID",
+                            "archiveFileName": "INVALID",
+                            "size": "100",
+                            "checksum": "SHA-256:9e576c6e44f54b1e921a43ea77bcc08ec99e0e4e0905f4b9acf9ab2c979f0a22"
+                        },
+                        {
+                            "host": "arm-linux-gnueabihf",
+                            "url": "http://downloads.arduino.cc/tools/dfu-util-0.11-arduino5-linux_arm.tar.gz",
+                            "archiveFileName": "dfu-util-0.11-arduino5-linux_arm.tar.gz",
+                            "size": "2512819",
+                            "checksum": "SHA-256:acd4bd283fd408515279a44dd830499ad37b0767e8f2fde5c27e878ded909dc3"
+                        }
+                    ]
+                },
+                {
+                    "name": "dfu-util",
+                    "version": "0.11.0-arduino5",
+                    "systems": []
+                }
+            ]
+        }
+    ]
+}

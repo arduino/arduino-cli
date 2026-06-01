@@ -1,0 +1,11 @@
+## Arduino Duemilanove or Diecimila w/ ATmega123
+## ---------------------------------------------
+diecimila.menu.cpu.atmega123=ATmega123
+
+diecimila.menu.cpu.atmega123.upload.maximum_size=14336
+diecimila.menu.cpu.atmega123.upload.maximum_data_size=1024
+diecimila.menu.cpu.atmega123.upload.speed=19200
+
+diecimila.menu.cpu.atmega123.bootloader.high_fuses=0xdd
+diecimila.menu.cpu.atmega123.bootloader.extended_fuses=0x00
+diecimila.menu.cpu.atmega123.bootloader.file=atmega/ATmegaBOOT_123_diecimila.hex

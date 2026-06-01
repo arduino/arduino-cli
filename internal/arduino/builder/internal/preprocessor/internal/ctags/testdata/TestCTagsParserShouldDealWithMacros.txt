@@ -1,0 +1,8 @@
+DEBUG	/tmp/sketch5976699731718729500.cpp	1;"	kind:macro	line:1
+DISABLED	/tmp/sketch5976699731718729500.cpp	2;"	kind:macro	line:2
+hello	/tmp/sketch5976699731718729500.cpp	/^String hello = "world!";$/;"	kind:variable	line:16
+setup	/tmp/sketch5976699731718729500.cpp	/^void setup() {$/;"	kind:function	line:18	signature:()	returntype:void
+loop	/tmp/sketch5976699731718729500.cpp	/^void loop() {$/;"	kind:function	line:23	signature:()	returntype:void
+debug	/tmp/sketch5976699731718729500.cpp	/^void debug() {$/;"	kind:function	line:35	signature:()	returntype:void
+disabledIsDefined	/tmp/sketch5976699731718729500.cpp	/^void disabledIsDefined() {$/;"	kind:function	line:46	signature:()	returntype:void
+useMyType	/tmp/sketch5976699731718729500.cpp	/^int useMyType(MyType type) {$/;"	kind:function	line:50	signature:(MyType type)	returntype:int

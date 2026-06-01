@@ -1,0 +1,28 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+#if __SAM3X8E__
+#line 2 {{QuoteCppString .sketchMainFile}}
+void ifBranch();
+#line 9 {{QuoteCppString .sketchMainFile}}
+void f1();
+#line 10 {{QuoteCppString .sketchMainFile}}
+void f2();
+#line 12 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 14 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 2 {{QuoteCppString .sketchMainFile}}
+void ifBranch() {
+}
+#else
+void elseBranch() {
+}
+#endif
+
+void f1(){ f2(); }
+void f2(){;}
+
+void setup() {
+}
+void loop() {
+}

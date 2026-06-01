@@ -1,0 +1,46 @@
+name: i18n-weekly-pull
+
+env:
+  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
+  COVERAGE_ARTIFACT: coverage-data
+
+on:
+  schedule:
+    # run every monday at 2AM
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  pull-from-transifex:
+    # This workflow is only of value to the arduino/arduino-cli repository and
+    # would always fail in forks
+    if: github.repository == 'arduino/arduino-cli'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Run task i18n:pull
+        run: go tool github.com/go-task/task/v3/cmd/task i18n:pull
+        env:
+          TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
+          TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
+          TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
+          TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: Updated translation files
+          title: Updated translation files
+          branch: i18n/translations-update
+          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>

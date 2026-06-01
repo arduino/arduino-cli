@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<?ifndef ProductVersion?>
+<?error ProductVersion property not defined?>
+<?endif?>
+
+<?define UpgradeCode = "96AEA20C-2FB2-431D-87A4-D7A6E57F70B7"?>
+
+<!-- Define a unique UpgradeCode per platform -->
+<?if $(var.Platform) = "x64"?>
+<?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+<?elseif $(var.Platform) = "x86"?>
+<?define ProgramFilesFolder = "ProgramFilesFolder"?>
+<?endif?>
+
+<!-- https://www.add-in-express.com/docs/wix-setup-package.php -->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <!-- https://wixtoolset.org/documentation/manual/v3/xsd/wix/product.html -->
+    <Product Id="*" Name="Arduino CLI" Version="$(var.ProductVersion)" Language="1033" Manufacturer="Arduino Srl." UpgradeCode="$(var.UpgradeCode)">
+        <!-- https://wixtoolset.org/documentation/manual/v3/xsd/wix/package.html -->
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"/>
+        <!-- by adding this attribute, you create a single .MSI file as opposed to getting a CAB file along with the .MSI. -->
+        <MediaTemplate EmbedCab="yes"/>
+
+        <!-- Remove older product(s) early but within the transaction -->
+        <MajorUpgrade DowngradeErrorMessage="A newer version of !(bind.property.ProductName) is already installed."/>
+
+        <!-- directory structure to create -->
+        <!-- https://wixtoolset.org/documentation/manual/v3/howtos/files_and_registry/add_a_file.html -->
+        <!-- Outermost folder (kind of virtual). Fixed entry. -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- "ProgramFilesFolder" is a variable containing the absolute path. -->
+            <!-- For a list of folder variables, see: http://msdn.microsoft.com/en-us/library/aa372057%28VS.85%29.aspx -->
+            <Directory Id="$(var.ProgramFilesFolder)" Name="Program Files">
+                <!-- All folders from here on are relative to their parent. -->
+                <!-- INSTALLDIR is a property name. We need it later for the UI (to be able to change the install dir. -->
+                <Directory Id="INSTALLDIR" Name="Arduino CLI"/>
+            </Directory>
+        </Directory>
+
+        <!-- Determine the directory of a previous installation (if one exists). If not INSTALLDIR stays empty -->
+        <Property Id="INSTALLDIR">
+            <RegistrySearch Id="InstallDir" Root="HKLM" Key="SOFTWARE\Arduino CLI" Name="InstallDir" Type="directory"/>
+        </Property>
+
+        <!-- Features define which parts of the application can be installed in a custom installation -->
+        <Feature Id="DefaultFeature" ConfigurableDirectory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Guid="0c407434-5d0f-428a-a855-d823f6acce8d">
+                <File Name="arduino-cli.exe" KeyPath="yes"/>
+                <Environment Id="Path" Action="set" Name="PATH" Part="last" System="yes" Value="[INSTALLDIR]"/>
+            </Component>
+
+            <!-- Persist the INSTALLDIR and restore it in subsequent installs -->
+            <Component Directory="INSTALLDIR">
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Arduino CLI" Name="InstallDir" Type="string" Value="[INSTALLDIR]"/>
+            </Component>
+        </Feature>
+
+        <!-- Broadcast environment variable changes -->
+        <!-- https://wixtoolset.org/documentation/manual/v3/customactions/wixsettingchange.html -->
+        <CustomActionRef Id="WixBroadcastEnvironmentChange" />
+
+        <!-- Use customized WixUI_InstallDir that removes WixUI_LicenseAgreementDlg -->
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+        <UIRef Id="ArduinoCLI_InstallDir"/>
+    </Product>
+</Wix>

@@ -1,0 +1,3 @@
+setup	/tmp/test542833488/preproc/ctags_target.cpp	/^void setup(){}$/;"	kind:function	line:2	signature:()	returntype:void
+loop	/tmp/test542833488/preproc/ctags_target.cpp	/^void loop(){}$/;"	kind:function	line:3	signature:()	returntype:void
+doStuff	/tmp/test542833488/preproc/ctags_target.cpp	/^static void doStuff() {}$/;"	kind:function	line:4	signature:()	returntype:void

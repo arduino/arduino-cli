@@ -1,0 +1,5 @@
+A_NEW_TYPE	/tmp/sketch8930345717354294915.cpp	/^struct A_NEW_TYPE {$/;"	kind:struct	line:3
+foo	/tmp/sketch8930345717354294915.cpp	/^} foo;$/;"	kind:variable	line:7	typeref:struct:A_NEW_TYPE
+setup	/tmp/sketch8930345717354294915.cpp	/^void setup() {$/;"	kind:function	line:9	signature:()	returntype:void
+loop	/tmp/sketch8930345717354294915.cpp	/^void loop() {$/;"	kind:function	line:13	signature:()	returntype:void
+dostuff	/tmp/sketch8930345717354294915.cpp	/^void dostuff (A_NEW_TYPE * bar)$/;"	kind:function	line:17	signature:(A_NEW_TYPE * bar)	returntype:void

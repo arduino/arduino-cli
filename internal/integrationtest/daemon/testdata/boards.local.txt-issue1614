@@ -1,0 +1,10 @@
+# https://github.com/arduino/arduino-cli/issues/1614
+
+menu.some_menu=Some Custom Menu
+
+uno.menu.some_menu.bad=Bad Option
+uno.menu.some_menu.bad.build.extra_flags=-bad-build-extraflags
+uno.menu.some_menu.bad.compiler.cpp.extra_flags=-bad-compiler-cpp-extraflags
+
+uno.menu.some_menu.good=Good Option
+uno.menu.some_menu.good.compiler.cpp.extra_flags=-DGOOD_COMPILER_CPP_EXTRA_FLAGS

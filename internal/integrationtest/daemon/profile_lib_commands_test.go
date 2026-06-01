@@ -1,0 +1,561 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2025 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
+package daemon
+
+import (
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
+	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
+)
+
+func indexLibArray(l ...*commands.ProfileLibraryReference) []*commands.ProfileLibraryReference {
+	return l
+}
+
+func indexLib(name, version string, isdep ...bool) *commands.ProfileLibraryReference {
+	return &commands.ProfileLibraryReference{
+		Library: &commands.ProfileLibraryReference_IndexLibrary_{
+			IndexLibrary: &commands.ProfileLibraryReference_IndexLibrary{
+				Name:         name,
+				Version:      version,
+				IsDependency: len(isdep) > 0 && isdep[0],
+			},
+		},
+	}
+}
+
+func latestVersion(t *testing.T, cli *integrationtest.ArduinoCLI, name string) string {
+	out, _, err := cli.Run("lib", "search", name, "--json")
+	require.NoError(t, err)
+	v := requirejson.Parse(t, out).Query(`.libraries[] | select(.name=="` + name + `") | .latest.version`).String()
+	return strings.Trim(v, `"`)
+}
+
+func TestProfileLibAddListAndRemove(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	t.Cleanup(func() { env.CleanUp() })
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { tmp.RemoveAll() })
+	sk := tmp.Join("sketch")
+
+	// Create a new sketch
+	_, _, err = cli.Run("sketch", "new", sk.String())
+	require.NoError(t, err)
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	// Create a new profile
+	_, err = grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
+	require.NoError(t, err)
+	projectFile := sk.Join("sketch.yaml")
+
+	expect := func(expected string) {
+		p, _ := projectFile.ReadFile()
+		require.Equal(t, strings.TrimSpace(expected), strings.TrimSpace(string(p)))
+	}
+	expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+
+	_, err = grpcInst.ProfileCreate(t.Context(), "test2", sk.String(), "arduino:avr:mini", false)
+	require.NoError(t, err)
+	expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+
+	// Gather latest versions of dependencies to check later
+	vAdafruitL3GD20U := latestVersion(t, cli, "Adafruit L3GD20 U")
+	vAdafruitLSM303DLHC := latestVersion(t, cli, "Adafruit LSM303DLHC")
+	vAdafruitUnifiedSensor := latestVersion(t, cli, "Adafruit Unified Sensor")
+	vAdafruitBusIO := latestVersion(t, cli, "Adafruit BusIO")
+
+	// Add a library to the profile
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("ArduinoJson", "6.18.5"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(indexLib("ArduinoJson", "6.18.5")), addresp.GetAddedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Add a library with deps to the profile
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Adafruit 9DOF", "1.1.4"), true, false)
+		require.NoError(t, err)
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+      - Adafruit 9DOF (1.1.4)
+      - dependency: Adafruit L3GD20 U (` + vAdafruitL3GD20U + `)
+      - dependency: Adafruit LSM303DLHC (` + vAdafruitLSM303DLHC + `)
+      - dependency: Adafruit Unified Sensor (` + vAdafruitUnifiedSensor + `)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+		require.Equal(t, indexLibArray(
+			indexLib("Adafruit 9DOF", "1.1.4"),
+			indexLib("Adafruit L3GD20 U", vAdafruitL3GD20U, true),
+			indexLib("Adafruit LSM303DLHC", vAdafruitLSM303DLHC, true),
+			indexLib("Adafruit Unified Sensor", vAdafruitUnifiedSensor, true),
+		), addresp.GetAddedLibraries())
+	}
+
+	{
+		// Add a library with deps to the profile
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Adafruit ADG72x", "1.0.0"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Adafruit ADG72x", "1.0.0"),
+			indexLib("Adafruit BusIO", vAdafruitBusIO, true),
+		), addresp.GetAddedLibraries())
+	}
+	{
+		// Add a library with deps to the profile
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Adafruit ADS1X15", "2.6.0"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(indexLib("Adafruit ADS1X15", "2.6.0")), addresp.GetAddedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+      - Adafruit 9DOF (1.1.4)
+      - dependency: Adafruit L3GD20 U (` + vAdafruitL3GD20U + `)
+      - dependency: Adafruit LSM303DLHC (` + vAdafruitLSM303DLHC + `)
+      - dependency: Adafruit Unified Sensor (` + vAdafruitUnifiedSensor + `)
+      - Adafruit ADG72x (1.0.0)
+      - dependency: Adafruit BusIO (` + vAdafruitBusIO + `)
+      - Adafruit ADS1X15 (2.6.0)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Remove a library with deps from the profile
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Adafruit ADG72x", "1.0.0"), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(indexLib("Adafruit ADG72x", "1.0.0")), remresp.RemovedLibraries)
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+      - Adafruit 9DOF (1.1.4)
+      - dependency: Adafruit L3GD20 U (` + vAdafruitL3GD20U + `)
+      - dependency: Adafruit LSM303DLHC (` + vAdafruitLSM303DLHC + `)
+      - dependency: Adafruit Unified Sensor (` + vAdafruitUnifiedSensor + `)
+      - dependency: Adafruit BusIO (` + vAdafruitBusIO + `)
+      - Adafruit ADS1X15 (2.6.0)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Remove another library with deps from the profile that will also remove some shared dependencies
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Adafruit ADS1X15", "2.6.0"), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Adafruit ADS1X15", "2.6.0"),
+			indexLib("Adafruit BusIO", vAdafruitBusIO, true),
+		), remresp.RemovedLibraries)
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+      - Adafruit 9DOF (1.1.4)
+      - dependency: Adafruit L3GD20 U (` + vAdafruitL3GD20U + `)
+      - dependency: Adafruit LSM303DLHC (` + vAdafruitLSM303DLHC + `)
+      - dependency: Adafruit Unified Sensor (` + vAdafruitUnifiedSensor + `)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Now explicitly add a dependency making it no longer a (removable) dependency
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Adafruit Unified Sensor", vAdafruitUnifiedSensor), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(indexLib("Adafruit Unified Sensor", vAdafruitUnifiedSensor)), addresp.GetSkippedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+      - Adafruit 9DOF (1.1.4)
+      - dependency: Adafruit L3GD20 U (` + vAdafruitL3GD20U + `)
+      - dependency: Adafruit LSM303DLHC (` + vAdafruitLSM303DLHC + `)
+      - Adafruit Unified Sensor (` + vAdafruitUnifiedSensor + `)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Try to remove the main library again, the explicitly added dependency should remain
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Adafruit 9DOF", "1.1.4"), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Adafruit 9DOF", "1.1.4"),
+			indexLib("Adafruit L3GD20 U", vAdafruitL3GD20U, true),
+			indexLib("Adafruit LSM303DLHC", vAdafruitLSM303DLHC, true),
+		), remresp.RemovedLibraries)
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.18.5)
+      - Adafruit Unified Sensor (` + vAdafruitUnifiedSensor + `)
+
+  test2:
+    fqbn: arduino:avr:mini
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+}
+
+func TestProfileLibRemoveWithDeps(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	t.Cleanup(env.CleanUp)
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { tmp.RemoveAll() })
+	sk := tmp.Join("sketch")
+
+	// Gather latest versions of dependencies to check later
+	vArduinoRPClite := latestVersion(t, cli, "Arduino_RPClite")
+	vArxContainer := latestVersion(t, cli, "ArxContainer")
+	vArxTypeTraits := latestVersion(t, cli, "ArxTypeTraits")
+	vDebugLog := latestVersion(t, cli, "DebugLog")
+	vMsgPack := latestVersion(t, cli, "MsgPack")
+
+	// Create a new sketch
+	_, _, err = cli.Run("sketch", "new", sk.String())
+	require.NoError(t, err)
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	// Create a new profile
+	_, err = grpcInst.ProfileCreate(t.Context(), "test", sk.String(), "arduino:avr:uno", true)
+	require.NoError(t, err)
+	projectFile := sk.Join("sketch.yaml")
+
+	expect := func(expected string) {
+		p, _ := projectFile.ReadFile()
+		require.Equal(t, strings.TrimSpace(expected), strings.TrimSpace(string(p)))
+	}
+	expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+
+	// Add a library to the profile
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", "0.2.2"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RPClite", vArduinoRPClite, true),
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("ArxContainer", vArxContainer, true),
+			indexLib("ArxTypeTraits", vArxTypeTraits, true),
+			indexLib("DebugLog", vDebugLog, true),
+			indexLib("MsgPack", vMsgPack, true),
+		), addresp.GetAddedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - dependency: Arduino_RPClite (` + vArduinoRPClite + `)
+      - Arduino_RouterBridge (0.2.2)
+      - dependency: ArxContainer (` + vArxContainer + `)
+      - dependency: ArxTypeTraits (` + vArxTypeTraits + `)
+      - dependency: DebugLog (` + vDebugLog + `)
+      - dependency: MsgPack (` + vMsgPack + `)
+
+default_profile: test
+`)
+	}
+
+	// Remove the library (without indicating the version) and the dependencies
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", ""), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("Arduino_RPClite", vArduinoRPClite, true),
+			indexLib("ArxContainer", vArxContainer, true),
+			indexLib("ArxTypeTraits", vArxTypeTraits, true),
+			indexLib("DebugLog", vDebugLog, true),
+			indexLib("MsgPack", vMsgPack, true),
+		), remresp.GetRemovedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+
+	// Re-add the library to the profile
+	{
+		addresp, err := grpcInst.ProfileLibAdd(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", "0.2.2"), true, false)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RPClite", vArduinoRPClite, true),
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("ArxContainer", vArxContainer, true),
+			indexLib("ArxTypeTraits", vArxTypeTraits, true),
+			indexLib("DebugLog", vDebugLog, true),
+			indexLib("MsgPack", vMsgPack, true),
+		), addresp.GetAddedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - dependency: Arduino_RPClite (` + vArduinoRPClite + `)
+      - Arduino_RouterBridge (0.2.2)
+      - dependency: ArxContainer (` + vArxContainer + `)
+      - dependency: ArxTypeTraits (` + vArxTypeTraits + `)
+      - dependency: DebugLog (` + vDebugLog + `)
+      - dependency: MsgPack (` + vMsgPack + `)
+
+default_profile: test
+`)
+	}
+
+	// Remove one dep library (without indicating the version)
+	{
+		_, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Arduino_RPClite", ""), true)
+		require.NoError(t, err)
+		// require.Equal(t, indexLibArray(
+		// 	indexLib("Arduino_RPClite", "0.2.0", true),
+		// ), remresp.GetRemovedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - Arduino_RouterBridge (0.2.2)
+      - dependency: ArxContainer (` + vArxContainer + `)
+      - dependency: ArxTypeTraits (` + vArxTypeTraits + `)
+      - dependency: DebugLog (` + vDebugLog + `)
+      - dependency: MsgPack (` + vMsgPack + `)
+
+default_profile: test
+`)
+	}
+
+	// Remove the library (without indicating the version) and all the dependencies
+	{
+		remresp, err := grpcInst.ProfileLibRemove(t.Context(), sk.String(), "test", indexLib("Arduino_RouterBridge", ""), true)
+		require.NoError(t, err)
+		require.Equal(t, indexLibArray(
+			indexLib("Arduino_RouterBridge", "0.2.2"),
+			indexLib("ArxContainer", vArxContainer, true),
+			indexLib("ArxTypeTraits", vArxTypeTraits, true),
+			indexLib("DebugLog", vDebugLog, true),
+			indexLib("MsgPack", vMsgPack, true),
+		), remresp.GetRemovedLibraries())
+		expect(`
+profiles:
+  test:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+
+default_profile: test
+`)
+	}
+}
+
+func TestSketchLoader(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	t.Cleanup(env.CleanUp)
+
+	sketchPath, err := paths.New("testdata", "sketch_with_profile").Abs()
+	require.NoError(t, err)
+
+	sk, err := cli.LoadSketch(sketchPath)
+	require.NoError(t, err)
+
+	profiles := sk.GetSketch().GetProfiles()
+	require.Len(t, profiles, 2)
+
+	// nanorp:
+	//   fqbn: arduino:avr:uno
+	//   platforms:
+	//     - platform: arduino:mbed_nano
+	//   libraries:
+	//     - ArduinoIoTCloud (1.0.2)
+	//     - Arduino_ConnectionHandler (0.6.4)
+	//     - TinyDHT sensor library (1.1.0)
+	profile1 := profiles[0]
+	require.Equal(t, "arduino:avr:uno", profile1.GetFqbn())
+	require.Len(t, profile1.GetPlatforms(), 1)
+	require.Equal(t, "arduino:mbed_nano", profile1.GetPlatforms()[0].GetId())
+	require.Equal(t, "", profile1.GetPlatforms()[0].GetVersion())
+	require.Len(t, profile1.GetLibraries(), 3)
+	require.Equal(t, "ArduinoIoTCloud", profile1.GetLibraries()[0].GetIndexLibrary().GetName())
+	require.Equal(t, "1.0.2", profile1.GetLibraries()[0].GetIndexLibrary().GetVersion())
+	require.Equal(t, "Arduino_ConnectionHandler", profile1.GetLibraries()[1].GetIndexLibrary().GetName())
+	require.Equal(t, "0.6.4", profile1.GetLibraries()[1].GetIndexLibrary().GetVersion())
+	require.Equal(t, "TinyDHT sensor library", profile1.GetLibraries()[2].GetIndexLibrary().GetName())
+	require.Equal(t, "1.1.0", profile1.GetLibraries()[2].GetIndexLibrary().GetVersion())
+
+	// profile2:
+	//   fqbn: arduino:avr:uno
+	//   platforms:
+	//     - platform: arduino:mbed_nano (4.0.2)
+	//     - platform: test:mbed_nano (1.2.3)
+	//       platform_index_url: https://test.com/mbed_nano_index.json
+	//   libraries:
+	//     - ArduinoIoTCloud (1.0.2)
+	//     - dir: libraries/Arduino_ConnectionHandler
+	profile2 := profiles[1]
+	require.Equal(t, "arduino:avr:uno", profile2.GetFqbn())
+	require.Len(t, profile2.GetPlatforms(), 2)
+	require.Equal(t, "arduino:mbed_nano", profile2.GetPlatforms()[0].GetId())
+	require.Equal(t, "4.0.2", profile2.GetPlatforms()[0].GetVersion())
+	require.Equal(t, "test:mbed_nano", profile2.GetPlatforms()[1].GetId())
+	require.Equal(t, "1.2.3", profile2.GetPlatforms()[1].GetVersion())
+	require.Equal(t, "https://test.com/mbed_nano_index.json", profile2.GetPlatforms()[1].GetIndexUrl())
+	require.Len(t, profile2.GetLibraries(), 2)
+	require.Equal(t, "ArduinoIoTCloud", profile2.GetLibraries()[0].GetIndexLibrary().GetName())
+	require.Equal(t, "1.0.2", profile2.GetLibraries()[0].GetIndexLibrary().GetVersion())
+	require.Equal(t, "libraries/Arduino_ConnectionHandler", profile2.GetLibraries()[1].GetLocalLibrary().GetPath())
+}

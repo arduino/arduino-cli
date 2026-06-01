@@ -1,0 +1,14 @@
+
+name=Test AVR Boards
+version=1.0.0
+
+preferred_output_format=hex
+recipe.output.tmp_file={build.project_name}.{preferred_output_format}
+
+# Fake AVR programmer tool for testing
+# ------------------------------------
+tools.avrdude-none.upload.params.verbose=VERBOSE
+tools.avrdude-none.upload.params.quiet=QUIET
+tools.avrdude-none.upload.params.verify=VERIFY
+tools.avrdude-none.upload.params.noverify=NOVERIFY
+tools.avrdude-none.upload.pattern=echo {upload.verbose} {upload.verify} "{build.path}/{build.project_name}.hex"

@@ -1,0 +1,268 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-task.md
+name: Check Go
+
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
+on:
+  create:
+  push:
+    paths:
+      - ".github/workflows/check-go-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - ".golangci.ya?ml"
+      - "**/go.mod"
+      - "**/go.sum"
+      - "**.go"
+  pull_request:
+    paths:
+      - ".github/workflows/check-go-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - ".golangci.ya?ml"
+      - "**/go.mod"
+      - "**/go.sum"
+      - "**.go"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 7 * * WED"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  check-outdated:
+    name: check-outdated (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          # TODO: add paths of all Go modules here
+          - path: .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module.path }}/go.mod
+
+      - name: Modernize usages of outdated APIs
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task go:fix
+
+      - name: Check if any fixes were needed
+        run: |
+          git diff \
+            --color \
+            --exit-code
+
+  check-style:
+    name: check-style (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          # TODO: add paths of all Go modules here
+          - path: .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module.path }}/go.mod
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11.3
+
+      - name: Check style
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task  \
+              --silent \
+              go:lint
+
+  check-formatting:
+    name: check-formatting (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          # TODO: add paths of all Go modules here
+          - path: .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module.path }}/go.mod
+
+      - name: Format code
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task go:format
+
+      - name: Check formatting
+        run: |
+          git diff \
+            --color \
+            --exit-code
+
+  check-config:
+    name: check-config (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          # TODO: add paths of all Go modules here
+          - path: .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module.path }}/go.mod
+
+      - name: Run go mod tidy
+        working-directory: ${{ matrix.module.path }}
+        run: go mod tidy
+
+      - name: Check whether any tidying was needed
+        run: |
+          git diff \
+            --color \
+            --exit-code
+
+  check-license-headers:
+    name: check-license-headers (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          # TODO: add paths of all Go modules here
+          - path: .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module.path }}/go.mod
+
+      - name: Check for missing license headers
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task go:add-license-headers
+          git diff --color --exit-code
+
+  # Do a simple "smoke test" build for the modules with no other form of validation
+  build:
+    name: build (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          # TODO: add paths of all Go modules here
+          - path: internal/arduino/discovery/discovery_client
+          - path: rpc/internal/client_example
+          - path: commands/term_example
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          # use the Go version specified in the root's go.mod file
+          go-version-file: ./go.mod
+
+      - name: Build
+        working-directory: ${{ matrix.module.path }}
+        run: go build

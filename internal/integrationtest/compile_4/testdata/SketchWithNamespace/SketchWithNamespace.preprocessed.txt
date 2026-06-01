@@ -1,0 +1,16 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+namespace Test {
+	int value() {
+		return 42;
+	}
+	int ciao = 24;
+}
+#line 7 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 8 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 7 {{QuoteCppString .sketchMainFile}}
+void setup() {}
+void loop() {}
+

@@ -1,0 +1,5 @@
+build.debug.config.test1.svd_file=test1.svd
+build.debug.config.test1.cortex-debug.custom.test1=true
+
+build.debug.config.test2.svd_file=test2.svd
+build.debug.config.test2.cortex-debug.custom.test2=true

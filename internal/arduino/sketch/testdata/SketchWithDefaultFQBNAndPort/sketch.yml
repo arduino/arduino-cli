@@ -1,0 +1,13 @@
+profiles:
+  nanorp:
+    fqbn: arduino:mbed_nano:nanorp2040connect
+    platforms:
+      - platform: arduino:mbed_nano (2.1.0)
+    libraries:
+      - ArduinoIoTCloud (1.0.2)
+      - Arduino_ConnectionHandler (0.6.4)
+      - TinyDHT sensor library (1.1.0)
+
+default_fqbn: arduino:avr:uno
+default_port: /dev/ttyACM0
+default_protocol: serial

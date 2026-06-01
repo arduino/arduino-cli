@@ -1,0 +1,15 @@
+[
+  {
+    "severity": "ERROR",
+    "message": "expected '}' at end of input\n void wrong() {\n              ^",
+    "file": "D:\\a\\arduino-cli\\arduino-cli\\internal\\integrationtest\\compile_3\\testdata\\blink_with_wrong_cpp\\wrong.cpp",
+    "line": 1,
+    "col": 14,
+    "context": [
+      {
+        "message": "In function 'void wrong()':",
+        "file": "D:\\a\\arduino-cli\\arduino-cli\\internal\\integrationtest\\compile_3\\testdata\\blink_with_wrong_cpp\\wrong.cpp"
+      }
+    ]
+  }
+]

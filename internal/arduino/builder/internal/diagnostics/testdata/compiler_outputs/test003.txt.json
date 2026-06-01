@@ -1,0 +1,190 @@
+[
+  {
+    "severity": "ERROR",
+    "message": "expected ')' before '*' token\n  DACClass(Dacc *_dac, uint32_t _dacId, IRQn_Type _isrId) :\n          ~    ^~\n               )",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 21,
+    "col": 15,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'Dacc' does not name a type\n  Dacc *dac;\n  ^~~~",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 35,
+    "col": 2,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'IRQn_Type' does not name a type\n  IRQn_Type isrId;\n  ^~~~~~~~~",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 37,
+    "col": 2,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'isrId' was not declared in this scope\n void enableInterrupts()  { NVIC_EnableIRQ(isrId); };\n                                           ^~~~~",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 31,
+    "col": 43,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      },
+      {
+        "message": "In member function 'void DACClass::enableInterrupts()':",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h"
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'NVIC_EnableIRQ' was not declared in this scope\n void enableInterrupts()  { NVIC_EnableIRQ(isrId); };\n                            ^~~~~~~~~~~~~~",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 31,
+    "col": 28,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      },
+      {
+        "message": "In member function 'void DACClass::enableInterrupts()':",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h"
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'isrId' was not declared in this scope\n void disableInterrupts() { NVIC_DisableIRQ(isrId); };\n                                            ^~~~~",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 32,
+    "col": 44,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      },
+      {
+        "message": "In member function 'void DACClass::disableInterrupts()':",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h"
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'NVIC_DisableIRQ' was not declared in this scope\n void disableInterrupts() { NVIC_DisableIRQ(isrId); };\n                            ^~~~~~~~~~~~~~~",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h",
+    "line": 32,
+    "col": 28,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+        "line": 16
+      },
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      },
+      {
+        "message": "In member function 'void DACClass::disableInterrupts()':",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/DAC.h"
+      }
+    ]
+  },
+  {
+    "severity": "WARNING",
+    "message": "no return statement in function returning non-void [-Wreturn-type]\n  virtual size_t write(uint8_t c)                         { /* not implemented */ };\n                                                                                  ^",
+    "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h",
+    "line": 25,
+    "col": 82,
+    "context": [
+      {
+        "message": "included from here",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 1
+      },
+      {
+        "message": "In member function 'virtual size_t AudioClass::write(uint8_t)':",
+        "file": "/home/megabug/Arduino/libraries/Audio/src/Audio.h"
+      }
+    ]
+  },
+  {
+    "severity": "ERROR",
+    "message": "'asd' was not declared in this scope\n asd;\n ^~~",
+    "file": "/home/megabug/Arduino/Blink/Blink.ino",
+    "line": 4,
+    "col": 1,
+    "context": [
+      {
+        "message": "In function 'void setup()':",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino"
+      }
+    ],
+    "suggestions": [
+      {
+        "message": "suggested alternative: 'rand'\n asd;\n ^~~\n rand",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 4,
+        "col": 1
+      }
+    ]
+  }
+]

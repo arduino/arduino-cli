@@ -1,0 +1,4 @@
+t1Callback	/tmp/test547238273/preproc/ctags_target.cpp	/^Task t1(&t1Callback);$/;"	kind:variable	line:2
+t1Callback	/tmp/test547238273/preproc/ctags_target.cpp	/^void t1Callback() {}$/;"	kind:function	line:3	signature:()	returntype:void
+setup	/tmp/test547238273/preproc/ctags_target.cpp	/^void setup() {}$/;"	kind:function	line:4	signature:()	returntype:void
+loop	/tmp/test547238273/preproc/ctags_target.cpp	/^void loop() {}$/;"	kind:function	line:5	signature:()	returntype:void

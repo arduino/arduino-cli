@@ -1,0 +1,3 @@
+minimum	/tmp/sketch8398023134925534708.cpp	/^template <typename T> T minimum (T a, T b) $/;"	kind:function	line:2	signature:(T a, T b)	returntype:templateT
+setup	/tmp/sketch8398023134925534708.cpp	/^void setup () $/;"	kind:function	line:9	signature:()	returntype:void
+loop	/tmp/sketch8398023134925534708.cpp	/^void loop () { }$/;"	kind:function	line:13	signature:()	returntype:void

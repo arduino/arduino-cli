@@ -1,0 +1,14 @@
+version: v2
+plugins:
+  # Use protoc-gen-go
+  - remote: buf.build/protocolbuffers/go:v1.34.2
+    out: ./rpc
+    opt:
+      - paths=source_relative
+  # Use of protoc-gen-go-grpc
+  - remote: buf.build/grpc/go:v1.5.1
+    out: ./rpc
+    opt:
+      - paths=source_relative
+inputs:
+  - directory: ./rpc

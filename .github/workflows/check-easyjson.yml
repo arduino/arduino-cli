@@ -1,0 +1,52 @@
+name: Check easyjson generated files
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-easyjson.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+  pull_request:
+    paths:
+      - ".github/workflows/check-easyjson.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check-easyjson-generated-files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Regenerate easyjson source code
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              go:easyjson-generate
+
+      - name: Check for outdated cache
+        id: diff
+        run: |
+          git add .
+          if ! git diff --cached --color --exit-code; then
+            echo
+            echo "::error::easyjson generated files out of sync."
+            exit 1
+          fi

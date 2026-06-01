@@ -1,0 +1,157 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md
+name: Check Go Dependencies
+
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
+on:
+  create:
+  push:
+    paths:
+      - ".github/workflows/check-go-dependencies-task.ya?ml"
+      - ".licenses/**"
+      - ".licensed.json"
+      - ".licensed.ya?ml"
+      - "debian/arduino-cli/usr/share/doc/arduino-cli/copyright"
+      - "Taskfile.ya?ml"
+      - "**/.gitmodules"
+      - "**/go.mod"
+      - "**/go.sum"
+  pull_request:
+    paths:
+      - ".github/workflows/check-go-dependencies-task.ya?ml"
+      - ".licenses/**"
+      - ".licensed.json"
+      - ".licensed.ya?ml"
+      - "debian/arduino-cli/usr/share/doc/arduino-cli/copyright"
+      - "Taskfile.ya?ml"
+      - "**/.gitmodules"
+      - "**/go.mod"
+      - "**/go.sum"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 8 * * WED"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  check-cache:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      # This is required to allow licensee/setup-licensed to install Licensed via Ruby gem.
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby # Install latest version
+
+      - name: Install licensed
+        uses: licensee/setup-licensed@v1.3.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: 5.x
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Update dependencies license metadata cache
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              general:cache-dep-licenses
+
+      - name: Check for outdated cache
+        id: diff
+        run: |
+          git add .
+          if
+            ! git diff \
+              --cached \
+              --color \
+              --exit-code
+          then
+            echo
+            echo "::error::Dependency license metadata out of sync. See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#metadata-cache"
+            exit 1
+          fi
+
+      # Some might find it convenient to have CI generate the cache rather than setting up for it locally
+      - name: Upload cache to workflow artifact
+        if: failure() && steps.diff.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          include-hidden-files: true
+          name: dep-licenses-cache
+          path: .licenses/
+
+  check-deps:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      # This is required to allow licensee/setup-licensed to install Licensed via Ruby gem.
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby # Install latest version
+
+      - name: Install licensed
+        uses: licensee/setup-licensed@v1.3.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: 5.x
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Check for dependencies with unapproved licenses
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              general:check-dep-licenses

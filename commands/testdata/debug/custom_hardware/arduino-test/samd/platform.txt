@@ -1,0 +1,237 @@
+# Copyright (c) 2014-2015 Arduino LLC.  All right reserved.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# Arduino SAMD Core and platform.
+#
+# For more info:
+# https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
+
+name=Arduino SAMD (32-bits ARM Cortex-M0+) Boards
+version=1.8.5
+
+# Compile variables
+# -----------------
+
+compiler.warning_flags=-w
+compiler.warning_flags.none=-w
+compiler.warning_flags.default=
+compiler.warning_flags.more=-Wall -Wno-expansion-to-defined
+compiler.warning_flags.all=-Wall -Wextra -Wno-expansion-to-defined
+
+compiler.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
+compiler.c.cmd=arm-none-eabi-gcc
+compiler.c.flags=-mcpu={build.mcu} -mthumb -c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -MMD
+compiler.c.elf.cmd=arm-none-eabi-g++
+compiler.c.elf.flags=-Os -Wl,--gc-sections -save-temps
+compiler.S.cmd=arm-none-eabi-gcc
+compiler.S.flags=-c -g -x assembler-with-cpp -MMD
+compiler.cpp.cmd=arm-none-eabi-g++
+compiler.cpp.flags=-mcpu={build.mcu} -mthumb -c -g -Os {compiler.warning_flags} -std=gnu++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD
+compiler.ar.cmd=arm-none-eabi-ar
+compiler.ar.flags=rcs
+compiler.objcopy.cmd=arm-none-eabi-objcopy
+compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0
+compiler.elf2hex.bin.flags=-O binary
+compiler.elf2hex.hex.flags=-O ihex -R .eeprom
+compiler.elf2hex.cmd=arm-none-eabi-objcopy
+compiler.ldflags=-mcpu={build.mcu} -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align
+compiler.size.cmd=arm-none-eabi-size
+compiler.define=-DARDUINO=
+compiler.readelf.cmd=arm-none-eabi-readelf
+
+# this can be overriden in boards.txt
+build.extra_flags=
+
+# These can be overridden in platform.local.txt
+compiler.c.extra_flags=
+compiler.c.elf.extra_flags=
+#compiler.c.elf.extra_flags=-v
+compiler.cpp.extra_flags=
+compiler.S.extra_flags=
+compiler.ar.extra_flags=
+compiler.elf2hex.extra_flags=
+
+compiler.arm.cmsis.c.flags="-I{runtime.tools.CMSIS-4.5.0.path}/CMSIS/Include/" "-I{runtime.tools.CMSIS-Atmel-1.2.0.path}/CMSIS/Device/ATMEL/"
+compiler.arm.cmsis.ldflags="-L{runtime.tools.CMSIS-4.5.0.path}/CMSIS/Lib/GCC/" -larm_cortexM0l_math
+
+compiler.libraries.ldflags=
+
+# USB Flags
+# ---------
+build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSBCON '-DUSB_MANUFACTURER={build.usb_manufacturer}' '-DUSB_PRODUCT={build.usb_product}'
+
+# Default usb manufacturer will be replaced at compile time using
+# numeric vendor ID if available or by board's specific value.
+build.usb_manufacturer="Unknown"
+
+# Compile patterns
+# ----------------
+
+## Compile c files
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {compiler.arm.cmsis.c.flags} {includes} "{source_file}" -o "{object_file}"
+
+## Compile c++ files
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.arm.cmsis.c.flags} {includes} "{source_file}" -o "{object_file}"
+
+## Compile S files
+recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {compiler.arm.cmsis.c.flags} {includes} "{source_file}" -o "{object_file}"
+
+## Create archives
+# archive_file_path is needed for backwards compatibility with IDE 1.6.5 or older, IDE 1.6.6 or newer overrides this value
+archive_file_path={build.path}/{archive_file}
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
+
+## Combine gc-sections, archives, and objects
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} "-T{build.variant.path}/{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nano.specs --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} {compiler.libraries.ldflags} -Wl,--start-group {compiler.arm.cmsis.ldflags} -lm "{build.path}/{archive_file}" -Wl,--end-group
+
+## Create output (bin file)
+recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.bin.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
+
+## Create output (hex file)
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
+
+build.preferred_out_format=bin
+
+## Save hex
+recipe.output.tmp_file={build.project_name}.{build.preferred_out_format}
+recipe.output.save_file={build.project_name}.{build.variant}.{build.preferred_out_format}
+
+## Compute size
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
+recipe.size.regex=\.text\s+([0-9]+).*
+
+
+# Debugger configuration (general options)
+# ----------------------------------------
+# EXPERIMENTAL feature:
+#  - this is alpha and may be subject to change without notice
+debug.executable={build.path}/{build.project_name}.elf
+debug.toolchain=gcc
+debug.toolchain.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
+debug.toolchain.prefix=arm-none-eabi-
+debug.server=openocd
+debug.server.openocd.path={runtime.tools.openocd-0.10.0-arduino7.path}/bin/openocd
+debug.server.openocd.path.windows={runtime.tools.openocd-0.10.0-arduino7.path}/bin/openocd.exe
+debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/
+debug.server.openocd.script={runtime.platform.path}/variants/{build.variant}/{build.openocdscript}
+
+
+# Upload/Debug tools
+# ------------------
+
+#
+# AVRDUDE
+#
+tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.cmd={path}/bin/avrdude
+tools.avrdude.config.path={path}/etc/avrdude.conf
+
+tools.avrdude.upload.params.verbose=-v -v
+tools.avrdude.upload.params.quiet=-q -q
+tools.avrdude.upload.params.noverify=-V
+tools.avrdude.upload.pattern="{cmd}" "-C{config.path}" {upload.verbose} -p{build.emu.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+
+tools.avrdude_remote.upload.pattern="openocd --version 2>&1 | grep 2016 && if opkg update; then opkg upgrade openocd; exit 1; else echo 'Please connect your board to the Internet in order to upgrade tools' >&2; exit 1; fi || /usr/bin/run-avrdude /tmp/sketch.hex"
+
+tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+#
+# BOSSA
+#
+tools.bossac.path={runtime.tools.bossac-1.7.0-arduino3.path}
+tools.bossac.cmd=bossac
+tools.bossac.cmd.windows=bossac.exe
+
+tools.bossac.upload.params.verbose=-i -d
+tools.bossac.upload.params.quiet=
+tools.bossac.upload.pattern="{path}/{cmd}" {upload.verbose} --port={serial.port.file} -U {upload.native_usb} -i -e -w -v "{build.path}/{build.project_name}.bin" -R
+
+tools.bossac_remote.upload.pattern=/usr/bin/run-bossac {upload.verbose} --port=ttyATH0 -U {upload.native_usb} -e -w -v /tmp/sketch.bin -R
+
+tools.bossac.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.bossac.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+#
+# BOSSA (ignore binary size)
+#
+tools.bossacI.path={runtime.tools.bossac-1.7.0-arduino3.path}
+tools.bossacI.cmd=bossac
+tools.bossacI.cmd.windows=bossac.exe
+
+tools.bossacI.upload.params.verbose=-i -d
+tools.bossacI.upload.params.quiet=
+tools.bossacI.upload.pattern="{path}/{cmd}" {upload.verbose} --port={serial.port.file} -I -U {upload.native_usb} -i -e -w "{build.path}/{build.project_name}.bin" -R
+
+tools.bossacI_remote.upload.pattern=/usr/bin/run-bossac {upload.verbose} --port=ttyATH0 -U {upload.native_usb} -e -w -v /tmp/sketch.bin -R
+
+tools.bossacI.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.bossacI.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+
+#
+# OpenOCD sketch upload
+#
+
+tools.openocd.path={runtime.tools.openocd.path}
+tools.openocd.cmd=bin/openocd
+tools.openocd.cmd.windows=bin/openocd.exe
+
+tools.openocd.upload.params.verbose=-d2
+tools.openocd.upload.params.quiet=-d0
+tools.openocd.upload.pattern="{path}/{cmd}" {upload.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; program {{build.path}/{build.project_name}.bin} verify reset 0x2000; shutdown"
+
+tools.openocd.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.openocd.upload.network_pattern={network_cmd} -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+# Program flashes the binary at 0x0000, so use the linker script without_bootloader
+tools.openocd.program.params.verbose=-d2
+tools.openocd.program.params.quiet=-d0
+tools.openocd.program.pattern="{path}/{cmd}" {program.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; program {{build.path}/{build.project_name}.elf} verify reset; shutdown"
+
+tools.openocd.erase.params.verbose=-d3
+tools.openocd.erase.params.quiet=-d0
+tools.openocd.erase.pattern=
+
+tools.openocd.bootloader.params.verbose=-d2
+tools.openocd.bootloader.params.quiet=-d0
+tools.openocd.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; init; halt; at91samd bootloader 0; program {{runtime.platform.path}/bootloaders/{bootloader.file}} verify reset; shutdown"
+
+#
+# OpenOCD sketch upload - version with configurable bootloader size
+# FIXME: this programmer is a workaround for default options being overwritten by uploadUsingPreferences
+#
+
+tools.openocd-withbootsize.path={runtime.tools.openocd-0.10.0-arduino7.path}
+tools.openocd-withbootsize.cmd=bin/openocd
+tools.openocd-withbootsize.cmd.windows=bin/openocd.exe
+
+tools.openocd-withbootsize.upload.params.verbose=-d2
+tools.openocd-withbootsize.upload.params.quiet=-d0
+tools.openocd-withbootsize.upload.pattern="{path}/{cmd}" {upload.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; program {{build.path}/{build.project_name}.bin} verify reset {bootloader.size}; shutdown"
+
+# Program flashes the binary at 0x0000, so use the linker script without_bootloader
+tools.openocd-withbootsize.program.params.verbose=-d2
+tools.openocd-withbootsize.program.params.quiet=-d0
+tools.openocd-withbootsize.program.pattern="{path}/{cmd}" {program.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; program {{build.path}/{build.project_name}.elf} verify reset; shutdown"
+
+tools.openocd-withbootsize.erase.params.verbose=-d3
+tools.openocd-withbootsize.erase.params.quiet=-d0
+tools.openocd-withbootsize.erase.pattern=
+
+tools.openocd-withbootsize.bootloader.params.verbose=-d2
+tools.openocd-withbootsize.bootloader.params.quiet=-d0
+tools.openocd-withbootsize.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; init; halt; at91samd bootloader 0; program {{runtime.platform.path}/bootloaders/{bootloader.file}} verify reset; shutdown"

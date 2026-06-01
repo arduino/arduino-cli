@@ -1,0 +1,3 @@
+String hello() {
+  return "world";
+}

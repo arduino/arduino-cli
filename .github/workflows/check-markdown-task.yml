@@ -1,0 +1,134 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-markdown-task.md
+name: Check Markdown
+
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
+on:
+  create:
+  push:
+    paths:
+      - ".github/workflows/check-markdown-task.ya?ml"
+      - ".markdown-link-check.json"
+      - ".npmrc"
+      - "go.mod"
+      - "go.sum"
+      - "package.json"
+      - "package-lock.json"
+      - "Taskfile.ya?ml"
+      - "**/.markdownlint*"
+      - "**.go"
+      - "**.mdx?"
+      - "**.mkdn"
+      - "**.mdown"
+      - "**.markdown"
+      - "rpc/**"
+  pull_request:
+    paths:
+      - ".github/workflows/check-markdown-task.ya?ml"
+      - ".markdown-link-check.json"
+      - ".npmrc"
+      - "go.mod"
+      - "go.sum"
+      - "package.json"
+      - "package-lock.json"
+      - "Taskfile.ya?ml"
+      - "**/.markdownlint*"
+      - "**.go"
+      - "**.mdx?"
+      - "**.mkdn"
+      - "**.mdown"
+      - "**.markdown"
+      - "rpc/**"
+  schedule:
+    # Run every Tuesday at 8 AM UTC to catch breakage caused by external changes.
+    - cron: "0 8 * * TUE"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  lint:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+
+      - name: Initialize markdownlint-cli problem matcher
+        uses: xt0rted/markdownlint-problem-matcher@v3
+
+      - name: Lint
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task markdown:lint
+
+  links:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+
+      - name: Install Go dependencies
+        run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
+
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - name: Check links
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task \
+              --silent \
+              markdown:check-links

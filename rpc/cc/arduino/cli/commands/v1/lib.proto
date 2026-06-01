@@ -1,0 +1,428 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+import "cc/arduino/cli/commands/v1/common.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+message LibraryDownloadRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Name of the library.
+  string name = 2;
+  // The version of the library to download.
+  string version = 3;
+}
+
+message LibraryDownloadResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the library download.
+    DownloadProgress progress = 1;
+    // Download result.
+    Result result = 2;
+  }
+}
+
+message LibraryInstallRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Name of the library.
+  string name = 2;
+  // The version of the library to install.
+  string version = 3;
+  // Set to true to skip installation of specified library's dependencies,
+  // defaults to false.
+  bool no_deps = 4;
+  // Set to true to skip installation if a different version of the library or
+  // one of its dependencies is already installed, defaults to false.
+  bool no_overwrite = 5;
+  // Install the library and dependencies in the specified location.
+  LibraryInstallLocation install_location = 6;
+}
+
+// Represent a library installation location.
+enum LibraryInstallLocation {
+  // In the `libraries` subdirectory of the user directory (sketchbook). This is
+  // the default if not specified.
+  LIBRARY_INSTALL_LOCATION_USER = 0;
+  // In the configured 'builtin.libraries' directory.
+  LIBRARY_INSTALL_LOCATION_BUILTIN = 1;
+}
+
+message LibraryInstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the library download.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // Download result.
+    Result result = 3;
+  }
+}
+
+message LibraryUpgradeRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Name of the library.
+  string name = 2;
+  // Set to true to skip installation of specified library's dependencies,
+  // defaults to false.
+  bool no_deps = 3;
+}
+
+message LibraryUpgradeResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the library download.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 2;
+    // Download result.
+    Result result = 3;
+  }
+}
+
+message LibraryUninstallRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Name of the library.
+  string name = 2;
+  // The version of the library to uninstall.
+  string version = 3;
+}
+
+message LibraryUninstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the uninstallation.
+    TaskProgress task_progress = 1;
+    // Uninstall result.
+    Result result = 2;
+  }
+}
+
+message LibraryUpgradeAllRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+}
+
+message LibraryUpgradeAllResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Progress of the downloads of files needed for the upgrades.
+    DownloadProgress progress = 1;
+    // Description of the current stage of the upgrade.
+    TaskProgress task_progress = 2;
+    // Upgrade result.
+    Result result = 3;
+  }
+}
+
+message LibraryResolveDependenciesRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Name of the library.
+  string name = 2;
+  // The version of the library to check dependencies of. If no version is
+  // specified, dependencies of the newest version will be listed.
+  string version = 3;
+  // If true the computed solution will try to keep exising libraries
+  // at their current version.
+  bool do_not_update_installed_libraries = 4;
+}
+
+message LibraryResolveDependenciesResponse {
+  // Dependencies of the library.
+  repeated LibraryDependencyStatus dependencies = 1;
+}
+
+message LibraryDependencyStatus {
+  // The name of the library dependency.
+  string name = 1;
+  // The required version of the library dependency.
+  string version_required = 2;
+  // Version of the library dependency currently installed.
+  string version_installed = 3;
+}
+
+message LibrarySearchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Set to true to not populate the releases field in the response (may save a
+  // lot of bandwidth/CPU).
+  bool omit_releases_details = 2;
+  // Keywords for the search.
+  string search_args = 3;
+}
+
+// Represent the result of the library search.
+enum LibrarySearchStatus {
+  // No search results were found.
+  LIBRARY_SEARCH_STATUS_FAILED = 0;
+  // Search results were found.
+  LIBRARY_SEARCH_STATUS_SUCCESS = 1;
+}
+
+message LibrarySearchResponse {
+  // The results of the search.
+  repeated SearchedLibrary libraries = 1;
+  // Whether the search yielded results.
+  LibrarySearchStatus status = 2;
+}
+
+message SearchedLibrary {
+  // Library name.
+  string name = 1;
+  // The index data for the available versions of the library. The key of the
+  // map is the library version.
+  map<string, LibraryRelease> releases = 2;
+  // The index data for the latest version of the library.
+  LibraryRelease latest = 3;
+  // The available versions of this library.
+  repeated string available_versions = 4;
+}
+
+message LibraryRelease {
+  // Value of the `author` field in library.properties.
+  string author = 1;
+  // Value of the `version` field in library.properties.
+  string version = 2;
+  // Value of the `maintainer` field in library.properties.
+  string maintainer = 3;
+  // Value of the `sentence` field in library.properties.
+  string sentence = 4;
+  // Value of the `paragraph` field in library.properties.
+  string paragraph = 5;
+  // Value of the `url` field in library.properties.
+  string website = 6;
+  // Value of the `category` field in library.properties.
+  string category = 7;
+  // Value of the `architectures` field in library.properties.
+  repeated string architectures = 8;
+  // The type categories of the library, as defined in the libraries index.
+  // Possible values: `Arduino`, `Partner`, `Recommended`, `Contributed`,
+  // `Retired`.
+  repeated string types = 9;
+  // Information about the library archive file.
+  DownloadResource resources = 10;
+  // Value of the `license` field in library.properties.
+  string license = 11;
+  // Value of the `includes` field in library.properties.
+  repeated string provides_includes = 12;
+  // The names of the library's dependencies, as defined by the 'depends'
+  // field of library.properties.
+  repeated LibraryDependency dependencies = 13;
+}
+
+message LibraryDependency {
+  // Library name of the dependency.
+  string name = 1;
+  // Version constraint of the dependency.
+  string version_constraint = 2;
+}
+
+message DownloadResource {
+  // Download URL of the library archive.
+  string url = 1;
+  // Filename of the library archive.
+  string archive_filename = 2;
+  // Checksum of the library archive.
+  string checksum = 3;
+  // File size of the library archive.
+  int64 size = 4;
+  // The directory under the staging subdirectory of the data directory the
+  // library archive file will be downloaded to.
+  string cache_path = 5;
+}
+
+message LibraryListRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Whether to include built-in libraries (from platforms and the Arduino
+  // IDE) in the listing.
+  bool all = 2;
+  // Whether to list only libraries for which there is a newer version than
+  // the installed version available in the libraries index.
+  bool updatable = 3;
+  // If set filters out the libraries not matching name.
+  string name = 4;
+  // By setting this field all duplicate libraries are filtered out leaving
+  // only the libraries that will be used to compile for the specified board
+  // FQBN.
+  string fqbn = 5;
+}
+
+message LibraryListResponse {
+  // List of installed libraries.
+  repeated InstalledLibrary installed_libraries = 1;
+}
+
+message InstalledLibrary {
+  // Information about the library.
+  Library library = 1;
+  // When the `updatable` field of the `LibraryList` request is set to `true`,
+  // this will contain information on the latest version of the library in the
+  // libraries index.
+  LibraryRelease release = 2;
+}
+
+message Library {
+  // Library name (value of `name` field in library.properties).
+  string name = 1;
+  // Value of the `author` field in library.properties.
+  string author = 2;
+  // Value of the `maintainer` field in library.properties.
+  string maintainer = 3;
+  // Value of the `sentence` field in library.properties.
+  string sentence = 4;
+  // Value of the `paragraph` field in library.properties.
+  string paragraph = 5;
+  // Value of the `url` field in library.properties.
+  string website = 6;
+  // Value of the `category` field in library.properties.
+  string category = 7;
+  // Value of the `architectures` field in library.properties.
+  repeated string architectures = 8;
+  // The type categories of the library. Possible values: `Arduino`,
+  // `Partner`, `Recommended`, `Contributed`, `Retired`.
+  repeated string types = 9;
+  // The path of the library directory.
+  string install_dir = 10;
+  // The location of the library's source files.
+  string source_dir = 11;
+  // The location of the library's `utility` directory.
+  string utility_dir = 12;
+  // If `location` is `platform_builtin` or `referenced_platform_builtin`, the
+  // identifying string for the platform containing the library
+  // (e.g., `arduino:avr@1.8.2`).
+  string container_platform = 14;
+  // Value of the `dot_a_linkage` field in library.properties.
+  bool dot_a_linkage = 17;
+  // Value of the `precompiled` field in library.properties.
+  bool precompiled = 18;
+  // Value of the `ldflags` field in library.properties.
+  string ld_flags = 19;
+  // A library.properties file is not present in the library's root directory.
+  bool is_legacy = 20;
+  // Value of the `version` field in library.properties.
+  string version = 21;
+  // Value of the `license` field in library.properties.
+  string license = 22;
+  // The data from the library's library.properties file, including unused
+  // fields.
+  map<string, string> properties = 23;
+  // The location type of the library installation.
+  LibraryLocation location = 24;
+  // The library format type.
+  LibraryLayout layout = 25;
+  // The example sketches provided by the library.
+  repeated string examples = 26;
+  // Value of the `includes` field in library.properties or, if missing, the
+  // list of include files available on the library source root directory.
+  repeated string provides_includes = 27;
+  // Map of FQBNs that specifies if library is compatible with this library.
+  map<string, bool> compatible_with = 28;
+  // This value is set to true if the library is in development and should not
+  // be treated as read-only. This status is determined by the presence of a
+  // `.development` file in the library root directory.
+  bool in_development = 29;
+}
+
+// Represent the library layout.
+enum LibraryLayout {
+  // Library is in the 1.0 Arduino library format.
+  LIBRARY_LAYOUT_FLAT = 0;
+  // Library is in the 1.5 Arduino library format.
+  LIBRARY_LAYOUT_RECURSIVE = 1;
+}
+
+// Represent the location of the library.
+enum LibraryLocation {
+  // In the configured 'builtin.libraries' directory.
+  LIBRARY_LOCATION_BUILTIN = 0;
+  // In the `libraries` subdirectory of the user directory (sketchbook).
+  LIBRARY_LOCATION_USER = 1;
+  // In the `libraries` subdirectory of a platform.
+  LIBRARY_LOCATION_PLATFORM_BUILTIN = 2;
+  // When `LibraryLocation` is used in a context where a board is specified,
+  // this indicates the library is in the `libraries` subdirectory of a
+  // platform referenced by the board's platform.
+  LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN = 3;
+  // Outside the `libraries` folders managed by the CLI.
+  LIBRARY_LOCATION_UNMANAGED = 4;
+  // Library is part of the sketch profile.
+  LIBRARY_LOCATION_PROFILE = 5;
+}
+
+message ZipLibraryInstallRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Path to the archived library.
+  string path = 2;
+  // Set to true to overwrite an already installed library with the same name.
+  // Defaults to false.
+  bool overwrite = 3;
+}
+
+message ZipLibraryInstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
+    // Installation result.
+    Result result = 2;
+  }
+}
+
+message GitLibraryInstallRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // URL to the repository containing the library.
+  string url = 2;
+  // Set to true to overwrite an already installed library with the same name.
+  // Defaults to false.
+  bool overwrite = 3;
+}
+
+message GitLibraryInstallResponse {
+  message Result {
+    // Empty message, reserved for future expansion.
+  }
+  oneof message {
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
+    // Installation result.
+    Result result = 2;
+  }
+}

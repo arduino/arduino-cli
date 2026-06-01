@@ -1,0 +1,25 @@
+testboard.name=Test Board
+
+testboard.vid.0=0x2341
+testboard.pid.0=0x8888
+
+testboard.upload.tool=avrdude-none
+testboard.upload.protocol=arduino
+testboard.upload.maximum_size=32256
+testboard.upload.maximum_data_size=2048
+testboard.upload.speed=115200
+
+testboard.bootloader.tool=avrdude
+testboard.bootloader.low_fuses=0xFF
+testboard.bootloader.high_fuses=0xDE
+testboard.bootloader.extended_fuses=0xFD
+testboard.bootloader.unlock_bits=0x3F
+testboard.bootloader.lock_bits=0x0F
+testboard.bootloader.file=optiboot/optiboot_atmega328.hex
+
+testboard.build.mcu=atmega328p
+testboard.build.f_cpu=16000000L
+testboard.build.board=AVR_UNO
+testboard.build.core=arduino:arduino
+testboard.build.variant=standard
+

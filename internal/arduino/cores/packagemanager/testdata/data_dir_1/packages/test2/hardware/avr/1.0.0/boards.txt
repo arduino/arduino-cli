@@ -1,0 +1,47 @@
+menu.core=Core
+menu.variant=Variant
+
+## Test cases for core selection
+
+test.name=Test Board
+test.build.board=AVR_TEST
+test.build.core=arduino
+test.build.variant=standard
+
+test2.name=Test Board 2
+test2.build.board=AVR_TEST_2
+test2.build.core={my_core}
+test2.my_core=arduino
+test2.build.variant=standard
+
+test3.name=Test Board 2
+test3.build.board=AVR_TEST_2
+test3.build.core={my_core}
+test3.my_core=arduino
+test3.build.variant=standard
+test3.menu.core.default=Default
+test3.menu.core.referenced=Referenced
+test3.menu.core.referenced.my_core=arduino:arduino
+
+## Test cases for variant selection
+
+test4.name=Test Board
+test4.build.board=AVR_TEST
+test4.build.core=arduino
+test4.build.variant=standard
+
+test5.name=Test Board 2
+test5.build.board=AVR_TEST_2
+test5.build.core=arduino
+test5.my_variant=standard
+test5.build.variant={my_variant}
+
+test6.name=Test Board 2
+test6.build.board=AVR_TEST_2
+test5.build.core=arduino
+test6.my_variant=standard
+test6.build.variant={my_variant}
+test6.menu.variant.default=Default
+test6.menu.variant.referenced=Referenced
+test6.menu.variant.referenced.my_variant=arduino:standard
+

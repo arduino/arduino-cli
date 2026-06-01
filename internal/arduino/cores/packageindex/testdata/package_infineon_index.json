@@ -1,0 +1,573 @@
+{
+  "packages": [
+    {
+      "name": "Infineon",
+      "maintainer": "Infineon Technologies AG",
+      "websiteURL": "https://www.infineon.com",
+      "email": "",
+      "help": {
+        "online": "https://www.infineon.com"
+      },
+      "platforms": [
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.0/XMC_IFX_1.0.0.zip",
+          "archiveFileName": "XMC_IFX_1.0.0.zip",
+          "checksum": "SHA-256:e04e142e028325d0899b02ca53e4eec043defac021232c4a93cb59e48f33f394",
+          "size": "1418983",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.0"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.1/XMC_IFX_1.0.1.zip",
+          "archiveFileName": "XMC_IFX_1.0.1.zip",
+          "checksum": "SHA-256:6b8d989bf4f781c3d034f9097c7767011dd22eb0e453e520349d39d110125ab5",
+          "size": "1461793",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.0"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.2",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.2/XMC_IFX_1.0.2.zip",
+          "archiveFileName": "XMC_IFX_1.0.2.zip",
+          "checksum": "SHA-256:4ab7cab10da04349cafc28d3e46d3d53619b5c8f2e44849b977a3ab32913dc7d",
+          "size": "1485285",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.0"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.3",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.3/XMC_IFX_1.0.3.zip",
+          "archiveFileName": "XMC_IFX_1.0.3.zip",
+          "checksum": "SHA-256:af4494d94ec9e04ea63488ff816a81303691447807bd7b58245570d16462f415",
+          "size": "1445822",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC1300 Boot Kit"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.0"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.4",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.4/XMC_IFX_1.0.4.zip",
+          "archiveFileName": "XMC_IFX_1.0.4.zip",
+          "checksum": "SHA-256:fda31ea7b6758f1bab928033945dbf77b7e031e1d7f458ff927566856cd84e60",
+          "size": "1358552",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC1300 Boot Kit"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.0"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.5/XMC_IFX_1.0.5.zip",
+          "archiveFileName": "XMC_IFX_1.0.5.zip",
+          "checksum": "SHA-256:e307dbd4f21bfda6e2007433b32cc540acc1e01cb4b4cc61154b220dcfe1fa7c",
+          "size": "1370473",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC1300 Boot Kit"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.0"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.0.6/XMC_IFX_1.0.6.zip",
+          "archiveFileName": "XMC_IFX_1.0.6.zip",
+          "checksum": "SHA-256:e307dbd4f21bfda6e2007433b32cc540acc1e01cb4b4cc61154b220dcfe1fa7c",
+          "size": "1370473",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": " XMC1100 Boot Kit"
+            },
+            {
+              "name": " XMC1100 XMC2Go"
+            },
+            {
+              "name": " XMC1300 Boot Kit"
+            },
+            {
+              "name": " XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.1"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.1.0/XMC_IFX_1.1.0.zip",
+          "archiveFileName": "XMC_IFX_1.1.0.zip",
+          "checksum": "SHA-256:8affb80893ede7c412a6bbe3bdaf1a745f2d863004ca85cb3f4d714e4f362682",
+          "size": "1462049",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": "XMC1100 Boot Kit"
+            },
+            {
+              "name": "XMC1100 XMC2Go"
+            },
+            {
+              "name": "XMC1100 H-Bridge 2Go"
+            },
+            {
+              "name": "XMC1300 Boot Kit"
+            },
+            {
+              "name": "XMC1300 Sense2GoL"
+            },
+            {
+              "name": "XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.1"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.1.1",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.1.1/XMC_IFX_1.1.1.zip",
+          "archiveFileName": "XMC_IFX_1.1.1.zip",
+          "checksum": "SHA-256:0f09fd02d5cbfa206536e56b70750b2abdd9006dfb630a3d6a42d8322748098b",
+          "size": "1480676",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": "XMC1100 Boot Kit"
+            },
+            {
+              "name": "XMC1100 XMC2Go"
+            },
+            {
+              "name": "XMC1100 H-Bridge 2Go"
+            },
+            {
+              "name": "XMC1300 Boot Kit"
+            },
+            {
+              "name": "XMC1300 Sense2GoL"
+            },
+            {
+              "name": "XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "Infineon",
+              "name": "arm-none-eabi-gcc",
+              "version": "5.4-2016q3"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.1"
+            }
+          ]
+        },
+        {
+          "name": "Infineon's XMC Microcontroller",
+          "architecture": "arm",
+          "version": "1.1.2",
+          "category": "Contributed",
+          "url": "https://github.com/Infineon/XMC-for-Arduino/releases/download/V1.1.2/XMC_IFX_1.1.2.zip",
+          "archiveFileName": "XMC_IFX_1.1.2.zip",
+          "checksum": "SHA-256:c9247f7a02b03cb3b69e8b2f120f5e9d92f529954c2d71a0a13774a61ba8f025",
+          "size": "1480694",
+          "help": {
+            "online": "https://github.com/Infineon/XMC-for-Arduino"
+          },
+          "boards": [
+            {
+              "name": "XMC1100 Boot Kit"
+            },
+            {
+              "name": "XMC1100 XMC2Go"
+            },
+            {
+              "name": "XMC1100 H-Bridge 2Go"
+            },
+            {
+              "name": "XMC1300 Boot Kit"
+            },
+            {
+              "name": "XMC1300 Sense2GoL"
+            },
+            {
+              "name": "XMC4700 Relax Kit"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "Infineon",
+              "name": "arm-none-eabi-gcc",
+              "version": "5.4-2016q3"
+            },
+            {
+              "packager": "Infineon",
+              "name": "XMCFlasher",
+              "version": "1.2.1"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "arm-none-eabi-gcc",
+          "version": "4.8.3-2014q1",
+          "systems": [
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-arm.tar.bz2",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-arm.tar.bz2",
+              "checksum": "SHA-256:ebe96b34c4f434667cab0187b881ed585e7c7eb990fe6b69be3c81ec7e11e845",
+              "size": "44423906"
+            },
+            {
+              "host": "i686-mingw32",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+              "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+              "checksum": "SHA-256:fd8c111c861144f932728e00abd3f7d1107e186eb9cd6083a54c7236ea78b7c2",
+              "size": "84537449"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+              "checksum": "SHA-256:3598acf21600f17a8e4a4e8e193dc422b894dc09384759b270b2ece5facb59c2",
+              "size": "52518522"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+              "checksum": "SHA-256:d23f6626148396d6ec42a5b4d928955a703e0757829195fa71a939e5b86eecf6",
+              "size": "51395093"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+              "checksum": "SHA-256:ba1994235f69c526c564f65343f22ddbc9822b2ea8c5ee07dd79d89f6ace2498",
+              "size": "51029223"
+            }
+          ]
+        },
+        {
+          "name": "arm-none-eabi-gcc",
+          "version": "5.4-2016q3",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "archiveFileName": "gcc-arm-none-eabi-5_4-2016q3-20160926-win32.zip",
+              "url": "https://github.com/Infineon/Assets/releases/download/current/gcc-arm-none-eabi-5_4-2016q3-20160926-win32.zip",
+              "checksum": "SHA-256:9c32bb862160ead54ff0a8972e2d2122345da4349de8cb899abfee593f7b7509",
+              "size": "121430852"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/Infineon/Assets/releases/download/current/gcc-arm-none-eabi-5_4-2016q3-20160926-mac.-d-.tar.bz2",
+              "archiveFileName": "gcc-arm-none-eabi-5_4-2016q3-20160926-mac.-d-.tar.bz2",
+              "checksum": "SHA-256:5656cdec40f99d5c054a85bbc694276e1c4a1488cdacbbc448bc6acd3bbe070d",
+              "size": "96956416"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/Infineon/Assets/releases/download/current/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.-d-.tar.bz2",
+              "archiveFileName": "gcc-arm-none-eabi-5_4-2016q3-20160926-linux.-d-.tar.bz2",
+              "checksum": "SHA-256:a397c49bdd0cf17a38a494cb691baf68b8dcffa4d4c06561ef3d71b2ab4c92a1",
+              "size": "92820662"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/Infineon/Assets/releases/download/current/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.-d-.tar.bz2",
+              "archiveFileName": "gcc-arm-none-eabi-5_4-2016q3-20160926-linux.-d-.tar.bz2",
+              "checksum": "SHA-256:a397c49bdd0cf17a38a494cb691baf68b8dcffa4d4c06561ef3d71b2ab4c92a1",
+              "size": "92820662"
+            }
+          ]
+        },
+        {
+          "name": "XMCFlasher",
+          "version": "1.2.0",
+          "systems": [
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.0.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.0.zip",
+              "checksum": "SHA-256:3ec96615a2adf2c474e2fd9ee27d1e78f8232b701b8b3476a8270ae37ce2c827",
+              "size": "11244414"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.0.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.0.zip",
+              "checksum": "SHA-256:3ec96615a2adf2c474e2fd9ee27d1e78f8232b701b8b3476a8270ae37ce2c827",
+              "size": "11244414"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.0.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.0.zip",
+              "checksum": "SHA-256:3ec96615a2adf2c474e2fd9ee27d1e78f8232b701b8b3476a8270ae37ce2c827",
+              "size": "11244414"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.0.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.0.zip",
+              "checksum": "SHA-256:3ec96615a2adf2c474e2fd9ee27d1e78f8232b701b8b3476a8270ae37ce2c827",
+              "size": "11244414"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.0.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.0.zip",
+              "checksum": "SHA-256:3ec96615a2adf2c474e2fd9ee27d1e78f8232b701b8b3476a8270ae37ce2c827",
+              "size": "11244414"
+            }
+          ]
+        },
+        {
+          "name": "XMCFlasher",
+          "version": "1.2.1",
+          "systems": [
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.1.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.1.zip",
+              "checksum": "SHA-256:809969e5c025466b1cd03d9ef2e208606e7659c08f46aeed1832f7fa5576c39b",
+              "size": "11245896"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.1.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.1.zip",
+              "checksum": "SHA-256:809969e5c025466b1cd03d9ef2e208606e7659c08f46aeed1832f7fa5576c39b",
+              "size": "11245896"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.1.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.1.zip",
+              "checksum": "SHA-256:809969e5c025466b1cd03d9ef2e208606e7659c08f46aeed1832f7fa5576c39b",
+              "size": "11245896"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.1.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.1.zip",
+              "checksum": "SHA-256:809969e5c025466b1cd03d9ef2e208606e7659c08f46aeed1832f7fa5576c39b",
+              "size": "11245896"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/Infineon/Assets/raw/master/Tools/XMCFlasher_IFX_1.2.1.zip",
+              "archiveFileName": "XMCFlasher_IFX_1.2.1.zip",
+              "checksum": "SHA-256:809969e5c025466b1cd03d9ef2e208606e7659c08f46aeed1832f7fa5576c39b",
+              "size": "11245896"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

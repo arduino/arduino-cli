@@ -1,0 +1,540 @@
+{
+    "packages":
+    [
+        {
+            "name":"RedBear",
+            "maintainer":"RedBear",
+            "websiteURL":"http://redbear.cc/",
+            "email":"info@redbear.cc",
+            "help":{ "online":"http://discuss.redbear.cc/" },
+            "platforms": 
+            [
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.1.1",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v011.zip",
+                    "archiveFileName": "duo_board_v011.zip",
+                    "checksum": "SHA-256:64039719B008DDF79743C71F7ED108A6A972E0B8A3F62B9D4769BF930FB8D408",
+                    "size": "5610622",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.1",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v021.zip",
+                    "archiveFileName": "duo_board_v021-beta.zip",
+                    "checksum": "SHA-256:B61ADD7C4141CE874A1D4CE9ACCF15F1114A0CA3D1F5E0AA4BE7D9A6CB9D0D66",
+                    "size": "5741929",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.2",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v022.zip",
+                    "archiveFileName": "duo_board_v022.zip",
+                    "checksum": "SHA-256:237D41ABAE68E78BAAF57790F50AEC4D1D456E6EBE1C424F7A6F78E23F845614",
+                    "size": "6175570",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.3",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v023.zip",
+                    "archiveFileName": "duo_board_v023.zip",
+                    "checksum": "SHA-256:F95AE6621D4C15C83C0E6C415C9A7A1D0AF5BA40AFDA5C72327B9BDA88B82A7F",
+                    "size": "5949366",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.4",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.4.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.4.tar.gz",
+                    "checksum": "SHA-256:6CAEDFE438835B70331EA17C37CFDC74C8CADCA8397DA95BFBCE73C3143E2710",
+                    "size": "7722715",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.5",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.5.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.5.tar.gz",
+                    "checksum": "SHA-256:41FCBB7028C174C348504D6A0478DFF84D3AF06D229E1E6DEC5949FBCCCDCF97",
+                    "size": "8091023",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.6",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.6.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.6.tar.gz",
+                    "checksum": "SHA-256:20E05F6620EB44E11F44CB0EA25A6FE50EF18025496F394EA615A6B3660AD30F",
+                    "size": "8354522",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.7",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.7.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.7.tar.gz",
+                    "checksum": "SHA-256:eaa5f0aa273f2055ba42ef77c5ba232cccd3f15cf24c269c5fe4f3170f828e06",
+                    "size": "8376510",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.8",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.8.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.8.tar.gz",
+                    "checksum": "SHA-256:06D772EB7D9B82C3EBAE85A99FB93017DF00B44C91F6071FD3497288FF507B3E",
+                    "size": "8488102",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.9",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.9.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.9.tar.gz",
+                    "checksum": "SHA-256:20CC78DFD60FE6F0CB6B5835F8453B216D7692F1F744CF8BEAA699BA4AC1EA06",
+                    "size": "10634397",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.2.10",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.2.10.tar.gz",
+                    "archiveFileName": "duo_board_v0.2.10.tar.gz",
+                    "checksum": "SHA-256:421D081BDD65A90D93D193AD4E126F8052D7165FDA68077DCA66D0464D658918",
+                    "size": "10641900",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc-redbear",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+				{
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.3.0",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.3.0.tar.gz",
+                    "archiveFileName": "duo_board_v0.3.0.tar.gz",
+                    "checksum": "SHA-256:FFE93A10D9AE01114BAA08839D8CF1D273EA0B3D60A8F807355D24A5D31BA921",
+                    "size": "13128652",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc-redbear",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+				{
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.3.1",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.3.1.tar.gz",
+                    "archiveFileName": "duo_board_v0.3.1.tar.gz",
+                    "checksum": "SHA-256:0E59E6F6244021484400A095CDEE8E52C46E9D1C4BD6A62A30B8C8C9F183993D",
+                    "size": "13128077",
+                    "boards":
+                    [
+                        {"name": "RedBear Duo"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc-redbear",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+				{
+                    "name": "RedBear Duo (32-bits ARM Cortex-M3)",
+                    "architecture": "STM32F2",
+                    "version": "0.3.2",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/Duo/duo_board_v0.3.2.tar.gz",
+                    "archiveFileName": "duo_board_v0.3.2.tar.gz",
+                    "checksum": "SHA-256:F1FDA4361D54FAA5F33B08DFAF79E8353576A48947D56A88F93BD30AD32D6198",
+                    "size": "13698522",
+                    "boards": {"name": "RedBear Duo"},
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc-redbear",
+                            "version": "4.9-2015-q3"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                              {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                }
+            ],
+            "tools":
+            [
+                {
+                    "name": "arm-none-eabi-gcc",
+                    "version": "4.9-2015-q3",
+                    "systems": 
+                    [
+                        {
+                            "host": "i686-mingw32",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-win32.tar.bz2",
+                            "url": "https://redbearlab.github.io/gcc-arm/gcc-arm-none-eabi-4_9-2015q3-20150921-win32.tar.bz2",
+                            "checksum": "MD5:aef73c8af927427a7640ab20b5177d7d",
+                            "size": "82648992"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-mac.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-mac.tar.bz2",
+                            "checksum": "MD5:7886163ba5a1c17b560939e3dcf1382b",
+                            "size": "77455989"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "checksum": "MD5:8a4a74872830f80c788c944877d3ad8c",
+                            "size": "73710332"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "checksum": "MD5:8a4a74872830f80c788c944877d3ad8c",
+                            "size": "73710332"
+                        }
+                    ]
+                },
+                {
+                    "name": "arm-none-eabi-gcc-redbear",
+                    "version": "4.9-2015-q3",
+                    "systems": 
+                    [
+                        {
+                            "host": "i686-mingw32",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-win32.tar.bz2",
+                            "url": "https://redbearlab.github.io/gcc-arm/gcc-arm-none-eabi-4_9-2015q3-20150921-win32.tar.bz2",
+                            "checksum": "MD5:aef73c8af927427a7640ab20b5177d7d",
+                            "size": "82648992"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-mac.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-mac.tar.bz2",
+                            "checksum": "MD5:7886163ba5a1c17b560939e3dcf1382b",
+                            "size": "77455989"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "checksum": "MD5:8a4a74872830f80c788c944877d3ad8c",
+                            "size": "73710332"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2",
+                            "checksum": "MD5:8a4a74872830f80c788c944877d3ad8c",
+                            "size": "73710332"
+                        }
+                    ]
+                },
+                {
+                    "name": "openocd",
+                    "version": "0.9.0-arduino",
+                    "systems": 
+                    [
+                        {
+                            "host": "arm-linux-gnueabihf",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-arm-linux-gnueabihf.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-dev-arduino-arm-linux-gnueabihf.tar.bz2",
+                            "checksum": "SHA-256:a84e7c4cba853f2c937d77286f8a0ca317447d3873e51cbd2a2d41424e044a18",
+                            "size": "1402283"
+                        },
+                        {
+                            "host": "i686-mingw32",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-i686-pc-cygwin.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-i686-pc-cygwin.tar.bz2",
+                            "checksum": "SHA-256:5310bdd3730168a33b09b68558e908ca8b2fec25620c488f50a5fb35d0d1effd",
+                            "size": "2360705"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-x86_64-apple-darwin14.3.0.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-x86_64-apple-darwin14.3.0.tar.bz2",
+                            "checksum": "SHA-256:ef90769c07b8018cec3a5054e690ac6c196e03720e102ac5038c3f9da4e44782",
+                            "size": "2275101"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-x86_64-linux-gnu.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-x86_64-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:c350409f7badf213dfcc516ea34289461ad92d87806e8e33945508a2c6b2c0b3",
+                            "size": "1210796"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-i486-linux-gnu.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-i486-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:4c9793dfd7822b0fc959d039e5ecabfa89092ee2911abfdc7b5905deb171499a",
+                            "size": "1129654"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

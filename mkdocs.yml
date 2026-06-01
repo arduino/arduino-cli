@@ -1,0 +1,121 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/mkdocs/mkdocs.yml
+# See: https://www.mkdocs.org/user-guide/configuration/
+
+site_name: Arduino CLI
+site_description: Arduino Command Line Interface
+site_url: https://arduino.github.io/arduino-cli/
+
+repo_name: arduino/arduino-cli
+repo_url: https://github.com/arduino/arduino-cli
+edit_uri: blob/master/docs/
+
+copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+
+theme:
+  name: material
+  logo: img/icon_mac_light.png
+  palette:
+    primary: teal
+    accent: orange
+
+markdown_extensions:
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - markdown.extensions.toc:
+      permalink: true
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+      truly_sane: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
+  - pymdownx.magiclink:
+      repo: arduino-cli
+      repo_url_shorthand: true
+      user: arduino
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - installation.md
+  - UPGRADING.md
+  - getting-started.md
+  - command-line-completion.md
+  - CONTRIBUTING.md
+  - FAQ.md
+  - Command reference:
+      - arduino-cli: commands/arduino-cli.md
+      - board: commands/arduino-cli_board.md
+      - board attach: commands/arduino-cli_board_attach.md
+      - board details: commands/arduino-cli_board_details.md
+      - board list: commands/arduino-cli_board_list.md
+      - board listall: commands/arduino-cli_board_listall.md
+      - board search: commands/arduino-cli_board_search.md
+      - burn-bootloader: commands/arduino-cli_burn-bootloader.md
+      - cache: commands/arduino-cli_cache.md
+      - cache clean: commands/arduino-cli_cache_clean.md
+      - compile: commands/arduino-cli_compile.md
+      - completion: commands/arduino-cli_completion.md
+      - config: commands/arduino-cli_config.md
+      - config dump: commands/arduino-cli_config_dump.md
+      - config init: commands/arduino-cli_config_init.md
+      - config add: commands/arduino-cli_config_add.md
+      - config delete: commands/arduino-cli_config_delete.md
+      - config get: commands/arduino-cli_config_get.md
+      - config remove: commands/arduino-cli_config_remove.md
+      - config set: commands/arduino-cli_config_set.md
+      - core: commands/arduino-cli_core.md
+      - core download: commands/arduino-cli_core_download.md
+      - core install: commands/arduino-cli_core_install.md
+      - core list: commands/arduino-cli_core_list.md
+      - core search: commands/arduino-cli_core_search.md
+      - core uninstall: commands/arduino-cli_core_uninstall.md
+      - core update-index: commands/arduino-cli_core_update-index.md
+      - core upgrade: commands/arduino-cli_core_upgrade.md
+      - daemon: commands/arduino-cli_daemon.md
+      - debug: commands/arduino-cli_debug.md
+      - debug check: commands/arduino-cli_debug_check.md
+      - lib: commands/arduino-cli_lib.md
+      - lib deps: commands/arduino-cli_lib_deps.md
+      - lib download: commands/arduino-cli_lib_download.md
+      - lib examples: commands/arduino-cli_lib_examples.md
+      - lib install: commands/arduino-cli_lib_install.md
+      - lib list: commands/arduino-cli_lib_list.md
+      - lib search: commands/arduino-cli_lib_search.md
+      - lib uninstall: commands/arduino-cli_lib_uninstall.md
+      - lib update-index: commands/arduino-cli_lib_update-index.md
+      - lib upgrade: commands/arduino-cli_lib_upgrade.md
+      - monitor: commands/arduino-cli_monitor.md
+      - outdated: commands/arduino-cli_outdated.md
+      - sketch: commands/arduino-cli_sketch.md
+      - sketch archive: commands/arduino-cli_sketch_archive.md
+      - sketch new: commands/arduino-cli_sketch_new.md
+      - update: commands/arduino-cli_update.md
+      - upgrade: commands/arduino-cli_upgrade.md
+      - upload: commands/arduino-cli_upload.md
+      - version: commands/arduino-cli_version.md
+  - gRPC reference:
+      - commands: rpc/commands.md
+  - configuration.md
+  - Integration options: integration-options.md
+  - sketch-build-process.md
+  - sketch-specification.md
+  - sketch-project-file.md
+  - library-specification.md
+  - platform-specification.md
+  - Pluggable discovery specification: pluggable-discovery-specification.md
+  - Pluggable monitor specification: pluggable-monitor-specification.md
+  - Package index specification: package_index_json-specification.md
+  - Guides:
+      - Secure boot: guides/secure-boot.md
+  - Backward compatibility policy: versioning.md
+
+extra:
+  version:
+    provider: mike

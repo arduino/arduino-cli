@@ -1,0 +1,152 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
+package commands
+
+import (
+	"context"
+
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
+	"github.com/arduino/arduino-cli/internal/arduino/cores"
+	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+)
+
+// PlatformUpgradeStreamResponseToCallbackFunction returns a gRPC stream to be used in PlatformUpgrade that sends
+// all responses to the callback function.
+func PlatformUpgradeStreamResponseToCallbackFunction(ctx context.Context, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (rpc.ArduinoCoreService_PlatformUpgradeServer, func() *rpc.PlatformUpgradeResponse_Result) {
+	var resp *rpc.PlatformUpgradeResponse_Result
+	return streamResponseToCallback(ctx, func(r *rpc.PlatformUpgradeResponse) error {
+			if r.GetProgress() != nil {
+				downloadCB(r.GetProgress())
+			}
+			if r.GetTaskProgress() != nil {
+				taskCB(r.GetTaskProgress())
+			}
+			if r.GetResult() != nil {
+				resp = r.GetResult()
+			}
+			return nil
+		}), func() *rpc.PlatformUpgradeResponse_Result {
+			return resp
+		}
+}
+
+// PlatformUpgrade upgrades a platform package
+func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest, stream rpc.ArduinoCoreService_PlatformUpgradeServer) error {
+	syncSend := NewSynchronizedSend(stream.Send)
+	ctx := stream.Context()
+	downloadCB := func(p *rpc.DownloadProgress) {
+		syncSend.Send(&rpc.PlatformUpgradeResponse{
+			Message: &rpc.PlatformUpgradeResponse_Progress{
+				Progress: p,
+			},
+		})
+	}
+	taskCB := func(p *rpc.TaskProgress) {
+		syncSend.Send(&rpc.PlatformUpgradeResponse{
+			Message: &rpc.PlatformUpgradeResponse_TaskProgress{
+				TaskProgress: p,
+			},
+		})
+	}
+
+	upgrade := func() (*cores.PlatformRelease, error) {
+		pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+		defer release()
+
+		// Extract all PlatformReference to platforms that have updates
+		ref := &packagemanager.PlatformReference{
+			Package:              req.GetPlatformPackage(),
+			PlatformArchitecture: req.GetArchitecture(),
+		}
+		checks := resources.IntegrityCheckFull
+		if s.settings.BoardManagerEnableUnsafeInstall() {
+			checks = resources.IntegrityCheckNone
+		}
+		if ref.PlatformVersion != nil {
+			return nil, &cmderrors.InvalidArgumentError{Message: i18n.Tr("Upgrade doesn't accept parameters with version")}
+		}
+
+		// Search the latest version for all specified platforms
+		platform := pme.FindPlatform(ref)
+		if platform == nil {
+			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
+		}
+		installed := pme.GetInstalledPlatformRelease(platform)
+		if installed == nil {
+			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
+		}
+		latest := platform.GetLatestCompatibleRelease()
+		if !latest.Version.GreaterThan(installed.Version) {
+			return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: ref.String()}
+		}
+		ref.PlatformVersion = latest.Version
+
+		platformRelease, tools, libs, err := pme.FindPlatformReleaseDependencies(ref)
+		if err != nil {
+			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
+		}
+		if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall(), checks); err != nil {
+			return nil, err
+		}
+
+		li, err := instances.GetLibrariesIndex(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+
+		lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+		defer releaseLmi()
+
+		if err := s.installLibraries(ctx, li, lmi, libs, pme.DownloadDir, downloadCB, taskCB); err != nil {
+			return nil, err
+		}
+
+		return platformRelease, nil
+	}
+
+	platformRelease, err := upgrade()
+	if platformRelease != nil {
+		syncSend.Send(&rpc.PlatformUpgradeResponse{
+			Message: &rpc.PlatformUpgradeResponse_Result_{
+				Result: &rpc.PlatformUpgradeResponse_Result{
+					Platform: &rpc.Platform{
+						Metadata: platformRelease.Platform.ToRPCPlatformMetadata(),
+						Release:  platformRelease.ToRPC(),
+					},
+				},
+			},
+		})
+	}
+	if err != nil {
+		return err
+	}
+
+	if err := s.Init(&rpc.InitRequest{Instance: req.GetInstance()}, InitStreamResponseToCallbackFunction(ctx, nil)); err != nil {
+		return err
+	}
+
+	return nil
+}

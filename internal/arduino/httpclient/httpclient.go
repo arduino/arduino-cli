@@ -1,0 +1,53 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
+package httpclient
+
+import (
+	"context"
+	"time"
+
+	"github.com/arduino/arduino-cli/commands/cmderrors"
+	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
+	"go.bug.st/downloader/v3"
+)
+
+// DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
+// A DownloadProgressCB callback function must be passed to monitor download progress.
+// If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
+func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config downloader.Config) (returnedError error) {
+	if queryParameter != "" {
+		URL = URL + "?query=" + queryParameter
+	}
+	logrus.WithField("url", URL).Info("Starting download")
+	downloadCB.Start(URL, label)
+	defer func() {
+		if returnedError == nil {
+			downloadCB.End(true, "")
+		} else {
+			downloadCB.End(false, returnedError.Error())
+		}
+	}()
+
+	config.PollFunction = downloadCB.Update
+	config.PollInterval = 250 * time.Millisecond
+	if err := downloader.DownloadWithConfig(ctx, path.String(), URL, config); err != nil {
+		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Download failed"), Cause: err}
+	}
+	return nil
+}

@@ -1,0 +1,179 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+// Configuration to apply to the given instance.
+// Any missing field will be kept at the default value.
+message Configuration {
+  message Directories {
+    message Builtin {
+      // The directory where the built-in libraries are installed.
+      optional string libraries = 1;
+    }
+    // Data directory.
+    string data = 1;
+    // User directory.
+    string user = 2;
+    // Downloads directory.
+    string downloads = 3;
+    // The directory where the built-in resources are installed.
+    optional Builtin builtin = 4;
+  }
+  message Network {
+    // Extra user-agent information to be appended in network requests.
+    optional string extra_user_agent = 1;
+    // The proxy to use for network requests.
+    optional string proxy = 2;
+  }
+  message Sketch {
+    // Set to true to always export binaries to the sketch directory.
+    bool always_export_binaries = 1;
+  }
+  message BuildCache {
+    // The minimum number of compilations before the cache is purged.
+    uint64 compilations_before_purge = 1;
+    // Time to live of the cache in seconds.
+    uint64 ttl_secs = 2;
+  }
+  message BoardManager {
+    // Additional URLs to be used for the board manager.
+    repeated string additional_urls = 1;
+  }
+  message Daemon {
+    // The TCP port of the daemon.
+    string port = 1;
+  }
+  message Output {
+    // Set to true to disable coloring of the output.
+    bool no_color = 1;
+  }
+  message Logging {
+    // The logging level.
+    string level = 1;
+    // The logging format.
+    string format = 2;
+    // The logging file.
+    optional string file = 3;
+  }
+  message Library {
+    // Set to true to enable library installation from zip archives or git
+    // repositories.
+    bool enable_unsafe_install = 1;
+  }
+  message Updater {
+    // Set to true to enable notifications for updates.
+    bool enable_notification = 1;
+  }
+
+  // The directories configuration.
+  Directories directories = 1;
+  // The network configuration.
+  Network network = 2;
+  // The sketch configuration.
+  Sketch sketch = 3;
+  // The build cache configuration.
+  BuildCache build_cache = 4;
+  // The board manager configuration.
+  BoardManager board_manager = 5;
+  // The daemon configuration.
+  Daemon daemon = 6;
+  // The console output configuration.
+  Output output = 7;
+  // The logging configuration.
+  Logging logging = 8;
+  // The library configuration.
+  Library library = 9;
+  // The updater configuration.
+  Updater updater = 10;
+
+  // The language locale to use.
+  optional string locale = 100;
+}
+
+message ConfigurationGetRequest {}
+
+message ConfigurationGetResponse {
+  // The current configuration.
+  Configuration configuration = 1;
+}
+
+message ConfigurationSaveRequest {
+  // The format of the encoded settings, allowed values are "json" and "yaml".
+  string settings_format = 1;
+}
+
+message ConfigurationSaveResponse {
+  // The encoded settings.
+  string encoded_settings = 1;
+}
+
+message ConfigurationOpenRequest {
+  // The encoded settings.
+  string encoded_settings = 1;
+  // The format of the encoded settings, allowed values are "json" and "yaml".
+  string settings_format = 2;
+}
+
+message ConfigurationOpenResponse {
+  // Warnings that occurred while opening the configuration (e.g. unknown keys,
+  // or invalid values).
+  repeated string warnings = 1;
+}
+
+message SettingsGetValueRequest {
+  // The key to get.
+  string key = 1;
+  // The format of the encoded_value (default is "json", allowed values are
+  // "json" and "yaml).
+  string value_format = 2;
+}
+
+message SettingsGetValueResponse {
+  // The value of the key (encoded).
+  string encoded_value = 1;
+}
+
+message SettingsSetValueRequest {
+  // The key to change.
+  string key = 1;
+  // The new value (encoded), no objects, only scalar or array of scalars are
+  // allowed.
+  string encoded_value = 2;
+  // The format of the encoded_value (default is "json", allowed values are
+  // "json", "yaml" and "cli").
+  string value_format = 3;
+}
+
+message SettingsSetValueResponse {}
+
+message SettingsEnumerateRequest {}
+
+message SettingsEnumerateResponse {
+  message Entry {
+    // The key.
+    string key = 1;
+    // The key type.
+    string type = 2;
+  }
+
+  // The list of key/value pairs.
+  repeated Entry entries = 1;
+}

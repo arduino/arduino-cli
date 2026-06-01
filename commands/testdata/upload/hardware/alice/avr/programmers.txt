@@ -1,0 +1,19 @@
+progr1.name=Programmer 1
+progr1.program.protocol=progprotocol
+progr1.program.tool=one
+progr1.protocol=genprog1protocol
+
+progr2.name=Programmer 2
+progr2.program.protocol=prog2protocol
+progr2.program.tool=one-noport
+
+progr3.name=Programmer 3
+progr3.program.protocol=prog3protocol
+progr3.program.tool=one-extra-params
+progr3.program.extra_params={serial.port}
+
+progr4.name=Programmer 4
+progr4.program.protocol=prog4protocol-upload
+progr4.program.tool=one
+progr4.bootloader.protocol=prog4protocol-bootloader
+progr4.bootloader.tool=two

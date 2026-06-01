@@ -1,0 +1,8 @@
+bar.name=Bar
+bar.upload.tool=baz
+bar.upload.protocol=
+bar.build.board=AVR_BAR
+bar.build.f_cpu=16000000L
+bar.build.mcu=atmega328p
+bar.build.core=arduino:arduino
+bar.build.variant=arduino:standard

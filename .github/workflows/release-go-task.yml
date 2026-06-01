@@ -1,0 +1,389 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/release-go-task.md
+name: Release
+
+env:
+  # As defined by the Taskfile's PROJECT_NAME variable
+  PROJECT_NAME: arduino-cli
+  # As defined by the Taskfile's DIST_DIR variable
+  DIST_DIR: dist
+  # The project's folder on Arduino's download server for uploading builds
+  AWS_PLUGIN_TARGET: /arduino-cli/
+  AWS_REGION: "us-east-1"
+  ARTIFACT_PREFIX: dist-
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  create-release-artifacts:
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+    name: Build ${{ matrix.os.artifact-suffix }}
+    runs-on: ${{ matrix.os.runner }}
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        os:
+          - task: Windows_32bit
+            artifact-suffix: Windows_32bit
+            runner: ubuntu-latest
+          - task: Windows_64bit
+            artifact-suffix: Windows_64bit
+            runner: ubuntu-latest
+          - task: Linux_32bit
+            artifact-suffix: Linux_32bit
+            runner: ubuntu-latest
+          - task: Linux_64bit
+            artifact-suffix: Linux_64bit
+            runner: ubuntu-latest
+          - task: Linux_ARMv6
+            artifact-suffix: Linux_ARMv6
+            runner: ubuntu-latest
+          - task: Linux_ARMv7
+            artifact-suffix: Linux_ARMv7
+            runner: ubuntu-latest
+          - task: Linux_ARM64
+            artifact-suffix: Linux_ARM64
+            runner: ubuntu-latest
+          - task: macOS_64bit
+            artifact-suffix: macOS_64bit
+            runner: ubuntu-latest
+          - task: macOS_ARM64
+            artifact-suffix: macOS_ARM64
+            runner: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Create changelog
+        # Avoid creating the same changelog for each os
+        if: matrix.os.task == 'Windows_32bit'
+        uses: arduino/create-changelog@v1
+        with:
+          tag-regex: '^v[0-9]+\.[0-9]+\.[0-9]+.*$'
+          filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
+          case-insensitive-regex: true
+          changelog-file-path: "${{ env.DIST_DIR }}/CHANGELOG.md"
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task dist:${{ matrix.os.task }}
+
+      - name: Output Version
+        id: get-version
+        run: echo "version=$(go tool github.com/go-task/task/v3/cmd/task general:get-version)" >> $GITHUB_OUTPUT
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_PREFIX }}${{ matrix.os.artifact-suffix }}
+          path: ${{ env.DIST_DIR }}
+
+  notarize-macos:
+    name: Notarize ${{ matrix.build.folder-suffix }}
+    runs-on: macos-latest
+    needs: create-release-artifacts
+    permissions:
+      contents: read
+
+    env:
+      GON_CONFIG_PATH: gon.config.hcl
+
+    strategy:
+      matrix:
+        build:
+          - artifact-suffix: macOS_64bit
+            folder-suffix: darwin_amd64
+            package-suffix: "macOS_64bit.tar.gz"
+          - artifact-suffix: macOS_ARM64
+            folder-suffix: darwin_arm64
+            package-suffix: "macOS_ARM64.tar.gz"
+
+    steps:
+      - name: Set environment variables
+        run: |
+          # See: https://docs.github.com/actions/reference/workflows-and-actions/workflow-commands#setting-an-environment-variable
+          echo "BUILD_FOLDER=${{ env.PROJECT_NAME }}_osx_${{ matrix.build.folder-suffix }}" >>"$GITHUB_ENV"
+
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
+          echo "TAG=${TAG}" >>"$GITHUB_ENV"
+
+          echo "PACKAGE_FILENAME=${{ env.PROJECT_NAME }}_${TAG}_${{ matrix.build.package-suffix }}" >>$GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.ARTIFACT_PREFIX }}${{ matrix.build.artifact-suffix }}
+          path: ${{ env.DIST_DIR }}
+
+      - name: Remove non-notarized artifact
+        uses: geekyeggo/delete-artifact@v6
+        with:
+          name: ${{ env.ARTIFACT_PREFIX }}${{ matrix.build.artifact-suffix }}
+
+      - name: Import Code-Signing Certificates
+        env:
+          KEYCHAIN: "sign.keychain"
+          INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
+          # Arbitrary password for a keychain that exists only for the duration of the job, so not secret
+          KEYCHAIN_PASSWORD: keychainpassword
+        run: |
+          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode >"${{ env.INSTALLER_CERT_MAC_PATH }}"
+
+          security create-keychain \
+            -p "${{ env.KEYCHAIN_PASSWORD }}" \
+            "${{ env.KEYCHAIN }}"
+
+          security default-keychain \
+            -s "${{ env.KEYCHAIN }}"
+
+          security unlock-keychain \
+            -p "${{ env.KEYCHAIN_PASSWORD }}" \
+            "${{ env.KEYCHAIN }}"
+
+          security import \
+            "${{ env.INSTALLER_CERT_MAC_PATH }}" \
+            -k "${{ env.KEYCHAIN }}" \
+            -f pkcs12 \
+            -A \
+            -T "/usr/bin/codesign" \
+            -P "${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}"
+
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s \
+            -k "${{ env.KEYCHAIN_PASSWORD }}" \
+            "${{ env.KEYCHAIN }}"
+
+      - name: Install gon for code signing and app notarization
+        run: |
+          wget \
+            -q https://github.com/Bearer/gon/releases/download/v0.0.27/gon_macos.zip
+
+          unzip \
+            gon_macos.zip \
+            -d /usr/local/bin
+
+      - name: Write gon config to file
+        # gon does not allow env variables in config file (https://github.com/mitchellh/gon/issues/20)
+        run: |
+          cat >"${{ env.GON_CONFIG_PATH }}" \
+          <<EOF
+          # See: https://github.com/Bearer/gon#configuration-file
+          source = ["${{ env.DIST_DIR }}/${{ env.BUILD_FOLDER }}/${{ env.PROJECT_NAME }}"]
+          bundle_id = "cc.arduino.${{ env.PROJECT_NAME }}"
+
+          sign {
+            application_identity = "Developer ID Application: ARDUINO SA (7KT7ZWMCJT)"
+          }
+
+          # Ask Gon for zip output to force notarization process to take place.
+          # The CI will ignore the zip output, using the signed binary only.
+          zip {
+            output_path = "unused.zip"
+          }
+          EOF
+
+      - name: Sign and notarize binary
+        env:
+          AC_USERNAME: ${{ secrets.AC_USERNAME }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+          AC_PROVIDER: ${{ secrets.AC_PROVIDER }}
+        run: |
+          gon "${{ env.GON_CONFIG_PATH }}"
+
+      - name: Re-package binary
+        working-directory: ${{ env.DIST_DIR }}
+        # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
+        run: |
+          # GitHub's upload/download-artifact actions don't preserve file permissions,
+          # so we need to add execution permission back until the action is made to do this.
+          chmod \
+            +x \
+            "${{ env.BUILD_FOLDER }}/${{ env.PROJECT_NAME }}"
+
+          tar \
+            -czvf "${{ env.PACKAGE_FILENAME }}" \
+            -C "${{ env.BUILD_FOLDER }}/" \
+            "${{ env.PROJECT_NAME }}" \
+            -C ../../ LICENSE.txt
+
+      - name: Upload notarized artifact
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_PREFIX }}${{ matrix.build.artifact-suffix }}
+          path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
+
+  create-windows-installer:
+    runs-on: windows-sign-pc
+    needs: create-release-artifacts
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      INSTALLER_CERT_WINDOWS_CER: "/tmp/cert.cer"
+      # We are hardcoding the path for signtool because is not present on the windows PATH env var by default.
+      # Keep in mind that this path could change when upgrading to a new runner version
+      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x86/signtool.exe"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ env.ARTIFACT_PREFIX }}Windows_64bit
+          path: ${{ env.DIST_DIR }}
+
+      - name: Prepare PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build MSI
+        id: buildmsi
+        run: |
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
+          WIX_TAG="${TAG%%-*}" # removes "-rc*" since wix is not happy with it, this only affects RCs builds (error CNDL0108)
+          PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_Windows_64bit"
+          SOURCE_DIR="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_windows_amd64/"
+          MSBuild.exe ./installer/cli.wixproj -p:SourceDir="$SOURCE_DIR" -p:OutputPath="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}" -p:OutputName="$PACKAGE_FILENAME" -p:ProductVersion="$WIX_TAG"
+
+      - name: Save Win signing certificate to file
+        run: echo "${{ secrets.INSTALLER_CERT_WINDOWS_CER }}" | base64 --decode > ${{ env.INSTALLER_CERT_WINDOWS_CER}}
+
+      - name: Sign MSI
+        env:
+          MSI_FILE: ${{ steps.buildmsi.outputs.msi }} # this comes from .installer/cli.wixproj
+          CERT_PASSWORD: ${{ secrets.INSTALLER_CERT_WINDOWS_PASSWORD }}
+          CONTAINER_NAME: ${{ secrets.INSTALLER_CERT_WINDOWS_CONTAINER }}
+          # https://stackoverflow.com/questions/17927895/automate-extended-validation-ev-code-signing-with-safenet-etoken
+        run: |
+          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_CER}} -csp "eToken Base Cryptographic Provider" -k "[{{${{ env.CERT_PASSWORD }}}}]=${{ env.CONTAINER_NAME }}" -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v6
+        env:
+          MSI_FILE: ${{ steps.buildmsi.outputs.msi }}
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_PREFIX }}windows-installer
+          path: ${{ env.MSI_FILE }}
+
+  create-release:
+    runs-on: ubuntu-latest
+    environment: production
+    needs:
+      - create-release-artifacts
+      - notarize-macos
+      - create-windows-installer
+    permissions:
+      contents: write
+      id-token: write # This is required for requesting the JWT
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ env.ARTIFACT_PREFIX }}*
+          merge-multiple: true
+          path: ${{ env.DIST_DIR }}
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Install buf
+        uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - name: Collect proto files
+        run: go tool github.com/go-task/task/v3/cmd/task protoc:collect
+
+      - name: Add configuration JSON schema
+        run: go tool github.com/go-task/task/v3/cmd/task dist:jsonschema
+
+      - name: Create checksum file
+        working-directory: ${{ env.DIST_DIR }}
+        run: |
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
+          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* >${TAG}-checksums.txt
+
+      - name: Identify Prerelease
+        # This is a workaround while waiting for create-release action
+        # to implement auto pre-release based on tag
+        id: prerelease
+        run: |
+          wget \
+            -q \
+            -P /tmp \
+            https://github.com/fsaintjacques/semver-tool/archive/3.2.0.zip
+
+          unzip \
+            -p \
+            /tmp/3.2.0.zip \
+            semver-tool-3.2.0/src/semver \
+          >/tmp/semver
+
+          chmod \
+            +x \
+            /tmp/semver
+
+          if [[ \
+            "$(
+              /tmp/semver get prerel \
+                ${{ needs.create-release-artifacts.outputs.version }}
+            )" != \
+            "" \
+          ]]; then
+            echo "IS_PRE=true" >>$GITHUB_OUTPUT
+          fi
+
+      - name: Create Github Release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: ${{ env.DIST_DIR }}/CHANGELOG.md
+          draft: false
+          prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
+          # NOTE: "Artifact is a directory" warnings are expected and don't indicate a problem
+          # (all the files we need are in the DIST_DIR root)
+          artifacts: ${{ env.DIST_DIR }}/*
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: "github_${{ env.PROJECT_NAME }}"
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload release files on Arduino downloads servers
+        run: |
+          aws s3 sync \
+            ${{ env.DIST_DIR }} \
+            s3://${{ secrets.DOWNLOADS_BUCKET }}${{ env.AWS_PLUGIN_TARGET }}

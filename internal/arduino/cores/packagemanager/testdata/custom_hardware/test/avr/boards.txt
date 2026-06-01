@@ -1,0 +1,21 @@
+a.name=Board A
+a.vid=0x9999
+a.pid=0x0001
+
+b.name=Board B
+b.vid.0=0x9999
+b.pid.0=0x0002
+
+c.name=Board C
+c.vid.0=0x9999
+c.pid.0=0x0003
+c.vid.1=0x9999
+c.pid.1=0x0004
+
+d.name=Board D
+d.vid.1=0x9999
+d.pid.1=0x0005
+
+e.name=Board E
+e.vid.1=0xAB00
+e.pid.1=0xcd00

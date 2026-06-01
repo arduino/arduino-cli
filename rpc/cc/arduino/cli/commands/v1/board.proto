@@ -1,0 +1,254 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+message BoardDetailsRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The fully qualified board name of the board you want information about
+  // (e.g., `arduino:avr:uno`).
+  string fqbn = 2;
+  // If set to true the returned build properties will be left unexpanded, with
+  // the variables placeholders exactly as defined in the platform.
+  bool do_not_expand_build_properties = 3;
+}
+
+message BoardDetailsResponse {
+  // The fully qualified board name of the board.
+  string fqbn = 1;
+  // Name used to identify the board to humans (e.g., Arduino Uno).
+  string name = 2;
+  // Installed version of the board's platform.
+  string version = 3;
+  // The board ID component of the FQBN (e.g., `uno`).
+  string properties_id = 4;
+  // Board alias that can be used as a more user friendly alternative to the
+  // FQBN.
+  string alias = 5;
+  // Whether this is an official or 3rd party board.
+  bool official = 6;
+  // URL of the board's pinout documentation.
+  string pinout = 7;
+  // Data about the package that contains the board's platform.
+  Package package = 8;
+  // Data about the board's platform.
+  BoardPlatform platform = 9;
+  // Tool dependencies of the board.
+  repeated ToolsDependencies tools_dependencies = 10;
+  // The board's custom configuration options.
+  repeated ConfigOption config_options = 11;
+  // List of programmers supported by the board.
+  repeated Programmer programmers = 13;
+  reserved 14;
+  // Identifying information for the board (e.g., USB VID/PID).
+  repeated BoardIdentificationProperties identification_properties = 15;
+  // Board build properties used for compiling.
+  repeated string build_properties = 16;
+  // Default programmer for the board.
+  string default_programmer_id = 17;
+}
+
+message BoardIdentificationProperties {
+  // A set of properties that must all be matched to identify the board.
+  map<string, string> properties = 1;
+}
+
+message Package {
+  // Maintainer of the package.
+  string maintainer = 1;
+  // The URL of the platforms index file
+  // (e.g., https://downloads.arduino.cc/packages/package_index.json).
+  string url = 2;
+  // A URL provided by the package author, intended to point to their website.
+  string website_url = 3;
+  // Email address of the package maintainer.
+  string email = 4;
+  // Package vendor name.
+  string name = 5;
+  // Resources for getting help about using the package.
+  Help help = 6;
+}
+
+message Help {
+  // URL for getting online help.
+  string online = 1;
+}
+
+message BoardPlatform {
+  // Architecture of the platform (e.g., `avr`).
+  string architecture = 1;
+  // Category of the platform. Set to `Contributed` for 3rd party platforms.
+  string category = 2;
+  // Download URL of the platform archive file.
+  string url = 3;
+  // File name of the platform archive.
+  string archive_filename = 4;
+  // Checksum of the platform archive.
+  string checksum = 5;
+  // File size of the platform archive.
+  int64 size = 6;
+  // Name used to identify the platform to humans.
+  string name = 7;
+}
+
+message ToolsDependencies {
+  // Vendor name of the package containing the tool definition.
+  string packager = 1;
+  // Tool name.
+  string name = 2;
+  // Tool version.
+  string version = 3;
+  // Data for the operating system-specific builds of the tool.
+  repeated Systems systems = 4;
+}
+
+message Systems {
+  // Checksum of the tool archive.
+  string checksum = 1;
+  // Operating system identifier.
+  string host = 2;
+  // File name of the tool archive.
+  string archive_filename = 3;
+  // Download URL of the tool archive.
+  string url = 4;
+  // File size of the tool archive.
+  int64 size = 5;
+}
+
+message ConfigOption {
+  // ID of the configuration option. For identifying the option to machines.
+  string option = 1;
+  // Name of the configuration option for identifying the option to humans.
+  string option_label = 2;
+  // Possible values of the configuration option.
+  repeated ConfigValue values = 3;
+}
+
+message ConfigValue {
+  // The configuration option value.
+  string value = 1;
+  // Label to identify the configuration option to humans.
+  string value_label = 2;
+  // Whether the configuration option is selected.
+  bool selected = 3;
+}
+
+message BoardListRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Search for boards for the given time (in milliseconds).
+  int64 timeout = 2;
+  // The fully qualified board name of the board you want information about
+  // (e.g., `arduino:avr:uno`).
+  string fqbn = 3;
+  // If set to true, when a board cannot be identified using the installed
+  // platforms, the cloud API will not be called to detect the board.
+  bool skip_cloud_api_for_board_detection = 4;
+}
+
+message BoardListResponse {
+  // List of ports and the boards detected on those ports.
+  repeated DetectedPort ports = 1;
+  // Warning messages or errors coming from the discoveries.
+  repeated string warnings = 2;
+}
+
+message DetectedPort {
+  // The possible boards attached to the port.
+  repeated BoardListItem matching_boards = 1;
+  // The port details.
+  Port port = 2;
+}
+
+message BoardListAllRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The search query to filter the board list by.
+  repeated string search_args = 2;
+  // Set to true to get also the boards marked as "hidden" in the platform.
+  bool include_hidden_boards = 3;
+}
+
+message BoardListAllResponse {
+  // List of installed boards.
+  repeated BoardListItem boards = 1;
+}
+
+message BoardListWatchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // If set to true, when a board cannot be identified using the installed
+  // platforms, the cloud API will not be called to detect the board.
+  bool skip_cloud_api_for_board_detection = 2;
+}
+
+message BoardListWatchResponse {
+  // Event type as received from the serial discovery tool.
+  string event_type = 1;
+  // Information about the port.
+  DetectedPort port = 2;
+  // Eventual errors when detecting connected boards.
+  string error = 3;
+}
+
+message BoardListItem {
+  // The name for use when identifying the board to a human.
+  string name = 1;
+  // The fully qualified board name. Used to identify the board to a machine.
+  string fqbn = 2;
+  // If the board is marked as "hidden" in the platform.
+  bool is_hidden = 3;
+  // Platform this board belongs to.
+  Platform platform = 6;
+}
+
+message BoardSearchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The search query to filter the board list by.
+  string search_args = 2;
+  // Set to true to get also the boards marked as "hidden" in installed
+  // platforms.
+  bool include_hidden_boards = 3;
+}
+
+message BoardSearchResponse {
+  // List of installed and installable boards.
+  repeated BoardListItem boards = 1;
+}
+
+message BoardIdentifyRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // A set of properties to search (can be taken from a Port message).
+  map<string, string> properties = 2;
+  // If set to true, when a board cannot be identified using the installed
+  // platforms, the cloud API will be called to detect the board.
+  bool use_cloud_api_for_unknown_board_detection = 3;
+}
+
+message BoardIdentifyResponse {
+  // List of matching boards (they may have an FQBN with options set).
+  repeated BoardListItem boards = 1;
+}

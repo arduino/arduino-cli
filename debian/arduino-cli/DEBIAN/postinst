@@ -1,0 +1,4 @@
+#!/bin/sh
+
+mkdir -p /etc/bash_completion.d
+arduino-cli completion bash > /etc/bash_completion.d/arduino-cli.bash || true

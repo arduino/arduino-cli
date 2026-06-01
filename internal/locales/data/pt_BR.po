@@ -1,0 +1,148 @@
+# 
+# Translators:
+# Henrique Diniz <henrique.diniz@toptal.com>, 2020
+# 
+msgid ""
+msgstr ""
+"Last-Translator: Henrique Diniz <henrique.diniz@toptal.com>, 2020\n"
+"Language-Team: Portuguese (Brazil) (https://www.transifex.com/arduino-1/teams/108174/pt_BR/)\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: cli/usage.go:31
+msgid "Additional help topics:"
+msgstr ""
+
+#: cli/usage.go:26
+msgid "Aliases:"
+msgstr ""
+
+#: cli/usage.go:28
+msgid "Available Commands:"
+msgstr ""
+
+#: cli/board/details.go:98
+msgid "Board name:"
+msgstr ""
+
+#: cli/board/details.go:100
+msgid "Board version:"
+msgstr ""
+
+#: cli/board/details.go:141
+msgid "Checksum:"
+msgstr ""
+
+#: cli/board/details.go:55 cli/board/details.go:65
+msgid "Error getting board details: %v"
+msgstr ""
+
+#: cli/usage.go:27
+msgid "Examples:"
+msgstr ""
+
+#: cli/board/details.go:139
+msgid "File:"
+msgstr ""
+
+#: cli/usage.go:29
+msgid "Flags:"
+msgstr ""
+
+#: cli/usage.go:30
+msgid "Global Flags:"
+msgstr ""
+
+#: cli/board/details.go:111
+msgid "Identification properties:"
+msgstr ""
+
+#: cli/board/details.go:138
+msgid "OS:"
+msgstr ""
+
+#: cli/board/details.go:104
+msgid "Official Arduino board:"
+msgstr ""
+
+#: cli/board/details.go:150
+msgid "Option:"
+msgstr ""
+
+#: cli/board/details.go:120
+msgid "Package URL:"
+msgstr ""
+
+#: cli/board/details.go:119
+msgid "Package maintainer:"
+msgstr ""
+
+#: cli/board/details.go:118
+msgid "Package name:"
+msgstr ""
+
+#: cli/board/details.go:122
+msgid "Package online help:"
+msgstr ""
+
+#: cli/board/details.go:121
+msgid "Package website:"
+msgstr ""
+
+#: cli/board/details.go:128
+msgid "Platform URL:"
+msgstr ""
+
+#: cli/board/details.go:127
+msgid "Platform architecture:"
+msgstr ""
+
+#: cli/board/details.go:126
+msgid "Platform category:"
+msgstr ""
+
+#: cli/board/details.go:131
+msgid "Platform checksum:"
+msgstr ""
+
+#: cli/board/details.go:129
+msgid "Platform file name:"
+msgstr ""
+
+#: cli/board/details.go:125
+msgid "Platform name:"
+msgstr ""
+
+#: cli/board/details.go:130
+msgid "Platform size (bytes):"
+msgstr ""
+
+#: cli/board/details.go:40
+msgid "Print details about a board."
+msgstr ""
+
+#: cli/board/details.go:135
+msgid "Required tool:"
+msgstr ""
+
+#: cli/board/details.go:47
+msgid "Show full board details"
+msgstr ""
+
+#: cli/board/details.go:41
+msgid ""
+"Show information about a board, in particular if the board has options to be"
+" specified in the FQBN."
+msgstr ""
+
+#: cli/board/details.go:140
+msgid "Size (bytes):"
+msgstr ""
+
+#: cli/usage.go:25
+msgid "Usage:"
+msgstr ""
+
+#: cli/usage.go:32
+msgid "Use %s for more information about a command."
+msgstr "Use %s para mais informações sobre um comando."

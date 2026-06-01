@@ -1,0 +1,11 @@
+profiles:
+  zero:
+    fqbn: arduino:samd:arduino_zero_native
+    platforms:
+      - platform: arduino:samd (1.8.14)
+    libraries:
+      - FlashStorage (1.0.0)
+      - ArduinoRS485 (1.1.0)
+
+default_profile: zero
+

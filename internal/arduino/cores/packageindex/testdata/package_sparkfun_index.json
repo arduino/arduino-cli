@@ -1,0 +1,829 @@
+{
+  "packages": [
+    {
+      "name": "SparkFun",
+      "maintainer": "SparkFun Electronics",
+      "websiteURL": "https://SparkFun.com",
+      "email": "TechSupport@SparkFun.com",
+      "help": {
+        "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+      },
+      "platforms": [
+        {
+          "name": "SparkFun AVR Boards",
+          "architecture": "avr",
+          "version": "1.1.5",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfunboards.1.1.5.tar.bz2",
+          "archiveFileName": "sparkfunboards.1.1.5.tar.bz2",
+          "checksum": "SHA-256:41f9728983e0dbab597bb46ddf00b5bac6cfec7c8f3771ecd1612dae58bb0366",
+          "size": "1162215",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "RedBoard"
+            },
+            {
+              "name": "MaKey MaKey"
+            },
+            {
+              "name": "Pro Micro"
+            },
+            {
+              "name": "Fio v3"
+            },
+            {
+              "name": "Qduino Mini"
+            },
+            {
+              "name": "Digital Sandbox"
+            },
+            {
+              "name": "Mega Pro"
+            },
+            {
+              "name": "RedBot"
+            },
+            {
+              "name": "Serial 7-segment Display"
+            },
+            {
+              "name": "ATmega128RFA1 Dev Board"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun AVR Boards",
+          "architecture": "avr",
+          "version": "1.1.6",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfunboards.1.1.6.tar.bz2",
+          "archiveFileName": "sparkfunboards.1.1.6.tar.bz2",
+          "checksum": "SHA-256:049FA0DF51602120EC1BDAC19F440FC0CC448C23BB277DD0D8DF855C52ACD483",
+          "size": "1159276",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "RedBoard"
+            },
+            {
+              "name": "MaKey MaKey"
+            },
+            {
+              "name": "Pro Micro"
+            },
+            {
+              "name": "Fio v3"
+            },
+            {
+              "name": "Qduino Mini"
+            },
+            {
+              "name": "Digital Sandbox"
+            },
+            {
+              "name": "Mega Pro"
+            },
+            {
+              "name": "RedBot"
+            },
+            {
+              "name": "Serial 7-segment Display"
+            },
+            {
+              "name": "ATmega128RFA1 Dev Board"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun AVR Boards",
+          "architecture": "avr",
+          "version": "1.1.7",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfunboards.1.1.7.tar.bz2",
+          "archiveFileName": "sparkfunboards.1.1.7.tar.bz2",
+          "checksum": "SHA-256:16A9CA03A7869C424562795504B82FEED0FB6A7D4A63FC94280FBBA44132257C",
+          "size": "1236343",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "RedBoard"
+            },
+            {
+              "name": "MaKey MaKey"
+            },
+            {
+              "name": "Pro Micro"
+            },
+            {
+              "name": "Fio v3"
+            },
+            {
+              "name": "Qduino Mini"
+            },
+            {
+              "name": "Digital Sandbox"
+            },
+            {
+              "name": "Mega Pro"
+            },
+            {
+              "name": "RedBot"
+            },
+            {
+              "name": "Serial 7-segment Display"
+            },
+            {
+              "name": "ATmega128RFA1 Dev Board"
+            },
+            {
+              "name": "LilyPad USB Plus"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun AVR Boards",
+          "architecture": "avr",
+          "version": "1.1.8",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfunboards.1.1.8.tar.bz2",
+          "archiveFileName": "sparkfunboards.1.1.8.tar.bz2",
+          "checksum": "SHA-256:23D479AF10DC97F4DB8EA8AD514FE92C4391EADD8D9DD5EF1D49A70EA05255C3",
+          "size": "1238017",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "RedBoard"
+            },
+            {
+              "name": "MaKey MaKey"
+            },
+            {
+              "name": "Pro Micro"
+            },
+            {
+              "name": "Fio v3"
+            },
+            {
+              "name": "Qduino Mini"
+            },
+            {
+              "name": "Digital Sandbox"
+            },
+            {
+              "name": "Mega Pro"
+            },
+            {
+              "name": "RedBot"
+            },
+            {
+              "name": "Serial 7-segment Display"
+            },
+            {
+              "name": "ATmega128RFA1 Dev Board"
+            },
+            {
+              "name": "LilyPad USB Plus"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun AVR Boards",
+          "architecture": "avr",
+          "version": "1.1.9",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfunboards.1.1.9.tar.bz2",
+          "archiveFileName": "sparkfunboards.1.1.9.tar.bz2",
+          "checksum": "SHA-256:89480C355876966DB68504E4E4130719942320AECF0AD6AEF819299796B22202",
+          "size": "1238253",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "RedBoard"
+            },
+            {
+              "name": "MaKey MaKey"
+            },
+            {
+              "name": "Pro Micro"
+            },
+            {
+              "name": "Fio v3"
+            },
+            {
+              "name": "Qduino Mini"
+            },
+            {
+              "name": "Digital Sandbox"
+            },
+            {
+              "name": "Mega Pro"
+            },
+            {
+              "name": "RedBot"
+            },
+            {
+              "name": "Serial 7-segment Display"
+            },
+            {
+              "name": "ATmega128RFA1 Dev Board"
+            },
+            {
+              "name": "LilyPad USB Plus"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun AVR Boards",
+          "architecture": "avr",
+          "version": "1.1.10",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfunboards.1.1.10.tar.bz2",
+          "archiveFileName": "sparkfunboards.1.1.10.tar.bz2",
+          "checksum": "SHA-256:ABC30EF048B0BE63B6E3BB02A1FD52F35E2FC4A1CAFD60D4E7C3F9FD776129C0",
+          "size": "1237620",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "RedBoard"
+            },
+            {
+              "name": "MaKey MaKey"
+            },
+            {
+              "name": "Pro Micro"
+            },
+            {
+              "name": "Fio v3"
+            },
+            {
+              "name": "Qduino Mini"
+            },
+            {
+              "name": "Digital Sandbox"
+            },
+            {
+              "name": "Mega Pro"
+            },
+            {
+              "name": "RedBot"
+            },
+            {
+              "name": "Serial 7-segment Display"
+            },
+            {
+              "name": "ATmega128RFA1 Dev Board"
+            },
+            {
+              "name": "LilyPad USB Plus"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.5)",
+          "architecture": "samd",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.0.0.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.0.0.tar.bz2",
+          "checksum": "SHA-256:12e0be6862a3a28b6515755dcad2842757caf4e5270326554f95059512ebaab5",
+          "size": "268954",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.5)",
+          "architecture": "samd",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.1.0.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.1.0.tar.bz2",
+          "checksum": "SHA-256:5d71cbf8ccf5781eef9809d7b3141041daf3ed1a1272f5278762ece5a0aecf44",
+          "size": "279683",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.5)",
+          "architecture": "samd",
+          "version": "1.2.0",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.2.0.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.2.0.tar.bz2",
+          "checksum": "SHA-256:50e055f311e07ba4d154bf00aa10579648024bef680bb3eb267401c496f791e6",
+          "size": "281932",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.6)",
+          "architecture": "samd",
+          "version": "1.2.1",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.2.1.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.2.1.tar.bz2",
+          "checksum": "SHA-256:63b90fb26a18a89b2f51556a08286117cdade38d6cb7a16eb1eccb7d1d92422a",
+          "size": "280405",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.8)",
+          "architecture": "samd",
+          "version": "1.2.2",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.2.2.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.2.2.tar.bz2",
+          "checksum": "SHA-256:21bc1ab1a8fd6550dca3b4953deaa2066d49ffa2583cd8e8a1e36d0c0ab00d52",
+          "size": "283240",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.8)",
+          "architecture": "samd",
+          "version": "1.3.0",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.3.0.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.3.0.tar.bz2",
+          "checksum": "SHA-256:87695137f303000099e7e6d3fae3e87d5882ed999e4c14403c65cf51a4d6a6be",
+          "size": "195440",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            },
+            {
+              "name": "SparkFun 9DoF Razor IMU M0"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards (dependency: Arduino SAMD Boards 1.6.9)",
+          "architecture": "samd",
+          "version": "1.3.2",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.3.2.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.3.2.tar.bz2",
+          "checksum": "SHA-256:eb4274a3df4c6c4dbc1396600b1efc9cd9454e5be4880530ff87ba4fb3e6216a",
+          "size": "206253",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            },
+            {
+              "name": "SparkFun 9DoF Razor IMU M0"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "SparkFun SAMD Boards",
+          "architecture": "samd",
+          "version": "1.4.0",
+          "category": "Contributed",
+          "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/IDE_Board_Manager/sparkfun-samd-1.4.0.tar.bz2",
+          "archiveFileName": "sparkfun-samd-1.4.0.tar.bz2",
+          "checksum": "SHA-256:968918117E6EA9C7F3982F83E07B6459663AB844779855B5E175E19461C16691",
+          "size": "289555",
+          "help": {
+            "online": "https://learn.sparkfun.com/tutorials/installing-arduino-ide/board-add-ons-with-arduino-board-manager"
+          },
+          "boards": [
+            {
+              "name": "SparkFun SAMD21 Mini Breakout"
+            },
+            {
+              "name": "SparkFun SAMD21 Dev Breakout"
+            },
+            {
+              "name": "SparkFun 9DoF Razor IMU M0"
+            },
+            {
+              "name": "LilyPad LilyMini"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "SparkFun",
+              "name": "bossac",
+              "version": "1.4.0"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "bossac",
+          "version": "1.4.0",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/sparkfun/samd-tools/bossac/bossac-1.4.0-win.zip",
+              "archiveFileName": "bossac-1.4.0-win.zip",
+              "checksum": "SHA-256:BCA6503F5DBB1F96693AFD0701A759ECFB3BE5B9FB3F9D901CA17853B224F4EB",
+              "size": "314705"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/sparkfun/samd-tools/bossac/bossac-1.4.0-linux64.tar.bz2",
+              "archiveFileName": "bossac-1.4.0-linux64.tar.bz2",
+              "checksum": "SHA-256:BB8F398BF84C5F31880FE9A2C7AE0174592516CE4821B49744B426AA968ADA10",
+              "size": "225696"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/sparkfun/Arduino_Boards/raw/master/sparkfun/samd-tools/bossac/bossac-1.4.0-osx.tar.bz2",
+              "archiveFileName": "bossac-1.4.0-osx.tar.bz2",
+              "checksum": "SHA-256:D0F225846D7BC80A74324D783CDB35C42A7F85EAD73CC016C0CC767B0AA5E81C",
+              "size": "74461"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "maintainer": "SparkFun Electronics",
+      "help": {
+        "online": "http://SparkFun.com"
+      },
+      "websiteURL": "https://github.com/sparkfun/Arduino_Boards",
+      "platforms": [
+        {
+          "category": "Contributed",
+          "name": "SparkFun ESP8266 Boards",
+          "url": "https://cdn.sparkfun.com/assets/learn_tutorials/4/9/5/sparkfun-esp8266-2.1.0.tar.bz2",
+          "checksum": "SHA-256:FE3E0504B38A5A4C912801A3E4633380A666DC77B8D3043548187AF8675477DA",
+          "help": {
+            "online": "https://learn.sparkfun.com"
+          },
+          "version": "2.1.0",
+          "architecture": "esp8266",
+          "archiveFileName": "sparkfun-esp8266-2.1.0.tar.bz2",
+          "boards": [
+            {
+              "name": "SparkFun Blynk Board - ESP8266"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing - Development Board"
+            },
+            {
+              "name": "Generic ESP8266 Module"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "esp8266",
+              "version": "0.4.8",
+              "name": "esptool"
+            },
+            {
+              "packager": "esp8266",
+              "version": "1.20.0-26-gb404fb9-2",
+              "name": "xtensa-lx106-elf-gcc"
+            },
+            {
+              "packager": "esp8266",
+              "version": "0.1.2",
+              "name": "mkspiffs"
+            }
+          ],
+          "size": "5436076"
+        }
+      ],
+      "tools": [
+        {
+          "version": "1.20.0-26-gb404fb9-2",
+          "name": "xtensa-lx106-elf-gcc",
+          "systems": [
+            {
+              "url": "http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
+              "host": "i686-mingw32",
+              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "size": "153527527"
+            },
+            {
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "size": "35385382"
+            },
+            {
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "size": "35385382"
+            },
+            {
+              "url": "http://arduino.esp8266.com/linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "size": "30262903"
+            },
+            {
+              "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz",
+              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
+              "size": "32734156"
+            }
+          ]
+        },
+        {
+          "version": "1.20.0-26-gb404fb9",
+          "name": "xtensa-lx106-elf-gcc",
+          "systems": [
+            {
+              "url": "http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "checksum": "SHA-256:1561ec85cc58cab35cc48bfdb0d0087809f89c043112a2c36b54251a13bf781f",
+              "host": "i686-mingw32",
+              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "size": "153807368"
+            },
+            {
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "size": "35385382"
+            },
+            {
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "size": "35385382"
+            },
+            {
+              "url": "http://arduino.esp8266.com/linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "size": "30262903"
+            },
+            {
+              "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz",
+              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
+              "size": "32734156"
+            }
+          ]
+        },
+        {
+          "version": "0.4.8",
+          "name": "esptool",
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-win32.zip",
+              "checksum": "SHA-256:8d09cb0df6234c2a0562389ceedd11482b44a3f538695f9a4df80f9f10411ece",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-0.4.8-win32.zip",
+              "size": "32192"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz",
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz",
+              "size": "28798"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz",
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz",
+              "size": "28798"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux64.tar.gz",
+              "checksum": "SHA-256:1cd9a6014bbbc37ba6dc249f4fc027f0ca9bbc6dd0e203ebc7d146dfd78a6e78",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.8-linux64.tar.gz",
+              "size": "15479"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux32.tar.gz",
+              "checksum": "SHA-256:b0d6e71e6f41d4ed7e167bb4b3f4f0b1b3e49d69af50ab7fbe952cbfed83f164",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.8-linux32.tar.gz",
+              "size": "15444"
+            }
+          ]
+        },
+        {
+          "version": "0.4.5",
+          "name": "esptool",
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-win32.zip",
+              "checksum": "SHA-256:1b0a7d254e74942d820a09281aa5dc2af1c8314ae5ee1a5abb0653d0580e531b",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-0.4.5-win32.zip",
+              "size": "17408"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-osx.tar.gz",
+              "checksum": "SHA-256:924d31c64f4bb9f748e70806dafbabb15e5eb80afcdde33715f3ec884be1652d",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-0.4.5-osx.tar.gz",
+              "size": "11359"
+            },
+            {
+              "url": "http://arduino.esp8266.com/esptool-0.4.5-1-gfaa5794-osx.tar.gz",
+              "checksum": "SHA-256:722142071f6cf4d8c02dea42497a747e06abf583d86137a6a256b7db71dc61f6",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "esptool-0.4.5-1-gfaa5794-osx.tar.gz",
+              "size": "20751"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux64.tar.gz",
+              "checksum": "SHA-256:4ce799e13fbd89f8a8f08a08db77dc3b1362c4486306fe1b3801dee80cfa3203",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.5-linux64.tar.gz",
+              "size": "12789"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux32.tar.gz",
+              "checksum": "SHA-256:a7a2c3200786d7396e8cafca1b9aefe56db8ec1dab5e9163d4a19358232a7d87",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.5-linux32.tar.gz",
+              "size": "12055"
+            }
+          ]
+        },
+        {
+          "version": "0.4.6",
+          "name": "esptool",
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-win32.zip",
+              "checksum": "SHA-256:0248bf78514a3195f583e29218ca7828a66e13c6e5545a078f1c1257033e4927",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-0.4.6-win32.zip",
+              "size": "17481"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz",
+              "checksum": "SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-0.4.6-osx.tar.gz",
+              "size": "20926"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz",
+              "checksum": "SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "esptool-0.4.6-osx.tar.gz",
+              "size": "20926"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux64.tar.gz",
+              "checksum": "SHA-256:f9f456e9a42bb2597126c513cb8865f923fb978865d4838b9623d322216b74d0",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.6-linux64.tar.gz",
+              "size": "12885"
+            },
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux32.tar.gz",
+              "checksum": "SHA-256:85275ca03a82bfc456f5a84e86962ca1e470ea2e168829c38ca29ee668831d93",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.6-linux32.tar.gz",
+              "size": "13417"
+            }
+          ]
+        },
+        {
+          "version": "0.1.2",
+          "name": "mkspiffs",
+          "systems": [
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-windows.zip",
+              "checksum": "SHA-256:0a29119b8458b61a877408f7995e4944623a712e0d313a2c2f76af9ab55cc9f2",
+              "host": "i686-mingw32",
+              "archiveFileName": "mkspiffs-0.1.2-windows.zip",
+              "size": "230802"
+            },
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-osx.tar.gz",
+              "checksum": "SHA-256:df656fae21a41c1269ea50cb53752dcaf6a4e1437255f3a9fb50b4025549b58e",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "mkspiffs-0.1.2-osx.tar.gz",
+              "size": "115091"
+            },
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-osx.tar.gz",
+              "checksum": "SHA-256:df656fae21a41c1269ea50cb53752dcaf6a4e1437255f3a9fb50b4025549b58e",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "mkspiffs-0.1.2-osx.tar.gz",
+              "size": "115091"
+            },
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux64.tar.gz",
+              "checksum": "SHA-256:1a1dd81b51daf74c382db71b42251757ca4136e8762107e69feaa8617bac315f",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "mkspiffs-0.1.2-linux64.tar.gz",
+              "size": "46281"
+            },
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux32.tar.gz",
+              "checksum": "SHA-256:e990d545dfcae308aabaac5fa9e1db734cc2b08167969e7eedac88bd0839667c",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "mkspiffs-0.1.2-linux32.tar.gz",
+              "size": "45272"
+            }
+          ]
+        }
+      ],
+      "email": "ivan@esp8266.com",
+      "name": "esp8266"
+    }
+  ]
+}

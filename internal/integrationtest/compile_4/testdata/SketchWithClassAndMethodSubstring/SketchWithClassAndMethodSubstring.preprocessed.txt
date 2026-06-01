@@ -1,0 +1,22 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+class Foo {
+public:
+int blooper(int x) { return x+1; }
+};
+
+Foo foo;
+
+#line 8 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 12 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 8 {{QuoteCppString .sketchMainFile}}
+void setup() {
+  foo.blooper(1);
+}
+
+void loop() {
+  foo.blooper(2);
+}
+

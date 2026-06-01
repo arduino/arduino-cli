@@ -1,0 +1,8 @@
+server	/tmp/sketch7210316334309249705.cpp	/^YunServer server;$/;"	kind:variable	line:31
+setup	/tmp/sketch7210316334309249705.cpp	/^void setup() {$/;"	kind:function	line:33	signature:()	returntype:void
+loop	/tmp/sketch7210316334309249705.cpp	/^void loop() {$/;"	kind:function	line:46	signature:()	returntype:void
+process	/tmp/sketch7210316334309249705.cpp	/^void process(YunClient client);$/;"	kind:prototype	line:61	signature:(YunClient client)	returntype:void
+process	/tmp/sketch7210316334309249705.cpp	/^void process(YunClient client) {$/;"	kind:function	line:62	signature:(YunClient client)	returntype:void
+digitalCommand	/tmp/sketch7210316334309249705.cpp	/^void digitalCommand(YunClient client) {$/;"	kind:function	line:82	signature:(YunClient client)	returntype:void
+analogCommand	/tmp/sketch7210316334309249705.cpp	/^void analogCommand(YunClient client) {$/;"	kind:function	line:110	signature:(YunClient client)	returntype:void
+modeCommand	/tmp/sketch7210316334309249705.cpp	/^void modeCommand(YunClient client) {$/;"	kind:function	line:151	signature:(YunClient client)	returntype:void

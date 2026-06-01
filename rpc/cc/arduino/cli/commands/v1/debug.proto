@@ -1,0 +1,152 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+// The top-level message sent by the client for the `Debug` method.
+// Multiple `DebugRequest` messages can be sent but the first message
+// must contain a `GetDebugConfigRequest` message to initialize the debug
+// session. All subsequent messages must contain bytes to be sent to the debug
+// session and must not contain a `GetDebugConfigRequest` message.
+message DebugRequest {
+  // Content must be either a debug session config or data to be sent.
+
+  // Provides information to the debug that specifies which is the target.
+  // The first `DebugRequest` message must contain a `GetDebugConfigRequest`
+  // message.
+  GetDebugConfigRequest debug_request = 1;
+
+  // The data to be sent to the target being monitored.
+  bytes data = 2;
+
+  // Set this to true to send and Interrupt signal to the debugger process.
+  bool send_interrupt = 3;
+}
+
+// The streaming response may contain chunks of data from the debugger or an
+// error.
+message DebugResponse {
+  message Result {
+    // Incoming error output from the debugger tool.
+    string error = 1;
+  }
+  oneof message {
+    // Incoming data from the debugger tool.
+    bytes data = 1;
+    // Debugging result.
+    Result result = 2;
+  }
+}
+
+message IsDebugSupportedRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the board in use (e.g.,
+  // `arduino:samd:mkr1000`).
+  string fqbn = 2;
+  // Port of the debugger (optional).
+  Port port = 3;
+  // Which GDB command interpreter to use.
+  string interpreter = 4;
+  // The programmer to use for debugging.
+  string programmer = 5;
+  // List of custom debug properties.
+  repeated string debug_properties = 6;
+}
+
+message IsDebugSupportedResponse {
+  // True if debugging is supported.
+  bool debugging_supported = 1;
+  // This is the same FQBN given in the IsDebugSupportedRequest but cleaned
+  // up of the board options that do not affect the debugger configuration.
+  // It may be used by clients/IDE to group slightly different boards option
+  // selections under the same debug configuration.
+  string debug_fqbn = 2;
+}
+
+message GetDebugConfigRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the board in use
+  // (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+  // the sketch will be used.
+  string fqbn = 2;
+  // Path to the sketch that is running on the board. The compiled executable
+  // is expected to be located under this path.
+  string sketch_path = 3;
+  // Port of the debugger (optional).
+  Port port = 4;
+  // Which GDB command interpreter to use.
+  string interpreter = 5;
+  // Directory containing the compiled executable. If `import_dir` is not
+  // specified, the executable is assumed to be in
+  // `{sketch_path}/build/{fqbn}/`.
+  string import_dir = 8;
+  // The programmer to use for debugging.
+  string programmer = 9;
+  // List of custom debug properties.
+  repeated string debug_properties = 10;
+}
+
+message GetDebugConfigResponse {
+  // The executable binary to debug.
+  string executable = 1;
+  // The toolchain type used for the build (for example "gcc").
+  string toolchain = 2;
+  // The toolchain directory.
+  string toolchain_path = 3;
+  // The toolchain architecture prefix (for example "arm-none-eabi").
+  string toolchain_prefix = 4;
+  // The GDB server type used to connect to the programmer/board (for example
+  // "openocd").
+  string server = 5;
+  // The GDB server directory.
+  string server_path = 6;
+  // Extra configuration parameters wrt toolchain.
+  google.protobuf.Any toolchain_configuration = 7;
+  // Extra configuration parameters wrt GDB server.
+  google.protobuf.Any server_configuration = 8;
+  // Custom debugger configurations (not handled directly by Arduino CLI but
+  // provided for 3rd party plugins/debuggers). The map keys identifies which
+  // 3rd party plugin/debugger is referred, the map string values contains a
+  // JSON configuration for it.
+  map<string, string> custom_configs = 9;
+  // the SVD file to use.
+  string svd_file = 10;
+  // The programmer specified in the request.
+  string programmer = 11;
+}
+
+// Configurations specific for the 'gcc' toolchain.
+message DebugGCCToolchainConfiguration {}
+
+// Configuration specific for the 'openocd` server.
+message DebugOpenOCDServerConfiguration {
+  // Path to openocd.
+  string path = 1;
+  // Path to openocd scripts.
+  string scripts_dir = 2;
+  // List of scripts to execute by openocd.
+  repeated string scripts = 3;
+}

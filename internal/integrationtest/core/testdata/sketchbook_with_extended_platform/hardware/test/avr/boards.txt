@@ -1,0 +1,7 @@
+
+test.name=Test Board
+test.build.core=arduino:arduino
+
+test2.name=Test 2 Board
+test2.build.core=arduino:arduino
+test2.runtime.use_core_platform_path_for_runtime_platform_path=true

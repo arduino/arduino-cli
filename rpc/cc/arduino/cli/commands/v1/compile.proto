@@ -1,0 +1,183 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/lib.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+message CompileRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is
+  // not defined, the FQBN of the board attached to the sketch via the
+  // `BoardAttach` method is used.
+  string fqbn = 2;
+  // The path where the sketch is stored.
+  string sketch_path = 3;
+  // Just get the build properties and do not run the full compile.
+  bool show_properties = 4;
+  // Print preprocessed code to stdout instead of compiling.
+  bool preprocess = 5;
+  // Builds of core and sketches are saved into this path to be cached and
+  // reused.
+  string build_cache_path = 6 [deprecated = true];
+  // Path to use to store the files used for the compilation. If omitted,
+  // a directory will be created in the operating system's default temporary
+  // path.
+  string build_path = 7;
+  // List of custom build properties.
+  repeated string build_properties = 8;
+  // Used to tell gcc which warning level to use. The level names are: "none",
+  // "default", "more" and "all".
+  string warnings = 9;
+  // Turns on verbose mode.
+  bool verbose = 10;
+  // Suppresses almost every output.
+  bool quiet = 11;
+  // The max number of concurrent compiler instances to run (as `make -jx`).
+  // If jobs is set to 0, it will use the number of available CPUs as the
+  // maximum.
+  int32 jobs = 14;
+  // A list of paths to directories containing a collection of libraries.
+  repeated string libraries = 15;
+  // Optimize compile output for debug, not for release.
+  bool optimize_for_debug = 16;
+  // Optional: save the build artifacts in this directory, the directory must
+  // exist.
+  string export_dir = 18;
+  // Optional: cleanup the build folder and do not use any previously cached
+  // build.
+  bool clean = 19;
+  // When set to `true` only the compilation database will be produced and no
+  // actual build will be performed.
+  bool create_compilation_database_only = 21;
+  // This map (source file -> new content) let the builder use the provided
+  // content instead of reading the corresponding file on disk. This is useful
+  // for IDE that have unsaved changes in memory. The path must be relative to
+  // the sketch directory. Only files from the sketch are allowed.
+  map<string, string> source_override = 22;
+  // When set to `true` the compiled binary will be copied to the export
+  // directory.
+  optional bool export_binaries = 23;
+  // A list of paths to single libraries root directory.
+  repeated string library = 24;
+  // The path where to search for the custom signing key name and the encrypt
+  // key name.
+  string keys_keychain = 25;
+  // The name of the custom key to use for signing during the compile process.
+  string sign_key = 26;
+  // The name of the custom key to use for encrypting during the compile process.
+  string encrypt_key = 27;
+  // If set to true the build will skip the library discovery process and will
+  // use the same libraries of latest build. Enabling this flag may produce a
+  // wrong output and should not be used in regular compiles unless there is a
+  // very specific reason to do so. This flag is mainly provided for usage in
+  // language servers to optimize the build speed in some particular cases.
+  bool skip_libraries_discovery = 28;
+  // If set to true the returned build properties will be left unexpanded, with
+  // the variables placeholders exactly as defined in the platform.
+  bool do_not_expand_build_properties = 29;
+  // Search for precompiled cores in the given paths and use them if found.
+  // This search is performed after the standard build_cache directory.
+  repeated string build_cache_extra_paths = 30;
+}
+
+message CompileResponse {
+  oneof message {
+    // The output of the compilation process (stream).
+    bytes out_stream = 1;
+    // The error output of the compilation process (stream).
+    bytes err_stream = 2;
+    // Completions reports of the compilation process (stream).
+    TaskProgress progress = 3;
+    // The compilation result.
+    BuilderResult result = 4;
+  }
+}
+
+message InstanceNeedsReinitializationError {}
+
+message BuilderResult {
+  // The compiler build path.
+  string build_path = 1;
+  // The libraries used in the build.
+  repeated Library used_libraries = 2;
+  // The size of the executable split by sections.
+  repeated ExecutableSectionSize executable_sections_size = 3;
+  // The platform where the board is defined.
+  InstalledPlatformReference board_platform = 4;
+  // The platform used for the build (if referenced from the board platform).
+  InstalledPlatformReference build_platform = 5;
+  // Build properties used for compiling.
+  repeated string build_properties = 7;
+  // Compiler errors and warnings.
+  repeated CompileDiagnostic diagnostics = 8;
+}
+
+message ExecutableSectionSize {
+  // The name of the section.
+  string name = 1;
+  // The used size of the section in bytes.
+  int64 size = 2;
+  // The maximum size of the section in bytes.
+  int64 max_size = 3;
+}
+
+message CompileDiagnostic {
+  // Severity of the diagnostic.
+  string severity = 1;
+  // The explanation of the diagnostic (it may be multiple preformatted lines).
+  string message = 2;
+  // The file containing the diagnostic.
+  string file = 3;
+  // The line of the diagnostic if available (starts from 1).
+  int64 line = 4;
+  // The column of the diagnostic if available (starts from 1).
+  int64 column = 5;
+  // The context where this diagnostic is found (it may be multiple files that
+  // represents a chain of includes, or a text describing where the diagnostic
+  // is found).
+  repeated CompileDiagnosticContext context = 6;
+  // Annotations or suggestions to the diagnostic made by the compiler.
+  repeated CompileDiagnosticNote notes = 7;
+}
+
+message CompileDiagnosticContext {
+  // The message describing the context reference.
+  string message = 1;
+  // The file of the context reference.
+  string file = 2;
+  // The line of the context reference.
+  int64 line = 3;
+  // The column of the context reference.
+  int64 column = 4;
+}
+
+message CompileDiagnosticNote {
+  // The message describing the compiler note.
+  string message = 1;
+  // The file of the compiler note.
+  string file = 2;
+  // The line of the compiler note.
+  int64 line = 3;
+  // The column of the compiler note.
+  int64 column = 4;
+}

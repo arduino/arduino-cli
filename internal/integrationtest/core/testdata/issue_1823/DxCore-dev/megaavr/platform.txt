@@ -1,0 +1,234 @@
+#################################
+# DxCore platform definition    #
+#                               #
+# github.com/SpenceKonde/DxCore #
+#################################
+
+
+##############################
+# DxCore-related definitions #
+##############################
+name=DxCore
+versionnum.major=1
+versionnum.minor=4
+versionnum.patch=10
+versionnum.postfix=
+versionnum.released=1
+version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
+build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DDXCORE="{version}" -DDXCORE_MAJOR={versionnum.major}UL -DDXCORE_MINOR={versionnum.minor}UL -DDXCORE_PATCH={versionnum.patch}UL -DDXCORE_RELEASED={versionnum.released}
+
+build.optiondefines=-DF_CPU={build.f_cpu} -DCLOCK_SOURCE={build.clocksource} {build.attachmode} -DTWI_{build.wire.mode} -DMILLIS_USE_TIMER{build.millistimer}
+
+
+#####################
+# Compile Parameter #
+#####################
+
+# Force users to see warnings, since it defaults to them being off if you let the IDE have it's way.
+compiler.warning_flags=-Wall
+compiler.warning_flags.none=-Wall
+compiler.warning_flags.default=-Wall
+compiler.warning_flags.more=-Wall
+compiler.warning_flags.all=-Wall -Wextra
+
+# Default "compiler.path" is correct, change only if you want to override the initial value
+compiler.path={runtime.tools.avr-gcc.path}/bin/
+compiler.c.cmd=avr-gcc
+compiler.c.flags=-c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mrelax -Werror=implicit-function-declaration -Wundef
+# DxCore has the three additional FLMAP sections for mapped flash
+compiler.c.elf.flags={compiler.warning_flags} -Os -g -flto -fuse-linker-plugin -mrelax -Wl,--gc-sections,--section-start={build.text_section_start},--section-start=.FLMAP_SECTION1=0x8000,--section-start=.FLMAP_SECTION2=0x10000,--section-start=.FLMAP_SECTION3=0x18000
+compiler.c.elf.cmd=avr-gcc
+compiler.S.flags=-c -g -x assembler-with-cpp -flto -MMD
+compiler.cpp.cmd=avr-g++
+compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -std=gnu++17 -fpermissive -Wno-sized-deallocation -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto -mrelax
+compiler.ar.cmd=avr-gcc-ar
+compiler.ar.flags=rcs
+compiler.objcopy.cmd=avr-objcopy
+compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0
+compiler.objdump.cmd=avr-objdump
+compiler.objdump.flags=--disassemble --source --line-numbers --demangle --section=.text
+compiler.nm.cmd=avr-nm
+compiler.nm.flags=--numeric-sort --line-numbers --demangle --print-size --format=s
+compiler.elf2hex.flags=-O ihex -R .eeprom
+compiler.elf2hex.bin.flags=-O binary -R .eeprom
+compiler.elf2hex.cmd=avr-objcopy
+compiler.ldflags=
+compiler.libraries.ldflags=
+compiler.size.cmd=avr-size
+
+# Overridden by platform.local.txt if used
+compiler.c.extra_flags=
+compiler.c.elf.extra_flags=
+compiler.S.extra_flags=
+compiler.cpp.extra_flags=
+compiler.ar.extra_flags=
+compiler.objcopy.eep.extra_flags=
+compiler.elf2hex.extra_flags=
+
+# Normally overridden by boards.txt
+build.extra_flags=
+
+####################
+# Compile Patterns #
+####################
+
+## Compile c files
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mmcu={build.mcu} {build.optiondefines} {build.versiondefines} {compiler.c.extra_flags} {build.extra_flags} "-I{build.core.path}/api/deprecated" {includes} "{source_file}" -o "{object_file}"
+
+## Compile c++ files
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -mmcu={build.mcu} {build.optiondefines} {build.versiondefines} {compiler.cpp.extra_flags} {build.extra_flags} "-I{build.core.path}/api/deprecated" {includes} "{source_file}" -o "{object_file}"
+
+## Compile S files
+recipe.S.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.S.flags} -mmcu={build.mcu} {build.optiondefines} {build.versiondefines} {compiler.S.extra_flags} {build.extra_flags} "-I{build.core.path}/api/deprecated" {includes} "{source_file}" -o "{object_file}"
+
+## Preprocessor
+# These two are used during the lib discovery phase and for function prototype generation
+preproc.includes.flags=-w -x c++ -M -MG -MP
+recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.includes.flags} -mmcu={build.mcu} {build.optiondefines} {build.versiondefines} {compiler.cpp.extra_flags} {build.extra_flags} "-I{build.core.path}/api/deprecated" {includes} "{source_file}"
+preproc.macros.flags=-w -x c++ -E -CC
+recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu}  {build.optiondefines} {build.versiondefines} {compiler.cpp.extra_flags} {build.extra_flags} "-I{build.core.path}/api/deprecated" {includes} "{source_file}" -o "{preprocessed_file_path}"
+
+## Create archives
+# archive_file_path is needed for backwards compatibility with IDE 1.6.5 or older, IDE 1.6.6 or newer overrides this value
+archive_file_path={build.path}/{archive_file}
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
+
+## Combine gc-sections, archives, and objects
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} {compiler.c.elf.extra_flags} {build.printf} {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} {compiler.libraries.ldflags} "{build.path}/{archive_file}" "-L{build.path}" -lm
+
+## Compute size
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
+recipe.size.regex=^(?:\.text|\.data|\.FLMAP_SECTION1|\.FLMAP_SECTION2|\.FLMAP_SECTION3|\.rodata|\.bootloader)\s+([0-9]+).*
+recipe.size.regex.data=^(?:\.data|\.bss|\.noinit|\.flmap0\.flmap1)\s+([0-9]+).*
+recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
+
+## Create output files (.eep and .hex)
+recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} {compiler.objcopy.eep.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
+recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.bin.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
+
+####################################
+# Export Compiled Binary and more  #
+####################################
+# Export Compiled Binary will also #
+# generate an assembly listing and #
+# memory map for hand debugging,   #
+# optimization and analysis.       #
+####################################
+
+## Save hex
+# Needs to be specified separately, because otherwise some parts of it don't resolve for reasons I dont understand.
+recipe.output.tmp_file={build.project_name}.hex
+recipe.output.save_file={build.project_name}.{build.mcu}{build.mcupostfix}.{build.speed}c{build.clocksource}.m{build.millistimer}{build.wireabr}{build.printfabr}{build.appspmabr}{build.attachabr}.v{versionnum.major}{versionnum.minor}{versionnum.patch}.hex
+
+## Extra asset name (for .lst and .map output - doesn't fully resolve for .hex)
+build.extraassetname={build.project_name}.{build.mcu}{build.mcupostfix}.{build.speed}c{build.clocksource}.m{build.millistimer}{build.wireabr}{build.printfabr}{build.appspmabr}{build.attachabr}.v{versionnum.major}{versionnum.minor}{versionnum.patch}
+
+## Create disassembler listing
+recipe.hooks.objcopy.postobjcopy.1.pattern.windows=cmd /C "{compiler.path}{compiler.objdump.cmd}" {compiler.objdump.flags} "{build.path}/{build.project_name}.elf" > "{build.path}/{build.project_name}.lst"
+recipe.hooks.objcopy.postobjcopy.1.pattern.linux=bash -c "{compiler.path}{compiler.objdump.cmd} {compiler.objdump.flags} {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.lst"
+recipe.hooks.objcopy.postobjcopy.1.pattern.macosx=bash -c "{compiler.path}{compiler.objdump.cmd} {compiler.objdump.flags} {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.lst"
+
+## Create memory map
+recipe.hooks.objcopy.postobjcopy.2.pattern.windows=cmd /C "{compiler.path}{compiler.nm.cmd}" {compiler.nm.flags}  "{build.path}/{build.project_name}.elf" > "{build.path}/{build.project_name}.map"
+recipe.hooks.objcopy.postobjcopy.2.pattern.linux=bash -c "{compiler.path}{compiler.nm.cmd} {compiler.nm.flags}  {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.map"
+recipe.hooks.objcopy.postobjcopy.2.pattern.macosx=bash -c "{compiler.path}{compiler.nm.cmd} {compiler.nm.flags}  {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.map"
+
+## Save assembly listing
+recipe.hooks.savehex.presavehex.1.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.lst" "{sketch_path}\{build.extraassetname}.lst"
+recipe.hooks.savehex.presavehex.1.pattern.linux=cp "{build.path}/{build.project_name}.lst" "{sketch_path}/{build.extraassetname}.lst"
+recipe.hooks.savehex.presavehex.1.pattern.macosx=cp "{build.path}/{build.project_name}.lst" "{sketch_path}/{build.extraassetname}.lst"
+
+## Save memory map
+recipe.hooks.savehex.presavehex.2.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.map" "{sketch_path}\{build.extraassetname}.map"
+recipe.hooks.savehex.presavehex.2.pattern.linux=cp "{build.path}/{build.project_name}.map" "{sketch_path}/{build.extraassetname}.map"
+recipe.hooks.savehex.presavehex.2.pattern.macosx=cp "{build.path}/{build.project_name}.map" "{sketch_path}/{build.extraassetname}.map"
+
+#########################################
+# avrdude - the classic AVR upload tool #
+# Currently used for all non-SerialUPDI #
+# programming tools.                    #
+# Would love to replace most of this    #
+# with new python upload tools.         #
+#########################################
+
+## Unused Parameters
+tools.avrdude.program.verify=
+tools.avrdude.upload.verify=
+tools.avrdude.erase.params.verbose=
+tools.avrdude.erase.params.quiet=
+tools.avrdude.erase.pattern=
+
+## avrdude-related paths
+tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.cmd.path={path}/bin/avrdude
+tools.avrdude.config.path={runtime.platform.path}/avrdude.conf
+tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+
+## Used for Sketch -> Upload using Programmer or uploads without a bootloader
+tools.avrdude.program.params.verbose=-v
+tools.avrdude.program.params.quiet=-q -q
+tools.avrdude.program.params.noverify=-V
+tools.avrdude.program.pattern={upload.prog_interlock}"{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu} -c{protocol} {program.extra_params} "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.CODESIZE}:m" "-Ufuse8:w:{bootloader.BOOTSIZE}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+
+## Used for "upload" through bootloader
+tools.avrdude.upload.params.verbose=-v
+tools.avrdude.upload.params.quiet=-q -q
+tools.avrdude.upload.params.noverify=-V
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} {upload.verify} -p{build.mcu} -c{upload.protocol} {upload.extra_params} -P{serial.port} -b{upload.speed} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+
+## Used for Tools -> Burn Bootloader
+tools.avrdude.bootloader.params.verbose=-v
+tools.avrdude.bootloader.params.quiet=-q -q
+tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -e "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.CODESIZE}:m" "-Ufuse8:w:{bootloader.BOOTSIZE}:m" "{bootloader.avrdudestring}"
+
+## This functionality has never been tested with these parts. The maintainers of this core have no idea what this is, or whether it is expected to work.
+tools.avrdude_remote.upload.pattern=/usr/bin/run-avrdude /tmp/sketch.hex {upload.verbose} -p{build.mcu}
+tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -d -v
+
+##############################################################
+# Serial UPDI - UPDI uploads using a serial adapter directly #
+##############################################################
+# Board manager installations have the python executable in  #
+# different location than a manual installation. The package #
+# build script deletes the line starting with                #
+# tools.serialupdi.cmd                                       #
+# and the #REMOVE#, leaving the correct path.                #
+##############################################################
+
+tools.serialupdi.cmd={runtime.platform.path}/tools/python3/python3
+#REMOVE#tools.serialupdi.cmd={runtime.tools.python3.path}/python3
+
+# Unused Parameters.
+# SerialUPDI has only one level of verbosity.
+# There's an *actual* internal verbose mode, but it is WAY too verbose and results >500kb log files which are mostly useless.
+# SerialUPDI must verify, because errors are not checked for along the way
+# Upload is only for uploading through a bootloader, and erase is not used anywhere.
+tools.serialupdi.bootloader.params.noverify=
+tools.serialupdi.bootloader.params.quiet=
+tools.serialupdi.bootloader.params.verbose=-v
+tools.serialupdi.bootloader.verify=
+tools.serialupdi.erase.params.quiet=
+tools.serialupdi.erase.params.verbose=-v
+tools.serialupdi.erase.pattern=
+tools.serialupdi.program.params.noverify=
+tools.serialupdi.program.params.quiet=
+tools.serialupdi.program.params.verbose=-v
+tools.serialupdi.program.verify=
+tools.serialupdi.upload.params.noverify=
+tools.serialupdi.upload.params.quiet=
+tools.serialupdi.upload.params.verbose=-v
+tools.serialupdi.upload.verify=
+tools.serialupdi.upload.pattern=echo "This can't happen, but has to be here or automated tests fail"
+
+## Tools -> Burn Bootloader pattern
+# write fuses 0, 1, 2, 5, 6, 7, 8.
+# 2 is always written 0 (sets clock to use HF osc, not 32kHz ULP).
+# Fuses 3 and 4 are reserved.
+tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:0x00 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.CODESIZE} 8:{bootloader.BOOTSIZE} {bootloader.pymcuprogstring} {bootloader.verbose}
+
+## Program pattern (all uploads through SerialUPDI)
+# Upload/Program will set fuses 5-8. Fuse 0 is not written because the core never configures that, and if a user went and set that themselvesm we shouldn't undo it.
+# Fuse 1 is the BOD configuration , which could "brick" the chip if set for a higher voltage than the power rail.
+# That leaves the two SYSCFG fuses which are safe (SYSCFG0 will not be safe on DD, though!), and the boot and codesize fuses.
+tools.serialupdi.program.pattern={upload.prog_interlock}"{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.CODESIZE} 8:{bootloader.BOOTSIZE} "-f{build.path}/{build.project_name}.hex" -a write {program.verbose}

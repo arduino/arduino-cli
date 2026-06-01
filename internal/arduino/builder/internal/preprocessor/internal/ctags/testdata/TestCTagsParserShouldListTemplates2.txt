@@ -1,0 +1,4 @@
+setup	/tmp/sketch463160524247569568.cpp	/^void setup() {$/;"	kind:function	line:1	signature:()	returntype:void
+loop	/tmp/sketch463160524247569568.cpp	/^void loop() {$/;"	kind:function	line:6	signature:()	returntype:void
+SRAM_writeAnything	/tmp/sketch463160524247569568.cpp	/^template <class T> int SRAM_writeAnything(int ee, const T& value)$/;"	kind:function	line:11	signature:(int ee, const T& value)	returntype:template int
+SRAM_readAnything	/tmp/sketch463160524247569568.cpp	/^template <class T> int SRAM_readAnything(int ee, T& value)$/;"	kind:function	line:21	signature:(int ee, T& value)	returntype:template int

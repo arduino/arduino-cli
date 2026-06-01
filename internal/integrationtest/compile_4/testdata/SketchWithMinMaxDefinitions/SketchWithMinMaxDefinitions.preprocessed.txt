@@ -1,0 +1,26 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+// See: https://github.com/arduino/arduino-builder/issues/68
+
+// The following avoid duplicate definitions of min and max
+#undef min
+#undef max
+
+#include <memory>
+
+#line 9 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 13 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 15 {{QuoteCppString .sketchMainFile}}
+void test();
+#line 9 {{QuoteCppString .sketchMainFile}}
+void setup() {
+  test();
+}
+
+void loop() {}
+
+void test() {}
+
+

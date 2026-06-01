@@ -1,0 +1,41 @@
+name: i18n-nightly-push
+
+on:
+  schedule:
+    # run every day at 1AM
+    - cron: "0 1 * * *"
+
+jobs:
+  push-to-transifex:
+    # This workflow is only of value to the arduino/arduino-cli repository and
+    # would always fail in forks
+    if: github.repository == 'arduino/arduino-cli'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Install Taskfile
+        uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Run task i18n:update
+        run: task i18n:update
+
+      - name: Run task i18n:push
+        run: task i18n:push
+        env:
+          TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
+          TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
+          TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
+          TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}

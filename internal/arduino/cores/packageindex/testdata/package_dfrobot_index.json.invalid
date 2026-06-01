@@ -1,0 +1,146 @@
+﻿{
+  "packages": [
+    {
+      "name": "nucDuino",
+      "maintainer": "DFRobot",
+      "websiteURL": "http://www.dfrobot.com/",
+      "email": "ouki.wang@dfrobot.com",
+      "help": {
+        "online": "http://www.dfrobot.com/"
+      },
+
+      "platforms": [
+        {
+          "name": "Bluno M0 MainBoard & DFRduino M0 MainBoard",
+          "architecture": "nucDuino",
+          "version": "1.0.3",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.dfrobot.com/"
+          },
+          "url": "https://github.com/DFRobot/DFRobotDuinoBoard/raw/master/nucDuino-1.0.3.zip",
+          "archiveFileName": "nucDuino-1.0.3.zip",
+          "checksum": "SHA-256:dbe73e21180edef80a7659608a2449642fc7414d80bb1fda847b2372b2ea6c64",	  
+          "size": "5119069",
+          "boards": [
+            {"name": "Bluno M0 MainBoard"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "nucDuino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            }
+          ]
+        },
+        {
+          "name": "Bluno M0 MainBoard & DFRduino M0 MainBoard",
+          "architecture": "nucDuino",
+          "version": "1.0.2",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.dfrobot.com/"
+          },
+          "url": "https://github.com/DFRobot/DFRobotDuinoBoard/raw/master/nucDuino-1.0.2.zip",
+          "archiveFileName": "nucDuino-1.0.2.zip",
+          "checksum": "SHA-256:e2b59Fe3eaefff40ad897115f1f877abf995f6637a4029dada9315f96a89f615",	  
+          "size": "4311402",
+          "boards": [
+            {"name": "Bluno M0 MainBoard"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "nucDuino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            }
+          ]
+        },
+	    {
+          "name": "Bluno M0 MainBoard & DFRduino M0 MainBoard",
+          "architecture": "nucDuino",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.dfrobot.com/"
+          },
+          "url": "https://github.com/DFRobot/DFRobotDuinoBoard/raw/master/nucDuino-1.0.1.zip",
+          "archiveFileName": "nucDuino-1.0.1.zip",
+          "checksum": "SHA-256:32651ed99ffffd356deb730e4fdbc5f8924848e2bbC4cb7d3190d26ebeb86a95",					   
+          "size": "4946849", 
+          "boards": [
+            {"name": "Bluno M0 MainBoard"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "nucDuino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            }
+          ]
+        },
+		
+        {
+          "name": "Bluno M0 MainBoard & DFRduino M0 MainBoard",
+          "architecture": "nucDuino",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.dfrobot.com/"
+          },
+          "url": "https://github.com/DFRobot/DFRobotDuinoBoard/raw/master/nucDuino-1.0.0.tar.gz",
+          "archiveFileName": "nucDuino-1.0.0.tar.gz",
+          "checksum": "SHA-256:6971a6d7f25115b7bcaf2514f52036b39f380f1604c0d095b3e55fe79a3f3e3f",
+          "size": "3853874",
+          "boards": [
+            {"name": "Bluno M0 MainBoard"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "nucDuino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            }
+          ]
+        }
+      ],
+
+      "tools": [
+        {
+           "name":"arm-none-eabi-gcc",
+           "version":"4.8.3-2014q1",
+           "systems":[
+              {
+                 "host":"i686-mingw32",
+                 "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+                 "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+                 "checksum":"SHA-256:fd8c111c861144f932728e00abd3f7d1107e186eb9cd6083a54c7236ea78b7c2",
+                 "size":"84537449"
+              },
+              {
+                 "host":"x86_64-apple-darwin",
+                 "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+                 "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+                 "checksum":"SHA-256:3598acf21600f17a8e4a4e8e193dc422b894dc09384759b270b2ece5facb59c2",
+                 "size":"52518522"
+              },
+              {
+                 "host":"x86_64-pc-linux-gnu",
+                 "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+                 "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+                 "checksum":"SHA-256:d23f6626148396d6ec42a5b4d928955a703e0757829195fa71a939e5b86eecf6",
+                 "size":"51395093"
+              },
+              {
+                 "host":"i686-pc-linux-gnu",
+                 "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+                 "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+                 "checksum":"SHA-256:ba1994235f69c526c564f65343f22ddbc9822b2ea8c5ee07dd79d89f6ace2498",
+                 "size":"51029223"
+              }
+           ]
+        }
+      ]
+    }
+  ]
+}

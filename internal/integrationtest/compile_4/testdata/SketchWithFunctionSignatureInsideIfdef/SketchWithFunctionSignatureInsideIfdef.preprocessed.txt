@@ -1,0 +1,30 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 3 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 15 {{QuoteCppString .sketchMainFile}}
+int8_t adalight();
+#line 1 {{QuoteCppString .sketchMainFile}}
+void setup() {}
+
+void loop() {
+  // Visualize leds via Adalight
+  int8_t newData = adalight();
+
+}
+
+
+//#define ADALIGHT_USE_TEMPLATE
+
+#ifdef ADALIGHT_USE_TEMPLATE
+int16_t adalight()
+#else
+int8_t adalight()
+#endif
+{
+  // Flag if the leds got a new frame that should be updated
+  return 0;
+}
+

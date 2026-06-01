@@ -1,0 +1,220 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/test-go-task.md
+name: Test Go
+
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
+on:
+  create:
+  push:
+    paths:
+      - ".github/workflows/test-go-task.ya?ml"
+      - ".github/.?codecov.ya?ml"
+      - "dev/.?codecov.ya?ml"
+      - ".?codecov.ya?ml"
+      - "**/go.mod"
+      - "**/go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+      - "**/testdata/**"
+  pull_request:
+    paths:
+      - ".github/workflows/test-go-task.ya?ml"
+      - ".github/.?codecov.ya?ml"
+      - "dev/.?codecov.ya?ml"
+      - ".?codecov.ya?ml"
+      - "**/go.mod"
+      - "**/go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+      - "**/testdata/**"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 11 * * WED"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    permissions: {}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  tests-collector:
+    runs-on: ubuntu-latest
+    needs: run-determination
+    permissions:
+      contents: read
+    if: needs.run-determination.outputs.result == 'true'
+    outputs:
+      tests-data: ${{ steps.collection.outputs.tests-data }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Collect tests
+        id: collection
+        # jq flags must be "-cRn" see: https://stackoverflow.com/a/68859958/1655275
+        run: |
+          echo "tests-data=$(go list ./internal/integrationtest/... | grep integrationtest/ | tr "/" " " | cut -d " " -f 6 | jq -cRn '[inputs]')" >> $GITHUB_OUTPUT
+
+  test-integration:
+    needs: tests-collector
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+
+      matrix:
+        operating-system:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+        tests: ${{ fromJSON(needs.tests-collector.outputs.tests-data) }}
+
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      # By default, actions/checkout converts the repo's LF line endings to CRLF on the Windows runner.
+      - name: Disable EOL conversions
+        run: git config --global core.autocrlf false
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        shell: bash
+        run: |
+          export GO_TEST_PACKAGE="github.com/arduino/arduino-cli/internal/integrationtest/${{ matrix.tests }}"
+          go tool \
+            github.com/go-task/task/v3/cmd/task go:integration-test
+          mv coverage_integration.txt coverage_integration_${{ matrix.operating-system }}_${{ matrix.tests }}.txt
+
+      - name: Upload coverage data to workflow artifact
+        uses: actions/upload-artifact@v6
+        with:
+          if-no-files-found: error
+          name: coverage-data-test-integration-${{ matrix.operating-system }}-${{ matrix.tests }}
+          path: |
+            ./coverage_integration_*.txt
+
+  test:
+    needs: run-determination
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      # By default, actions/checkout converts the repo's LF line endings to CRLF on the Windows runner.
+      - name: Disable EOL conversions
+        run: git config --global core.autocrlf false
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        shell: bash
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task go:test
+
+      - name: Upload coverage data to workflow artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v6
+        with:
+          if-no-files-found: error
+          name: coverage-data-test-${{ matrix.operating-system }}
+          path: |
+            ./coverage_unit.txt
+
+  coverage-upload:
+    runs-on: ubuntu-latest
+    needs:
+      - test
+      - test-integration
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Install gocovmerge
+        run: go install github.com/wadey/gocovmerge@b5bfa59
+
+      - name: Download coverage data artifact
+        uses: actions/download-artifact@v7
+        with:
+          pattern: coverage-data-*
+          merge-multiple: true
+
+      - name: Merge all code coverage artifacts
+        run: gocovmerge coverage*.txt > coverage.txt
+
+      # A token is used to avoid intermittent spurious job failures caused by rate limiting.
+      - name: Set up Codecov upload token
+        run: |
+          if [[ "${{ github.repository }}" == "arduino/arduino-cli" ]]; then
+            # In order to avoid uploads of data from forks, only use the token for runs in the arduino/arduino-ide repo.
+            # Token is intentionally exposed.
+            # See: https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
+            CODECOV_TOKEN="18b9885b-cbf2-4166-bfbb-39617323daf0"
+          else
+            # codecov/codecov-action does unauthenticated upload if empty string is passed via the `token` input.
+            CODECOV_TOKEN=""
+          fi
+          echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> "$GITHUB_ENV"
+
+      # There is a bug in the codecov uploader that makes it fail when there are broken symlinks in the repository.
+      # We must keep this workaround until the bug is fixed: https://github.com/codecov/codecov-action/issues/1890
+      - name: Workaround for codecov uploader bug
+        run: |
+          rm internal/integrationtest/compile_4/testdata/ValidSketchWithNonInoBrokenSketchFileSymlink/other_file.c
+          touch internal/integrationtest/compile_4/testdata/ValidSketchWithNonInoBrokenSketchFileSymlink/other_file.c
+
+      - name: Send unit tests coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ env.CODECOV_TOKEN }}
+          files: ./coverage.txt
+          flags: unit
+          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}

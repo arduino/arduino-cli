@@ -1,0 +1,209 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2024 ARDUINO SA (https://www.arduino.cc/)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+message UploadRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+  // If this field is not defined, the FQBN of the board attached to the sketch
+  // via the `BoardAttach` method is used.
+  string fqbn = 2;
+  // Path where the sketch to be uploaded is stored. Unless the `import_file`
+  // field is defined, the compiled binary is assumed to be at the location and
+  // filename under this path where it is saved by the `Compile` method.
+  string sketch_path = 3;
+  // The port of the board.
+  Port port = 4;
+  // Whether to turn on verbose output during the upload.
+  bool verbose = 5;
+  // After upload, verify that the contents of the memory on the board match the
+  // uploaded binary.
+  bool verify = 6;
+  // When `import_file` is specified, it overrides the `import_dir` and
+  // `sketch_path` params.
+  string import_file = 7;
+  // Custom path to a directory containing compiled files. When `import_dir` is
+  // not specified, the standard build directory under `sketch_path` is used.
+  string import_dir = 8;
+  // The programmer to use for upload. If set an UploadUsingProgrammer is
+  // triggered instead of a normal upload. The UploadUsingProgrammer call may
+  // also be used for explicit error check.
+  string programmer = 9;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 10;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 11;
+  // List of custom upload properties.
+  repeated string upload_properties = 12;
+}
+
+message UploadResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+    // The upload result.
+    UploadResult result = 3;
+  }
+}
+
+message UploadResult {
+  // When a board requires a port disconnection to perform the upload, this
+  // field returns the port where the board reconnects after the upload.
+  Port updated_upload_port = 1;
+}
+
+message ProgrammerIsRequiredForUploadError {}
+
+message UploadUsingProgrammerRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+  // If this field is not defined, the FQBN of the board attached to the sketch
+  // via the `BoardAttach` method is used.
+  string fqbn = 2;
+  // Path where the sketch to be uploaded is stored. Unless the `import_file`
+  // field is defined, the compiled binary is assumed to be at the location and
+  // filename under this path where it is saved by the `Compile` method.
+  string sketch_path = 3;
+  // The port of the board.
+  Port port = 4;
+  // Whether to turn on verbose output during the upload.
+  bool verbose = 5;
+  // After upload, verify that the contents of the memory on the board match the
+  // uploaded binary.
+  bool verify = 6;
+  // When `import_file` is specified, it overrides the `import_dir` and
+  // `sketch_path` params.
+  string import_file = 7;
+  // Custom path to a directory containing compiled files. When `import_dir` is
+  // not specified, the standard build directory under `sketch_path` is used.
+  string import_dir = 8;
+  // The programmer to use for upload.
+  string programmer = 9;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 10;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 11;
+  // List of custom upload properties.
+  repeated string upload_properties = 12;
+}
+
+message UploadUsingProgrammerResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+  }
+}
+
+message BurnBootloaderRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+  string fqbn = 2;
+  // The port of the programmer used to program the bootloader.
+  Port port = 3;
+  // Whether to turn on verbose output during the programming.
+  bool verbose = 4;
+  // After programming, verify the contents of the memory on the board match the
+  // uploaded binary.
+  bool verify = 5;
+  // The programmer to use for burning bootloader.
+  string programmer = 6;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 7;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 11;
+  // List of custom upload properties.
+  repeated string upload_properties = 12;
+}
+
+message BurnBootloaderResponse {
+  oneof message {
+    // The output of the burn bootloader process.
+    bytes out_stream = 1;
+    // The error output of the burn bootloader process.
+    bytes err_stream = 2;
+  }
+}
+
+message ListProgrammersAvailableForUploadRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+  string fqbn = 2;
+}
+
+message ListProgrammersAvailableForUploadResponse {
+  // List of programmers supported by the board.
+  repeated Programmer programmers = 1;
+}
+
+message SupportedUserFieldsRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+  string fqbn = 2;
+  // Protocol that will be used to upload, this information is
+  // necessary to pick the right upload tool for the board specified
+  // with the FQBN.
+  string protocol = 3;
+}
+
+message UserField {
+  // Id of the tool that supports this field.
+  string tool_id = 1;
+  // Name used internally to store and retrieve this field.
+  string name = 2;
+  // Label is the text shown to the user when they need to input this field.
+  string label = 3;
+  // True if the value of the field must not be shown when typing, for example
+  // when the user inputs a network password.
+  bool secret = 4;
+}
+
+message SupportedUserFieldsResponse {
+  // User fields supported by board specified in SupportedUserFieldsRequest.
+  // If board doesn't support any field it will be empty.
+  repeated UserField user_fields = 1;
+}

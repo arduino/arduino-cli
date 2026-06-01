@@ -1,0 +1,35 @@
+name: Check Internationalization
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    branches:
+      # Release branches have names like 0.8.x, 0.9.x, ...
+      - "[0-9]+.[0-9]+.x"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Check i18n source and translation files are up to date
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task i18n:check
+        env:
+          TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
+          TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
+          TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
+          TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}

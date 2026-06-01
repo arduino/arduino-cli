@@ -1,0 +1,283 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-prettier-formatting-task.md
+name: Check Prettier Formatting
+
+# See: https://docs.github.com/actions/reference/workflows-and-actions/events-that-trigger-workflows
+on:
+  create:
+  push:
+    paths:
+      - ".github/workflows/check-prettier-formatting-task.ya?ml"
+      - ".npmrc"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**/.prettierignore"
+      - "**/.prettierrc*"
+      # Prettier-covered file patterns are defined by:
+      # https://github.com/github-linguist/linguist/blob/main/lib/linguist/languages.yml
+      #
+      # CSS
+      - "**.css"
+      - "**.wxss"
+      # PostCSS
+      - "**.pcss"
+      - "**.postcss"
+      # Less
+      - "**.less"
+      # SCSS
+      - "**.scss"
+      # GraphQL
+      - "**.graphqls?"
+      - "**.gql"
+      # handlebars
+      - "**.handlebars"
+      - "**.hbs"
+      # HTML
+      - "**.mjml"
+      - "**.html?"
+      - "**.html.hl"
+      - "**.st"
+      - "**.xht"
+      - "**.xhtml"
+      # Vue
+      - "**.vue"
+      # JavaScript
+      - "**.flow"
+      - "**._?jsb?"
+      - "**.bones"
+      - "**.cjs"
+      - "**.es6?"
+      - "**.frag"
+      - "**.gs"
+      - "**.jake"
+      - "**.jscad"
+      - "**.jsfl"
+      - "**.js[ms]"
+      - "**.[mn]js"
+      - "**.pac"
+      - "**.wxs"
+      - "**.[xs]s?js"
+      - "**.xsjslib"
+      # JSX
+      - "**.jsx"
+      # TypeScript
+      - "**.ts"
+      # TSX
+      - "**.tsx"
+      # JSON
+      - "**/.eslintrc"
+      - "**.json"
+      - "**.avsc"
+      - "**.geojson"
+      - "**.gltf"
+      - "**.har"
+      - "**.ice"
+      - "**.JSON-tmLanguage"
+      - "**.mcmeta"
+      - "**.tfstate"
+      - "**.topojson"
+      - "**.webapp"
+      - "**.webmanifest"
+      - "**.yyp?"
+      # JSONC
+      - "**/.babelrc"
+      - "**/.jscsrc"
+      - "**/.js[hl]intrc"
+      - "**.jsonc"
+      - "**.sublime-*"
+      # JSON5
+      - "**.json5"
+      # Markdown
+      - "**.mdx?"
+      - "**.markdown"
+      - "**.mk?down"
+      - "**.mdwn"
+      - "**.mkdn?"
+      - "**.ronn"
+      - "**.workbook"
+      # TOML
+      - "**/Cargo.lock"
+      - "**/Cargo.toml.orig"
+      - "**/Gopkg.lock"
+      - "**/Pipfile"
+      - "**/pdm.lock"
+      - "**.toml"
+      # YAML
+      - "**/.clang-format"
+      - "**/.clang-tidy"
+      - "**/.gemrc"
+      - "**/glide.lock"
+      - "**.ya?ml*"
+      - "**.mir"
+      - "**.reek"
+      - "**.rviz"
+      - "**.sublime-syntax"
+      - "**.syntax"
+  pull_request:
+    paths:
+      - ".github/workflows/check-prettier-formatting-task.ya?ml"
+      - ".npmrc"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**/.prettierignore"
+      - "**/.prettierrc*"
+      # CSS
+      - "**.css"
+      - "**.wxss"
+      # PostCSS
+      - "**.pcss"
+      - "**.postcss"
+      # Less
+      - "**.less"
+      # SCSS
+      - "**.scss"
+      # GraphQL
+      - "**.graphqls?"
+      - "**.gql"
+      # handlebars
+      - "**.handlebars"
+      - "**.hbs"
+      # HTML
+      - "**.mjml"
+      - "**.html?"
+      - "**.html.hl"
+      - "**.st"
+      - "**.xht"
+      - "**.xhtml"
+      # Vue
+      - "**.vue"
+      # JavaScript
+      - "**.flow"
+      - "**._?jsb?"
+      - "**.bones"
+      - "**.cjs"
+      - "**.es6?"
+      - "**.frag"
+      - "**.gs"
+      - "**.jake"
+      - "**.jscad"
+      - "**.jsfl"
+      - "**.js[ms]"
+      - "**.[mn]js"
+      - "**.pac"
+      - "**.wxs"
+      - "**.[xs]s?js"
+      - "**.xsjslib"
+      # JSX
+      - "**.jsx"
+      # TypeScript
+      - "**.ts"
+      # TSX
+      - "**.tsx"
+      # JSON
+      - "**/.eslintrc"
+      - "**.json"
+      - "**.avsc"
+      - "**.geojson"
+      - "**.gltf"
+      - "**.har"
+      - "**.ice"
+      - "**.JSON-tmLanguage"
+      - "**.mcmeta"
+      - "**.tfstate"
+      - "**.topojson"
+      - "**.webapp"
+      - "**.webmanifest"
+      - "**.yyp?"
+      # JSONC
+      - "**/.babelrc"
+      - "**/.jscsrc"
+      - "**/.js[hl]intrc"
+      - "**.jsonc"
+      - "**.sublime-*"
+      # JSON5
+      - "**.json5"
+      # Markdown
+      - "**.mdx?"
+      - "**.markdown"
+      - "**.mk?down"
+      - "**.mdwn"
+      - "**.mkdn?"
+      - "**.ronn"
+      - "**.workbook"
+      # TOML
+      - "**/Cargo.lock"
+      - "**/Cargo.toml.orig"
+      - "**/Gopkg.lock"
+      - "**/Pipfile"
+      - "**/pdm.lock"
+      - "**.toml"
+      # YAML
+      - "**/.clang-format"
+      - "**/.clang-tidy"
+      - "**/.gemrc"
+      - "**/glide.lock"
+      - "**.ya?ml*"
+      - "**.mir"
+      - "**.reek"
+      - "**.rviz"
+      - "**.sublime-syntax"
+      - "**.syntax"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 4 * * WED"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "result=$RESULT" >>$GITHUB_OUTPUT
+
+  check:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+
+      - name: Format with Prettier
+        run: |
+          go tool \
+            github.com/go-task/task/v3/cmd/task general:format-prettier
+
+      - name: Check formatting
+        run: |
+          git diff \
+            --color \
+            --exit-code

@@ -1,0 +1,9 @@
+profiles:
+  tiny:
+    notes: Invalid profile mixing versioned and non-versioned platforms.
+    fqbn: attiny:avr:ATtinyX5:cpu=attiny85,clock=internal16
+    platforms:
+      - platform: attiny:avr
+        platform_index_url: http://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json
+      - platform: arduino:avr (1.8.3)
+

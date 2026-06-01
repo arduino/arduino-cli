@@ -1,0 +1,5 @@
+Package: arduino-cli
+Version: $VERSION
+Architecture: $ARCH
+Maintainer: arduino <support@arduino.cc>
+Description: Arduino CLI

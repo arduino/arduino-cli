@@ -1,0 +1,16 @@
+# Source:
+# https://github.com/arduino/tooling-project-assets/blob/main/issue-templates/template-choosers/general/config.yml
+# See:
+# https://docs.github.com/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
+
+blank_issues_enabled: false
+contact_links:
+  - name: Learn about using this project
+    url: https://arduino.github.io/arduino-cli/dev/
+    about: Detailed usage documentation is available here.
+  - name: Support request
+    url: https://forum.arduino.cc/c/software/arduino-cli/89
+    about: We can help you out on the Arduino Forum!
+  - name: Discuss development work on the project
+    url: https://groups.google.com/a/arduino.cc/g/developers
+    about: Arduino Developers Mailing List

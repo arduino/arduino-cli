@@ -1,0 +1,179 @@
+version: "2"
+run:
+  tests: true
+
+linters:
+  # Disable all linters.
+  default: none
+  # Enable specific linter
+  enable:
+    # Nice to have
+    #- depguard
+    #- errcheck
+    #- gocritic
+    #- thelper
+    - copyloopvar
+    - dupword
+    - errorlint
+    - forbidigo
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - revive
+    - staticcheck
+    - unconvert
+    # We must disable this one because there is no support 'optional' protobuf fields yet: https://github.com/arduino/arduino-cli/pull/2570
+    #- protogetter
+
+  settings:
+    errorlint:
+      errorf: false
+      asserts: false
+      comparison: true
+    forbidigo:
+      forbid:
+        - pattern: ^(fmt\.Print(|f|ln)|print|println)$
+          msg: in cli package use `feedback.*` instead
+        - pattern: (os\.(Stdout|Stderr|Stdin))(# )?
+          msg: in cli package use `feedback.*` instead
+      analyze-types: true
+    govet:
+      enable:
+        - appends
+        - asmdecl
+        - assign
+        - atomic
+        - atomicalign
+        - bools
+        - buildtag
+        - cgocall
+        - composites
+        - copylocks
+        - deepequalerrors
+        - defers
+        - directive
+        - errorsas
+        - findcall
+        - framepointer
+        - httpresponse
+        - ifaceassert
+        - loopclosure
+        - lostcancel
+        - nilfunc
+        - nilness
+        - printf
+        - reflectvaluecompare
+        - shift
+        - sigchanyzer
+        - slog
+        - sortslice
+        - stdmethods
+        - stringintconv
+        - structtag
+        - testinggoroutine
+        - tests
+        - unmarshal
+        - unreachable
+        - unsafeptr
+        - unusedresult
+        - unusedwrite
+    revive:
+      confidence: 0.8
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: empty-block
+        - name: error-naming
+        - name: error-strings
+        - name: errorf
+        - name: exported
+        - name: increment-decrement
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: superfluous-else
+        - name: time-naming
+        - name: unreachable-code
+        - name: var-declaration
+        - name: defer
+        - name: atomic
+        - name: waitgroup-by-value
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+          - gosec
+        path: _test\.go
+      - linters:
+          - gosec
+        text: G401
+      - linters:
+          - gosec
+        text: G501
+      - linters:
+          - gosec
+        path: internal/integrationtest/
+        text: G112
+      - linters:
+          - gosec
+        path: executils/process.go
+        text: G204
+      - linters:
+          - staticcheck
+        path: commands/lib/search.go
+        text: SA1019
+      - linters:
+          - revive
+        path: arduino/libraries/loader.go
+        text: empty-block
+      - linters:
+          - revive
+        path: arduino/serialutils/serialutils.go
+        text: empty-block
+      - linters:
+          - revive
+        path: arduino/resources/download.go
+        text: empty-block
+      - linters:
+          - revive
+        path: arduino/builder/internal/progress/progress_test.go
+        text: empty-block
+      - linters:
+          - revive
+        path: internal/algorithms/channels.go
+        text: empty-block
+      - linters:
+          - forbidigo
+        path-except: internal/cli/
+      - linters:
+          - forbidigo
+        path: internal/cli/.*_test.go
+      - linters:
+          - forbidigo
+        path: internal/cli/feedback/
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  fix: false
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
