@@ -310,11 +310,11 @@ func (l *SketchLibrariesDetector) findIncludes(
 	// The preRunner may start GCC tasks that write libsdetect.d as a side effect; if we
 	// checked after the preRunner, a fast GCC run could update libsdetect.d's timestamp
 	// and make the sketch appear unchanged even after a modification (issue #3202).
-	mergedSketchForCheck, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
+	mergedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
 	if err != nil {
 		return err
 	}
-	l.sketchIsUnchanged, _ = mergedSketchForCheck.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
+	l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
 
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
@@ -350,11 +350,6 @@ func (l *SketchLibrariesDetector) findIncludes(
 	sourceFileQueue := &uniqueSourceFileQueue{}
 
 	if !l.useCachedLibrariesResolution {
-		mergedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
-		if err != nil {
-			return err
-		}
-
 		// Queue all sources from sketch folder, except the preprocessed sketch "sketch.ino.cpp".
 		// The library discovery is performed on the `sketch.ino.cpp.merged` file.
 		// The `sketch.ino.cpp` file is generated in a later stage from `sketch.ino.cpp.merged` by the
