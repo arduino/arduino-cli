@@ -225,9 +225,9 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 	return l.detectedChangeInLibraries
 }
 
-// IsSketchUnchanged returns true if the sketch source and all included library
+// IsSketchDepsUnchanged returns true if the sketch or any of its dependencies is up-to-date
 // headers are unchanged since the last preprocessing run.
-func (l *SketchLibrariesDetector) IsSketchUnchanged() bool {
+func (l *SketchLibrariesDetector) IsSketchDepsUnchanged() bool {
 	return l.sketchIsUnchanged
 }
 

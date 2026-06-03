@@ -29,7 +29,7 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 
 	// Skip preprocessing if the sketch and all included library headers are unchanged since
 	// the last preprocessing run.
-	if b.libsDetector.IsSketchUnchanged() && preprocessedSourceFile.Exist() {
+	if b.libsDetector.IsSketchDepsUnchanged() && preprocessedSourceFile.Exist() {
 		b.logIfVerbose(false, i18n.Tr("Using cached sketch with function prototypes."))
 		return nil
 	}
