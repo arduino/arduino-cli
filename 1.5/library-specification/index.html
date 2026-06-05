@@ -2067,10 +2067,18 @@ was compiled for. Ex: <code>cortex-m3</code> for the Arduino Due.</p>
 <p><strong>(available from Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0)</strong> The floating point ABI configuration of
 ARM core microcontrollers may be adjusted via compiler flags. An extra subfolder level can be used to provide files
 compiled for a specific floating point configuration: <code>src/{build.mcu}/{build.fpu}-{build.float-abi}</code>, where
-<code>{build.fpu}</code> is the value of the <code>-mfpu</code> compiler flag and <code>{build.float-abi}</code> is the value of the <code>-mfloat-abi</code>
-compiler flag. <strong>(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)</strong> If floating point
-configuration flags are used but no folder matching that configuration is found, <code>src/{build.mcu}</code> is used as a
-fallback.</p>
+<code>{build.fpu}</code> is the FPU type and <code>{build.float-abi}</code> is the floating-point ABI (e.g., <code>fpv4-sp-d16-softfp</code>).</p>
+<p>These values are determined as follows:</p>
+<ol>
+<li><strong>(available from Arduino CLI 1.6.0)</strong> If the platform defines both <code>build.fpu</code> and <code>build.float-abi</code> build
+   properties (in <code>boards.txt</code> or <code>platform.txt</code>), Arduino CLI uses those property values directly to construct the
+   subfolder path.</li>
+<li>If either property is absent, Arduino CLI falls back to detecting the values by inspecting the fully expanded
+   <code>recipe.cpp.o.pattern</code> compiler command for <code>-mfpu=</code> and <code>-mfloat-abi=</code> flags. This ensures compatibility with
+   existing platforms that embed these settings inside the recipe rather than exposing them as standalone properties.</li>
+</ol>
+<p><strong>(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)</strong> If floating point configuration flags
+are used but no folder matching that configuration is found, <code>src/{build.mcu}</code> is used as a fallback.</p>
 <p>Below is an example library <code>src</code> folder structure that provides:</p>
 <ul>
 <li>Header file containing the declarations for the library API.</li>
