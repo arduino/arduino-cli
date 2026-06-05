@@ -282,7 +282,7 @@ jobs:
           "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_CER}} -csp "eToken Base Cryptographic Provider" -k "[{{${{ env.CERT_PASSWORD }}}}]=${{ env.CONTAINER_NAME }}" -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         env:
           MSI_FILE: ${{ steps.buildmsi.outputs.msi }}
         with:
