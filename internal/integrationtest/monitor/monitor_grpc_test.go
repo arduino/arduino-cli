@@ -115,3 +115,88 @@ func TestMonitorGRPCClose(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestMonitorGRPCAppliedSettings(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/2965
+
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	cli.InstallMockedSerialDiscovery(t)
+	cli.InstallMockedSerialMonitor(t)
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	boardListResp, err := grpcInst.BoardList(time.Second)
+	require.NoError(t, err)
+	ports := boardListResp.GetPorts()
+	require.NotEmpty(t, ports)
+
+	// recvUntilAppliedSettings reads from the monitor stream, skipping rxData and other
+	// messages, until an applied_settings response is received or the test times out.
+	recvUntilAppliedSettings := func(mon commands.ArduinoCoreService_MonitorClient) *commands.MonitorPortConfiguration {
+		t.Helper()
+		for {
+			monResp, err := mon.Recv()
+			require.NoError(t, err)
+			fmt.Printf("MON> %v\n", monResp)
+			if as := monResp.GetAppliedSettings(); as != nil {
+				return as
+			}
+		}
+	}
+
+	// Open the monitor with a non-default baudrate (115200 vs the default 9600).
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	mon, err := grpcInst.MonitorWithConfig(ctx, ports[0].GetPort(), &commands.MonitorPortConfiguration{
+		Settings: []*commands.MonitorPortSetting{
+			{SettingId: "baudrate", Value: "115200"},
+		},
+	})
+	require.NoError(t, err)
+
+	// The server must emit applied_settings right after opening the port.
+	openApplied := recvUntilAppliedSettings(mon)
+	openSettings := map[string]string{}
+	for _, s := range openApplied.GetSettings() {
+		openSettings[s.GetSettingId()] = s.GetValue()
+	}
+	require.Equal(t, "115200", openSettings["baudrate"], "applied_settings after open must reflect the configured baudrate")
+
+	// Send an updated configuration to change the baudrate back to 9600.
+	err = mon.Send(&commands.MonitorRequest{
+		Message: &commands.MonitorRequest_UpdatedConfiguration{
+			UpdatedConfiguration: &commands.MonitorPortConfiguration{
+				Settings: []*commands.MonitorPortSetting{
+					{SettingId: "baudrate", Value: "9600"},
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// The server must emit applied_settings after the configuration update.
+	updateApplied := recvUntilAppliedSettings(mon)
+	updateSettings := map[string]string{}
+	for _, s := range updateApplied.GetSettings() {
+		updateSettings[s.GetSettingId()] = s.GetValue()
+	}
+	require.Equal(t, "9600", updateSettings["baudrate"], "applied_settings after update must reflect the new baudrate")
+
+	// Close the monitor to allow cleanup of the env (otherwise on Windows the
+	// tmp monitor.exe cannot be deleted because it's still open).
+	cancel()
+	_, err = mon.Recv()
+	require.EqualError(t, err, "rpc error: code = Canceled desc = context canceled")
+	// the mocked serial-monitor is designed to delay 2 seconds before closing,
+	// let's wait a bit to ensure the monitor process has exited before the test ends and the env is cleaned up.
+	time.Sleep(3 * time.Second)
+}
