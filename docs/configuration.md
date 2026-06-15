@@ -53,6 +53,11 @@
   - `cloud_api.skip_board_detection_calls` - if set to `true` it will make the Arduino CLI skip network calls to Arduino
     Cloud API to help detection of an unknown board.
 
+> **ⓘ** When the `GITHUB_TOKEN` environment variable is set, Arduino CLI automatically adds it as an
+> `Authorization: Bearer` header on requests to the GitHub Actions artifact download API:
+> `api.github.com/repos/{owner}/{repo}/actions/artifacts/{id}/{format}`. This allows downloading private workflow
+> artifacts. The token is **never** sent to any other URL, even when a redirect is followed.
+
 ### Default directories
 
 The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
@@ -115,6 +120,10 @@ On Linux or macOS, you can use the [`export` command][export command] to set env
 can use the [`set` command][set command].
 
 `ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variables can be a list of space-separated URLs.
+
+The `GITHUB_TOKEN` environment variable is also recognised: when set, its value is sent as an `Authorization: Bearer`
+header on GitHub Actions artifact download requests only (see the note in the [Configuration keys](#configuration-keys)
+section above).
 
 #### Example
 
