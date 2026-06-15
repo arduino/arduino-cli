@@ -1670,6 +1670,12 @@
 </ul>
 </li>
 </ul>
+<blockquote>
+<p><strong>ⓘ</strong> When the <code>GITHUB_TOKEN</code> environment variable is set, Arduino CLI automatically adds it as an
+<code>Authorization: Bearer</code> header on requests to the GitHub Actions artifact download API:
+<code>api.github.com/repos/{owner}/{repo}/actions/artifacts/{id}/{format}</code>. This allows downloading private workflow
+artifacts. The token is <strong>never</strong> sent to any other URL, even when a redirect is followed.</p>
+</blockquote>
 <h3 id="default-directories">Default directories<a class="headerlink" href="#default-directories" title="Permanent link">&para;</a></h3>
 <p>The following are the default directories selected by the Arduino CLI if alternatives are not specified in the
 configuration file.</p>
@@ -1727,6 +1733,9 @@ variable sets the <code>directories.user</code> configuration option.</p>
 <p>On Linux or macOS, you can use the <a href="https://ss64.com/bash/export.html"><code>export</code> command</a> to set environment variables. On Windows cmd, you
 can use the <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1"><code>set</code> command</a>.</p>
 <p><code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variables can be a list of space-separated URLs.</p>
+<p>The <code>GITHUB_TOKEN</code> environment variable is also recognised: when set, its value is sent as an <code>Authorization: Bearer</code>
+header on GitHub Actions artifact download requests only (see the note in the <a href="#configuration-keys">Configuration keys</a>
+section above).</p>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Boards Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
