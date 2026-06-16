@@ -17,7 +17,9 @@ package configmap
 
 import "encoding/json"
 
-func (c Map) MarshalJSON() ([]byte, error) {
+func (c *Map) MarshalJSON() ([]byte, error) {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	return json.Marshal(c.values)
 }
 
@@ -27,9 +29,11 @@ func (c *Map) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.values = map[string]any{}
 	for k, v := range flattenMap(in) {
-		if err := c.Set(k, v); err != nil {
+		if err := c.setValue(k, v); err != nil {
 			return err
 		}
 	}
