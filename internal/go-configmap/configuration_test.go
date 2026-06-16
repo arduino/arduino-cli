@@ -17,6 +17,8 @@ package configmap_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/go-configmap"
@@ -138,6 +140,19 @@ dir:
 		require.NoError(t, err)
 		require.ElementsMatch(t, []string{"foo", "dir.a", "dir.b", "dir.d"}, c.AllKeys())
 	}
+}
+
+func TestConcurrentAccess(t *testing.T) {
+	c := configmap.New()
+	c.Set("updater.enable_notification", true)
+	var wg sync.WaitGroup
+	for i := range 50 {
+		wg.Add(3)
+		go func() { defer wg.Done(); _ = c.GetBool("updater.enable_notification") }()
+		go func(i int) { defer wg.Done(); _ = c.Set("directories.data", fmt.Sprintf("/p/%d", i)) }(i)
+		go func() { defer wg.Done(); _, _ = yaml.Marshal(c) }()
+	}
+	wg.Wait()
 }
 
 func TestSchema(t *testing.T) {
