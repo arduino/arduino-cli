@@ -341,7 +341,7 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [issues]: #issue-reports
 [nightly]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds
 [prs]: #pull-requests
-[translate]: https://www.transifex.com/arduino-1/arduino-cli/
+[translate]: https://explore.transifex.com/arduino-1/arduino-cli/
 [store]: https://store.arduino.cc
 [issue-tracker]: https://github.com/arduino/arduino-cli/issues?q=
 [reactions]: https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments
