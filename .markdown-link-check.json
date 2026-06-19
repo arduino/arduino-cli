@@ -5,10 +5,10 @@
   "aliveStatusCodes": [200, 206],
   "ignorePatterns": [
     {
-      "pattern": "^#google-protobuf-Any$"
+      "pattern": "^#google\\.protobuf\\.Any$"
     },
     {
-      "pattern": "^#google-rpc-Status$"
+      "pattern": "^#google\\.rpc\\.Status$"
     },
     {
       "pattern": "https?://localhost:\\d*/"
