@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download JSON schema for labels configuration file
         id: download-schema
@@ -110,7 +110,7 @@ jobs:
           echo "flag=--dry-run" >>$GITHUB_OUTPUT
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download configuration file artifacts
         uses: actions/download-artifact@v8
