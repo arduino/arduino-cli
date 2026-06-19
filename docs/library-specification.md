@@ -344,10 +344,10 @@ It is permitted to leave a field empty.
 
 ##### `REFERENCE_LINK`
 
-This field specifies the [Arduino Language Reference](https://www.arduino.cc/reference/en) page to open via the Arduino
-IDE's **Right Click > Find in Reference** or **Help > Find in Reference** when the cursor is on that keyword. Generally
-it does not make sense to define the `REFERENCE_LINK` field for 3rd party library keywords since they are not likely to
-be in the Arduino Language Reference.
+This field specifies the [Arduino Language Reference](https://docs.arduino.cc/language-reference/) page to open via the
+Arduino IDE's **Right Click > Find in Reference** or **Help > Find in Reference** when the cursor is on that keyword.
+Generally it does not make sense to define the `REFERENCE_LINK` field for 3rd party library keywords since they are not
+likely to be in the Arduino Language Reference.
 
 ##### `RSYNTAXTEXTAREA_TOKENTYPE`
 
