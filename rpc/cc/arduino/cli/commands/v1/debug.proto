@@ -141,7 +141,7 @@ message GetDebugConfigResponse {
 // Configurations specific for the 'gcc' toolchain.
 message DebugGCCToolchainConfiguration {}
 
-// Configuration specific for the 'openocd` server.
+// Configuration specific for the 'openocd' server.
 message DebugOpenOCDServerConfiguration {
   // Path to openocd.
   string path = 1;

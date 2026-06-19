@@ -646,7 +646,7 @@ func (*DebugGCCToolchainConfiguration) Descriptor() ([]byte, []int) {
 	return file_cc_arduino_cli_commands_v1_debug_proto_rawDescGZIP(), []int{6}
 }
 
-// Configuration specific for the 'openocd` server.
+// Configuration specific for the 'openocd' server.
 type DebugOpenOCDServerConfiguration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
