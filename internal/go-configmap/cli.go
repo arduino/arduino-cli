@@ -22,11 +22,14 @@ import (
 )
 
 func (c *Map) SetFromENV(key string, arg string) error {
+	c.ensureMux()
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 	// in case of schemaless configuration, we don't know the type of the setting
 	// we will save it as a string
 	if len(c.schema) == 0 {
-		c.Set(key, arg)
-		return nil
+		return c.setValue(key, arg)
 	}
 
 	// Find the correct type for the given setting
@@ -55,12 +58,16 @@ func (c *Map) SetFromENV(key string, arg string) error {
 		}
 	}
 
-	return c.Set(key, value)
+	return c.setValue(key, value)
 }
 
 func (c *Map) SetFromCLIArgs(key string, args ...string) error {
+	c.ensureMux()
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 	if len(args) == 0 {
-		c.Delete(key)
+		c.delete(strings.Split(key, "."))
 		return nil
 	}
 
@@ -69,9 +76,9 @@ func (c *Map) SetFromCLIArgs(key string, args ...string) error {
 	if len(c.schema) == 0 {
 		switch len(args) {
 		case 1:
-			c.Set(key, args[0])
+			c.setValue(key, args[0])
 		default:
-			c.Set(key, args)
+			c.setValue(key, args)
 		}
 		return nil
 	}
@@ -107,7 +114,7 @@ func (c *Map) SetFromCLIArgs(key string, args ...string) error {
 		return fmt.Errorf("error setting value: key is not an array, but multiple values were provided")
 	}
 
-	return c.Set(key, value)
+	return c.setValue(key, value)
 }
 
 func (c *Map) InjectEnvVars(env []string, prefix string) []error {

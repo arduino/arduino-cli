@@ -20,7 +20,9 @@ import (
 )
 
 func (c Map) MarshalYAML() (any, error) {
-	return c.values, nil
+	c.mux.RLock()
+	defer c.mux.RUnlock()
+	return deepSnapshot(c.values), nil
 }
 
 func (c *Map) UnmarshalYAML(node *yaml.Node) error {
@@ -29,9 +31,12 @@ func (c *Map) UnmarshalYAML(node *yaml.Node) error {
 		return err
 	}
 
+	c.ensureMux()
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	errs := &UnmarshalErrors{}
 	for k, v := range flattenMap(in) {
-		if err := c.Set(k, v); err != nil {
+		if err := c.setValue(k, v); err != nil {
 			errs.append(err)
 		}
 	}
