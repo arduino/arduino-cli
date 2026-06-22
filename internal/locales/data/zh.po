@@ -16,7 +16,7 @@ msgstr ""
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s 版本：%[3]s 提交：%[4]s 日期：%[5]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:618
+#: internal/arduino/builder/internal/detector/detector.go:633
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "%[1]s 文件夹不再受支持！有关详细信息，请参见 %[2]s"
 
@@ -40,7 +40,7 @@ msgstr "%s 已经下载"
 msgid "%s and %s cannot be used together"
 msgstr "%s 和 %s 不能一起使用"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:331
+#: internal/arduino/cores/packagemanager/install_uninstall.go:334
 msgid "%s installed"
 msgstr "%s 已安装"
 
@@ -53,7 +53,7 @@ msgstr "%s 已安装"
 msgid "%s is not a directory"
 msgstr "%s 不是目录"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:250
+#: internal/arduino/cores/packagemanager/install_uninstall.go:261
 msgid "%s is not managed by package manager"
 msgstr "%s 不是由软件包管理器管理的"
 
@@ -152,7 +152,7 @@ msgstr "所有内核都是最新版本"
 msgid "Already installed %s"
 msgstr "已经安装 %s"
 
-#: internal/arduino/builder/internal/detector/detector.go:102
+#: internal/arduino/builder/internal/detector/detector.go:103
 msgid "Alternatives for %[1]s: %[2]s"
 msgstr "%[1]s 的替代方案：%[2]s"
 
@@ -161,7 +161,7 @@ msgstr "%[1]s 的替代方案：%[2]s"
 msgid "An error occurred adding prototypes"
 msgstr "添加原型时出错"
 
-#: internal/arduino/builder/internal/detector/detector.go:262
+#: internal/arduino/builder/internal/detector/detector.go:264
 msgid "An error occurred detecting libraries"
 msgstr "检测库时出错"
 
@@ -292,7 +292,7 @@ msgid "Can't download library"
 msgstr "无法下载库"
 
 #: commands/service_platform_uninstall.go:89
-#: internal/arduino/cores/packagemanager/install_uninstall.go:96
+#: internal/arduino/cores/packagemanager/install_uninstall.go:97
 msgid "Can't find dependencies for platform %s"
 msgstr "找不到 %s 平台的依赖"
 
@@ -354,11 +354,11 @@ msgstr "找不到绝对路径：%v"
 msgid "Cannot get the configuration key %[1]s: %[2]v"
 msgstr "无法从配置中取得键值对 %[1]s:%[2]v"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:103
+#: internal/arduino/cores/packagemanager/install_uninstall.go:104
 msgid "Cannot install platform"
 msgstr "无法安装平台"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:309
+#: internal/arduino/cores/packagemanager/install_uninstall.go:316
 msgid "Cannot install tool %s"
 msgstr "无法安装 %s 工具 "
 
@@ -375,7 +375,7 @@ msgstr ""
 msgid "Cannot set %s as default profile: %v"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:121
+#: internal/arduino/cores/packagemanager/install_uninstall.go:122
 msgid "Cannot upgrade platform"
 msgstr "无法升级平台"
 
@@ -464,11 +464,11 @@ msgid ""
 "<ID>=<value>[,<ID>=<value>]..."
 msgstr "用于通信的端口设置格式为：<ID>=<value>[,<ID>=<value>]……"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:137
+#: internal/arduino/cores/packagemanager/install_uninstall.go:143
 msgid "Configuring platform."
 msgstr "配置平台。"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:319
+#: internal/arduino/cores/packagemanager/install_uninstall.go:328
 msgid "Configuring tool."
 msgstr "配置工具。"
 
@@ -696,7 +696,7 @@ msgstr "正在下载 %s 库"
 msgid "Downloading missing tool %s"
 msgstr "正在下载丢失的 %s 工具 "
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:56
+#: internal/arduino/cores/packagemanager/install_uninstall.go:57
 msgid "Downloading packages"
 msgstr "正在下载软件包"
 
@@ -995,7 +995,7 @@ msgstr "解析 %[1]s 的依赖时出错：%[2]s"
 msgid "Error retrieving core list: %v"
 msgstr "检索内核列表时出错：%v"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:118
+#: internal/arduino/cores/packagemanager/install_uninstall.go:119
 msgid "Error rolling-back changes: %s"
 msgstr "回滚更改时出错：%s"
 
@@ -1049,7 +1049,7 @@ msgstr "更新库索引时出错：%v"
 msgid "Error upgrading libraries"
 msgstr "升级库时出错"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:113
+#: internal/arduino/cores/packagemanager/install_uninstall.go:114
 msgid "Error upgrading platform: %s"
 msgstr "更新平台时出错：%s"
 
@@ -1058,7 +1058,7 @@ msgstr "更新平台时出错：%s"
 msgid "Error verifying signature"
 msgstr "验证签名时出错"
 
-#: internal/arduino/builder/internal/detector/detector.go:495
+#: internal/arduino/builder/internal/detector/detector.go:510
 msgid "Error while detecting libraries included by %[1]s"
 msgstr "检测 %[1]s 包含的库时出错"
 
@@ -1151,7 +1151,7 @@ msgstr "未能侦听 TCP 端口：%[1]s。意外错误：%[2]v"
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "未能侦听 TCP 端口：%s。地址已被使用。"
 
-#: internal/arduino/builder/internal/detector/detector.go:304
+#: internal/arduino/builder/internal/detector/detector.go:306
 msgid "Failed to load library discovery cache: %[1]s"
 msgstr ""
 
@@ -1295,7 +1295,7 @@ msgid "Installed %s"
 msgstr "已安装 %s"
 
 #: commands/service_library_install.go:198
-#: internal/arduino/cores/packagemanager/install_uninstall.go:293
+#: internal/arduino/cores/packagemanager/install_uninstall.go:300
 msgid "Installing %s"
 msgstr "正在安装 %s"
 
@@ -1303,7 +1303,7 @@ msgstr "正在安装 %s"
 msgid "Installing library %s"
 msgstr "正在安装 %s 库"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:79
+#: internal/arduino/cores/packagemanager/install_uninstall.go:80
 #: internal/arduino/cores/packagemanager/profiles.go:143
 msgid "Installing platform %s"
 msgstr "正在安装 %s 平台"
@@ -1320,7 +1320,7 @@ msgstr "安装一个或多个内核和相应的工具依赖。"
 msgid "Installs one or more specified libraries into the system."
 msgstr "在系统中安装一个或多个指定的库。"
 
-#: internal/arduino/builder/internal/detector/detector.go:537
+#: internal/arduino/builder/internal/detector/detector.go:552
 msgid "Internal error in cache"
 msgstr "缓存中的内部错误"
 
@@ -1394,7 +1394,7 @@ msgstr ""
 msgid "Invalid network configuration: %s"
 msgstr ""
 
-#: internal/cli/configuration/network.go:88
+#: internal/cli/configuration/network.go:89
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "无效的 ‘%[1]s’ 网络代理: %[2]s"
 
@@ -1493,7 +1493,7 @@ msgstr "未找到 %s 库"
 msgid "Library '%s' not found"
 msgstr "未找到 %s 库"
 
-#: internal/arduino/builder/internal/detector/detector.go:627
+#: internal/arduino/builder/internal/detector/detector.go:642
 msgid ""
 "Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
 msgstr "库不能同时使用 ‘%[1]s’ 和 ‘%[2]s’ 文件夹。在 ‘%[3]s’ 再次检查。"
@@ -1595,7 +1595,7 @@ msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr "记录此级别及以上的消息。有效级别为 %s"
 
-#: internal/arduino/builder/internal/detector/detector.go:622
+#: internal/arduino/builder/internal/detector/detector.go:637
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "%[2]s 中的库中缺少 ‘%[1]s’"
 
@@ -1643,7 +1643,7 @@ msgstr "未找到 ‘%s’ 监视器"
 msgid "Monitor port settings:"
 msgstr "监视端口设置："
 
-#: internal/arduino/builder/internal/detector/detector.go:200
+#: internal/arduino/builder/internal/detector/detector.go:201
 msgid "Multiple libraries were found for \"%[1]s\""
 msgstr "为 “%[1]s” 找到了多个库"
 
@@ -1721,7 +1721,7 @@ msgstr "找不到有效的依赖解决方案"
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
 msgstr "内存不足；有关减少空间的提示，请参见 %[1]s。"
 
-#: internal/arduino/builder/internal/detector/detector.go:203
+#: internal/arduino/builder/internal/detector/detector.go:204
 msgid "Not used: %[1]s"
 msgstr "未使用：%[1]s"
 
@@ -1870,7 +1870,7 @@ msgstr "在 %s 端口上执行 1200-bps TOUCH 重置"
 msgid "Platform %s already installed"
 msgstr "%s 平台已经安装"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:154
+#: internal/arduino/cores/packagemanager/install_uninstall.go:151
 msgid "Platform %s installed"
 msgstr "已安装 %s 平台"
 
@@ -1882,7 +1882,7 @@ msgstr ""
 "在任何已知索引中都找不到 %s 平台\n"
 "也许你需要添加一个第 3 方地址？"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:278
+#: internal/arduino/cores/packagemanager/install_uninstall.go:285
 msgid "Platform %s uninstalled"
 msgstr "%s 平台已卸载"
 
@@ -2041,7 +2041,7 @@ msgstr "从设置中删除一个或多个值。"
 msgid "Replacing %[1]s with %[2]s"
 msgstr "将 %[1]s 替换为 %[2]s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:83
+#: internal/arduino/cores/packagemanager/install_uninstall.go:84
 msgid "Replacing platform %[1]s with %[2]s"
 msgstr "用 %[2]s 替换 %[1]s 平台"
 
@@ -2061,10 +2061,10 @@ msgstr ""
 msgid "Running normal build of the core..."
 msgstr "正在运行正常的内核构建。。。"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:257
-#: internal/arduino/cores/packagemanager/install_uninstall.go:371
-msgid "Running pre_uninstall script."
-msgstr "运行 pre_uninstall 命令。"
+#: internal/arduino/cores/packagemanager/install_uninstall.go:270
+#: internal/arduino/cores/packagemanager/install_uninstall.go:376
+msgid "Running uninstall script."
+msgstr ""
 
 #: internal/cli/lib/search.go:39
 msgid "SEARCH_TERM"
@@ -2378,7 +2378,7 @@ msgstr "正在跳过以下内容的存档创建：%[1]s"
 msgid "Skipping compile of: %[1]s"
 msgstr "跳过编译：%[1]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:152
+#: internal/arduino/builder/internal/detector/detector.go:153
 msgid "Skipping dependencies detection for precompiled library %[1]s"
 msgstr "跳过 %[1]s 预编译库的依赖检测"
 
@@ -2387,18 +2387,18 @@ msgid ""
 "Skipping installation of library %[1]s, because %[2]s is already installed"
 msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:150
+#: internal/arduino/cores/packagemanager/install_uninstall.go:147
 msgid "Skipping platform configuration."
 msgstr "跳过平台配置。"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:266
-#: internal/arduino/cores/packagemanager/install_uninstall.go:380
-msgid "Skipping pre_uninstall script."
-msgstr "跳过 pre_uninstall 命令"
-
-#: internal/arduino/cores/packagemanager/install_uninstall.go:328
+#: internal/arduino/cores/packagemanager/install_uninstall.go:331
 msgid "Skipping tool configuration."
 msgstr "跳过工具配置。"
+
+#: internal/arduino/cores/packagemanager/install_uninstall.go:273
+#: internal/arduino/cores/packagemanager/install_uninstall.go:379
+msgid "Skipping uninstall script."
+msgstr ""
 
 #: internal/arduino/builder/recipe.go:48
 msgid "Skipping: %[1]s"
@@ -2476,11 +2476,11 @@ msgstr ""
 "‘%[1]v’ 键不是列表中的条目，无法从中删除。\n"
 "是否可以使用 ‘%[2]s’？"
 
-#: internal/arduino/builder/internal/detector/detector.go:511
+#: internal/arduino/builder/internal/detector/detector.go:526
 msgid "The library %[1]s has been added from sketch project."
 msgstr ""
 
-#: internal/arduino/builder/internal/detector/detector.go:360
+#: internal/arduino/builder/internal/detector/detector.go:375
 msgid "The library %[1]s has been queued for inclusion from sketch project."
 msgstr ""
 
@@ -2541,12 +2541,12 @@ msgstr "此命令显示可升级的已安装内核和库或其一的列表。如
 msgid "Timestamp each incoming line."
 msgstr "显示时间戳。"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:49
-#: internal/arduino/cores/packagemanager/install_uninstall.go:288
+#: internal/arduino/cores/packagemanager/install_uninstall.go:50
+#: internal/arduino/cores/packagemanager/install_uninstall.go:295
 msgid "Tool %s already installed"
 msgstr "%s 工具已经安装"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:392
+#: internal/arduino/cores/packagemanager/install_uninstall.go:391
 msgid "Tool %s uninstalled"
 msgstr "%s 工具已经卸载"
 
@@ -2613,12 +2613,12 @@ msgid "Unable to parse URL"
 msgstr "无法解析地址"
 
 #: commands/service_library_uninstall.go:71
-#: internal/arduino/cores/packagemanager/install_uninstall.go:240
+#: internal/arduino/cores/packagemanager/install_uninstall.go:251
 msgid "Uninstalling %s"
 msgstr "正在卸载 %s"
 
 #: commands/service_platform_uninstall.go:99
-#: internal/arduino/cores/packagemanager/install_uninstall.go:126
+#: internal/arduino/cores/packagemanager/install_uninstall.go:127
 msgid "Uninstalling %s, tool is no more required"
 msgstr "卸载 %s，工具不再需要了"
 
@@ -2746,7 +2746,7 @@ msgstr "已使用的库"
 msgid "Used platform"
 msgstr "已使用的平台"
 
-#: internal/arduino/builder/internal/detector/detector.go:201
+#: internal/arduino/builder/internal/detector/detector.go:202
 msgid "Used: %[1]s"
 msgstr "使用：%[1]s"
 
@@ -2754,11 +2754,11 @@ msgstr "使用：%[1]s"
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr "使用平台的 ‘%[1]s’ 开发板，在列出的文件夹中：%[2]s"
 
-#: internal/arduino/builder/internal/detector/detector.go:459
+#: internal/arduino/builder/internal/detector/detector.go:474
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr "使用缓存库文件依赖项：%[1]s"
 
-#: internal/arduino/builder/preprocess_sketch.go:31
+#: internal/arduino/builder/preprocess_sketch.go:43
 msgid "Using cached sketch with function prototypes."
 msgstr ""
 
@@ -2826,18 +2826,18 @@ msgstr "版本"
 msgid "Versions: %s"
 msgstr "版本：%s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:145
-msgid "WARNING cannot configure platform: %s"
-msgstr "警告：无法配置平台：%s"
+#: internal/arduino/cores/packagemanager/install_uninstall.go:143
+msgid "WARNING: cannot configure platform"
+msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:324
-msgid "WARNING cannot configure tool: %s"
-msgstr "警告无法配置工具：%s"
+#: internal/arduino/cores/packagemanager/install_uninstall.go:328
+msgid "WARNING: cannot configure tool"
+msgstr ""
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:262
+#: internal/arduino/cores/packagemanager/install_uninstall.go:270
 #: internal/arduino/cores/packagemanager/install_uninstall.go:376
-msgid "WARNING cannot run pre_uninstall script: %s"
-msgstr "警告！无法运行 pre_uninstall 命令%s"
+msgid "WARNING: cannot run uninstall script"
+msgstr ""
 
 #: internal/arduino/builder/libraries.go:298
 msgid ""
@@ -2937,7 +2937,7 @@ msgstr "找不到 %s 工具的最新版本"
 msgid "can't find pattern for discovery with id %s"
 msgstr "找不到 id 为 %s 的 discovery"
 
-#: internal/arduino/builder/internal/detector/detector.go:104
+#: internal/arduino/builder/internal/detector/detector.go:105
 msgid "candidates"
 msgstr "候选"
 
@@ -3004,7 +3004,7 @@ msgstr "无法更新项目文件"
 msgid "creating core cache folder: %s"
 msgstr "创建核心缓存文件夹：%s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:179
+#: internal/arduino/cores/packagemanager/install_uninstall.go:176
 msgid "creating installed.json in %[1]s: %[2]s"
 msgstr "在 %[1]s 中创建 installed.json：%[2]s"
 
@@ -3191,7 +3191,7 @@ msgstr "未设置安装目录"
 msgid "installing %[1]s tool: %[2]s"
 msgstr "正在安装 %[1]s 工具：%[2]s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:171
+#: internal/arduino/cores/packagemanager/install_uninstall.go:168
 msgid "installing platform %[1]s: %[2]s"
 msgstr "安装 %[1]s 平台: %[2]s"
 
@@ -3476,7 +3476,7 @@ msgstr "找到多个构建文件：‘%[1]s’ 和 ‘%[2]s’"
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "找到多个主项目文件 (%[1]v, %[2]v)"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:298
+#: internal/arduino/cores/packagemanager/install_uninstall.go:305
 msgid ""
 "no compatible version of %[1]s tools found for the current os, try "
 "contacting %[2]s"
@@ -3572,7 +3572,7 @@ msgstr "该平台不适用于您的操作系统"
 
 #: commands/service_compile.go:125 commands/service_profile_create.go:73
 #: internal/arduino/cores/packagemanager/install_uninstall.go:139
-#: internal/arduino/cores/packagemanager/install_uninstall.go:243
+#: internal/arduino/cores/packagemanager/install_uninstall.go:254
 #: internal/arduino/cores/packagemanager/loader.go:437
 msgid "platform not installed"
 msgstr "平台未安装"
@@ -3673,7 +3673,7 @@ msgstr "正在删除损坏的存档文件：%s"
 msgid "removing library directory: %s"
 msgstr "删除库目录：%s"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:270
+#: internal/arduino/cores/packagemanager/install_uninstall.go:277
 msgid "removing platform files: %s"
 msgstr "正在删除平台文件：%s"
 
@@ -3743,7 +3743,7 @@ msgstr "测试本地存档完整性：%s"
 msgid "text section exceeds available space in board"
 msgstr "文本部分超出开发板的可用空间"
 
-#: internal/arduino/builder/internal/detector/detector.go:263
+#: internal/arduino/builder/internal/detector/detector.go:265
 #: internal/arduino/builder/internal/preprocessor/ctags.go:71
 msgid "the compilation database may be incomplete or inaccurate"
 msgstr "编译数据库可能不完整或不准确"
@@ -3760,7 +3760,7 @@ msgstr "服务器响应状态 %s"
 msgid "timeout waiting for message"
 msgstr "等待消息超时"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:364
+#: internal/arduino/cores/packagemanager/install_uninstall.go:367
 msgid "tool %s is not managed by package manager"
 msgstr "%s 工具不是由软件包管理器管理的"
 
@@ -3773,7 +3773,7 @@ msgstr "未找到 %s 工具"
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr "在 ‘%[2]s’ 软件包中找不到 ‘%[1]s’ 工具"
 
-#: internal/arduino/cores/packagemanager/install_uninstall.go:359
+#: internal/arduino/cores/packagemanager/install_uninstall.go:362
 msgid "tool not installed"
 msgstr "工具未安装"
 
