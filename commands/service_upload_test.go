@@ -190,7 +190,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
-		_, err := srv.runProgramAction(
+		_, _, err := srv.runProgramAction(
 			context.Background(),
 			pme,
 			nil,                     // sketch
@@ -202,11 +202,12 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			verboseVerify,       // verbose
 			verboseVerify,       // verify
 			test.burnBootloader, // burnBootloader
-			outStream,
-			errStream,
-			false,
-			map[string]string{},
-			nil,
+			outStream,           // output stream
+			errStream,           // error stream
+			false,               // dryRun
+			map[string]string{}, // userFields
+			nil,                 // requestUploadProperties
+			"",                  // uploadToFirmwareFile
 		)
 		verboseVerifyOutput := "verbose verify"
 		if !verboseVerify {
