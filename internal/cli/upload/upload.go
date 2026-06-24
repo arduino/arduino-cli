@@ -46,6 +46,7 @@ var (
 	programmer       arguments.Programmer
 	dryRun           bool
 	uploadProperties []string
+	uploadToFile     string
 )
 
 // NewCommand created a new `upload` command
@@ -77,6 +78,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		i18n.Tr("Override an upload property with a custom value. Can be used multiple times for multiple properties."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, i18n.Tr("Verify uploaded binary after the upload."))
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, i18n.Tr("Optional, turns on verbose mode."))
+	uploadCommand.Flags().StringVarP(&uploadToFile, "write-to-fw-file", "O", "", i18n.Tr("Write a firmware file instead of uploading it, it can be used with the 'upload fw` command."))
 	programmer.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, i18n.Tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
@@ -187,18 +189,19 @@ func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 
 	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{
-		Instance:         inst,
-		Fqbn:             fqbn,
-		SketchPath:       path,
-		Port:             port,
-		Verbose:          verbose,
-		Verify:           verify,
-		ImportFile:       importFile,
-		ImportDir:        importDir,
-		Programmer:       prog,
-		DryRun:           dryRun,
-		UserFields:       fields,
-		UploadProperties: uploadProperties,
+		Instance:             inst,
+		Fqbn:                 fqbn,
+		SketchPath:           path,
+		Port:                 port,
+		Verbose:              verbose,
+		Verify:               verify,
+		ImportFile:           importFile,
+		ImportDir:            importDir,
+		Programmer:           prog,
+		DryRun:               dryRun,
+		UserFields:           fields,
+		UploadProperties:     uploadProperties,
+		UploadToFirmwareFile: &uploadToFile,
 	}
 	stream, streamResp := commands.UploadToServerStreams(ctx, stdOut, stdErr)
 	if err := srv.Upload(req, stream); err != nil {
