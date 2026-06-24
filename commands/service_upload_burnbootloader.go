@@ -72,7 +72,7 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 	}
 	defer release()
 
-	if _, err := s.runProgramAction(
+	if _, _, err := s.runProgramAction(
 		stream.Context(),
 		pme,
 		nil, // sketch
@@ -89,6 +89,7 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 		req.GetDryRun(),
 		map[string]string{}, // User fields
 		req.GetUploadProperties(),
+		"",
 	); err != nil {
 		return err
 	}
