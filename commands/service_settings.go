@@ -70,14 +70,14 @@ func (s *arduinoCoreServerImpl) ConfigurationGet(ctx context.Context, req *rpc.C
 	}
 
 	if builtinLibs := s.settings.IDEBuiltinLibrariesDir(); builtinLibs != nil {
-		conf.Directories.Builtin.Libraries = new(builtinLibs.String())
+		conf.Directories.Builtin.Libraries = f.ToPtr(builtinLibs.String())
 	}
 
 	if ua := s.settings.ExtraUserAgent(); ua != "" {
 		conf.Network.ExtraUserAgent = &ua
 	}
 	if proxy, err := s.settings.NetworkProxy(); err == nil && proxy != nil {
-		conf.Network.Proxy = new(proxy.String())
+		conf.Network.Proxy = f.ToPtr(proxy.String())
 	}
 
 	if logFile := s.settings.LoggingFile(); logFile != nil {
