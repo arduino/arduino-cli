@@ -87,7 +87,7 @@ jobs:
           python -m pip install poetry
 
       - name: Install Task
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
