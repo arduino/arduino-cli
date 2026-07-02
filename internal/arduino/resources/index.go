@@ -41,7 +41,12 @@ type IndexResource struct {
 }
 
 // IndexFileName returns the index file name as it is saved in data dir (package_xxx_index.json).
+// If the URL contains a fragment (e.g. #package_foo_index.json), that fragment is used as-is as
+// the local filename, allowing users to provide a meaningful name for URLs whose path provides none.
 func (res *IndexResource) IndexFileName() (string, error) {
+	if res.URL.Fragment != "" {
+		return res.URL.Fragment, nil
+	}
 	filename := path.Base(res.URL.Path) // == package_index.json[.gz] || packacge_index.tar.bz2
 	if filename == "." || filename == "" || filename == "/" {
 		return "", &cmderrors.InvalidURLError{}
@@ -73,15 +78,19 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	defer tmp.RemoveAll()
 
 	// Download index file
+	// Strip any fragment from the request URL — fragments are client-side hints, not sent to the server.
+	reqURL := *res.URL
+	reqURL.Fragment = ""
+	reqURL.RawFragment = ""
 	downloadFileName := path.Base(res.URL.Path) // == package_index.json[.gz] || package_index.tar.bz2
-	indexFileName, err := res.IndexFileName()   // == package_index.json
+	indexFileName, err := res.IndexFileName()   // == package_index.json (or fragment-specified name)
 	if err != nil {
 		return err
 	}
 	tmpIndexPath := tmp.Join(downloadFileName)
 	config.DoNotResumeDownload = true // Disable resuming downloads for index files
-	if err := httpclient.DownloadFile(ctx, tmpIndexPath, res.URL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config); err != nil {
-		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index '%s'", res.URL), Cause: err}
+	if err := httpclient.DownloadFile(ctx, tmpIndexPath, reqURL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config); err != nil {
+		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index '%s'", &reqURL), Cause: err}
 	}
 
 	var signaturePath, tmpSignaturePath *paths.Path

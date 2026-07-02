@@ -20,7 +20,6 @@ import (
 	"errors"
 	"net/url"
 	"os"
-	"path"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -32,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
+	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
@@ -463,12 +463,9 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
 func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
-	indexFileName := path.Base(URL.Path)
-	if indexFileName == "." || indexFileName == "" {
+	indexFileName, err := (&resources.IndexResource{URL: URL}).IndexFileName()
+	if err != nil {
 		return &cmderrors.InvalidURLError{Cause: errors.New(URL.String())}
-	}
-	if before, ok := strings.CutSuffix(indexFileName, ".tar.bz2"); ok {
-		indexFileName = before + ".json"
 	}
 	indexPath := pmb.IndexDir.Join(indexFileName)
 	index, err := packageindex.LoadIndex(indexPath)
