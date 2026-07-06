@@ -124,6 +124,7 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 		MissingMetadata: in.GetMissingMetadata(),
 		Deprecated:      in.GetDeprecated(),
 		Compatible:      in.GetCompatible(),
+		Indexed:         in.GetIndexed(),
 	}
 	return res
 }
@@ -139,6 +140,7 @@ type PlatformRelease struct {
 	MissingMetadata bool          `json:"missing_metadata,omitempty"`
 	Deprecated      bool          `json:"deprecated,omitempty"`
 	Compatible      bool          `json:"compatible"`
+	Indexed         bool          `json:"indexed,omitempty"`
 }
 
 func (p *PlatformRelease) FormatName() string {

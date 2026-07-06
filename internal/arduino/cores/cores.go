@@ -525,6 +525,7 @@ func (release *PlatformRelease) ToRPC() *rpc.PlatformRelease {
 		Types:           []string{release.Category},
 		Deprecated:      release.Deprecated,
 		Compatible:      release.IsCompatible(),
+		Indexed:         release.Indexed,
 	}
 }
 
