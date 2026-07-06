@@ -92,3 +92,44 @@ func TestRequiresToolReleaseDiscovery(t *testing.T) {
 	toolRelease.Version = semver.ParseRelaxed("1.0.0")
 	require.True(t, release.RequiresToolRelease(toolRelease))
 }
+
+func TestGetLatestCompatibleIndexedRelease(t *testing.T) {
+	platform := &Platform{
+		Architecture: "avr",
+		Releases:     map[semver.NormalizedString]*PlatformRelease{},
+	}
+	addRelease := func(version string, compatible, indexed bool) {
+		v := semver.MustParse(version)
+		platform.Releases[v.NormalizedString()] = &PlatformRelease{
+			Version:    v,
+			Platform:   platform,
+			Compatible: compatible,
+			Indexed:    indexed,
+		}
+	}
+
+	// Public indexed releases up to 1.8.4, plus a newer local-only version 2.0.0
+	// (e.g. installed from a removed additional-url).
+	addRelease("1.8.3", true, true)
+	addRelease("1.8.4", true, true)
+	addRelease("2.0.0", true, false)
+
+	// The overall latest (including local) is 2.0.0.
+	require.Equal(t, "2.0.0", platform.GetLatestCompatibleRelease().Version.String())
+
+	// Excluding local-only versions, the latest is 1.8.4.
+	require.Equal(t, "1.8.4", platform.GetLatestCompatibleIndexedRelease().Version.String())
+
+	// An incompatible indexed release must be ignored.
+	addRelease("1.9.0", false, true)
+	require.Equal(t, "1.8.4", platform.GetLatestCompatibleIndexedRelease().Version.String())
+
+	// If no indexed release is available, the result is nil.
+	onlyLocal := &Platform{
+		Architecture: "avr",
+		Releases:     map[semver.NormalizedString]*PlatformRelease{},
+	}
+	lv := semver.MustParse("3.0.0")
+	onlyLocal.Releases[lv.NormalizedString()] = &PlatformRelease{Version: lv, Platform: onlyLocal, Compatible: true, Indexed: false}
+	require.Nil(t, onlyLocal.GetLatestCompatibleIndexedRelease())
+}

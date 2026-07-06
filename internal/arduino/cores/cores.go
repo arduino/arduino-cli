@@ -314,6 +314,23 @@ func (platform *Platform) GetLatestCompatibleRelease() *PlatformRelease {
 	return maximum
 }
 
+// GetLatestCompatibleIndexedRelease returns the latest compatible release of this platform
+// that is available in a package index, or nil if none is available. Releases that are only
+// installed locally (i.e. not present in any package index, for example a version installed from
+// an additional-url that was later removed) are excluded.
+func (platform *Platform) GetLatestCompatibleIndexedRelease() *PlatformRelease {
+	var maximum *PlatformRelease
+	for _, release := range platform.Releases {
+		if !release.IsCompatible() || !release.Indexed {
+			continue
+		}
+		if maximum == nil || release.Version.GreaterThan(maximum.Version) {
+			maximum = release
+		}
+	}
+	return maximum
+}
+
 // GetAllReleases returns all the releases of this platform, or an empty
 // slice if no releases are available
 func (platform *Platform) GetAllReleases() []*PlatformRelease {

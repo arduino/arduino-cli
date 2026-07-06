@@ -50,5 +50,5 @@ func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, sk
 	inst := instance.CreateAndInit(ctx, srv)
 	logrus.Info("Executing `arduino-cli upgrade`")
 	lib.Upgrade(ctx, srv, inst, []string{})
-	core.Upgrade(ctx, srv, inst, []string{}, skipPostInstall, skipPreUninstall)
+	core.Upgrade(ctx, srv, inst, []string{}, skipPostInstall, skipPreUninstall, false)
 }
