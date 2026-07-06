@@ -185,11 +185,49 @@ func TestIndexFileName(t *testing.T) {
 		{url: "package_arduino.cc_index.json.gz", expected: "package_arduino.cc_index.json"},
 		{url: "package_arduino.cc_index.tar.bz2", expected: "package_arduino.cc_index.json"},
 		{url: "http://drazzy.com/package_drazzy.com_index.json", expected: "package_drazzy.com_index.json"},
+		// URL fragment overrides path-derived name (e.g. GitHub Actions artifact URLs)
+		{url: "https://api.github.com/repos/owner/repo/actions/artifacts/123/zip#package_foo_index.json", expected: "package_foo_index.json"},
+		{url: "https://example.com/some/opaque/path#my_index.json", expected: "my_index.json"},
 	}
 	for _, tc := range tests {
-		ir := IndexResource{URL: &url.URL{Path: tc.url}}
+		u, err := url.Parse(tc.url)
+		require.NoError(t, err)
+		ir := IndexResource{URL: u}
 		name, err := ir.IndexFileName()
 		require.NoError(t, err, fmt.Sprintf("error trying url: %v", tc))
 		require.Equal(t, tc.expected, name)
 	}
+}
+
+func TestIndexDownloadWithURLFragment(t *testing.T) {
+	ctx := context.Background()
+
+	// Spawn a test server that serves a minimal JSON index at a path with no extension.
+	mux := http.NewServeMux()
+	mux.HandleFunc("/artifacts/123/zip", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"packages":[]}`)
+	})
+	server := &http.Server{Handler: mux}
+	ln, err := net.Listen("tcp", "127.0.0.1:")
+	require.NoError(t, err)
+	defer ln.Close()
+	go server.Serve(ln)
+	defer server.Close()
+
+	// URL whose path ends in /zip (no useful extension) but whose fragment names the index.
+	rawURL := "http://" + ln.Addr().String() + "/artifacts/123/zip#package_fragment_index.json"
+	u, err := url.Parse(rawURL)
+	require.NoError(t, err)
+
+	destDir, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer destDir.RemoveAll()
+
+	err = (&IndexResource{URL: u}).Download(ctx, destDir, func(*rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
+	require.NoError(t, err)
+
+	// File must be saved under the fragment name, not "zip.json".
+	require.True(t, destDir.Join("package_fragment_index.json").Exist(), "expected package_fragment_index.json")
+	require.False(t, destDir.Join("zip.json").Exist(), "unexpected zip.json")
 }
