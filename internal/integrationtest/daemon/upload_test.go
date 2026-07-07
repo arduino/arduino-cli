@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -108,13 +107,28 @@ func TestUploadCancelation(t *testing.T) {
 	}
 	cancel()
 
-	// Wait 5 seconds.
-	// If the mocked avrdude is not killed it will create a checkfile and it will remove it after 5 seconds.
-	time.Sleep(5 * time.Second)
-
-	// Test if the checkfile is still there (if the file is there it means that mocked avrdude
-	// has been correctly killed).
+	// After the upload has been cancelled the daemon must terminate the child
+	// avrdude process. The mocked avrdude keeps updating the modification time of
+	// the check file while it is alive, so its termination can be detected by
+	// observing that the modification time stops advancing. This avoids relying
+	// on a fixed sleep, which is racy on loaded/slow CI runners.
 	require.NotEmpty(t, checkFile)
-	require.FileExists(t, checkFile)
-	require.NoError(t, os.Remove(checkFile))
+	cf := paths.New(checkFile)
+	require.Eventually(t, func() bool {
+		before, err := cf.Stat()
+		if err != nil {
+			// The check file is gone: the mocked avrdude ran to completion, which
+			// means it was NOT killed. Keep waiting: the test will fail on timeout.
+			return false
+		}
+		time.Sleep(1 * time.Second)
+		after, err := cf.Stat()
+		if err != nil {
+			return false
+		}
+		// If the modification time didn't advance, the process is no longer running.
+		return after.ModTime().Equal(before.ModTime())
+	}, 20*time.Second, 250*time.Millisecond, "the avrdude process was not terminated after the upload was cancelled")
+
+	require.NoError(t, cf.Remove())
 }
