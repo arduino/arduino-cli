@@ -200,9 +200,10 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 	statuses := []*status.Status{}
 
 	librariesDir.scanned = true
-
 	var loadedLibs libraries.List
-	if cacheFilePath := librariesDir.Path.Join("libraries-loader-cache"); cacheFilePath.Exist() {
+	cacheEnabled := os.Getenv("ARDUINO_CLI_ENABLE_EXP_LIBS_LOAD_CACHING") != ""
+	cacheFilePath := librariesDir.Path.Join("libraries-loader-cache")
+	if cacheEnabled && cacheFilePath.Exist() {
 		logrus.WithField("file", cacheFilePath).Info("Using library cache")
 
 		// Load lib cache
@@ -227,7 +228,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 				return statuses
 			}
 			if err != nil {
-				s := status.Newf(codes.FailedPrecondition, i18n.Tr("reading dir %[1]s: %[2]s", librariesDir.Path, err))
+				s := status.Newf(codes.FailedPrecondition, "reading dir %[1]s: %[2]s", librariesDir.Path, err)
 				return append(statuses, s)
 			}
 			d.FilterDirs()
@@ -238,7 +239,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 		for _, libDir := range libDirs {
 			library, err := libraries.Load(libDir, librariesDir.Location)
 			if err != nil {
-				s := status.Newf(codes.Internal, i18n.Tr("loading library from %[1]s: %[2]s", libDir, err))
+				s := status.Newf(codes.Internal, "loading library from %[1]s: %[2]s", libDir, err)
 				statuses = append(statuses, s)
 				continue
 			}
@@ -249,7 +250,7 @@ func (lm *LibrariesManager) loadLibrariesFromDir(librariesDir *LibrariesDir) []*
 		for _, lib := range loadedLibs {
 			lib.SourceHeaders()
 		}
-		if librariesDir.Location != libraries.Unmanaged {
+		if cacheEnabled && librariesDir.Location != libraries.Unmanaged {
 			// Write lib cache
 			cache, err := cacheFilePath.Create()
 			if err != nil {
