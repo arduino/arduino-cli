@@ -63,12 +63,17 @@ func matcherTokensFromQueryString(query string) []string {
 // is used for the simple search.
 func defaultLibraryMatchExtractor(lib *librariesindex.Library) string {
 	var res strings.Builder
-	res.WriteString(lib.Name + " " +
-		lib.Latest.Paragraph + " " +
-		lib.Latest.Sentence + " " +
-		lib.Latest.Author + " ")
+	res.WriteString(lib.Name)
+	res.WriteString(" ")
+	res.WriteString(lib.Latest.Paragraph)
+	res.WriteString(" ")
+	res.WriteString(lib.Latest.Sentence)
+	res.WriteString(" ")
+	res.WriteString(lib.Latest.Author)
+	res.WriteString(" ")
 	for _, include := range lib.Latest.ProvidesIncludes {
-		res.WriteString(include + " ")
+		res.WriteString(include)
+		res.WriteString(" ")
 	}
 	return res.String()
 }
