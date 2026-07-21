@@ -1,9 +1,9 @@
 ---
-name: google.golang.org/grpc/experimental/stats
+name: google.golang.org/grpc/experimental/balancer/weight
 version: v1.82.1
 type: go
-summary: Package stats contains experimental metrics/stats API's.
-homepage: https://pkg.go.dev/google.golang.org/grpc/experimental/stats
+summary: Package weight contains utilities to manage endpoint weights.
+homepage: https://pkg.go.dev/google.golang.org/grpc/experimental/balancer/weight
 license: apache-2.0
 licenses:
 - sources: grpc@v1.82.1/LICENSE

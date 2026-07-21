@@ -1,12 +1,12 @@
 ---
-name: google.golang.org/grpc/internal/balancer/weight
-version: v1.81.1
+name: google.golang.org/grpc/internal/transport/internal
+version: v1.82.1
 type: go
-summary: Package weight contains utilities to manage endpoint weights.
-homepage: https://pkg.go.dev/google.golang.org/grpc/internal/balancer/weight
+summary: Package internal contains functionality internal to the transport package.
+homepage: https://pkg.go.dev/google.golang.org/grpc/internal/transport/internal
 license: apache-2.0
 licenses:
-- sources: grpc@v1.81.1/LICENSE
+- sources: grpc@v1.82.1/LICENSE
   text: |2
 
                                      Apache License

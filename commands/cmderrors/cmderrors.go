@@ -913,7 +913,8 @@ type MultipleLibraryInstallDetected struct {
 
 func (e *MultipleLibraryInstallDetected) Error() string {
 	var res strings.Builder
-	res.WriteString(i18n.Tr("The library %s has multiple installations:", e.LibName) + "\n")
+	res.WriteString(i18n.Tr("The library %s has multiple installations:", e.LibName))
+	res.WriteString("\n")
 	for _, lib := range e.LibsDir {
 		fmt.Fprintf(&res, "- %s\n", lib)
 	}
