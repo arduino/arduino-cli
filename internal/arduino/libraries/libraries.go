@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"path/filepath"
 	"slices"
 
@@ -95,16 +96,22 @@ func (library *Library) String() string {
 }
 
 func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
+	writeLen := func(l int) error {
+		if l < 0 || l > math.MaxUint16 {
+			return fmt.Errorf("length %d is out of allowed range 0-%d", l, math.MaxUint16)
+		}
+		return binary.Write(out, binary.NativeEndian, uint16(l))
+	}
 	writeString := func(in string) error {
 		inBytes := []byte(in)
-		if err := binary.Write(out, binary.NativeEndian, uint16(len(inBytes))); err != nil {
+		if err := writeLen(len(inBytes)); err != nil {
 			return err
 		}
 		_, err := out.Write(inBytes)
 		return err
 	}
 	writeStringArray := func(in []string) error {
-		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+		if err := writeLen(len(in)); err != nil {
 			return err
 		}
 		for _, i := range in {
@@ -115,7 +122,7 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 		return nil
 	}
 	writeMap := func(in map[string]bool) error {
-		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+		if err := writeLen(len(in)); err != nil {
 			return err
 		}
 		for k, v := range in {
@@ -133,7 +140,7 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 		if in != nil {
 			keys = in.Keys()
 		}
-		if err := binary.Write(out, binary.NativeEndian, uint16(len(keys))); err != nil {
+		if err := writeLen(len(keys)); err != nil {
 			return err
 		}
 		for _, k := range keys {
@@ -161,7 +168,7 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 		}
 	}
 	writePathList := func(in []*paths.Path) error {
-		if err := binary.Write(out, binary.NativeEndian, uint16(len(in))); err != nil {
+		if err := writeLen(len(in)); err != nil {
 			return err
 		}
 		for _, p := range in {
@@ -262,25 +269,25 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 
 func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error {
 	readString := func() (string, error) {
-		var len uint16
-		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+		var length uint16
+		if err := binary.Read(in, binary.NativeEndian, &length); err != nil {
 			return "", err
 		}
-		res := make([]byte, len)
+		res := make([]byte, length)
 		if _, err := in.Read(res); err != nil {
 			return "", err
 		}
 		return string(res), nil
 	}
 	readStringArray := func() ([]string, error) {
-		var len uint16
-		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+		var length uint16
+		if err := binary.Read(in, binary.NativeEndian, &length); err != nil {
 			return nil, err
 		}
-		if len == 0 {
+		if length == 0 {
 			return nil, nil
 		}
-		res := make([]string, len)
+		res := make([]string, length)
 		for i := range res {
 			var err error
 			res[i], err = readString()
@@ -291,12 +298,12 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 		return res, nil
 	}
 	readMap := func() (map[string]bool, error) {
-		var len uint16
-		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+		var length uint16
+		if err := binary.Read(in, binary.NativeEndian, &length); err != nil {
 			return nil, err
 		}
 		res := map[string]bool{}
-		for range len {
+		for range length {
 			k, err := readString()
 			if err != nil {
 				return nil, err
@@ -321,12 +328,12 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 		}
 	}
 	readPathList := func() (paths.PathList, error) {
-		var len uint16
-		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+		var length uint16
+		if err := binary.Read(in, binary.NativeEndian, &length); err != nil {
 			return nil, err
 		}
 		list := paths.NewPathList()
-		for range len {
+		for range length {
 			if p, err := readPath(); err != nil {
 				return nil, err
 			} else {
@@ -336,12 +343,12 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 		return list, nil
 	}
 	readProperties := func() (*properties.Map, error) {
-		var len uint16
-		if err := binary.Read(in, binary.NativeEndian, &len); err != nil {
+		var length uint16
+		if err := binary.Read(in, binary.NativeEndian, &length); err != nil {
 			return nil, err
 		}
 		props := properties.NewMap()
-		for range len {
+		for range length {
 			if k, err := readString(); err != nil {
 				return nil, err
 			} else if v, err := readString(); err != nil {
