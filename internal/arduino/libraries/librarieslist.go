@@ -74,7 +74,7 @@ func (list *List) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	if err := binary.Write(out, binary.NativeEndian, list.binaryMagicNumber()); err != nil {
 		return err
 	}
-	if err := binary.Write(out, binary.NativeEndian, int32(len(*list))); err != nil {
+	if err := binary.Write(out, binary.NativeEndian, toInt32(len(*list))); err != nil {
 		return err
 	}
 	for _, lib := range *list {

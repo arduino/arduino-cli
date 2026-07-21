@@ -95,6 +95,20 @@ func (library *Library) String() string {
 	return library.Name + "@" + library.Version.String()
 }
 
+func toInt32(in int) int32 {
+	if in < math.MinInt32 || in > math.MaxInt32 {
+		panic(fmt.Sprintf("value %d is out of allowed range %d-%d", in, math.MinInt32, math.MaxInt32))
+	}
+	return int32(in)
+}
+
+func toUint16(in int) uint16 {
+	if in < 0 || in > math.MaxUint16 {
+		panic(fmt.Sprintf("value %d is out of allowed range 0-%d", in, math.MaxUint16))
+	}
+	return uint16(in)
+}
+
 func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	writeLen := func(l int) error {
 		if l < 0 || l > math.MaxUint16 {
@@ -217,11 +231,11 @@ func (library *Library) MarshalBinary(out io.Writer, prefix *paths.Path) error {
 	if err := writePath(library.UtilityDir); err != nil {
 		return err
 	}
-	if err := binary.Write(out, binary.NativeEndian, int32(library.Location)); err != nil {
+	if err := binary.Write(out, binary.NativeEndian, toInt32(int(library.Location))); err != nil {
 		return err
 	}
 	// library.ContainerPlatform      *cores.PlatformRelease `json:""`
-	if err := binary.Write(out, binary.NativeEndian, int32(library.Layout)); err != nil {
+	if err := binary.Write(out, binary.NativeEndian, toInt32(int(library.Layout))); err != nil {
 		return err
 	}
 	if err := binary.Write(out, binary.NativeEndian, library.DotALinkage); err != nil {
@@ -422,7 +436,7 @@ func (library *Library) UnmarshalBinary(in io.Reader, prefix *paths.Path) error 
 	if err := binary.Read(in, binary.NativeEndian, &layout); err != nil {
 		return err
 	}
-	library.Layout = LibraryLayout(layout)
+	library.Layout = LibraryLayout(toUint16(int(layout)))
 	if err := binary.Read(in, binary.NativeEndian, &library.DotALinkage); err != nil {
 		return err
 	}
