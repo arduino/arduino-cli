@@ -48,7 +48,10 @@ func TestArduinoCliDaemonCompileWithLotOfOutput(t *testing.T) {
 	require.NoError(t, err)
 
 	testCompile := func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		// Use a generous per-compile deadline: it exists only to catch the
+		// synchronization hang from issue #2169, not to benchmark compile speed,
+		// so it must not expire on slow/loaded CI runners.
+		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 		defer cancel()
 		compile, err := grpcInst.Compile(ctx, "arduino:avr:uno", sketchPath.String(), "all")
 		require.NoError(t, err)
@@ -64,7 +67,7 @@ func TestArduinoCliDaemonCompileWithLotOfOutput(t *testing.T) {
 		fmt.Println("Received", msgCount, "messages.")
 	}
 
-	// The synchronization bug doesn't always happens, try 10 times to
+	// The synchronization bug doesn't always happen, try 10 times to
 	// increase the chance to trigger it.
 	testCompile()
 	testCompile()

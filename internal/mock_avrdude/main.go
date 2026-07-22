@@ -36,10 +36,18 @@ func main() {
 
 	fmt.Println("CHECKFILE:", tmpPath)
 
-	// Just sit here for 5 seconds
-	time.Sleep(5 * time.Second)
+	// Keep the check file "alive" by periodically updating its modification time.
+	// A test can detect that this process has been killed by observing that the
+	// modification time stops advancing. The loop is capped to 30s so that a
+	// leaked process eventually exits on its own instead of running forever.
+	for range 150 {
+		if err := tmpPath.WriteFile(fmt.Appendf(nil, "%d", time.Now().UnixNano())); err != nil {
+			break
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
 
-	// Remove the check file at the end
+	// Remove the check file on normal completion.
 	tmpPath.Remove()
 
 	fmt.Println("COMPLETED")
