@@ -525,13 +525,13 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 				if portAddress != "" {
 					logrus.WithField("phase", "board reset").Infof("Upload port found on %s", portAddress)
 				} else {
-					logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort.Address)
+					logrus.WithField("phase", "board reset").Infof("No new upload port detected after reset; continuing with the originally selected port %s", actualPort.Address)
 				}
 				if verbose {
 					if portAddress != "" {
 						fmt.Fprintln(outStream, i18n.Tr("Upload port found on %s", portAddress))
 					} else {
-						fmt.Fprintln(outStream, i18n.Tr("No upload port found, using %s as fallback", actualPort.Address))
+						fmt.Fprintln(outStream, i18n.Tr("No new upload port detected after reset; continuing with the originally selected port %s", actualPort.Address))
 					}
 				}
 			},
