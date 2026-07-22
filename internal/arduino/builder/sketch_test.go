@@ -17,12 +17,16 @@ package builder
 
 import (
 	"fmt"
+	"io"
 	"runtime"
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/marcinbor85/gohex"
 	"github.com/stretchr/testify/require"
 )
 
@@ -105,6 +109,54 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	info2, err := sk2.AdditionalFiles[0].Stat()
 	require.NoError(t, err)
 	require.Equal(t, info1.ModTime(), info2.ModTime())
+}
+
+func TestMergeSketchWithBootloaderUsesBuildProjectName(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+
+	buildPath := tmp.Join("build")
+	platformPath := tmp.Join("platform")
+	require.NoError(t, buildPath.MkdirAll())
+	require.NoError(t, platformPath.Join("bootloaders").MkdirAll())
+
+	sk, err := sketch.New(paths.New("testdata", "TestLoadSketchFolder"))
+	require.NoError(t, err)
+
+	writeHexFile(t, buildPath.Join("custom-project.hex"), 0x0000, []byte{0x01, 0x02, 0x03, 0x04})
+	writeHexFile(t, platformPath.Join("bootloaders", "bootloader.hex"), 0x1000, []byte{0x05, 0x06, 0x07, 0x08})
+
+	buildProperties := properties.NewMap()
+	buildProperties.Set("build.project_name", "custom-project")
+	buildProperties.Set("bootloader.file", "bootloader.hex")
+	buildProperties.SetPath("runtime.platform.path", platformPath)
+	buildProperties.Set("upload.maximum_size", "4096")
+
+	b := Builder{
+		sketch:          sk,
+		buildPath:       buildPath,
+		buildProperties: buildProperties,
+		logger:          logger.New(io.Discard, io.Discard, logger.VerbosityQuiet, ""),
+	}
+	require.NoError(t, b.mergeSketchWithBootloader())
+	require.FileExists(t, buildPath.Join("custom-project.with_bootloader.hex").String())
+	require.FileExists(t, buildPath.Join("custom-project.with_bootloader.bin").String())
+	require.NoFileExists(t, buildPath.Join(sk.MainFile.Base()+".with_bootloader.hex").String())
+	require.NoFileExists(t, buildPath.Join(sk.MainFile.Base()+".with_bootloader.bin").String())
+}
+
+func writeHexFile(t *testing.T, path *paths.Path, address uint32, data []byte) {
+	t.Helper()
+
+	mem := gohex.NewMemory()
+	require.NoError(t, mem.AddBinary(address, data))
+
+	file, err := path.Create()
+	require.NoError(t, err)
+	defer file.Close()
+
+	mem.DumpIntelHex(file, 16)
 }
 
 func TestStripUTF8BOM(t *testing.T) {
