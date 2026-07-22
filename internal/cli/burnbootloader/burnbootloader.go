@@ -46,7 +46,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	burnBootloaderCommand := &cobra.Command{
 		Use:     "burn-bootloader",
 		Short:   i18n.Tr("Upload the bootloader."),
-		Long:    i18n.Tr("Upload the bootloader on the board using an external programmer."),
+		Long:    i18n.Tr("Upload the bootloader on the board, optionally using an external programmer."),
 		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
