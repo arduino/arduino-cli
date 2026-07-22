@@ -156,6 +156,10 @@ message PlatformRelease {
   // True if the platform dependencies are available for the current OS/ARCH.
   // This also means that the platform is installable.
   bool compatible = 9;
+  // True if this release is available in a package index (as opposed to being
+  // only found installed locally, for example a version installed from an
+  // additional-url that was later removed).
+  bool indexed = 10;
 }
 
 message InstalledPlatformReference {

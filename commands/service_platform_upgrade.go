@@ -95,9 +95,21 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 		if installed == nil {
 			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
 		}
-		latest := platform.GetLatestCompatibleRelease()
-		if !latest.Version.GreaterThan(installed.Version) {
-			return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: ref.String()}
+		var latest *cores.PlatformRelease
+		if req.GetAllowDowngrade() {
+			// Target the latest version available in a package index, excluding
+			// versions that are only installed locally. This allows reverting to
+			// the latest indexed version even if the installed one is newer (for
+			// example a version installed from an additional-url later removed).
+			latest = platform.GetLatestCompatibleIndexedRelease()
+			if latest == nil || latest.Version.Equal(installed.Version) {
+				return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: ref.String()}
+			}
+		} else {
+			latest = platform.GetLatestCompatibleRelease()
+			if !latest.Version.GreaterThan(installed.Version) {
+				return installed, &cmderrors.PlatformAlreadyAtTheLatestVersionError{Platform: ref.String()}
+			}
 		}
 		ref.PlatformVersion = latest.Version
 

@@ -354,7 +354,11 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
 	outPlatformRelease.LibraryDependencies = inPlatformRelease.extractLibraryDependencies()
 	outPlatformRelease.Deprecated = inPlatformRelease.Deprecated
-	outPlatformRelease.Indexed = true
+	// A release is considered "indexed" only when it comes from a real package
+	// index (default index or additional-urls), not when it is loaded from an
+	// installed.json (which is a local, installed-only metadata file). This
+	// mirrors the platform-level `outPlatform.Indexed` logic above.
+	outPlatformRelease.Indexed = outPlatformRelease.Indexed || !isInstallJSON
 	return nil
 }
 

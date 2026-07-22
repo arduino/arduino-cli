@@ -122,6 +122,11 @@ message PlatformUpgradeRequest {
   // Set to true to not run (eventual) pre uninstall scripts for trusted
   // platforms when performing platform upgrades.
   bool skip_pre_uninstall = 5;
+  // Set to true to allow downgrading to the latest version available in a
+  // package index when the installed version is only available locally (for
+  // example a newer version installed from an additional-url that has since
+  // been removed).
+  bool allow_downgrade = 6;
 }
 
 message PlatformUpgradeResponse {

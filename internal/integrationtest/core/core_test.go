@@ -1476,3 +1476,45 @@ func makeSketch(t *testing.T, files map[string]string) *paths.Path {
 
 	return sketch
 }
+
+func TestCoreUpgradeAllowDowngrade(t *testing.T) {
+	// Scenario: a newer platform version is installed from an additional-url that
+	// is later removed. `core upgrade --allow-downgrade` must revert to the latest
+	// version still available in a package index.
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// "public" index: test:x86 up to 2.0.0 (3.0.0 has incompatible deps)
+	publicIndex := paths.New("..", "testdata", "test_index.json")
+	publicURL := env.HTTPServeFile(8000, publicIndex)
+	// "additional" index: provides a newer test:x86 2.5.0
+	extraIndex := paths.New("..", "testdata", "test_index_downgrade.json")
+	extraURL := env.HTTPServeFile(8001, extraIndex)
+
+	// Install the newer 2.5.0 version, available only through the additional url.
+	_, _, err := cli.Run("core", "update-index",
+		"--additional-urls="+publicURL.String()+","+extraURL.String())
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "test:x86@2.5.0",
+		"--additional-urls="+publicURL.String()+","+extraURL.String())
+	require.NoError(t, err)
+
+	// From now on only the public index is available (the additional url is dropped).
+
+	// A plain upgrade must NOT downgrade and must not print spurious warnings: the
+	// installed 2.5.0 is newer than the latest indexed compatible version (2.0.0).
+	stdout, _, err := cli.Run("core", "upgrade", "test:x86", "--additional-urls="+publicURL.String())
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "Downgrading")
+	out, _, err := cli.Run("core", "list", "--json", "--additional-urls="+publicURL.String())
+	require.NoError(t, err)
+	requirejson.Query(t, out, `.platforms.[] | select(.id == "test:x86") | .installed_version`, `"2.5.0"`)
+
+	// With --allow-downgrade the platform is reverted to the latest indexed
+	// compatible version (2.0.0), even though it is lower than the installed one.
+	_, _, err = cli.Run("core", "upgrade", "test:x86", "--allow-downgrade", "--additional-urls="+publicURL.String())
+	require.NoError(t, err)
+	out, _, err = cli.Run("core", "list", "--json", "--additional-urls="+publicURL.String())
+	require.NoError(t, err)
+	requirejson.Query(t, out, `.platforms.[] | select(.id == "test:x86") | .installed_version`, `"2.0.0"`)
+}

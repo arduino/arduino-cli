@@ -30,10 +30,12 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	var postInstallFlags arguments.PrePostScriptsFlags
+	var allowDowngrade bool
 	upgradeCommand := &cobra.Command{
 		Use:   fmt.Sprintf("upgrade [%s:%s] ...", i18n.Tr("PACKAGER"), i18n.Tr("ARCH")),
 		Short: i18n.Tr("Upgrades one or all installed platforms to the latest version."),
@@ -44,21 +46,22 @@ func initUpgradeCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			"  # " + i18n.Tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(cmd.Context(), srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
+			runUpgradeCommand(cmd.Context(), srv, args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue(), allowDowngrade)
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
+	upgradeCommand.Flags().BoolVar(&allowDowngrade, "allow-downgrade", false, i18n.Tr("Downgrade to the latest version available in a package index when the installed version is only available locally (e.g. from a removed additional url)."))
 	return upgradeCommand
 }
 
-func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool) {
+func runUpgradeCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, skipPostInstall bool, skipPreUninstall bool, allowDowngrade bool) {
 	logrus.Info("Executing `arduino-cli core upgrade`")
 	inst := instance.CreateAndInit(ctx, srv)
-	Upgrade(ctx, srv, inst, args, skipPostInstall, skipPreUninstall)
+	Upgrade(ctx, srv, inst, args, skipPostInstall, skipPreUninstall, allowDowngrade)
 }
 
 // Upgrade upgrades one or all installed platforms to the latest version.
-func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
+func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool, allowDowngrade bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
 		platforms, err := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{
@@ -73,14 +76,28 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 			if platform.GetInstalledVersion() == "" {
 				continue
 			}
-			// if it's not updatable, skip it
-			latestRelease := platform.GetLatestRelease()
-			if latestRelease != nil && platform.GetInstalledVersion() != latestRelease.GetVersion() {
-				targets = append(targets, &rpc.Platform{
-					Metadata: platform.GetMetadata(),
-					Release:  latestRelease,
-				})
+			// The upgrade target is the latest release available in a package
+			// index (local-only versions are excluded), so that --allow-downgrade
+			// can revert to it and normal upgrades ignore local-only versions.
+			latestRelease := latestIndexedRelease(platform)
+			if latestRelease == nil {
+				continue
 			}
+			// Without --allow-downgrade only newer versions are targeted; with it,
+			// any version different from the installed one is targeted (up or down).
+			// Either way, unchanged platforms are skipped so no spurious warnings
+			// are printed.
+			installed := platform.GetInstalledVersion()
+			if installed == latestRelease.GetVersion() {
+				continue
+			}
+			if !allowDowngrade && !isNewerVersion(latestRelease.GetVersion(), installed) {
+				continue
+			}
+			targets = append(targets, &rpc.Platform{
+				Metadata: platform.GetMetadata(),
+				Release:  latestRelease,
+			})
 		}
 
 		if len(targets) == 0 {
@@ -122,6 +139,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 			Architecture:     platformRef.Architecture,
 			SkipPostInstall:  skipPostInstall,
 			SkipPreUninstall: skipPreUninstall,
+			AllowDowngrade:   allowDowngrade,
 		}
 		stream, respCB := commands.PlatformUpgradeStreamResponseToCallbackFunction(ctx, feedback.ProgressBar(), feedback.TaskProgress())
 		err := srv.PlatformUpgrade(r, stream)
@@ -155,4 +173,25 @@ func (r *platformUpgradeResult) Data() any {
 // String implements feedback.Result.
 func (r *platformUpgradeResult) String() string {
 	return ""
+}
+
+// latestIndexedRelease returns the latest compatible release of the given platform
+// that is available in a package index (local-only versions are excluded), or nil
+// if none is available.
+func latestIndexedRelease(platform *rpc.PlatformSummary) *rpc.PlatformRelease {
+	var latest *rpc.PlatformRelease
+	for _, release := range platform.GetReleases() {
+		if !release.GetCompatible() || !release.GetIndexed() {
+			continue
+		}
+		if latest == nil || isNewerVersion(release.GetVersion(), latest.GetVersion()) {
+			latest = release
+		}
+	}
+	return latest
+}
+
+// isNewerVersion returns true if version a is greater than version b.
+func isNewerVersion(a, b string) bool {
+	return semver.ParseRelaxed(a).GreaterThan(semver.ParseRelaxed(b))
 }
