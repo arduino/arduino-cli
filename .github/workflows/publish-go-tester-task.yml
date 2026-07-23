@@ -93,6 +93,10 @@ jobs:
             path: "*Windows_64bit.zip"
             name: Windows_X86-64
             runner: ubuntu-latest
+          - task: dist:Windows_ARM64
+            path: "*Windows_ARM64.zip"
+            name: Windows_ARM64
+            runner: ubuntu-latest
           - task: dist:Linux_32bit
             path: "*Linux_32bit.tar.gz"
             name: Linux_X86-32
