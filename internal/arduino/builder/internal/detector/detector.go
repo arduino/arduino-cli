@@ -648,10 +648,14 @@ func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
 	return nil
 }
 
-var includeRegexp = regexp.MustCompile(`(?ms)^\s*[0-9 |]*\s*#[ \t]*include\s*[<"](\S+)[">]`)
+var (
+	ansiControlSequenceRegexp = regexp.MustCompile("\x1b\\[[0-?]*[ -/]*[@-~]")
+	includeRegexp             = regexp.MustCompile(`(?ms)^\s*[0-9 |]*\s*#[ \t]*include\s*[<"](\S+)[">]`)
+)
 
 // IncludesFinderWithRegExp fixdoc
 func IncludesFinderWithRegExp(source string) string {
+	source = ansiControlSequenceRegexp.ReplaceAllString(source, "")
 	match := includeRegexp.FindStringSubmatch(source)
 	if match != nil {
 		return strings.TrimSpace(match[1])
