@@ -22627,7 +22627,7 @@ SOFTWARE.
 MIT
 
 *****
-github.com/mattn/go-isatty@v0.0.23
+github.com/mattn/go-isatty@v0.0.24
 
 Copyright (c) Yasuhiro MATSUMOTO <mattn.jp@gmail.com>
 
