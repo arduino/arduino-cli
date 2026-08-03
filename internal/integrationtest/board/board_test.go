@@ -588,6 +588,12 @@ func TestBoardAttach(t *testing.T) {
 }
 
 func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// Skipping test on Windows because serial-discovery.exe sometimes
+		// produces access denied errors when trying to remove it
+		t.SkipNow()
+	}
+
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
