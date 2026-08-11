@@ -212,7 +212,7 @@ jobs:
           touch internal/integrationtest/compile_4/testdata/ValidSketchWithNonInoBrokenSketchFileSymlink/other_file.c
 
       - name: Send unit tests coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ env.CODECOV_TOKEN }}
           files: ./coverage.txt
