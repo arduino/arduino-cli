@@ -77,7 +77,7 @@ jobs:
           setup_only: true
 
       - name: Install Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version-file: pyproject.toml
 
