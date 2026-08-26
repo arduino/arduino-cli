@@ -10,11 +10,11 @@ require (
 	github.com/ProtonMail/go-crypto v1.4.1
 	github.com/arduino/go-paths-helper v1.14.0
 	github.com/arduino/go-properties-orderedmap v1.8.1
-	github.com/arduino/go-serial-utils v0.1.3
+	github.com/arduino/go-serial-utils v0.1.4
 	github.com/arduino/go-timeutils v1.0.0
 	github.com/arduino/go-win32-utils v1.0.1
-	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.2.3
-	github.com/arduino/pluggable-monitor-protocol-handler v0.9.3
+	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.2.4
+	github.com/arduino/pluggable-monitor-protocol-handler v0.9.4
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/djherbis/buffer v1.2.0
