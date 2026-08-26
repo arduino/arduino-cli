@@ -1,6 +1,6 @@
 ---
 name: github.com/mailru/easyjson
-version: v0.7.7
+version: v0.9.2
 type: go
 summary: Package easyjson contains marshaler/unmarshaler interfaces and helper functions.
 homepage: https://pkg.go.dev/github.com/mailru/easyjson
