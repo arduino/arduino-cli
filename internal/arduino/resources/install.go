@@ -19,8 +19,8 @@ import (
 	"context"
 	"errors"
 	"os"
-	"os/signal"
 
+	"github.com/arduino/arduino-cli/internal/cleanup"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v4"
@@ -71,7 +71,7 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 	defer file.Close()
 
 	// Extract into temp directory
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	ctx, cancel := cleanup.InterruptableContext(context.Background())
 	defer cancel()
 	if err := extract.Archive(ctx, file, tempDir.String(), nil); err != nil {
 		return errors.New(i18n.Tr("extracting archive: %s", err))

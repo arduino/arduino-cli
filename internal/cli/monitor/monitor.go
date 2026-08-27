@@ -22,13 +22,13 @@ import (
 	"errors"
 	"io"
 	"os"
-	"os/signal"
 	"slices"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/internal/cleanup"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -217,7 +217,7 @@ func runMonitorCmd(
 		ttyOut = newTimeStampWriter(ttyOut)
 	}
 
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+	ctx, cancel := cleanup.InterruptableContext(ctx)
 	defer cancel()
 	if raw {
 		if feedback.IsInteractive() {
