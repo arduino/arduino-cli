@@ -26,7 +26,7 @@ The serial monitor is available through the [monitor command][monitor command]. 
 by this command is very limited and you may want to look for other tools if you need more advanced functionality.
 
 There are many excellent serial terminals to chose from. On Linux or macOS, you may already have `screen` installed. On
-Windows, a good choice for command line usage is Plink, included with [PuTTY][putty].
+Windows, a good choice for command line usage is Plink, included with PuTTY.
 
 ## How to change monitor configuration?
 
@@ -58,6 +58,5 @@ If your question wasn't answered, feel free to ask on [Arduino CLI's forum board
 [arduino cli board list]: commands/arduino-cli_board_list.md
 [0]: platform-specification.md
 [1]: https://forum.arduino.cc/c/software/arduino-cli/89
-[putty]: https://www.chiark.greenend.org.uk/~sgtatham/putty/
 [monitor command]: commands/arduino-cli_monitor.md
 [configuration parameters]: pluggable-monitor-specification.md#describe-command
