@@ -69,6 +69,9 @@ service ArduinoCoreService {
   // Requests details about a board.
   rpc BoardDetails(BoardDetailsRequest) returns (BoardDetailsResponse);
 
+  // Requests details about uploading to a board with a specified protocol and configuration.
+  rpc BoardUploadDetails(BoardUploadDetailsRequest) returns (BoardUploadDetailsResponse);
+
   // List the boards currently connected to the computer.
   rpc BoardList(BoardListRequest) returns (BoardListResponse);
 

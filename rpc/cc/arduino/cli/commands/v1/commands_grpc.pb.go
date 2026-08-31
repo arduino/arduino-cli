@@ -46,6 +46,7 @@ const (
 	ArduinoCoreService_ArchiveSketch_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ArchiveSketch"
 	ArduinoCoreService_SetSketchDefaults_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SetSketchDefaults"
 	ArduinoCoreService_BoardDetails_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardDetails"
+	ArduinoCoreService_BoardUploadDetails_FullMethodName                = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardUploadDetails"
 	ArduinoCoreService_BoardList_FullMethodName                         = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardList"
 	ArduinoCoreService_BoardListAll_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListAll"
 	ArduinoCoreService_BoardSearch_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardSearch"
@@ -123,6 +124,8 @@ type ArduinoCoreServiceClient interface {
 	SetSketchDefaults(ctx context.Context, in *SetSketchDefaultsRequest, opts ...grpc.CallOption) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board.
 	BoardDetails(ctx context.Context, in *BoardDetailsRequest, opts ...grpc.CallOption) (*BoardDetailsResponse, error)
+	// Requests details about uploading to a board with a specified protocol and configuration.
+	BoardUploadDetails(ctx context.Context, in *BoardUploadDetailsRequest, opts ...grpc.CallOption) (*BoardUploadDetailsResponse, error)
 	// List the boards currently connected to the computer.
 	BoardList(ctx context.Context, in *BoardListRequest, opts ...grpc.CallOption) (*BoardListResponse, error)
 	// List all the boards provided by installed platforms.
@@ -357,6 +360,16 @@ func (c *arduinoCoreServiceClient) BoardDetails(ctx context.Context, in *BoardDe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BoardDetailsResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_BoardDetails_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) BoardUploadDetails(ctx context.Context, in *BoardUploadDetailsRequest, opts ...grpc.CallOption) (*BoardUploadDetailsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BoardUploadDetailsResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_BoardUploadDetails_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -984,6 +997,8 @@ type ArduinoCoreServiceServer interface {
 	SetSketchDefaults(context.Context, *SetSketchDefaultsRequest) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board.
 	BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error)
+	// Requests details about uploading to a board with a specified protocol and configuration.
+	BoardUploadDetails(context.Context, *BoardUploadDetailsRequest) (*BoardUploadDetailsResponse, error)
 	// List the boards currently connected to the computer.
 	BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error)
 	// List all the boards provided by installed platforms.
@@ -1119,6 +1134,9 @@ func (UnimplementedArduinoCoreServiceServer) SetSketchDefaults(context.Context, 
 }
 func (UnimplementedArduinoCoreServiceServer) BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardDetails not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) BoardUploadDetails(context.Context, *BoardUploadDetailsRequest) (*BoardUploadDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BoardUploadDetails not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardList not implemented")
@@ -1446,6 +1464,24 @@ func _ArduinoCoreService_BoardDetails_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArduinoCoreServiceServer).BoardDetails(ctx, req.(*BoardDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_BoardUploadDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BoardUploadDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).BoardUploadDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_BoardUploadDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).BoardUploadDetails(ctx, req.(*BoardUploadDetailsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2146,6 +2182,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BoardDetails",
 			Handler:    _ArduinoCoreService_BoardDetails_Handler,
+		},
+		{
+			MethodName: "BoardUploadDetails",
+			Handler:    _ArduinoCoreService_BoardUploadDetails_Handler,
 		},
 		{
 			MethodName: "BoardList",
