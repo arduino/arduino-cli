@@ -240,10 +240,34 @@ func parseTag(row string) *Tag {
 	tag.Prototype = returntype + " " + tag.FunctionName + tag.Signature + ";"
 
 	if strings.Contains(row, "/^") && strings.Contains(row, "$/;") {
-		tag.Code = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]
+		tag.Code = unescapeTagPattern(row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")])
 	}
 
 	return tag
+}
+
+// unescapeTagPattern undoes the quoting that ctags applies to the search
+// pattern field of a tag line: a backslash, the pattern delimiter and a
+// terminal '$' are each written with a leading backslash. The pattern is used
+// as the source code of the tag and compared against the prototype, which is
+// built from the unescaped name, signature and returntype fields, so it has to
+// be unescaped first. Without this, a definition whose return type, name or
+// signature contains one of those characters never matches its own prototype
+// and is silently dropped.
+func unescapeTagPattern(pattern string) string {
+	var unescaped strings.Builder
+	for i := 0; i < len(pattern); i++ {
+		if pattern[i] == '\\' && i+1 < len(pattern) {
+			switch pattern[i+1] {
+			case '\\', '/', '$':
+				unescaped.WriteByte(pattern[i+1])
+				i++
+				continue
+			}
+		}
+		unescaped.WriteByte(pattern[i])
+	}
+	return unescaped.String()
 }
 
 func removeEmpty(rows []string) []string {
