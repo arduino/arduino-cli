@@ -1736,6 +1736,10 @@ can use the <a href="https://docs.microsoft.com/en-us/windows-server/administrat
 <p>The <code>GITHUB_TOKEN</code> environment variable is also recognised: when set, its value is sent as an <code>Authorization: Bearer</code>
 header on GitHub Actions artifact download requests only (see the note in the <a href="#configuration-keys">Configuration keys</a>
 section above).</p>
+<p><code>ARDUINO_FORCE_TOOLS_ARCH</code> can be set to a Go architecture name such as <code>arm64</code> or <code>amd64</code> to force installation of tool
+dependencies in the "<a href="../package_index_json-specification/#tools-flavours-available-builds-made-for-different-os">flavour</a>" for the specified architecture, rather than for the host machine's
+architecture. The tools must be available in the exact flavour for the host machine's operating system; no emulation
+fallback is applied. This is intended for cross-architecture or emulated environments.</p>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Boards Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
