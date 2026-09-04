@@ -515,16 +515,20 @@ func (release *PlatformRelease) ToRPC() *rpc.PlatformRelease {
 			return &rpc.Board{Name: board.Name}
 		})
 	}
+	libraryDependencies := f.Map(release.LibraryDependencies, func(dep *LibraryDependency) *rpc.PlatformLibraryDependency {
+		return &rpc.PlatformLibraryDependency{Name: dep.Name, Version: dep.Version.String()}
+	})
 	return &rpc.PlatformRelease{
-		Name:            release.Name,
-		Help:            &rpc.HelpResources{Online: release.Platform.Package.Help.Online},
-		Boards:          boards,
-		Version:         release.Version.String(),
-		Installed:       release.IsInstalled(),
-		MissingMetadata: !release.HasMetadata(),
-		Types:           []string{release.Category},
-		Deprecated:      release.Deprecated,
-		Compatible:      release.IsCompatible(),
+		Name:                release.Name,
+		Help:                &rpc.HelpResources{Online: release.Platform.Package.Help.Online},
+		Boards:              boards,
+		Version:             release.Version.String(),
+		Installed:           release.IsInstalled(),
+		MissingMetadata:     !release.HasMetadata(),
+		Types:               []string{release.Category},
+		Deprecated:          release.Deprecated,
+		Compatible:          release.IsCompatible(),
+		LibraryDependencies: libraryDependencies,
 	}
 }
 

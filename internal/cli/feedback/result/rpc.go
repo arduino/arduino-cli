@@ -114,31 +114,46 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 			Online: in.GetHelp().GetOnline(),
 		}
 	}
+	var libraryDependencies []*PlatformLibraryDependency
+	for _, dep := range in.GetLibraryDependencies() {
+		libraryDependencies = append(libraryDependencies, &PlatformLibraryDependency{
+			Name:    dep.GetName(),
+			Version: dep.GetVersion(),
+		})
+	}
 	res := &PlatformRelease{
-		Name:            in.GetName(),
-		Version:         in.GetVersion(),
-		Types:           in.GetTypes(),
-		Installed:       in.GetInstalled(),
-		Boards:          boards,
-		Help:            help,
-		MissingMetadata: in.GetMissingMetadata(),
-		Deprecated:      in.GetDeprecated(),
-		Compatible:      in.GetCompatible(),
+		Name:                in.GetName(),
+		Version:             in.GetVersion(),
+		Types:               in.GetTypes(),
+		Installed:           in.GetInstalled(),
+		Boards:              boards,
+		Help:                help,
+		MissingMetadata:     in.GetMissingMetadata(),
+		Deprecated:          in.GetDeprecated(),
+		Compatible:          in.GetCompatible(),
+		LibraryDependencies: libraryDependencies,
 	}
 	return res
 }
 
 // PlatformRelease maps a rpc.PlatformRelease
 type PlatformRelease struct {
-	Name            string        `json:"name,omitempty"`
-	Version         string        `json:"version,omitempty"`
-	Types           []string      `json:"types,omitempty"`
-	Installed       bool          `json:"installed,omitempty"`
-	Boards          []*Board      `json:"boards,omitempty"`
-	Help            *HelpResource `json:"help,omitempty"`
-	MissingMetadata bool          `json:"missing_metadata,omitempty"`
-	Deprecated      bool          `json:"deprecated,omitempty"`
-	Compatible      bool          `json:"compatible"`
+	Name                string                       `json:"name,omitempty"`
+	Version             string                       `json:"version,omitempty"`
+	Types               []string                     `json:"types,omitempty"`
+	Installed           bool                         `json:"installed,omitempty"`
+	Boards              []*Board                     `json:"boards,omitempty"`
+	Help                *HelpResource                `json:"help,omitempty"`
+	MissingMetadata     bool                         `json:"missing_metadata,omitempty"`
+	Deprecated          bool                         `json:"deprecated,omitempty"`
+	Compatible          bool                         `json:"compatible"`
+	LibraryDependencies []*PlatformLibraryDependency `json:"library_dependencies,omitempty"`
+}
+
+// PlatformLibraryDependency maps a rpc.PlatformLibraryDependency
+type PlatformLibraryDependency struct {
+	Name    string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
 }
 
 func (p *PlatformRelease) FormatName() string {
