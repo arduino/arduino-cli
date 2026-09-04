@@ -156,6 +156,20 @@ message PlatformRelease {
   // True if the platform dependencies are available for the current OS/ARCH.
   // This also means that the platform is installable.
   bool compatible = 9;
+  // Libraries declared by this platform release in the package index. These
+  // libraries are provided by the platform, so a sketch profile that does not
+  // pin the platform to a specific version must not list them among its own
+  // libraries.
+  repeated PlatformLibraryDependency library_dependencies = 10;
+}
+
+// PlatformLibraryDependency is a library that a platform release declares in
+// the package index and provides to the sketches built with it.
+message PlatformLibraryDependency {
+  // Name of the library.
+  string name = 1;
+  // Version of the library required by the platform release.
+  string version = 2;
 }
 
 message InstalledPlatformReference {
