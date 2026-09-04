@@ -515,9 +515,15 @@ func (release *PlatformRelease) ToRPC() *rpc.PlatformRelease {
 			return &rpc.Board{Name: board.Name}
 		})
 	}
-	libraryDependencies := f.Map(release.LibraryDependencies, func(dep *LibraryDependency) *rpc.PlatformLibraryDependency {
-		return &rpc.PlatformLibraryDependency{Name: dep.Name, Version: dep.Version.String()}
-	})
+	// Keep the slice nil when the platform declares no libraries, so that the resulting
+	// message stays comparable with one built without this field.
+	var libraryDependencies []*rpc.PlatformLibraryDependency
+	for _, dep := range release.LibraryDependencies {
+		libraryDependencies = append(libraryDependencies, &rpc.PlatformLibraryDependency{
+			Name:    dep.Name,
+			Version: dep.Version.String(),
+		})
+	}
 	return &rpc.PlatformRelease{
 		Name:                release.Name,
 		Help:                &rpc.HelpResources{Online: release.Platform.Package.Help.Online},
