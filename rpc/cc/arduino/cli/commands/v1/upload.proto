@@ -107,6 +107,10 @@ message FirmwareFileDetails {
   string fqbn = 4;
   // The programmer required for the upload.
   optional string programmer = 5;
+  // User fields supported by the board that was used to generate the upload artifacts.
+  repeated UserField user_fields = 6;
+  // The protocol used for the upload.
+  string protocol = 7;
 }
 
 message ProgrammerIsRequiredForUploadError {}
