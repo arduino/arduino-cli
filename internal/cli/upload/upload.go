@@ -80,6 +80,8 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 		},
 	}
 
+	uploadCommand.AddCommand(NewUploadFirmwareCommand(srv))
+
 	fqbnArg.AddToCommand(uploadCommand, srv)
 	portArgs.AddToCommand(uploadCommand, srv)
 	profileArg.AddToCommand(uploadCommand, srv)

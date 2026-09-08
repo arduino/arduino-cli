@@ -163,6 +163,48 @@ message UploadUsingProgrammerResponse {
   }
 }
 
+message UploadFirmwareFileRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The firmware file to upload to the board.
+  string firmware_file = 2;
+  // The port of the board.
+  Port port = 3;
+  // Whether to turn on verbose output during the upload.
+  bool verbose = 4;
+  // After upload, verify that the contents of the memory on the board match the
+  // uploaded binary.
+  bool verify = 5;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 6;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 7;
+  // List of custom upload properties.
+  repeated string upload_properties = 8;
+}
+
+message UploadFirmwareFileResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+
+    // Progress of the downloads of upload tools.
+    DownloadProgress download_progress = 3;
+    // Progress of the installation of upload tools.
+    TaskProgress task_progress = 4;
+
+    // The upload result.
+    UploadResult result = 5;
+  }
+}
+
 message BurnBootloaderRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
@@ -238,4 +280,14 @@ message SupportedUserFieldsResponse {
   // User fields supported by board specified in SupportedUserFieldsRequest.
   // If board doesn't support any field it will be empty.
   repeated UserField user_fields = 1;
+}
+
+message ReadFirmwareFileDetailsRequest {
+  // The firmware file to upload to the board.
+  string firmware_file = 1;
+}
+
+message ReadFirmwareFileDetailsResponse {
+  // The details of the firmware file.
+  FirmwareFileDetails firmware_file_details = 1;
 }
