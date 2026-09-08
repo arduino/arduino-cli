@@ -210,7 +210,22 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 	// If we are uploading to a firmware file, just produce it and return
 	// ------------------------------------------------------------------
 	if req.GetUploadToFirmwareFile() != "" {
-		fwDetails, err := makeFirmwareFile(fqbn, uploadProperties, req.GetUploadToFirmwareFile(), uploadDetails.GetUploadTools())
+		userFieldRes, err := s.SupportedUserFields(stream.Context(), &rpc.SupportedUserFieldsRequest{
+			Instance: req.GetInstance(),
+			Fqbn:     fqbn,
+			Protocol: req.GetPort().GetProtocol(),
+		})
+		if err != nil {
+			return err
+		}
+
+		fwDetails, err := makeFirmwareFile(
+			fqbn,
+			uploadProperties,
+			req.GetUploadToFirmwareFile(),
+			uploadDetails.GetUploadTools(),
+			userFieldRes.GetUserFields(),
+			req.GetPort().GetProtocol())
 		if err != nil {
 			return err
 		}
@@ -523,10 +538,14 @@ func makeFirmwareFile(
 	uploadProperties *properties.Map,
 	firmwareFileName string,
 	requiredTools []*rpc.ToolsDependencies,
+	userFieldRes []*rpc.UserField,
+	protocol string,
 ) (*rpc.FirmwareFileDetails, error) {
 	fwDetails := &rpc.FirmwareFileDetails{
 		Fqbn:          fqbn,
 		RequiredTools: requiredTools,
+		UserFields:    userFieldRes,
+		Protocol:      protocol,
 	}
 	if programmer, ok := uploadProperties.GetOk("runtime.upload.programmer"); ok && programmer != "" {
 		fwDetails.Programmer = &programmer
