@@ -35,24 +35,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	fqbnArg          arguments.Fqbn
-	portArgs         arguments.Port
-	profileArg       arguments.Profile
-	verbose          bool
-	verify           bool
-	importDir        string
-	importFile       string
-	programmer       arguments.Programmer
-	dryRun           bool
-	uploadProperties []string
-	uploadToFile     string
-)
-
 // NewCommand created a new `upload` command
 func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
-	uploadFields := map[string]string{}
-	uploadCommand := &cobra.Command{
+	var fqbnArg arguments.Fqbn
+	var portArgs arguments.Port
+	var profileArg arguments.Profile
+	var verbose bool
+	var verify bool
+	var importDir string
+	var importFile string
+	var programmer arguments.Programmer
+	var dryRun bool
+	var uploadProperties []string
+	var uploadToFile string
+	var uploadFields = argumentsUploadFields{}
+	var uploadCommand = &cobra.Command{
 		Use:   "upload",
 		Short: i18n.Tr("Upload Arduino sketches."),
 		Long:  i18n.Tr("Upload Arduino sketches. This does NOT compile the sketch prior to upload."),
@@ -64,7 +61,22 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir", "build-path")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runUploadCommand(cmd.Context(), srv, args, uploadFields)
+			runUploadCommand(
+				cmd.Context(),
+				srv,
+				args,
+				fqbnArg,
+				portArgs,
+				profileArg,
+				verbose,
+				verify,
+				importDir,
+				importFile,
+				programmer,
+				dryRun,
+				uploadProperties,
+				uploadToFile,
+				uploadFields)
 		},
 	}
 
@@ -82,11 +94,26 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	programmer.AddToCommand(uploadCommand, srv)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, i18n.Tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
-	arguments.AddKeyValuePFlag(uploadCommand, &uploadFields, "upload-field", "F", nil, i18n.Tr("Set a value for a field required to upload."))
 	return uploadCommand
 }
 
-func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, args []string, uploadFieldsArgs map[string]string) {
+func runUploadCommand(
+	ctx context.Context,
+	srv rpc.ArduinoCoreServiceServer,
+	args []string,
+	fqbnArg arguments.Fqbn,
+	portArgs arguments.Port,
+	profileArg arguments.Profile,
+	verbose bool,
+	verify bool,
+	importDir string,
+	importFile string,
+	programmer arguments.Programmer,
+	dryRun bool,
+	uploadProperties []string,
+	uploadToFile string,
+	uploadFieldsArgs argumentsUploadFields,
+) {
 	logrus.Info("Executing `arduino-cli upload`")
 
 	path := ""
@@ -152,27 +179,13 @@ func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
-	fields := map[string]string{}
-	if len(userFieldRes.GetUserFields()) > 0 {
+	var fields map[string]string
+	if uploadToFile != "" {
 		if len(uploadFieldsArgs) > 0 {
-			// If the user has specified some fields via cmd-line, we don't ask for them
-			for _, field := range userFieldRes.GetUserFields() {
-				if value, ok := uploadFieldsArgs[field.GetName()]; ok {
-					fields[field.GetName()] = value
-				} else {
-					feedback.Fatal(i18n.Tr("Missing required upload field: %s", field.GetName()), feedback.ErrBadArgument)
-				}
-			}
-		} else {
-			// Otherwise prompt the user for them
-			feedback.Print(i18n.Tr("Uploading to specified board using %s protocol requires the following info:", port.GetProtocol()))
-			if f, err := arguments.AskForUserFields(userFieldRes.GetUserFields()); err != nil {
-				msg := fmt.Sprintf("%s: %s", i18n.Tr("Error getting user input"), err)
-				feedback.Fatal(msg, feedback.ErrGeneric)
-			} else {
-				fields = f
-			}
+			feedback.Fatal(i18n.Tr("Cannot use --write-to-fw-file and --upload-field at the same time"), feedback.ErrBadArgument)
 		}
+	} else {
+		fields = uploadFieldsArgs.ResolveUserFields(userFieldRes.GetUserFields())
 	}
 
 	if sketchPath != nil {
