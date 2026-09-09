@@ -555,9 +555,11 @@ func makeFirmwareFile(
 
 	// Prepare the upload properties for the firmware file generation
 	fwProperties := uploadProperties.Clone()
-	for _, runtimeKey := range fwProperties.SubTree("runtime.tools").Keys() {
-		// Remove all runtime.tools.* properties, as they will be populated by the uploader
-		fwProperties.Remove("runtime.tools." + runtimeKey)
+	// Remove all runtime.tools.* properties, as they will be populated by the uploader
+	for key := range uploadProperties.IterKeys() {
+		if strings.HasPrefix(key, "runtime.tools.") && strings.HasSuffix(key, ".path") {
+			fwProperties.Remove(key)
+		}
 	}
 	fwProperties.Set("build.path", "build.path")
 	fwProperties.Set("runtime.platform.path", "runtime.platform.path")
