@@ -559,9 +559,10 @@ func makeFirmwareFile(
 			fwProperties.Remove(key)
 		}
 	}
-	fwProperties.Set("build.path", "build.path")
-	fwProperties.Set("runtime.platform.path", "runtime.platform.path")
-	fwDetails.UploadProperties = fwProperties.AsMap()
+	fwProperties.Set("build.path", "{runtime.fw.path}/build.path")
+	fwProperties.Set("build.variant.path", "{runtime.fw.path}/build.variant.path")
+	fwProperties.Set("runtime.platform.path", "{runtime.fw.path}/runtime.platform.path")
+	fwDetails.UploadProperties = fwProperties.CloneAsMap()
 
 	// Make a tmp folder to export the artifacts to, and then zip them into the firmware file
 	tmpDir, err := paths.MkTempDir("", "")
@@ -575,7 +576,10 @@ func makeFirmwareFile(
 	}
 
 	// Add artifacts and export them to the tmp folder
-	for artifactName, artifactPathRecipe := range uploadProperties.SubTree("upload.artifacts").AsMap() {
+	fwProperties.Set("build.path", "build.path")
+	fwProperties.Set("build.variant.path", "build.variant.path")
+	fwProperties.Set("runtime.platform.path", "runtime.platform.path")
+	for artifactName, artifactPathRecipe := range uploadProperties.SubTree("upload.artifacts").IterMap() {
 		artifactPath := paths.New(uploadProperties.ExpandPropsInString(artifactPathRecipe))
 		artifactFwPath := fwProperties.ExpandPropsInString(artifactPathRecipe)
 
