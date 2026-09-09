@@ -279,10 +279,6 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
-	if burnBootloader && programmerID == "" {
-		return nil, &cmderrors.MissingProgrammerError{}
-	}
-
 	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
 		return nil, &cmderrors.InvalidFQBNError{Cause: err}
@@ -395,6 +391,10 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
 	for name, value := range userFields {
 		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
+	}
+
+	if burnBootloader && programmer == nil && bootloaderRecipeRequiresProgrammer(uploadProperties) {
+		return nil, &cmderrors.MissingProgrammerError{}
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
@@ -599,6 +599,28 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		return userPort, nil
 	}
 	return rpc.DiscoveryPortToRPC(updatedPort), nil
+}
+
+func bootloaderRecipeRequiresProgrammer(props *properties.Map) bool {
+	programmerOnlyProperties := []string{
+		"protocol",
+		"program.protocol",
+		"program.extra_params",
+		"bootloader.protocol",
+	}
+
+	for _, recipeID := range []string{"erase.pattern", "bootloader.pattern"} {
+		recipe, ok := props.GetOk(recipeID)
+		if !ok || strings.TrimSpace(recipe) == "" {
+			continue
+		}
+		for _, property := range programmerOnlyProperties {
+			if props.IsPropertyMissingInExpandPropsInString(property, recipe) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func detectUploadPort(
