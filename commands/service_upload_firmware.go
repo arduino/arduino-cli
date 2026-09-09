@@ -123,6 +123,7 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 	for _, installedTool := range installedTools {
 		uploadProperties.Merge(installedTool.RuntimeProperties())
 	}
+	uploadProperties.Set("runtime.fw.path", fwDir.String())
 
 	// Perform upload
 	updatedPort, fwFileDetails, err := s.runProgramAction(
