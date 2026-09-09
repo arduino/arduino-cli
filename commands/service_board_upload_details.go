@@ -188,12 +188,23 @@ func (s *arduinoCoreServerImpl) BoardUploadDetails(ctx context.Context, req *rpc
 		return nil, fmt.Errorf("%s: %w", i18n.Tr("finding required tools"), err)
 	}
 
-	// From the upload pattern extract the tools required by looking for {runtime.tools.<tool_id>.path} or
-	// {runtime.tools.<tool_id>.<version>.path} patterns, and add them to the firmware details
+	// Extract the tools required for the upload from the upload recipe
+	// and add them to the firmware details.
 	var uploadTools []*rpc.ToolsDependencies
 	{
+		// Remove all {runtime.tools.*.path} values from the upload properties.
+		// This way we can find the tools required for upload by looking at the
+		// {runtime.tools.*.path} variables remaining in the upload pattern after
+		// a full variable expansion.
+		uploadPropertiesNoRuntime := uploadProperties.Clone()
+		for key := range uploadProperties.IterKeys() {
+			if strings.HasPrefix(key, "runtime.tools.") && strings.HasSuffix(key, ".path") {
+				uploadPropertiesNoRuntime.Remove(key)
+			}
+		}
+
 		runtimeToolsRegex := regexp.MustCompile(`\{runtime\.tools\.([^}]+)\.path\}`)
-		uploadPattern := uploadProperties.ExpandPropsInString(uploadProperties.Get(action + ".pattern"))
+		uploadPattern := uploadPropertiesNoRuntime.ExpandPropsInString(uploadPropertiesNoRuntime.Get(action + ".pattern"))
 		toolsFound := f.Map(runtimeToolsRegex.FindAllStringSubmatch(uploadPattern, -1), func(match []string) string { return match[1] })
 
 		toolsAdded := map[*cores.ToolRelease]bool{}
@@ -223,7 +234,7 @@ func (s *arduinoCoreServerImpl) BoardUploadDetails(ctx context.Context, req *rpc
 	}
 
 	return &rpc.BoardUploadDetailsResponse{
-		UploadProperties: uploadProperties.AsMap(),
+		UploadProperties: uploadProperties.CloneAsMap(),
 		UploadTools:      uploadTools,
 	}, nil
 }
