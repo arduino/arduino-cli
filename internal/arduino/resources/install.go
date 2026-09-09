@@ -129,10 +129,10 @@ func findPackageRoot(parent *paths.Path) (*paths.Path, error) {
 	files.FilterOutPrefix("__MACOSX")
 
 	if len(files) == 0 {
-		return nil, errors.New(i18n.Tr("files in archive must be placed in a subdirectory"))
+		return nil, errors.New(i18n.Tr("the platform archive is not structured correctly: all files must be placed within a single root folder. This is likely a problem with the third-party platform; please report it to the platform's maintainer."))
 	}
 	if len(files) > 1 {
-		return nil, errors.New(i18n.Tr("no unique root dir in archive, found '%[1]s' and '%[2]s'", files[0], files[1]))
+		return nil, errors.New(i18n.Tr("the platform archive is not structured correctly: it must contain a single root folder, but found multiple ('%[1]s', '%[2]s'). This is likely a problem with the third-party platform; please report it to the platform's maintainer.", files[0], files[1]))
 	}
 
 	return files[0], nil
