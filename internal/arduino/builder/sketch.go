@@ -236,7 +236,10 @@ func (b *Builder) mergeSketchWithBootloader() error {
 		return nil
 	}
 
-	sketchFileName := b.sketch.MainFile.Base()
+	sketchFileName := b.buildProperties.Get("build.project_name")
+	if sketchFileName == "" {
+		sketchFileName = b.sketch.MainFile.Base()
+	}
 	sketchInBuildPath := b.buildPath.Join(sketchFileName + ".hex")
 	sketchInSubfolder := b.buildPath.Join("sketch", sketchFileName+".hex")
 
