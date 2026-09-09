@@ -20,7 +20,6 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/codeclysm/extract/v4"
 	"github.com/sirupsen/logrus"
-	semver "go.bug.st/relaxed-semver"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -99,12 +98,10 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 	defer pmeRelease()
 
 	// Install required tools if needed
+	installedTools := []*cores.ToolRelease{}
 	for _, tool := range fwDetails.GetRequiredTools() {
-		installedTool := pme.FindToolDependency(&cores.ToolDependency{
-			ToolName:     tool.GetName(),
-			ToolPackager: tool.GetPackager(),
-			ToolVersion:  semver.ParseRelaxed(tool.GetVersion()),
-		})
+		dep := cores.FromRpcToolDependencies(tool)
+		installedTool := pme.FindToolDependency(dep)
 		if installedTool == nil {
 			toolRelease := cores.ToolReleaseFromRpcToolDependencies(tool)
 			if err := pme.DownloadToolRelease(ctx, toolRelease, downloadCB); err != nil {
@@ -113,7 +110,18 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 			if err := pme.InstallTool(toolRelease, taskCB, false /* Skip post-install */, resources.IntegrityCheckFull); err != nil {
 				return err
 			}
+			installedTool = pme.FindToolDependency(dep)
+			if installedTool == nil {
+				return fmt.Errorf("%s: %w", i18n.Tr("tool not found after installation"), err)
+			}
 		}
+		installedTools = append(installedTools, installedTool)
+	}
+
+	// Load the runtime properties for the tools
+	uploadProperties := properties.NewFromHashmap(fwDetails.GetUploadProperties())
+	for _, installedTool := range installedTools {
+		uploadProperties.Merge(installedTool.RuntimeProperties())
 	}
 
 	// Perform upload
@@ -127,7 +135,7 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 		errStream,
 		req.GetDryRun(),
 		req.GetUserFields(),
-		properties.NewFromHashmap(fwDetails.GetUploadProperties()),
+		uploadProperties,
 	)
 	if err != nil {
 		return err
