@@ -1400,8 +1400,6 @@ func TestPlatformWithLibraryDependencies(t *testing.T) {
 	require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
 
 	t.Run("Search", func(t *testing.T) {
-		// The libraries declared by the platform must be reported in the search output, so that
-		// clients can tell which libraries a platform already provides.
 		stdout, _, err := cli.Run("core", "search", "Test:samd", "--all", "--additional-urls", url.String(), "--json")
 		require.NoError(t, err)
 		requirejson.Query(t, stdout,

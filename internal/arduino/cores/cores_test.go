@@ -108,11 +108,9 @@ func TestPlatformReleaseToRPCLibraryDependencies(t *testing.T) {
 	require.Len(t, rpcRelease.GetLibraryDependencies(), 2)
 	require.Equal(t, "Arduino_RouterBridge", rpcRelease.GetLibraryDependencies()[0].GetName())
 	require.Equal(t, "0.3.0", rpcRelease.GetLibraryDependencies()[0].GetVersion())
-	// A dependency without a version is reported with an empty version string.
 	require.Equal(t, "ArduinoJson", rpcRelease.GetLibraryDependencies()[1].GetName())
 	require.Empty(t, rpcRelease.GetLibraryDependencies()[1].GetVersion())
 
-	// A platform declaring no libraries must not report any.
 	noLibs := &PlatformRelease{Platform: platform, Version: semver.MustParse("1.0.0")}
 	require.Empty(t, noLibs.ToRPC().GetLibraryDependencies())
 }

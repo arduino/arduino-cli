@@ -515,8 +515,7 @@ func (release *PlatformRelease) ToRPC() *rpc.PlatformRelease {
 			return &rpc.Board{Name: board.Name}
 		})
 	}
-	// Keep the slice nil when the platform declares no libraries, so that the resulting
-	// message stays comparable with one built without this field.
+
 	var libraryDependencies []*rpc.PlatformLibraryDependency
 	for _, dep := range release.LibraryDependencies {
 		libraryDependencies = append(libraryDependencies, &rpc.PlatformLibraryDependency{
