@@ -16,6 +16,7 @@
 package cores
 
 import (
+	"os"
 	"regexp"
 	"runtime"
 
@@ -212,7 +213,27 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
 func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
+	// This is useful when the CLI is running under emulation, or when the
+	// downloaded tool will be used by a different architecture than the CLI.
+	// Do not use the compatibility rules in this case: an explicitly requested
+	// architecture must not silently fall back to another one.
+	if forcedArch := os.Getenv("ARDUINO_FORCE_TOOLS_ARCH"); forcedArch != "" {
+		return tr.GetFlavourFor(runtime.GOOS, forcedArch)
+	}
 	return tr.GetFlavourCompatibleWith(runtime.GOOS, runtime.GOARCH)
+}
+
+// GetFlavourFor returns the downloadable resource built for the specified O.S.
+// and architecture. Unlike GetFlavourCompatibleWith, it does not consider
+// emulation or other compatibility fallbacks. This can be used to explicitly
+// select a tool for a foreign architecture.
+func (tr *ToolRelease) GetFlavourFor(osName, osArch string) *resources.DownloadResource {
+	for _, flavour := range tr.Flavors {
+		if flavour.isExactMatchWith(osName, osArch) {
+			return flavour.Resource
+		}
+	}
+	return nil
 }
 
 // GetFlavourCompatibleWith returns the downloadable resource compatible with the specified O.S.

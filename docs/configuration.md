@@ -125,6 +125,11 @@ The `GITHUB_TOKEN` environment variable is also recognised: when set, its value 
 header on GitHub Actions artifact download requests only (see the note in the [Configuration keys](#configuration-keys)
 section above).
 
+`ARDUINO_FORCE_TOOLS_ARCH` can be set to a Go architecture name such as `arm64` or `amd64` to force installation of tool
+dependencies in the "[flavour][tool flavour]" for the specified architecture, rather than for the host machine's
+architecture. The tools must be available in the exact flavour for the host machine's operating system; no emulation
+fallback is applied. This is intended for cross-architecture or emulated environments.
+
 #### Example
 
 Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variable:
@@ -200,6 +205,7 @@ schema should be considered unstable in this version.
 [arduino-cli global flags]: commands/arduino-cli_config.md#options-inherited-from-parent-commands
 [export command]: https://ss64.com/bash/export.html
 [set command]: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1
+[tool flavour]: package_index_json-specification.md#tools-flavours-available-builds-made-for-different-os
 [arduino-cli config init]: commands/arduino-cli_config_init.md
 [json]: https://www.json.org
 [toml]: https://github.com/toml-lang/toml
