@@ -156,10 +156,7 @@ message PlatformRelease {
   // True if the platform dependencies are available for the current OS/ARCH.
   // This also means that the platform is installable.
   bool compatible = 9;
-  // Libraries declared by this platform release in the package index. These
-  // libraries are provided by the platform, so a sketch profile that does not
-  // pin the platform to a specific version must not list them among its own
-  // libraries.
+  // Libraries declared by this platform release in the package index.
   repeated PlatformLibraryDependency library_dependencies = 10;
 }
 
