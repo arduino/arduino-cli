@@ -812,10 +812,7 @@ type PlatformRelease struct {
 	// True if the platform dependencies are available for the current OS/ARCH.
 	// This also means that the platform is installable.
 	Compatible bool `protobuf:"varint,9,opt,name=compatible,proto3" json:"compatible,omitempty"`
-	// Libraries declared by this platform release in the package index. These
-	// libraries are provided by the platform, so a sketch profile that does not
-	// pin the platform to a specific version must not list them among its own
-	// libraries.
+	// Libraries declared by this platform release in the package index.
 	LibraryDependencies []*PlatformLibraryDependency `protobuf:"bytes,10,rep,name=library_dependencies,json=libraryDependencies,proto3" json:"library_dependencies,omitempty"`
 }
 
