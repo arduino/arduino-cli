@@ -26,7 +26,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
@@ -69,19 +68,19 @@ func (s *arduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rp
 		return nil, &cmderrors.UnknownFQBNError{Cause: err}
 	}
 
-	toolID, err := getToolID(boardProperties, "upload", req.GetProtocol())
+	toolRecipeID, err := getToolRecipeID(boardProperties, "upload", req.GetProtocol())
 	if err != nil {
 		return nil, err
 	}
 
 	return &rpc.SupportedUserFieldsResponse{
-		UserFields: getUserFields(toolID, platformRelease),
+		UserFields: getUserFields(toolRecipeID, platformRelease),
 	}, nil
 }
 
-// getToolID returns the ID of the tool that supports the action and protocol combination by searching in props.
-// Returns error if tool cannot be found.
-func getToolID(props *properties.Map, action, protocol string) (string, error) {
+// getToolRecipeID returns the ID of the tool recipies that supports the action and protocol
+// combination by searching in props. Returns error if a tool recipe cannot be found.
+func getToolRecipeID(props *properties.Map, action, protocol string) (string, error) {
 	toolProperty := fmt.Sprintf("%s.tool.%s", action, protocol)
 	defaultToolProperty := fmt.Sprintf("%s.tool.default", action)
 
@@ -333,7 +332,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	} else if programmer != nil {
 		action = "program"
 	}
-	uploadToolID, err := getToolID(props, action, port.Protocol)
+	uploadToolID, err := getToolRecipeID(props, action, port.Protocol)
 	if err != nil {
 		return nil, err
 	}
@@ -468,12 +467,13 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		return nil, err
 	}
 	defer watcher.Close()
-	updatedUploadPort := f.NewFuture[*discovery.Port]()
-	go detectUploadPort(
-		uploadCtx,
-		port, watcher.Feed(),
-		uploadProperties.GetBoolean("upload.wait_for_upload_port"),
-		updatedUploadPort)
+	updatedUploadPort := make(chan *discovery.Port, 1)
+	go func() {
+		updatedUploadPort <- detectUploadPort(
+			uploadCtx,
+			port, watcher.Feed(),
+			uploadProperties.GetBoolean("upload.wait_for_upload_port"))
+	}()
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
 	// when a sketch causes a crash and the native USB serial port is lost.
@@ -482,12 +482,11 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	// In order to trigger the forced serial-port-wait the following conditions must be met:
 	// - No upload port specified (protocol == "default")
 	// - "upload.wait_for_upload_port" == true (developers requested the touch + port wait)
-	// - "upload.tool.serial" not defained, or
+	// - "upload.tool.serial" not defined, or
 	//   "upload.tool.serial" is the same as "upload.tool.default"
 	forcedSerialPortWait := port.Protocol == "default" && // this is the value when no port is specified
 		uploadProperties.GetBoolean("upload.wait_for_upload_port") &&
-		(!uploadProperties.ContainsKey("upload.tool.serial") ||
-			uploadProperties.Get("upload.tool.serial") == uploadProperties.Get("upload.tool.default"))
+		(!uploadProperties.ContainsKey("upload.tool.serial") || uploadProperties.Get("upload.tool.serial") == uploadProperties.Get("upload.tool.default"))
 
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
@@ -593,7 +592,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	uploadCompleted()
 	logrus.Tracef("Upload successful")
 
-	updatedPort := updatedUploadPort.Await()
+	updatedPort := <-updatedUploadPort
 	if updatedPort == nil {
 		// If the algorithms can not detect the new port, fallback to the user-provided port.
 		return userPort, nil
@@ -605,15 +604,11 @@ func detectUploadPort(
 	uploadCtx context.Context,
 	uploadPort *discovery.Port, watch <-chan *discovery.Event,
 	waitForUploadPort bool,
-	result f.Future[*discovery.Port],
-) {
+) *discovery.Port {
 	log := logrus.WithField("task", "port_detection")
 	log.Debugf("Detecting new board port after upload")
 
 	candidate := uploadPort.Clone()
-	defer func() {
-		result.Send(candidate)
-	}()
 
 	// Ignore all events during the upload
 	for {
@@ -621,7 +616,7 @@ func detectUploadPort(
 		case ev, ok := <-watch:
 			if !ok {
 				log.Error("Upload port detection failed, watcher closed")
-				return
+				return candidate
 			}
 			if candidate != nil && ev.Type == "remove" && ev.Port.Equals(candidate) {
 				log.WithField("event", ev).Debug("User-specified port has been disconnected, forcing wait for upload port")
@@ -647,7 +642,7 @@ func detectUploadPort(
 		case ev, ok := <-watch:
 			if !ok {
 				log.Error("Upload port detection failed, watcher closed")
-				return
+				return candidate
 			}
 			if candidate != nil && ev.Type == "remove" && candidate.Equals(ev.Port) {
 				log.WithField("event", ev).Debug("Candidate port is no longer available")
@@ -698,7 +693,7 @@ func detectUploadPort(
 
 		case <-timeout:
 			log.WithField("selected_port", candidate).Debug("Timeout waiting for candidate port")
-			return
+			return candidate
 		}
 	}
 }

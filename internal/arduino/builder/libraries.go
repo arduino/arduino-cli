@@ -172,13 +172,16 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 
 			// Add required LD flags
 			var libsCmd strings.Builder
-			libsCmd.WriteString(library.LDflags + " ")
+			libsCmd.WriteString(library.LDflags)
+			libsCmd.WriteString(" ")
 			dynAndStaticLibs := libs.Clone()
 			dynAndStaticLibs.FilterSuffix(".a", ".so")
 			for _, lib := range dynAndStaticLibs {
 				name := strings.TrimSuffix(lib.Base(), lib.Ext())
 				if strings.HasPrefix(name, "lib") {
-					libsCmd.WriteString("-l" + name[3:] + " ")
+					libsCmd.WriteString("-l")
+					libsCmd.WriteString(name[3:])
+					libsCmd.WriteString(" ")
 				}
 			}
 

@@ -129,8 +129,7 @@ func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
-		var platformErr *cmderrors.PlatformNotFoundError
-		if errors.As(err, &platformErr) {
+		if platformErr, ok := errors.AsType[*cmderrors.PlatformNotFoundError](err); ok {
 			split := strings.Split(platformErr.Platform, ":")
 			if len(split) < 2 {
 				panic(i18n.Tr("Platform ID is not correct"))

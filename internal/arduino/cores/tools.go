@@ -21,8 +21,10 @@ import (
 	"runtime"
 
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -127,6 +129,17 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 	return res
 }
 
+// ToRpcToolsDependencies convert a ToolRelease to an rpc.ToolsDependencies message
+// (yes the plural is wrong, but we have to keep it for backward compatibility).
+func (tr *ToolRelease) ToRpcToolsDependencies() *rpc.ToolsDependencies {
+	return &rpc.ToolsDependencies{
+		Name:     tr.Tool.Name,
+		Packager: tr.Tool.Package.Name,
+		Version:  tr.Version.String(),
+		Systems:  f.Map(tr.Flavors, (*Flavor).ToRpcSystem),
+	}
+}
+
 var (
 	regexpLinuxArm     = regexp.MustCompile("arm.*-linux-gnueabihf")
 	regexpLinuxArm64   = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
@@ -209,6 +222,17 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 	}
 
 	return false, 0
+}
+
+// ToRpcSystem converts this Flavor to a rpc.Systems message
+func (f *Flavor) ToRpcSystem() *rpc.Systems {
+	return &rpc.Systems{
+		Checksum:        f.Resource.Checksum,
+		Size:            f.Resource.Size,
+		Host:            f.OS,
+		ArchiveFilename: f.Resource.ArchiveFileName,
+		Url:             f.Resource.URL,
+	}
 }
 
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.

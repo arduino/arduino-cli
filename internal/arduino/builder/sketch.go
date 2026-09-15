@@ -111,8 +111,11 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 		lineOffset++
 	}
 
-	mergedSource.WriteString("#line 1 " + cpp.QuoteString(b.sketch.MainFile.String()) + "\n")
-	mergedSource.WriteString(mainSrc + "\n")
+	mergedSource.WriteString("#line 1 ")
+	mergedSource.WriteString(cpp.QuoteString(b.sketch.MainFile.String()))
+	mergedSource.WriteString("\n")
+	mergedSource.WriteString(mainSrc)
+	mergedSource.WriteString("\n")
 	lineOffset++
 
 	for _, file := range b.sketch.OtherSketchFiles {
@@ -120,8 +123,11 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 		if err != nil {
 			return 0, "", err
 		}
-		mergedSource.WriteString("#line 1 " + cpp.QuoteString(file.String()) + "\n")
-		mergedSource.WriteString(src + "\n")
+		mergedSource.WriteString("#line 1 ")
+		mergedSource.WriteString(cpp.QuoteString(file.String()))
+		mergedSource.WriteString("\n")
+		mergedSource.WriteString(src)
+		mergedSource.WriteString("\n")
 	}
 
 	return lineOffset, mergedSource.String(), nil
