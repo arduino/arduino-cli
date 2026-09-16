@@ -1399,6 +1399,14 @@ func TestPlatformWithLibraryDependencies(t *testing.T) {
 	require.Contains(t, string(stdout), "Installed ArduinoBearSSL@1.7.5", "did not install direct dependencies")
 	require.NotContains(t, string(stdout), "Installed ArduinoECCX08", "should not install transitive dependencies")
 
+	t.Run("Search", func(t *testing.T) {
+		stdout, _, err := cli.Run("core", "search", "Test:samd", "--all", "--additional-urls", url.String(), "--json")
+		require.NoError(t, err)
+		requirejson.Query(t, stdout,
+			`.platforms.[].releases."1.8.14".library_dependencies`,
+			`[{"name":"ArduinoBearSSL","version":"1.7.5"}]`)
+	})
+
 	t.Run("Profile", func(t *testing.T) {
 		sketch := makeSketch(t, map[string]string{
 			"sketch.ino": `
