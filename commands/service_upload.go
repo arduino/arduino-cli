@@ -16,10 +16,12 @@
 package commands
 
 import (
+	"archive/tar"
 	"context"
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -37,7 +39,9 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	serialutils "github.com/arduino/go-serial-utils"
 	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
+	"github.com/dsnet/compress/bzip2"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
@@ -177,6 +181,65 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		programmer = sk.GetDefaultProgrammer()
 	}
 
+	uploadDetails, err := s.BoardUploadDetails(stream.Context(), &rpc.BoardUploadDetailsRequest{
+		Instance:               req.GetInstance(),
+		Fqbn:                   fqbn,
+		Protocol:               req.GetPort().GetProtocol(),
+		Programmer:             programmer,
+		CustomUploadProperties: req.GetUploadProperties(),
+		BurnBootloader:         false,
+	})
+	if err != nil {
+		return err
+	}
+
+	uploadProperties := properties.NewFromHashmap(uploadDetails.GetUploadProperties())
+	importPath, sketchName, err := s.determineBuildPathAndSketchName(req.GetImportFile(), req.GetImportDir(), sk)
+	if err != nil {
+		return &cmderrors.NotFoundError{Message: i18n.Tr("Error finding build artifacts"), Cause: err}
+	}
+	if !importPath.Exist() {
+		return &cmderrors.NotFoundError{Message: i18n.Tr("Compiled sketch not found in %s", importPath)}
+	}
+	if !importPath.IsDir() {
+		return &cmderrors.NotFoundError{Message: i18n.Tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+	}
+	uploadProperties.SetPath("build.path", importPath)
+	uploadProperties.Set("build.project_name", sketchName)
+
+	// If we are uploading to a firmware file, just produce it and return
+	// ------------------------------------------------------------------
+	if req.GetUploadToFirmwareFile() != "" {
+		userFieldRes, err := s.SupportedUserFields(stream.Context(), &rpc.SupportedUserFieldsRequest{
+			Instance: req.GetInstance(),
+			Fqbn:     fqbn,
+			Protocol: req.GetPort().GetProtocol(),
+		})
+		if err != nil {
+			return err
+		}
+
+		fwDetails, err := makeFirmwareFile(
+			fqbn,
+			uploadProperties,
+			req.GetUploadToFirmwareFile(),
+			uploadDetails.GetUploadTools(),
+			userFieldRes.GetUserFields(),
+			req.GetPort().GetProtocol())
+		if err != nil {
+			return err
+		}
+		return syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_Result{
+				Result: &rpc.UploadResult{
+					FirmwareFileDetails: fwDetails,
+				},
+			},
+		})
+	}
+
+	// otherwise, perform the actual upload to the board
+	// -------------------------------------------------
 	outStream := feedStreamTo(func(data []byte) {
 		syncSend.Send(&rpc.UploadResponse{
 			Message: &rpc.UploadResponse_OutStream{OutStream: data},
@@ -189,23 +252,17 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		})
 	})
 	defer errStream.Close()
-	updatedPort, err := s.runProgramAction(
+	updatedPort, fwFileDetails, err := s.runProgramAction(
 		stream.Context(),
 		pme,
-		sk,
-		req.GetImportFile(),
-		req.GetImportDir(),
-		fqbn,
 		req.GetPort(),
-		programmer,
 		req.GetVerbose(),
 		req.GetVerify(),
-		false, // burnBootloader
 		outStream,
 		errStream,
 		req.GetDryRun(),
 		req.GetUserFields(),
-		req.GetUploadProperties(),
+		uploadProperties,
 	)
 	if err != nil {
 		return err
@@ -213,7 +270,8 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 	return syncSend.Send(&rpc.UploadResponse{
 		Message: &rpc.UploadResponse_Result{
 			Result: &rpc.UploadResult{
-				UpdatedUploadPort: updatedPort,
+				UpdatedUploadPort:   updatedPort,
+				FirmwareFileDetails: fwFileDetails,
 			},
 		},
 	})
@@ -262,142 +320,30 @@ func (s *arduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 	}, streamAdapter)
 }
 
-func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packagemanager.Explorer,
-	sk *sketch.Sketch,
-	importFile, importDir, fqbnIn string, userPort *rpc.Port,
-	programmerID string,
-	verbose, verify, burnBootloader bool,
+func (s *arduinoCoreServerImpl) runProgramAction(
+	ctx context.Context,
+	pme *packagemanager.Explorer,
+	userPort *rpc.Port,
+	verbose, verify bool,
 	outStream, errStream io.Writer,
-	dryRun bool, userFields map[string]string,
-	requestUploadProperties []string,
-) (*rpc.Port, error) {
+	dryRun bool,
+	userFields map[string]string,
+	uploadProperties *properties.Map,
+) (*rpc.Port, *rpc.FirmwareFileDetails, error) {
 	port := rpc.DiscoveryPortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
 		port = &discovery.Port{Protocol: "default"}
-	}
-	logrus.WithField("port", port).Tracef("Upload port")
-
-	if burnBootloader && programmerID == "" {
-		return nil, &cmderrors.MissingProgrammerError{}
-	}
-
-	fqbn, err := fqbn.Parse(fqbnIn)
-	if err != nil {
-		return nil, &cmderrors.InvalidFQBNError{Cause: err}
-	}
-	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
-
-	// Find target board and board properties
-	_, boardPlatform, board, boardProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
-	if boardPlatform == nil {
-		return nil, &cmderrors.PlatformNotFoundError{
-			Platform: fmt.Sprintf("%s:%s", fqbn.Vendor, fqbn.Architecture),
-			Cause:    err,
-		}
-	} else if err != nil {
-		return nil, &cmderrors.UnknownFQBNError{Cause: err}
-	}
-	logrus.
-		WithField("boardPlatform", boardPlatform).
-		WithField("board", board).
-		WithField("buildPlatform", buildPlatform).
-		Tracef("Upload data")
-
-	// Extract programmer properties (when specified)
-	var programmer *cores.Programmer
-	if programmerID != "" {
-		programmer = boardPlatform.Programmers[programmerID]
-		if programmer == nil {
-			// Try to find the programmer in the referenced build platform
-			programmer = buildPlatform.Programmers[programmerID]
-		}
-		if programmer == nil {
-			return nil, &cmderrors.ProgrammerNotFoundError{Programmer: programmerID}
-		}
-	}
-
-	// Determine upload tool
-	// create a temporary configuration only for the selection of upload tool
-	props := properties.NewMap()
-	props.Merge(boardPlatform.Properties)
-	props.Merge(boardPlatform.RuntimeProperties())
-	props.Merge(boardProperties)
-	if programmer != nil {
-		props.Merge(programmer.Properties)
-	}
-	action := "upload"
-	if burnBootloader {
-		action = "bootloader"
-	} else if programmer != nil {
-		action = "program"
-	}
-	uploadToolID, err := getToolRecipeID(props, action, port.Protocol)
-	if err != nil {
-		return nil, err
-	}
-
-	var uploadToolPlatform *cores.PlatformRelease
-	if programmer != nil {
-		uploadToolPlatform = programmer.PlatformRelease
-	} else {
-		uploadToolPlatform = boardPlatform
-	}
-	logrus.
-		WithField("uploadToolID", uploadToolID).
-		WithField("uploadToolPlatform", uploadToolPlatform).
-		Trace("Upload tool")
-
-	if split := strings.Split(uploadToolID, ":"); len(split) > 2 {
-		return nil, &cmderrors.InvalidPlatformPropertyError{
-			Property: fmt.Sprintf("%s.tool.%s", action, port.Protocol), // TODO: Can be done better, maybe inline getToolID(...)
-			Value:    uploadToolID}
-	} else if len(split) == 2 {
-		p := pme.FindPlatform(&packagemanager.PlatformReference{
-			Package:              split[0],
-			PlatformArchitecture: boardPlatform.Platform.Architecture,
-		})
-		if p == nil {
-			return nil, &cmderrors.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
-		}
-		uploadToolID = split[1]
-		uploadToolPlatform = pme.GetInstalledPlatformRelease(p)
-		if uploadToolPlatform == nil {
-			return nil, &cmderrors.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
-		}
-	}
-
-	// Build configuration for upload
-	uploadProperties := properties.NewMap()
-	if uploadToolPlatform != nil {
-		uploadProperties.Merge(uploadToolPlatform.Properties)
-	}
-	uploadProperties.Set("runtime.os", properties.GetOSSuffix())
-	uploadProperties.Merge(boardPlatform.Properties)
-	uploadProperties.Merge(boardPlatform.RuntimeProperties())
-	uploadProperties.Merge(overrideProtocolProperties(action, port.Protocol, boardProperties))
-	uploadProperties.Merge(uploadProperties.SubTree("tools." + uploadToolID))
-	if programmer != nil {
-		uploadProperties.Merge(programmer.Properties)
-	}
-
-	// Add user provided custom upload properties
-	if p, err := properties.LoadFromSlice(requestUploadProperties); err == nil {
-		uploadProperties.Merge(p)
-	} else {
-		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
 
 	// Certain tools require the user to provide custom fields at run time,
 	// if they've been provided set them
 	// For more info:
 	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+	action := uploadProperties.Get("runtime.upload.action")
+	logrus.WithField("port", port).Tracef("Upload port")
 	for name, value := range userFields {
 		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
-	}
-
-	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
-		return nil, &cmderrors.ProgrammerRequiredForUploadError{}
 	}
 
 	// Set properties for verbose upload
@@ -442,21 +388,6 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		uploadProperties.Set("bootloader.verify", uploadProperties.Get("bootloader.params.noverify"))
 	}
 
-	if !burnBootloader {
-		importPath, sketchName, err := s.determineBuildPathAndSketchName(importFile, importDir, sk)
-		if err != nil {
-			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Error finding build artifacts"), Cause: err}
-		}
-		if !importPath.Exist() {
-			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Compiled sketch not found in %s", importPath)}
-		}
-		if !importPath.IsDir() {
-			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
-		}
-		uploadProperties.SetPath("build.path", importPath)
-		uploadProperties.Set("build.project_name", sketchName)
-	}
-
 	// This context is kept alive for the entire duration of the upload
 	uploadCtx, uploadCompleted := context.WithCancel(ctx)
 	defer uploadCompleted()
@@ -464,7 +395,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	// Start the upload port change detector.
 	watcher, err := pme.DiscoveryManager().Watch()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer watcher.Close()
 	updatedUploadPort := make(chan *discovery.Port, 1)
@@ -491,7 +422,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
 	actualPort := port.Clone()
-	if programmer == nil && !burnBootloader && (port.Protocol == "serial" || forcedSerialPortWait) {
+	if action == "upload" && (port.Protocol == "serial" || forcedSerialPortWait) {
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
 		wait := false
@@ -565,28 +496,32 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	uploadProperties.Set("upload.port.protocol", port.Protocol)
 	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
 	if actualPort.Properties != nil {
-		for prop, value := range actualPort.Properties.AsMap() {
-			uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+		for prop, value := range actualPort.Properties.IterMap() {
+			uploadProperties.Set("upload.port.properties."+prop, value)
 		}
 	}
 
 	// Run recipes for upload
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
-	if burnBootloader {
+	switch action {
+	case "bootloader":
 		if err := runTool(uploadCtx, "erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed chip erase"), Cause: err}
+			return nil, nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed chip erase"), Cause: err}
 		}
 		if err := runTool(uploadCtx, "bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed to burn bootloader"), Cause: err}
+			return nil, nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed to burn bootloader"), Cause: err}
 		}
-	} else if programmer != nil {
+	case "program":
 		if err := runTool(uploadCtx, "program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed programming"), Cause: err}
+			return nil, nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed programming"), Cause: err}
 		}
-	} else {
+	case "upload":
 		if err := runTool(uploadCtx, "upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed uploading"), Cause: err}
+			return nil, nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed uploading"), Cause: err}
 		}
+	default:
+		// should never happen
+		panic("Invalid action: " + action)
 	}
 
 	uploadCompleted()
@@ -595,9 +530,140 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	updatedPort := <-updatedUploadPort
 	if updatedPort == nil {
 		// If the algorithms can not detect the new port, fallback to the user-provided port.
-		return userPort, nil
+		return userPort, nil, nil
 	}
-	return rpc.DiscoveryPortToRPC(updatedPort), nil
+	return rpc.DiscoveryPortToRPC(updatedPort), nil, nil
+}
+
+func makeFirmwareFile(
+	fqbn string,
+	uploadProperties *properties.Map,
+	firmwareFileName string,
+	requiredTools []*rpc.ToolsDependencies,
+	userFieldRes []*rpc.UserField,
+	protocol string,
+) (*rpc.FirmwareFileDetails, error) {
+	fwDetails := &rpc.FirmwareFileDetails{
+		Fqbn:          fqbn,
+		RequiredTools: requiredTools,
+		UserFields:    userFieldRes,
+		Protocol:      protocol,
+	}
+	if programmer, ok := uploadProperties.GetOk("runtime.upload.programmer"); ok && programmer != "" {
+		fwDetails.Programmer = &programmer
+	}
+
+	// Prepare the upload properties for the firmware file generation
+	fwProperties := uploadProperties.Clone()
+	// Remove all runtime.tools.* properties, as they will be populated by the uploader
+	for key := range uploadProperties.IterKeys() {
+		if strings.HasPrefix(key, "runtime.tools.") && strings.HasSuffix(key, ".path") {
+			fwProperties.Remove(key)
+		}
+	}
+	fwProperties.Set("build.path", "{runtime.fw.path}/build.path")
+	fwProperties.Set("build.variant.path", "{runtime.fw.path}/build.variant.path")
+	fwProperties.Set("runtime.platform.path", "{runtime.fw.path}/runtime.platform.path")
+	fwDetails.UploadProperties = fwProperties.CloneAsMap()
+
+	// Make a tmp folder to export the artifacts to, and then zip them into the firmware file
+	tmpDir, err := paths.MkTempDir("", "")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("creating temporary directory"), err)
+	}
+	defer tmpDir.RemoveAll()
+	fwDir := tmpDir.Join(filepath.Base(firmwareFileName))
+	if err := fwDir.MkdirAll(); err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("creating temporary directory"), err)
+	}
+
+	// Add artifacts and export them to the tmp folder
+	fwProperties.Set("build.path", "build.path")
+	fwProperties.Set("build.variant.path", "build.variant.path")
+	fwProperties.Set("runtime.platform.path", "runtime.platform.path")
+	for artifactName, artifactPathRecipe := range uploadProperties.SubTree("upload.artifacts").IterMap() {
+		artifactPath := paths.New(uploadProperties.ExpandPropsInString(artifactPathRecipe))
+		artifactFwPath := fwProperties.ExpandPropsInString(artifactPathRecipe)
+
+		fwDetails.Artifacts = append(fwDetails.Artifacts, &rpc.FirmwareFileDetails_Artifact{
+			Id:          "artifacts." + artifactName,
+			Path:        artifactPathRecipe,
+			IsDirectory: artifactPath.IsDir(),
+		})
+
+		// Ensure the parent directory of the export path exists
+		artifactTmpPath := fwDir.Join(artifactFwPath)
+		if err := artifactTmpPath.Parent().MkdirAll(); err != nil {
+			return nil, fmt.Errorf("%s: %w", i18n.Tr("creating temporary directory"), err)
+		}
+		if artifactPath.IsDir() {
+			if err := artifactPath.CopyDirTo(artifactTmpPath); err != nil {
+				return nil, fmt.Errorf("%s: %w", i18n.Tr("copying directory %s to %s", artifactPath, artifactTmpPath), err)
+			}
+		} else {
+			if err := artifactPath.CopyTo(artifactTmpPath); err != nil {
+				return nil, fmt.Errorf("%s: %w", i18n.Tr("copying file %s to %s", artifactPath, artifactTmpPath), err)
+			}
+		}
+	}
+
+	// Export firmware details
+	p, _ := protojson.Marshal(fwDetails)
+	if err := fwDir.Join("firmware.json").WriteFile(p); err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("writing firmware details"), err)
+	}
+
+	// Archive everything in tmp into the uploadToFirmwareFile
+	f, err := paths.New(firmwareFileName).Create()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("creating firmware file"), err)
+	}
+	defer f.Close()
+
+	// Create the tar.bz2 archive
+	bzWriter, err := bzip2.NewWriter(f, nil)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("creating bzip2 writer"), err)
+	}
+	defer bzWriter.Close()
+	tarWriter := tar.NewWriter(bzWriter)
+	defer tarWriter.Close()
+	writeTarWalker := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relPath, err := filepath.Rel(tmpDir.String(), path)
+		if err != nil {
+			return err
+		}
+		if relPath == "." {
+			return nil
+		}
+		header, err := tar.FileInfoHeader(info, "")
+		if err != nil {
+			return err
+		}
+		header.Name = relPath
+		if info.IsDir() {
+			header.Name += "/"
+		}
+		if err := tarWriter.WriteHeader(header); err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			fileContent, err := paths.New(path).ReadFile()
+			if err != nil {
+				return err
+			}
+			_, err = tarWriter.Write(fileContent)
+			return err
+		}
+		return nil
+	}
+	if err := filepath.Walk(tmpDir.String(), writeTarWalker); err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("creating firmware archive"), err)
+	}
+	return fwDetails, nil
 }
 
 func detectUploadPort(
@@ -875,7 +941,7 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 func overrideProtocolProperties(action, protocol string, props *properties.Map) *properties.Map {
 	res := props.Clone()
 	subtree := props.SubTree(fmt.Sprintf("%s.%s", action, protocol))
-	for k, v := range subtree.AsMap() {
+	for k, v := range subtree.IterMap() {
 		res.Set(fmt.Sprintf("%s.%s", action, k), v)
 	}
 	return res

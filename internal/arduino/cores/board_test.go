@@ -263,13 +263,13 @@ func TestBoardOptions(t *testing.T) {
 
 	conf2560, err := boardMega.GeneratePropertiesForConfiguration("cpu=atmega2560")
 	require.NoError(t, err, "generating cpu=atmega2560 configuration")
-	require.EqualValues(t, expConf2560.AsMap(), conf2560.AsMap(), "configuration for cpu=atmega2560")
-	require.EqualValues(t, map[string]string{"cpu": "Processor"}, boardMega.GetConfigOptions().AsMap())
+	require.EqualValues(t, expConf2560.CloneAsMap(), conf2560.CloneAsMap(), "configuration for cpu=atmega2560")
+	require.EqualValues(t, map[string]string{"cpu": "Processor"}, boardMega.GetConfigOptions().CloneAsMap())
 	require.EqualValues(t, map[string]string{
 		"atmega1280": "ATmega1280",
 		"atmega2560": "ATmega2560 (Mega 2560)",
-	}, boardMega.GetConfigOptionValues("cpu").AsMap())
-	require.EqualValues(t, map[string]string{"cpu": "atmega2560"}, boardMega.defaultConfig.AsMap())
+	}, boardMega.GetConfigOptionValues("cpu").CloneAsMap())
+	require.EqualValues(t, map[string]string{"cpu": "atmega2560"}, boardMega.defaultConfig.CloneAsMap())
 	expConf1280 := properties.NewMap()
 	expConf1280.Set("bootloader.extended_fuses", "0xF5")
 	expConf1280.Set("bootloader.file", "atmega/ATmegaBOOT_168_atmega1280.hex")
@@ -323,7 +323,7 @@ func TestBoardOptions(t *testing.T) {
 	expConf1280.Set("vid.5", "0x2341")
 	conf1280, err := boardMega.GeneratePropertiesForConfiguration("cpu=atmega1280")
 	require.NoError(t, err, "generating cpu=atmega1280 configuration")
-	require.EqualValues(t, expConf1280.AsMap(), conf1280.AsMap(), "configuration for cpu=atmega1280")
+	require.EqualValues(t, expConf1280.CloneAsMap(), conf1280.CloneAsMap(), "configuration for cpu=atmega1280")
 
 	_, err = boardMega.GeneratePropertiesForConfiguration("cpu=atmegassss")
 	require.Error(t, err, "generating cpu=atmegassss configuration")
@@ -364,7 +364,7 @@ func TestBoardOptions(t *testing.T) {
 	expWatterott.Set("vid.0", "0x16D0")
 	confWatterott, err := boardWatterottTiny841.GeneratePropertiesForConfiguration("core=spencekonde,info=info")
 	require.NoError(t, err, "generating core=spencekonde,info=info configuration")
-	require.EqualValues(t, expWatterott.AsMap(), confWatterott.AsMap(), "generating core=spencekonde,info=info configuration")
+	require.EqualValues(t, expWatterott.CloneAsMap(), confWatterott.CloneAsMap(), "generating core=spencekonde,info=info configuration")
 
 	// data, err := json.MarshalIndent(prop, "", "  ")
 	// require.NoError(t, err, "marshaling result")
@@ -667,7 +667,7 @@ func TestBoardConfigMatching(t *testing.T) {
 			if test.configOutput != nil {
 				require.True(t, brd01.IsBoardMatchingIDProperties(identificationProps))
 				config := brd01.IdentifyBoardConfiguration(identificationProps)
-				require.EqualValues(t, test.configOutput, config.AsMap())
+				require.EqualValues(t, test.configOutput, config.CloneAsMap())
 			} else {
 				require.False(t, brd01.IsBoardMatchingIDProperties(identificationProps))
 			}
