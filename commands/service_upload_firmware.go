@@ -7,8 +7,11 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/internal/instances"
@@ -20,6 +23,7 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/codeclysm/extract/v4"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/f"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -112,14 +116,25 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 			}
 			installedTool = pme.FindToolDependency(dep)
 			if installedTool == nil {
+				// TODO: We may download the tool from the URLs saved in the
+				// firmware file manifest to attempt a manual download. BTW
+				// the URLs may be malicious and should be verified against
+				// a known good sources list.
+
 				return fmt.Errorf("%s: %w", i18n.Tr("tool not found after installation"), err)
 			}
 		}
 		installedTools = append(installedTools, installedTool)
 	}
 
-	// Load the runtime properties for the tools
+	// Verify that the upload action is a known one before proceeding
 	uploadProperties := properties.NewFromHashmap(fwDetails.GetUploadProperties())
+	trust := determineUploadPropertiesTrustLevel(uploadProperties)
+	if err := errors.Join(trust.ProjectNameCheckResult, trust.PatternCheckResult, trust.ActionCheckResult); err != nil {
+		return fmt.Errorf("%s: %w", i18n.Tr("upload properties trust check failed"), err)
+	}
+
+	// Load the runtime properties for the tools
 	for _, installedTool := range installedTools {
 		uploadProperties.Merge(installedTool.RuntimeProperties())
 	}
@@ -149,6 +164,56 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 			},
 		},
 	})
+}
+
+type uploadTrustLevel struct {
+	ProjectNameCheckResult error
+	PatternCheckResult     error
+	ActionCheckResult      error
+}
+
+func determineUploadPropertiesTrustLevel(_uploadProperties *properties.Map) uploadTrustLevel {
+	// Clone properties so the original map remains unmodified.
+	uploadProperties := _uploadProperties.Clone()
+
+	// The build.project_name contains the name of the project, this is known at compile
+	// time but it's not a fixed part of the upload pattern.
+	// The variable should only contain alphanumeric characters, underscores, dots, and
+	// spaces; we check that this is the case and remove the project name from the properties,
+	// so we can match the remaining pattern against known good patterns.
+	projectName := uploadProperties.Get("build.project_name")
+	var projectNameValid error
+	if !f.Must(regexp.MatchString(`^[a-zA-Z0-9_. ]+$`, projectName)) {
+		projectNameValid = fmt.Errorf("invalid project name %s: it must only contain alphanumeric characters, underscores, dots, and spaces", projectName)
+	}
+	uploadProperties.Remove("build.project_name")
+
+	// Produce the expanded upload pattern for further validation.
+	action := uploadProperties.Get("runtime.upload.action")
+	var actionValid error
+	if action != "upload" {
+		actionValid = fmt.Errorf("invalid action %s: it must be 'upload'", action)
+	}
+	pattern := uploadProperties.Get(action + ".pattern")
+	expandedPattern := uploadProperties.ExpandPropsInString(pattern)
+
+	// Check if the expanded pattern, matches one of the known good patterns
+	var patternValid error
+	if !slices.Contains(safedPatterns, expandedPattern) {
+		patternValid = fmt.Errorf("the expanded pattern '%s' does not match any known good patterns", expandedPattern)
+	}
+
+	return uploadTrustLevel{
+		ProjectNameCheckResult: projectNameValid,
+		PatternCheckResult:     patternValid,
+		ActionCheckResult:      actionValid,
+	}
+}
+
+// TODO: Allow downloading updated patterns from a remote source
+var safedPatterns = []string{
+	// arduino:zephyr:unoq version 1.0.0
+	`"{runtime.tools.remoteocd.path}/remoteocd" upload --adb-path "{runtime.tools.adb.path}/adb" -s "{upload.port.properties.serialNumber}" -f "{runtime.fw.path}/build.variant.path/flash_sketch.cfg" "{upload.verbose}" "{runtime.fw.path}/runtime.platform.path/firmwares/zephyr-arduino_uno_q_stm32u585xx.elf" "{runtime.fw.path}/build.path/{build.project_name}.elf-zsk.bin"`,
 }
 
 // readFirmwareFileDetails only reads the firmware.json file from the firmware file
