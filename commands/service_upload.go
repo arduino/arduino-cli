@@ -494,8 +494,8 @@ func (s *arduinoCoreServerImpl) runProgramAction(
 	uploadProperties.Set("upload.port.protocol", port.Protocol)
 	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
 	if actualPort.Properties != nil {
-		for prop, value := range actualPort.Properties.AsMap() {
-			uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+		for prop, value := range actualPort.Properties.IterMap() {
+			uploadProperties.Set("upload.port.properties."+prop, value)
 		}
 	}
 
@@ -939,7 +939,7 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 func overrideProtocolProperties(action, protocol string, props *properties.Map) *properties.Map {
 	res := props.Clone()
 	subtree := props.SubTree(fmt.Sprintf("%s.%s", action, protocol))
-	for k, v := range subtree.AsMap() {
+	for k, v := range subtree.IterMap() {
 		res.Set(fmt.Sprintf("%s.%s", action, k), v)
 	}
 	return res

@@ -148,7 +148,7 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 			}
 		}
 	}
-	for setting, value := range boardSettings.AsMap() {
+	for setting, value := range boardSettings.IterMap() {
 		if err := monitor.Configure(setting, value); err != nil {
 			logrus.Errorf("Could not set configuration %s=%s: %s", setting, value, err)
 		} else {

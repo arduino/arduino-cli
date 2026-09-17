@@ -194,12 +194,12 @@ func (s *arduinoCoreServerImpl) getDebugProperties(req *rpc.GetDebugConfigReques
 
 	// Extract and expand all debugging properties
 	debugProperties := properties.NewMap()
-	for k, v := range toolProperties.SubTree("debug").AsMap() {
+	for k, v := range toolProperties.SubTree("debug").IterMap() {
 		debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 	}
 	if debugAdditionalConfig, ok := toolProperties.GetOk("debug.additional_config"); ok {
 		debugAdditionalConfig = toolProperties.ExpandPropsInString(debugAdditionalConfig)
-		for k, v := range toolProperties.SubTree(debugAdditionalConfig).AsMap() {
+		for k, v := range toolProperties.SubTree(debugAdditionalConfig).IterMap() {
 			debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 		}
 	}
