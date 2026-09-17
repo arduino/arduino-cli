@@ -338,7 +338,7 @@ program.extra_params=-P{serial.port}
 `))
 	require.NoError(t, err)
 
-	require.Equal(t, expectedProps.AsMap(), props.AsMap())
+	require.Equal(t, expectedProps.CloneAsMap(), props.CloneAsMap())
 }
 
 func TestConvertUploadToolsToPluggableDiscoveryWithMenus(t *testing.T) {
@@ -406,5 +406,5 @@ menu.upload_method.dfuMethod.upload.tool=stm32CubeProg
 menu.upload_method.dfuMethod.upload.tool.default=stm32CubeProg
 `))
 	require.NoError(t, err)
-	require.Equal(t, expectedProps.AsMap(), props.AsMap())
+	require.Equal(t, expectedProps.CloneAsMap(), props.CloneAsMap())
 }
