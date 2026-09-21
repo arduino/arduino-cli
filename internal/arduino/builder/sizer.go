@@ -157,10 +157,15 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 	}
 
 	if b.logger.VerbosityLevel() > logger.VerbosityQuiet {
-		b.logger.Info(i18n.Tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
-			strconv.Itoa(textSize),
-			strconv.Itoa(maxTextSize),
-			strconv.Itoa(textSize*100/maxTextSize)))
+		if maxTextSize > 0 {
+			b.logger.Info(i18n.Tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
+				strconv.Itoa(textSize),
+				strconv.Itoa(maxTextSize),
+				strconv.Itoa(textSize*100/maxTextSize)))
+		} else {
+			b.logger.Info(i18n.Tr("Sketch uses %s bytes of program storage space.", strconv.Itoa(textSize)))
+		}
+
 		if dataSize >= 0 {
 			if maxDataSize > 0 {
 				b.logger.Info(i18n.Tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
@@ -189,7 +194,7 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 		})
 	}
 
-	if textSize > maxTextSize {
+	if maxTextSize > 0 && textSize > maxTextSize {
 		b.logger.Warn(i18n.Tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return executableSectionsSize, errors.New(i18n.Tr("text section exceeds available space in board"))
 	}
