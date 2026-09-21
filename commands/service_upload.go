@@ -467,12 +467,10 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		return nil, err
 	}
 	defer watcher.Close()
+	waitForUploadPort := uploadProperties.GetBoolean("upload.wait_for_upload_port")
 	updatedUploadPort := make(chan *discovery.Port, 1)
 	go func() {
-		updatedUploadPort <- detectUploadPort(
-			uploadCtx,
-			port, watcher.Feed(),
-			uploadProperties.GetBoolean("upload.wait_for_upload_port"))
+		updatedUploadPort <- detectUploadPort(uploadCtx, port, watcher.Feed(), waitForUploadPort)
 	}()
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
@@ -485,7 +483,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	// - "upload.tool.serial" not defined, or
 	//   "upload.tool.serial" is the same as "upload.tool.default"
 	forcedSerialPortWait := port.Protocol == "default" && // this is the value when no port is specified
-		uploadProperties.GetBoolean("upload.wait_for_upload_port") &&
+		waitForUploadPort &&
 		(!uploadProperties.ContainsKey("upload.tool.serial") || uploadProperties.Get("upload.tool.serial") == uploadProperties.Get("upload.tool.default"))
 
 	// If not using programmer perform some action required
@@ -499,7 +497,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		if touch {
 			portToTouch = port.Address
 			// Waits for upload port only if a 1200bps touch is done
-			wait = uploadProperties.GetBoolean("upload.wait_for_upload_port")
+			wait = waitForUploadPort
 		}
 
 		// if touch is requested but port is not specified, print a warning
