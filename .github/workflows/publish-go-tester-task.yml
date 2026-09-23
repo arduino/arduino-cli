@@ -43,9 +43,9 @@ jobs:
           TAG_REGEX="refs/tags/.*"
           # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
           if [[
-            ("${{ github.event_name }}" != "create" ||
-            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX) &&
-            ! "${{ github.ref }}" =~ $TAG_REGEX
+            ("$GITHUB_EVENT_NAME" != "create" ||
+            "$GITHUB_REF" =~ $RELEASE_BRANCH_REGEX) &&
+            ! "$GITHUB_REF" =~ $TAG_REGEX
           ]]; then
             # Run the other jobs.
             RESULT="true"
@@ -68,7 +68,7 @@ jobs:
         id: calculation
         run: |
           PACKAGE_NAME_PREFIX="test"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
             PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
           fi
           PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
