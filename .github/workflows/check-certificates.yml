@@ -36,18 +36,18 @@ jobs:
             (
               # Only run on branch creation when it is a release branch.
               # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
-              "${{ github.event_name }}" != "create" ||
-              "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+              "$GITHUB_EVENT_NAME" != "create" ||
+              "$GITHUB_REF" =~ $RELEASE_BRANCH_REGEX
             ) &&
             (
               # Only run when the workflow will have access to the certificate secrets.
               # This could be done via a GitHub Actions workflow conditional, but makes more sense to do it here as well.
               (
-                "${{ github.event_name }}" != "pull_request" &&
+                "$GITHUB_EVENT_NAME" != "pull_request" &&
                 "${{ github.repository }}" == "$REPO_SLUG"
               ) ||
               (
-                "${{ github.event_name }}" == "pull_request" &&
+                "$GITHUB_EVENT_NAME" == "pull_request" &&
                 "${{ github.event.pull_request.head.repo.full_name }}" == "$REPO_SLUG"
               )
             )
