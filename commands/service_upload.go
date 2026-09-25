@@ -533,6 +533,26 @@ func (s *arduinoCoreServerImpl) runProgramAction(
 	return rpc.DiscoveryPortToRPC(updatedPort), nil, nil
 }
 
+// pathRewriter helps to rebase paths from a base directory to a target directory.
+// TODO: Could be an helper to add in the go-paths library?
+type pathRewriter struct {
+	basePath   *paths.Path
+	targetPath *paths.Path
+}
+
+// Rewrite rebases the given path from the base directory to the target directory.
+// If the path is not inside the base directory, it returns nil.
+func (r *pathRewriter) Rewrite(p *paths.Path) *paths.Path {
+	if inside, _ := p.IsInsideDir(r.basePath); !inside {
+		return nil
+	}
+	rel, err := p.RelFrom(r.basePath)
+	if err != nil {
+		return p
+	}
+	return r.targetPath.JoinPath(rel)
+}
+
 func makeFirmwareFile(
 	fqbn string,
 	uploadProperties *properties.Map,
@@ -576,32 +596,54 @@ func makeFirmwareFile(
 	}
 
 	// Add artifacts and export them to the tmp folder
-	fwProperties.Set("build.path", "build.path")
-	fwProperties.Set("build.variant.path", "build.variant.path")
-	fwProperties.Set("runtime.platform.path", "runtime.platform.path")
-	for artifactName, artifactPathRecipe := range uploadProperties.SubTree("upload.artifacts").IterMap() {
-		artifactPath := paths.New(uploadProperties.ExpandPropsInString(artifactPathRecipe))
-		artifactFwPath := fwProperties.ExpandPropsInString(artifactPathRecipe)
+	allowedPaths := []pathRewriter{
+		{basePath: uploadProperties.GetPath("build.path"), targetPath: paths.New("build.path")},
+		{basePath: uploadProperties.GetPath("build.variant.path"), targetPath: paths.New("build.variant.path")},
+		{basePath: uploadProperties.GetPath("runtime.platform.path"), targetPath: paths.New("runtime.platform.path")},
+	}
+	rebasePath := func(artifactPath *paths.Path) (*paths.Path, bool) {
+		for _, allowedPath := range allowedPaths {
+			if rebased := allowedPath.Rewrite(artifactPath); rebased != nil {
+				return rebased, true
+			}
+		}
+		return nil, false
+	}
+	collectArtifact := func(artifactName string, artifactPath *paths.Path) error {
+		// Rebase the artifact path to the firmware directory structure
+		artifactFwPath, ok := rebasePath(artifactPath)
+		if !ok {
+			return fmt.Errorf("%s", i18n.Tr("artifact path %s is not under allowed paths", artifactPath))
+		}
 
 		fwDetails.Artifacts = append(fwDetails.Artifacts, &rpc.FirmwareFileDetails_Artifact{
 			Id:          "artifacts." + artifactName,
-			Path:        artifactPathRecipe,
+			Path:        artifactFwPath.String(),
 			IsDirectory: artifactPath.IsDir(),
 		})
 
 		// Ensure the parent directory of the export path exists
-		artifactTmpPath := fwDir.Join(artifactFwPath)
+		artifactTmpPath := fwDir.JoinPath(artifactFwPath)
 		if err := artifactTmpPath.Parent().MkdirAll(); err != nil {
-			return nil, fmt.Errorf("%s: %w", i18n.Tr("creating temporary directory"), err)
+			return fmt.Errorf("%s: %w", i18n.Tr("creating temporary directory"), err)
 		}
 		if artifactPath.IsDir() {
 			if err := artifactPath.CopyDirTo(artifactTmpPath); err != nil {
-				return nil, fmt.Errorf("%s: %w", i18n.Tr("copying directory %s to %s", artifactPath, artifactTmpPath), err)
+				return fmt.Errorf("%s: %w", i18n.Tr("copying directory %s to %s", artifactPath, artifactTmpPath), err)
 			}
 		} else {
 			if err := artifactPath.CopyTo(artifactTmpPath); err != nil {
-				return nil, fmt.Errorf("%s: %w", i18n.Tr("copying file %s to %s", artifactPath, artifactTmpPath), err)
+				return fmt.Errorf("%s: %w", i18n.Tr("copying file %s to %s", artifactPath, artifactTmpPath), err)
 			}
+		}
+		return nil
+	}
+
+	// Collect declared artifacts
+	for artifactName, artifactPathRecipe := range uploadProperties.SubTree("upload.artifacts").IterMap() {
+		artifactPath := paths.New(uploadProperties.ExpandPropsInString(artifactPathRecipe))
+		if err := collectArtifact(artifactName, artifactPath); err != nil {
+			return nil, err
 		}
 	}
 
