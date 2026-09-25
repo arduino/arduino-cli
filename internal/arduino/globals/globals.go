@@ -47,6 +47,7 @@ var (
 		".json": true,
 		".tpp":  true,
 		".ipp":  true,
+		".inc":  true,
 	}
 
 	// SourceFilesValidExtensions lists valid extensions for source files (no headers).
