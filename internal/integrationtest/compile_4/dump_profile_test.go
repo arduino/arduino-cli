@@ -69,3 +69,48 @@ func TestDumpProfileClean(t *testing.T) {
 		require.NotContains(t, string(stdout), validProfile)
 	})
 }
+
+func TestDumpExistingProfile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	t.Cleanup(env.CleanUp)
+
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	tmpDir, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = tmpDir.RemoveAll })
+
+	sketchPath := tmpDir.Join("ProfileSketch")
+	require.NoError(t, sketchPath.MkdirAll())
+	require.NoError(t, sketchPath.Join("ProfileSketch.ino").WriteFile([]byte(`#include <Servo.h>
+
+void setup() {}
+void loop() {}
+`)))
+	require.NoError(t, sketchPath.Join("sketch.yaml").WriteFile([]byte(`profiles:
+  project_default:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - Servo (1.3.0)
+default_profile: project_default
+`)))
+
+	_, _, err = cli.Run("compile", sketchPath.String())
+	require.NoError(t, err)
+
+	stdout, stderr, err := cli.Run("compile", "--dump-profile", sketchPath.String())
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Equal(t, strings.TrimSpace(`profiles:
+  project_default:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - Servo (1.3.0)
+default_profile: project_default
+`), strings.TrimSpace(string(stdout)))
+}
