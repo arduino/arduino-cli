@@ -111,6 +111,8 @@ message FirmwareFileDetails {
   repeated UserField user_fields = 6;
   // The protocol used for the upload.
   string protocol = 7;
+  // Warnings or informational messages generated during the firmware generation process.
+  repeated string warnings = 8;
 }
 
 message ProgrammerIsRequiredForUploadError {}
