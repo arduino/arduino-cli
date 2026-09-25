@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 
 	"fortio.org/safecast"
 )
@@ -26,12 +27,20 @@ import (
 type Map struct {
 	values map[string]any
 	schema map[string]reflect.Type
+	mux    *sync.RWMutex
 }
 
 func New() *Map {
 	return &Map{
 		values: make(map[string]any),
 		schema: make(map[string]reflect.Type),
+		mux:    &sync.RWMutex{},
+	}
+}
+
+func (c *Map) ensureMux() {
+	if c.mux == nil {
+		c.mux = &sync.RWMutex{}
 	}
 }
 
@@ -41,8 +50,9 @@ func (c Map) Get(key string) any {
 }
 
 func (c Map) GetOk(key string) (any, bool) {
-	keys := strings.Split(key, ".")
-	return c.get(keys)
+	c.mux.RLock()
+	defer c.mux.RUnlock()
+	return c.get(strings.Split(key, "."))
 }
 
 func (c Map) get(keys []string) (any, bool) {
@@ -60,7 +70,7 @@ func (c Map) get(keys []string) (any, bool) {
 	return nil, false
 }
 
-func (c Map) Set(key string, value any) error {
+func (c Map) setValue(key string, value any) error {
 	if len(c.schema) > 0 {
 		t, ok := c.schema[key]
 		if !ok {
@@ -72,9 +82,14 @@ func (c Map) Set(key string, value any) error {
 		}
 		value = newValue
 	}
-	keys := strings.Split(key, ".")
-	c.set(keys, value)
+	c.set(strings.Split(key, "."), value)
 	return nil
+}
+
+func (c Map) Set(key string, value any) error {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	return c.setValue(key, value)
 }
 
 func tryConversion(current any, desiredType reflect.Type) (any, error) {
@@ -144,8 +159,9 @@ func (c Map) set(keys []string, value any) {
 }
 
 func (c Map) Delete(key string) {
-	keys := strings.Split(key, ".")
-	c.delete(keys)
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.delete(strings.Split(key, "."))
 }
 
 func (c Map) delete(keys []string) {
@@ -167,10 +183,17 @@ func (c Map) delete(keys []string) {
 }
 
 func (c *Map) Merge(x *Map) error {
+	c.ensureMux()
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	return c.merge(x)
+}
+
+func (c *Map) merge(x *Map) error {
 	for xk, xv := range x.values {
 		if xSubConf, ok := xv.(*Map); ok {
 			if subConf, ok := c.values[xk].(*Map); ok {
-				if err := subConf.Merge(xSubConf); err != nil {
+				if err := subConf.merge(xSubConf); err != nil {
 					return err
 				}
 				continue
@@ -191,10 +214,16 @@ func (c *Map) Merge(x *Map) error {
 }
 
 func (c *Map) AllKeys() []string {
+	c.ensureMux()
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	return c.allKeys("")
 }
 
 func (c *Map) Schema() map[string]reflect.Type {
+	c.ensureMux()
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	return c.schema
 }
 
@@ -217,5 +246,22 @@ func (c *Map) allKeys(prefix string) []string {
 }
 
 func (c *Map) SetKeyTypeSchema(key string, t any) {
+	c.ensureMux()
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.schema[key] = reflect.TypeOf(t)
+}
+
+// deepSnapshot recursively builds a plain map[string]any, expanding all *Map
+// sub-objects into plain maps. Must be called while the top-level mux is held.
+func deepSnapshot(values map[string]any) map[string]any {
+	out := make(map[string]any, len(values))
+	for k, v := range values {
+		if subMap, ok := v.(*Map); ok {
+			out[k] = deepSnapshot(subMap.values)
+		} else {
+			out[k] = v
+		}
+	}
+	return out
 }
