@@ -616,6 +616,13 @@ func makeFirmwareFile(
 			return fmt.Errorf("%s", i18n.Tr("artifact path %s is not under allowed paths", artifactPath))
 		}
 
+		// Check if the artifact is already in the firmware details
+		for _, artifact := range fwDetails.Artifacts {
+			if artifact.Path == artifactFwPath.String() {
+				return fmt.Errorf("%s", i18n.Tr("artifact path %s is already included in the firmware details", artifactFwPath))
+			}
+		}
+
 		fwDetails.Artifacts = append(fwDetails.Artifacts, &rpc.FirmwareFileDetails_Artifact{
 			Id:          "artifacts." + artifactName,
 			Path:        artifactFwPath.String(),
@@ -644,6 +651,25 @@ func makeFirmwareFile(
 		artifactPath := paths.New(uploadProperties.ExpandPropsInString(artifactPathRecipe))
 		if err := collectArtifact(artifactName, artifactPath); err != nil {
 			return nil, err
+		}
+	}
+
+	// Heuristic: collect additional artifacts by looking at the command line arguments
+	action := fwProperties.Get("runtime.upload.action")
+	toolRecipeID := fwProperties.Get(action + ".tool")
+	recipe := fwProperties.Get("tools." + toolRecipeID + "." + action + ".pattern")
+	cmqQuoted := uploadProperties.ExpandPropsInString(recipe)
+	cmdArgs, err := properties.SplitQuotedString(cmqQuoted, `"'`, false)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.Tr("splitting command line arguments"), err)
+	}
+	for i, candidatePath := range cmdArgs {
+		candidate := paths.New(candidatePath)
+		if !candidate.Exist() {
+			continue
+		}
+		if err := collectArtifact(fmt.Sprintf("autodetected.%d", i), candidate); err == nil {
+			fwDetails.Warnings = append(fwDetails.Warnings, fmt.Sprintf("Collecting autodetected artifact %s.", candidate))
 		}
 	}
 
