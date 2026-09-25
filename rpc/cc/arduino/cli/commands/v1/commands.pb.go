@@ -417,9 +417,9 @@ type FailedInstanceInitError struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// specific cause of the error.
+	// The specific cause of the error.
 	Reason FailedInstanceInitReason `protobuf:"varint,1,opt,name=reason,proto3,enum=cc.arduino.cli.commands.v1.FailedInstanceInitReason" json:"reason,omitempty"`
-	// explanation of the error.
+	// The long explanation of the error.
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 }
 

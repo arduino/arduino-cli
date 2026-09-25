@@ -132,7 +132,10 @@ func (fqbn *FQBN) String() string {
 	if fqbn.Configs.Size() > 0 {
 		sep := ":"
 		for _, k := range fqbn.Configs.Keys() {
-			res.WriteString(sep + k + "=" + fqbn.Configs.Get(k))
+			res.WriteString(sep)
+			res.WriteString(k)
+			res.WriteString("=")
+			res.WriteString(fqbn.Configs.Get(k))
 			sep = ","
 		}
 	}
