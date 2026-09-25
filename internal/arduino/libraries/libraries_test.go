@@ -18,6 +18,7 @@ package libraries
 import (
 	"encoding/json"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -158,4 +159,15 @@ func TestLoadExamples(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, lib.Examples, 1)
 	require.True(t, lib.Examples.Contains(example))
+}
+
+func TestUtilityFolderHelper(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping test on Windows because symlinks require admin privileges.")
+	}
+	lib, err := Load(paths.New("testdata", "LinkToLegacyLibWithUtility"), User)
+	require.NoError(t, err)
+	// SourceDir and UtilityDir should be set to the symlinked paths, not the real paths.
+	require.Contains(t, lib.SourceDir.String(), paths.New("testdata", "LinkToLegacyLibWithUtility").String())
+	require.Contains(t, lib.UtilityDir.String(), paths.New("testdata", "LinkToLegacyLibWithUtility", "utility").String())
 }

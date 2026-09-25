@@ -16,21 +16,16 @@
 package librariesindex
 
 import (
-	"errors"
+	"bufio"
+	"fmt"
+	"iter"
 
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
-	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
-	easyjson "github.com/mailru/easyjson"
+	json "github.com/goccy/go-json"
 	semver "go.bug.st/relaxed-semver"
 )
 
-//easyjson:json
-type indexJSON struct {
-	Libraries []indexRelease `json:"libraries"`
-}
-
-//easyjson:json
 type indexRelease struct {
 	Name             string             `json:"name"`
 	Version          *semver.Version    `json:"version"`
@@ -51,48 +46,67 @@ type indexRelease struct {
 	ProvidesIncludes []string           `json:"providesIncludes"`
 }
 
-//easyjson:json
 type indexDependency struct {
 	Name    string `json:"name"`
 	Version string `json:"version,omitempty"`
 }
 
-// LoadIndex reads a library_index.json and create the corresponding Index
+// LoadIndex creates an Index backed by the given library_index.json file.
+// The file is not read here: it is streamed on demand by the Index methods, so
+// that the whole (potentially very large) index is never held in memory.
 func LoadIndex(indexFile *paths.Path) (*Index, error) {
-	buff, err := indexFile.ReadFile()
-	if err != nil {
-		return nil, errors.New(i18n.Tr("reading library_index.json: %s", err))
+	if !indexFile.Exist() {
+		return nil, fmt.Errorf("index file not found: %s", indexFile)
 	}
-
-	var i indexJSON
-	err = easyjson.Unmarshal(buff, &i)
-	if err != nil {
-		return nil, errors.New(i18n.Tr("parsing library_index.json: %s", err))
-	}
-
-	return i.extractIndex()
+	return &Index{indexFile: indexFile}, nil
 }
 
-func (i indexJSON) extractIndex() (*Index, error) {
-	index := &Index{
-		Libraries: map[string]*Library{},
-	}
-	for _, indexLib := range i.Libraries {
-		indexLib.extractLibraryIn(index)
-	}
-	return index, nil
-}
-
-func (indexLib *indexRelease) extractLibraryIn(index *Index) {
-	library, exist := index.Libraries[indexLib.Name]
-	if !exist {
-		library = &Library{
-			Name:     indexLib.Name,
-			Releases: map[semver.NormalizedString]*Release{},
+// scanIndexFile streams the "libraries" array of the given index file, yielding
+// one release at a time without ever loading the whole file. The file is closed
+// when iteration ends; any read or decode error silently stops it.
+func scanIndexFile(indexFile *paths.Path) iter.Seq[*indexRelease] {
+	return func(yield func(*indexRelease) bool) {
+		file, err := indexFile.Open()
+		if err != nil {
+			return
 		}
-		index.Libraries[indexLib.Name] = library
+		defer file.Close()
+
+		dec := json.NewDecoder(bufio.NewReaderSize(file, 1024*1024))
+
+		// The index has the form: { "libraries": [ <release>, <release>, ... ] }.
+		if _, err := dec.Token(); err != nil { // consume the opening '{'
+			return
+		}
+		for dec.More() {
+			keyToken, err := dec.Token()
+			if err != nil {
+				return
+			}
+			if key, _ := keyToken.(string); key != "libraries" {
+				// Skip any unexpected top-level field without loading it whole.
+				var discard json.RawMessage
+				if dec.Decode(&discard) != nil {
+					return
+				}
+				continue
+			}
+			if _, err := dec.Token(); err != nil { // consume the opening '['
+				return
+			}
+			for dec.More() {
+				var release indexRelease
+				if dec.Decode(&release) != nil {
+					return
+				}
+				if !yield(&release) {
+					return
+				}
+			}
+			// The "libraries" array is the only field we care about.
+			return
+		}
 	}
-	indexLib.extractReleaseIn(library)
 }
 
 func (indexLib *indexRelease) extractReleaseIn(library *Library) {

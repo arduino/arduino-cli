@@ -40,7 +40,7 @@ func searchLibrary(req *rpc.LibrarySearchRequest, li *librariesindex.Index) *rpc
 	query := req.GetSearchArgs()
 	matcher := MatcherFromQueryString(query)
 
-	for _, lib := range li.Libraries {
+	for lib := range li.Libraries() {
 		if matcher(lib) {
 			res = append(res, indexLibraryToRPCSearchLibrary(lib, req.GetOmitReleasesDetails()))
 		}

@@ -242,19 +242,19 @@ upload.tool.serial=bossac
 upload.tool.network=arduino_ota`))
 	require.NoError(t, err)
 
-	toolID, err := getToolID(props, "upload", "serial")
+	toolID, err := getToolRecipeID(props, "upload", "serial")
 	require.NoError(t, err)
 	require.Equal(t, "bossac", toolID)
 
-	toolID, err = getToolID(props, "upload", "network")
+	toolID, err = getToolRecipeID(props, "upload", "network")
 	require.NoError(t, err)
 	require.Equal(t, "arduino_ota", toolID)
 
-	toolID, err = getToolID(props, "bootloader", "serial")
+	toolID, err = getToolRecipeID(props, "bootloader", "serial")
 	require.NoError(t, err)
 	require.Equal(t, "avrdude", toolID)
 
-	toolID, err = getToolID(props, "bootloader", "network")
+	toolID, err = getToolRecipeID(props, "bootloader", "network")
 	require.EqualError(t, err, "Property 'bootloader.tool.network' is undefined")
 	require.Equal(t, "", toolID)
 
@@ -263,19 +263,19 @@ upload.tool.network=arduino_ota`))
 	upload.tool.default=bossac`))
 	require.NoError(t, err)
 
-	toolID, err = getToolID(props, "upload", "serial")
+	toolID, err = getToolRecipeID(props, "upload", "serial")
 	require.NoError(t, err)
 	require.Equal(t, "bossac", toolID)
 
-	toolID, err = getToolID(props, "upload", "network")
+	toolID, err = getToolRecipeID(props, "upload", "network")
 	require.NoError(t, err)
 	require.Equal(t, "bossac", toolID)
 
-	toolID, err = getToolID(props, "bootloader", "serial")
+	toolID, err = getToolRecipeID(props, "bootloader", "serial")
 	require.NoError(t, err)
 	require.Equal(t, "avrdude", toolID)
 
-	toolID, err = getToolID(props, "bootloader", "network")
+	toolID, err = getToolRecipeID(props, "bootloader", "network")
 	require.NoError(t, err)
 	require.Equal(t, "avrdude", toolID)
 }

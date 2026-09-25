@@ -502,3 +502,60 @@ default_profile: test
 `)
 	}
 }
+
+func TestSketchLoader(t *testing.T) {
+	env, cli := integrationtest.CreateEnvForDaemon(t)
+	t.Cleanup(env.CleanUp)
+
+	sketchPath, err := paths.New("testdata", "sketch_with_profile").Abs()
+	require.NoError(t, err)
+
+	sk, err := cli.LoadSketch(sketchPath)
+	require.NoError(t, err)
+
+	profiles := sk.GetSketch().GetProfiles()
+	require.Len(t, profiles, 2)
+
+	// nanorp:
+	//   fqbn: arduino:avr:uno
+	//   platforms:
+	//     - platform: arduino:mbed_nano
+	//   libraries:
+	//     - ArduinoIoTCloud (1.0.2)
+	//     - Arduino_ConnectionHandler (0.6.4)
+	//     - TinyDHT sensor library (1.1.0)
+	profile1 := profiles[0]
+	require.Equal(t, "arduino:avr:uno", profile1.GetFqbn())
+	require.Len(t, profile1.GetPlatforms(), 1)
+	require.Equal(t, "arduino:mbed_nano", profile1.GetPlatforms()[0].GetId())
+	require.Equal(t, "", profile1.GetPlatforms()[0].GetVersion())
+	require.Len(t, profile1.GetLibraries(), 3)
+	require.Equal(t, "ArduinoIoTCloud", profile1.GetLibraries()[0].GetIndexLibrary().GetName())
+	require.Equal(t, "1.0.2", profile1.GetLibraries()[0].GetIndexLibrary().GetVersion())
+	require.Equal(t, "Arduino_ConnectionHandler", profile1.GetLibraries()[1].GetIndexLibrary().GetName())
+	require.Equal(t, "0.6.4", profile1.GetLibraries()[1].GetIndexLibrary().GetVersion())
+	require.Equal(t, "TinyDHT sensor library", profile1.GetLibraries()[2].GetIndexLibrary().GetName())
+	require.Equal(t, "1.1.0", profile1.GetLibraries()[2].GetIndexLibrary().GetVersion())
+
+	// profile2:
+	//   fqbn: arduino:avr:uno
+	//   platforms:
+	//     - platform: arduino:mbed_nano (4.0.2)
+	//     - platform: test:mbed_nano (1.2.3)
+	//       platform_index_url: https://test.com/mbed_nano_index.json
+	//   libraries:
+	//     - ArduinoIoTCloud (1.0.2)
+	//     - dir: libraries/Arduino_ConnectionHandler
+	profile2 := profiles[1]
+	require.Equal(t, "arduino:avr:uno", profile2.GetFqbn())
+	require.Len(t, profile2.GetPlatforms(), 2)
+	require.Equal(t, "arduino:mbed_nano", profile2.GetPlatforms()[0].GetId())
+	require.Equal(t, "4.0.2", profile2.GetPlatforms()[0].GetVersion())
+	require.Equal(t, "test:mbed_nano", profile2.GetPlatforms()[1].GetId())
+	require.Equal(t, "1.2.3", profile2.GetPlatforms()[1].GetVersion())
+	require.Equal(t, "https://test.com/mbed_nano_index.json", profile2.GetPlatforms()[1].GetIndexUrl())
+	require.Len(t, profile2.GetLibraries(), 2)
+	require.Equal(t, "ArduinoIoTCloud", profile2.GetLibraries()[0].GetIndexLibrary().GetName())
+	require.Equal(t, "1.0.2", profile2.GetLibraries()[0].GetIndexLibrary().GetVersion())
+	require.Equal(t, "libraries/Arduino_ConnectionHandler", profile2.GetLibraries()[1].GetLocalLibrary().GetPath())
+}

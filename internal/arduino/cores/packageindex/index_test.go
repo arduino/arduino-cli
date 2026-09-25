@@ -45,9 +45,9 @@ func TestDecodeOfLibraryDeps(t *testing.T) {
 	require.NotNil(t, idx)
 	require.Len(t, idx.Packages, 1)
 	require.Len(t, idx.Packages[0].Platforms, 1)
-	require.Len(t, idx.Packages[0].Platforms[0].LibrariesDependencies, 1)
-	require.Equal(t, "FlashStorage", idx.Packages[0].Platforms[0].LibrariesDependencies[0].Name)
-	require.Equal(t, "1.0.0", idx.Packages[0].Platforms[0].LibrariesDependencies[0].Version.String())
+	require.Len(t, idx.Packages[0].Platforms[0].LibraryDependencies, 1)
+	require.Equal(t, "FlashStorage", idx.Packages[0].Platforms[0].LibraryDependencies[0].Name)
+	require.Equal(t, "1.0.0", idx.Packages[0].Platforms[0].LibraryDependencies[0].Version.String())
 }
 
 func TestIndexFromPlatformRelease(t *testing.T) {
@@ -287,7 +287,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			{Packager: "arduino", Name: "ble-monitor"},
 			{Packager: "arduino", Name: "serial-monitor"},
 		},
-		LibrariesDependencies: cores.LibrariesDependencies{
+		LibraryDependencies: cores.LibraryDependencies{
 			{Name: "FlashStorage", Version: semver.MustParse("1.0.0")},
 		},
 		Name:     "Arduino AVR Boards",
@@ -398,7 +398,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 					{Packager: "arduino", Name: "ble-monitor"},
 					{Packager: "arduino", Name: "serial-monitor"},
 				},
-				LibrariesDependencies: []indexLibraryDependency{
+				LibraryDependencies: []indexLibraryDependency{
 					{Name: "FlashStorage", Version: semver.MustParse("1.0.0")},
 				},
 			}},
@@ -628,7 +628,37 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			require.ElementsMatch(t, expectedPlatform.ToolDependencies, indexPlatform.ToolDependencies)
 			require.ElementsMatch(t, expectedPlatform.DiscoveryDependencies, indexPlatform.DiscoveryDependencies)
 			require.ElementsMatch(t, expectedPlatform.MonitorDependencies, indexPlatform.MonitorDependencies)
-			require.ElementsMatch(t, expectedPlatform.LibrariesDependencies, indexPlatform.LibrariesDependencies)
+			require.ElementsMatch(t, expectedPlatform.LibraryDependencies, indexPlatform.LibraryDependencies)
 		}
 	}
+}
+
+func TestPlatformReleaseIndexedFlag(t *testing.T) {
+	// A platform release loaded from a real package index must be marked as indexed.
+	idx, err := LoadIndex(paths.New("testdata", "package_test1_index.json"))
+	require.NoError(t, err)
+	pkgs := cores.NewPackages()
+	idx.MergeIntoPackages(pkgs)
+	pkg, ok := pkgs.GetPackage("arduino")
+	require.True(t, ok)
+	platform := pkg.Platforms["avr"]
+	require.NotNil(t, platform)
+	release := platform.FindReleaseWithVersion(semver.MustParse("1.8.7"))
+	require.NotNil(t, release)
+	require.True(t, release.Indexed, "a release from a real index must be marked as indexed")
+
+	// The same data loaded from an installed.json (local metadata) must NOT be
+	// marked as indexed.
+	idx2, err := LoadIndex(paths.New("testdata", "package_test1_index.json"))
+	require.NoError(t, err)
+	idx2.isInstalledJSON = true
+	localPkgs := cores.NewPackages()
+	idx2.MergeIntoPackages(localPkgs)
+	localPkg, ok := localPkgs.GetPackage("arduino")
+	require.True(t, ok)
+	localPlatform := localPkg.Platforms["avr"]
+	require.NotNil(t, localPlatform)
+	localRelease := localPlatform.FindReleaseWithVersion(semver.MustParse("1.8.7"))
+	require.NotNil(t, localRelease)
+	require.False(t, localRelease.Indexed, "a release from installed.json must not be marked as indexed")
 }

@@ -20,10 +20,10 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/internal/cleanup"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v4"
-	"go.bug.st/cleanup"
 )
 
 type IntegrityCheckMode int

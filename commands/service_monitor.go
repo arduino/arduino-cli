@@ -137,16 +137,26 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		monitor.Quit()
 		return &cmderrors.FailedMonitorError{Cause: err}
 	}
+	var openAppliedSettings []*rpc.MonitorPortSetting
 	if portConfig := openReq.GetPortConfiguration(); portConfig != nil {
 		for _, setting := range portConfig.GetSettings() {
-			boardSettings.Remove(setting.GetSettingId())
 			if err := monitor.Configure(setting.GetSettingId(), setting.GetValue()); err != nil {
 				logrus.Errorf("Could not set configuration %s=%s: %s", setting.GetSettingId(), setting.GetValue(), err)
+			} else {
+				boardSettings.Remove(setting.GetSettingId())
+				openAppliedSettings = append(openAppliedSettings, setting)
 			}
 		}
 	}
 	for setting, value := range boardSettings.AsMap() {
-		monitor.Configure(setting, value)
+		if err := monitor.Configure(setting, value); err != nil {
+			logrus.Errorf("Could not set configuration %s=%s: %s", setting, value, err)
+		} else {
+			openAppliedSettings = append(openAppliedSettings, &rpc.MonitorPortSetting{
+				SettingId: setting,
+				Value:     value,
+			})
+		}
 	}
 	monitorIO, err := monitor.Open(openReq.GetPort().GetAddress(), openReq.GetPort().GetProtocol())
 	if err != nil {
@@ -162,6 +172,11 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	// Send a message with Success set to true to notify the caller of the port being now active
 	syncSend := NewSynchronizedSend(stream.Send)
 	_ = syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Success{Success: true}})
+	if len(openAppliedSettings) > 0 {
+		_ = syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_AppliedSettings{
+			AppliedSettings: &rpc.MonitorPortConfiguration{Settings: openAppliedSettings},
+		}})
+	}
 
 	ctx, cancel := context.WithCancel(stream.Context())
 	gracefulCloseInitiated := &atomic.Bool{}
@@ -180,10 +195,18 @@ func (s *arduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 				return
 			}
 			if conf := msg.GetUpdatedConfiguration(); conf != nil {
+				var appliedSettings []*rpc.MonitorPortSetting
 				for _, c := range conf.GetSettings() {
 					if err := monitor.Configure(c.GetSettingId(), c.GetValue()); err != nil {
 						syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_Error{Error: err.Error()}})
+					} else {
+						appliedSettings = append(appliedSettings, c)
 					}
+				}
+				if len(appliedSettings) > 0 {
+					syncSend.Send(&rpc.MonitorResponse{Message: &rpc.MonitorResponse_AppliedSettings{
+						AppliedSettings: &rpc.MonitorPortConfiguration{Settings: appliedSettings},
+					}})
 				}
 			}
 			if closeMsg := msg.GetClose(); closeMsg {

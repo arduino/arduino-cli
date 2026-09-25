@@ -506,6 +506,13 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 	}
 }
 
+// LoadSketch calls the "LoadSketch" gRPC method.
+func (cli *ArduinoCLI) LoadSketch(sketchPath *paths.Path) (*commands.LoadSketchResponse, error) {
+	return cli.daemonClient.LoadSketch(context.Background(), &commands.LoadSketchRequest{
+		SketchPath: sketchPath.String(),
+	})
+}
+
 // Destroy calls the "Destroy" gRPC method.
 func (inst *ArduinoCLIInstance) Destroy(ctx context.Context) error {
 	logCallf(">>> Destroy(%v)\n", inst.instance.GetId())
@@ -686,8 +693,13 @@ func (inst *ArduinoCLIInstance) PlatformSearch(ctx context.Context, args string,
 
 // Monitor calls the "Monitor" gRPC method and sends the OpenRequest message.
 func (inst *ArduinoCLIInstance) Monitor(ctx context.Context, port *commands.Port) (commands.ArduinoCoreService_MonitorClient, error) {
+	return inst.MonitorWithConfig(ctx, port, nil)
+}
+
+// MonitorWithConfig calls the "Monitor" gRPC method and sends the OpenRequest message with an optional port configuration.
+func (inst *ArduinoCLIInstance) MonitorWithConfig(ctx context.Context, port *commands.Port, portConfig *commands.MonitorPortConfiguration) (commands.ArduinoCoreService_MonitorClient, error) {
 	req := &commands.MonitorRequest{}
-	logCallf(">>> Monitor(%+v)\n", req)
+	logCallf(">>> MonitorWithConfig(%+v)\n", req)
 	monitorClient, err := inst.cli.daemonClient.Monitor(ctx)
 	if err != nil {
 		return nil, err
@@ -695,8 +707,9 @@ func (inst *ArduinoCLIInstance) Monitor(ctx context.Context, port *commands.Port
 	err = monitorClient.Send(&commands.MonitorRequest{
 		Message: &commands.MonitorRequest_OpenRequest{
 			OpenRequest: &commands.MonitorPortOpenRequest{
-				Instance: inst.instance,
-				Port:     port,
+				Instance:          inst.instance,
+				Port:              port,
+				PortConfiguration: portConfig,
 			},
 		},
 	})

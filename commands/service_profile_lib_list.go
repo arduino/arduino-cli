@@ -45,7 +45,7 @@ func (s *arduinoCoreServerImpl) ProfileLibList(ctx context.Context, req *rpc.Pro
 	}
 
 	return &rpc.ProfileLibListResponse{
-		Libraries:   f.Map(profile.Libraries, (*sketch.ProfileLibraryReference).ToRpc),
+		Libraries:   f.Map(profile.Libraries, (*sketch.ProfileLibraryReference).ToRPC),
 		ProfileName: profileName,
 	}, nil
 }

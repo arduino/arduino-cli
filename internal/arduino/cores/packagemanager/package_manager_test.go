@@ -26,6 +26,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
@@ -1019,12 +1020,19 @@ func TestRunScript(t *testing.T) {
 			require.NoError(t, err)
 			err = os.Chmod(scriptPath.String(), 0777)
 			require.NoError(t, err)
-			stdout, stderr, err := pme.RunPreOrPostScript(dir, test.scriptName)
-			require.NoError(t, err)
+			var capturedMessages []string
+			taskCB := func(msg *rpc.TaskProgress) {
+				if msg != nil && msg.GetMessage() != "" {
+					capturedMessages = append(capturedMessages, msg.GetMessage())
+				}
+			}
+			pme.RunPreOrPostScript(dir, test.scriptName, taskCB, "start", "warning: %s")
 
-			// `HasPrefix` because windows seem to add a trailing space at the end
-			require.Equal(t, "sent in stdout", strings.Trim(string(stdout), "\n\r "))
-			require.Equal(t, "sent in stderr", strings.Trim(string(stderr), "\n\r "))
+			// start message + stdout + stderr; windows may add trailing whitespace
+			require.Len(t, capturedMessages, 3)
+			require.Equal(t, "start", capturedMessages[0])
+			require.Equal(t, "sent in stdout", strings.Trim(capturedMessages[1], "\n\r "))
+			require.Equal(t, "sent in stderr", strings.Trim(capturedMessages[2], "\n\r "))
 		})
 	}
 }

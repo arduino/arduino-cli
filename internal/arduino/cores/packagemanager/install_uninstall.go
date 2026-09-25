@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -134,19 +135,15 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 	// Perform post install
 	if !skipPostInstall {
 		log.Info("Running post_install script")
-		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Configuring platform.")})
 		if !platformRelease.IsInstalled() {
 			return errors.New(i18n.Tr("platform not installed"))
 		}
-		stdout, stderr, err := pme.RunPreOrPostScript(platformRelease.InstallDir, "post_install")
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout), Completed: true})
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr), Completed: true})
-		if err != nil {
-			taskCB(&rpc.TaskProgress{Message: i18n.Tr("WARNING cannot configure platform: %s", err), Completed: true})
-		}
+		pme.RunPreOrPostScript(
+			platformRelease.InstallDir, "post_install",
+			taskCB, i18n.Tr("Configuring platform."), i18n.Tr("WARNING: cannot configure platform"))
 
 	} else {
-		log.Info("Skipping platform configuration.")
+		log.Info("Skipping post_install script")
 		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Skipping platform configuration.")})
 	}
 
@@ -192,27 +189,41 @@ func (pme *Explorer) cacheInstalledJSON(platformRelease *cores.PlatformRelease) 
 	return nil
 }
 
-// RunPreOrPostScript runs either the post_install.sh (or post_install.bat) or the pre_uninstall.sh (or pre_uninstall.bat)
-// script for the specified platformRelease or toolRelease.
-func (pme *Explorer) RunPreOrPostScript(installDir *paths.Path, prefix string) ([]byte, []byte, error) {
-	scriptFilename := prefix + ".sh"
+// RunPreOrPostScript runs the pre/post script for the given install directory and
+// emits progress messages via taskCB. startMessage is sent only when the script actually exists.
+// warningMessage is sent if the script fails together with the error message.
+func (pme *Explorer) RunPreOrPostScript(
+	installDir *paths.Path, scriptPrefix string,
+	taskCB rpc.TaskProgressCB, startMessage string, warningMessage string,
+) {
+	scriptFilename := scriptPrefix + ".sh"
 	if runtime.GOOS == "windows" {
-		scriptFilename = prefix + ".bat"
+		scriptFilename = scriptPrefix + ".bat"
 	}
 	script := installDir.Join(scriptFilename)
-	if script.Exist() && script.IsNotDir() {
-		cmd, err := paths.NewProcessFromPath(pme.GetEnvVarsForSpawnedProcess(), script)
-		if err != nil {
-			return []byte{}, []byte{}, err
-		}
-		cmdStdout, cmdStderr := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
-		cmd.RedirectStdoutTo(cmdStdout)
-		cmd.RedirectStderrTo(cmdStderr)
-		cmd.SetDirFromPath(installDir)
-		err = cmd.Run()
-		return cmdStdout.Bytes(), cmdStderr.Bytes(), err
+	if !script.Exist() || script.IsDir() {
+		return
 	}
-	return []byte{}, []byte{}, nil
+	taskCB(&rpc.TaskProgress{Message: startMessage})
+	cmd, err := paths.NewProcessFromPath(pme.GetEnvVarsForSpawnedProcess(), script)
+	if err != nil {
+		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("%s: %s", warningMessage, err)})
+		return
+	}
+	cmdStdout, cmdStderr := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
+	cmd.RedirectStdoutTo(cmdStdout)
+	cmd.RedirectStderrTo(cmdStderr)
+	cmd.SetDirFromPath(installDir)
+	err = cmd.Run()
+	if stdout := cmdStdout.String(); len(stdout) > 0 {
+		taskCB(&rpc.TaskProgress{Message: stdout})
+	}
+	if stderr := cmdStderr.String(); len(stderr) > 0 {
+		taskCB(&rpc.TaskProgress{Message: stderr})
+	}
+	if err != nil {
+		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("%s: %s", warningMessage, err)})
+	}
 }
 
 // IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager
@@ -254,16 +265,12 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 
 	if !skipPreUninstall {
 		log.Info("Running pre_uninstall script")
-		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Running pre_uninstall script.")})
-		stdout, stderr, err := pme.RunPreOrPostScript(platformRelease.InstallDir, "pre_uninstall")
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout), Completed: true})
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr), Completed: true})
-		if err != nil {
-			taskCB(&rpc.TaskProgress{Message: i18n.Tr("WARNING cannot run pre_uninstall script: %s", err), Completed: true})
-		}
+		pme.RunPreOrPostScript(
+			platformRelease.InstallDir, "pre_uninstall",
+			taskCB, i18n.Tr("Running uninstall script."), i18n.Tr("WARNING: cannot run uninstall script"))
 	} else {
 		log.Info("Skipping pre_uninstall script.")
-		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Skipping pre_uninstall script.")})
+		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Skipping uninstall script.")})
 	}
 
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
@@ -316,13 +323,9 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 	// Perform post install
 	if !skipPostInstall {
 		log.Info("Running tool post_install script")
-		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Configuring tool.")})
-		stdout, stderr, err := pme.RunPreOrPostScript(toolRelease.InstallDir, "post_install")
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout)})
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr)})
-		if err != nil {
-			taskCB(&rpc.TaskProgress{Message: i18n.Tr("WARNING cannot configure tool: %s", err)})
-		}
+		pme.RunPreOrPostScript(
+			toolRelease.InstallDir, "post_install",
+			taskCB, i18n.Tr("Configuring tool."), i18n.Tr("WARNING: cannot configure tool"))
 	} else {
 		log.Info("Skipping tool configuration.")
 		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Skipping tool configuration.")})
@@ -368,16 +371,12 @@ func (pme *Explorer) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Ta
 
 	if !skipPreUninstall {
 		log.Info("Running pre_uninstall script")
-		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Running pre_uninstall script.")})
-		stdout, stderr, err := pme.RunPreOrPostScript(toolRelease.InstallDir, "pre_uninstall")
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout), Completed: true})
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr), Completed: true})
-		if err != nil {
-			taskCB(&rpc.TaskProgress{Message: i18n.Tr("WARNING cannot run pre_uninstall script: %s", err), Completed: true})
-		}
+		pme.RunPreOrPostScript(
+			toolRelease.InstallDir, "pre_uninstall",
+			taskCB, i18n.Tr("Running uninstall script."), i18n.Tr("WARNING: cannot run uninstall script"))
 	} else {
 		log.Info("Skipping pre_uninstall script.")
-		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Skipping pre_uninstall script.")})
+		taskCB(&rpc.TaskProgress{Message: i18n.Tr("Skipping uninstall script.")})
 	}
 
 	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
@@ -407,13 +406,4 @@ func (pme *Explorer) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 		}
 	}
 	return false
-}
-
-func skipEmptyMessageTaskProgressCB(taskCB rpc.TaskProgressCB) rpc.TaskProgressCB {
-	return func(msg *rpc.TaskProgress) {
-		if msg != nil && len(msg.GetMessage()) == 0 {
-			return
-		}
-		taskCB(msg)
-	}
 }

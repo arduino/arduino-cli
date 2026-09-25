@@ -31,13 +31,15 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/f"
 )
 
 // LoadGlobalHardwareForProfile loads the hardware platforms for the given profile.
 // It uses the global package manager and does not download or install any missing tools or platforms.
 func (pmb *Builder) LoadGlobalHardwareForProfile(p *sketch.Profile) []error {
 	pmb.profile = p
-	return pmb.LoadHardware()
+	platformsToLoad := f.Map(p.Platforms, (*sketch.ProfilePlatformReference).String)
+	return pmb.LoadHardware(platformsToLoad...)
 }
 
 // LoadHardwareForProfile load the hardware platforms for the given profile.

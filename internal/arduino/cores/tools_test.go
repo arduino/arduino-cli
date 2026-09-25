@@ -16,6 +16,7 @@
 package cores
 
 import (
+	"runtime"
 	"slices"
 	"testing"
 
@@ -200,4 +201,27 @@ func TestFlavorPrioritySelection(t *testing.T) {
 	}).GetFlavourCompatibleWith("windows", "arm64")
 	require.NotNil(t, res)
 	require.Equal(t, "1", res.ArchiveFileName)
+}
+
+func TestFlavorForcedArchitecture(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("forced architecture test requires Linux tool flavors")
+	}
+
+	tr := &ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "x86_64-linux-gnu", Resource: &resources.DownloadResource{ArchiveFileName: "amd64"}},
+			{OS: "aarch64-linux-gnu", Resource: &resources.DownloadResource{ArchiveFileName: "arm64"}},
+		},
+	}
+
+	// An explicit architecture must select the requested flavor even when it
+	// does not match the architecture of the running test process.
+	require.Equal(t, "arm64", tr.GetFlavourFor("linux", "arm64").ArchiveFileName)
+
+	t.Setenv("ARDUINO_FORCE_TOOLS_ARCH", "arm64")
+	require.Equal(t, "arm64", tr.GetCompatibleFlavour().ArchiveFileName)
+
+	t.Setenv("ARDUINO_FORCE_TOOLS_ARCH", "386")
+	require.Nil(t, tr.GetCompatibleFlavour())
 }

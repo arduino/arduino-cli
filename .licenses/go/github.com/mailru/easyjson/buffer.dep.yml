@@ -1,13 +1,13 @@
 ---
 name: github.com/mailru/easyjson/buffer
-version: v0.7.7
+version: v0.9.2
 type: go
 summary: Package buffer implements a buffer for serialization, consisting of a chain
   of []byte-s to reduce copying and to allow reuse of individual chunks.
 homepage: https://pkg.go.dev/github.com/mailru/easyjson/buffer
 license: mit
 licenses:
-- sources: easyjson@v0.7.7/LICENSE
+- sources: easyjson@v0.8.1/LICENSE
   text: |
     Copyright (c) 2016 Mail.Ru Group
 

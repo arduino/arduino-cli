@@ -41,13 +41,12 @@ var DebugPreprocessor bool
 // PreprocessSketchWithCtags performs preprocessing of the arduino sketch using CTags.
 func PreprocessSketchWithCtags(
 	ctx context.Context,
-	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList,
+	unpreprocessedSourceFile, preprocessedSourceFile *paths.Path,
+	sketch *sketch.Sketch, includes paths.PathList,
 	lineOffset int, buildProperties *properties.Map,
 	onlyUpdateCompilationDatabase, verbose bool,
 ) (*runner.Result, error) {
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
-	unpreprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp.merged")
-	preprocessedSourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
 
 	// Create a temporary working directory
 	tmpDir, err := paths.MkTempDir("", "")

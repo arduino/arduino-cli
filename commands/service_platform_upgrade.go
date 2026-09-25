@@ -101,11 +101,26 @@ func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 		}
 		ref.PlatformVersion = latest.Version
 
-		platformRelease, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
+		platformRelease, tools, libs, err := pme.FindPlatformReleaseDependencies(ref)
 		if err != nil {
 			return nil, &cmderrors.PlatformNotFoundError{Platform: ref.String()}
 		}
 		if err := pme.DownloadAndInstallPlatformAndTools(ctx, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall(), checks); err != nil {
+			return nil, err
+		}
+
+		li, err := instances.GetLibrariesIndex(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+
+		lmi, releaseLmi, err := instances.GetLibraryManagerInstaller(req.GetInstance())
+		if err != nil {
+			return nil, err
+		}
+		defer releaseLmi()
+
+		if err := s.installLibraries(ctx, li, lmi, libs, pme.DownloadDir, downloadCB, taskCB); err != nil {
 			return nil, err
 		}
 

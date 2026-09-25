@@ -43,7 +43,7 @@ func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
 }
 
 func addUtilityDirectory(library *Library) {
-	utilitySourcePath := library.InstallDir.Join("utility")
+	utilitySourcePath := library.SourceDir.Join("utility")
 	if utilitySourcePath.IsDir() {
 		library.UtilityDir = utilitySourcePath
 	}

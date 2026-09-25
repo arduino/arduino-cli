@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -99,9 +100,9 @@ func (settings *Settings) NewHttpClient(ctx context.Context) (*http.Client, erro
 	}
 	return &http.Client{
 		Transport: &httpClientRoundTripper{
-			transport: &http.Transport{
+			transport: maybeWrapWithGitHubAuth(&http.Transport{
 				Proxy: http.ProxyURL(proxy),
-			},
+			}),
 			userAgent: settings.UserAgent(ctx),
 		},
 		Timeout: settings.ConnectionTimeout(),
@@ -118,6 +119,39 @@ func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, e
 	return h.transport.RoundTrip(req)
 }
 
+// githubArtifactPathRE matches GitHub Actions artifact download paths:
+// /repos/{owner}/{repo}/actions/artifacts/{id}/{format}
+var githubArtifactPathRE = regexp.MustCompile(`^/repos/[^/]+/[^/]+/actions/artifacts/\d+/`)
+
+// isGitHubArtifactURL reports whether the request URL targets the GitHub Actions
+// artifact download API endpoint. Only these URLs receive the Authorization header.
+func isGitHubArtifactURL(u *url.URL) bool {
+	return u.Scheme == "https" && u.Host == "api.github.com" && githubArtifactPathRE.MatchString(u.Path)
+}
+
+// githubAuthRoundTripper adds an Authorization header for requests to GitHub-owned hosts.
+type githubAuthRoundTripper struct {
+	transport http.RoundTripper
+	token     string
+}
+
+func (g *githubAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	if isGitHubArtifactURL(req.URL) {
+		req = req.Clone(req.Context())
+		req.Header.Set("Authorization", "Bearer "+g.token)
+	}
+	return g.transport.RoundTrip(req)
+}
+
+// maybeWrapWithGitHubAuth wraps inner with a githubAuthRoundTripper when the
+// GITHUB_TOKEN environment variable is set and non-empty; otherwise returns inner unchanged.
+func maybeWrapWithGitHubAuth(inner http.RoundTripper) http.RoundTripper {
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		return &githubAuthRoundTripper{transport: inner, token: token}
+	}
+	return inner
+}
+
 // DownloaderConfig returns the downloader configuration based on current settings.
 func (settings *Settings) DownloaderConfig(ctx context.Context) (downloader.Config, error) {
 	proxy, err := settings.NetworkProxy()
@@ -127,9 +161,9 @@ func (settings *Settings) DownloaderConfig(ctx context.Context) (downloader.Conf
 
 	return downloader.Config{
 		HttpClient: http.Client{
-			Transport: &http.Transport{
+			Transport: maybeWrapWithGitHubAuth(&http.Transport{
 				Proxy: http.ProxyURL(proxy),
-			},
+			}),
 		},
 		InactivityTimeout: settings.ConnectionTimeout(),
 		ExtraHeaders: map[string]string{

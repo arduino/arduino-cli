@@ -1,12 +1,12 @@
 ---
 name: github.com/pelletier/go-toml/v2/internal/tracker
-version: v2.2.4
+version: v2.3.1
 type: go
-summary: 
+summary: Package tracker provides functions for keeping track of AST nodes.
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/internal/tracker
 license: mit
 licenses:
-- sources: v2@v2.2.4/LICENSE
+- sources: v2@v2.3.1/LICENSE
   text: |
     The MIT License (MIT)
 
@@ -30,6 +30,6 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: v2@v2.2.4/README.md
+- sources: v2@v2.3.1/README.md
   text: The MIT License (MIT). Read [LICENSE](LICENSE).
 notices: []

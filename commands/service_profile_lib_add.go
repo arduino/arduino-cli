@@ -74,7 +74,7 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 			return nil, err
 		}
 
-		add := func(libReleaseToAdd *librariesindex.Release, isDep bool) {
+		add := func(libReleaseToAdd *librariesindex.ReleaseReference, isDep bool) {
 			libRefToAdd := &sketch.ProfileLibraryReference{
 				Library:      libReleaseToAdd.GetName(),
 				Version:      libReleaseToAdd.GetVersion(),
@@ -114,13 +114,13 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 				return nil, err
 			}
 			// sort to make the output order deterministic
-			slices.SortFunc(libWithDeps, librariesindex.ReleaseCompare)
+			slices.SortFunc(libWithDeps, librariesindex.ReleaseReferenceCompare)
 			for _, lib := range libWithDeps {
 				isDep := libRelease.GetName() != lib.GetName()
 				add(lib, isDep)
 			}
 		} else {
-			add(libRelease, false)
+			add(libRelease.AsReleaseReference(), false)
 		}
 	} else {
 		return nil, &cmderrors.InvalidArgumentError{Message: "library must be specified"}
@@ -132,8 +132,8 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 	}
 
 	return &rpc.ProfileLibAddResponse{
-		AddedLibraries:   f.Map(addedLibs, (*sketch.ProfileLibraryReference).ToRpc),
-		SkippedLibraries: f.Map(skippedLibs, (*sketch.ProfileLibraryReference).ToRpc),
+		AddedLibraries:   f.Map(addedLibs, (*sketch.ProfileLibraryReference).ToRPC),
+		SkippedLibraries: f.Map(skippedLibs, (*sketch.ProfileLibraryReference).ToRPC),
 		ProfileName:      profileName,
 	}, nil
 }

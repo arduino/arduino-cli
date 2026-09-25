@@ -21,12 +21,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
+	"os"
 	"os/exec"
 	"regexp"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/preprocessor"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
@@ -56,6 +59,7 @@ type SketchLibrariesDetector struct {
 	useCachedLibrariesResolution  bool
 	cache                         *detectorCache
 	onlyUpdateCompilationDatabase bool
+	stagedLibraries               map[*paths.Path]*libraries.Library
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
 	includeFolders                paths.PathList
@@ -81,6 +85,7 @@ func NewSketchLibrariesDetector(
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
 		cache:                         newDetectorCache(),
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
+		stagedLibraries:               map[*paths.Path]*libraries.Library{},
 		importedLibraries:             libraries.List{},
 		includeFolders:                paths.PathList{},
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
@@ -159,6 +164,25 @@ func (l *SketchLibrariesDetector) addAndBuildLibrary(sourceFileQueue *uniqueSour
 	}
 }
 
+// stageLibraryForInclusion adds the given library to the staged libraries list,
+// to be later checked for inclusion when processing the source files of the sketch.
+func (l *SketchLibrariesDetector) stageLibraryForInclusion(library *libraries.Library) {
+	l.stagedLibraries[library.InstallDir] = library
+}
+
+// commitStagedLibrary checks if the given path is inside any of the staged libraries,
+// and if so, it removes that library from the staged list and returns it.
+func (l *SketchLibrariesDetector) commitStagedLibrary(p *paths.Path) *libraries.Library {
+	for libPath := range maps.Keys(l.stagedLibraries) {
+		if inside, _ := p.IsInsideDir(libPath); inside {
+			library := l.stagedLibraries[libPath]
+			delete(l.stagedLibraries, libPath)
+			return library
+		}
+	}
+	return nil
+}
+
 // PrintUsedAndNotUsedLibraries todo
 func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool) {
 	// Print this message:
@@ -201,8 +225,9 @@ func (l *SketchLibrariesDetector) IncludeFoldersChanged() bool {
 	return l.detectedChangeInLibraries
 }
 
-// IsSketchUnchanged returns true if the sketch or any of its dependencies is up-to-date
-func (l *SketchLibrariesDetector) IsSketchUnchanged() bool {
+// IsSketchDepsUnchanged returns true if the sketch or any of its dependencies is up-to-date
+// headers are unchanged since the last preprocessing run.
+func (l *SketchLibrariesDetector) IsSketchDepsUnchanged() bool {
 	return l.sketchIsUnchanged
 }
 
@@ -281,6 +306,16 @@ func (l *SketchLibrariesDetector) findIncludes(
 		l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
 	}
 
+	// Determine if the sketch is unchanged BEFORE starting the preRunner goroutines.
+	// The preRunner may start GCC tasks that write libsdetect.d as a side effect; if we
+	// checked after the preRunner, a fast GCC run could update libsdetect.d's timestamp
+	// and make the sketch appear unchanged even after a modification (issue #3202).
+	mergedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
+	if err != nil {
+		return err
+	}
+	l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
+
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
@@ -298,6 +333,15 @@ func (l *SketchLibrariesDetector) findIncludes(
 		}
 	}()
 
+	// Only for testing purposes
+	if libraryDetector_ForcePrerunnerPriority {
+		// When set to true, it forces the library detector pre-runner (that is normally scheduled
+		// randomly by the goroutine scheduler) to run with priority, in particular before
+		// the library detection starts.
+		fmt.Println("TESTING: Waiting for pre-runner start...")
+		time.Sleep(time.Second)
+	}
+
 	l.addIncludeFolder(buildCorePath)
 	if buildVariantPath != nil {
 		l.addIncludeFolder(buildVariantPath)
@@ -306,12 +350,6 @@ func (l *SketchLibrariesDetector) findIncludes(
 	sourceFileQueue := &uniqueSourceFileQueue{}
 
 	if !l.useCachedLibrariesResolution {
-		mergedSketch, err := l.makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp.merged"))
-		if err != nil {
-			return err
-		}
-		l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
-
 		// Queue all sources from sketch folder, except the preprocessed sketch "sketch.ino.cpp".
 		// The library discovery is performed on the `sketch.ino.cpp.merged` file.
 		// The `sketch.ino.cpp` file is generated in a later stage from `sketch.ino.cpp.merged` by the
@@ -333,8 +371,10 @@ func (l *SketchLibrariesDetector) findIncludes(
 		allInstalledSorted.SortByName() // Sort libraries to ensure consistent ordering
 		for _, library := range allInstalledSorted {
 			if library.Location == libraries.Profile {
-				l.logger.Info(i18n.Tr("The library %[1]s has been automatically added from sketch project.", library.Name))
-				l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+				if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
+					l.logger.Info(i18n.Tr("The library %[1]s has been queued for inclusion from sketch project.", library.Name))
+				}
+				l.stageLibraryForInclusion(library)
 				l.addIncludeFolder(library.SourceDir)
 			}
 		}
@@ -459,19 +499,19 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.WriteStdout(preprocResult.Stdout)
 			}
+
 			// Unwrap error and see if it is an ExitError.
-			var exitErr *exec.ExitError
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if isExitErr := errors.As(preprocErr, &exitErr); !isExitErr || len(preprocResult.Stderr) == 0 {
-				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
-				return preprocErr
-			} else {
+			} else if _, isExitErr := errors.AsType[*exec.ExitError](preprocErr); isExitErr && len(preprocResult.Stderr) > 0 {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocResult.Stderr))
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 					l.logger.Info(i18n.Tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
+			} else {
+				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
+				return preprocErr
 			}
 		}
 
@@ -479,7 +519,17 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		l.cache.ExpectMissingIncludeH(missingIncludeH)
 
 		if missingIncludeH == "" {
-			// No missing includes found, we're done
+			// Check if the compilation unit requires a library that was previously marked for inclusion.
+			if deps, err := cpp.ReadDepFile(sourceFile.DepfilePath); err == nil {
+				for _, dep := range deps.Dependencies {
+					if library := l.commitStagedLibrary(paths.New(dep)); library != nil {
+						l.logger.Info(i18n.Tr("The library %[1]s has been added from sketch project.", library.Name))
+						l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
+					}
+				}
+			}
+
+			// No missing includes found, we're done.
 			return nil
 		}
 
@@ -524,6 +574,8 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	excludeFileNames []string,
 	extraIncludePath ...*paths.Path,
 ) error {
+	logrus.Tracef("queueSourceFilesFromFolder(%s, recurse=%v, sourceDir=%s, buildDir=%s, excludeFileNames=%v, extraIncludePath=%v)",
+		folder, recurse, sourceDir, buildDir, excludeFileNames, extraIncludePath)
 	logrus.Tracef("[LD] SCAN: %s (recurse=%v)", folder, recurse)
 
 	sourceFileExtensions := []string{}
@@ -598,10 +650,14 @@ func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
 	return nil
 }
 
-var includeRegexp = regexp.MustCompile(`(?ms)^\s*[0-9 |]*\s*#[ \t]*include\s*[<"](\S+)[">]`)
+var (
+	ansiControlSequenceRegexp = regexp.MustCompile("\x1b\\[[0-?]*[ -/]*[@-~]")
+	includeRegexp             = regexp.MustCompile(`(?ms)^\s*[0-9 |]*\s*#[ \t]*include\s*[<"](\S+)[">]`)
+)
 
 // IncludesFinderWithRegExp fixdoc
 func IncludesFinderWithRegExp(source string) string {
+	source = ansiControlSequenceRegexp.ReplaceAllString(source, "")
 	match := includeRegexp.FindStringSubmatch(source)
 	if match != nil {
 		return strings.TrimSpace(match[1])
@@ -697,3 +753,6 @@ func LibrariesLoader(
 	resolver := librariesresolver.NewCppResolver(allLibs, targetPlatform, buildPlatform)
 	return lm, resolver, verboseOut.Bytes(), nil
 }
+
+// libraryDetector_ForcePrerunnerPriority is used for testing purposes.
+var libraryDetector_ForcePrerunnerPriority = os.Getenv("TESTING_LIBRARY_DETECTOR_FORCE_PRERUNNER_PRIORITY") == "1"

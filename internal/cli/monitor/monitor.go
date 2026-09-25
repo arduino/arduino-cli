@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/internal/cleanup"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
@@ -39,7 +40,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"go.bug.st/cleanup"
 )
 
 // NewCommand created a new `monitor` command
@@ -218,6 +218,7 @@ func runMonitorCmd(
 	}
 
 	ctx, cancel := cleanup.InterruptableContext(ctx)
+	defer cancel()
 	if raw {
 		if feedback.IsInteractive() {
 			if err := feedback.SetRawModeStdin(); err != nil {

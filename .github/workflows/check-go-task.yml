@@ -39,8 +39,8 @@ jobs:
           RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
           # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
           if [[
-            "${{ github.event_name }}" != "create" ||
-            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+            "$GITHUB_EVENT_NAME" != "create" ||
+            "$GITHUB_REF" =~ $RELEASE_BRANCH_REGEX
           ]]; then
             # Run the other jobs.
             RESULT="true"
@@ -69,7 +69,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -146,7 +146,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -184,7 +184,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -206,6 +206,8 @@ jobs:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
@@ -217,7 +219,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -238,6 +240,8 @@ jobs:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
@@ -251,7 +255,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Go
         uses: actions/setup-go@v6

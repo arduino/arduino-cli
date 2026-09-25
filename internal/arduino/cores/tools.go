@@ -16,12 +16,15 @@
 package cores
 
 import (
+	"os"
 	"regexp"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"go.bug.st/f"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -126,6 +129,17 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 	return res
 }
 
+// ToRpcToolsDependencies convert a ToolRelease to an rpc.ToolsDependencies message
+// (yes the plural is wrong, but we have to keep it for backward compatibility).
+func (tr *ToolRelease) ToRpcToolsDependencies() *rpc.ToolsDependencies {
+	return &rpc.ToolsDependencies{
+		Name:     tr.Tool.Name,
+		Packager: tr.Tool.Package.Name,
+		Version:  tr.Version.String(),
+		Systems:  f.Map(tr.Flavors, (*Flavor).ToRpcSystem),
+	}
+}
+
 var (
 	regexpLinuxArm     = regexp.MustCompile("arm.*-linux-gnueabihf")
 	regexpLinuxArm64   = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
@@ -210,9 +224,40 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 	return false, 0
 }
 
+// ToRpcSystem converts this Flavor to a rpc.Systems message
+func (f *Flavor) ToRpcSystem() *rpc.Systems {
+	return &rpc.Systems{
+		Checksum:        f.Resource.Checksum,
+		Size:            f.Resource.Size,
+		Host:            f.OS,
+		ArchiveFilename: f.Resource.ArchiveFileName,
+		Url:             f.Resource.URL,
+	}
+}
+
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
 func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
+	// This is useful when the CLI is running under emulation, or when the
+	// downloaded tool will be used by a different architecture than the CLI.
+	// Do not use the compatibility rules in this case: an explicitly requested
+	// architecture must not silently fall back to another one.
+	if forcedArch := os.Getenv("ARDUINO_FORCE_TOOLS_ARCH"); forcedArch != "" {
+		return tr.GetFlavourFor(runtime.GOOS, forcedArch)
+	}
 	return tr.GetFlavourCompatibleWith(runtime.GOOS, runtime.GOARCH)
+}
+
+// GetFlavourFor returns the downloadable resource built for the specified O.S.
+// and architecture. Unlike GetFlavourCompatibleWith, it does not consider
+// emulation or other compatibility fallbacks. This can be used to explicitly
+// select a tool for a foreign architecture.
+func (tr *ToolRelease) GetFlavourFor(osName, osArch string) *resources.DownloadResource {
+	for _, flavour := range tr.Flavors {
+		if flavour.isExactMatchWith(osName, osArch) {
+			return flavour.Resource
+		}
+	}
+	return nil
 }
 
 // GetFlavourCompatibleWith returns the downloadable resource compatible with the specified O.S.

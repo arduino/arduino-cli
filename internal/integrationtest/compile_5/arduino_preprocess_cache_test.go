@@ -222,4 +222,96 @@ void myNewFunction() {}
 		require.Contains(t, string(out), "Generating function prototypes...")
 		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
 	})
+
+	// Regression test for https://github.com/arduino/arduino-cli/issues/3202
+	// After a successful build, modifying the sketch to add an #error directive should cause the next build to fail.
+	t.Run("SketchModificationAfterSuccessfulBuildInvalidatesCache/1", func(t *testing.T) {
+		// Create a tmp sketch
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void setup() {}
+void loop() {}
+`)))
+
+		// Enable the library detector prerunner priority to make sure that the prerunner
+		// is executed as first step of the compilation process, which makes it effective
+		// in catching the regression
+		env := cli.GetDefaultEnv()
+		env["TESTING_LIBRARY_DETECTOR_FORCE_PRERUNNER_PRIORITY"] = "1"
+
+		// Build successfully
+		_, _, err = cli.RunWithCustomEnv(env, "compile", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err)
+
+		// Modify sketch to add a compile error
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void setup() {}
+void loop() {
+  #error TEST
+}
+`)))
+
+		// Build again: must fail with the error (not silently reuse stale object)
+		_, outerr, err := cli.RunWithCustomEnv(env, "compile", "-b", "arduino:avr:uno", sketch.String())
+		require.Error(t, err, "compilation should fail due to #error in sketch")
+		require.Contains(t, string(outerr), "#error TEST")
+
+		// Modify sketch to add a compile error
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void setup() {}
+void loop() {
+}
+`)))
+
+		// Build again: must not fail anymore
+		_, _, err = cli.RunWithCustomEnv(env, "compile", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err, "compilation should succeed after removing #error in sketch")
+	})
+
+	// Regression test for https://github.com/arduino/arduino-cli/issues/3202
+	// After a successful build, modifying the sketch should cause the next build to not reuse the cached compilation results.
+	t.Run("SketchModificationAfterSuccessfulBuildInvalidatesCache/2", func(t *testing.T) {
+		// Create a tmp sketch
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void setup() {}
+void loop() {}
+`)))
+
+		// Enable the library detector prerunner priority to make sure that the prerunner
+		// is executed as first step of the compilation process, which makes it effective
+		// in catching the regression
+		env := cli.GetDefaultEnv()
+		env["TESTING_LIBRARY_DETECTOR_FORCE_PRERUNNER_PRIORITY"] = "1"
+
+		// Build successfully
+		_, _, err = cli.RunWithCustomEnv(env, "compile", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err)
+
+		// Modify sketch
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+void setup() {
+	Serial.begin(9600);
+}
+void loop() {
+	Serial.println("Hello");
+	delay(1000);
+}
+`)))
+
+		// Build again: must now use the cached sketch with function prototypes.
+		out, _, err := cli.RunWithCustomEnv(env, "compile", "-v", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err)
+		require.NotContains(t, string(out), "Using cached sketch with function prototypes.")
+	})
 }

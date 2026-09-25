@@ -85,3 +85,14 @@ func TestIncludesFinderWithRegExpPaddedIncludes5(t *testing.T) {
 
 	require.Equal(t, "Foobar.h", include)
 }
+
+func TestIncludesFinderWithRegExpANSIColoredOutput(t *testing.T) {
+	output := "\x1b[01m\x1b[K/some/path/sketch.ino:1:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kfatal error:\x1b[m\x1b[K SPI.h: No such file or directory\n" +
+		"    1 | #include <\x1b[01m\x1b[KSPI.h\x1b[m\x1b[K>\n" +
+		"      |          ^~~~~~~\n" +
+		"compilation terminated.\n"
+
+	include := detector.IncludesFinderWithRegExp(output)
+
+	require.Equal(t, "SPI.h", include)
+}

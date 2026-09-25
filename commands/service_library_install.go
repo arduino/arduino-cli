@@ -138,7 +138,7 @@ func (s *arduinoCoreServerImpl) downloadAndInstallLibrary(
 			return err
 		}
 
-		for _, dep := range deps {
+		for _, dep := range li.ResolveReleaseReferences(deps) {
 			if existingDep, has := toInstall[dep.GetName()]; has {
 				if !existingDep.GetVersion().Equal(dep.GetVersion()) {
 					err := errors.New(

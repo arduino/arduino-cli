@@ -34,7 +34,7 @@ Sketches may consist of multiple code files.
 
 The following extensions are supported:
 
-- .ino - [Arduino language](https://www.arduino.cc/reference/en/) files.
+- .ino - [Arduino language](https://docs.arduino.cc/language-reference/) files.
 - .pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino
   is recommended to avoid confusion. **`.pde` extension is deprecated and will be removed in the future.**
 - .cpp - C++ files.

@@ -37,6 +37,8 @@ jobs:
             runner: ubuntu-latest
           - task: Windows_64bit
             runner: ubuntu-latest
+          - task: Windows_ARM64
+            runner: ubuntu-latest
           - task: Linux_32bit
             runner: ubuntu-latest
           - task: Linux_64bit
@@ -56,10 +58,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Task
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
@@ -76,7 +78,7 @@ jobs:
         run: echo "version=$(task general:get-version)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}-${{ matrix.os.task }}
@@ -102,10 +104,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.ARTIFACT_NAME }}-${{ matrix.artifact.artifact-suffix }}
           path: ${{ env.DIST_DIR }}
@@ -185,7 +187,7 @@ jobs:
           echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
 
       - name: Upload notarized artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}-${{ matrix.artifact.artifact-suffix }}
@@ -207,10 +209,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.ARTIFACT_NAME }}-Windows_64bit
           path: ${{ env.DIST_DIR }}
@@ -240,7 +242,7 @@ jobs:
           "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_CER}} -csp "eToken Base Cryptographic Provider" -k "[{{${{ env.CERT_PASSWORD }}}}]=${{ env.CONTAINER_NAME }}" -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         env:
           MSI_FILE: ${{ steps.buildmsi.outputs.msi }}
         with:
@@ -261,17 +263,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: ${{ env.ARTIFACT_NAME }}-*
           merge-multiple: true
           path: ${{ env.DIST_DIR }}
 
       - name: Install Task
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x

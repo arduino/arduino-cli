@@ -30,12 +30,19 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
+// Version is the version of the package_index.json file format
+// generated with IndexFromPlatformRelease. It can be used to determine if
+// an installed.json is up-to-date with the current CLI version or if it
+// needs to be regenarated.
+const Version = 2
+
 // Index represents Cores and Tools struct as seen from package_index.json file.
 //
 //easyjson:json
 type Index struct {
 	Packages        []*indexPackage `json:"packages"`
 	IsTrusted       bool
+	Version         int `json:"version,omitempty"`
 	isInstalledJSON bool
 }
 
@@ -46,7 +53,7 @@ type indexPackage struct {
 	Name       string                  `json:"name"`
 	Maintainer string                  `json:"maintainer"`
 	WebsiteURL string                  `json:"websiteUrl"`
-	URL        string                  `json:"Url"`
+	URL        string                  `json:"url"`
 	Email      string                  `json:"email"`
 	Platforms  []*indexPlatformRelease `json:"platforms"`
 	Tools      []*indexToolRelease     `json:"tools"`
@@ -71,7 +78,7 @@ type indexPlatformRelease struct {
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
 	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
 	MonitorDependencies   []indexMonitorDependency   `json:"monitorDependencies"`
-	LibrariesDependencies []indexLibraryDependency   `json:"librariesDependencies"`
+	LibraryDependencies   []indexLibraryDependency   `json:"libraryDependencies"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -193,7 +200,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 
 	libraries := []indexLibraryDependency{}
-	for _, l := range pr.LibrariesDependencies {
+	for _, l := range pr.LibraryDependencies {
 		libraries = append(libraries, indexLibraryDependency{
 			Name:    l.Name,
 			Version: l.Version,
@@ -266,7 +273,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 			ToolDependencies:      nil,
 			DiscoveryDependencies: nil,
 			MonitorDependencies:   nil,
-			LibrariesDependencies: nil,
+			LibraryDependencies:   nil,
 		}
 	}
 
@@ -274,7 +281,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	mainPlatform.ToolDependencies = tools
 	mainPlatform.DiscoveryDependencies = discoveries
 	mainPlatform.MonitorDependencies = monitors
-	mainPlatform.LibrariesDependencies = libraries
+	mainPlatform.LibraryDependencies = libraries
 	delete(requiredPackages, pr.Platform.Package.Name)
 
 	mainPackage := extractIndexPackage(pr.Platform.Package)
@@ -289,6 +296,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 
 	return Index{
+		Version:   Version,
 		IsTrusted: pr.IsTrusted,
 		Packages:  packages,
 	}
@@ -344,8 +352,13 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.ToolDependencies = inPlatformRelease.extractToolDependencies()
 	outPlatformRelease.DiscoveryDependencies = inPlatformRelease.extractDiscoveryDependencies()
 	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
-	outPlatformRelease.LibrariesDependencies = inPlatformRelease.extractLibrariesDependencies()
+	outPlatformRelease.LibraryDependencies = inPlatformRelease.extractLibraryDependencies()
 	outPlatformRelease.Deprecated = inPlatformRelease.Deprecated
+	// A release is considered "indexed" only when it comes from a real package
+	// index (default index or additional-urls), not when it is loaded from an
+	// installed.json (which is a local, installed-only metadata file). This
+	// mirrors the platform-level `outPlatform.Indexed` logic above.
+	outPlatformRelease.Indexed = outPlatformRelease.Indexed || !isInstallJSON
 	return nil
 }
 
@@ -383,8 +396,8 @@ func (inPlatformRelease indexPlatformRelease) extractMonitorDependencies() cores
 	return res
 }
 
-func (inPlatformRelease indexPlatformRelease) extractLibrariesDependencies() cores.LibrariesDependencies {
-	return f.Map(inPlatformRelease.LibrariesDependencies, func(library indexLibraryDependency) *cores.LibraryDependency {
+func (inPlatformRelease indexPlatformRelease) extractLibraryDependencies() cores.LibraryDependencies {
+	return f.Map(inPlatformRelease.LibraryDependencies, func(library indexLibraryDependency) *cores.LibraryDependency {
 		return &cores.LibraryDependency{
 			Name:    library.Name,
 			Version: library.Version,

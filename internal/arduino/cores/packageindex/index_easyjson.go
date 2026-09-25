@@ -546,25 +546,25 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 				}
 				in.Delim(']')
 			}
-		case "librariesDependencies":
+		case "libraryDependencies":
 			if in.IsNull() {
 				in.Skip()
-				out.LibrariesDependencies = nil
+				out.LibraryDependencies = nil
 			} else {
 				in.Delim('[')
-				if out.LibrariesDependencies == nil {
+				if out.LibraryDependencies == nil {
 					if !in.IsDelim(']') {
-						out.LibrariesDependencies = make([]indexLibraryDependency, 0, 2)
+						out.LibraryDependencies = make([]indexLibraryDependency, 0, 2)
 					} else {
-						out.LibrariesDependencies = []indexLibraryDependency{}
+						out.LibraryDependencies = []indexLibraryDependency{}
 					}
 				} else {
-					out.LibrariesDependencies = (out.LibrariesDependencies)[:0]
+					out.LibraryDependencies = (out.LibraryDependencies)[:0]
 				}
 				for !in.IsDelim(']') {
 					var v9 indexLibraryDependency
 					(v9).UnmarshalEasyJSON(in)
-					out.LibrariesDependencies = append(out.LibrariesDependencies, v9)
+					out.LibraryDependencies = append(out.LibraryDependencies, v9)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -693,25 +693,25 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 					}
 					in.Delim(']')
 				}
-			case "librariesdependencies":
+			case "librarydependencies":
 				if in.IsNull() {
 					in.Skip()
-					out.LibrariesDependencies = nil
+					out.LibraryDependencies = nil
 				} else {
 					in.Delim('[')
-					if out.LibrariesDependencies == nil {
+					if out.LibraryDependencies == nil {
 						if !in.IsDelim(']') {
-							out.LibrariesDependencies = make([]indexLibraryDependency, 0, 2)
+							out.LibraryDependencies = make([]indexLibraryDependency, 0, 2)
 						} else {
-							out.LibrariesDependencies = []indexLibraryDependency{}
+							out.LibraryDependencies = []indexLibraryDependency{}
 						}
 					} else {
-						out.LibrariesDependencies = (out.LibrariesDependencies)[:0]
+						out.LibraryDependencies = (out.LibraryDependencies)[:0]
 					}
 					for !in.IsDelim(']') {
 						var v14 indexLibraryDependency
 						(v14).UnmarshalEasyJSON(in)
-						out.LibrariesDependencies = append(out.LibrariesDependencies, v14)
+						out.LibraryDependencies = append(out.LibraryDependencies, v14)
 						in.WantComma()
 					}
 					in.Delim(']')
@@ -850,13 +850,13 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		}
 	}
 	{
-		const prefix string = ",\"librariesDependencies\":"
+		const prefix string = ",\"libraryDependencies\":"
 		out.RawString(prefix)
-		if in.LibrariesDependencies == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+		if in.LibraryDependencies == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v23, v24 := range in.LibrariesDependencies {
+			for v23, v24 := range in.LibraryDependencies {
 				if v23 > 0 {
 					out.RawByte(',')
 				}
@@ -916,7 +916,7 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			out.Maintainer = string(in.String())
 		case "websiteUrl":
 			out.WebsiteURL = string(in.String())
-		case "Url":
+		case "url":
 			out.URL = string(in.String())
 		case "email":
 			out.Email = string(in.String())
@@ -1091,7 +1091,7 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		out.String(string(in.WebsiteURL))
 	}
 	{
-		const prefix string = ",\"Url\":"
+		const prefix string = ",\"url\":"
 		out.RawString(prefix)
 		out.String(string(in.URL))
 	}
@@ -1761,6 +1761,8 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 			}
 		case "IsTrusted":
 			out.IsTrusted = bool(in.Bool())
+		case "version":
+			out.Version = int(in.Int())
 		default:
 			switch strings.ToLower(key) {
 			case "packages":
@@ -1796,6 +1798,8 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 				}
 			case "istrusted":
 				out.IsTrusted = bool(in.Bool())
+			case "version":
+				out.Version = int(in.Int())
 			default:
 				in.SkipRecursive()
 			}
@@ -1835,6 +1839,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliInternalArduinoCoresPackage
 		const prefix string = ",\"IsTrusted\":"
 		out.RawString(prefix)
 		out.Bool(bool(in.IsTrusted))
+	}
+	if in.Version != 0 {
+		const prefix string = ",\"version\":"
+		out.RawString(prefix)
+		out.Int(int(in.Version))
 	}
 	out.RawByte('}')
 }

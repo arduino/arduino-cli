@@ -56,7 +56,7 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 		PlatformArchitecture: req.GetArchitecture(),
 		PlatformVersion:      version,
 	}
-	platform, tools, _, err := pme.FindPlatformReleaseDependencies(ref)
+	platform, tools, libsRef, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return &cmderrors.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
@@ -75,6 +75,22 @@ func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 
 	for _, tool := range tools {
 		if err := pme.DownloadToolRelease(ctx, tool, downloadCB); err != nil {
+			return err
+		}
+	}
+
+	li, err := instances.GetLibrariesIndex(req.GetInstance())
+	if err != nil {
+		return err
+	}
+
+	for _, libRef := range libsRef {
+		lib, err := li.FindRelease(libRef.Name, libRef.Version)
+		if err != nil {
+			return err
+		}
+
+		if err := downloadLibrary(ctx, pme.DownloadDir, lib, downloadCB, func(msg *rpc.TaskProgress) {}, "depends", s.settings); err != nil {
 			return err
 		}
 	}
