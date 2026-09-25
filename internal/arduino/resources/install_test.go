@@ -59,7 +59,7 @@ func TestInstallPlatform(t *testing.T) {
 				Checksum:        "SHA-256:8b3fc6253c5ac2f3ba684eba0d62bb8a4ee93469fa822f81e2cd7d1b959c4044",
 				Size:            148,
 			},
-			error: "no unique root dir in archive",
+			error: "must contain a single root folder",
 		},
 		{
 			testName: "root folder not present",
@@ -68,7 +68,7 @@ func TestInstallPlatform(t *testing.T) {
 				Checksum:        "SHA-256:bc00db9784e20f50d7a5fceccb6bd95ebff4a3e847aac88365b95a6851a24963",
 				Size:            177,
 			},
-			error: "files in archive must be placed in a subdirectory",
+			error: "must be placed within a single root folder",
 		},
 	}
 	for _, test := range tests {
