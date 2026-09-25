@@ -69,6 +69,9 @@ service ArduinoCoreService {
   // Requests details about a board.
   rpc BoardDetails(BoardDetailsRequest) returns (BoardDetailsResponse);
 
+  // Requests details about uploading to a board with a specified protocol and configuration.
+  rpc BoardUploadDetails(BoardUploadDetailsRequest) returns (BoardUploadDetailsResponse);
+
   // List the boards currently connected to the computer.
   rpc BoardList(BoardListRequest) returns (BoardListResponse);
 
@@ -107,9 +110,15 @@ service ArduinoCoreService {
   // Upload a compiled sketch to a board using a programmer.
   rpc UploadUsingProgrammer(UploadUsingProgrammerRequest) returns (stream UploadUsingProgrammerResponse);
 
+  // Upload a firmware file to a board.
+  rpc UploadFirmwareFile(UploadFirmwareFileRequest) returns (stream UploadFirmwareFileResponse);
+
   // Returns the list of users fields necessary to upload to that board
   // using the specified protocol.
   rpc SupportedUserFields(SupportedUserFieldsRequest) returns (SupportedUserFieldsResponse);
+
+  // Reads the details from a firmware file.
+  rpc ReadFirmwareFileDetails(ReadFirmwareFileDetailsRequest) returns (ReadFirmwareFileDetailsResponse);
 
   // List programmers available for a board.
   rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadRequest) returns (ListProgrammersAvailableForUploadResponse);
