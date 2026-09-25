@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
@@ -29,6 +30,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	discovery "github.com/arduino/pluggable-discovery-protocol-handler/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/downloader/v3"
@@ -127,6 +129,65 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 				require.Equal(t, resBuildPath.String(), buildPath.String())
 			}
 			require.Equal(t, test.resSketchName, sketchName)
+		})
+	}
+}
+
+func TestDetectUploadPortWithoutSelectedPortReturnsFirstDetectedPort(t *testing.T) {
+	uploadCtx, cancelUpload := context.WithCancel(context.Background())
+	events := make(chan *discovery.Event)
+	detectedPorts := make(chan *discovery.Port, 1)
+	go func() {
+		detectedPorts <- detectUploadPort(
+			uploadCtx,
+			&discovery.Port{Protocol: "default"},
+			events,
+			false,
+		)
+	}()
+
+	firstEventSent := make(chan struct{})
+	go func() {
+		events <- &discovery.Event{Type: "add", Port: &discovery.Port{Address: "ignored"}}
+		close(firstEventSent)
+	}()
+	select {
+	case <-firstEventSent:
+	case <-time.After(time.Second):
+		t.Fatal("timed out sending pre-upload event")
+	}
+	cancelUpload()
+
+	detectedPort := &discovery.Port{Address: "COM3", Protocol: "serial", HardwareID: "USB"}
+	go func() {
+		events <- &discovery.Event{Type: "add", Port: detectedPort}
+	}()
+
+	select {
+	case detected := <-detectedPorts:
+		require.Equal(t, detectedPort, detected)
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for upload port detection")
+	}
+}
+
+func TestUploadPortWaitRequested(t *testing.T) {
+	tests := []struct {
+		name       string
+		properties string
+		expected   bool
+	}{
+		{"both set", "upload.wait_for_upload_port=true\nupload.use_1200bps_touch=true\n", true},
+		{"wait without touch", "upload.wait_for_upload_port=true\n", false},
+		{"touch without wait", "upload.use_1200bps_touch=true\n", false},
+		{"neither set", "", false},
+		{"both false", "upload.wait_for_upload_port=false\nupload.use_1200bps_touch=false\n", false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			props, err := properties.LoadFromBytes([]byte(test.properties))
+			require.NoError(t, err)
+			require.Equal(t, test.expected, uploadPortWaitRequested(props))
 		})
 	}
 }
