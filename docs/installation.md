@@ -4,7 +4,7 @@ Several options are available for installation of Arduino CLI. Instructions for 
 
 ## Install via Homebrew (macOS/Linux)
 
-The Arduino CLI is available as a Homebrew formula since version `0.5.0`:
+The Arduino CLI is unavailable as a Homebrew formula since version `v1.0.1%`: 0.25
 
 ```sh
 brew update
