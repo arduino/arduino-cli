@@ -4,6 +4,28 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
+  init:
+    desc: Install tools used by the other tasks into .bin
+    deps:
+      - install:easyjson
+      - install:addlicense
+      - install:golangci-lint
+
+  install:easyjson:
+    desc: Install easyjson into .bin
+    cmds:
+      - GOBIN={{.ROOT_DIR}}/.bin go install github.com/mailru/easyjson/easyjson
+
+  install:addlicense:
+    desc: Install addlicense into .bin
+    cmds:
+      - GOBIN={{.ROOT_DIR}}/.bin go install github.com/google/addlicense@{{.ADDLICENSE_VERSION}}
+
+  install:golangci-lint:
+    desc: Install golangci-lint into .bin
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b {{.ROOT_DIR}}/.bin {{.GOLANGCI_LINT_VERSION}}
+
   general:update-deb-copyright:
     desc: Extract project and dependency licenses into debian copyright
     cmds:
@@ -115,13 +137,7 @@ tasks:
     desc: Lint Go code
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      - |
-        if ! which golangci-lint &>/dev/null; then
-          echo "golangci-lint not installed or not in PATH. Please install: https://golangci-lint.run/usage/install/"
-          exit 1
-        fi
-      - |
-        golangci-lint run
+      - "{{.ROOT_DIR}}/.bin/golangci-lint run"
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
   go:test:
@@ -165,13 +181,12 @@ tasks:
   go:easyjson-generate:
     desc: Run easyjson code generation
     cmds:
-      - go run github.com/mailru/easyjson/easyjson internal/arduino/cores/packageindex/index.go
+      - "{{.ROOT_DIR}}/.bin/easyjson internal/arduino/cores/packageindex/index.go"
 
   go:add-license-headers:
     desc: Add missing go license headers
     cmds:
-      - go install github.com/google/addlicense@v1.1.1
-      - addlicense -c "ARDUINO SA (http://www.arduino.cc/)" -f ./license_header.tpl $(find . -name "*.go" -type f -print0 | xargs -0)
+      - "{{.ROOT_DIR}}/.bin/addlicense -c \"ARDUINO SA (http://www.arduino.cc/)\" -f ./license_header.tpl $(find . -name \"*.go\" -type f -print0 | xargs -0)"
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
   markdown:check-links:
@@ -385,6 +400,8 @@ tasks:
       - echo {{.VERSION}}
 
 vars:
+  ADDLICENSE_VERSION: v1.1.1
+  GOLANGCI_LINT_VERSION: v2.11.3
   PROJECT_NAME: "arduino-cli"
   DIST_DIR: "dist"
   # all modules of this project except for integration test
