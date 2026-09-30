@@ -796,8 +796,8 @@ A default programmer for each board may be specified through the `programmer.def
 BOARD_ID.programmer.default=PROGRAMMER_ID
 ```
 
-The default programmer will be selected automatically if the user does not specify or select another programmer. This may
-be useful for boards with an on-board programmer/debugger.
+The default programmer will be selected automatically if the user does not specify or select another programmer. This
+may be useful for boards with an on-board programmer/debugger.
 
 For example if we want to set Atmel ICE as the default programmer for the Arduino UNO we would add the following line to
 the `boards.txt` file:
