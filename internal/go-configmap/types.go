@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-func (c Map) GetStringOk(key string) (string, bool, error) {
+func (c *Map) GetStringOk(key string) (string, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return "", false, nil
@@ -32,7 +32,7 @@ func (c Map) GetStringOk(key string) (string, bool, error) {
 	return "", false, errors.New(key + " is not a string")
 }
 
-func (c Map) GetString(key string) string {
+func (c *Map) GetString(key string) string {
 	v, ok, err := c.GetStringOk(key)
 	if err != nil {
 		panic(err.Error())
@@ -43,11 +43,11 @@ func (c Map) GetString(key string) string {
 	return ""
 }
 
-func (c Map) SetString(key string, value string) {
+func (c *Map) SetString(key string, value string) {
 	c.Set(key, value)
 }
 
-func (c Map) GetBoolOk(key string) (bool, bool, error) {
+func (c *Map) GetBoolOk(key string) (bool, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return false, false, nil
@@ -58,7 +58,7 @@ func (c Map) GetBoolOk(key string) (bool, bool, error) {
 	return false, false, errors.New(key + " is not a bool")
 }
 
-func (c Map) GetBool(key string) bool {
+func (c *Map) GetBool(key string) bool {
 	v, ok, err := c.GetBoolOk(key)
 	if err != nil {
 		panic(err.Error())
@@ -69,11 +69,11 @@ func (c Map) GetBool(key string) bool {
 	return false
 }
 
-func (c Map) SetBool(key string, value bool) {
+func (c *Map) SetBool(key string, value bool) {
 	c.Set(key, value)
 }
 
-func (c Map) GetUintOk(key string) (uint, bool, error) {
+func (c *Map) GetUintOk(key string) (uint, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return 0, false, nil
@@ -84,7 +84,7 @@ func (c Map) GetUintOk(key string) (uint, bool, error) {
 	return 0, false, errors.New(key + " is not a uint")
 }
 
-func (c Map) GetUint(key string) uint {
+func (c *Map) GetUint(key string) uint {
 	v, ok, err := c.GetUintOk(key)
 	if err != nil {
 		panic(err.Error())
@@ -95,11 +95,11 @@ func (c Map) GetUint(key string) uint {
 	return 0
 }
 
-func (c Map) SetUint(key string, value uint) {
+func (c *Map) SetUint(key string, value uint) {
 	c.Set(key, value)
 }
 
-func (c Map) GetIntOk(key string) (int, bool, error) {
+func (c *Map) GetIntOk(key string) (int, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return 0, false, nil
@@ -110,7 +110,7 @@ func (c Map) GetIntOk(key string) (int, bool, error) {
 	return 0, false, errors.New(key + " is not a uint")
 }
 
-func (c Map) GetInt(key string) int {
+func (c *Map) GetInt(key string) int {
 	v, ok, err := c.GetIntOk(key)
 	if err != nil {
 		panic(err.Error())
@@ -121,11 +121,11 @@ func (c Map) GetInt(key string) int {
 	return 0
 }
 
-func (c Map) SetInt(key string, value int) {
+func (c *Map) SetInt(key string, value int) {
 	c.Set(key, value)
 }
 
-func (c Map) GetUint32Ok(key string) (uint32, bool, error) {
+func (c *Map) GetUint32Ok(key string) (uint32, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return 0, false, nil
@@ -136,7 +136,7 @@ func (c Map) GetUint32Ok(key string) (uint32, bool, error) {
 	return 0, false, errors.New(key + " is not a uint32")
 }
 
-func (c Map) GetUint32(key string) uint32 {
+func (c *Map) GetUint32(key string) uint32 {
 	v, ok, err := c.GetUint32Ok(key)
 	if err != nil {
 		panic(err.Error())
@@ -147,11 +147,11 @@ func (c Map) GetUint32(key string) uint32 {
 	return 0
 }
 
-func (c Map) SetUint32(key string, value uint32) {
+func (c *Map) SetUint32(key string, value uint32) {
 	c.Set(key, value)
 }
 
-func (c Map) GetStringSliceOk(key string) ([]string, bool, error) {
+func (c *Map) GetStringSliceOk(key string) ([]string, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return nil, false, nil
@@ -174,7 +174,7 @@ func (c Map) GetStringSliceOk(key string) ([]string, bool, error) {
 	return nil, false, fmt.Errorf("%s is not an array of strings", key)
 }
 
-func (c Map) GetStringSlice(key string) []string {
+func (c *Map) GetStringSlice(key string) []string {
 	v, ok, err := c.GetStringSliceOk(key)
 	if err != nil {
 		panic(err.Error())
@@ -185,7 +185,7 @@ func (c Map) GetStringSlice(key string) []string {
 	return nil
 }
 
-func (c Map) GetDurationOk(key string) (time.Duration, bool, error) {
+func (c *Map) GetDurationOk(key string) (time.Duration, bool, error) {
 	v, ok := c.GetOk(key)
 	if !ok {
 		return 0, false, nil
@@ -199,7 +199,7 @@ func (c Map) GetDurationOk(key string) (time.Duration, bool, error) {
 	}
 }
 
-func (c Map) GetDuration(key string) time.Duration {
+func (c *Map) GetDuration(key string) time.Duration {
 	v, ok, err := c.GetDurationOk(key)
 	if err != nil {
 		panic(err.Error())
@@ -210,6 +210,6 @@ func (c Map) GetDuration(key string) time.Duration {
 	return 0
 }
 
-func (c Map) SetDuration(key string, value time.Duration) {
+func (c *Map) SetDuration(key string, value time.Duration) {
 	c.SetString(key, value.String())
 }
