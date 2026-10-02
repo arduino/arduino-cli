@@ -470,7 +470,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	waitForUploadPort := uploadProperties.GetBoolean("upload.wait_for_upload_port")
 	updatedUploadPort := make(chan *discovery.Port, 1)
 	go func() {
-		updatedUploadPort <- detectUploadPort(uploadCtx, port, watcher.Feed(), waitForUploadPort)
+		updatedUploadPort <- detectUploadPort(uploadCtx, port, watcher.Feed(), uploadPortWaitRequested(uploadProperties))
 	}()
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
@@ -598,15 +598,24 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	return rpc.DiscoveryPortToRPC(updatedPort), nil
 }
 
+func uploadPortWaitRequested(uploadProperties *properties.Map) bool {
+	return uploadProperties.GetBoolean("upload.wait_for_upload_port") &&
+		uploadProperties.GetBoolean("upload.use_1200bps_touch")
+}
+
 func detectUploadPort(
-	uploadCtx context.Context,
-	uploadPort *discovery.Port, watch <-chan *discovery.Event,
+	uploadCtx context.Context, uploadPort *discovery.Port, watch <-chan *discovery.Event,
 	waitForUploadPort bool,
 ) *discovery.Port {
+
 	log := logrus.WithField("task", "port_detection")
 	log.Debugf("Detecting new board port after upload")
 
-	candidate := uploadPort.Clone()
+	noPortSelected := uploadPort == nil || (uploadPort.Address == "" && uploadPort.Protocol == "default")
+	var candidate *discovery.Port
+	if !noPortSelected {
+		candidate = uploadPort.Clone()
+	}
 
 	// Ignore all events during the upload
 	for {
@@ -655,6 +664,9 @@ func detectUploadPort(
 			if ev.Type != "add" {
 				log.WithField("event", ev).Debug("Ignored non-add event")
 				continue
+			}
+			if noPortSelected {
+				return ev.Port
 			}
 
 			portPriority := func(port *discovery.Port) int {
