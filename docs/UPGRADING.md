@@ -88,8 +88,8 @@ The Settings API has been heavily refactored. Here a quick recap of the new meth
 
 The previous gRPC Setting rpc call may be replaced as follows:
 
-- The old `SettingsMerge` rpc call can now be done trough `SettingsSetValue`.
-- The old `SettingsDelete` rpc call can now be done trough `SettingsSetValue` passing the `key` to delete with an empty
+- The old `SettingsMerge` rpc call can now be done through `SettingsSetValue`.
+- The old `SettingsDelete` rpc call can now be done through `SettingsSetValue` passing the `key` to delete with an empty
   `value`.
 - The old `SettingsGetAll` rpc call has been replaced by `ConfigurationGet` that returns a structured message
   `Configuration` with all the settings populated.
