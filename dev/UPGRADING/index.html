@@ -4061,8 +4061,8 @@ when the cache directory is not set by the user.</p>
 </ul>
 <p>The previous gRPC Setting rpc call may be replaced as follows:</p>
 <ul>
-<li>The old <code>SettingsMerge</code> rpc call can now be done trough <code>SettingsSetValue</code>.</li>
-<li>The old <code>SettingsDelete</code> rpc call can now be done trough <code>SettingsSetValue</code> passing the <code>key</code> to delete with an empty
+<li>The old <code>SettingsMerge</code> rpc call can now be done through <code>SettingsSetValue</code>.</li>
+<li>The old <code>SettingsDelete</code> rpc call can now be done through <code>SettingsSetValue</code> passing the <code>key</code> to delete with an empty
   <code>value</code>.</li>
 <li>The old <code>SettingsGetAll</code> rpc call has been replaced by <code>ConfigurationGet</code> that returns a structured message
   <code>Configuration</code> with all the settings populated.</li>
