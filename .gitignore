@@ -14,6 +14,7 @@ venv
 /dist
 /.pytest-tmp-dir
 /node_modules/
+/.bin/
 __debug_bin*
 .vscode
 

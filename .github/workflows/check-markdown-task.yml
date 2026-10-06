@@ -93,10 +93,14 @@ jobs:
       - name: Initialize markdownlint-cli problem matcher
         uses: xt0rted/markdownlint-problem-matcher@v3
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Lint
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task markdown:lint
+        run: task markdown:lint
 
   links:
     needs: run-determination
@@ -126,9 +130,11 @@ jobs:
         with:
           setup_only: true
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Check links
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task \
-              --silent \
-              markdown:check-links
+        run: task --silent markdown:check-links

@@ -86,7 +86,11 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Build website
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task website:check
+        run: task website:check
