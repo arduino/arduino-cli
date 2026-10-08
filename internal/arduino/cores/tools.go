@@ -140,6 +140,23 @@ func (tr *ToolRelease) ToRpcToolsDependencies() *rpc.ToolsDependencies {
 	}
 }
 
+// ToolReleaseFromRpcToolDependencies converts a rpc.ToolsDependencies message to a
+// synthetic ToolRelease object. The ToolRelease is not linked to a global Tool or Package.
+func ToolReleaseFromRpcToolDependencies(rpcTool *rpc.ToolsDependencies) *ToolRelease {
+	version := semver.ParseRelaxed(rpcTool.GetVersion())
+	tool := &Tool{
+		Name:     rpcTool.GetName(),
+		Releases: map[semver.NormalizedString]*ToolRelease{},
+	}
+	release := &ToolRelease{
+		Version: version,
+		Tool:    tool,
+		Flavors: f.Map(rpcTool.GetSystems(), FlavorFromRpcSystem),
+	}
+	tool.Releases[version.NormalizedString()] = release
+	return release
+}
+
 var (
 	regexpLinuxArm     = regexp.MustCompile("arm.*-linux-gnueabihf")
 	regexpLinuxArm64   = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
@@ -227,11 +244,24 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 // ToRpcSystem converts this Flavor to a rpc.Systems message
 func (f *Flavor) ToRpcSystem() *rpc.Systems {
 	return &rpc.Systems{
+		Host:            f.OS,
 		Checksum:        f.Resource.Checksum,
 		Size:            f.Resource.Size,
-		Host:            f.OS,
 		ArchiveFilename: f.Resource.ArchiveFileName,
 		Url:             f.Resource.URL,
+	}
+}
+
+// FlavorFromRpcSystem converts a rpc.Systems message to a Flavor
+func FlavorFromRpcSystem(rpcSystem *rpc.Systems) *Flavor {
+	return &Flavor{
+		OS: rpcSystem.GetHost(),
+		Resource: &resources.DownloadResource{
+			URL:             rpcSystem.GetUrl(),
+			ArchiveFileName: rpcSystem.GetArchiveFilename(),
+			Checksum:        rpcSystem.GetChecksum(),
+			Size:            rpcSystem.GetSize(),
+		},
 	}
 }
 

@@ -192,6 +192,15 @@ func (dep *ToolDependency) InternalUniqueIdentifier(platformIndexURL *url.URL) s
 	return utils.SanitizeName(res)
 }
 
+// FromRpcToolDependencies converts an rpc.ToolsDependencies to a ToolDependency.
+func FromRpcToolDependencies(dep *rpc.ToolsDependencies) *ToolDependency {
+	return &ToolDependency{
+		ToolName:     dep.GetName(),
+		ToolPackager: dep.GetPackager(),
+		ToolVersion:  semver.ParseRelaxed(dep.GetVersion()),
+	}
+}
+
 // DiscoveryDependencies is a list of DiscoveryDependency
 type DiscoveryDependencies []*DiscoveryDependency
 

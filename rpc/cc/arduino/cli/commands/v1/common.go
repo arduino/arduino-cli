@@ -114,7 +114,7 @@ func DiscoveryPortToRPC(p *discovery.Port) *Port {
 		Protocol:      p.Protocol,
 		ProtocolLabel: p.ProtocolLabel,
 		HardwareId:    p.HardwareID,
-		Properties:    props.AsMap(),
+		Properties:    props.CloneAsMap(),
 	}
 }
 

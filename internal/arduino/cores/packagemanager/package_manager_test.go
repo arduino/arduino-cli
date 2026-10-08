@@ -378,7 +378,7 @@ func TestBoardOptionsFunctions(t *testing.T) {
 	require.Equal(t, "Upload Speed", esp8266Options.Get("UploadSpeed"))
 
 	esp8266UploadSpeedValues := esp8266.GetConfigOptionValues("UploadSpeed")
-	for k, v := range esp8266UploadSpeedValues.AsMap() {
+	for k, v := range esp8266UploadSpeedValues.IterMap() {
 		// Some option values are missing for a particular OS: check that only the available options are listed
 		require.Equal(t, k, v)
 	}

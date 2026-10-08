@@ -111,7 +111,7 @@ func (fqbn *FQBN) Match(target *FQBN) bool {
 		return false
 	}
 
-	for neededKey, neededValue := range target.Configs.AsMap() {
+	for neededKey, neededValue := range target.Configs.IterMap() {
 		targetValue, hasKey := fqbn.Configs.GetOk(neededKey)
 		if !hasKey || targetValue != neededValue {
 			return false
