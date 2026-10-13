@@ -230,6 +230,9 @@ func runUploadCommand(
 		feedback.FatalError(err, errcode)
 	} else {
 		io := stdIOResult()
+		for _, warn := range streamResp().GetFirmwareFileDetails().GetWarnings() {
+			feedback.Warning(warn)
+		}
 		feedback.PrintResult(&uploadResult{
 			Stdout:            io.Stdout,
 			Stderr:            io.Stderr,
