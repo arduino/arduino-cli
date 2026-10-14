@@ -428,6 +428,12 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 					responseError(e.GRPCStatus())
 					return nil
 				}
+				if err := utils.SyncTree(libDir); err != nil {
+					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
+					e := &cmderrors.FailedLibraryInstallError{Cause: err}
+					responseError(e.GRPCStatus())
+					return nil
+				}
 				taskCallback(&rpc.TaskProgress{Completed: true})
 			}
 

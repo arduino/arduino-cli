@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -209,6 +210,9 @@ func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, l
 	installPath := installTask.TargetPath
 	tmpDirPath := installPath.Parent()
 	if err := libRelease.Resource.Install(downloadsDir, tmpDirPath, installPath, checks); err != nil {
+		return &cmderrors.FailedLibraryInstallError{Cause: err}
+	}
+	if err := utils.SyncTree(installPath); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 

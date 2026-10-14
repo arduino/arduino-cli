@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -175,6 +176,9 @@ func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformR
 	if err := pme.cacheInstalledJSON(platformRelease); err != nil {
 		return errors.New(i18n.Tr("creating installed.json in %[1]s: %[2]s", platformRelease.InstallDir, err))
 	}
+	if err := utils.SyncTree(destDir); err != nil {
+		return errors.New(i18n.Tr("installing platform %[1]s: %[2]s", platformRelease, err))
+	}
 	return nil
 }
 
@@ -313,6 +317,9 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir, checks)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
+		return &cmderrors.FailedInstallError{Message: i18n.Tr("Cannot install tool %s", toolRelease), Cause: err}
+	}
+	if err := utils.SyncTree(destDir); err != nil {
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Cannot install tool %s", toolRelease), Cause: err}
 	}
 	if d, err := destDir.Abs(); err == nil {

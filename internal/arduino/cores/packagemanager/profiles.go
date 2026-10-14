@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -193,6 +194,10 @@ func (pmb *Builder) installMissingProfileTool(ctx context.Context, toolRelease *
 	// Install tool
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Installing tool %s", toolRelease)})
 	if err := toolResource.Install(pmb.DownloadDir, tmp, destDir, resources.IntegrityCheckFull); err != nil {
+		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error installing tool %s", toolRelease)})
+		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing tool %s", toolRelease), Cause: err}
+	}
+	if err := utils.SyncTree(destDir); err != nil {
 		taskCB(&rpc.TaskProgress{Name: i18n.Tr("Error installing tool %s", toolRelease)})
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Error installing tool %s", toolRelease), Cause: err}
 	}

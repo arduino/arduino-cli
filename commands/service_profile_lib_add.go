@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"go.bug.st/f"
@@ -128,6 +129,9 @@ func (s *arduinoCoreServerImpl) ProfileLibAdd(ctx context.Context, req *rpc.Prof
 
 	projectFilePath := sk.GetProjectPath()
 	if err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml())); err != nil {
+		return nil, err
+	}
+	if err := utils.SyncFile(projectFilePath); err != nil {
 		return nil, err
 	}
 

@@ -20,6 +20,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -88,6 +89,9 @@ func saveConfiguration(ctx context.Context, srv rpc.ArduinoCoreServiceServer) {
 
 	configFile := GetConfigFile(ctx)
 	if err := paths.New(configFile).WriteFile(outConfig); err != nil {
+		feedback.Fatal(i18n.Tr("Error writing to file: %v", err), feedback.ErrGeneric)
+	}
+	if err := utils.SyncFile(paths.New(configFile)); err != nil {
 		feedback.Fatal(i18n.Tr("Error writing to file: %v", err), feedback.ErrGeneric)
 	}
 }

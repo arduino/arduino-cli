@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/i18n"
@@ -121,6 +122,9 @@ func runInitCommand(ctx context.Context, cmd *cobra.Command) {
 	}
 
 	if err := configFileAbsPath.WriteFile([]byte(resp.GetEncodedSettings())); err != nil {
+		feedback.Fatal(i18n.Tr("Cannot create config file: %v", err), feedback.ErrGeneric)
+	}
+	if err := utils.SyncFile(configFileAbsPath); err != nil {
 		feedback.Fatal(i18n.Tr("Cannot create config file: %v", err), feedback.ErrGeneric)
 	}
 
