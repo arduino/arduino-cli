@@ -16,8 +16,6 @@
 package utils
 
 import (
-	"os"
-
 	"github.com/arduino/go-paths-helper"
 	"golang.org/x/sys/unix"
 )
@@ -25,10 +23,10 @@ import (
 // SyncTree flushes to disk the files and directories under root.
 // It flushes the whole filesystem that contains root.
 func SyncTree(root *paths.Path) error {
-	f, err := os.Open(root.String())
+	fd, err := unix.Open(root.String(), unix.O_RDONLY|unix.O_CLOEXEC, 0)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	return unix.Syncfs(int(f.Fd()))
+	defer unix.Close(fd)
+	return unix.Syncfs(fd)
 }
