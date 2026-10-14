@@ -422,13 +422,7 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 
 				// Install library
 				taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Installing library %s", libraryRef)})
-				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir, resources.IntegrityCheckFull); err != nil {
-					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
-					e := &cmderrors.FailedLibraryInstallError{Cause: err}
-					responseError(e.GRPCStatus())
-					return nil
-				}
-				if err := utils.SyncTree(libDir); err != nil {
+				if err := libRelease.Resource.Install(pme.DownloadDir, libRoot, libDir, resources.IntegrityCheckFull, nil); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Error installing library %s", libraryRef)})
 					e := &cmderrors.FailedLibraryInstallError{Cause: err}
 					responseError(e.GRPCStatus())

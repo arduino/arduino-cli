@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
-	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -165,7 +164,12 @@ func (pme *Explorer) InstallPlatform(platformRelease *cores.PlatformRelease, che
 
 // InstallPlatformInDirectory installs a specific release of a platform in a specific directory.
 func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path, checks resources.IntegrityCheckMode) error {
-	if err := platformRelease.Resource.Install(pme.DownloadDir, pme.tempDir, destDir, checks); err != nil {
+	platformJSON, err := json.MarshalIndent(packageindex.IndexFromPlatformRelease(platformRelease), "", "  ")
+	if err != nil {
+		return errors.New(i18n.Tr("creating installed.json in %[1]s: %[2]s", destDir, err))
+	}
+	extraFiles := map[string][]byte{"installed.json": platformJSON}
+	if err := platformRelease.Resource.Install(pme.DownloadDir, pme.tempDir, destDir, checks, extraFiles); err != nil {
 		return errors.New(i18n.Tr("installing platform %[1]s: %[2]s", platformRelease, err))
 	}
 	if d, err := destDir.Abs(); err == nil {
@@ -173,23 +177,6 @@ func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformR
 	} else {
 		return err
 	}
-	if err := pme.cacheInstalledJSON(platformRelease); err != nil {
-		return errors.New(i18n.Tr("creating installed.json in %[1]s: %[2]s", platformRelease.InstallDir, err))
-	}
-	if err := utils.SyncTree(destDir); err != nil {
-		return errors.New(i18n.Tr("installing platform %[1]s: %[2]s", platformRelease, err))
-	}
-	return nil
-}
-
-func (pme *Explorer) cacheInstalledJSON(platformRelease *cores.PlatformRelease) error {
-	index := packageindex.IndexFromPlatformRelease(platformRelease)
-	platformJSON, err := json.MarshalIndent(index, "", "  ")
-	if err != nil {
-		return err
-	}
-	installedJSON := platformRelease.InstallDir.Join("installed.json")
-	installedJSON.WriteFile(platformJSON)
 	return nil
 }
 
@@ -314,12 +301,9 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir, checks)
+	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir, checks, nil)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		return &cmderrors.FailedInstallError{Message: i18n.Tr("Cannot install tool %s", toolRelease), Cause: err}
-	}
-	if err := utils.SyncTree(destDir); err != nil {
 		return &cmderrors.FailedInstallError{Message: i18n.Tr("Cannot install tool %s", toolRelease), Cause: err}
 	}
 	if d, err := destDir.Abs(); err == nil {
