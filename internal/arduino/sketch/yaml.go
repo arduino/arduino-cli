@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"gopkg.in/yaml.v3"
@@ -89,5 +90,8 @@ func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 	}
 
 	// Write back the updated YAML
-	return path.WriteFile(dstYaml)
+	if err := path.WriteFile(dstYaml); err != nil {
+		return err
+	}
+	return utils.SyncFile(path)
 }
