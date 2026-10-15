@@ -117,9 +117,11 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 		if err := root.CopyDirTo(destDir); err != nil {
 			return errors.New(i18n.Tr("moving extracted archive to destination dir: %s", err))
 		}
-		if err := utils.SyncTree(destDir); err != nil {
-			return errors.New(i18n.Tr("syncing extracted archive to disk: %s", err))
-		}
+	}
+
+	// Flush the move to disk
+	if err := utils.SyncTree(destDir); err != nil {
+		return errors.New(i18n.Tr("syncing extracted archive to disk: %s", err))
 	}
 
 	return nil
