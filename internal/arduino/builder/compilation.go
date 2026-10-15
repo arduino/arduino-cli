@@ -29,6 +29,16 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
+// pathIsCore reports whether the provided path is in (or exactly matches)
+// the core build folder where all core intermediate files are stored.
+func (b *Builder) pathIsCore(path *paths.Path) bool {
+	if path.EquivalentTo(b.coreBuildPath) {
+		return true
+	}
+	inside, _ := path.IsInsideDir(b.coreBuildPath)
+	return inside
+}
+
 func (b *Builder) compileFiles(
 	sourceDir *paths.Path,
 	buildPath *paths.Path,
@@ -129,6 +139,9 @@ func (b *Builder) compileFileWithRecipe(
 	properties := b.buildProperties.Clone()
 	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
 	properties.Set("includes", strings.Join(includes, " "))
+	if b.pathIsCore(buildPath) {
+		properties.Remove("build.library_discovery_flags")
+	}
 	properties.SetPath("source_file", source)
 	properties.SetPath("object_file", objectFile)
 	command, err := b.prepareCommandForRecipe(properties, recipe, false)

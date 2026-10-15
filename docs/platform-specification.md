@@ -146,6 +146,21 @@ The following automatically generated properties can be used globally in all con
   intent, `-DARDUINO_LIB_DISCOVERY_PHASE` was added to `recipe.preproc.macros` during library discovery in Arduino
   Builder 1.5.3/Arduino CLI 0.10.0. That flag was replaced by the more flexible `{build.library_discovery_phase}`
   property.
+- `{build.library_discovery_flags}`: a series of `-D` flags, one set per library resolved during library discovery. It
+  is available to sketch and library compile recipes only; it is deliberately not exposed to core-compile recipes. This
+  property was added in Arduino CLI 1.6.0.<br /> For each library, the property contains a flag with the form
+  `-DFOUND_<SLUG>_LIB=0x<hex-version>`, and one with the form `-DFOUND_<SLUG>_LIB_<SOURCE>=1`.
+  - `<SLUG>` is the library name converted to a valid uppercase C identifier (runs of characters outside `[A-Za-z0-9_]`
+    become a single `_`).
+  - `<hex-version>` is the library's version, in the form of a 24-bit value assembled from the major/minor/patch
+    components (`MMmmpp`). Each component is clamped to `0xFF`. Pre-release/build metadata components are discarded. An
+    unknown or unparseable version is encoded as `1`.
+  - `<SOURCE>` identifies where the library was found:
+    - `IN_IDE`: Arduino IDE's built-in libraries.
+    - `IN_PLATFORM`: libraries bundled with the platform.
+    - `IN_PROFILE`: libraries specified as a dependency by the build profile.
+    - `IN_SKETCHBOOK`: libraries located under `directories.user`, or under a path specified via a `--libraries` flag.
+    - `IN_SPECIFIED_PATH`: libraries under a path specified via a `--library` flag.
 - `{compiler.optimization_flags}`: see ["Sketch debugging configuration"](#sketch-debugging-configuration) for details
 - `{extra.time.utc}`: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on
 - `{extra.time.local}`: Unix time with local timezone and DST offset
