@@ -122,17 +122,13 @@ func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
 	}
 
 	// Load previous build options map
-	var buildOptionsJSONPrevious []byte
-	if buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
-		var err error
-		buildOptionsJSONPrevious, err = buildOptionsFile.ReadFile()
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(buildOptionsJSONPrevious) == 0 {
+	buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json")
+	if !buildOptionsFile.Exist() {
 		return nil
+	}
+	buildOptionsJSONPrevious, err := buildOptionsFile.ReadFile()
+	if err != nil {
+		return err
 	}
 
 	var prevOpts *properties.Map

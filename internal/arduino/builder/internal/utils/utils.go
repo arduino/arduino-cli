@@ -78,11 +78,12 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 	}
 	deps, err := cpp.ReadDepFile(dependencyFile)
 	if err != nil {
-		logrus.Debugf("Could not read dependency file: %s", dependencyFile)
-		return false, err
+		logrus.WithError(err).Debugf("Could not read dependency file: %s", dependencyFile)
+		return false, nil
 	}
 	if len(deps.Dependencies) == 0 {
-		return true, nil
+		logrus.Debugf("Dependency file is empty: %v", dependencyFile)
+		return false, nil
 	}
 
 	if deps.ObjectFile != objectFile.String() {
