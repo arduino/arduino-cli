@@ -101,7 +101,7 @@ The `Test.ino.cpp` is composed following the rules described in [.ino file compo
 In this phase the build system tests if the sketch uses external libraries that are not part of the build. The algorithm
 in principle is very simple: it just tries to C/C++ Preprocess each compilation unit, and check if this operation
 results in a `Missing include <xxx.h>` error. In such cases the builder adds a library that provides the missing `xxx.h`
-include and retries, until the C/C++ Preprocess is succesful or there are errors different from `Missing include ...`.
+include and retries, until the C/C++ Preprocess is successful or there are errors different from `Missing include ...`.
 
 The C/C++ Preprocessing consists in the macro expansion of the C language, i.e. the substitution of the `#include` and
 `#define` and `#ifdef/endif` macros. We are doing only this operation during the auto discovery of used libraries,
