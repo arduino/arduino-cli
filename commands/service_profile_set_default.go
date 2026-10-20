@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -43,6 +44,9 @@ func (s *arduinoCoreServerImpl) ProfileSetDefault(ctx context.Context, req *rpc.
 	sk.Project.DefaultProfile = req.GetProfileName()
 	projectFilePath := sk.GetProjectPath()
 	if err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml())); err != nil {
+		return nil, err
+	}
+	if err := utils.SyncFile(projectFilePath); err != nil {
 		return nil, err
 	}
 

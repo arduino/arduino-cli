@@ -20,6 +20,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/cleanup"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	paths "github.com/arduino/go-paths-helper"
@@ -39,7 +40,8 @@ const (
 // - the only root dir is moved/renamed to/as the destination directory
 // Note that tempPath and destDir must be on the same filesystem partition
 // otherwise the last step will fail.
-func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.Path, checks IntegrityCheckMode) error {
+// The extraFiles, a map of relative path to content, are added to the root dir before the move.
+func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.Path, checks IntegrityCheckMode, extraFiles map[string][]byte) error {
 	if checks != IntegrityCheckNone {
 		// Check the integrity of the package
 		if ok, err := release.TestLocalArchiveIntegrity(downloadDir); err != nil {
@@ -82,6 +84,16 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 	if err != nil {
 		return errors.New(i18n.Tr("searching package root dir: %s", err))
 	}
+	for name, data := range extraFiles {
+		if err := root.Join(name).WriteFile(data); err != nil {
+			return errors.New(i18n.Tr("creating %[1]s: %[2]s", name, err))
+		}
+	}
+
+	// Flush the files to disk before the move makes them visible in the destination dir
+	if err := utils.SyncTree(root); err != nil {
+		return errors.New(i18n.Tr("syncing extracted archive to disk: %s", err))
+	}
 
 	// Ensure container dir exists
 	destDirParent := destDir.Parent()
@@ -105,6 +117,11 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 		if err := root.CopyDirTo(destDir); err != nil {
 			return errors.New(i18n.Tr("moving extracted archive to destination dir: %s", err))
 		}
+	}
+
+	// Flush the move to disk
+	if err := utils.SyncTree(destDir); err != nil {
+		return errors.New(i18n.Tr("syncing extracted archive to disk: %s", err))
 	}
 
 	return nil

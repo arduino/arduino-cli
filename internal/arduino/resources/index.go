@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/arduino/security"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -187,8 +188,14 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	if err := tmpIndexPath.CopyTo(indexPath); err != nil {
 		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index"), Cause: err}
 	}
+	if err := utils.SyncFile(indexPath); err != nil {
+		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index"), Cause: err}
+	}
 	if hasSignature {
 		if err := tmpSignaturePath.CopyTo(signaturePath); err != nil {
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index signature"), Cause: err}
+		}
+		if err := utils.SyncFile(signaturePath); err != nil {
 			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error saving downloaded index signature"), Cause: err}
 		}
 	}
