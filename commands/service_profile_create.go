@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -92,6 +93,9 @@ func (s *arduinoCoreServerImpl) ProfileCreate(ctx context.Context, req *rpc.Prof
 	projectFilePath := sk.GetProjectPath()
 	err = projectFilePath.WriteFile([]byte(sk.Project.AsYaml()))
 	if err != nil {
+		return nil, err
+	}
+	if err := utils.SyncFile(projectFilePath); err != nil {
 		return nil, err
 	}
 

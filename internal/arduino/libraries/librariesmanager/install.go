@@ -139,6 +139,9 @@ func (lmi *Installer) importLibraryFromDirectory(libPath *paths.Path, overwrite 
 	if err := libPath.CopyDirTo(installPlan.TargetPath); err != nil {
 		return fmt.Errorf("%s: %w", i18n.Tr("copying library to destination directory:"), err)
 	}
+	if err := utils.SyncTree(installPlan.TargetPath); err != nil {
+		return fmt.Errorf("%s: %w", i18n.Tr("syncing library to disk:"), err)
+	}
 	return nil
 }
 

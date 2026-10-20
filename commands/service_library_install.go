@@ -208,7 +208,7 @@ func installLibrary(lmi *librariesmanager.Installer, downloadsDir *paths.Path, l
 
 	installPath := installTask.TargetPath
 	tmpDirPath := installPath.Parent()
-	if err := libRelease.Resource.Install(downloadsDir, tmpDirPath, installPath, checks); err != nil {
+	if err := libRelease.Resource.Install(downloadsDir, tmpDirPath, installPath, checks, nil); err != nil {
 		return &cmderrors.FailedLibraryInstallError{Cause: err}
 	}
 

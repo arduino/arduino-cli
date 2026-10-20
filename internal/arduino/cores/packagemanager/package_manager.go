@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	paths "github.com/arduino/go-paths-helper"
@@ -517,6 +518,8 @@ func (pmb *Builder) LoadInstalledPlatformMetadataAndMigrateIfPossible(installedJ
 			if platformJSON, err := json.MarshalIndent(updatedIndex, "", "  "); err != nil {
 				return nil, errors.New(i18n.Tr("upgdating platform metadata: %s", err))
 			} else if err := installedJSONPath.WriteFile(platformJSON); err != nil {
+				return nil, errors.New(i18n.Tr("updating platform metadata: %s", err))
+			} else if err := utils.SyncFile(installedJSONPath); err != nil {
 				return nil, errors.New(i18n.Tr("updating platform metadata: %s", err))
 			}
 
