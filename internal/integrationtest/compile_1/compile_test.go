@@ -71,6 +71,8 @@ func TestCompile(t *testing.T) {
 		{"UsingPlatformLocalTxt", compileUsingPlatformLocalTxt},
 		{"UsingBoardsLocalTxt", compileUsingBoardsLocalTxt},
 		{"WithInvalidBuildOptionJson", compileWithInvalidBuildOptionJson},
+		{"WithInterruptedBuild", compileWithInterruptedBuild},
+		{"WithCorruptedCacheFiles", compileWithCorruptedCacheFiles},
 		{"WithRelativeBuildPath", compileWithRelativeBuildPath},
 		{"WithFakeSecureBootCore", compileWithFakeSecureBootCore},
 		{"PreprocessFlagDoNotMessUpWithOutput", preprocessFlagDoNotMessUpWithOutput},
@@ -1033,6 +1035,79 @@ func compileWithInvalidBuildOptionJson(t *testing.T, env *integrationtest.Enviro
 
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
 	require.NoError(t, err)
+}
+
+func compileWithInterruptedBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileInterruptedBuild"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	buildPath := cli.SketchbookDir().Join("interrupted_build_path")
+	defer buildPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// A new build path keeps its existing files
+	require.NoError(t, buildPath.MkdirAll())
+	require.NoError(t, buildPath.Join("user-file").WriteFile([]byte("keep")))
+	_, _, err = cli.Run("compile", "-b", fqbn, "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+	require.FileExists(t, buildPath.Join("build.complete").String())
+	require.FileExists(t, buildPath.Join("user-file").String())
+
+	// A build without the stamp is interrupted: corrupted cache files must not break the next build
+	require.NoError(t, buildPath.Join("build.complete").Remove())
+	require.NoError(t, buildPath.Join("includes.cache").WriteFile(nil))
+	require.NoError(t, buildPath.Join("libraries.cache").WriteFile(nil))
+	require.NoError(t, buildPath.Join("sketch", sketchName+".ino.cpp.o").WriteFile(nil))
+	stdout, _, err := cli.Run("compile", "-b", fqbn, "--build-path", buildPath.String(), sketchPath.String(), "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "build.complete invalid, rebuilding all")
+	require.FileExists(t, buildPath.Join("build.complete").String())
+	require.NoFileExists(t, buildPath.Join("user-file").String())
+
+	// A compile error keeps the stamp
+	require.NoError(t, sketchPath.Join(sketchName+".ino").WriteFile([]byte("void setup() { error }\nvoid loop() {}\n")))
+	_, _, err = cli.Run("compile", "-b", fqbn, "--build-path", buildPath.String(), sketchPath.String())
+	require.Error(t, err)
+	require.FileExists(t, buildPath.Join("build.complete").String())
+}
+
+func compileWithCorruptedCacheFiles(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileCorruptedCacheFiles"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	out, _, err := cli.Run("compile", "-b", fqbn, sketchPath.String(), "--json")
+	require.NoError(t, err)
+	var builderOutput struct {
+		BuilderResult struct {
+			BuildPath string `json:"build_path"`
+		} `json:"builder_result"`
+	}
+	require.NoError(t, json.Unmarshal(out, &builderOutput))
+	buildPath := paths.New(builderOutput.BuilderResult.BuildPath)
+
+	// Empty cache files in a complete build path must not break the next build
+	require.NoError(t, buildPath.Join("includes.cache").WriteFile(nil))
+	require.NoError(t, buildPath.Join("libraries.cache").WriteFile(nil))
+	require.NoError(t, buildPath.Join("sketch", sketchName+".ino.cpp.d").WriteFile(nil))
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+	require.NoError(t, buildPath.Join("libraries.cache").WriteFile(nil))
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--skip-libraries-discovery")
+	require.NoError(t, err)
+
+	// An empty build.options.json wipes the build path, but keeps the build cache timestamp
+	require.NoError(t, buildPath.Join("build.options.json").WriteFile(nil))
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchPath.String(), "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "build.options.json invalid, rebuilding all")
+	require.FileExists(t, buildPath.Join(".last-used").String())
 }
 
 func compileWithRelativeBuildPath(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
