@@ -24,10 +24,14 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Check i18n source and translation files are up to date
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task i18n:check
+        run: task i18n:check
         env:
           TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
           TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}

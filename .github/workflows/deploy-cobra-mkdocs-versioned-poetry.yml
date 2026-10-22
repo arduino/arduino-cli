@@ -93,15 +93,10 @@ jobs:
           version: 3.x
 
       - name: Create all generated documentation content
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task docs:generate
+        run: task docs:generate
 
       - name: Install Dependencies
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task poetry:install-deps \
-              POETRY_GROUPS=dev
+        run: task poetry:install-deps POETRY_GROUPS=dev
 
       - name: Determine versioning parameters
         id: determine-versioning

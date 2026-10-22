@@ -80,14 +80,18 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Build
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task dist:${{ matrix.os.task }}
+        run: task dist:${{ matrix.os.task }}
 
       - name: Output Version
         id: get-version
-        run: echo "version=$(go tool github.com/go-task/task/v3/cmd/task general:get-version)" >> $GITHUB_OUTPUT
+        run: echo "version=$(task general:get-version)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
@@ -325,11 +329,17 @@ jobs:
         with:
           setup_only: true
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Collect proto files
-        run: go tool github.com/go-task/task/v3/cmd/task protoc:collect
+        run: task protoc:collect
 
       - name: Add configuration JSON schema
-        run: go tool github.com/go-task/task/v3/cmd/task dist:jsonschema
+        run: task dist:jsonschema
 
       - name: Create checksum file
         working-directory: ${{ env.DIST_DIR }}

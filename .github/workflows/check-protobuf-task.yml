@@ -62,11 +62,16 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Check protocol buffers compile correctly
         if: runner.os == 'Linux'
         run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task protoc:compile
+          task protoc:compile
           git diff --color --exit-code
 
   check:

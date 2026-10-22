@@ -104,12 +104,17 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Run tests
         shell: bash
         run: |
           export GO_TEST_PACKAGE="github.com/arduino/arduino-cli/internal/integrationtest/${{ matrix.tests }}"
-          go tool \
-            github.com/go-task/task/v3/cmd/task go:integration-test
+          task go:integration-test
           mv coverage_integration.txt coverage_integration_${{ matrix.operating-system }}_${{ matrix.tests }}.txt
 
       - name: Upload coverage data to workflow artifact
@@ -147,11 +152,15 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Run tests
         shell: bash
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task go:test
+        run: task go:test
 
       - name: Upload coverage data to workflow artifact
         if: runner.os == 'Linux'

@@ -76,12 +76,16 @@ jobs:
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Modernize usages of outdated APIs
         env:
           GO_MODULE_PATH: ${{ matrix.module.path }}
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task go:fix
+        run: task go:fix
 
       - name: Check if any fixes were needed
         run: |
@@ -114,19 +118,24 @@ jobs:
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.11.3
 
+      - name: Install golangci-lint into .bin
+        run: task install:golangci-lint
+
       - name: Check style
         env:
           GO_MODULE_PATH: ${{ matrix.module.path }}
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task  \
-              --silent \
-              go:lint
+        run: task --silent go:lint
 
   check-formatting:
     name: check-formatting (${{ matrix.module.path }})
@@ -153,12 +162,16 @@ jobs:
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Format code
         env:
           GO_MODULE_PATH: ${{ matrix.module.path }}
-        run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task go:format
+        run: task go:format
 
       - name: Check formatting
         run: |
@@ -226,12 +239,20 @@ jobs:
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Install addlicense into .bin
+        run: task install:addlicense
+
       - name: Check for missing license headers
         env:
           GO_MODULE_PATH: ${{ matrix.module.path }}
         run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task go:add-license-headers
+          task go:add-license-headers
           git diff --color --exit-code
 
   # Do a simple "smoke test" build for the modules with no other form of validation
