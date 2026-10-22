@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -27,6 +28,7 @@ import (
 	"fortio.org/safecast"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/internal/arduino/globals"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
@@ -136,6 +138,14 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 // sketchCopyAdditionalFiles copies the additional files for a sketch to the
 // specified destination directory.
 func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map[string]string) error {
+	mainFileName := filepath.Clean(b.sketch.MainFile.Base())
+	expectedFiles := map[string]bool{
+		mainFileName + ".cpp":                     true,
+		mainFileName + ".cpp.merged":              true,
+		mainFileName + ".cpp.merged.libsdetect.d": true,
+		mainFileName + ".cpp.o":                   true,
+		mainFileName + ".cpp.d":                   true,
+	}
 	for _, file := range b.sketch.AdditionalFiles {
 		relpath, err := b.sketch.FullPath.RelTo(file)
 		if err != nil {
@@ -143,6 +153,13 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 		}
 
 		targetPath := buildPath.JoinPath(relpath)
+		relpathString := filepath.Clean(relpath.String())
+		expectedFiles[relpathString] = true
+		if _, ok := globals.SourceFilesValidExtensions[file.Ext()]; ok {
+			expectedFiles[filepath.Clean(relpathString+".o")] = true
+			expectedFiles[filepath.Clean(relpathString+".d")] = true
+			expectedFiles[filepath.Clean(relpathString+".libsdetect.d")] = true
+		}
 		// create the directory containing the target
 		if err = targetPath.Parent().MkdirAll(); err != nil {
 			return fmt.Errorf("%s: %w", i18n.Tr("unable to create the folder containing the item"), err)
@@ -172,7 +189,50 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 		}
 	}
 
+	buildFiles, err := buildPath.ReadDirRecursiveFiltered(
+		func(*paths.Path) bool { return true },
+		paths.FilterOutDirectories(),
+	)
+	if err != nil {
+		return err
+	}
+	for _, buildFile := range buildFiles {
+		relpath, err := buildPath.RelTo(buildFile)
+		if err != nil {
+			return err
+		}
+		relpathString := filepath.Clean(relpath.String())
+		if expectedFiles[relpathString] || globals.MainFileValidExtensions[relpath.Ext()] || !isStaleSketchBuildFile(relpathString) {
+			continue
+		}
+		if err := buildFile.RemoveAll(); err != nil {
+			return fmt.Errorf("removing stale sketch build file %s: %w", buildFile, err)
+		}
+	}
+
 	return nil
+}
+
+func isStaleSketchBuildFile(relpath string) bool {
+	if strings.HasSuffix(relpath, ".cpp.merged") {
+		return true
+	}
+
+	ext := filepath.Ext(relpath)
+	if ext == ".o" || ext == ".d" {
+		base := strings.TrimSuffix(relpath, ext)
+		base = strings.TrimSuffix(base, ".libsdetect")
+		return isSketchFileExtension(filepath.Ext(base)) || strings.HasSuffix(base, ".cpp.merged")
+	}
+	return isSketchFileExtension(ext)
+}
+
+func isSketchFileExtension(ext string) bool {
+	if globals.AdditionalFileValidExtensions[ext] {
+		return true
+	}
+	_, ok := globals.SourceFilesValidExtensions[ext]
+	return ok
 }
 
 func writeIfDifferent(source []byte, destPath *paths.Path) error {
