@@ -16,7 +16,7 @@ require (
 	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.2.4
 	github.com/arduino/pluggable-monitor-protocol-handler v0.9.4
 	github.com/cmaglie/pb v1.0.27
-	github.com/codeclysm/extract/v4 v4.0.0
+	github.com/codeclysm/extract/v4 v4.0.2
 	github.com/djherbis/buffer v1.2.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.19.0
@@ -40,7 +40,7 @@ require (
 	go.bug.st/f v0.5.0
 	go.bug.st/relaxed-semver v0.15.0
 	go.bug.st/testifyjson v1.3.0
-	golang.org/x/sys v0.47.0
+	golang.org/x/sys v0.49.0
 	golang.org/x/term v0.45.0
 	golang.org/x/text v0.41.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260825221802-da73d73af1c5
@@ -143,7 +143,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/juju/errors v1.0.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.18.7 // indirect
+	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
@@ -171,7 +171,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/u-root/u-root v0.16.0 // indirect
 	github.com/u-root/uio v0.0.0-20240224005618-d2acac8f3701 // indirect
-	github.com/ulikunitz/xz v0.5.15 // indirect
+	github.com/ulikunitz/xz v0.5.17 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
