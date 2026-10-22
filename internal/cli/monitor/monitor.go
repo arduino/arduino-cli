@@ -236,7 +236,7 @@ func runMonitorCmd(
 		ttyIn = io.TeeReader(ttyIn, ctrlCDetector)
 	}
 	var portConfiguration []*rpc.MonitorPortSetting
-	for k, v := range layeredPortConfig.AsMap() {
+	for k, v := range layeredPortConfig.IterMap() {
 		portConfiguration = append(portConfiguration, &rpc.MonitorPortSetting{
 			SettingId: k,
 			Value:     v,

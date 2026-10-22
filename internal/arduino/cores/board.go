@@ -43,7 +43,7 @@ type Board struct {
 func (b *Board) HasUsbID(reqVid, reqPid string) bool {
 	vids := b.Properties.SubTree("vid")
 	pids := b.Properties.SubTree("pid")
-	for id, vid := range vids.AsMap() {
+	for id, vid := range vids.IterMap() {
 		if pid, ok := pids.GetOk(id); ok {
 			if strings.EqualFold(vid, reqVid) && strings.EqualFold(pid, reqPid) {
 				return true
@@ -140,7 +140,7 @@ func (b *Board) GetBuildProperties(fqbn *fqbn.FQBN) (*properties.Map, error) {
 
 	// Add all sub-configurations one by one (a config is: option=value)
 	// Check for residual invalid options...
-	for option, value := range config.AsMap() {
+	for option, value := range config.IterMap() {
 		if option == "" {
 			return nil, errors.New(i18n.Tr("invalid empty option found"))
 		}
@@ -185,7 +185,7 @@ func (b *Board) GetIdentificationProperties() []*properties.Map {
 func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 	// check checks if the given set of properties p match the "query"
 	check := func(p *properties.Map) bool {
-		for k, v := range p.AsMap() {
+		for k, v := range p.IterMap() {
 			if !strings.EqualFold(query.Get(k), v) {
 				return false
 			}
@@ -208,7 +208,7 @@ func GetMonitorSettings(protocol string, boardProperties *properties.Map) *prope
 func (b *Board) IdentifyBoardConfiguration(query *properties.Map) *properties.Map {
 	// check checks if the given set of properties p match the "query"
 	check := func(p *properties.Map) bool {
-		for k, v := range p.AsMap() {
+		for k, v := range p.IterMap() {
 			if !strings.EqualFold(query.Get(k), v) {
 				return false
 			}

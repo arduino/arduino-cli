@@ -16,6 +16,7 @@
 package arguments
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -72,26 +73,15 @@ func (p *Port) GetPortAddressAndProtocol(ctx context.Context, instance *rpc.Inst
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
 func (p *Port) GetPort(ctx context.Context, instance *rpc.Instance, srv rpc.ArduinoCoreServiceServer, defaultAddress, defaultProtocol string, profile *rpc.SketchProfile) (*rpc.Port, error) {
-	if profile.GetPort() != "" {
-		defaultAddress = profile.GetPort()
-	}
-	if profile.GetProtocol() != "" {
-		defaultProtocol = profile.GetProtocol()
-	}
-	address := p.address
-	protocol := p.protocol
-	if address == "" && (defaultAddress != "" || defaultProtocol != "") {
-		address, protocol = defaultAddress, defaultProtocol
-	}
+	address := cmp.Or(p.address, profile.GetPort(), defaultAddress)
+	protocol := cmp.Or(p.protocol, profile.GetProtocol(), defaultProtocol, "default")
 	if address == "" {
 		// If no address is provided we assume the user is trying to upload
 		// to a board that supports a tool that automatically detects
 		// the attached board without specifying explicitly a port.
 		// Tools that work this way must be specified using the property
 		// "BOARD_ID.upload.tool.default" in the platform's boards.txt.
-		return &rpc.Port{
-			Protocol: "default",
-		}, nil
+		return &rpc.Port{Protocol: protocol}, nil
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 

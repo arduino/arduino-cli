@@ -110,10 +110,10 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 	}
 
 	cli.cliEnvVars = map[string]string{
-		"LANG":                                          "en",
-		"ARDUINO_DIRECTORIES_DATA":                      cli.dataDir.String(),
-		"ARDUINO_DIRECTORIES_DOWNLOADS":                 cli.stagingDir.String(),
-		"ARDUINO_DIRECTORIES_USER":                      cli.sketchbookDir.String(),
+		"LANG":                          "en",
+		"ARDUINO_DIRECTORIES_DATA":      cli.dataDir.String(),
+		"ARDUINO_DIRECTORIES_DOWNLOADS": cli.stagingDir.String(),
+		"ARDUINO_DIRECTORIES_USER":      cli.sketchbookDir.String(),
 		"ARDUINO_BUILD_CACHE_COMPILATIONS_BEFORE_PURGE": "0",
 	}
 	env.RegisterCleanUpCallback(cli.CleanUp)
