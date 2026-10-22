@@ -170,13 +170,18 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		{buildPath1, "alice:avr:board1", "port", "serial", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/upload/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "", "progr3", false, "FAIL", ""},
 
-		// 10: burn bootloader, require port
-		{buildPath1, "alice:avr:board1", "port", "serial", "", true, "FAIL", ""}, // requires programmer
+		// 10: burn bootloader, legacy recipes require programmer-provided properties
+		{buildPath1, "alice:avr:board1", "port", "serial", "", true, "FAIL", ""},
 		{buildPath1, "alice:avr:board1", "port", "serial", "progr1", true,
 			"ERASE conf-board1 conf-general conf-erase $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed\n",
 			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/upload/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 
-		// 12: burn bootloader, preferences override from programmers.txt
+		// 12: burn bootloader, no programmer required when the board defines a self-contained bootloader recipe
+		{buildPath1, "alice:avr:board3", "port", "serial", "", true,
+			"ERASE conf-board3 conf-general conf-erase $$VERBOSE-VERIFY$$ protocol port -bspeed\n",
+			"BURN conf-board3 conf-general conf-bootloader $$VERBOSE-VERIFY$$ protocol port -bspeed -F0xFF " + cwd + "/testdata/upload/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
+
+		// 13: burn bootloader, preferences override from programmers.txt
 		{buildPath1, "alice:avr:board1", "port", "serial", "progr4", true,
 			"ERASE conf-board1 conf-two-general conf-two-erase $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed\n",
 			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/upload/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
