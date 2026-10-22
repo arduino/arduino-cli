@@ -72,7 +72,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
@@ -110,7 +110,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
@@ -149,7 +149,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
@@ -187,7 +187,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
@@ -222,7 +222,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: ${{ matrix.module.path }}/go.mod
 
@@ -258,7 +258,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           # use the Go version specified in the root's go.mod file
           go-version-file: ./go.mod
