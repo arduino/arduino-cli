@@ -812,7 +812,7 @@ type PlatformRelease struct {
 	// True if the platform dependencies are available for the current OS/ARCH.
 	// This also means that the platform is installable.
 	Compatible bool `protobuf:"varint,9,opt,name=compatible,proto3" json:"compatible,omitempty"`
-	// Libraries declared by this platform release in the package index.
+	// Libraries on which this platform depends.
 	LibraryDependencies []*PlatformLibraryDependency `protobuf:"bytes,10,rep,name=library_dependencies,json=libraryDependencies,proto3" json:"library_dependencies,omitempty"`
 }
 
@@ -918,8 +918,8 @@ func (x *PlatformRelease) GetLibraryDependencies() []*PlatformLibraryDependency 
 	return nil
 }
 
-// PlatformLibraryDependency is a library that a platform release declares in
-// the package index and provides to the sketches built with it.
+// PlatformLibraryDependency is a library that a platform release declares
+// as a dependency.
 type PlatformLibraryDependency struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
