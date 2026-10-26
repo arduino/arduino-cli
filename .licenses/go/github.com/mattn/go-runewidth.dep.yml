@@ -1,8 +1,8 @@
 ---
 name: github.com/mattn/go-runewidth
-version: v0.0.24
+version: v0.0.27
 type: go
-summary:
+summary: 
 homepage: https://pkg.go.dev/github.com/mattn/go-runewidth
 license: mit
 licenses:

@@ -1,12 +1,12 @@
 ---
 name: github.com/arduino/go-properties-orderedmap
-version: v1.8.1
+version: v1.9.1
 type: go
 summary: Package properties is a library for handling maps of hierarchical properties.
 homepage: https://pkg.go.dev/github.com/arduino/go-properties-orderedmap
 license: gpl-2.0-or-later
 licenses:
-- sources: LICENSE
+- sources: LICENSE.txt
   text: |2
                         GNU GENERAL PUBLIC LICENSE
                            Version 2, June 1991
@@ -347,4 +347,10 @@ licenses:
     consider it more useful to permit linking proprietary applications with the
     library.  If this is what you want to do, use the GNU Lesser General
     Public License instead of this License.
+- sources: README.md
+  text: |-
+    ```
+    SPDX-FileCopyrightText: Arduino s.r.l. and/or its affiliated companies
+    SPDX-License-Identifier: GPL-2.0-or-later
+    ```
 notices: []
