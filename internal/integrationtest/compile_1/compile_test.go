@@ -52,6 +52,7 @@ func TestCompile(t *testing.T) {
 		{"WithoutFqbn", compileWithoutFqbn},
 		{"ErrorMessage", compileErrorMessage},
 		{"WithSimpleSketch", compileWithSimpleSketch},
+		{"WithSourceOverrideIncludes", compileWithSourceOverrideIncludes},
 		{"WithCachePurgeNeeded", compileWithCachePurgeNeeded},
 		{"OutputFlagDefaultPath", compileOutputFlagDefaultPath},
 		{"WithSketchWithSymlinkSelfloop", compileWithSketchWithSymlinkSelfloop},
@@ -77,6 +78,33 @@ func TestCompile(t *testing.T) {
 		{"WithCustomBuildPath", buildWithCustomBuildPath},
 		{"WithCustomBuildPathAndOUtputDirFlag", buildWithCustomBuildPathAndOUtputDirFlag},
 	}.Run(t, env, cli)
+}
+
+func compileWithSourceOverrideIncludes(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchPath := env.RootDir().Join("source_override")
+	require.NoError(t, sketchPath.MkdirAll())
+	sketchFile := sketchPath.Join("source_override.ino")
+	source := "#include <EEPROM.h>\n#include <SPI.h>\n#include <SoftwareSerial.h>\n#include <Wire.h>\n" +
+		"void setup() {}\nvoid loop() {}\n"
+	require.NoError(t, sketchFile.WriteFile([]byte(source)))
+	overrideFile := env.RootDir().Join("source-override.json")
+	buildPath := env.RootDir().Join("source-override-build")
+
+	for offset := 0; offset <= 3; offset++ {
+		t.Run(fmt.Sprintf("Offset%d", offset), func(t *testing.T) {
+			overrides, err := json.Marshal(map[string]string{
+				"source_override.ino": strings.Repeat("\n", offset) + source,
+			})
+			require.NoError(t, err)
+			require.NoError(t, overrideFile.WriteFile(overrides))
+			_, stderr, err := cli.Run("compile", "--fqbn", "arduino:avr:uno",
+				"--source-override", overrideFile.String(), "--build-path", buildPath.String(), sketchPath.String())
+			require.NoError(t, err, string(stderr))
+			contents, err := sketchFile.ReadFile()
+			require.NoError(t, err)
+			require.Equal(t, source, string(contents))
+		})
+	}
 }
 
 func compileWithoutFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
