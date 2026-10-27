@@ -66,8 +66,7 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 		DebugProperties: req.GetDebugProperties(),
 	}
 	expectedOutput, err := s.getDebugProperties(configRequest, pme, true)
-	var x *cmderrors.FailedDebugError
-	if errors.As(err, &x) {
+	if _, ok := errors.AsType[*cmderrors.FailedDebugError](err); ok {
 		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
 	}
 	if err != nil {

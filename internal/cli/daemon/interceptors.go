@@ -27,7 +27,7 @@ import (
 )
 
 var debugStdOut io.Writer
-var debugSeq uint32
+var debugSeq atomic.Uint32
 var debugFilters []string
 
 func log(isRequest bool, seq uint32, msg any) {
@@ -62,7 +62,7 @@ func unaryLoggerInterceptor(ctx context.Context, req any, info *grpc.UnaryServer
 	if !logSelector(info.FullMethod) {
 		return handler(ctx, req)
 	}
-	seq := atomic.AddUint32(&debugSeq, 1)
+	seq := debugSeq.Add(1)
 	fmt.Fprintln(debugStdOut, seq, "CALLED:", info.FullMethod)
 	log(true, seq, req)
 	resp, err := handler(ctx, req)
@@ -77,7 +77,7 @@ func streamLoggerInterceptor(srv any, stream grpc.ServerStream, info *grpc.Strea
 	if !logSelector(info.FullMethod) {
 		return handler(srv, stream)
 	}
-	seq := atomic.AddUint32(&debugSeq, 1)
+	seq := debugSeq.Add(1)
 	streamReq := ""
 	if info.IsClientStream {
 		streamReq = "STREAM_REQ "

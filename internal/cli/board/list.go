@@ -75,8 +75,7 @@ func runListCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, watch
 	})
 	ports := list.GetPorts()
 	discoveryErrors := list.GetWarnings()
-	var invalidFQBNErr *cmderrors.InvalidFQBNError
-	if errors.As(err, &invalidFQBNErr) {
+	if _, ok := errors.AsType[*cmderrors.InvalidFQBNError](err); ok {
 		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
 	if err != nil {
