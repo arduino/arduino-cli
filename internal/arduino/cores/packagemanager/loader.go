@@ -340,7 +340,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 
 	// Build pluggable monitor references
 	platform.Monitors = map[string]*cores.MonitorDependency{}
-	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
+	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").IterMap() {
 		split := strings.Split(ref, ":")
 		if len(split) != 2 {
 			return errors.New(i18n.Tr("invalid pluggable monitor reference: %s", ref))
@@ -354,7 +354,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 
 	// Support for pluggable monitors in debugging/development environments
 	platform.MonitorsDevRecipes = map[string]string{}
-	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
+	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").IterMap() {
 		pm.log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
 		platform.MonitorsDevRecipes[protocol] = recipe
 	}
@@ -563,7 +563,7 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 		if !props.ContainsKey(defaultAction) {
 			// Search for "menu.MENU-ID.MENU-ITEM.ACTION.tool" (some platforms sets ACTION.tool on
 			// submenu config entries). See https://github.com/arduino/arduino-cli/issues/1444
-			for key, value := range props.AsMap() {
+			for key, value := range props.IterMap() {
 				if !strings.HasPrefix(key, "menu.") {
 					continue
 				}
