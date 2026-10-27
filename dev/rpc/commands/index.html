@@ -1213,6 +1213,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#platformlibrarydependency" class="md-nav__link">
+    PlatformLibraryDependency
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platformmetadata" class="md-nav__link">
     PlatformMetadata
   </a>
@@ -3130,6 +3137,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#platformlibrarydependency" class="md-nav__link">
+    PlatformLibraryDependency
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platformmetadata" class="md-nav__link">
     PlatformMetadata
   </a>
@@ -4726,6 +4740,7 @@
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a>
     - <a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a>
     - <a href="#cc.arduino.cli.commands.v1.Platform">Platform</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformLibraryDependency">PlatformLibraryDependency</a>
     - <a href="#cc.arduino.cli.commands.v1.PlatformMetadata">PlatformMetadata</a>
     - <a href="#cc.arduino.cli.commands.v1.PlatformRelease">PlatformRelease</a>
     - <a href="#cc.arduino.cli.commands.v1.PlatformSummary">PlatformSummary</a>
@@ -5259,6 +5274,34 @@ platform release.</p>
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.PlatformLibraryDependency"></a></p>
+<h3 id="platformlibrarydependency">PlatformLibraryDependency<a class="headerlink" href="#platformlibrarydependency" title="Permanent link">&para;</a></h3>
+<p>PlatformLibraryDependency is a library that a platform release declares
+as a dependency.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Name of the library.</td>
+</tr>
+<tr>
+<td>version</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Version of the library required by the platform release.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.PlatformMetadata"></a></p>
 <h3 id="platformmetadata">PlatformMetadata<a class="headerlink" href="#platformmetadata" title="Permanent link">&para;</a></h3>
 <p>PlatformMetadata contains generic information about a platform (not
@@ -5383,6 +5426,12 @@ correlated to a specific release).</p>
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>True if the platform dependencies are available for the current OS/ARCH. This also means that the platform is installable.</td>
+</tr>
+<tr>
+<td>library_dependencies</td>
+<td><a href="#cc.arduino.cli.commands.v1.PlatformLibraryDependency">PlatformLibraryDependency</a></td>
+<td>repeated</td>
+<td>Libraries on which this platform depends.</td>
 </tr>
 </tbody>
 </table>
