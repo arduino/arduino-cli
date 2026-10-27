@@ -234,7 +234,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		SketchPath:                    sketchPath.String(),
 		ShowProperties:                showProperties != arguments.ShowPropertiesDisabled,
 		Preprocess:                    preprocess,
-		BuildCachePath:                buildCachePath,
+		BuildCachePath:                buildCachePath, //nolint:staticcheck // SA1019: deprecated field still supported for backward compatibility
 		BuildPath:                     buildPath,
 		BuildProperties:               buildProperties,
 		Warnings:                      warnings,
