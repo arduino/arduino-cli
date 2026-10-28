@@ -235,7 +235,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 		SketchPath:                    sketchPath.String(),
 		ShowProperties:                showProperties != arguments.ShowPropertiesDisabled,
 		Preprocess:                    preprocess,
-		BuildCachePath:                buildCachePath,
+		BuildCachePath:                buildCachePath, //nolint:staticcheck // SA1019: deprecated field still supported for backward compatibility
 		BuildPath:                     buildPath,
 		BuildProperties:               buildProperties,
 		Warnings:                      warnings,
@@ -402,8 +402,7 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
-		var platformErr *cmderrors.PlatformNotFoundError
-		if errors.As(compileError, &platformErr) {
+		if platformErr, ok := errors.AsType[*cmderrors.PlatformNotFoundError](compileError); ok {
 			split := strings.Split(platformErr.Platform, ":")
 			if len(split) < 2 {
 				panic(i18n.Tr("Platform ID is not correct"))

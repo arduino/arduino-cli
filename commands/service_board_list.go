@@ -56,7 +56,7 @@ func (s *arduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 	for _, port := range dm.List() {
 		resp, err := s.BoardIdentify(ctx, &rpc.BoardIdentifyRequest{
 			Instance:                            req.GetInstance(),
-			Properties:                          port.Properties.AsMap(),
+			Properties:                          port.Properties.CloneAsMap(),
 			UseCloudApiForUnknownBoardDetection: !req.GetSkipCloudApiForBoardDetection(),
 		})
 		if err != nil {
@@ -135,7 +135,7 @@ func (s *arduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, s
 			if event.Type == "add" {
 				resp, err := s.BoardIdentify(context.Background(), &rpc.BoardIdentifyRequest{
 					Instance:                            req.GetInstance(),
-					Properties:                          event.Port.Properties.AsMap(),
+					Properties:                          event.Port.Properties.CloneAsMap(),
 					UseCloudApiForUnknownBoardDetection: !req.GetSkipCloudApiForBoardDetection(),
 				})
 				if err != nil {

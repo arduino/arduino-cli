@@ -1,12 +1,13 @@
 ---
-name: github.com/pelletier/go-toml/v2/internal/characters
-version: v2.3.1
+name: github.com/pelletier/go-toml/v2/internal/parserbridge
+version: v2.4.3
 type: go
-summary: Package characters provides functions for working with string encodings.
-homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/internal/characters
+summary: Package parserbridge exposes the unstable parser's non-AST scanners to the
+  root toml package without making them part of the unstable public API.
+homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/internal/parserbridge
 license: mit
 licenses:
-- sources: v2@v2.3.1/LICENSE
+- sources: v2@v2.4.3/LICENSE
   text: |
     The MIT License (MIT)
 
@@ -30,6 +31,6 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: v2@v2.3.1/README.md
+- sources: v2@v2.4.3/README.md
   text: The MIT License (MIT). Read [LICENSE](LICENSE).
 notices: []
