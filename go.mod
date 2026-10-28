@@ -23,7 +23,7 @@ require (
 	github.com/go-git/go-git/v5 v5.19.3
 	github.com/goccy/go-json v0.11.2
 	github.com/gofrs/uuid/v5 v5.5.1
-	github.com/leonelquinteros/gotext v1.7.2
+	github.com/leonelquinteros/gotext v1.8.0
 	github.com/mailru/easyjson v0.9.2
 	github.com/marcinbor85/gohex v0.1.0
 	github.com/mattn/go-colorable v0.1.16
