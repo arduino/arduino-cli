@@ -127,8 +127,7 @@ func Upgrade(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst *rpc.In
 		err := srv.PlatformUpgrade(r, stream)
 		warningMissingIndex(respCB().GetPlatform())
 		if err != nil {
-			var alreadyAtLatestVersionErr *cmderrors.PlatformAlreadyAtTheLatestVersionError
-			if errors.As(err, &alreadyAtLatestVersionErr) {
+			if _, ok := errors.AsType[*cmderrors.PlatformAlreadyAtTheLatestVersionError](err); ok {
 				feedback.Warning(err.Error())
 				continue
 			}

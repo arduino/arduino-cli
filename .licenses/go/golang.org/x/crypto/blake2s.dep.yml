@@ -1,12 +1,13 @@
 ---
-name: golang.org/x/net/internal/httpcommon
-version: v0.58.0
+name: golang.org/x/crypto/blake2s
+version: v0.56.0
 type: go
-summary:
-homepage: https://pkg.go.dev/golang.org/x/net/internal/httpcommon
+summary: Package blake2s implements the BLAKE2s hash algorithm defined by RFC 7693
+  and the extendable output function (XOF) BLAKE2Xs.
+homepage: https://pkg.go.dev/golang.org/x/crypto/blake2s
 license: bsd-3-clause
 licenses:
-- sources: net@v0.58.0/LICENSE
+- sources: crypto@v0.56.0/LICENSE
   text: |
     Copyright 2009 The Go Authors.
 
@@ -35,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: net@v0.58.0/PATENTS
+- sources: crypto@v0.56.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
