@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
@@ -231,6 +232,15 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			testRunner(t, test, true)
 		})
 	}
+}
+
+func TestBurnBootloaderMissingFQBN(t *testing.T) {
+	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
+	_, err := srv.runProgramAction(
+		context.Background(), nil, nil, "", "", "", nil, "programmer",
+		false, false, true, nil, nil, false, nil, nil,
+	)
+	require.IsType(t, &cmderrors.MissingFQBNError{}, err)
 }
 
 func TestGetToolId(t *testing.T) {
