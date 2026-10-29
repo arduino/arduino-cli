@@ -23,10 +23,12 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/buildcache"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
 )
 
 // buildOptions fixdoc
@@ -103,36 +105,65 @@ func (b *Builder) createBuildOptionsJSON() error {
 	return b.buildOptions.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
 
+// openBuildPath creates the build path, wipes it if invalid, then removes the build.complete stamp.
+// The returned function creates the stamp again, unless the build was cancelled.
+func (b *Builder) openBuildPath() (func(), error) {
+	if err := b.buildPath.MkdirAll(); err != nil {
+		return nil, err
+	}
+	if err := b.wipeBuildPathIfInvalid(); err != nil {
+		return nil, err
+	}
+	stamp := b.buildPath.Join("build.complete")
+	if err := stamp.RemoveAll(); err != nil {
+		return nil, err
+	}
+	return func() {
+		if b.ctx.Err() != nil {
+			return
+		}
+		if err := stamp.WriteFile(nil); err != nil {
+			logrus.WithError(err).Warn("Could not create build path stamp")
+		}
+	}, nil
+}
+
 func (b *Builder) wipeBuildPath() error {
 	// FIXME: this should go outside legacy and behind a `logrus` call so users can
 	// control when this should be printed.
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
-	if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
-		return fmt.Errorf("%s: %w", i18n.Tr("cleaning build path"), err)
-	}
 	if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
 		return fmt.Errorf("%s: %w", i18n.Tr("cleaning build path"), err)
+	}
+	files, err := b.buildOptions.buildPath.ReadDir(paths.FilterOutNames(buildcache.LastUsedFileName))
+	if err != nil {
+		return fmt.Errorf("%s: %w", i18n.Tr("cleaning build path"), err)
+	}
+	for _, f := range files {
+		if err := f.RemoveAll(); err != nil {
+			return fmt.Errorf("%s: %w", i18n.Tr("cleaning build path"), err)
+		}
 	}
 	return nil
 }
 
-func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
+func (b *Builder) wipeBuildPathIfInvalid() error {
 	if b.buildOptions.clean {
 		return b.wipeBuildPath()
 	}
 
 	// Load previous build options map
-	var buildOptionsJSONPrevious []byte
-	if buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
-		var err error
-		buildOptionsJSONPrevious, err = buildOptionsFile.ReadFile()
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(buildOptionsJSONPrevious) == 0 {
+	buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json")
+	if !buildOptionsFile.Exist() {
 		return nil
+	}
+	if !b.buildOptions.buildPath.Join("build.complete").Exist() {
+		b.logger.Info(i18n.Tr("%[1]s invalid, rebuilding all", "build.complete"))
+		return b.wipeBuildPath()
+	}
+	buildOptionsJSONPrevious, err := buildOptionsFile.ReadFile()
+	if err != nil {
+		return err
 	}
 
 	var prevOpts *properties.Map

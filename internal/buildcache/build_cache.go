@@ -52,7 +52,8 @@ var (
 	FileWriteErr = cacheError{Code: fileWriteErrCode}
 )
 
-const lastUsedFileName = ".last-used"
+// LastUsedFileName is the file that records when a cache directory was last used.
+const LastUsedFileName = ".last-used"
 
 // BuildCache represents a cache of built files (sketches and cores), it's designed
 // to work on directories. Given a directory as "base" it handles direct subdirectories as
@@ -69,7 +70,7 @@ func (bc *BuildCache) GetOrCreate(key string) (*paths.Path, error) {
 		return nil, cacheError{createDirErrCode, err}
 	}
 
-	if err := keyDir.Join(lastUsedFileName).WriteFile([]byte{}); err != nil {
+	if err := keyDir.Join(LastUsedFileName).WriteFile([]byte{}); err != nil {
 		return nil, cacheError{fileWriteErrCode, err}
 	}
 	return keyDir, nil
@@ -96,7 +97,7 @@ func New(baseDir *paths.Path) *BuildCache {
 }
 
 func removeIfExpired(dir *paths.Path, ttl time.Duration) {
-	fileInfo, err := dir.Join(lastUsedFileName).Stat()
+	fileInfo, err := dir.Join(LastUsedFileName).Stat()
 	if err != nil {
 		return
 	}

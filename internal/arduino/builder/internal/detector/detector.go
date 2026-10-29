@@ -290,9 +290,8 @@ func (l *SketchLibrariesDetector) findIncludes(
 			return err
 		}
 		if err := json.Unmarshal(d, &cachedIncludeFolders); err != nil {
-			return err
-		}
-		if l.useCachedLibrariesResolution {
+			l.logger.Warn(i18n.Tr("Failed to load library discovery cache: %[1]s", err))
+		} else if l.useCachedLibrariesResolution {
 			l.includeFolders = cachedIncludeFolders
 			if l.logger.VerbosityLevel() == logger.VerbosityVerbose {
 				l.logger.Info("Using cached library discovery: " + librariesResolutionCachePath.String())

@@ -35,7 +35,7 @@ func Test_UpdateLastUsedFileExisting(t *testing.T) {
 	require.NoError(t, testBuildDir.MkdirAll())
 
 	// create the file
-	preExistingFile := testBuildDir.Join(lastUsedFileName)
+	preExistingFile := testBuildDir.Join(LastUsedFileName)
 	require.NoError(t, preExistingFile.WriteFile([]byte{}))
 	timeBeforeUpdating := time.Now().Add(-time.Second)
 	preExistingFile.Chtimes(time.Now(), timeBeforeUpdating)
@@ -45,7 +45,7 @@ func Test_UpdateLastUsedFileExisting(t *testing.T) {
 func requireCorrectUpdate(t *testing.T, dir *paths.Path, prevModTime time.Time) {
 	_, err := New(dir.Parent()).GetOrCreate(dir.Base())
 	require.NoError(t, err)
-	expectedFile := dir.Join(lastUsedFileName)
+	expectedFile := dir.Join(LastUsedFileName)
 	fileInfo, err := expectedFile.Stat()
 	require.Nil(t, err)
 	require.Greater(t, fileInfo.ModTime(), prevModTime)
@@ -64,7 +64,7 @@ func TestPurge(t *testing.T) {
 	// create the metadata files
 	for dirPath, lastUsedTime := range lastUsedTimesByDirPath {
 		require.NoError(t, dirPath.MkdirAll())
-		infoFilePath := dirPath.Join(lastUsedFileName).Canonical()
+		infoFilePath := dirPath.Join(LastUsedFileName).Canonical()
 		require.NoError(t, infoFilePath.WriteFile([]byte{}))
 		// make sure access time does not matter
 		accesstime := time.Now()
