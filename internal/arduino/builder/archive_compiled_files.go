@@ -56,6 +56,9 @@ func (b *Builder) archiveCompiledFiles(archiveFilePath *paths.Path, objectFilesT
 
 	for _, objectFile := range objectFilesToArchive {
 		properties := b.buildProperties.Clone()
+		if b.pathIsCore(archiveFilePath) {
+			properties.Remove("build.library_discovery_flags")
+		}
 		properties.Set("archive_file", archiveFilePath.Base())
 		properties.SetPath("archive_file_path", archiveFilePath)
 		properties.SetPath("object_file", objectFile)

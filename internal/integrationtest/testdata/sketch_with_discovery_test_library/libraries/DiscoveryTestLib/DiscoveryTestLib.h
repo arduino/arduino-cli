@@ -1,0 +1,3 @@
+#ifndef DISCOVERYTESTLIB_H
+#define DISCOVERYTESTLIB_H
+#endif
