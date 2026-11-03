@@ -49,7 +49,7 @@ func (s *arduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context
 	}
 
 	// Apply default settings for this board and protocol
-	for setting, value := range boardSettings.AsMap() {
+	for setting, value := range boardSettings.IterMap() {
 		if param, ok := desc.ConfigurationParameters[setting]; ok {
 			if slices.Contains(param.Values, value) {
 				param.Selected = value

@@ -203,9 +203,9 @@ tasks:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_osx_darwin_arm64"
       BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
       BUILD_PLATFORM: "darwin/arm64"
-      # The image with tag "1.26.1-darwin-arm64-debian12" has incorrect tagging,
+      # The image with tag "1.27.3-darwin-arm64-debian12" has incorrect tagging,
       # so we need to use the sha256 digest to ensure we are using the correct image.
-      CONTAINER_TAG: "{{.GO_VERSION}}-darwin-arm64-debian12@sha256:b4c9174f88974965552a07d4619b82653185fbe40a21309d7ba83617bf80b131"
+      CONTAINER_TAG: "{{.GO_VERSION}}-darwin-arm64-debian12@sha256:dfccb428c621b57f3601718c7a65e08080517e0a421eb8452e6e2a4b3b135db3"
       PACKAGE_PLATFORM: "macOS_ARM64"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 

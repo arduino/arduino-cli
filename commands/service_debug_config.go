@@ -66,8 +66,7 @@ func (s *arduinoCoreServerImpl) IsDebugSupported(ctx context.Context, req *rpc.I
 		DebugProperties: req.GetDebugProperties(),
 	}
 	expectedOutput, err := s.getDebugProperties(configRequest, pme, true)
-	var x *cmderrors.FailedDebugError
-	if errors.As(err, &x) {
+	if _, ok := errors.AsType[*cmderrors.FailedDebugError](err); ok {
 		return &rpc.IsDebugSupportedResponse{DebuggingSupported: false}, nil
 	}
 	if err != nil {
@@ -194,12 +193,12 @@ func (s *arduinoCoreServerImpl) getDebugProperties(req *rpc.GetDebugConfigReques
 
 	// Extract and expand all debugging properties
 	debugProperties := properties.NewMap()
-	for k, v := range toolProperties.SubTree("debug").AsMap() {
+	for k, v := range toolProperties.SubTree("debug").IterMap() {
 		debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 	}
 	if debugAdditionalConfig, ok := toolProperties.GetOk("debug.additional_config"); ok {
 		debugAdditionalConfig = toolProperties.ExpandPropsInString(debugAdditionalConfig)
-		for k, v := range toolProperties.SubTree(debugAdditionalConfig).AsMap() {
+		for k, v := range toolProperties.SubTree(debugAdditionalConfig).IterMap() {
 			debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 		}
 	}

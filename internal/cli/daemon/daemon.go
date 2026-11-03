@@ -140,13 +140,11 @@ func runDaemonCommand(srv rpc.ArduinoCoreServiceServer, daemonPort, debugFile st
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", daemonIP, daemonPort))
 	if err != nil {
 		// Invalid port, such as "Foo"
-		var dnsError *net.DNSError
-		if errors.As(err, &dnsError) {
+		if dnsError, ok := errors.AsType[*net.DNSError](err); ok {
 			feedback.Fatal(i18n.Tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", daemonPort, dnsError.Name), feedback.ErrBadTCPPortArgument)
 		}
 		// Invalid port number, such as -1
-		var addrError *net.AddrError
-		if errors.As(err, &addrError) {
+		if addrError, ok := errors.AsType[*net.AddrError](err); ok {
 			feedback.Fatal(i18n.Tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", daemonPort, addrError.Addr), feedback.ErrBadTCPPortArgument)
 		}
 		// Port is already in use

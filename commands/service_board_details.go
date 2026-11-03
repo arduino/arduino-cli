@@ -55,7 +55,7 @@ func (s *arduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 	details.IdentificationProperties = []*rpc.BoardIdentificationProperties{}
 	for _, p := range board.GetIdentificationProperties() {
 		details.IdentificationProperties = append(details.GetIdentificationProperties(), &rpc.BoardIdentificationProperties{
-			Properties: p.AsMap(),
+			Properties: p.CloneAsMap(),
 		})
 	}
 	for _, k := range boardProperties.Keys() {

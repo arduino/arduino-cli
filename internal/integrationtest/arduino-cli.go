@@ -110,7 +110,8 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 	}
 
 	cli.cliEnvVars = map[string]string{
-		"LANG":                                          "en",
+		"LANG": "en",
+
 		"ARDUINO_DIRECTORIES_DATA":                      cli.dataDir.String(),
 		"ARDUINO_DIRECTORIES_DOWNLOADS":                 cli.stagingDir.String(),
 		"ARDUINO_DIRECTORIES_USER":                      cli.sketchbookDir.String(),

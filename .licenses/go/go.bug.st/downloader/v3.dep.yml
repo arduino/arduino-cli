@@ -1,6 +1,6 @@
 ---
 name: go.bug.st/downloader/v3
-version: v3.0.0
+version: v3.0.1
 type: go
 summary: Package downloader provides an asynchronous file downloader with progress
   tracking and timeout support.
