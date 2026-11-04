@@ -46,7 +46,7 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
-		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile,
+		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile, b.libsDetector.SketchPreprocessedFile(),
 		b.sketch, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 		b.logger.VerbosityLevel() == logger.VerbosityVerbose,
