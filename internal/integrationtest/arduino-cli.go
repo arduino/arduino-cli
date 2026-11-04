@@ -532,15 +532,47 @@ func (cli *ArduinoCLI) SetValue(key, jsonData string) error {
 	return err
 }
 
-// Init calls the "Init" gRPC method.
-func (inst *ArduinoCLIInstance) Init(profile string, sketchPath string, respCB func(*commands.InitResponse)) error {
-	initReq := &commands.InitRequest{
-		Instance:   inst.instance,
-		Profile:    profile,
-		SketchPath: sketchPath,
+// Initialize calls the "Initialize" gRPC method.
+func (inst *ArduinoCLIInstance) Initialize(respCB func(*commands.InitializeResponse)) error {
+	initReq := &commands.InitializeRequest{
+		Instance: inst.instance,
+		Message: &commands.InitializeRequest_Generic_{
+			Generic: &commands.InitializeRequest_Generic{},
+		},
 	}
-	logCallf(">>> Init(%v)\n", initReq)
-	initClient, err := inst.cli.daemonClient.Init(context.Background(), initReq)
+	logCallf(">>> Initialize(%v)\n", initReq)
+	initClient, err := inst.cli.daemonClient.Initialize(context.Background(), initReq)
+	if err != nil {
+		return err
+	}
+	for {
+		msg, err := initClient.Recv()
+		if errors.Is(err, io.EOF) {
+			logCallf("<<< Init EOF\n")
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if respCB != nil {
+			respCB(msg)
+		}
+	}
+}
+
+// InitializeWithProfile calls the "Initialize" gRPC method with a specific profile and sketch path.
+func (inst *ArduinoCLIInstance) InitializeWithProfile(profile string, sketchPath string, respCB func(*commands.InitializeResponse)) error {
+	initReq := &commands.InitializeRequest{
+		Instance: inst.instance,
+		Message: &commands.InitializeRequest_SketchProfile_{
+			SketchProfile: &commands.InitializeRequest_SketchProfile{
+				Profile:    profile,
+				SketchPath: sketchPath,
+			},
+		},
+	}
+	logCallf(">>> Initialize(%v)\n", initReq)
+	initClient, err := inst.cli.daemonClient.Initialize(context.Background(), initReq)
 	if err != nil {
 		return err
 	}

@@ -114,7 +114,61 @@ func InitStreamResponseToCallbackFunction(ctx context.Context, cb func(r *rpc.In
 // All responses are sent through responseCallback, can be nil to ignore all responses.
 // Failures don't stop the loading process, in case of loading failure the Platform or library
 // is simply skipped and an error gRPC status is sent to responseCallback.
+//
+// Deprecated: This method is deprecated, use Initialize instead.
 func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error {
+	// Map InitializeResponse to InitResponse for the gRPC stream.
+	initStream := InitializeStreamResponseToCallbackFunction(stream.Context(), func(r *rpc.InitializeResponse) error {
+		if pr := r.GetInitProgress(); pr != nil {
+			return stream.Send(&rpc.InitResponse{
+				Message: &rpc.InitResponse_InitProgress{
+					InitProgress: &rpc.InitResponse_Progress{
+						TaskProgress:     pr.GetTaskProgress(),
+						DownloadProgress: pr.GetDownloadProgress(),
+					},
+				},
+			})
+		}
+		if profile := r.GetProfile(); profile != nil {
+			return stream.Send(&rpc.InitResponse{
+				Message: &rpc.InitResponse_Profile{
+					Profile: profile,
+				},
+			})
+		}
+		if e := r.GetError(); e != nil {
+			return stream.Send(&rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: e,
+				},
+			})
+		}
+		return nil
+	})
+	// Map InitRequest to InitializeRequest for the Initialize call.
+	initializeReq := &rpc.InitializeRequest{
+		Instance: req.GetInstance(),
+	}
+	if req.GetProfile() != "" {
+		initializeReq.Message = &rpc.InitializeRequest_SketchProfile_{
+			SketchProfile: &rpc.InitializeRequest_SketchProfile{
+				Profile:    req.GetProfile(),
+				SketchPath: req.GetSketchPath(),
+			},
+		}
+	} else {
+		initializeReq.Message = &rpc.InitializeRequest_Generic_{}
+	}
+	return s.Initialize(initializeReq, initStream)
+}
+
+// InitializeStreamResponseToCallbackFunction returns a gRPC stream to be used in Initialize that sends
+// all responses to the callback function.
+func InitializeStreamResponseToCallbackFunction(ctx context.Context, cb func(r *rpc.InitializeResponse) error) rpc.ArduinoCoreService_InitializeServer {
+	return streamResponseToCallback(ctx, cb)
+}
+
+func (s *arduinoCoreServerImpl) Initialize(req *rpc.InitializeRequest, stream rpc.ArduinoCoreService_InitializeServer) error {
 	ctx := stream.Context()
 
 	instance := req.GetInstance()
@@ -123,33 +177,33 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	}
 
 	// Setup callback functions
-	var responseCallback func(*rpc.InitResponse) error
+	var responseCallback func(*rpc.InitializeResponse) error
 	if stream != nil {
 		syncSend := NewSynchronizedSend(stream.Send)
 		responseCallback = syncSend.Send
 	} else {
-		responseCallback = func(*rpc.InitResponse) error { return nil }
+		responseCallback = func(*rpc.InitializeResponse) error { return nil }
 	}
 	responseError := func(st *status.Status) {
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
+		responseCallback(&rpc.InitializeResponse{
+			Message: &rpc.InitializeResponse_Error{
 				Error: st.Proto(),
 			},
 		})
 	}
 	taskCallback := func(msg *rpc.TaskProgress) {
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_InitProgress{
-				InitProgress: &rpc.InitResponse_Progress{
+		responseCallback(&rpc.InitializeResponse{
+			Message: &rpc.InitializeResponse_InitProgress{
+				InitProgress: &rpc.InitializeResponse_Progress{
 					TaskProgress: msg,
 				},
 			},
 		})
 	}
 	downloadCallback := func(msg *rpc.DownloadProgress) {
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_InitProgress{
-				InitProgress: &rpc.InitResponse_Progress{
+		responseCallback(&rpc.InitializeResponse{
+			Message: &rpc.InitializeResponse_InitProgress{
+				InitProgress: &rpc.InitializeResponse_Progress{
 					DownloadProgress: msg,
 				},
 			},
@@ -159,19 +213,19 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	// Try to extract profile if specified
 	var profile *sketch.Profile
 	var profileSketchFullPath *paths.Path
-	if req.GetProfile() != "" {
-		sk, err := sketch.New(paths.New(req.GetSketchPath()))
+	if profileReq := req.GetSketchProfile(); profileReq != nil {
+		sk, err := sketch.New(paths.New(profileReq.GetSketchPath()))
 		if err != nil {
 			return &cmderrors.InvalidArgumentError{Cause: err}
 		}
 		profileSketchFullPath = sk.FullPath
-		p, err := sk.GetProfile(req.GetProfile())
+		p, err := sk.GetProfile(profileReq.GetProfile())
 		if err != nil {
 			return err
 		}
 		profile = p
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Profile{
+		responseCallback(&rpc.InitializeResponse{
+			Message: &rpc.InitializeResponse_Profile{
 				Profile: profile.ToRPC(),
 			},
 		})
