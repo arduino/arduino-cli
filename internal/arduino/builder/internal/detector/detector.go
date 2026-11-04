@@ -67,6 +67,7 @@ type SketchLibrariesDetector struct {
 	diagnosticStore               *diagnostics.Store
 	preRunner                     *runner.Runner
 	detectedChangeInLibraries     bool
+	mergedSketch                  sourceFile
 	sketchIsUnchanged             bool
 }
 
@@ -314,13 +315,26 @@ func (l *SketchLibrariesDetector) findIncludes(
 	if err != nil {
 		return err
 	}
+	l.mergedSketch = mergedSketch
 	l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
+
+	// An edit of the sketch code changes nothing the detection depends on. When the merged
+	// sketch holds the directives recorded with the cache and the files they pulled in are
+	// unchanged, its recorded detection is replayed as if the sketch were untouched.
+	directives, err := sketchDirectives(mergedSketch.SourcePath)
+	if err != nil {
+		return err
+	}
+	if !l.sketchIsUnchanged && l.cache.SketchDirectivesUnchanged(directives) {
+		l.sketchIsUnchanged, _ = mergedSketch.DepsAreUpToDate(logrus.WithField("runner", "sketchcheck"))
+	}
+	l.cache.SetSketchDirectives(directives)
 
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
 		if entry.CompileTask != nil {
-			upToDate, _ := entry.Compile.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
+			upToDate, _ := l.unitIsUnchanged(*entry.Compile, logrus.WithField("runner", "prerun"))
 			if !upToDate {
 				_ = entry.Compile.PrepareBuildPath()
 				l.preRunner.Enqueue(entry.CompileTask)
@@ -453,7 +467,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := sourceFile.ObjFileIsUpToDate(logrus.WithField("runner", "main"))
+	unchanged, err := l.unitIsUnchanged(sourceFile, logrus.WithField("runner", "main"))
 	if err != nil {
 		return err
 	}
@@ -563,6 +577,16 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
 		l.addIncludeFolder(library.SourceDir)
 	}
+}
+
+// unitIsUnchanged reports whether the detection recorded for a compilation unit still holds.
+// The merged sketch is judged once, before the pre-runner starts, by its directives as well
+// as by its times.
+func (l *SketchLibrariesDetector) unitIsUnchanged(unit sourceFile, log *logrus.Entry) (bool, error) {
+	if unit.Equals(l.mergedSketch) {
+		return l.sketchIsUnchanged, nil
+	}
+	return unit.ObjFileIsUpToDate(log)
 }
 
 func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(

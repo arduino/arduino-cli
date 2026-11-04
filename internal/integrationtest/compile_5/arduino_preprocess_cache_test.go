@@ -223,6 +223,62 @@ void myNewFunction() {}
 		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
 	})
 
+	t.Run("ChangesToSketchCodeReplayLibraryDetection", func(t *testing.T) {
+		// Create a tmp sketch
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+#include <Wire.h>
+
+void setup() {}
+void loop() {}
+`)))
+		replayed := "Using cached library dependencies for file: .*/sketch.ino.cpp.merged"
+
+		// Build twice, the second build replays the library detection of the untouched sketch
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotRegexp(t, replayed, string(out))
+
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Regexp(t, replayed, string(out))
+
+		// An edit of the code leaves the directives as they are: the detection is replayed, the prototypes are generated again
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+#include <Wire.h>
+
+void setup() { Wire.begin(); }
+void loop() {}
+`)))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Regexp(t, replayed, string(out))
+		require.NotContains(t, string(out), "Using cached sketch with function prototypes.")
+
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Regexp(t, replayed, string(out))
+		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
+
+		// An edit of the directives runs the detection again
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+#include <Wire.h>
+#include <SPI.h>
+
+void setup() { Wire.begin(); }
+void loop() {}
+`)))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotRegexp(t, replayed, string(out))
+		require.Contains(t, string(out), "SPI")
+	})
+
 	// Regression test for https://github.com/arduino/arduino-cli/issues/3202
 	// After a successful build, modifying the sketch to add an #error directive should cause the next build to fail.
 	t.Run("SketchModificationAfterSuccessfulBuildInvalidatesCache/1", func(t *testing.T) {
