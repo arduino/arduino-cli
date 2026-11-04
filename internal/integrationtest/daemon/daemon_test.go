@@ -45,7 +45,7 @@ func TestArduinoCliDaemon(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -122,7 +122,7 @@ func TestDaemonAutoUpdateIndexOnFirstInit(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -140,7 +140,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -162,7 +162,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	require.NoError(t, err)
 
 	// Re-init instance to update changes
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -216,7 +216,7 @@ func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -246,7 +246,7 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -282,7 +282,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -385,7 +385,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 	require.NoError(t, err)
 
 	// Re-init
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -422,7 +422,7 @@ func TestDaemonLibrariesRescanOnInstall(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 	cli.Run("lib", "install", "SD@1.2.3")
@@ -442,7 +442,7 @@ func TestDaemonLibrariesRescanOnInstall(t *testing.T) {
 
 func TestDaemonCoreUpgradePlatform(t *testing.T) {
 	refreshInstance := func(t *testing.T, grpcInst *integrationtest.ArduinoCLIInstance) {
-		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {}))
+		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {}))
 	}
 	updateIndexAndInstallPlatform := func(cli *integrationtest.ArduinoCLI, grpcInst *integrationtest.ArduinoCLIInstance, version string) {
 		refreshInstance(t, grpcInst)
@@ -628,7 +628,7 @@ func TestDaemonUserAgent(t *testing.T) {
 	enableTest.Store(true)
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -654,7 +654,7 @@ func TestDaemonCreateSketch(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
