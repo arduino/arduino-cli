@@ -281,6 +281,9 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	if burnBootloader && programmerID == "" {
 		return nil, &cmderrors.MissingProgrammerError{}
 	}
+	if burnBootloader && fqbnIn == "" {
+		return nil, &cmderrors.MissingFQBNError{}
+	}
 
 	fqbn, err := fqbn.Parse(fqbnIn)
 	if err != nil {
