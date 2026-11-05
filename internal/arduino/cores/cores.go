@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
-	"net/url"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -182,11 +181,11 @@ func (dep *ToolDependency) String() string {
 }
 
 // InternalUniqueIdentifier returns the unique identifier for this object
-func (dep *ToolDependency) InternalUniqueIdentifier(platformIndexURL *url.URL) string {
+func (dep *ToolDependency) InternalUniqueIdentifier(hash string) string {
 	h := sha256.New()
 	h.Write([]byte(dep.String()))
-	if platformIndexURL != nil {
-		h.Write([]byte(platformIndexURL.String()))
+	if hash != "" {
+		h.Write([]byte(hash))
 	}
 	res := dep.String() + "_" + hex.EncodeToString(h.Sum([]byte{}))[:16]
 	return utils.SanitizeName(res)

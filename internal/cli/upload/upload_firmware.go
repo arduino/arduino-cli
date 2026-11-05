@@ -57,8 +57,8 @@ func runUploadFirmwareCommand(
 	dryRun bool,
 	uploadFields argumentsUploadFields,
 ) {
-	inst := instance.CreateAndInit(ctx, srv)
 	fwFilePath := args[0]
+	inst := instance.CreateAndInitWithFirmwareFile(ctx, srv, fwFilePath)
 
 	resp, err := srv.ReadFirmwareFileDetails(ctx, &rpc.ReadFirmwareFileDetailsRequest{
 		FirmwareFile: fwFilePath,

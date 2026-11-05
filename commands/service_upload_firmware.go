@@ -12,8 +12,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	"github.com/arduino/arduino-cli/internal/arduino/cores"
-	"github.com/arduino/arduino-cli/internal/arduino/resources"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -60,7 +58,6 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 	logrus.Tracef("Upload firmware file %s on %s started", req.GetFirmwareFile(), req.GetPort())
 	syncSend := NewSynchronizedSend(stream.Send)
 
-	ctx := stream.Context()
 	outStream := feedStreamTo(func(data []byte) {
 		syncSend.Send(&rpc.UploadFirmwareFileResponse{
 			Message: &rpc.UploadFirmwareFileResponse_OutStream{OutStream: data},
@@ -73,16 +70,6 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 		})
 	})
 	defer errStream.Close()
-	taskCB := func(msg *rpc.TaskProgress) {
-		syncSend.Send(&rpc.UploadFirmwareFileResponse{
-			Message: &rpc.UploadFirmwareFileResponse_TaskProgress{TaskProgress: msg},
-		})
-	}
-	downloadCB := func(progress *rpc.DownloadProgress) {
-		syncSend.Send(&rpc.UploadFirmwareFileResponse{
-			Message: &rpc.UploadFirmwareFileResponse_DownloadProgress{DownloadProgress: progress},
-		})
-	}
 
 	// Open the firmware file and get its properties
 	fwDetails, fwDir, err := loadFirmwareFile(stream.Context(), paths.New(req.GetFirmwareFile()))
@@ -97,30 +84,9 @@ func (s *arduinoCoreServerImpl) UploadFirmwareFile(req *rpc.UploadFirmwareFileRe
 	}
 	defer pmeRelease()
 
-	// Install required tools if needed
-	installedTools := []*cores.ToolRelease{}
-	for _, tool := range fwDetails.GetRequiredTools() {
-		dep := cores.FromRpcToolDependencies(tool)
-		installedTool := pme.FindToolDependency(dep)
-		if installedTool == nil || !installedTool.IsInstalled() {
-			toolRelease := cores.ToolReleaseFromRpcToolDependencies(tool)
-			if err := pme.DownloadToolRelease(ctx, toolRelease, downloadCB); err != nil {
-				return err
-			}
-			if err := pme.InstallTool(toolRelease, taskCB, false /* Skip post-install */, resources.IntegrityCheckFull); err != nil {
-				return err
-			}
-			installedTool = pme.FindToolDependency(dep)
-			if installedTool == nil {
-				return fmt.Errorf("%s: %w", i18n.Tr("tool not found after installation"), err)
-			}
-		}
-		installedTools = append(installedTools, installedTool)
-	}
-
 	// Load the runtime properties for the tools
 	uploadProperties := properties.NewFromHashmap(fwDetails.GetUploadProperties())
-	for _, installedTool := range installedTools {
+	for _, installedTool := range pme.GetAllInstalledToolsReleases() {
 		uploadProperties.Merge(installedTool.RuntimeProperties())
 	}
 	uploadProperties.Set("runtime.fw.path", fwDir.String())

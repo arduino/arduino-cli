@@ -231,6 +231,17 @@ func (s *arduinoCoreServerImpl) Initialize(req *rpc.InitializeRequest, stream rp
 		})
 	}
 
+	// Extract firmware data if specified
+	var firmwareDetails *rpc.FirmwareFileDetails
+	if firmwareReq := req.GetFirmwareFile(); firmwareReq != nil {
+		firmwarePath := firmwareReq.GetFirmwarePath()
+		if resp, err := s.ReadFirmwareFileDetails(ctx, &rpc.ReadFirmwareFileDetailsRequest{FirmwareFile: firmwarePath}); err != nil {
+			return &cmderrors.InvalidArgumentError{Cause: err}
+		} else {
+			firmwareDetails = resp.GetFirmwareFileDetails()
+		}
+	}
+
 	// Perform first-update of indexes if needed
 	defaultIndexURL, _ := utils.URLParse(globals.DefaultIndexURL)
 	allPackageIndexUrls := []*url.URL{defaultIndexURL}
@@ -302,25 +313,29 @@ func (s *arduinoCoreServerImpl) Initialize(req *rpc.InitializeRequest, stream rp
 		}
 
 		// Load Platforms
-		if profile == nil {
+		if firmwareDetails != nil { // Firmware-file mode
+			errs := pmb.LoadHardwareForFirmwareUpload(ctx, firmwareDetails, downloadCallback, taskCallback, s.settings)
+			for _, err := range errs {
+				s := &cmderrors.PlatformLoadingError{Cause: err}
+				responseError(s.GRPCStatus())
+			}
+			_ = loadBuiltinTools()
+		} else if profile == nil { // General mode
 			for _, err := range pmb.LoadHardware() {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
 			}
-		} else if profile.RequireSystemInstalledPlatform() {
+		} else if profile.RequireSystemInstalledPlatform() { // Sketch profile mode which requires system-installed platform
 			for _, err := range pmb.LoadGlobalHardwareForProfile(profile) {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
 			}
-		} else {
-			// Load platforms from profile
+		} else { // Sketch profile mode
 			errs := pmb.LoadHardwareForProfile(ctx, profile, true, downloadCallback, taskCallback, s.settings)
 			for _, err := range errs {
 				s := &cmderrors.PlatformLoadingError{Cause: err}
 				responseError(s.GRPCStatus())
 			}
-
-			// Load "builtin" tools
 			_ = loadBuiltinTools()
 		}
 
