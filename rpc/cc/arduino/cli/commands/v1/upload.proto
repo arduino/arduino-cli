@@ -196,14 +196,8 @@ message UploadFirmwareFileResponse {
     bytes out_stream = 1;
     // The error output of the upload process.
     bytes err_stream = 2;
-
-    // Progress of the downloads of upload tools.
-    DownloadProgress download_progress = 3;
-    // Progress of the installation of upload tools.
-    TaskProgress task_progress = 4;
-
     // The upload result.
-    UploadResult result = 5;
+    UploadResult result = 3;
   }
 }
 
