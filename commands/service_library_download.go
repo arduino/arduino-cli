@@ -89,6 +89,7 @@ func downloadLibrary(
 	queryParameter string,
 	settings *configuration.Settings,
 ) error {
+	ctx = settings.WithAria2c(ctx)
 	taskCB(&rpc.TaskProgress{Name: i18n.Tr("Downloading %s", libRelease)})
 	config, err := settings.DownloaderConfig(ctx)
 	if err != nil {

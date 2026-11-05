@@ -159,6 +159,10 @@
           "type": "string",
           "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?|(\\.[0-9]+))(ns|us|µs|μs|ms|s|m|h))+$"
         },
+        "aria2c_enabled": {
+          "description": "use the external aria2c downloader (if installed) for faster multi-connection downloads, defaults to 'false'",
+          "type": "boolean"
+        },
         "cloud_api": {
           "description": "settings related to the Arduino Cloud API.",
           "type": "object",

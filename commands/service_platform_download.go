@@ -37,7 +37,7 @@ func PlatformDownloadStreamResponseToCallbackFunction(ctx context.Context, downl
 
 // PlatformDownload downloads a platform package
 func (s *arduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadRequest, stream rpc.ArduinoCoreService_PlatformDownloadServer) error {
-	ctx := stream.Context()
+	ctx := s.settings.WithAria2c(stream.Context())
 	syncSend := NewSynchronizedSend(stream.Send)
 
 	pme, release, err := instances.GetPackageManagerExplorer(req.GetInstance())
