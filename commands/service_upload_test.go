@@ -207,6 +207,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			false,
 			map[string]string{},
 			nil,
+			nil, // readMemory
 		)
 		verboseVerifyOutput := "verbose verify"
 		if !verboseVerify {

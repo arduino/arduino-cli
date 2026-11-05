@@ -207,3 +207,47 @@ message SupportedUserFieldsResponse {
   // If board doesn't support any field it will be empty.
   repeated UserField user_fields = 1;
 }
+
+message ReadMemoryRequest {
+  // Arduino Core Service instance from the Init response.
+  Instance instance = 1;
+  // Fully qualified board name. No sketch or compiled artifact is needed.
+  string fqbn = 2;
+  // Board or programmer port, if required by the selected recipe.
+  Port port = 3;
+  // Optional external programmer ID.
+  string programmer = 4;
+  // Platform-defined memory identifier, for example flash or eeprom.
+  string memory = 5;
+  // Platform-defined file format identifier, for example bin or ihex.
+  string format = 6;
+  // New output file on the server filesystem. Existing files are never overwritten.
+  string output_file = 7;
+  // Print the expanded read recipe and tool diagnostics.
+  bool verbose = 8;
+  // Validate and print the recipe without running tools, resetting the board,
+  // or creating an output file.
+  bool dry_run = 9;
+}
+
+message ReadMemoryResponse {
+  oneof message {
+    // Standard output of the read tool, not the memory contents.
+    bytes out_stream = 1;
+    // Standard error of the read tool.
+    bytes err_stream = 2;
+    // Sent only after successful readback, or a successful dry run.
+    ReadMemoryResult result = 3;
+  }
+}
+
+message ReadMemoryResult {
+  // Absolute output path on the server filesystem.
+  string output_file = 1;
+  // Size of the saved artifact in bytes (zero for a dry run).
+  int64 size = 2;
+  // True when no readback was performed and no output file was created.
+  bool dry_run = 3;
+  // The board port after the read tool has finished.
+  Port updated_port = 4;
+}

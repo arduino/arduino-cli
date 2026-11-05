@@ -1131,6 +1131,300 @@ func (x *SupportedUserFieldsResponse) GetUserFields() []*UserField {
 	return nil
 }
 
+type ReadMemoryRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Arduino Core Service instance from the Init response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Fully qualified board name. No sketch or compiled artifact is needed.
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// Board or programmer port, if required by the selected recipe.
+	Port *Port `protobuf:"bytes,3,opt,name=port,proto3" json:"port,omitempty"`
+	// Optional external programmer ID.
+	Programmer string `protobuf:"bytes,4,opt,name=programmer,proto3" json:"programmer,omitempty"`
+	// Platform-defined memory identifier, for example flash or eeprom.
+	Memory string `protobuf:"bytes,5,opt,name=memory,proto3" json:"memory,omitempty"`
+	// Platform-defined file format identifier, for example bin or ihex.
+	Format string `protobuf:"bytes,6,opt,name=format,proto3" json:"format,omitempty"`
+	// New output file on the server filesystem. Existing files are never overwritten.
+	OutputFile string `protobuf:"bytes,7,opt,name=output_file,json=outputFile,proto3" json:"output_file,omitempty"`
+	// Print the expanded read recipe and tool diagnostics.
+	Verbose bool `protobuf:"varint,8,opt,name=verbose,proto3" json:"verbose,omitempty"`
+	// Validate and print the recipe without running tools, resetting the board,
+	// or creating an output file.
+	DryRun bool `protobuf:"varint,9,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
+}
+
+func (x *ReadMemoryRequest) Reset() {
+	*x = ReadMemoryRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadMemoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadMemoryRequest) ProtoMessage() {}
+
+func (x *ReadMemoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadMemoryRequest.ProtoReflect.Descriptor instead.
+func (*ReadMemoryRequest) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_upload_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ReadMemoryRequest) GetInstance() *Instance {
+	if x != nil {
+		return x.Instance
+	}
+	return nil
+}
+
+func (x *ReadMemoryRequest) GetFqbn() string {
+	if x != nil {
+		return x.Fqbn
+	}
+	return ""
+}
+
+func (x *ReadMemoryRequest) GetPort() *Port {
+	if x != nil {
+		return x.Port
+	}
+	return nil
+}
+
+func (x *ReadMemoryRequest) GetProgrammer() string {
+	if x != nil {
+		return x.Programmer
+	}
+	return ""
+}
+
+func (x *ReadMemoryRequest) GetMemory() string {
+	if x != nil {
+		return x.Memory
+	}
+	return ""
+}
+
+func (x *ReadMemoryRequest) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+func (x *ReadMemoryRequest) GetOutputFile() string {
+	if x != nil {
+		return x.OutputFile
+	}
+	return ""
+}
+
+func (x *ReadMemoryRequest) GetVerbose() bool {
+	if x != nil {
+		return x.Verbose
+	}
+	return false
+}
+
+func (x *ReadMemoryRequest) GetDryRun() bool {
+	if x != nil {
+		return x.DryRun
+	}
+	return false
+}
+
+type ReadMemoryResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Message:
+	//
+	//	*ReadMemoryResponse_OutStream
+	//	*ReadMemoryResponse_ErrStream
+	//	*ReadMemoryResponse_Result
+	Message isReadMemoryResponse_Message `protobuf_oneof:"message"`
+}
+
+func (x *ReadMemoryResponse) Reset() {
+	*x = ReadMemoryResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadMemoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadMemoryResponse) ProtoMessage() {}
+
+func (x *ReadMemoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadMemoryResponse.ProtoReflect.Descriptor instead.
+func (*ReadMemoryResponse) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_upload_proto_rawDescGZIP(), []int{14}
+}
+
+func (m *ReadMemoryResponse) GetMessage() isReadMemoryResponse_Message {
+	if m != nil {
+		return m.Message
+	}
+	return nil
+}
+
+func (x *ReadMemoryResponse) GetOutStream() []byte {
+	if x, ok := x.GetMessage().(*ReadMemoryResponse_OutStream); ok {
+		return x.OutStream
+	}
+	return nil
+}
+
+func (x *ReadMemoryResponse) GetErrStream() []byte {
+	if x, ok := x.GetMessage().(*ReadMemoryResponse_ErrStream); ok {
+		return x.ErrStream
+	}
+	return nil
+}
+
+func (x *ReadMemoryResponse) GetResult() *ReadMemoryResult {
+	if x, ok := x.GetMessage().(*ReadMemoryResponse_Result); ok {
+		return x.Result
+	}
+	return nil
+}
+
+type isReadMemoryResponse_Message interface {
+	isReadMemoryResponse_Message()
+}
+
+type ReadMemoryResponse_OutStream struct {
+	// Standard output of the read tool, not the memory contents.
+	OutStream []byte `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3,oneof"`
+}
+
+type ReadMemoryResponse_ErrStream struct {
+	// Standard error of the read tool.
+	ErrStream []byte `protobuf:"bytes,2,opt,name=err_stream,json=errStream,proto3,oneof"`
+}
+
+type ReadMemoryResponse_Result struct {
+	// Sent only after successful readback, or a successful dry run.
+	Result *ReadMemoryResult `protobuf:"bytes,3,opt,name=result,proto3,oneof"`
+}
+
+func (*ReadMemoryResponse_OutStream) isReadMemoryResponse_Message() {}
+
+func (*ReadMemoryResponse_ErrStream) isReadMemoryResponse_Message() {}
+
+func (*ReadMemoryResponse_Result) isReadMemoryResponse_Message() {}
+
+type ReadMemoryResult struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Absolute output path on the server filesystem.
+	OutputFile string `protobuf:"bytes,1,opt,name=output_file,json=outputFile,proto3" json:"output_file,omitempty"`
+	// Size of the saved artifact in bytes (zero for a dry run).
+	Size int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	// True when no readback was performed and no output file was created.
+	DryRun bool `protobuf:"varint,3,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
+	// The board port after the read tool has finished.
+	UpdatedPort *Port `protobuf:"bytes,4,opt,name=updated_port,json=updatedPort,proto3" json:"updated_port,omitempty"`
+}
+
+func (x *ReadMemoryResult) Reset() {
+	*x = ReadMemoryResult{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadMemoryResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadMemoryResult) ProtoMessage() {}
+
+func (x *ReadMemoryResult) ProtoReflect() protoreflect.Message {
+	mi := &file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadMemoryResult.ProtoReflect.Descriptor instead.
+func (*ReadMemoryResult) Descriptor() ([]byte, []int) {
+	return file_cc_arduino_cli_commands_v1_upload_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ReadMemoryResult) GetOutputFile() string {
+	if x != nil {
+		return x.OutputFile
+	}
+	return ""
+}
+
+func (x *ReadMemoryResult) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *ReadMemoryResult) GetDryRun() bool {
+	if x != nil {
+		return x.DryRun
+	}
+	return false
+}
+
+func (x *ReadMemoryResult) GetUpdatedPort() *Port {
+	if x != nil {
+		return x.UpdatedPort
+	}
+	return nil
+}
+
 var File_cc_arduino_cli_commands_v1_upload_proto protoreflect.FileDescriptor
 
 var file_cc_arduino_cli_commands_v1_upload_proto_rawDesc = []byte{
@@ -1315,12 +1609,53 @@ var file_cc_arduino_cli_commands_v1_upload_proto_rawDesc = []byte{
 	0x32, 0x25, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
 	0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x73,
 	0x65, 0x72, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x52, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x46, 0x69, 0x65,
-	0x6c, 0x64, 0x73, 0x42, 0x48, 0x5a, 0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e,
-	0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61, 0x72, 0x64,
-	0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
-	0x73, 0x2f, 0x76, 0x31, 0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6c, 0x64, 0x73, 0x22, 0xc3, 0x02, 0x0a, 0x11, 0x52, 0x65, 0x61, 0x64, 0x4d, 0x65, 0x6d, 0x6f,
+	0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x40, 0x0a, 0x08, 0x69, 0x6e, 0x73,
+	0x74, 0x61, 0x6e, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x63, 0x63,
+	0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d,
+	0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63,
+	0x65, 0x52, 0x08, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x66,
+	0x71, 0x62, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x66, 0x71, 0x62, 0x6e, 0x12,
+	0x34, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e,
+	0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x63,
+	0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x72, 0x74, 0x52,
+	0x04, 0x70, 0x6f, 0x72, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x70, 0x72, 0x6f, 0x67, 0x72, 0x61, 0x6d,
+	0x6d, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x72, 0x6f, 0x67, 0x72,
+	0x61, 0x6d, 0x6d, 0x65, 0x72, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x12, 0x16, 0x0a,
+	0x06, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x66,
+	0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x5f,
+	0x66, 0x69, 0x6c, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x6f, 0x75, 0x74, 0x70,
+	0x75, 0x74, 0x46, 0x69, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x62, 0x6f, 0x73,
+	0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x76, 0x65, 0x72, 0x62, 0x6f, 0x73, 0x65,
+	0x12, 0x17, 0x0a, 0x07, 0x64, 0x72, 0x79, 0x5f, 0x72, 0x75, 0x6e, 0x18, 0x09, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x06, 0x64, 0x72, 0x79, 0x52, 0x75, 0x6e, 0x22, 0xa9, 0x01, 0x0a, 0x12, 0x52, 0x65,
+	0x61, 0x64, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x1f, 0x0a, 0x0a, 0x6f, 0x75, 0x74, 0x5f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0c, 0x48, 0x00, 0x52, 0x09, 0x6f, 0x75, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61,
+	0x6d, 0x12, 0x1f, 0x0a, 0x0a, 0x65, 0x72, 0x72, 0x5f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0c, 0x48, 0x00, 0x52, 0x09, 0x65, 0x72, 0x72, 0x53, 0x74, 0x72, 0x65,
+	0x61, 0x6d, 0x12, 0x46, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
+	0x63, 0x6c, 0x69, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e,
+	0x52, 0x65, 0x61, 0x64, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74,
+	0x48, 0x00, 0x52, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0xa5, 0x01, 0x0a, 0x10, 0x52, 0x65, 0x61, 0x64, 0x4d, 0x65,
+	0x6d, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x6f, 0x75,
+	0x74, 0x70, 0x75, 0x74, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x46, 0x69, 0x6c, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x73,
+	0x69, 0x7a, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x12,
+	0x17, 0x0a, 0x07, 0x64, 0x72, 0x79, 0x5f, 0x72, 0x75, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x06, 0x64, 0x72, 0x79, 0x52, 0x75, 0x6e, 0x12, 0x43, 0x0a, 0x0c, 0x75, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x64, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20,
+	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x72, 0x74,
+	0x52, 0x0b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x50, 0x6f, 0x72, 0x74, 0x42, 0x48, 0x5a,
+	0x46, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75,
+	0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f,
+	0x72, 0x70, 0x63, 0x2f, 0x63, 0x63, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x63,
+	0x6c, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x2f, 0x76, 0x31, 0x3b, 0x63,
+	0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1335,7 +1670,7 @@ func file_cc_arduino_cli_commands_v1_upload_proto_rawDescGZIP() []byte {
 	return file_cc_arduino_cli_commands_v1_upload_proto_rawDescData
 }
 
-var file_cc_arduino_cli_commands_v1_upload_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_cc_arduino_cli_commands_v1_upload_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_cc_arduino_cli_commands_v1_upload_proto_goTypes = []any{
 	(*UploadRequest)(nil),                             // 0: cc.arduino.cli.commands.v1.UploadRequest
 	(*UploadResponse)(nil),                            // 1: cc.arduino.cli.commands.v1.UploadResponse
@@ -1350,34 +1685,41 @@ var file_cc_arduino_cli_commands_v1_upload_proto_goTypes = []any{
 	(*SupportedUserFieldsRequest)(nil),                // 10: cc.arduino.cli.commands.v1.SupportedUserFieldsRequest
 	(*UserField)(nil),                                 // 11: cc.arduino.cli.commands.v1.UserField
 	(*SupportedUserFieldsResponse)(nil),               // 12: cc.arduino.cli.commands.v1.SupportedUserFieldsResponse
-	nil,                                               // 13: cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry
-	nil,                                               // 14: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry
-	nil,                                               // 15: cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry
-	(*Instance)(nil),                                  // 16: cc.arduino.cli.commands.v1.Instance
-	(*Port)(nil),                                      // 17: cc.arduino.cli.commands.v1.Port
-	(*Programmer)(nil),                                // 18: cc.arduino.cli.commands.v1.Programmer
+	(*ReadMemoryRequest)(nil),                         // 13: cc.arduino.cli.commands.v1.ReadMemoryRequest
+	(*ReadMemoryResponse)(nil),                        // 14: cc.arduino.cli.commands.v1.ReadMemoryResponse
+	(*ReadMemoryResult)(nil),                          // 15: cc.arduino.cli.commands.v1.ReadMemoryResult
+	nil,                                               // 16: cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry
+	nil,                                               // 17: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry
+	nil,                                               // 18: cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry
+	(*Instance)(nil),                                  // 19: cc.arduino.cli.commands.v1.Instance
+	(*Port)(nil),                                      // 20: cc.arduino.cli.commands.v1.Port
+	(*Programmer)(nil),                                // 21: cc.arduino.cli.commands.v1.Programmer
 }
 var file_cc_arduino_cli_commands_v1_upload_proto_depIdxs = []int32{
-	16, // 0: cc.arduino.cli.commands.v1.UploadRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
-	17, // 1: cc.arduino.cli.commands.v1.UploadRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
-	13, // 2: cc.arduino.cli.commands.v1.UploadRequest.user_fields:type_name -> cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry
+	19, // 0: cc.arduino.cli.commands.v1.UploadRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	20, // 1: cc.arduino.cli.commands.v1.UploadRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
+	16, // 2: cc.arduino.cli.commands.v1.UploadRequest.user_fields:type_name -> cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry
 	2,  // 3: cc.arduino.cli.commands.v1.UploadResponse.result:type_name -> cc.arduino.cli.commands.v1.UploadResult
-	17, // 4: cc.arduino.cli.commands.v1.UploadResult.updated_upload_port:type_name -> cc.arduino.cli.commands.v1.Port
-	16, // 5: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
-	17, // 6: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
-	14, // 7: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.user_fields:type_name -> cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry
-	16, // 8: cc.arduino.cli.commands.v1.BurnBootloaderRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
-	17, // 9: cc.arduino.cli.commands.v1.BurnBootloaderRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
-	15, // 10: cc.arduino.cli.commands.v1.BurnBootloaderRequest.user_fields:type_name -> cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry
-	16, // 11: cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
-	18, // 12: cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse.programmers:type_name -> cc.arduino.cli.commands.v1.Programmer
-	16, // 13: cc.arduino.cli.commands.v1.SupportedUserFieldsRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	20, // 4: cc.arduino.cli.commands.v1.UploadResult.updated_upload_port:type_name -> cc.arduino.cli.commands.v1.Port
+	19, // 5: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	20, // 6: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
+	17, // 7: cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.user_fields:type_name -> cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry
+	19, // 8: cc.arduino.cli.commands.v1.BurnBootloaderRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	20, // 9: cc.arduino.cli.commands.v1.BurnBootloaderRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
+	18, // 10: cc.arduino.cli.commands.v1.BurnBootloaderRequest.user_fields:type_name -> cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry
+	19, // 11: cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	21, // 12: cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse.programmers:type_name -> cc.arduino.cli.commands.v1.Programmer
+	19, // 13: cc.arduino.cli.commands.v1.SupportedUserFieldsRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
 	11, // 14: cc.arduino.cli.commands.v1.SupportedUserFieldsResponse.user_fields:type_name -> cc.arduino.cli.commands.v1.UserField
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	19, // 15: cc.arduino.cli.commands.v1.ReadMemoryRequest.instance:type_name -> cc.arduino.cli.commands.v1.Instance
+	20, // 16: cc.arduino.cli.commands.v1.ReadMemoryRequest.port:type_name -> cc.arduino.cli.commands.v1.Port
+	15, // 17: cc.arduino.cli.commands.v1.ReadMemoryResponse.result:type_name -> cc.arduino.cli.commands.v1.ReadMemoryResult
+	20, // 18: cc.arduino.cli.commands.v1.ReadMemoryResult.updated_port:type_name -> cc.arduino.cli.commands.v1.Port
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_cc_arduino_cli_commands_v1_upload_proto_init() }
@@ -1544,6 +1886,42 @@ func file_cc_arduino_cli_commands_v1_upload_proto_init() {
 				return nil
 			}
 		}
+		file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[13].Exporter = func(v any, i int) any {
+			switch v := v.(*ReadMemoryRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[14].Exporter = func(v any, i int) any {
+			switch v := v.(*ReadMemoryResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[15].Exporter = func(v any, i int) any {
+			switch v := v.(*ReadMemoryResult); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[1].OneofWrappers = []any{
 		(*UploadResponse_OutStream)(nil),
@@ -1558,13 +1936,18 @@ func file_cc_arduino_cli_commands_v1_upload_proto_init() {
 		(*BurnBootloaderResponse_OutStream)(nil),
 		(*BurnBootloaderResponse_ErrStream)(nil),
 	}
+	file_cc_arduino_cli_commands_v1_upload_proto_msgTypes[14].OneofWrappers = []any{
+		(*ReadMemoryResponse_OutStream)(nil),
+		(*ReadMemoryResponse_ErrStream)(nil),
+		(*ReadMemoryResponse_Result)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cc_arduino_cli_commands_v1_upload_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
