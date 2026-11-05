@@ -104,6 +104,62 @@ func TestGetCommandLine(t *testing.T) {
 	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))
 }
 
+func TestGetDebugPropertiesWithDiscoveryPortProperties(t *testing.T) {
+	customHardware := paths.New("testdata", "debug", "custom_hardware")
+	dataDir := paths.New("testdata", "debug", "data_dir", "packages")
+	sketchPath := paths.New("testdata", "debug", "hello")
+	require.NoError(t, sketchPath.ToAbs())
+
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
+	pmb.LoadHardwareFromDirectory(customHardware)
+	pmb.LoadHardwareFromDirectory(dataDir)
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
+	newReq := func() *rpc.GetDebugConfigRequest {
+		return &rpc.GetDebugConfigRequest{
+			Instance:   &rpc.Instance{Id: 1},
+			Fqbn:       "arduino-test:samd:arduino_zero_edbg",
+			SketchPath: sketchPath.String(),
+			ImportDir:  sketchPath.Join("build", "arduino-test.samd.arduino_zero_edbg").String(),
+			Programmer: "edbg",
+		}
+	}
+
+	t.Run("DiscoveryPortPropertiesAreExpanded", func(t *testing.T) {
+		req := newReq()
+		req.Port = &rpc.Port{
+			Address:       "/dev/ttyACM0",
+			Label:         "ttyACM0",
+			Protocol:      "serial",
+			ProtocolLabel: "Serial Port (USB)",
+			Properties: map[string]string{
+				"serialNumber": "EBEABFD6514D32364E202020FF10181E",
+				"vid":          "0x2341",
+			},
+		}
+		resp, err := srv.getDebugProperties(req, pme, false)
+		require.NoError(t, err)
+		custom := resp.GetCustomConfigs()["cortex-debug"]
+		require.Contains(t, custom, "/dev/ttyACM0")
+		require.Contains(t, custom, "ttyACM0")
+		require.Contains(t, custom, "serial")
+		require.Contains(t, custom, "Serial Port (USB)")
+		require.Contains(t, custom, "EBEABFD6514D32364E202020FF10181E")
+		require.Contains(t, custom, "0x2341")
+		require.NotContains(t, custom, "{upload.port.")
+	})
+
+	t.Run("NoPortLeavesTokensVerbatim", func(t *testing.T) {
+		resp, err := srv.getDebugProperties(newReq(), pme, false)
+		require.NoError(t, err)
+		custom := resp.GetCustomConfigs()["cortex-debug"]
+		require.Contains(t, custom, "{upload.port.address}")
+	})
+}
+
 func TestConvertToJSONMap(t *testing.T) {
 	testIn := properties.NewFromHashmap(map[string]string{
 		"k":                   "v",
