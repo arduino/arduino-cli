@@ -237,7 +237,7 @@ void myNewFunction() {}
 void setup() {}
 void loop() {}
 `)))
-		replayed := "Using cached library dependencies for file: .*/sketch.ino.cpp.merged"
+		replayed := "Using cached library dependencies for file: .*[/\\\\]sketch\\.ino\\.cpp\\.merged"
 
 		// Build twice, the second build replays the library detection of the untouched sketch
 		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
