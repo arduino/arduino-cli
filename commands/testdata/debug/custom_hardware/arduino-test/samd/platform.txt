@@ -127,6 +127,8 @@ debug.server.openocd.path={runtime.tools.openocd-0.10.0-arduino7.path}/bin/openo
 debug.server.openocd.path.windows={runtime.tools.openocd-0.10.0-arduino7.path}/bin/openocd.exe
 debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/
 debug.server.openocd.script={runtime.platform.path}/variants/{build.variant}/{build.openocdscript}
+# Test directive: pluggable discovery port properties must be usable in debug directives (issue #3273)
+debug.cortex-debug.custom.test_upload_port_props={upload.port.address} {upload.port.label} {upload.port.protocol} {upload.port.protocolLabel} {upload.port.properties.serialNumber} {upload.port.properties.vid}
 
 
 # Upload/Debug tools

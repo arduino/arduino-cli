@@ -191,6 +191,20 @@ func (s *arduinoCoreServerImpl) getDebugProperties(req *rpc.GetDebugConfigReques
 		toolProperties.Set("debug.port.file", portFile)
 	}
 
+	// Expose pluggable discovery port properties to debug directives, so
+	// platform.txt debug.* recipes can reference {upload.port.address},
+	// {upload.port.label}, {upload.port.protocol}, {upload.port.protocolLabel}
+	// and {upload.port.properties.*}, mirroring the upload path.
+	if port != nil && port.GetAddress() != "" {
+		toolProperties.Set("upload.port.address", port.GetAddress())
+		toolProperties.Set("upload.port.label", port.GetLabel())
+		toolProperties.Set("upload.port.protocol", port.GetProtocol())
+		toolProperties.Set("upload.port.protocolLabel", port.GetProtocolLabel())
+		for prop, value := range port.GetProperties() {
+			toolProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+		}
+	}
+
 	// Extract and expand all debugging properties
 	debugProperties := properties.NewMap()
 	for k, v := range toolProperties.SubTree("debug").IterMap() {
