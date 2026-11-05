@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/f"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // LoadGlobalHardwareForProfile loads the hardware platforms for the given profile.
@@ -40,6 +41,38 @@ func (pmb *Builder) LoadGlobalHardwareForProfile(p *sketch.Profile) []error {
 	pmb.profile = p
 	platformsToLoad := f.Map(p.Platforms, (*sketch.ProfilePlatformReference).String)
 	return pmb.LoadHardware(platformsToLoad...)
+}
+
+func (pmb *Builder) LoadHardwareForFirmwareUpload(ctx context.Context, firmwareDetails *rpc.FirmwareFileDetails, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) []error {
+	var merr []error
+
+	// Load tools dependencies for the upload
+	for _, toolDep := range firmwareDetails.GetRequiredTools() {
+		// Check if the tool is available in the package manager
+		targetPackage := pmb.packages.GetOrCreatePackage(toolDep.GetPackager())
+		tool := targetPackage.GetOrCreateTool(toolDep.GetName())
+		version := semver.ParseRelaxed(toolDep.GetVersion())
+		if toolRelease, ok := tool.Releases[version.NormalizedString()]; !ok || toolRelease.GetCompatibleFlavour() == nil {
+			// If the no tool release is available in the package manager,
+			// import the tool metadata from the metadata
+			toolRelease := &cores.ToolRelease{
+				Version: version,
+				Tool:    tool,
+				Flavors: f.Map(toolDep.GetSystems(), cores.FlavorFromRpcSystem),
+			}
+			tool.Releases[version.NormalizedString()] = toolRelease
+		}
+
+		// Load the tool
+		toolRef := cores.FromRpcToolDependencies(toolDep)
+		if err := pmb.loadProfileTool(ctx, toolRef, nil, true, downloadCB, taskCB, settings); err != nil {
+			merr = append(merr, fmt.Errorf("loading profile tool %s: %w", toolDep.GetName(), err))
+		}
+	}
+
+	// TODO: Start the required discoveries
+
+	return merr
 }
 
 // LoadHardwareForProfile load the hardware platforms for the given profile.
@@ -152,16 +185,23 @@ func (pmb *Builder) installMissingProfilePlatform(ctx context.Context, platformR
 func (pmb *Builder) loadProfileTool(ctx context.Context, toolRef *cores.ToolDependency, indexURL *url.URL, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) error {
 	targetPackage := pmb.packages.GetOrCreatePackage(toolRef.ToolPackager)
 	tool := targetPackage.GetOrCreateTool(toolRef.ToolName)
+	toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
 
-	uid := toolRef.InternalUniqueIdentifier(indexURL)
-	destDir := settings.ProfilesCacheDir().Join(uid)
-
+	var destDir *paths.Path
+	if indexURL == nil {
+		archive := toolRelease.GetCompatibleFlavour()
+		if archive == nil {
+			return &cmderrors.InvalidVersionError{Cause: errors.New(i18n.Tr("version %s not available for this operating system", toolRelease))}
+		}
+		uid := toolRef.InternalUniqueIdentifier(archive.Checksum)
+		destDir = settings.ProfilesCacheDir().Join(uid)
+	} else {
+		// TODO: Shall we use archive checksum here too, instead of index URL?
+		uid := toolRef.InternalUniqueIdentifier(indexURL.String())
+		destDir = settings.ProfilesCacheDir().Join(uid)
+	}
 	if !destDir.IsDir() && installMissing {
 		// Try installing the missing tool
-		toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
-		if toolRelease == nil {
-			return &cmderrors.InvalidVersionError{Cause: errors.New(i18n.Tr("version %s not found", toolRef.ToolVersion))}
-		}
 		if err := pmb.installMissingProfileTool(ctx, toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
 		}

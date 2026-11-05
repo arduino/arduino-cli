@@ -50,6 +50,15 @@ func CreateAndInitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceSer
 	return instance, profile
 }
 
+func CreateAndInitWithFirmwareFile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, firmwareFilePath string) *rpc.Instance {
+	inst, err := create(ctx, srv)
+	if err != nil {
+		feedback.Fatal(i18n.Tr("Error creating instance: %v", err), feedback.ErrGeneric)
+	}
+	InitWithSketchFirmware(ctx, srv, inst, firmwareFilePath)
+	return inst
+}
+
 // create and return a new Instance.
 func create(ctx context.Context, srv rpc.ArduinoCoreServiceServer) (*rpc.Instance, error) {
 	res, err := srv.Create(ctx, &rpc.CreateRequest{})
@@ -81,6 +90,19 @@ func InitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, inst
 			SketchProfile: &rpc.InitializeRequest_SketchProfile{
 				SketchPath: sketchPath.String(),
 				Profile:    profileName,
+			},
+		},
+	})
+}
+
+// InitWithSketchFirmware initializes instance by loading the specified firmware file, and installing the missing tools if needed.
+// The initilization will also starts the required discovery process for the firmware upload.
+func InitWithSketchFirmware(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, firmwareFilePath string) {
+	doInit(ctx, srv, &rpc.InitializeRequest{
+		Instance: instance,
+		Message: &rpc.InitializeRequest_FirmwareFile_{
+			FirmwareFile: &rpc.InitializeRequest_FirmwareFile{
+				FirmwarePath: firmwareFilePath,
 			},
 		},
 	})
