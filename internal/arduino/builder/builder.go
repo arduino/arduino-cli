@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/detector"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/diagnostics"
@@ -519,6 +520,13 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 			}
 		}
 	}
+
+	// Old GCC toolchains on Windows (e.g. AVR gcc 7.3.0) cannot open paths
+	// containing characters outside the active ANSI code page and fail with
+	// a spurious "No such file or directory" error. Convert such paths to
+	// their 8.3 short form, which is plain ASCII. See #1239.
+	// (No-op on other platforms or when short names are unavailable.)
+	args = cpp.ShortenCompilerArgs(args)
 
 	command, err := paths.NewProcess(b.toolEnv, args...)
 	if err != nil {
