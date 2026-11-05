@@ -89,6 +89,7 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 		req.GetDryRun(),
 		map[string]string{}, // User fields
 		req.GetUploadProperties(),
+		nil, // readMemory
 	); err != nil {
 		return err
 	}

@@ -206,6 +206,7 @@ func (s *arduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		req.GetDryRun(),
 		req.GetUserFields(),
 		req.GetUploadProperties(),
+		nil, // readMemory
 	)
 	if err != nil {
 		return err
@@ -270,6 +271,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	outStream, errStream io.Writer,
 	dryRun bool, userFields map[string]string,
 	requestUploadProperties []string,
+	readMemory *readMemoryOptions,
 ) (*rpc.Port, error) {
 	port := rpc.DiscoveryPortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
@@ -331,6 +333,12 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		action = "bootloader"
 	} else if programmer != nil {
 		action = "program"
+	}
+	if readMemory != nil {
+		action = "read"
+		if programmer != nil {
+			action = "read_program"
+		}
 	}
 	uploadToolID, err := getToolRecipeID(props, action, port.Protocol)
 	if err != nil {
@@ -396,7 +404,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
 	}
 
-	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
+	if readMemory == nil && !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
 		return nil, &cmderrors.ProgrammerRequiredForUploadError{}
 	}
 
@@ -442,7 +450,7 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		uploadProperties.Set("bootloader.verify", uploadProperties.Get("bootloader.params.noverify"))
 	}
 
-	if !burnBootloader {
+	if !burnBootloader && readMemory == nil {
 		importPath, sketchName, err := s.determineBuildPathAndSketchName(importFile, importDir, sk)
 		if err != nil {
 			return nil, &cmderrors.NotFoundError{Message: i18n.Tr("Error finding build artifacts"), Cause: err}
@@ -455,6 +463,17 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
+	}
+
+	// Reject unsupported reads before discovering/resetting ports or starting tools.
+	// Never derive read commands by rewriting upload/erase recipes.
+	readRecipe := ""
+	if readMemory != nil {
+		var err error
+		readRecipe, err = readMemory.prepareRecipe(action, uploadProperties)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// This context is kept alive for the entire duration of the upload
@@ -570,7 +589,11 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 
 	// Run recipes for upload
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
-	if burnBootloader {
+	if readMemory != nil {
+		if err := runTool(uploadCtx, readRecipe, uploadProperties, outStream, errStream, verbose || dryRun, dryRun, toolEnv); err != nil {
+			return nil, fmt.Errorf("%s: %w", i18n.Tr("Failed reading memory"), err)
+		}
+	} else if burnBootloader {
 		if err := runTool(uploadCtx, "erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return nil, &cmderrors.FailedUploadError{Message: i18n.Tr("Failed chip erase"), Cause: err}
 		}
