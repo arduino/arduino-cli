@@ -203,10 +203,38 @@ func (s *arduinoCoreServerImpl) BoardUploadDetails(ctx context.Context, req *rpc
 			}
 		}
 
+		// Extract the {runtime.tools.*.path} variables from the upload pattern
 		runtimeToolsRegex := regexp.MustCompile(`\{runtime\.tools\.([^}]+)\.path\}`)
+		extractToolsFromPattern := func(pattern string) []string {
+			matches := runtimeToolsRegex.FindAllStringSubmatch(pattern, -1)
+			return f.Map(matches, func(match []string) string { return match[1] })
+		}
 		uploadPattern := uploadPropertiesNoRuntime.ExpandPropsInString(uploadPropertiesNoRuntime.Get(action + ".pattern"))
-		toolsFound := f.Map(runtimeToolsRegex.FindAllStringSubmatch(uploadPattern, -1), func(match []string) string { return match[1] })
+		toolsFound := extractToolsFromPattern(uploadPattern)
 
+		// Extract the discovery tools required by the board platform and add them to the list of tools found
+		discoveriesProps := boardPlatform.Properties.SubTree("pluggable_discovery")
+		for _, id := range discoveriesProps.ExtractSubIndexLists("required") {
+			if _, discoveryTool, ok := strings.Cut(id, ":"); ok {
+				toolsFound = append(toolsFound, discoveryTool)
+			}
+		}
+		perDiscoveryProps := discoveriesProps.FirstLevelOf()
+		delete(perDiscoveryProps, "required")
+		for _, discoveryProps := range perDiscoveryProps {
+			pattern, ok := discoveryProps.GetOk("pattern")
+			if !ok {
+				continue
+			}
+			configuration := uploadPropertiesNoRuntime.Clone()
+			configuration.Merge(discoveriesProps)
+			configuration.Merge(discoveryProps)
+			cmd := configuration.ExpandPropsInString(pattern)
+			toolsFound = append(toolsFound, extractToolsFromPattern(cmd)...)
+		}
+
+		// Pin the tools required by the upload pattern and discoveries to their specific releases
+		// and add them to the manifest.
 		toolsAdded := map[*cores.ToolRelease]bool{}
 		for _, toolID := range toolsFound {
 			toolMatchesToolID := func(tool *cores.ToolRelease) bool {

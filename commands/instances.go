@@ -392,6 +392,12 @@ func (s *arduinoCoreServerImpl) Initialize(req *rpc.InitializeRequest, stream rp
 		s := &cmderrors.PlatformLoadingError{Cause: err}
 		responseError(s.GRPCStatus())
 	}
+	if firmwareDetails != nil {
+		for _, err := range pme.LoadDiscoveriesForFirmwareUpload(firmwareDetails) {
+			s := &cmderrors.PlatformLoadingError{Cause: err}
+			responseError(s.GRPCStatus())
+		}
+	}
 
 	// Create library manager and add libraries directories
 	lmb := librariesmanager.NewBuilder()
