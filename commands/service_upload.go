@@ -461,17 +461,23 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	uploadCtx, uploadCompleted := context.WithCancel(ctx)
 	defer uploadCompleted()
 
-	// Start the upload port change detector.
-	watcher, err := pme.DiscoveryManager().Watch()
-	if err != nil {
-		return nil, err
-	}
-	defer watcher.Close()
 	waitForUploadPort := uploadProperties.GetBoolean("upload.wait_for_upload_port")
-	updatedUploadPort := make(chan *discovery.Port, 1)
-	go func() {
-		updatedUploadPort <- detectUploadPort(uploadCtx, port, watcher.Feed(), waitForUploadPort)
-	}()
+
+	// Start the upload port change detector. With no port given and no wait requested
+	// there is no port to follow: the detector would only wait out its timeout after
+	// the upload and report the port as given.
+	var updatedUploadPort chan *discovery.Port
+	if port.Protocol != "default" || waitForUploadPort {
+		watcher, err := pme.DiscoveryManager().Watch()
+		if err != nil {
+			return nil, err
+		}
+		defer watcher.Close()
+		updatedUploadPort = make(chan *discovery.Port, 1)
+		go func() {
+			updatedUploadPort <- detectUploadPort(uploadCtx, port, watcher.Feed(), waitForUploadPort)
+		}()
+	}
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
 	// when a sketch causes a crash and the native USB serial port is lost.
@@ -590,6 +596,9 @@ func (s *arduinoCoreServerImpl) runProgramAction(ctx context.Context, pme *packa
 	uploadCompleted()
 	logrus.Tracef("Upload successful")
 
+	if updatedUploadPort == nil {
+		return userPort, nil
+	}
 	updatedPort := <-updatedUploadPort
 	if updatedPort == nil {
 		// If the algorithms can not detect the new port, fallback to the user-provided port.
