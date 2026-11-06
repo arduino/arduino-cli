@@ -68,6 +68,7 @@ type SketchLibrariesDetector struct {
 	preRunner                     *runner.Runner
 	detectedChangeInLibraries     bool
 	sketchIsUnchanged             bool
+	doneUnits                     []sourceFile
 }
 
 // NewSketchLibrariesDetector todo
@@ -519,6 +520,8 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		l.cache.ExpectMissingIncludeH(missingIncludeH)
 
 		if missingIncludeH == "" {
+			l.doneUnits = append(l.doneUnits, sourceFile)
+
 			// Check if the compilation unit requires a library that was previously marked for inclusion.
 			if deps, err := cpp.ReadDepFile(sourceFile.DepfilePath); err == nil {
 				for _, dep := range deps.Dependencies {
@@ -562,6 +565,12 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		// include scanning
 		l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
 		l.addIncludeFolder(library.SourceDir)
+
+		// The units already done ran without this include folder
+		for _, unit := range l.doneUnits {
+			sourceFileQueue.Push(unit)
+		}
+		l.doneUnits = nil
 	}
 }
 
