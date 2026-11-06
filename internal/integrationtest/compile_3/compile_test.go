@@ -284,3 +284,24 @@ func TestCompileWithInvalidLibrary(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stderr), fmt.Sprintf("loading library from %s: invalid library: no header files found", emptyLibPath))
 }
+
+func TestCompileWithHasIncludeOfLateLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	// The sketch includes LibC only if LibB is found, and LibB is found only after the sketch, from LibA sources
+	sketchPath := cli.CopySketch("sketch_with_has_include_of_late_library")
+	libraries := sketchPath.Join("libraries")
+
+	stdout, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--libraries", libraries.String(), "-v", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Using library LibC")
+
+	// The second build replays the library discovery from its cache
+	stdout, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--libraries", libraries.String(), "-v", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Using library LibC")
+}
