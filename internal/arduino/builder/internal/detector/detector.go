@@ -652,28 +652,21 @@ func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
 
 var (
 	ansiControlSequenceRegexp = regexp.MustCompile("\x1b\\[[0-?]*[ -/]*[@-~]")
+	missingIncludeRegexp      = regexp.MustCompile(`(?m)(?:^|: )fatal error: (?:(.+): No such file or directory|'(.+)' file not found)\r?$`)
 	includeRegexp             = regexp.MustCompile(`(?ms)^\s*[0-9 |]*\s*#[ \t]*include\s*[<"](\S+)[">]`)
 )
 
-// IncludesFinderWithRegExp fixdoc
+// IncludesFinderWithRegExp extracts the missing header from compiler diagnostics.
 func IncludesFinderWithRegExp(source string) string {
 	source = ansiControlSequenceRegexp.ReplaceAllString(source, "")
+	// With source overrides, the diagnostic's source excerpt can refer to the
+	// unchanged file on disk. Prefer the header named by the compiler itself.
+	if match := missingIncludeRegexp.FindStringSubmatch(source); match != nil {
+		return strings.TrimSpace(match[1] + match[2])
+	}
 	match := includeRegexp.FindStringSubmatch(source)
 	if match != nil {
 		return strings.TrimSpace(match[1])
-	}
-	return findIncludeForOldCompilers(source)
-}
-
-func findIncludeForOldCompilers(source string) string {
-	lines := strings.SplitSeq(source, "\n")
-	for line := range lines {
-		splittedLine := strings.Split(line, ":")
-		for i := range splittedLine {
-			if strings.Contains(splittedLine[i], "fatal error") {
-				return strings.TrimSpace(splittedLine[i+1])
-			}
-		}
 	}
 	return ""
 }
