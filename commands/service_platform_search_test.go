@@ -47,7 +47,7 @@ func TestPlatformSearch(t *testing.T) {
 	inst := createResp.GetInstance()
 	require.NotNil(t, inst)
 
-	err = srv.Init(&rpc.InitRequest{Instance: inst}, InitStreamResponseToCallbackFunction(ctx, nil))
+	err = srv.Initialize(&rpc.InitializeRequest{Instance: inst, Message: &rpc.InitializeRequest_Generic_{Generic: &rpc.InitializeRequest_Generic{}}}, InitializeStreamResponseToCallbackFunction(ctx, nil))
 	require.NoError(t, err)
 
 	t.Run("SearchAllVersions", func(t *testing.T) {
@@ -359,7 +359,9 @@ func TestPlatformSearchSorting(t *testing.T) {
 	require.NoError(t, err)
 	inst := createResp.GetInstance()
 	require.NotNil(t, inst)
-	err = srv.Init(&rpc.InitRequest{Instance: inst}, InitStreamResponseToCallbackFunction(ctx, nil))
+	err = srv.Initialize(
+		&rpc.InitializeRequest{Instance: inst, Message: &rpc.InitializeRequest_Generic_{Generic: &rpc.InitializeRequest_Generic{}}},
+		InitializeStreamResponseToCallbackFunction(ctx, nil))
 	require.NoError(t, err)
 
 	res, stat := srv.PlatformSearch(ctx, &rpc.PlatformSearchRequest{

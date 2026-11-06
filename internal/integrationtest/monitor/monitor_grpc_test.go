@@ -43,7 +43,7 @@ func TestMonitorGRPCClose(t *testing.T) {
 	cli.InstallMockedSerialMonitor(t)
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -129,7 +129,7 @@ func TestMonitorGRPCAppliedSettings(t *testing.T) {
 	cli.InstallMockedSerialMonitor(t)
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 

@@ -37,6 +37,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	ArduinoCoreService_Create_FullMethodName                            = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Create"
 	ArduinoCoreService_Init_FullMethodName                              = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Init"
+	ArduinoCoreService_Initialize_FullMethodName                        = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Initialize"
 	ArduinoCoreService_Destroy_FullMethodName                           = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Destroy"
 	ArduinoCoreService_UpdateIndex_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/UpdateIndex"
 	ArduinoCoreService_UpdateLibrariesIndex_FullMethodName              = "/cc.arduino.cli.commands.v1.ArduinoCoreService/UpdateLibrariesIndex"
@@ -46,6 +47,7 @@ const (
 	ArduinoCoreService_ArchiveSketch_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ArchiveSketch"
 	ArduinoCoreService_SetSketchDefaults_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SetSketchDefaults"
 	ArduinoCoreService_BoardDetails_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardDetails"
+	ArduinoCoreService_BoardUploadDetails_FullMethodName                = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardUploadDetails"
 	ArduinoCoreService_BoardList_FullMethodName                         = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardList"
 	ArduinoCoreService_BoardListAll_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListAll"
 	ArduinoCoreService_BoardSearch_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardSearch"
@@ -58,7 +60,9 @@ const (
 	ArduinoCoreService_PlatformUpgrade_FullMethodName                   = "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformUpgrade"
 	ArduinoCoreService_Upload_FullMethodName                            = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Upload"
 	ArduinoCoreService_UploadUsingProgrammer_FullMethodName             = "/cc.arduino.cli.commands.v1.ArduinoCoreService/UploadUsingProgrammer"
+	ArduinoCoreService_UploadFirmwareFile_FullMethodName                = "/cc.arduino.cli.commands.v1.ArduinoCoreService/UploadFirmwareFile"
 	ArduinoCoreService_SupportedUserFields_FullMethodName               = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SupportedUserFields"
+	ArduinoCoreService_ReadFirmwareFileDetails_FullMethodName           = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ReadFirmwareFileDetails"
 	ArduinoCoreService_ListProgrammersAvailableForUpload_FullMethodName = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ListProgrammersAvailableForUpload"
 	ArduinoCoreService_BurnBootloader_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BurnBootloader"
 	ArduinoCoreService_PlatformSearch_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformSearch"
@@ -100,9 +104,12 @@ const (
 type ArduinoCoreServiceClient interface {
 	// Create a new Arduino Core instance.
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	// Initializes an existing Arduino Core instance by loading platforms and
-	// libraries.
+	// Deprecated: Do not use.
+	// This call is deprecated, use Initialize instead.
+	// Initializes an existing Arduino Core instance by loading platforms and libraries.
 	Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InitResponse], error)
+	// Initializes an existing Arduino Core instance by loading platforms and libraries.
+	Initialize(ctx context.Context, in *InitializeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InitializeResponse], error)
 	// Destroy an instance of the Arduino Core Service.
 	Destroy(ctx context.Context, in *DestroyRequest, opts ...grpc.CallOption) (*DestroyResponse, error)
 	// Update package index of the Arduino Core Service.
@@ -123,6 +130,8 @@ type ArduinoCoreServiceClient interface {
 	SetSketchDefaults(ctx context.Context, in *SetSketchDefaultsRequest, opts ...grpc.CallOption) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board.
 	BoardDetails(ctx context.Context, in *BoardDetailsRequest, opts ...grpc.CallOption) (*BoardDetailsResponse, error)
+	// Requests details about uploading to a board with a specified protocol and configuration.
+	BoardUploadDetails(ctx context.Context, in *BoardUploadDetailsRequest, opts ...grpc.CallOption) (*BoardUploadDetailsResponse, error)
 	// List the boards currently connected to the computer.
 	BoardList(ctx context.Context, in *BoardListRequest, opts ...grpc.CallOption) (*BoardListResponse, error)
 	// List all the boards provided by installed platforms.
@@ -149,9 +158,13 @@ type ArduinoCoreServiceClient interface {
 	Upload(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UploadResponse], error)
 	// Upload a compiled sketch to a board using a programmer.
 	UploadUsingProgrammer(ctx context.Context, in *UploadUsingProgrammerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UploadUsingProgrammerResponse], error)
+	// Upload a firmware file to a board.
+	UploadFirmwareFile(ctx context.Context, in *UploadFirmwareFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UploadFirmwareFileResponse], error)
 	// Returns the list of users fields necessary to upload to that board
 	// using the specified protocol.
 	SupportedUserFields(ctx context.Context, in *SupportedUserFieldsRequest, opts ...grpc.CallOption) (*SupportedUserFieldsResponse, error)
+	// Reads the details from a firmware file.
+	ReadFirmwareFileDetails(ctx context.Context, in *ReadFirmwareFileDetailsRequest, opts ...grpc.CallOption) (*ReadFirmwareFileDetailsResponse, error)
 	// List programmers available for a board.
 	ListProgrammersAvailableForUpload(ctx context.Context, in *ListProgrammersAvailableForUploadRequest, opts ...grpc.CallOption) (*ListProgrammersAvailableForUploadResponse, error)
 	// Burn bootloader to a board.
@@ -236,6 +249,7 @@ func (c *arduinoCoreServiceClient) Create(ctx context.Context, in *CreateRequest
 	return out, nil
 }
 
+// Deprecated: Do not use.
 func (c *arduinoCoreServiceClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InitResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[0], ArduinoCoreService_Init_FullMethodName, cOpts...)
@@ -255,6 +269,25 @@ func (c *arduinoCoreServiceClient) Init(ctx context.Context, in *InitRequest, op
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ArduinoCoreService_InitClient = grpc.ServerStreamingClient[InitResponse]
 
+func (c *arduinoCoreServiceClient) Initialize(ctx context.Context, in *InitializeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InitializeResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[1], ArduinoCoreService_Initialize_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[InitializeRequest, InitializeResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ArduinoCoreService_InitializeClient = grpc.ServerStreamingClient[InitializeResponse]
+
 func (c *arduinoCoreServiceClient) Destroy(ctx context.Context, in *DestroyRequest, opts ...grpc.CallOption) (*DestroyResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DestroyResponse)
@@ -267,7 +300,7 @@ func (c *arduinoCoreServiceClient) Destroy(ctx context.Context, in *DestroyReque
 
 func (c *arduinoCoreServiceClient) UpdateIndex(ctx context.Context, in *UpdateIndexRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UpdateIndexResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[1], ArduinoCoreService_UpdateIndex_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[2], ArduinoCoreService_UpdateIndex_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +319,7 @@ type ArduinoCoreService_UpdateIndexClient = grpc.ServerStreamingClient[UpdateInd
 
 func (c *arduinoCoreServiceClient) UpdateLibrariesIndex(ctx context.Context, in *UpdateLibrariesIndexRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UpdateLibrariesIndexResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[2], ArduinoCoreService_UpdateLibrariesIndex_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[3], ArduinoCoreService_UpdateLibrariesIndex_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -363,6 +396,16 @@ func (c *arduinoCoreServiceClient) BoardDetails(ctx context.Context, in *BoardDe
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) BoardUploadDetails(ctx context.Context, in *BoardUploadDetailsRequest, opts ...grpc.CallOption) (*BoardUploadDetailsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BoardUploadDetailsResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_BoardUploadDetails_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *arduinoCoreServiceClient) BoardList(ctx context.Context, in *BoardListRequest, opts ...grpc.CallOption) (*BoardListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BoardListResponse)
@@ -405,7 +448,7 @@ func (c *arduinoCoreServiceClient) BoardIdentify(ctx context.Context, in *BoardI
 
 func (c *arduinoCoreServiceClient) BoardListWatch(ctx context.Context, in *BoardListWatchRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BoardListWatchResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[3], ArduinoCoreService_BoardListWatch_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[4], ArduinoCoreService_BoardListWatch_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -424,7 +467,7 @@ type ArduinoCoreService_BoardListWatchClient = grpc.ServerStreamingClient[BoardL
 
 func (c *arduinoCoreServiceClient) Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[CompileResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[4], ArduinoCoreService_Compile_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[5], ArduinoCoreService_Compile_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -443,7 +486,7 @@ type ArduinoCoreService_CompileClient = grpc.ServerStreamingClient[CompileRespon
 
 func (c *arduinoCoreServiceClient) PlatformInstall(ctx context.Context, in *PlatformInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PlatformInstallResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[5], ArduinoCoreService_PlatformInstall_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[6], ArduinoCoreService_PlatformInstall_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +505,7 @@ type ArduinoCoreService_PlatformInstallClient = grpc.ServerStreamingClient[Platf
 
 func (c *arduinoCoreServiceClient) PlatformDownload(ctx context.Context, in *PlatformDownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PlatformDownloadResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[6], ArduinoCoreService_PlatformDownload_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[7], ArduinoCoreService_PlatformDownload_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -481,7 +524,7 @@ type ArduinoCoreService_PlatformDownloadClient = grpc.ServerStreamingClient[Plat
 
 func (c *arduinoCoreServiceClient) PlatformUninstall(ctx context.Context, in *PlatformUninstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PlatformUninstallResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[7], ArduinoCoreService_PlatformUninstall_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[8], ArduinoCoreService_PlatformUninstall_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -500,7 +543,7 @@ type ArduinoCoreService_PlatformUninstallClient = grpc.ServerStreamingClient[Pla
 
 func (c *arduinoCoreServiceClient) PlatformUpgrade(ctx context.Context, in *PlatformUpgradeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PlatformUpgradeResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[8], ArduinoCoreService_PlatformUpgrade_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[9], ArduinoCoreService_PlatformUpgrade_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -519,7 +562,7 @@ type ArduinoCoreService_PlatformUpgradeClient = grpc.ServerStreamingClient[Platf
 
 func (c *arduinoCoreServiceClient) Upload(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UploadResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[9], ArduinoCoreService_Upload_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[10], ArduinoCoreService_Upload_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -538,7 +581,7 @@ type ArduinoCoreService_UploadClient = grpc.ServerStreamingClient[UploadResponse
 
 func (c *arduinoCoreServiceClient) UploadUsingProgrammer(ctx context.Context, in *UploadUsingProgrammerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UploadUsingProgrammerResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[10], ArduinoCoreService_UploadUsingProgrammer_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[11], ArduinoCoreService_UploadUsingProgrammer_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -555,10 +598,39 @@ func (c *arduinoCoreServiceClient) UploadUsingProgrammer(ctx context.Context, in
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ArduinoCoreService_UploadUsingProgrammerClient = grpc.ServerStreamingClient[UploadUsingProgrammerResponse]
 
+func (c *arduinoCoreServiceClient) UploadFirmwareFile(ctx context.Context, in *UploadFirmwareFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UploadFirmwareFileResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[12], ArduinoCoreService_UploadFirmwareFile_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[UploadFirmwareFileRequest, UploadFirmwareFileResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ArduinoCoreService_UploadFirmwareFileClient = grpc.ServerStreamingClient[UploadFirmwareFileResponse]
+
 func (c *arduinoCoreServiceClient) SupportedUserFields(ctx context.Context, in *SupportedUserFieldsRequest, opts ...grpc.CallOption) (*SupportedUserFieldsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SupportedUserFieldsResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_SupportedUserFields_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) ReadFirmwareFileDetails(ctx context.Context, in *ReadFirmwareFileDetailsRequest, opts ...grpc.CallOption) (*ReadFirmwareFileDetailsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReadFirmwareFileDetailsResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_ReadFirmwareFileDetails_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -577,7 +649,7 @@ func (c *arduinoCoreServiceClient) ListProgrammersAvailableForUpload(ctx context
 
 func (c *arduinoCoreServiceClient) BurnBootloader(ctx context.Context, in *BurnBootloaderRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BurnBootloaderResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[11], ArduinoCoreService_BurnBootloader_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[13], ArduinoCoreService_BurnBootloader_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -606,7 +678,7 @@ func (c *arduinoCoreServiceClient) PlatformSearch(ctx context.Context, in *Platf
 
 func (c *arduinoCoreServiceClient) LibraryDownload(ctx context.Context, in *LibraryDownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryDownloadResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[12], ArduinoCoreService_LibraryDownload_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[14], ArduinoCoreService_LibraryDownload_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -625,7 +697,7 @@ type ArduinoCoreService_LibraryDownloadClient = grpc.ServerStreamingClient[Libra
 
 func (c *arduinoCoreServiceClient) LibraryInstall(ctx context.Context, in *LibraryInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryInstallResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[13], ArduinoCoreService_LibraryInstall_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[15], ArduinoCoreService_LibraryInstall_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -644,7 +716,7 @@ type ArduinoCoreService_LibraryInstallClient = grpc.ServerStreamingClient[Librar
 
 func (c *arduinoCoreServiceClient) LibraryUpgrade(ctx context.Context, in *LibraryUpgradeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryUpgradeResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[14], ArduinoCoreService_LibraryUpgrade_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[16], ArduinoCoreService_LibraryUpgrade_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -663,7 +735,7 @@ type ArduinoCoreService_LibraryUpgradeClient = grpc.ServerStreamingClient[Librar
 
 func (c *arduinoCoreServiceClient) ZipLibraryInstall(ctx context.Context, in *ZipLibraryInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ZipLibraryInstallResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[15], ArduinoCoreService_ZipLibraryInstall_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[17], ArduinoCoreService_ZipLibraryInstall_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -682,7 +754,7 @@ type ArduinoCoreService_ZipLibraryInstallClient = grpc.ServerStreamingClient[Zip
 
 func (c *arduinoCoreServiceClient) GitLibraryInstall(ctx context.Context, in *GitLibraryInstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GitLibraryInstallResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[16], ArduinoCoreService_GitLibraryInstall_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[18], ArduinoCoreService_GitLibraryInstall_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -701,7 +773,7 @@ type ArduinoCoreService_GitLibraryInstallClient = grpc.ServerStreamingClient[Git
 
 func (c *arduinoCoreServiceClient) LibraryUninstall(ctx context.Context, in *LibraryUninstallRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryUninstallResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[17], ArduinoCoreService_LibraryUninstall_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[19], ArduinoCoreService_LibraryUninstall_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -720,7 +792,7 @@ type ArduinoCoreService_LibraryUninstallClient = grpc.ServerStreamingClient[Libr
 
 func (c *arduinoCoreServiceClient) LibraryUpgradeAll(ctx context.Context, in *LibraryUpgradeAllRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LibraryUpgradeAllResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[18], ArduinoCoreService_LibraryUpgradeAll_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[20], ArduinoCoreService_LibraryUpgradeAll_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -769,7 +841,7 @@ func (c *arduinoCoreServiceClient) LibraryList(ctx context.Context, in *LibraryL
 
 func (c *arduinoCoreServiceClient) Monitor(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MonitorRequest, MonitorResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[19], ArduinoCoreService_Monitor_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[21], ArduinoCoreService_Monitor_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -792,7 +864,7 @@ func (c *arduinoCoreServiceClient) EnumerateMonitorPortSettings(ctx context.Cont
 
 func (c *arduinoCoreServiceClient) Debug(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[DebugRequest, DebugResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[20], ArduinoCoreService_Debug_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[22], ArduinoCoreService_Debug_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -961,9 +1033,12 @@ func (c *arduinoCoreServiceClient) ProfileSetDefault(ctx context.Context, in *Pr
 type ArduinoCoreServiceServer interface {
 	// Create a new Arduino Core instance.
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	// Initializes an existing Arduino Core instance by loading platforms and
-	// libraries.
+	// Deprecated: Do not use.
+	// This call is deprecated, use Initialize instead.
+	// Initializes an existing Arduino Core instance by loading platforms and libraries.
 	Init(*InitRequest, grpc.ServerStreamingServer[InitResponse]) error
+	// Initializes an existing Arduino Core instance by loading platforms and libraries.
+	Initialize(*InitializeRequest, grpc.ServerStreamingServer[InitializeResponse]) error
 	// Destroy an instance of the Arduino Core Service.
 	Destroy(context.Context, *DestroyRequest) (*DestroyResponse, error)
 	// Update package index of the Arduino Core Service.
@@ -984,6 +1059,8 @@ type ArduinoCoreServiceServer interface {
 	SetSketchDefaults(context.Context, *SetSketchDefaultsRequest) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board.
 	BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error)
+	// Requests details about uploading to a board with a specified protocol and configuration.
+	BoardUploadDetails(context.Context, *BoardUploadDetailsRequest) (*BoardUploadDetailsResponse, error)
 	// List the boards currently connected to the computer.
 	BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error)
 	// List all the boards provided by installed platforms.
@@ -1010,9 +1087,13 @@ type ArduinoCoreServiceServer interface {
 	Upload(*UploadRequest, grpc.ServerStreamingServer[UploadResponse]) error
 	// Upload a compiled sketch to a board using a programmer.
 	UploadUsingProgrammer(*UploadUsingProgrammerRequest, grpc.ServerStreamingServer[UploadUsingProgrammerResponse]) error
+	// Upload a firmware file to a board.
+	UploadFirmwareFile(*UploadFirmwareFileRequest, grpc.ServerStreamingServer[UploadFirmwareFileResponse]) error
 	// Returns the list of users fields necessary to upload to that board
 	// using the specified protocol.
 	SupportedUserFields(context.Context, *SupportedUserFieldsRequest) (*SupportedUserFieldsResponse, error)
+	// Reads the details from a firmware file.
+	ReadFirmwareFileDetails(context.Context, *ReadFirmwareFileDetailsRequest) (*ReadFirmwareFileDetailsResponse, error)
 	// List programmers available for a board.
 	ListProgrammersAvailableForUpload(context.Context, *ListProgrammersAvailableForUploadRequest) (*ListProgrammersAvailableForUploadResponse, error)
 	// Burn bootloader to a board.
@@ -1093,6 +1174,9 @@ func (UnimplementedArduinoCoreServiceServer) Create(context.Context, *CreateRequ
 func (UnimplementedArduinoCoreServiceServer) Init(*InitRequest, grpc.ServerStreamingServer[InitResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method Init not implemented")
 }
+func (UnimplementedArduinoCoreServiceServer) Initialize(*InitializeRequest, grpc.ServerStreamingServer[InitializeResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method Initialize not implemented")
+}
 func (UnimplementedArduinoCoreServiceServer) Destroy(context.Context, *DestroyRequest) (*DestroyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Destroy not implemented")
 }
@@ -1119,6 +1203,9 @@ func (UnimplementedArduinoCoreServiceServer) SetSketchDefaults(context.Context, 
 }
 func (UnimplementedArduinoCoreServiceServer) BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardDetails not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) BoardUploadDetails(context.Context, *BoardUploadDetailsRequest) (*BoardUploadDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BoardUploadDetails not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardList not implemented")
@@ -1156,8 +1243,14 @@ func (UnimplementedArduinoCoreServiceServer) Upload(*UploadRequest, grpc.ServerS
 func (UnimplementedArduinoCoreServiceServer) UploadUsingProgrammer(*UploadUsingProgrammerRequest, grpc.ServerStreamingServer[UploadUsingProgrammerResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method UploadUsingProgrammer not implemented")
 }
+func (UnimplementedArduinoCoreServiceServer) UploadFirmwareFile(*UploadFirmwareFileRequest, grpc.ServerStreamingServer[UploadFirmwareFileResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method UploadFirmwareFile not implemented")
+}
 func (UnimplementedArduinoCoreServiceServer) SupportedUserFields(context.Context, *SupportedUserFieldsRequest) (*SupportedUserFieldsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SupportedUserFields not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) ReadFirmwareFileDetails(context.Context, *ReadFirmwareFileDetailsRequest) (*ReadFirmwareFileDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadFirmwareFileDetails not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) ListProgrammersAvailableForUpload(context.Context, *ListProgrammersAvailableForUploadRequest) (*ListProgrammersAvailableForUploadResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProgrammersAvailableForUpload not implemented")
@@ -1301,6 +1394,17 @@ func _ArduinoCoreService_Init_Handler(srv interface{}, stream grpc.ServerStream)
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ArduinoCoreService_InitServer = grpc.ServerStreamingServer[InitResponse]
+
+func _ArduinoCoreService_Initialize_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(InitializeRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ArduinoCoreServiceServer).Initialize(m, &grpc.GenericServerStream[InitializeRequest, InitializeResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ArduinoCoreService_InitializeServer = grpc.ServerStreamingServer[InitializeResponse]
 
 func _ArduinoCoreService_Destroy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DestroyRequest)
@@ -1446,6 +1550,24 @@ func _ArduinoCoreService_BoardDetails_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArduinoCoreServiceServer).BoardDetails(ctx, req.(*BoardDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_BoardUploadDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BoardUploadDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).BoardUploadDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_BoardUploadDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).BoardUploadDetails(ctx, req.(*BoardUploadDetailsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1610,6 +1732,17 @@ func _ArduinoCoreService_UploadUsingProgrammer_Handler(srv interface{}, stream g
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ArduinoCoreService_UploadUsingProgrammerServer = grpc.ServerStreamingServer[UploadUsingProgrammerResponse]
 
+func _ArduinoCoreService_UploadFirmwareFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(UploadFirmwareFileRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ArduinoCoreServiceServer).UploadFirmwareFile(m, &grpc.GenericServerStream[UploadFirmwareFileRequest, UploadFirmwareFileResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ArduinoCoreService_UploadFirmwareFileServer = grpc.ServerStreamingServer[UploadFirmwareFileResponse]
+
 func _ArduinoCoreService_SupportedUserFields_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SupportedUserFieldsRequest)
 	if err := dec(in); err != nil {
@@ -1624,6 +1757,24 @@ func _ArduinoCoreService_SupportedUserFields_Handler(srv interface{}, ctx contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArduinoCoreServiceServer).SupportedUserFields(ctx, req.(*SupportedUserFieldsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_ReadFirmwareFileDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadFirmwareFileDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).ReadFirmwareFileDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_ReadFirmwareFileDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).ReadFirmwareFileDetails(ctx, req.(*ReadFirmwareFileDetailsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2148,6 +2299,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ArduinoCoreService_BoardDetails_Handler,
 		},
 		{
+			MethodName: "BoardUploadDetails",
+			Handler:    _ArduinoCoreService_BoardUploadDetails_Handler,
+		},
+		{
 			MethodName: "BoardList",
 			Handler:    _ArduinoCoreService_BoardList_Handler,
 		},
@@ -2166,6 +2321,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SupportedUserFields",
 			Handler:    _ArduinoCoreService_SupportedUserFields_Handler,
+		},
+		{
+			MethodName: "ReadFirmwareFileDetails",
+			Handler:    _ArduinoCoreService_ReadFirmwareFileDetails_Handler,
 		},
 		{
 			MethodName: "ListProgrammersAvailableForUpload",
@@ -2259,6 +2418,11 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
+			StreamName:    "Initialize",
+			Handler:       _ArduinoCoreService_Initialize_Handler,
+			ServerStreams: true,
+		},
+		{
 			StreamName:    "UpdateIndex",
 			Handler:       _ArduinoCoreService_UpdateIndex_Handler,
 			ServerStreams: true,
@@ -2306,6 +2470,11 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "UploadUsingProgrammer",
 			Handler:       _ArduinoCoreService_UploadUsingProgrammer_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "UploadFirmwareFile",
+			Handler:       _ArduinoCoreService_UploadFirmwareFile_Handler,
 			ServerStreams: true,
 		},
 		{

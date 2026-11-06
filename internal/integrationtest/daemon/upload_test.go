@@ -35,7 +35,7 @@ func TestUploadCancelation(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -54,7 +54,7 @@ func TestUploadCancelation(t *testing.T) {
 	cli.InstallMockedAvrdude(t)
 
 	// Re-init instance to update changes
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 

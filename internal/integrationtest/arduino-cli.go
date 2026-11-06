@@ -533,14 +533,18 @@ func (cli *ArduinoCLI) SetValue(key, jsonData string) error {
 }
 
 // Init calls the "Init" gRPC method.
-func (inst *ArduinoCLIInstance) Init(profile string, sketchPath string, respCB func(*commands.InitResponse)) error {
-	initReq := &commands.InitRequest{
-		Instance:   inst.instance,
-		Profile:    profile,
-		SketchPath: sketchPath,
+func (inst *ArduinoCLIInstance) Init(profile string, sketchPath string, respCB func(*commands.InitializeResponse)) error {
+	initReq := &commands.InitializeRequest{
+		Instance: inst.instance,
+		Message: &commands.InitializeRequest_SketchProfile_{
+			SketchProfile: &commands.InitializeRequest_SketchProfile{
+				Profile:    profile,
+				SketchPath: sketchPath,
+			},
+		},
 	}
 	logCallf(">>> Init(%v)\n", initReq)
-	initClient, err := inst.cli.daemonClient.Init(context.Background(), initReq)
+	initClient, err := inst.cli.daemonClient.Initialize(context.Background(), initReq)
 	if err != nil {
 		return err
 	}

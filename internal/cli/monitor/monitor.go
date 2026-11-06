@@ -110,10 +110,12 @@ func runMonitorCmd(
 
 	var inst *rpc.Instance
 	var profile *rpc.SketchProfile
-	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, sketch.GetDefaultProfile().GetName(), sketchPath)
-	} else {
+	if profileArg.Get() != "" {
 		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileArg.Get(), sketchPath)
+	} else if profileName := sketch.GetDefaultProfile().GetName(); profileName != "" {
+		inst, profile = instance.CreateAndInitWithProfile(ctx, srv, profileName, sketchPath)
+	} else {
+		inst = instance.CreateAndInit(ctx, srv)
 	}
 	if inst == nil {
 		inst = instance.CreateAndInit(ctx, srv)
