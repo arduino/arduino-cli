@@ -187,20 +187,24 @@ func (pmb *Builder) loadProfileTool(ctx context.Context, toolRef *cores.ToolDepe
 	tool := targetPackage.GetOrCreateTool(toolRef.ToolName)
 	toolRelease := tool.GetOrCreateRelease(toolRef.ToolVersion)
 
-	var destDir *paths.Path
-	if indexURL == nil {
-		archive := toolRelease.GetCompatibleFlavour()
-		if archive == nil {
-			return &cmderrors.InvalidVersionError{Cause: errors.New(i18n.Tr("version %s not available for this operating system", toolRelease))}
-		}
-		uid := toolRef.InternalUniqueIdentifier(archive.Checksum)
-		destDir = settings.ProfilesCacheDir().Join(uid)
-	} else {
-		// TODO: Shall we use archive checksum here too, instead of index URL?
-		uid := toolRef.InternalUniqueIdentifier(indexURL.String())
-		destDir = settings.ProfilesCacheDir().Join(uid)
+	archive := toolRelease.GetCompatibleFlavour()
+	if archive == nil {
+		return &cmderrors.InvalidVersionError{Cause: errors.New(i18n.Tr("version %s not available for this operating system", toolRelease))}
 	}
-	if !destDir.IsDir() && installMissing {
+	uid := toolRef.InternalUniqueIdentifier(archive.Checksum)
+	destDir := settings.ProfilesCacheDir().Join(uid)
+
+	// If the tool is not cached, check if it is already cached using
+	// the legacy path with the index URL as part of the unique identifier
+	if indexURL != nil && !destDir.IsDir() {
+		uid := toolRef.InternalUniqueIdentifier(indexURL.String())
+		legacyDestDir := settings.ProfilesCacheDir().Join(uid)
+		if legacyDestDir.IsDir() {
+			destDir = legacyDestDir
+		}
+	}
+
+	if installMissing && !destDir.IsDir() {
 		// Try installing the missing tool
 		if err := pmb.installMissingProfileTool(ctx, toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
