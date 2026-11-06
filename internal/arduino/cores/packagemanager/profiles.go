@@ -211,8 +211,8 @@ func (pmb *Builder) loadProfileTool(ctx context.Context, toolRef *cores.ToolDepe
 }
 
 func (pmb *Builder) installMissingProfileTool(ctx context.Context, toolRelease *cores.ToolRelease, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	// Instantiate a temporary package manager only for platform installation
-	tmp, err := paths.MkTempDir(destDir.Parent().String(), "")
+	_ = pmb.tempDir.MkdirAll()
+	tmp, err := paths.MkTempDir(pmb.tempDir.String(), "")
 	if err != nil {
 		return fmt.Errorf("installing missing platform: could not create temp dir %s", err)
 	}
