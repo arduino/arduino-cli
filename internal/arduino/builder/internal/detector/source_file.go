@@ -90,11 +90,12 @@ func (f *sourceFile) ObjFileIsUpToDate(log *logrus.Entry) (unchanged bool, err e
 	}
 	deps, err := cpp.ReadDepFile(dependencyFile)
 	if err != nil {
-		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not read dependency file: %s", f.SourcePath, dependencyFile)
-		return false, err
+		log.WithError(err).Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not read dependency file: %s", f.SourcePath, dependencyFile)
+		return false, nil
 	}
 	if len(deps.Dependencies) == 0 {
-		return true, nil
+		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Dependency file is empty: %v", f.SourcePath, dependencyFile)
+		return false, nil
 	}
 	if deps.Dependencies[0] != sourceFile.String() {
 		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Depfile is about different source file: %v (expected %v)", f.SourcePath, deps.Dependencies[0], sourceFile)
