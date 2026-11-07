@@ -107,6 +107,61 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Equal(t, info1.ModTime(), info2.ModTime())
 }
 
+func TestCopyAdditionalFilesRemovesStaleFiles(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+
+	sourceDir := tmp.Join("SourceSketch")
+	buildDir := tmp.Join("build")
+	require.NoError(t, sourceDir.MkdirAll())
+	require.NoError(t, sourceDir.Join("SourceSketch.ino").WriteFile([]byte{}))
+	sourceFile := sourceDir.Join("old.cpp")
+	require.NoError(t, sourceFile.WriteFile([]byte("void old() {}\n")))
+
+	sk, err := sketch.New(sourceDir)
+	require.NoError(t, err)
+	require.True(t, sk.AdditionalFiles.ContainsEquivalentTo(sourceFile))
+	b := Builder{sketch: sk}
+	require.NoError(t, b.sketchCopyAdditionalFiles(buildDir, nil))
+	require.True(t, buildDir.Join("old.cpp").Exist())
+	for _, suffix := range []string{".o", ".d", ".libsdetect.d"} {
+		require.NoError(t, buildDir.Join("old.cpp"+suffix).WriteFile([]byte("stale")))
+	}
+	for _, name := range []string{
+		"SourceSketch.ino.cpp",
+		"SourceSketch.ino.cpp.merged",
+		"SourceSketch.ino.cpp.merged.libsdetect.d",
+		"SourceSketch.ino.cpp.o",
+		"SourceSketch.ino.cpp.d",
+	} {
+		require.NoError(t, buildDir.Join(name).WriteFile([]byte("current")))
+	}
+	preservedFile := buildDir.Join("preserved.txt")
+	require.NoError(t, preservedFile.WriteFile([]byte("preserve")))
+
+	require.NoError(t, sourceFile.RemoveAll())
+	sk, err = sketch.New(sourceDir)
+	require.NoError(t, err)
+	require.Empty(t, sk.AdditionalFiles)
+	b.sketch = sk
+	require.NoError(t, b.sketchCopyAdditionalFiles(buildDir, nil))
+	require.False(t, buildDir.Join("old.cpp").Exist())
+	for _, suffix := range []string{".o", ".d", ".libsdetect.d"} {
+		require.False(t, buildDir.Join("old.cpp"+suffix).Exist())
+	}
+	for _, name := range []string{
+		"SourceSketch.ino.cpp",
+		"SourceSketch.ino.cpp.merged",
+		"SourceSketch.ino.cpp.merged.libsdetect.d",
+		"SourceSketch.ino.cpp.o",
+		"SourceSketch.ino.cpp.d",
+	} {
+		require.True(t, buildDir.Join(name).Exist())
+	}
+	require.True(t, preservedFile.Exist())
+}
+
 func TestStripUTF8BOM(t *testing.T) {
 	// Case 1: Input with BOM
 	inputWithBOM := []byte{0xEF, 0xBB, 0xBF, 'H', 'e', 'l', 'l', 'o'}
