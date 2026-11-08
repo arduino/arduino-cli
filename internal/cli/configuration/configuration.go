@@ -93,8 +93,13 @@ func getDefaultUserDir() string {
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
-			feedback.Warning(i18n.Tr("Unable to get Documents Folder: %v", err))
-			return "."
+			// An invalid "Personal" value in the "User Shell Folders" registry
+			// key makes the lookup of the Documents folder fail: fall back to
+			// the Documents folder in the user home instead of a relative path.
+			documentsPath = filepath.Join(userHomeDir, "Documents")
+			feedback.Warning(i18n.Tr(
+				"Unable to get Documents Folder: %v, please check the 'Personal' value in the registry key HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders, using %s instead",
+				err, documentsPath))
 		}
 		return filepath.Join(documentsPath, "Arduino")
 	default:
