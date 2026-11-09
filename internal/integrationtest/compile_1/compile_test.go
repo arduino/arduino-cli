@@ -1251,6 +1251,33 @@ func buildWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cl
 		require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
 	})
 
+	t.Run("OutsideSketchWithBuildProjectName", func(t *testing.T) {
+		sketchName := "CompileWithCustomProjectName"
+		projectName := "custom_project"
+		sketchPath := cli.SketchbookDir().Join(sketchName)
+		defer sketchPath.RemoveAll()
+		fqbn := "arduino:avr:uno"
+
+		// Create a test sketch
+		_, _, err := cli.Run("sketch", "new", sketchPath.String())
+		require.NoError(t, err)
+
+		// Test the --build-path flag with a custom build.project_name
+		buildPath := cli.DataDir().Join("test_dir", "custom_project_build_dir")
+		_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--build-path", buildPath.String(), "--build-property", "build.project_name="+projectName)
+		require.NoError(t, err)
+
+		// Verifies expected binaries have been built to build_path
+		require.DirExists(t, buildPath.String())
+		require.FileExists(t, buildPath.Join(projectName+".eep").String())
+		require.FileExists(t, buildPath.Join(projectName+".elf").String())
+		require.FileExists(t, buildPath.Join(projectName+".hex").String())
+		require.FileExists(t, buildPath.Join(projectName+".with_bootloader.bin").String())
+		require.FileExists(t, buildPath.Join(projectName+".with_bootloader.hex").String())
+		require.NoFileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.bin").String())
+		require.NoFileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.hex").String())
+	})
+
 	t.Run("InsideSketch", func(t *testing.T) {
 		buildPath := sketchPath.Join("build")
 
