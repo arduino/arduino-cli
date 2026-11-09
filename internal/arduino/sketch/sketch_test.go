@@ -218,6 +218,27 @@ func TestSketchWithIppFile(t *testing.T) {
 	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(templateFile))
 }
 
+func TestSketchWithIncFile(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, tmp.RemoveAll()) })
+
+	sketchPath := tmp.Join("SketchWithIncFile")
+	require.NoError(t, sketchPath.MkdirAll())
+	mainFilePath := sketchPath.Join("SketchWithIncFile.ino")
+	includeFilePath := sketchPath.Join("include.inc")
+	require.NoError(t, mainFilePath.WriteFile([]byte("void setup() {}\nvoid loop() {}\n")))
+	require.NoError(t, includeFilePath.WriteFile([]byte("#define VALUE 1\n")))
+
+	sketch, err := New(sketchPath)
+	require.NoError(t, err)
+	require.Equal(t, 0, sketch.OtherSketchFiles.Len())
+	require.Equal(t, 1, sketch.AdditionalFiles.Len())
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(includeFilePath))
+	require.Equal(t, 1, sketch.RootFolderFiles.Len())
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(includeFilePath))
+}
+
 func TestNewSketchFolderSymlink(t *testing.T) {
 	// pass the path to the sketch folder
 	sketchName := "SketchSymlink"
