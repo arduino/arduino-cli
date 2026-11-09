@@ -32,6 +32,24 @@ tools.one.bootloader.params.verify=verify
 tools.one.bootloader.params.noverify=noverify
 tools.one.bootloader.pattern={cmd.path} BURN {conf.board} {conf.general} {bootloader.conf} {bootloader.verbose} {bootloader.verify} {protocol} "{serial.port}" -b{upload.speed} -F{bootloader.fuses} "{runtime.platform.path}/bootloaders/{bootloader.file}"
 
+# Bootloader upload using the board upload protocol, without programmer properties
+tools.one-upload-protocol.cmd.path=echo
+tools.one-upload-protocol.conf.general=conf-general
+
+tools.one-upload-protocol.erase.conf=conf-erase
+tools.one-upload-protocol.erase.params.verbose=verbose
+tools.one-upload-protocol.erase.params.quiet=quiet
+tools.one-upload-protocol.erase.params.verify=verify
+tools.one-upload-protocol.erase.params.noverify=noverify
+tools.one-upload-protocol.erase.pattern={cmd.path} ERASE {conf.board} {conf.general} {erase.conf} {erase.verbose} {erase.verify} {upload.protocol} "{serial.port}" -b{upload.speed}
+
+tools.one-upload-protocol.bootloader.conf=conf-bootloader
+tools.one-upload-protocol.bootloader.params.verbose=verbose
+tools.one-upload-protocol.bootloader.params.quiet=quiet
+tools.one-upload-protocol.bootloader.params.verify=verify
+tools.one-upload-protocol.bootloader.params.noverify=noverify
+tools.one-upload-protocol.bootloader.pattern={cmd.path} BURN {conf.board} {conf.general} {bootloader.conf} {bootloader.verbose} {bootloader.verify} {upload.protocol} "{serial.port}" -b{upload.speed} -F{bootloader.fuses} "{runtime.platform.path}/bootloaders/{bootloader.file}"
+
 # Upload test 2
 tools.one-noport.cmd.path=echo
 tools.one-noport.conf.general=conf-general
