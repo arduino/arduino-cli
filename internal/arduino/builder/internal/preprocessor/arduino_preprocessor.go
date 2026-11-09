@@ -56,7 +56,7 @@ func PreprocessSketchWithArduinoPreprocessor(
 	arduinoPreprocessorProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
 	arduinoPreprocessorProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
 	arduinoPreprocessorProperties.Set("tools.arduino-preprocessor.pattern", `"{cmd.path}" "{source_file}" -- -std=gnu++11`)
-	arduinoPreprocessorProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	arduinoPreprocessorProperties.Set("preproc.macros.flags", "-w -x c++ -E")
 	arduinoPreprocessorProperties.Merge(buildProperties)
 	arduinoPreprocessorProperties.Merge(arduinoPreprocessorProperties.SubTree("tools").SubTree("arduino-preprocessor"))
 	arduinoPreprocessorProperties.SetPath("source_file", targetFile)
