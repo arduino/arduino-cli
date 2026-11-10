@@ -1,0 +1,20 @@
+digraph {
+  // This generates pluggable-discovery-state-machine.png
+  // using the following command:
+  // dot -Tpng -Gsize=10,20\! pluggable-discovery-state-machine.dot > pluggable-discovery-state-machine.png
+  label="Pluggable discovery state machine"
+  labelloc=t
+  fontname="sans-serif"
+  node [fontname="sans-serif"]
+  edge [colorscheme=set15 fontsize=7 fontname="sans-serif"]
+  Alive -> Idling [label="  HELLO  " color=2 fontcolor=2]
+  Idling -> Running [label="  START  " color=3 fontcolor=3]
+  Running -> Idling [label="  STOP  " color=1 fontcolor=1]
+  Running -> Running [label="  LIST  " color=5 fontcolor=5]
+  Running -> Dead [label="  QUIT  " color=4 fontcolor=4]
+  Idling -> Syncing [label="  START_SYNC  " color=3 fontcolor=3]
+  Syncing -> Idling [label="  STOP  " color=1 fontcolor=1]
+  Syncing -> Dead [label="  QUIT  " color=4 fontcolor=4]
+  Idling -> Dead [label="  QUIT  " color=4 fontcolor=4]
+  Alive -> Dead [label="  QUIT  " color=4 fontcolor=4]
+}
