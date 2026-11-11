@@ -44,9 +44,15 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 		return nil
 	}
 
+	// The library detection may have left the sketch already run through the GCC preprocessor
+	gccPreprocessedFile := b.libsDetector.SketchPreprocessedFile()
+	if gccPreprocessedFile != nil {
+		defer gccPreprocessedFile.Remove()
+	}
+
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
-		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile,
+		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile, gccPreprocessedFile,
 		b.sketch, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 		b.logger.VerbosityLevel() == logger.VerbosityVerbose,

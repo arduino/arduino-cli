@@ -223,6 +223,28 @@ void myNewFunction() {}
 		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
 	})
 
+	// A library added by another file of the sketch changes what the .ino sees through __has_include:
+	// the prototypes must be generated with the libraries of the whole detection.
+	t.Run("SketchWithHasIncludeOfLibraryAddedByCppFile", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		require.NoError(t, sketch.Join("sketch.ino").WriteFile([]byte(`
+void setup() { spiInfo(); }
+void loop() {}
+
+#if __has_include(<SPI.h>)
+void spiInfo() {}
+#endif
+`)))
+		require.NoError(t, sketch.Join("helper.cpp").WriteFile([]byte("#include <SPI.h>\n")))
+
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err)
+	})
+
 	// Regression test for https://github.com/arduino/arduino-cli/issues/3202
 	// After a successful build, modifying the sketch to add an #error directive should cause the next build to fail.
 	t.Run("SketchModificationAfterSuccessfulBuildInvalidatesCache/1", func(t *testing.T) {

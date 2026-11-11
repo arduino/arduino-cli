@@ -68,6 +68,10 @@ type SketchLibrariesDetector struct {
 	preRunner                     *runner.Runner
 	detectedChangeInLibraries     bool
 	sketchIsUnchanged             bool
+	mergedSketch                  sourceFile
+	// sketchPassIncludes are the include folders of the pass that ended the detection on the
+	// merged sketch, nil when no pass ran.
+	sketchPassIncludes paths.PathList
 }
 
 // NewSketchLibrariesDetector todo
@@ -231,6 +235,22 @@ func (l *SketchLibrariesDetector) IsSketchDepsUnchanged() bool {
 	return l.sketchIsUnchanged
 }
 
+// SketchPreprocessedFile returns the merged sketch as the GCC preprocessor left it in the pass
+// that ended its detection. It returns nil when no pass ran, or when the detection went on to
+// other include folders than that pass had: the prototype generation then needs its own pass.
+func (l *SketchLibrariesDetector) SketchPreprocessedFile() *paths.Path {
+	if l.sketchPassIncludes == nil || !slices.Equal(l.sketchPassIncludes.AsStrings(), l.includeFolders.AsStrings()) {
+		return nil
+	}
+	return l.sketchPreprocessedPath(l.sketchPassIncludes)
+}
+
+// sketchPreprocessedPath is where a pass on the merged sketch writes its output: one file for
+// each set of include folders, since the passes of a detection may run at the same time.
+func (l *SketchLibrariesDetector) sketchPreprocessedPath(includes paths.PathList) *paths.Path {
+	return paths.New(fmt.Sprintf("%s.%d.ii", l.mergedSketch.SourcePath, len(includes)))
+}
+
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	logrus.Tracef("[LD] INCLUDE-PATH: %s", folder.String())
@@ -314,6 +334,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 	if err != nil {
 		return err
 	}
+	l.mergedSketch = mergedSketch
 	l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
 
 	// Pre-run cache entries
@@ -428,7 +449,12 @@ func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile sourceFile, build
 	}
 
 	_ = sourceFile.PrepareBuildPath()
-	return preprocessor.GCC(sourceFile.SourcePath, paths.NullPath(), includeFolders, buildProperties, sourceFile.DepfilePath)
+	// The merged sketch keeps the output of its passes: the last one feeds the prototype generation
+	target := paths.NullPath()
+	if sourceFile.Equals(l.mergedSketch) {
+		target = l.sketchPreprocessedPath(includeFolders)
+	}
+	return preprocessor.GCC(sourceFile.SourcePath, target, includeFolders, buildProperties, sourceFile.DepfilePath)
 }
 
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
@@ -504,6 +530,9 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
+				if sourceFile.Equals(l.mergedSketch) {
+					l.sketchPassIncludes = l.includeFolders.Clone()
+				}
 			} else if _, isExitErr := errors.AsType[*exec.ExitError](preprocErr); isExitErr && len(preprocResult.Stderr) > 0 {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocResult.Stderr))
 				if missingIncludeH == "" && l.logger.VerbosityLevel() == logger.VerbosityVerbose {
