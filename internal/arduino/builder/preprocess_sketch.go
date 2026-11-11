@@ -26,6 +26,9 @@ import (
 
 // preprocessSketch fixdoc
 func (b *Builder) preprocessSketch(includes paths.PathList) error {
+	// The library detection keeps the output of its passes on the sketch for this step only
+	defer b.libsDetector.RemoveSketchPreprocessedFiles()
+
 	unpreprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp.merged")
 	preprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp")
 	unpreprocessedSourceFileStat, err := unpreprocessedSourceFile.Stat()
@@ -44,15 +47,9 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 		return nil
 	}
 
-	// The library detection may have left the sketch already run through the GCC preprocessor
-	gccPreprocessedFile := b.libsDetector.SketchPreprocessedFile()
-	if gccPreprocessedFile != nil {
-		defer gccPreprocessedFile.Remove()
-	}
-
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
-		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile, gccPreprocessedFile,
+		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile, b.libsDetector.SketchPreprocessedFile(),
 		b.sketch, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 		b.logger.VerbosityLevel() == logger.VerbosityVerbose,

@@ -251,6 +251,20 @@ func (l *SketchLibrariesDetector) sketchPreprocessedPath(includes paths.PathList
 	return paths.New(fmt.Sprintf("%s.%d.ii", l.mergedSketch.SourcePath, len(includes)))
 }
 
+// RemoveSketchPreprocessedFiles removes the output the passes on the merged sketch left behind.
+func (l *SketchLibrariesDetector) RemoveSketchPreprocessedFiles() {
+	if l.mergedSketch.SourcePath == nil {
+		return
+	}
+	outputs, _ := l.mergedSketch.SourcePath.Parent().ReadDir(paths.AndFilter(
+		paths.FilterPrefixes(l.mergedSketch.SourcePath.Base()+"."),
+		paths.FilterSuffixes(".ii"),
+	))
+	for _, output := range outputs {
+		_ = output.Remove()
+	}
+}
+
 // addIncludeFolder add the given folder to the include path.
 func (l *SketchLibrariesDetector) addIncludeFolder(folder *paths.Path) {
 	logrus.Tracef("[LD] INCLUDE-PATH: %s", folder.String())
