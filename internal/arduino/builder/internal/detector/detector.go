@@ -70,7 +70,7 @@ type SketchLibrariesDetector struct {
 	sketchIsUnchanged             bool
 	mergedSketch                  sourceFile
 	// sketchPassIncludes are the include folders of the pass that ended the detection on the
-	// merged sketch, nil when no pass ran.
+	// merged sketch or confirmed its recorded one, nil when no pass did.
 	sketchPassIncludes paths.PathList
 }
 
@@ -236,8 +236,9 @@ func (l *SketchLibrariesDetector) IsSketchDepsUnchanged() bool {
 }
 
 // SketchPreprocessedFile returns the merged sketch as the GCC preprocessor left it in the pass
-// that ended its detection. It returns nil when no pass ran, or when the detection went on to
-// other include folders than that pass had: the prototype generation then needs its own pass.
+// that ended its detection or confirmed its recorded one. It returns nil when no pass did, or
+// when the detection went on to other include folders than that pass had: the prototype
+// generation then needs its own pass.
 func (l *SketchLibrariesDetector) SketchPreprocessedFile() *paths.Path {
 	if l.sketchPassIncludes == nil || !slices.Equal(l.sketchPassIncludes.AsStrings(), l.includeFolders.AsStrings()) {
 		return nil
@@ -351,11 +352,23 @@ func (l *SketchLibrariesDetector) findIncludes(
 	l.mergedSketch = mergedSketch
 	l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
 
+	// An edit of the sketch code changes nothing the detection depends on. When the merged
+	// sketch holds the directives recorded with the cache, one preprocessor pass tells whether
+	// its recorded detection still holds: it is then replayed as if the sketch were untouched.
+	directives, err := sketchDirectives(mergedSketch.SourcePath)
+	if err != nil {
+		return err
+	}
+	if !l.sketchIsUnchanged && l.cache.SketchDirectivesUnchanged(directives) {
+		l.sketchIsUnchanged = l.confirmSketchDetection(ctx, buildProperties)
+	}
+	l.cache.SetSketchDirectives(directives)
+
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
 	for _, entry := range l.cache.EntriesAhead() {
 		if entry.CompileTask != nil {
-			upToDate, _ := entry.Compile.ObjFileIsUpToDate(logrus.WithField("runner", "prerun"))
+			upToDate, _ := l.unitIsUnchanged(*entry.Compile, logrus.WithField("runner", "prerun"))
 			if !upToDate {
 				_ = entry.Compile.PrepareBuildPath()
 				l.preRunner.Enqueue(entry.CompileTask)
@@ -471,6 +484,52 @@ func (l *SketchLibrariesDetector) gccPreprocessTask(sourceFile sourceFile, build
 	return preprocessor.GCC(sourceFile.SourcePath, target, includeFolders, buildProperties, sourceFile.DepfilePath)
 }
 
+// confirmSketchDetection runs the GCC preprocessor once on the edited merged sketch, with the
+// include folders its recorded detection ended with, and reports whether the recorded detection
+// still holds: the pass must pull in the files the last one did, in the same order.
+func (l *SketchLibrariesDetector) confirmSketchDetection(ctx context.Context, buildProperties *properties.Map) bool {
+	sketch := l.mergedSketch
+	log := logrus.WithField("runner", "sketchcheck")
+	if unchanged, _ := sketch.DepsAreUpToDate(log); !unchanged {
+		return false
+	}
+	includes, recordedPass := l.cache.LastPass(sketch)
+	if recordedPass == nil {
+		return false
+	}
+	// The recorded pass must be the one the detection would end with today
+	target := l.sketchPreprocessedPath(includes)
+	if preprocessor.GCC(sketch.SourcePath, target, includes, buildProperties, sketch.DepfilePath).String() != recordedPass.String() {
+		return false
+	}
+	recorded, err := cpp.ReadDepFile(sketch.DepfilePath)
+	if err != nil {
+		return false
+	}
+
+	// The pass writes a dependency file of its own, which replaces the one of the detection
+	// only when it confirms it: the next build never takes a rejected pass for a detection.
+	depfile := paths.New(sketch.DepfilePath.String() + ".confirm")
+	defer depfile.Remove()
+	_ = sketch.PrepareBuildPath()
+	result := preprocessor.GCC(sketch.SourcePath, target, includes, buildProperties, depfile).Run(ctx)
+	if result.Error != nil {
+		log.Tracef("[LD] CONFIRM: REJECTED %v: %s", sketch.SourcePath, result.Error)
+		return false
+	}
+	deps, err := cpp.ReadDepFile(depfile)
+	if err != nil || !slices.Equal(deps.Dependencies, recorded.Dependencies) {
+		log.Tracef("[LD] CONFIRM: REJECTED %v: the files pulled in changed", sketch.SourcePath)
+		return false
+	}
+	if err := depfile.Rename(sketch.DepfilePath); err != nil {
+		return false
+	}
+	log.Tracef("[LD] CONFIRM: OK %v", sketch.SourcePath)
+	l.sketchPassIncludes = includes
+	return true
+}
+
 func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	ctx context.Context,
 	sourceFileQueue *uniqueSourceFileQueue,
@@ -493,7 +552,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := sourceFile.ObjFileIsUpToDate(logrus.WithField("runner", "main"))
+	unchanged, err := l.unitIsUnchanged(sourceFile, logrus.WithField("runner", "main"))
 	if err != nil {
 		return err
 	}
@@ -606,6 +665,16 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 		l.addAndBuildLibrary(sourceFileQueue, librariesBuildPath, library)
 		l.addIncludeFolder(library.SourceDir)
 	}
+}
+
+// unitIsUnchanged reports whether the detection recorded for a compilation unit still holds.
+// The merged sketch is judged once, before the detection starts: untouched, or edited with
+// its recorded detection confirmed.
+func (l *SketchLibrariesDetector) unitIsUnchanged(unit sourceFile, log *logrus.Entry) (bool, error) {
+	if unit.Equals(l.mergedSketch) {
+		return l.sketchIsUnchanged, nil
+	}
+	return unit.ObjFileIsUpToDate(log)
 }
 
 func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
