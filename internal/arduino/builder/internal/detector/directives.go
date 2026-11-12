@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"regexp"
 	"slices"
+	"strings"
 
 	"github.com/arduino/go-paths-helper"
 )
@@ -75,6 +76,14 @@ func directiveLines(source []byte) []string {
 	}
 	endLine()
 	return directives
+}
+
+// followCode reports whether a directive names a macro whose value changes with the code
+// around it: an edit of the code alone can then change what the directives do.
+func followCode(directives []string) bool {
+	return slices.ContainsFunc(directives, func(directive string) bool {
+		return strings.Contains(directive, "__LINE__") || strings.Contains(directive, "__COUNTER__")
+	})
 }
 
 func lengthBefore(text []byte, mark string) int {

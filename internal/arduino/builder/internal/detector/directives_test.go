@@ -104,3 +104,9 @@ func TestDirectiveLines(t *testing.T) {
 		})
 	}
 }
+
+func TestFollowCode(t *testing.T) {
+	require.False(t, followCode([]string{"#include <SPI.h>", "#define LIMIT 10"}))
+	require.True(t, followCode([]string{"#include <SPI.h>", "#if __LINE__ > 10"}))
+	require.True(t, followCode([]string{"#define ID __COUNTER__"}))
+}

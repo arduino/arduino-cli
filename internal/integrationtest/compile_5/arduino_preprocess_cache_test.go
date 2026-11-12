@@ -310,7 +310,7 @@ void start() { Wire.begin(); }
 		require.Contains(t, string(out), "Using library SPI")
 	})
 
-	// A comment turns a directive on or off with no change to its line
+	// A comment or the code around it turns a directive on or off with no change to its line
 	t.Run("ChangesToSketchDirectivesRunLibraryDetection", func(t *testing.T) {
 		code := "void setup() {}\nvoid loop() {}\n"
 		edits := []struct {
@@ -342,6 +342,13 @@ void start() { Wire.begin(); }
 				name:   "IncludeCommentedOutInBranchOffOnceLibrariesAreFound",
 				before: "#if __has_include(<utility/twi.h>)\n#else\n#include <SPI.h>\n#endif\n#include <Wire.h>\n" + code,
 				after:  "#if __has_include(<utility/twi.h>)\n#else\n/*\n#include <SPI.h>\n*/\n#endif\n#include <Wire.h>\n" + code,
+				used:   "Wire",
+				unused: "SPI",
+			},
+			{
+				name:   "IncludeUnderLineNumberConditionInBranchOffOnceLibrariesAreFound",
+				before: "int a;\n#if __has_include(<utility/twi.h>)\n#else\n#if __LINE__ > 3\n#include <SPI.h>\n#endif\n#endif\n#include <Wire.h>\n" + code,
+				after:  "#if __has_include(<utility/twi.h>)\n#else\n#if __LINE__ > 3\n#include <SPI.h>\n#endif\n#endif\n#include <Wire.h>\n" + code,
 				used:   "Wire",
 				unused: "SPI",
 			},
