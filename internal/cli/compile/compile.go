@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
 
@@ -300,6 +301,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 			UserFields: fields,
 		}
 
+		// Cancel the upload on Ctrl+C so even an unresponsive upload tool is stopped.
+		ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
+		defer stop()
 		stream, streamRes := commands.UploadToServerStreams(ctx, stdOut, stdErr)
 		if err := srv.Upload(uploadRequest, stream); err != nil {
 			errcode := feedback.ErrGeneric
