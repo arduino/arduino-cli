@@ -310,7 +310,7 @@ void start() { Wire.begin(); }
 		require.Contains(t, string(out), "Using library SPI")
 	})
 
-	// A directive can be turned on or off with no change to the lines that hold a #
+	// A comment turns a directive on or off with no change to its line
 	t.Run("ChangesToSketchDirectivesRunLibraryDetection", func(t *testing.T) {
 		code := "void setup() {}\nvoid loop() {}\n"
 		edits := []struct {
@@ -335,6 +335,13 @@ void start() { Wire.begin(); }
 				name:   "IncludeDeletedInBranchOffOnceLibrariesAreFound",
 				before: "#if __has_include(<utility/twi.h>)\n#else\n#include <SPI.h>\n#endif\n#include <Wire.h>\n" + code,
 				after:  "#if __has_include(<utility/twi.h>)\n#else\n#endif\n#include <Wire.h>\n" + code,
+				used:   "Wire",
+				unused: "SPI",
+			},
+			{
+				name:   "IncludeCommentedOutInBranchOffOnceLibrariesAreFound",
+				before: "#if __has_include(<utility/twi.h>)\n#else\n#include <SPI.h>\n#endif\n#include <Wire.h>\n" + code,
+				after:  "#if __has_include(<utility/twi.h>)\n#else\n/*\n#include <SPI.h>\n*/\n#endif\n#include <Wire.h>\n" + code,
 				used:   "Wire",
 				unused: "SPI",
 			},
@@ -363,6 +370,34 @@ void start() { Wire.begin(); }
 				}
 			})
 		}
+	})
+
+	// The sketch keeps its directives and its edit is in the code, but a library gained the
+	// header one of them looks for: the preprocessor tells that the recorded detection is over
+	t.Run("ChangesToWhatSketchDirectivesFindRunLibraryDetection", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		directives := "#include <Probe.h>\n#if __has_include(<ProbeExtra.h>)\n#include <SPI.h>\n#endif\n"
+
+		library := cli.SketchbookDir().Join("libraries").Join("Probe")
+		t.Cleanup(func() { _ = library.RemoveAll() })
+		require.NoError(t, library.MkdirAll())
+		require.NoError(t, library.Join("Probe.h").WriteFile([]byte("#pragma once\n")))
+
+		require.NoError(t, sketchFile.WriteFile([]byte(directives+"void setup() {}\nvoid loop() {}\n")))
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotContains(t, string(out), "Using library SPI ")
+
+		require.NoError(t, library.Join("ProbeExtra.h").WriteFile([]byte("#pragma once\n")))
+		require.NoError(t, sketchFile.WriteFile([]byte(directives+"void setup() { SPI.begin(); }\nvoid loop() {}\n")))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Using library SPI ")
 	})
 
 	// Regression test for https://github.com/arduino/arduino-cli/issues/3202

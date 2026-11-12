@@ -22,27 +22,85 @@ import (
 )
 
 func TestDirectiveLines(t *testing.T) {
-	source := "#include <Arduino.h>\r\n" +
-		"#line 1 \"/tmp/sketch/sketch.ino\"\n" +
-		"  #include <Wire.h>\n" +
-		"/* once */ #define LIMIT 10\n" +
-		"#if defined(A) || \\\n" +
-		"    defined(B)\n" +
-		"void setup() {}\n" +
-		"void loop() { Serial.println(\"#1\"); }\n" +
-		"#endif"
-	require.Equal(t, []string{
-		"#include <Arduino.h>",
-		"#line 1 \"/tmp/sketch/sketch.ino\"",
-		"  #include <Wire.h>",
-		"/* once */ #define LIMIT 10",
-		"#if defined(A) || \\",
-		"    defined(B)",
-		"void loop() { Serial.println(\"#1\"); }",
-		"#endif",
-	}, directiveLines([]byte(source)))
-}
-
-func TestDirectiveLinesOfPlainCode(t *testing.T) {
-	require.Equal(t, []string{}, directiveLines([]byte("void setup() {}\nvoid loop() {}\n")))
+	tests := []struct {
+		name       string
+		source     string
+		directives []string
+	}{
+		{
+			name: "DirectivesAmongCode",
+			source: "#include <Arduino.h>\r\n" +
+				"#line 1 \"/tmp/sketch/sketch.ino\"\n" +
+				"  #include \"config.h\"\n" +
+				"void setup() {}\n" +
+				"void loop() { Serial.println(\"#1\"); }\n" +
+				"#endif",
+			directives: []string{"#include <Arduino.h>", "#line 1 \"/tmp/sketch/sketch.ino\"", "#include \"config.h\"", "#endif"},
+		},
+		{
+			name:       "PlainCode",
+			source:     "void setup() {}\nvoid loop() {}\n",
+			directives: []string{},
+		},
+		{
+			name:       "DirectiveContinuedOnTheNextLine",
+			source:     "#if defined(A) ||\\\ndefined(B)\n#endif\n",
+			directives: []string{"#if defined(A) ||defined(B)", "#endif"},
+		},
+		{
+			name:       "CommentsAroundDirective",
+			source:     "/* once */ #define LIMIT 10 // ten\n",
+			directives: []string{"#define LIMIT 10"},
+		},
+		{
+			name:       "DirectiveInBlockComment",
+			source:     "/*\n#include <SPI.h>\n*/\n#include <Wire.h>\n",
+			directives: []string{"#include <Wire.h>"},
+		},
+		{
+			name:       "DirectiveInLineComment",
+			source:     "// #include <SPI.h>\n#include <Wire.h>\n",
+			directives: []string{"#include <Wire.h>"},
+		},
+		{
+			name:       "DirectiveInContinuedLineComment",
+			source:     "// note \\\n#include <SPI.h>\n#include <Wire.h>\n",
+			directives: []string{"#include <Wire.h>"},
+		},
+		{
+			name:       "DirectiveOnContinuedCodeLine",
+			source:     "int a = 1 + \\\n#include <SPI.h>\n;\n",
+			directives: []string{},
+		},
+		{
+			name:       "CommentMarksInString",
+			source:     "const char *open = \"/*\";\n#include <SPI.h>\nconst char *close = \"*/\";\n",
+			directives: []string{"#include <SPI.h>"},
+		},
+		{
+			name:       "QuoteInCharacter",
+			source:     "char quote = '\"'; /*\n#include <SPI.h>\n*/\n",
+			directives: []string{},
+		},
+		{
+			name:       "QuoteInNumber",
+			source:     "long big = 1'000; /*\n#include <SPI.h>\n*/\n",
+			directives: []string{},
+		},
+		{
+			name:       "RawString",
+			source:     "const char page[] = R\"html(\n#menu { color: #fff; } /* \"menu\"\n)html\";\n#include <SPI.h>\n",
+			directives: []string{"#include <SPI.h>"},
+		},
+		{
+			name:       "Digraph",
+			source:     "%:include <SPI.h>\n",
+			directives: []string{"%:include <SPI.h>"},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			require.Equal(t, test.directives, directiveLines([]byte(test.source)))
+		})
+	}
 }
