@@ -363,7 +363,10 @@ func (l *SketchLibrariesDetector) findIncludes(
 	if !l.sketchIsUnchanged && l.cache.SketchDirectivesUnchanged(directives) && !followCode(directives) {
 		l.sketchIsUnchanged = l.confirmSketchDetection(ctx, buildProperties)
 	}
-	l.cache.SetSketchDirectives(directives)
+	// The directives are recorded with the detection they led to, never with a replayed one
+	if !l.sketchIsUnchanged {
+		l.cache.SetSketchDirectives(directives)
+	}
 
 	// Pre-run cache entries
 	l.preRunner = runner.New(ctx, jobs)
