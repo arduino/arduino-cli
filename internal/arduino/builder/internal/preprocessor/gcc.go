@@ -71,6 +71,10 @@ func GCC(
 		args = append(args, "-MMD", "-MF", depFile.String())
 	}
 
+	// Convert non-ASCII paths to 8.3 short form for old Windows GCC
+	// toolchains that cannot open them (see #1239). No-op elsewhere.
+	args = cpp.ShortenCompilerArgs(args)
+
 	// Limit the stderr output to 100 KiB
 	// https://github.com/arduino/arduino-cli/pull/2883
 	return runner.NewTaskWithLimitedStderr(100*1024, args...)
