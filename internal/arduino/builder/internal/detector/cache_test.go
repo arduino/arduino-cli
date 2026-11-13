@@ -37,6 +37,19 @@ func TestDetectorCacheKeepsSketchDirectives(t *testing.T) {
 	require.False(t, loaded.SketchDirectivesUnchanged([]string{"#include <SPI.h>"}))
 }
 
+func TestDetectorCacheKeepsSketchDirectivesThatAreNotText(t *testing.T) {
+	cacheFile := paths.New(t.TempDir(), "includes.cache")
+	directives := directiveLines([]byte("#define NAME \"M\xfc\xfcller\"\n"))
+
+	saved := newDetectorCache()
+	saved.SetSketchDirectives(directives)
+	require.NoError(t, saved.Save(cacheFile))
+
+	loaded := newDetectorCache()
+	require.NoError(t, loaded.Load(cacheFile))
+	require.True(t, loaded.SketchDirectivesUnchanged(directives))
+}
+
 func TestDetectorCacheLoadsEntriesSavedWithoutDirectives(t *testing.T) {
 	cacheFile := paths.New(t.TempDir(), "includes.cache")
 	require.NoError(t, cacheFile.WriteFile([]byte(`[{"added_include_path": "/core"}]`)))

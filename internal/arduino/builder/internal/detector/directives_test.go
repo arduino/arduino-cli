@@ -88,6 +88,26 @@ func TestDirectiveLines(t *testing.T) {
 			directives: []string{},
 		},
 		{
+			name:       "QuotesInHexNumber",
+			source:     "long color = 0xFF'A5'00; /*\n#include <SPI.h>\n*/\n",
+			directives: []string{},
+		},
+		{
+			name:       "QuoteAfterNumber",
+			source:     "#if 0\nthe board is 5' long /*\n#endif\n#include <SPI.h>\n/* */\n",
+			directives: []string{"#if 0", "#endif", "#include <SPI.h>"},
+		},
+		{
+			name:       "OldMacLineEnds",
+			source:     "int a; // note\r#include <SPI.h>\rint b;\r",
+			directives: []string{"#include <SPI.h>"},
+		},
+		{
+			name:       "BytesThatAreNotText",
+			source:     "#define NAME \"M\xfc\xfcller\"\n",
+			directives: []string{"#define NAME \"M\ufffd\ufffdller\""},
+		},
+		{
 			name:       "RawString",
 			source:     "const char page[] = R\"html(\n#menu { color: #fff; } /* \"menu\"\n)html\";\n#include <SPI.h>\n",
 			directives: []string{"#include <SPI.h>"},

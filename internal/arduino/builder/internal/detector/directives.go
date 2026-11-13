@@ -33,7 +33,7 @@ func sketchDirectives(mergedSketch *paths.Path) ([]string, error) {
 	return directiveLines(source), nil
 }
 
-var lineContinuation = regexp.MustCompile(`\\[ \t]*\r?\n`)
+var lineContinuation = regexp.MustCompile(`\\[ \t\f\v]*\n`)
 
 // directiveLines returns the preprocessor directives of a C++ source, in order. The source is
 // read as the compiler reads it: continued lines are joined, comments are left out and the
@@ -41,13 +41,16 @@ var lineContinuation = regexp.MustCompile(`\\[ \t]*\r?\n`)
 // turns off: they only select the edits worth the preprocessor pass that confirms a replay of
 // the detection.
 func directiveLines(source []byte) []string {
+	source = bytes.ReplaceAll(source, []byte("\r\n"), []byte("\n"))
+	source = bytes.ReplaceAll(source, []byte("\r"), []byte("\n"))
 	source = lineContinuation.ReplaceAll(source, nil)
 	directives := []string{}
 	var line []byte
 	endLine := func() {
 		text := bytes.TrimSpace(line)
 		if bytes.HasPrefix(text, []byte("#")) || bytes.HasPrefix(text, []byte("%:")) {
-			directives = append(directives, string(text))
+			// Bytes that are not text are recorded as the cache file stores them
+			directives = append(directives, string([]rune(string(text))))
 		}
 		line = line[:0]
 	}
@@ -68,7 +71,7 @@ func directiveLines(source []byte) []string {
 			continue
 		case rest[0] == '"' && isRawStringPrefix(lastWord(line)):
 			length = rawStringLength(rest)
-		case rest[0] == '"', rest[0] == '\'' && !isNumber(lastWord(line)):
+		case rest[0] == '"', rest[0] == '\'' && !isDigitSeparator(line, rest):
 			length = quotedLength(rest)
 		}
 		line = append(line, rest[:length]...)
@@ -103,18 +106,25 @@ func lengthThrough(text []byte, mark string) int {
 // lastWord returns the letters, digits and underscores the line ends with.
 func lastWord(line []byte) []byte {
 	start := len(line)
-	for start > 0 && (line[start-1] == '_' || isDigit(line[start-1]) || isLetter(line[start-1])) {
+	for start > 0 && isWordChar(line[start-1]) {
 		start--
 	}
 	return line[start:]
 }
 
-func isDigit(c byte) bool  { return c >= '0' && c <= '9' }
-func isLetter(c byte) bool { return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' }
+func isDigit(c byte) bool { return c >= '0' && c <= '9' }
+func isWordChar(c byte) bool {
+	return c == '_' || isDigit(c) || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
+}
 
-// isNumber tells the quote of a digit separator, as in 1'000, from the one of a character.
-func isNumber(word []byte) bool {
-	return len(word) > 0 && isDigit(word[0])
+// isDigitSeparator tells the quote inside a number, as in 1'000 or 0xFF'A5'00, from the one
+// that opens a character.
+func isDigitSeparator(line, rest []byte) bool {
+	start := len(line)
+	for start > 0 && (line[start-1] == '\'' || isWordChar(line[start-1])) {
+		start--
+	}
+	return start < len(line) && isDigit(line[start]) && len(rest) > 1 && isWordChar(rest[1])
 }
 
 func isRawStringPrefix(word []byte) bool {
