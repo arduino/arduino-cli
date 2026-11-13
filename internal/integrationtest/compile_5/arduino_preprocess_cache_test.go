@@ -310,7 +310,7 @@ void start() { Wire.begin(); }
 		require.Contains(t, string(out), "Using library SPI")
 	})
 
-	// A comment or the code around it turns a directive on or off with no change to its line
+	// A comment or the code around it turns a directive on or off with no change to the lines that hold a #
 	t.Run("ChangesToSketchDirectivesRunLibraryDetection", func(t *testing.T) {
 		code := "void setup() {}\nvoid loop() {}\n"
 		edits := []struct {

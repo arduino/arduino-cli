@@ -353,16 +353,15 @@ func (l *SketchLibrariesDetector) findIncludes(
 	l.mergedSketch = mergedSketch
 	l.sketchIsUnchanged, _ = mergedSketch.ObjFileIsUpToDate(logrus.WithField("runner", "sketchcheck"))
 
-	// An edit of the sketch code changes nothing the detection depends on, unless a directive
-	// follows the code. When the merged sketch holds the directives recorded with the cache,
-	// one preprocessor pass tells whether its recorded detection still holds: it is then
-	// replayed as if the sketch were untouched.
+	// An edit of the sketch code changes nothing the detection depends on. When the merged
+	// sketch holds the directives recorded with the cache, one preprocessor pass tells whether
+	// its recorded detection still holds: it is then replayed as if the sketch were untouched.
 	directives, err := sketchDirectives(mergedSketch.SourcePath)
 	if err != nil {
 		return err
 	}
 	l.replaySketchDetection = l.sketchIsUnchanged
-	if !l.sketchIsUnchanged && l.cache.SketchDirectivesUnchanged(directives) && !followCode(directives) {
+	if !l.sketchIsUnchanged && l.cache.SketchDirectivesUnchanged(directives) {
 		l.replaySketchDetection = l.confirmSketchDetection(ctx, buildProperties)
 	}
 	// The directives are recorded with the detection they led to, never with a replayed one
