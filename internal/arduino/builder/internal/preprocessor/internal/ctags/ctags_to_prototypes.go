@@ -61,11 +61,10 @@ func (p *Parser) firstFunctionPointerUsedAsArgument() int {
 }
 
 func functionNameUsedAsFunctionPointerIn(tag *Tag, functionTags []*Tag) bool {
+	// ctags escapes the backslashes and the slashes of the source line
+	code := strings.NewReplacer(`\\`, `\`, `\/`, `/`).Replace(tag.Code)
 	for _, functionTag := range functionTags {
-		if tag.Line != functionTag.Line && strings.Contains(tag.Code, "&"+functionTag.FunctionName) {
-			return true
-		}
-		if tag.Line != functionTag.Line && strings.Contains(tag.Code, "("+functionTag.FunctionName+")") {
+		if tag.Line != functionTag.Line && codeUsesFunctionPointer(code, functionTag.FunctionName) {
 			return true
 		}
 	}
@@ -110,4 +109,33 @@ func (p *Parser) toPrototypes() []*Prototype {
 		}
 	}
 	return prototypes
+}
+
+// codeUsesFunctionPointer returns true if a line of code uses the function as a pointer, &name or (name), outside of its strings and comments.
+func codeUsesFunctionPointer(code, name string) bool {
+	pointer, argument := "&"+name, "("+name+")"
+	for i := 0; i < len(code); i++ {
+		switch {
+		case strings.HasPrefix(code[i:], "//"):
+			// The rest of the line is a comment
+			return false
+		case strings.HasPrefix(code[i:], "/*"):
+			// Skip to the last char of the closing */
+			end := strings.Index(code[i+2:], "*/")
+			if end == -1 {
+				return false
+			}
+			i += end + 3
+		case code[i] == '"':
+			// Skip to the closing quote, jumping over the escaped chars
+			for i++; i < len(code) && code[i] != '"'; i++ {
+				if code[i] == '\\' {
+					i++
+				}
+			}
+		case strings.HasPrefix(code[i:], pointer), strings.HasPrefix(code[i:], argument):
+			return true
+		}
+	}
+	return false
 }

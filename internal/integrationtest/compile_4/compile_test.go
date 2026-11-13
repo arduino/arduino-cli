@@ -119,6 +119,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithExternCMultiline", testBuilderSketchWithExternCMultiline},
 		{"SketchWithMultilineTemplate", testBuilderSketchWithMultilineTemplate},
 		{"SketchWithFakeFunctionPointer", testBuilderSketchWithFakeFunctionPointer},
+		{"SketchWithFunctionPointerInStringAndComment", testBuilderSketchWithFunctionPointerInStringAndComment},
 		{"SketchWithMinMaxDefinitions", testBuilderSketchWithMinMaxDefinitions},
 		{"SketchWithFastledsLibrary", testBuilderSketchWithFastledsLibrary},
 		{"SketchClassFunction", testBuilderSketchClassFunction},
@@ -737,6 +738,21 @@ func testBuilderSketchWithMultilineTemplate(t *testing.T, env *integrationtest.E
 }
 
 func testBuilderSketchWithFakeFunctionPointer(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithFunctionPointerInStringAndComment(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")

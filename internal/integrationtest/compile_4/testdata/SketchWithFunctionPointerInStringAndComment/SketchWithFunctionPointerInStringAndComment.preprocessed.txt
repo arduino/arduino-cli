@@ -1,0 +1,22 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+const char *text = "&draw";
+int value = 0; // (draw)
+
+struct Point {
+  int x;
+};
+
+#line 8 {{QuoteCppString .sketchMainFile}}
+void draw(Point p);
+#line 10 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 12 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 8 {{QuoteCppString .sketchMainFile}}
+void draw(Point p) {}
+
+void setup() {}
+
+void loop() {}
+
