@@ -68,6 +68,7 @@ type SketchLibrariesDetector struct {
 	preRunner                     *runner.Runner
 	detectedChangeInLibraries     bool
 	sketchIsUnchanged             bool
+	replaySketchDetection         bool
 	mergedSketch                  sourceFile
 	// sketchPassIncludes are the include folders of the pass that ended the detection on the
 	// merged sketch or confirmed its recorded one, nil when no pass did.
@@ -360,11 +361,12 @@ func (l *SketchLibrariesDetector) findIncludes(
 	if err != nil {
 		return err
 	}
+	l.replaySketchDetection = l.sketchIsUnchanged
 	if !l.sketchIsUnchanged && l.cache.SketchDirectivesUnchanged(directives) && !followCode(directives) {
-		l.sketchIsUnchanged = l.confirmSketchDetection(ctx, buildProperties)
+		l.replaySketchDetection = l.confirmSketchDetection(ctx, buildProperties)
 	}
 	// The directives are recorded with the detection they led to, never with a replayed one
-	if !l.sketchIsUnchanged {
+	if !l.replaySketchDetection {
 		l.cache.SetSketchDirectives(directives)
 	}
 
@@ -676,7 +678,7 @@ func (l *SketchLibrariesDetector) findMissingIncludesInCompilationUnit(
 // its recorded detection confirmed.
 func (l *SketchLibrariesDetector) unitIsUnchanged(unit sourceFile, log *logrus.Entry) (bool, error) {
 	if unit.Equals(l.mergedSketch) {
-		return l.sketchIsUnchanged, nil
+		return l.replaySketchDetection, nil
 	}
 	return unit.ObjFileIsUpToDate(log)
 }
