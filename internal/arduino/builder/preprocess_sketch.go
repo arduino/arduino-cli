@@ -26,9 +26,6 @@ import (
 
 // preprocessSketch fixdoc
 func (b *Builder) preprocessSketch(includes paths.PathList) error {
-	// The library detection keeps the output of its passes on the sketch for this step only
-	defer b.libsDetector.RemoveSketchPreprocessedFiles()
-
 	unpreprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp.merged")
 	preprocessedSourceFile := b.buildPath.Join("sketch", b.sketch.MainFile.Base()+".cpp")
 	unpreprocessedSourceFileStat, err := unpreprocessedSourceFile.Stat()
@@ -59,7 +56,10 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 			b.logger.WriteStdout(result.Stdout)
 		}
 		b.logger.WriteStderr(result.Stderr)
-		b.diagnosticStore.Parse(result.Args, result.Stderr)
+		// No compiler ran when the output of the library detection was taken
+		if len(result.Args) > 0 {
+			b.diagnosticStore.Parse(result.Args, result.Stderr)
+		}
 	}
 
 	return err
