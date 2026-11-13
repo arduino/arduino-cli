@@ -46,7 +46,7 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 
 	// In the future we might change the preprocessor
 	result, err := preprocessor.PreprocessSketchWithCtags(
-		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile,
+		b.ctx, unpreprocessedSourceFile, preprocessedSourceFile, b.libsDetector.SketchPreprocessedFile(),
 		b.sketch, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 		b.logger.VerbosityLevel() == logger.VerbosityVerbose,
@@ -56,7 +56,10 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 			b.logger.WriteStdout(result.Stdout)
 		}
 		b.logger.WriteStderr(result.Stderr)
-		b.diagnosticStore.Parse(result.Args, result.Stderr)
+		// No compiler ran when the output of the library detection was taken
+		if len(result.Args) > 0 {
+			b.diagnosticStore.Parse(result.Args, result.Stderr)
+		}
 	}
 
 	return err
