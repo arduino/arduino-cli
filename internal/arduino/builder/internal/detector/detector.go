@@ -499,7 +499,7 @@ func (l *SketchLibrariesDetector) confirmSketchDetection(ctx context.Context, bu
 	if unchanged, _ := sketch.DepsAreUpToDate(log); !unchanged {
 		return false
 	}
-	includes, recordedPass := l.cache.LastPass(sketch)
+	includes, found, recordedPass := l.cache.LastPass(sketch)
 	if recordedPass == nil {
 		return false
 	}
@@ -527,6 +527,18 @@ func (l *SketchLibrariesDetector) confirmSketchDetection(ctx context.Context, bu
 	if err != nil || !slices.Equal(deps.Dependencies, recorded.Dependencies) {
 		log.Tracef("[LD] CONFIRM: REJECTED %v: the files pulled in changed", sketch.SourcePath)
 		return false
+	}
+	// A library that an earlier pass found and this pass does not use was asked for by code
+	// this pass does not see: a detection of today may not find it
+	for _, library := range found {
+		used := slices.ContainsFunc(deps.Dependencies, func(dep string) bool {
+			inside, _ := paths.New(dep).IsInsideDir(library)
+			return inside
+		})
+		if !used {
+			log.Tracef("[LD] CONFIRM: REJECTED %v: %s is not used", sketch.SourcePath, library)
+			return false
+		}
 	}
 	if err := depfile.Rename(sketch.DepfilePath); err != nil {
 		return false

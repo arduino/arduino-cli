@@ -121,25 +121,29 @@ func (c *detectorCache) SetSketchDirectives(directives []string) {
 }
 
 // LastPass returns the task of the last recorded pass of the given unit, with the include paths
-// added before it. The task is nil when the unit has no recorded pass or its last one failed.
-func (c *detectorCache) LastPass(unit sourceFile) (paths.PathList, *runner.Task) {
-	var includes, passIncludes paths.PathList
-	var pass *runner.Task
+// added before it and, among them, the ones its earlier passes found. The task is nil when the
+// unit has no recorded pass or its last one failed.
+func (c *detectorCache) LastPass(unit sourceFile) (includes, found paths.PathList, pass *runner.Task) {
+	var added paths.PathList
+	first := -1
 	for i, entry := range c.entries {
 		if entry.AddedIncludePath != nil {
-			includes = append(includes, entry.AddedIncludePath)
+			added = append(added, entry.AddedIncludePath)
 		}
 		if entry.CompileTask == nil || !entry.Compile.Equals(unit) {
 			continue
 		}
-		pass, passIncludes = nil, nil
+		if first < 0 {
+			first = len(added)
+		}
+		pass, includes, found = nil, nil, nil
 		if i+1 < len(c.entries) {
 			if missing := c.entries[i+1].MissingIncludeH; missing != nil && *missing == "" {
-				pass, passIncludes = entry.CompileTask, includes.Clone()
+				pass, includes, found = entry.CompileTask, added.Clone(), slices.Clone(added[first:])
 			}
 		}
 	}
-	return passIncludes, pass
+	return includes, found, pass
 }
 
 // ExpectCompile adds a compile entry to the cache and checks if it matches the next expected entry.

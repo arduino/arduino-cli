@@ -407,6 +407,37 @@ void start() { Wire.begin(); }
 		require.Contains(t, string(out), "Using library SPI ")
 	})
 
+	// A header marked as a system header keeps its own includes out of the dependencies of the
+	// sketch: a library the sketch stops using there still looks pulled in by the same files
+	t.Run("LibraryNoLongerUsedBehindSystemHeaderRunsLibraryDetection", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+
+		outer := cli.SketchbookDir().Join("libraries").Join("Outer")
+		inner := cli.SketchbookDir().Join("libraries").Join("Inner")
+		t.Cleanup(func() { _ = outer.RemoveAll(); _ = inner.RemoveAll() })
+		require.NoError(t, outer.MkdirAll())
+		require.NoError(t, inner.MkdirAll())
+		require.NoError(t, outer.Join("Outer.h").WriteFile([]byte("#pragma GCC system_header\n#include <Inner.h>\n")))
+		require.NoError(t, inner.Join("Inner.h").WriteFile([]byte("#pragma once\n")))
+
+		require.NoError(t, sketchFile.WriteFile([]byte("#include <Outer.h>\nvoid setup() {}\nvoid loop() {}\n")))
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Using library Inner ")
+
+		// Outer now ships the header itself, and the sketch gets a code edit
+		require.NoError(t, outer.Join("Inner.h").WriteFile([]byte("#pragma once\n")))
+		require.NoError(t, sketchFile.WriteFile([]byte("#include <Outer.h>\nvoid setup() { delay(1); }\nvoid loop() {}\n")))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotContains(t, string(out), "Using library Inner ")
+	})
+
 	// The passes on the sketch succeed, then another file of the sketch stops the detection
 	t.Run("FailedLibraryDetectionLeavesNoSketchPreprocessorOutput", func(t *testing.T) {
 		tmp, err := paths.MkTempDir("", "")
