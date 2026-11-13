@@ -223,6 +223,239 @@ void myNewFunction() {}
 		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
 	})
 
+	// A library added by another file of the sketch changes what the .ino sees through __has_include:
+	// the prototypes must be generated with the libraries of the whole detection.
+	t.Run("SketchWithHasIncludeOfLibraryAddedByCppFile", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		source := `
+void setup() { spiInfo(); }
+void loop() {}
+
+#if __has_include(<SPI.h>)
+void spiInfo() {}
+#endif
+`
+		require.NoError(t, sketchFile.WriteFile([]byte(source)))
+		require.NoError(t, sketch.Join("helper.cpp").WriteFile([]byte("#include <SPI.h>\n")))
+
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err)
+
+		// The same holds when an edit of the code replays the library detection
+		require.NoError(t, sketchFile.WriteFile([]byte(source+"int counter;\n")))
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", sketch.String())
+		require.NoError(t, err)
+	})
+
+	t.Run("ChangesToSketchCodeReplayLibraryDetection", func(t *testing.T) {
+		// Create a tmp sketch
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+#include <Wire.h>
+
+void setup() {}
+void loop() {}
+`)))
+		replayed := "Using cached library dependencies for file: .*[/\\\\]sketch\\.ino\\.cpp\\.merged"
+
+		// Build twice, the second build replays the library detection of the untouched sketch
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotRegexp(t, replayed, string(out))
+
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Regexp(t, replayed, string(out))
+
+		// An edit of the code leaves the directives as they are: the detection is replayed, the prototypes are generated again
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+#include <Wire.h>
+
+void setup() { start(); }
+void loop() {}
+void start() { Wire.begin(); }
+`)))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Regexp(t, replayed, string(out))
+		require.NotContains(t, string(out), "Using cached sketch with function prototypes.")
+
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Regexp(t, replayed, string(out))
+		require.Contains(t, string(out), "Using cached sketch with function prototypes.")
+
+		// An edit of the directives runs the detection again
+		require.NoError(t, sketchFile.WriteFile([]byte(`
+#include <Wire.h>
+#include <SPI.h>
+
+void setup() { start(); }
+void loop() {}
+void start() { Wire.begin(); }
+`)))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotRegexp(t, replayed, string(out))
+		require.Contains(t, string(out), "Using library SPI")
+	})
+
+	// A comment or the code around it turns a directive on or off with no change to the lines that hold a #
+	t.Run("ChangesToSketchDirectivesRunLibraryDetection", func(t *testing.T) {
+		code := "void setup() {}\nvoid loop() {}\n"
+		edits := []struct {
+			name          string
+			before, after string
+			used, unused  string
+		}{
+			{
+				name:   "IncludeCommentedOut",
+				before: "#include <SPI.h>\n" + code,
+				after:  "/*\n#include <SPI.h>\n*/\n" + code,
+				unused: "SPI",
+			},
+			{
+				name:   "IncludeUncommented",
+				before: "/*\n#include <SPI.h>\n*/\n" + code,
+				after:  "#include <SPI.h>\nvoid setup() { SPI.begin(); }\nvoid loop() {}\n",
+				used:   "SPI",
+			},
+			{
+				// The branch is on only until the detection finds Wire
+				name:   "IncludeDeletedInBranchOffOnceLibrariesAreFound",
+				before: "#if __has_include(<utility/twi.h>)\n#else\n#include <SPI.h>\n#endif\n#include <Wire.h>\n" + code,
+				after:  "#if __has_include(<utility/twi.h>)\n#else\n#endif\n#include <Wire.h>\n" + code,
+				used:   "Wire",
+				unused: "SPI",
+			},
+			{
+				name:   "IncludeCommentedOutInBranchOffOnceLibrariesAreFound",
+				before: "#if __has_include(<utility/twi.h>)\n#else\n#include <SPI.h>\n#endif\n#include <Wire.h>\n" + code,
+				after:  "#if __has_include(<utility/twi.h>)\n#else\n/*\n#include <SPI.h>\n*/\n#endif\n#include <Wire.h>\n" + code,
+				used:   "Wire",
+				unused: "SPI",
+			},
+			{
+				name:   "IncludeUnderLineNumberConditionInBranchOffOnceLibrariesAreFound",
+				before: "int a;\n#if __has_include(<utility/twi.h>)\n#else\n#if __LINE__ > 3\n#include <SPI.h>\n#endif\n#endif\n#include <Wire.h>\n" + code,
+				after:  "#if __has_include(<utility/twi.h>)\n#else\n#if __LINE__ > 3\n#include <SPI.h>\n#endif\n#endif\n#include <Wire.h>\n" + code,
+				used:   "Wire",
+				unused: "SPI",
+			},
+		}
+		for _, edit := range edits {
+			t.Run(edit.name, func(t *testing.T) {
+				tmp, err := paths.MkTempDir("", "")
+				require.NoError(t, err)
+				t.Cleanup(func() { _ = tmp.RemoveAll() })
+				sketch := tmp.Join("sketch")
+				require.NoError(t, sketch.MkdirAll())
+				sketchFile := sketch.Join("sketch.ino")
+
+				require.NoError(t, sketchFile.WriteFile([]byte(edit.before)))
+				_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+				require.NoError(t, err)
+
+				require.NoError(t, sketchFile.WriteFile([]byte(edit.after)))
+				out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+				require.NoError(t, err)
+				if edit.used != "" {
+					require.Contains(t, string(out), "Using library "+edit.used+" ")
+				}
+				if edit.unused != "" {
+					require.NotContains(t, string(out), "Using library "+edit.unused+" ")
+				}
+			})
+		}
+	})
+
+	// The sketch keeps its directives and its edit is in the code, but a library gained the
+	// header one of them looks for: the preprocessor tells that the recorded detection is over
+	t.Run("ChangesToWhatSketchDirectivesFindRunLibraryDetection", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+		directives := "#include <Probe.h>\n#if __has_include(<ProbeExtra.h>)\n#include <SPI.h>\n#endif\n"
+
+		library := cli.SketchbookDir().Join("libraries").Join("Probe")
+		t.Cleanup(func() { _ = library.RemoveAll() })
+		require.NoError(t, library.MkdirAll())
+		require.NoError(t, library.Join("Probe.h").WriteFile([]byte("#pragma once\n")))
+
+		require.NoError(t, sketchFile.WriteFile([]byte(directives+"void setup() {}\nvoid loop() {}\n")))
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotContains(t, string(out), "Using library SPI ")
+
+		require.NoError(t, library.Join("ProbeExtra.h").WriteFile([]byte("#pragma once\n")))
+		require.NoError(t, sketchFile.WriteFile([]byte(directives+"void setup() { SPI.begin(); }\nvoid loop() {}\n")))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Using library SPI ")
+	})
+
+	// A header marked as a system header keeps its own includes out of the dependencies of the
+	// sketch: a library the sketch stops using there still looks pulled in by the same files
+	t.Run("LibraryNoLongerUsedBehindSystemHeaderRunsLibraryDetection", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		sketchFile := sketch.Join("sketch.ino")
+
+		outer := cli.SketchbookDir().Join("libraries").Join("Outer")
+		inner := cli.SketchbookDir().Join("libraries").Join("Inner")
+		t.Cleanup(func() { _ = outer.RemoveAll(); _ = inner.RemoveAll() })
+		require.NoError(t, outer.MkdirAll())
+		require.NoError(t, inner.MkdirAll())
+		require.NoError(t, outer.Join("Outer.h").WriteFile([]byte("#pragma GCC system_header\n#include <Inner.h>\n")))
+		require.NoError(t, inner.Join("Inner.h").WriteFile([]byte("#pragma once\n")))
+
+		require.NoError(t, sketchFile.WriteFile([]byte("#include <Outer.h>\nvoid setup() {}\nvoid loop() {}\n")))
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.Contains(t, string(out), "Using library Inner ")
+
+		// Outer now ships the header itself, and the sketch gets a code edit
+		require.NoError(t, outer.Join("Inner.h").WriteFile([]byte("#pragma once\n")))
+		require.NoError(t, sketchFile.WriteFile([]byte("#include <Outer.h>\nvoid setup() { delay(1); }\nvoid loop() {}\n")))
+		out, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "-v", sketch.String())
+		require.NoError(t, err)
+		require.NotContains(t, string(out), "Using library Inner ")
+	})
+
+	// The passes on the sketch succeed, then another file of the sketch stops the detection
+	t.Run("FailedLibraryDetectionLeavesNoSketchPreprocessorOutput", func(t *testing.T) {
+		tmp, err := paths.MkTempDir("", "")
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = tmp.RemoveAll() })
+		sketch := tmp.Join("sketch")
+		require.NoError(t, sketch.MkdirAll())
+		require.NoError(t, sketch.Join("sketch.ino").WriteFile([]byte("#include <SPI.h>\nvoid setup() {}\nvoid loop() {}\n")))
+		require.NoError(t, sketch.Join("helper.cpp").WriteFile([]byte("#include <NoSuchLibrary.h>\n")))
+		buildPath := tmp.Join("build")
+
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketch.String())
+		require.Error(t, err)
+		outputs, err := buildPath.Join("sketch").ReadDir(paths.FilterSuffixes(".ii"))
+		require.NoError(t, err)
+		require.Empty(t, outputs)
+	})
+
 	// Regression test for https://github.com/arduino/arduino-cli/issues/3202
 	// After a successful build, modifying the sketch to add an #error directive should cause the next build to fail.
 	t.Run("SketchModificationAfterSuccessfulBuildInvalidatesCache/1", func(t *testing.T) {
