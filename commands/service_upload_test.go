@@ -17,13 +17,11 @@ package commands
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
-	"github.com/arduino/arduino-cli/internal/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -31,7 +29,7 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader/v3"
+	"go.bug.st/f"
 )
 
 func TestDetectSketchNameFromBuildPath(t *testing.T) {
@@ -132,9 +130,6 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, nil, "test", downloader.GetDefaultConfig())
-	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "upload", "hardware"))
-	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "upload", "build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
 	type test struct {
@@ -182,40 +177,52 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/upload/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 	}
 
-	pm := pmb.Build()
-	pme, release := pm.NewExplorer()
-	defer release()
-
 	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)
+	srv.SettingsSetValue(t.Context(), &rpc.SettingsSetValueRequest{
+		Key:          "directories.user",
+		EncodedValue: f.Must(paths.New("testdata", "upload").Abs()).String(),
+		ValueFormat:  "cli"})
+	inst, err := srv.Create(t.Context(), &rpc.CreateRequest{})
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		srv.Destroy(t.Context(), &rpc.DestroyRequest{Instance: inst.GetInstance()})
+	})
+	err = srv.Init(&rpc.InitRequest{Instance: inst.GetInstance()}, InitStreamResponseToCallbackFunction(t.Context(), nil))
+	require.NoError(t, err)
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
-		_, err := srv.runProgramAction(
-			context.Background(),
-			pme,
-			nil,                     // sketch
-			"",                      // importFile
-			test.importDir.String(), // importDir
-			test.fqbn,               // FQBN
-			&rpc.Port{Address: test.port, Protocol: test.protocol},
-			test.programmer,     // programmer
-			verboseVerify,       // verbose
-			verboseVerify,       // verify
-			test.burnBootloader, // burnBootloader
-			outStream,
-			errStream,
-			false,
-			map[string]string{},
-			nil,
-		)
+		var uploadErr error
+		if test.burnBootloader {
+			stream := BurnBootloaderToServerStreams(t.Context(), outStream, errStream)
+			uploadErr = srv.BurnBootloader(&rpc.BurnBootloaderRequest{
+				Instance:   inst.GetInstance(),
+				Fqbn:       test.fqbn,
+				Port:       &rpc.Port{Address: test.port, Protocol: test.protocol},
+				Programmer: test.programmer,
+				Verbose:    verboseVerify,
+				Verify:     verboseVerify,
+			}, stream)
+		} else {
+			stream, _ := UploadToServerStreams(t.Context(), outStream, errStream)
+			uploadErr = srv.Upload(&rpc.UploadRequest{
+				Instance:   inst.GetInstance(),
+				ImportDir:  test.importDir.String(),
+				Fqbn:       test.fqbn,
+				Port:       &rpc.Port{Address: test.port, Protocol: test.protocol},
+				Programmer: test.programmer,
+				Verbose:    verboseVerify,
+				Verify:     verboseVerify,
+			}, stream)
+		}
 		verboseVerifyOutput := "verbose verify"
 		if !verboseVerify {
 			verboseVerifyOutput = "quiet noverify"
 		}
 		if test.expectedOutput == "FAIL" {
-			require.NotNil(t, err)
+			require.NotNil(t, uploadErr)
 		} else {
-			require.Nil(t, err)
+			require.Nil(t, uploadErr)
 			outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
 			outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
 			require.Contains(t, outFiltered, strings.ReplaceAll(test.expectedOutput, "$$VERBOSE-VERIFY$$", verboseVerifyOutput))

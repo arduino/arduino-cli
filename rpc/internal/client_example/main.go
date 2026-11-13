@@ -299,8 +299,9 @@ func createInstance(client rpc.ArduinoCoreServiceClient) *rpc.Instance {
 }
 
 func initInstance(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
-	stream, err := client.Init(context.Background(), &rpc.InitRequest{
+	stream, err := client.Initialize(context.Background(), &rpc.InitializeRequest{
 		Instance: instance,
+		Message:  &rpc.InitializeRequest_Generic_{Generic: &rpc.InitializeRequest_Generic{}},
 	})
 	if err != nil {
 		log.Fatalf("Error initializing server instance: %s", err)

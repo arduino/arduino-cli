@@ -30,8 +30,12 @@ import (
 // to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
 func CreateAndInit(ctx context.Context, srv rpc.ArduinoCoreServiceServer) *rpc.Instance {
-	inst, _ := CreateAndInitWithProfile(ctx, srv, "", nil)
-	return inst
+	instance, err := create(ctx, srv)
+	if err != nil {
+		feedback.Fatal(i18n.Tr("Error creating instance: %v", err), feedback.ErrGeneric)
+	}
+	Init(ctx, srv, instance)
+	return instance
 }
 
 // CreateAndInitWithProfile returns a new initialized instance using the given profile of the given sketch.
@@ -44,6 +48,15 @@ func CreateAndInitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceSer
 	}
 	profile := InitWithProfile(ctx, srv, instance, profileName, sketchPath)
 	return instance, profile
+}
+
+func CreateAndInitWithFirmwareFile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, firmwareFilePath string) *rpc.Instance {
+	inst, err := create(ctx, srv)
+	if err != nil {
+		feedback.Fatal(i18n.Tr("Error creating instance: %v", err), feedback.ErrGeneric)
+	}
+	InitWithSketchFirmware(ctx, srv, inst, firmwareFilePath)
+	return inst
 }
 
 // create and return a new Instance.
@@ -61,23 +74,45 @@ func create(ctx context.Context, srv rpc.ArduinoCoreServiceServer) (*rpc.Instanc
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
 func Init(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance) {
-	InitWithProfile(ctx, srv, instance, "", nil)
+	doInit(ctx, srv, &rpc.InitializeRequest{
+		Instance: instance,
+		Message:  &rpc.InitializeRequest_Generic_{Generic: &rpc.InitializeRequest_Generic{}},
+	})
 }
 
 // InitWithProfile initializes instance by loading libraries and platforms specified in the given profile of the given sketch.
 // In case of loading failures return a list of errors for each platform or library that we failed to load.
 // Required Package and library indexes files are automatically downloaded.
 func InitWithProfile(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.SketchProfile {
+	return doInit(ctx, srv, &rpc.InitializeRequest{
+		Instance: instance,
+		Message: &rpc.InitializeRequest_SketchProfile_{
+			SketchProfile: &rpc.InitializeRequest_SketchProfile{
+				SketchPath: sketchPath.String(),
+				Profile:    profileName,
+			},
+		},
+	})
+}
+
+// InitWithSketchFirmware initializes instance by loading the specified firmware file, and installing the missing tools if needed.
+// The initilization will also starts the required discovery process for the firmware upload.
+func InitWithSketchFirmware(ctx context.Context, srv rpc.ArduinoCoreServiceServer, instance *rpc.Instance, firmwareFilePath string) {
+	doInit(ctx, srv, &rpc.InitializeRequest{
+		Instance: instance,
+		Message: &rpc.InitializeRequest_FirmwareFile_{
+			FirmwareFile: &rpc.InitializeRequest_FirmwareFile{
+				FirmwarePath: firmwareFilePath,
+			},
+		},
+	})
+}
+
+func doInit(ctx context.Context, srv rpc.ArduinoCoreServiceServer, initReq *rpc.InitializeRequest) *rpc.SketchProfile {
 	downloadCallback := feedback.ProgressBar()
 	taskCallback := feedback.TaskProgress()
-
-	initReq := &rpc.InitRequest{Instance: instance}
-	if sketchPath != nil {
-		initReq.SketchPath = sketchPath.String()
-		initReq.Profile = profileName
-	}
 	var profile *rpc.SketchProfile
-	err := srv.Init(initReq, commands.InitStreamResponseToCallbackFunction(ctx, func(res *rpc.InitResponse) error {
+	err := srv.Initialize(initReq, commands.InitializeStreamResponseToCallbackFunction(ctx, func(res *rpc.InitializeResponse) error {
 		if st := res.GetError(); st != nil {
 			feedback.Warning(i18n.Tr("Error initializing instance: %v", st.GetMessage()))
 		}

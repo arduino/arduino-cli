@@ -32,7 +32,7 @@ func TestBoardIdentification(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 

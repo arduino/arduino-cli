@@ -38,7 +38,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 
 	// Create a new instance of the daemon
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -90,7 +90,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 		require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
 		// re-init instance
-		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 			fmt.Printf("INIT> %v\n", ir.GetMessage())
 		}))
 
@@ -113,7 +113,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
 	// Re-init instance and check again
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 	require.NoError(t, tryCompile())
@@ -129,7 +129,7 @@ func TestDetectionOfChangesInCoreBeforeCompile(t *testing.T) {
 	require.Contains(t, err.Error(), "The instance is no longer valid and needs to be reinitialized")
 
 	// Re-init instance and check again
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 	require.NoError(t, tryCompile())

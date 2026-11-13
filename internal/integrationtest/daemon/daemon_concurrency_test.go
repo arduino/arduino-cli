@@ -40,7 +40,7 @@ func TestArduinoCliDaemonCompileWithLotOfOutput(t *testing.T) {
 	require.NoError(t, err)
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -91,7 +91,7 @@ func TestInitAndMonitorConcurrency(t *testing.T) {
 	require.NoError(t, err)
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
@@ -121,7 +121,7 @@ func TestInitAndMonitorConcurrency(t *testing.T) {
 
 	// Check that Init completes without blocking when the monitor is open
 	start := time.Now()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 	require.LessOrEqual(t, time.Since(start), 4*time.Second)
