@@ -184,6 +184,69 @@ The .hex file is the final output of the compilation which is then uploaded to t
 If verbose output during compilation is enabled, the complete command line of each external command executed as part of
 the build process will be printed in the console.
 
+### Build history
+
+By default, the build files of a sketch are kept in a build folder that is reused by the following compilations of the
+same sketch: only the files that changed since the previous compilation are compiled again, and the compiled core is
+shared between sketches. This _incremental compilation_ relies on the modification time of the files and keeps only the
+latest build of each sketch: if a sketch is modified and later reverted to a previous version, the sketch is compiled
+and linked again.
+
+When the build history is enabled, Arduino CLI also retains the output of the last successful builds. When an identical
+build is requested again, the compilation is skipped and the previous build output is restored in the build folder,
+where it is used as usual by [`arduino-cli upload`](commands/arduino-cli_upload.md), `arduino-cli compile --upload`,
+`--output-dir` and `--export-binaries`. The build history is disabled by default and can be enabled with the
+[`build_cache.history.enabled`](configuration.md#configuration-keys) setting:
+
+```
+arduino-cli config set build_cache.history.enabled true
+arduino-cli config set build_cache.history.max_entries 20
+```
+
+or, for a single command, with the `ARDUINO_BUILD_CACHE_HISTORY_ENABLED=true` environment variable.
+
+A build is reused only if all of its inputs are identical:
+
+- the content of all the sketch files (including unsaved editor buffers passed by the IDE);
+- all the build properties: the board FQBN and its options, the platform and its version, the toolchain and its
+  version, the recipes, the compiler flags, the custom `--build-property` values, `--optimize-for-debug` and the
+  `--warnings` level;
+- the files of the platform, core and variant (changes are detected by size and modification time, as for the core
+  cache);
+- the list of installed libraries: installing, removing or upgrading any library invalidates the history, because it
+  may change the [dependency resolution](#dependency-resolution);
+- the content of every file the compiler reported as a dependency during the original build (the sources of the used
+  libraries and all the included headers) and the list of source files of every used library;
+- the signing and encryption keys, if any;
+- the Arduino CLI version.
+
+The builds are stored in the `history` folder inside the [`build_cache.path`](configuration.md#configuration-keys)
+folder, that by default is in the user's cache folder and is preserved across restarts. Every build retains all the
+files in the root of the build folder (the `.elf`, `.hex`, `.bin`, bootloader and partition files, and any other file
+generated there by the platform recipes), but not the intermediate object files. When more than
+`build_cache.history.max_entries` builds are stored, the least recently used ones are removed. Identical builds are
+stored only once. Failed builds are never stored. Each build is written in a temporary folder and published with an
+atomic rename, so interrupted or concurrent Arduino CLI processes can not leave incomplete builds in the history, and the
+checksums of the files are verified before restoring them. The history can be deleted at any time by removing its
+folder.
+
+The build history is used both with the default build folder and with a custom `--build-path`: the build is restored in
+the build folder of the current compilation. Builds are specific to the sketch location and to the build folder, so the
+same sketch compiled in two different build folders is stored twice.
+
+The build history is not used:
+
+- when `--clean` is specified (the sketch is compiled again and the result is stored in the history);
+- with `--only-compilation-database`, `--preprocess`, `--show-properties` and `--skip-libraries-discovery`;
+- when the sketch uses the `__DATE__`, `__TIME__` or `__TIMESTAMP__` macros, or the platform recipes use the
+  `{extra.time.*}` properties, because the build output depends on the build time.
+
+Limitations: files read by the linker or by the platform hooks that are outside of the sketch, platform, core, variant
+and keychain folders, and that are not reported as dependencies by the compiler (for example a linker script passed with
+a custom `--build-property`), are not part of the fingerprint. Similarly, libraries that embed the build time with
+`__DATE__` or `__TIME__` are not detected. In these cases use `--clean` or disable the build history. Files produced by
+the build in sub-folders of the build folder are not retained.
+
 ## Uploading
 
 Sketches are uploaded by a platform-specific upload tool (e.g., avrdude). The upload process is also controlled by

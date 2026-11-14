@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/libraries"
 	"github.com/arduino/arduino-cli/internal/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/buildhistory"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -98,6 +99,9 @@ type Builder struct {
 	toolEnv []string
 
 	diagnosticStore *diagnostics.Store
+
+	// Store of previous builds that may be reused instead of compiling (nil if disabled)
+	history *buildhistory.Store
 }
 
 // buildArtifacts contains the result of various build
@@ -137,6 +141,7 @@ func NewBuilder(
 	stdout, stderr io.Writer, verbosity logger.Verbosity, warningsLevel string,
 	progressCB rpc.TaskProgressCB,
 	toolEnv []string,
+	buildHistory *buildhistory.Store,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -201,6 +206,12 @@ func NewBuilder(
 		log.Warn(string(libsLoadingWarnings))
 	}
 
+	// The build history can not be used if the build is partial or if
+	// it depends on the previous content of the build path.
+	if onlyUpdateCompilationDatabase || useCachedLibrariesResolution {
+		buildHistory = nil
+	}
+
 	diagnosticStore := diagnostics.NewStore()
 	b := &Builder{
 		ctx:                           ctx,
@@ -238,6 +249,7 @@ func NewBuilder(
 			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
 		),
 		diagnosticStore: diagnosticStore,
+		history:         buildHistory,
 		libsDetector: detector.NewSketchLibrariesDetector(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
@@ -368,6 +380,14 @@ func (b *Builder) Build() error {
 	)
 	defer b.Progress.RemoveSubSteps()
 
+	// If an identical build is available in the build history use it.
+	// A clean build is always performed, but its result is still stored.
+	history := b.prepareHistory()
+	if history != nil && !b.clean && b.restoreFromHistory(history) {
+		b.printUsedLibraries(b.libsDetector.ImportedLibraries())
+		return b.size()
+	}
+
 	if err := b.preprocess(); err != nil {
 		return err
 	}
@@ -385,6 +405,9 @@ func (b *Builder) Build() error {
 	}
 	b.Progress.CompleteStep()
 
+	if history != nil {
+		b.saveToHistory(history)
+	}
 	return nil
 }
 

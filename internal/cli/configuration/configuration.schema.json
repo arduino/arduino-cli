@@ -35,6 +35,21 @@
             "type": "string"
           }
         },
+        "history": {
+          "description": "options related to the build history: a store of previous successful builds that are reused, without compiling, when an identical build is requested again.",
+          "properties": {
+            "enabled": {
+              "description": "set to `true` to retain previous builds and reuse them instead of compiling an identical build again, defaults to `false`.",
+              "type": "boolean"
+            },
+            "max_entries": {
+              "description": "maximum number of builds retained in the build history, the least recently used builds are removed first, defaults to `10`.",
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "type": "object"
+        },
         "compilations_before_purge": {
           "description": "interval, in number of compilations, at which the cache is purged, defaults to `10`. When `0` the cache is never purged.",
           "type": "integer",

@@ -55,6 +55,8 @@ func SetDefaults(settings *Settings) {
 	setDefaultValueAndKeyTypeSchema("build_cache.compilations_before_purge", uint(10))
 	setDefaultValueAndKeyTypeSchema("build_cache.path", getDefaultBuildCacheDir())
 	setKeyTypeSchema("build_cache.extra_paths", []string{})
+	setDefaultValueAndKeyTypeSchema("build_cache.history.enabled", false)
+	setDefaultValueAndKeyTypeSchema("build_cache.history.max_entries", uint(10))
 
 	// daemon settings
 	setDefaultValueAndKeyTypeSchema("daemon.port", "50051")

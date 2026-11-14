@@ -53,3 +53,21 @@ func (s *Settings) GetBuildCacheExtraPaths() paths.PathList {
 	}
 	return nil
 }
+
+// GetBuildCacheHistoryEnabled returns true if the previous builds must be
+// retained and reused instead of compiling again an identical build.
+func (s *Settings) GetBuildCacheHistoryEnabled() bool {
+	if res, ok, _ := s.GetBoolOk("build_cache.history.enabled"); ok {
+		return res
+	}
+	return s.Defaults.GetBool("build_cache.history.enabled")
+}
+
+// GetBuildCacheHistoryMaxEntries returns the maximum number of previous builds
+// retained in the build history.
+func (s *Settings) GetBuildCacheHistoryMaxEntries() uint {
+	if res, ok, _ := s.GetUintOk("build_cache.history.max_entries"); ok {
+		return res
+	}
+	return s.Defaults.GetUint("build_cache.history.max_entries")
+}

@@ -136,6 +136,22 @@ func (l *SketchLibrariesDetector) resolveLibrary(header, platformArch string) *l
 	return selected
 }
 
+// InstalledLibraries returns all the libraries that may be selected by the
+// library discovery, sorted by name.
+func (l *SketchLibrariesDetector) InstalledLibraries() libraries.List {
+	lme, release := l.librariesManager.NewExplorer()
+	defer release()
+	libs := lme.FindAllInstalled()
+	libs.SortByName()
+	return libs
+}
+
+// SetImportedLibraries sets the list of imported libraries, used when the
+// result of a previous library discovery is reused without running it again.
+func (l *SketchLibrariesDetector) SetImportedLibraries(libs libraries.List) {
+	l.importedLibraries = libs
+}
+
 // ImportedLibraries todo
 func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 	// TODO understand if we have to do a deepcopy

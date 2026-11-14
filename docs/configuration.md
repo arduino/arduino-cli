@@ -45,6 +45,10 @@
   - `ttl` - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files
     lifetime is renewed. The value format must be a valid input for
     [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
+  - `history.enabled` - set to `true` to retain previous successful builds and reuse them, without compiling, when an
+    identical build is requested again, defaults to `false`. See [Build history][build history].
+  - `history.max_entries` - maximum number of builds retained in the build history, the least recently used builds are
+    removed first, defaults to `10`.
 - `network` - configuration options related to the network connection.
   - `proxy` - URL of the proxy server.
   - `connection_timeout` - network inactivity timeout, the value format must be a valid input for
@@ -199,6 +203,7 @@ schema should be considered unstable in this version.
 [arduino cli lib install]: commands/arduino-cli_lib_install.md
 [sketch specification]: sketch-specification.md
 [arduino-cli compile]: commands/arduino-cli_compile.md
+[build history]: sketch-build-process.md#build-history
 [arduino-cli compile options]: commands/arduino-cli_compile.md#options
 [arduino-cli config dump]: commands/arduino-cli_config_dump.md
 [arduino cli command reference]: commands/arduino-cli.md
