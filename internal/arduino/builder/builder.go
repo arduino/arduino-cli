@@ -327,6 +327,7 @@ func (b *Builder) preprocess() error {
 	if err != nil {
 		return err
 	}
+	b.buildProperties.Set("build.library_discovery_flags", buildLibraryDiscoveryFlags(b.libsDetector.ImportedLibraries()))
 	if b.libsDetector.IncludeFoldersChanged() && b.librariesBuildPath.Exist() {
 		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			b.logger.Info(i18n.Tr("The list of included libraries has been changed... rebuilding all libraries."))
