@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -200,6 +201,9 @@ func runUploadCommand(ctx context.Context, srv rpc.ArduinoCoreServiceServer, arg
 		UserFields:       fields,
 		UploadProperties: uploadProperties,
 	}
+	// Cancel the upload on Ctrl+C so even an unresponsive upload tool is stopped.
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
+	defer stop()
 	stream, streamResp := commands.UploadToServerStreams(ctx, stdOut, stdErr)
 	if err := srv.Upload(req, stream); err != nil {
 		errcode := feedback.ErrGeneric
