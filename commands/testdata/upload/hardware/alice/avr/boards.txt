@@ -21,3 +21,13 @@ board2.bootloader.extended_fuses=0xFD
 board2.bootloader.unlock_bits=0x3F
 board2.bootloader.lock_bits=0x0F
 board2.bootloader.file=optiboot/optiboot_atmega328.hex
+
+
+board3.name=board3
+board3.conf.board=conf-board3
+board3.upload.tool=one
+board3.upload.protocol=protocol
+board3.upload.speed=speed
+board3.bootloader.tool=one-upload-protocol
+board3.bootloader.fuses=0xFF
+board3.bootloader.file=niceboot/niceboot.hex
