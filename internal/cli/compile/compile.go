@@ -325,7 +325,9 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 
 			var libs strings.Builder
 			for _, lib := range builderRes.GetUsedLibraries() {
-				if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
+				if lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_USER &&
+					lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED &&
+					lib.GetLocation() != rpc.LibraryLocation_LIBRARY_LOCATION_PROFILE {
 					continue
 				}
 				if lib.GetVersion() == "" || lib.Location == rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
@@ -344,9 +346,12 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 				}
 			}
 
-			newProfileName := "my_profile_name"
-			if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
-				newProfileName = split[2]
+			newProfileName := profile.GetName()
+			if newProfileName == "" {
+				newProfileName = "my_profile_name"
+				if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
+					newProfileName = split[2]
+				}
 			}
 			profileOut = fmt.Sprintln("profiles:")
 			profileOut += fmt.Sprintln("  " + newProfileName + ":")
@@ -370,7 +375,11 @@ func runCompileCommand(cmd *cobra.Command, args []string, srv rpc.ArduinoCoreSer
 				profileOut += fmt.Sprintln("    libraries:")
 				profileOut += fmt.Sprint(libs.String())
 			}
-			profileOut += fmt.Sprintln()
+			if profile.GetName() != "" {
+				profileOut += fmt.Sprintln("default_profile: " + newProfileName)
+			} else {
+				profileOut += fmt.Sprintln()
+			}
 		} else {
 			// An error occurred, output the buffered build errors instead of the profile
 			if stdOut, stdErr, err := feedback.DirectStreams(); err == nil {
