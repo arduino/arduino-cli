@@ -38,6 +38,67 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 	require.Equal(t, "", include)
 }
 
+func TestIncludesFinderWithRegExpDiagnostic(t *testing.T) {
+	tests := []struct {
+		name   string
+		output string
+		want   string
+	}{
+		{
+			name: "unsaved sketch",
+			output: "C:\\sketch\\sketch.ino:2:10: fatal error: EEPROM.h: No such file or directory\n" +
+				" #include <SPI.h>\n",
+			want: "EEPROM.h",
+		},
+		{
+			name: "numbered source excerpt",
+			output: "sketch.ino:3:10: fatal error: EEPROM.h: No such file or directory\n" +
+				"    3 | #include <SoftwareSerial.h>\n",
+			want: "EEPROM.h",
+		},
+		{
+			name: "colored diagnostic",
+			output: "sketch.ino:2:10: \x1b[31mfatal error:\x1b[0m EEPROM.h: No such file or directory\n" +
+				" #include <SPI.h>\n",
+			want: "EEPROM.h",
+		},
+		{
+			name: "clang diagnostic",
+			output: "sketch.ino:2:10: fatal error: 'EEPROM.h' file not found\n" +
+				"    2 | #include <SPI.h>\n",
+			want: "EEPROM.h",
+		},
+		{
+			name:   "macro include without excerpt",
+			output: "sketch.ino:2:10: fatal error: sub dir/header.h: No such file or directory\r\n",
+			want:   "sub dir/header.h",
+		},
+		{
+			name:   "clang without excerpt",
+			output: "sketch.ino:2:10: fatal error: 'header.h' file not found\n",
+			want:   "header.h",
+		},
+		{
+			name:   "excerpt fallback",
+			output: "#include <Wire.h>\n",
+			want:   "Wire.h",
+		},
+		{
+			name:   "other fatal error",
+			output: "compiler: fatal error: cannot execute cc1plus\n",
+		},
+		{
+			name:   "incomplete diagnostic",
+			output: "fatal error",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.want, detector.IncludesFinderWithRegExp(tt.output))
+		})
+	}
+}
+
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
 		" #               include <Wire.h>\n" +
