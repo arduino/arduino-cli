@@ -97,10 +97,27 @@ func TestObjFileIsUpToDateObjNewer(t *testing.T) {
 	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
 	defer depFile.RemoveAll()
+	depFile.WriteFile([]byte(objFile.String() + ": \\\n\t" + sourceFile.String()))
 
 	upToDate, err := ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	require.NoError(t, err)
 	require.True(t, upToDate)
+}
+
+func TestObjFileIsUpToDateDepEmpty(t *testing.T) {
+	sourceFile := tempFile(t, "source")
+	defer sourceFile.RemoveAll()
+
+	time.Sleep(time.Second)
+
+	objFile := tempFile(t, "obj")
+	defer objFile.RemoveAll()
+	depFile := tempFile(t, "dep")
+	defer depFile.RemoveAll()
+
+	upToDate, err := ObjFileIsUpToDate(sourceFile, objFile, depFile)
+	require.NoError(t, err)
+	require.False(t, upToDate)
 }
 
 func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
