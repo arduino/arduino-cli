@@ -42,6 +42,7 @@ The following extensions are supported:
 - .S - Assembly language files.
 - .h, .hpp, .hh [<sup>1</sup>](#hpp-hh-note) - Header files.
 - .tpp, .ipp [<sup>2</sup>](#tpp-ipp-note) - Header files.
+- .inc - C++ include files.
 
 <a id="hpp-hh-note"></a> <sup>1</sup> `.hpp` and `.hh` supported from Arduino IDE 1.8.0/arduino-builder 1.3.22. <br />
 <a id="tpp-ipp-note"></a> <sup>2</sup> Supported from Arduino CLI 0.19.0.
