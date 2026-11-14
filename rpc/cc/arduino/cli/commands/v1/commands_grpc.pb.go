@@ -90,6 +90,7 @@ const (
 	ArduinoCoreService_ProfileLibRemove_FullMethodName                  = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibRemove"
 	ArduinoCoreService_ProfileLibList_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileLibList"
 	ArduinoCoreService_ProfileSetDefault_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ProfileSetDefault"
+	ArduinoCoreService_ReadMemory_FullMethodName                        = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ReadMemory"
 )
 
 // ArduinoCoreServiceClient is the client API for ArduinoCoreService service.
@@ -216,6 +217,8 @@ type ArduinoCoreServiceClient interface {
 	ProfileLibList(ctx context.Context, in *ProfileLibListRequest, opts ...grpc.CallOption) (*ProfileLibListResponse, error)
 	// Set the default build profile.
 	ProfileSetDefault(ctx context.Context, in *ProfileSetDefaultRequest, opts ...grpc.CallOption) (*ProfileSetDefaultResponse, error)
+	// Read a board memory to a new file using an explicitly supported platform recipe.
+	ReadMemory(ctx context.Context, in *ReadMemoryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadMemoryResponse], error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -953,6 +956,25 @@ func (c *arduinoCoreServiceClient) ProfileSetDefault(ctx context.Context, in *Pr
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) ReadMemory(ctx context.Context, in *ReadMemoryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadMemoryResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[21], ArduinoCoreService_ReadMemory_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ReadMemoryRequest, ReadMemoryResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ArduinoCoreService_ReadMemoryClient = grpc.ServerStreamingClient[ReadMemoryResponse]
+
 // ArduinoCoreServiceServer is the server API for ArduinoCoreService service.
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility.
@@ -1077,6 +1099,8 @@ type ArduinoCoreServiceServer interface {
 	ProfileLibList(context.Context, *ProfileLibListRequest) (*ProfileLibListResponse, error)
 	// Set the default build profile.
 	ProfileSetDefault(context.Context, *ProfileSetDefaultRequest) (*ProfileSetDefaultResponse, error)
+	// Read a board memory to a new file using an explicitly supported platform recipe.
+	ReadMemory(*ReadMemoryRequest, grpc.ServerStreamingServer[ReadMemoryResponse]) error
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1251,6 +1275,9 @@ func (UnimplementedArduinoCoreServiceServer) ProfileLibList(context.Context, *Pr
 }
 func (UnimplementedArduinoCoreServiceServer) ProfileSetDefault(context.Context, *ProfileSetDefaultRequest) (*ProfileSetDefaultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProfileSetDefault not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) ReadMemory(*ReadMemoryRequest, grpc.ServerStreamingServer[ReadMemoryResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method ReadMemory not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 func (UnimplementedArduinoCoreServiceServer) testEmbeddedByValue()                            {}
@@ -2108,6 +2135,17 @@ func _ArduinoCoreService_ProfileSetDefault_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_ReadMemory_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ReadMemoryRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ArduinoCoreServiceServer).ReadMemory(m, &grpc.GenericServerStream[ReadMemoryRequest, ReadMemoryResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ArduinoCoreService_ReadMemoryServer = grpc.ServerStreamingServer[ReadMemoryResponse]
+
 // ArduinoCoreService_ServiceDesc is the grpc.ServiceDesc for ArduinoCoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2359,6 +2397,11 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _ArduinoCoreService_Debug_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "ReadMemory",
+			Handler:       _ArduinoCoreService_ReadMemory_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "cc/arduino/cli/commands/v1/commands.proto",

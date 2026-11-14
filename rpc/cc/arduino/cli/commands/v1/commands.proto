@@ -205,6 +205,9 @@ service ArduinoCoreService {
 
   // Set the default build profile.
   rpc ProfileSetDefault(ProfileSetDefaultRequest) returns (ProfileSetDefaultResponse) {}
+
+  // Read a board memory to a new file using an explicitly supported platform recipe.
+  rpc ReadMemory(ReadMemoryRequest) returns (stream ReadMemoryResponse);
 }
 
 message CreateRequest {}

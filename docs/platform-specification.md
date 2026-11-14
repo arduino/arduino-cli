@@ -1370,6 +1370,71 @@ defined in the programmer's platform is used without overrides from the properti
 other than the Arduino IDE, the handling of properties is the same as when doing a
 [standard Upload](#sketch-upload-configuration).
 
+### Reading board memory
+
+The `arduino-cli read` command and `ReadMemory` RPC read a memory region to a new file without a sketch or compilation.
+Support is opt-in: an upload recipe does not imply that reading is supported. Platforms declare separate recipes for
+each supported memory, file format, and connection route. Arduino CLI does not rewrite upload recipes or fall back to
+erase, program, or bootloader recipes.
+
+For the normal board connection, select a tool in `boards.txt`, for example:
+
+```ini
+example.read.tool.serial=avrdude
+```
+
+For an external programmer, select a tool in `programmers.txt`, for example:
+
+```ini
+usbasp.read_program.tool.default=avrdude
+```
+
+The `.tool.<protocol>` and `.tool.default` selectors and tool references follow the upload tool selection rules. The two
+actions are `read` and `read_program`, respectively. In `platform.txt`, declare the corresponding recipes as
+`tools.<tool>.<action>.<memory>.<format>.pattern`. Memory and format identifiers must start with a lowercase letter and
+contain only lowercase letters, digits, or underscores. `flash`, `eeprom`, `bin` (raw binary), and `ihex` (Intel HEX)
+are conventional identifiers; platforms may provide others.
+
+For example, an AVR platform that already defines AVRDUDE's `cmd.path`, `config.path`, MCU, and connection properties
+can opt in with these **read-only** recipes (only advertise combinations actually supported by the board/bootloader):
+
+```ini
+tools.avrdude.read.params.verbose=-v
+tools.avrdude.read.params.quiet=-q -q
+tools.avrdude.read.flash.bin.pattern="{cmd.path}" "-C{config.path}" {read.verbose} -p{build.mcu} -c{upload.protocol} "-P{serial.port}" -b{upload.speed} "-Uflash:r:{read.output_file}:r"
+tools.avrdude.read_program.params.verbose=-v
+tools.avrdude.read_program.params.quiet=-q -q
+tools.avrdude.read_program.flash.bin.pattern="{cmd.path}" "-C{config.path}" {read.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Uflash:r:{read.output_file}:r"
+tools.avrdude.read_program.eeprom.ihex.pattern="{cmd.path}" "-C{config.path}" {read.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Ueeprom:r:{read.output_file}:i"
+```
+
+Arduino CLI supplies `{read.output_file}` as a temporary output path and `{read.verbose}` from the selected action's
+`params.verbose` or `params.quiet`. The tool must exit successfully and produce a non-empty regular file there. Only
+then is it copied to the requested destination. Existing destination files are never overwritten, including files
+created while the tool is running. Failed reads clean up temporary output. Output paths containing double quotes or line
+breaks are rejected. As with other platform recipes, installed platform code is trusted: maintainers must ensure read
+recipes do not erase, write, unlock, or otherwise modify nonvolatile memory.
+
+For a platform providing the recipes above:
+
+```sh
+arduino-cli read --fqbn vendor:avr:example --port /dev/ttyACM0 --output flash.bin
+arduino-cli read --fqbn vendor:avr:example --programmer usbasp --memory eeprom --file-format ihex --output eeprom.hex
+arduino-cli read --fqbn vendor:avr:example --port /dev/ttyACM0 --output flash.bin --dry-run
+```
+
+The defaults are `--memory flash` and `--file-format bin`. `--dry-run` prints the selected recipe without running the
+tool, resetting the board, or creating an output file. An unsupported combination fails before resetting the board. The
+RPC requires explicit memory and format identifiers; its output path is on the **server's** filesystem. Its stream
+carries tool diagnostics followed by a result containing the output path, artifact size, and updated port, not the
+memory contents. The CLI's global `--json` flag controls diagnostic/result formatting independently of
+`--file-format`.
+
+Reading may reset or halt the board, and the existing serial bootloader reset/port transition handling is reused. Read
+protection and bootloader capabilities can limit which bytes are accessible; success does not imply a complete device
+backup or an atomic snapshot across memories. No automatic unlocking is attempted. Reading firmware does not recover the
+original sketch source. Current platforms must add these recipes before the new operation can be used.
+
 ### Burn Bootloader
 
 The `erase` and `bootloader` actions are triggered via the **Tools > Burn Bootloader** feature of the Arduino IDE or
