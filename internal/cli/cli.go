@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/generatedocs"
 	"github.com/arduino/arduino-cli/internal/cli/lib"
 	"github.com/arduino/arduino-cli/internal/cli/monitor"
+	"github.com/arduino/arduino-cli/internal/cli/ota"
 	"github.com/arduino/arduino-cli/internal/cli/outdated"
 	"github.com/arduino/arduino-cli/internal/cli/profile"
 	"github.com/arduino/arduino-cli/internal/cli/sketch"
@@ -154,6 +155,7 @@ func NewCommand(srv rpc.ArduinoCoreServiceServer) *cobra.Command {
 	cmd.AddCommand(generatedocs.NewCommand())
 	cmd.AddCommand(lib.NewCommand(srv, settings))
 	cmd.AddCommand(monitor.NewCommand(srv))
+	cmd.AddCommand(ota.NewCommand(srv))
 	cmd.AddCommand(outdated.NewCommand(srv))
 	cmd.AddCommand(sketch.NewCommand(srv))
 	cmd.AddCommand(update.NewCommand(srv))
