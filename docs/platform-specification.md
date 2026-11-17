@@ -362,8 +362,8 @@ Two properties can be used to define the total available memory:
 - `{upload.maximum_size}`: available program storage space
 - `{upload.maximum_data_size}`: available dynamic memory for global variables
 
-Both limits are byte counts. Use decimal values (for example, `131072`) or hexadecimal values prefixed with `0x` or
-`0X` (for example, `0x20000`).
+Both limits are byte counts. Use decimal values (for example, `131072`) or hexadecimal values prefixed with `0x` or `0X`
+(for example, `0x20000`).
 
 If the binary sketch size exceeds the value of these properties, the compilation process fails.
 
