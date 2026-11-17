@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"math"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"fortio.org/safecast"
@@ -276,7 +275,7 @@ func (b *Builder) mergeSketchWithBootloader() error {
 	// Ignore merger errors for the first iteration
 	maximumBinSize := 16000000
 	if uploadMaxSize, ok := b.buildProperties.GetOk("upload.maximum_size"); ok {
-		maximumBinSize, _ = strconv.Atoi(uploadMaxSize)
+		maximumBinSize, _ = parseSizeLimit(uploadMaxSize)
 		maximumBinSize *= 2
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
