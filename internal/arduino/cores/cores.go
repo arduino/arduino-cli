@@ -510,6 +510,13 @@ func (release *PlatformRelease) ToRPC() *rpc.PlatformRelease {
 		boards = f.Map(slices.Collect(maps.Values(release.Boards)), func(board *Board) *rpc.Board {
 			return &rpc.Board{Name: board.Name(), Fqbn: board.FQBN()}
 		})
+		// Installed boards come from a map, so give RPC responses a stable order.
+		sort.Slice(boards, func(i, j int) bool {
+			if boards[i].Name != boards[j].Name {
+				return boards[i].Name < boards[j].Name
+			}
+			return boards[i].Fqbn < boards[j].Fqbn
+		})
 	} else {
 		boards = f.Map(release.BoardsManifest, func(board *BoardManifest) *rpc.Board {
 			return &rpc.Board{Name: board.Name}

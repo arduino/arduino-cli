@@ -202,6 +202,8 @@ ID              Version Name
 esp8266:esp8266 2.5.2   esp8266
 ```
 
+With `core search --format json`, boards for installed releases are ordered by board name, then by FQBN when names match.
+
 Alternatively, you can pass a link to the additional package index file with the `--additional-urls` option, that has to
 be specified every time and for every command that operates on a 3rd party platform core, for example:
 
