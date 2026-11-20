@@ -270,6 +270,20 @@ done in 0.009 seconds
 CPU reset.
 ```
 
+### Upload a previously compiled sketch
+
+To build on one machine and upload from another, save the build artifacts to a directory and copy the entire directory
+to the machine connected to the board. Use the same board FQBN in both commands:
+
+```sh
+arduino-cli compile --fqbn arduino:samd:mkr1000 --output-dir ./artifacts MyFirstSketch
+arduino-cli upload --fqbn arduino:samd:mkr1000 --port /dev/ttyACM0 --input-dir ./artifacts
+```
+
+Use `--input-file` when you need to select the primary binary explicitly. That option does not restrict the upload to
+one file: the board platform's upload recipe can also require companion files, such as a bootloader or partition table.
+Keep any required companion files alongside the primary binary under their original names.
+
 ## Add libraries
 
 If you need to add more functionalities to your sketch, chances are some of the libraries available in the Arduino
