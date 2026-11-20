@@ -1438,6 +1438,11 @@ directives:
 
 If the `debug.executable` property is not present or is empty debugging will not be allowed.
 
+Debug directives may reference the pluggable discovery port properties (`{upload.port.address}`,
+`{upload.port.label}`, `{upload.port.protocol}`, `{upload.port.protocolLabel}` and
+`{upload.port.properties.*}`, see [Properties from pluggable discovery](#properties-from-pluggable-discovery)),
+which are expanded using the debug port selected by the user.
+
 OpenOCD server specific configurations:
 
 - `debug.server.openocd.path`: is the absolute path to the OpenOCD directory
