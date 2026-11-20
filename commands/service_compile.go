@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
+	"github.com/arduino/arduino-cli/internal/buildhistory"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	"github.com/arduino/arduino-cli/pkg/fqbn"
@@ -244,6 +245,20 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	librariesDirs.Add(s.settings.LibrariesDir())
 	libraryDirs := paths.NewPathList(req.GetLibrary()...) // Array of single-library directories
 
+	// The build history is stored inside the build cache directory
+	var buildHistory *buildhistory.Store
+	if s.settings.GetBuildCacheHistoryEnabled() && s.settings.GetBuildCacheHistoryMaxEntries() > 0 {
+		historyPath := s.settings.GetBuildCachePath()
+		if p := req.GetBuildCachePath(); p != "" { //nolint:staticcheck
+			historyPath = paths.New(p)
+		}
+		historyPath = historyPath.Join("history")
+		if err := historyPath.ToAbs(); err != nil {
+			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build cache directory"), Cause: err}
+		}
+		buildHistory = buildhistory.New(historyPath, s.settings.GetBuildCacheHistoryMaxEntries())
+	}
+
 	var libsManager *librariesmanager.LibrariesManager
 	if profile != nil {
 		lm, err := instances.GetLibraryManager(req.GetInstance())
@@ -276,6 +291,7 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		outStream, errStream, verbosity, req.GetWarnings(),
 		progressCB,
 		pme.GetEnvVarsForSpawnedProcess(),
+		buildHistory,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
