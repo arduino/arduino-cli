@@ -17,7 +17,7 @@ require (
 	github.com/arduino/pluggable-monitor-protocol-handler v0.9.4
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/extract/v4 v4.0.2
-	github.com/djherbis/buffer v1.2.0
+	github.com/djherbis/buffer v1.2.1
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.19.0
 	github.com/go-git/go-git/v5 v5.19.3
