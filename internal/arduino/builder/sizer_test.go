@@ -16,8 +16,13 @@
 package builder
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"testing"
 
+	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -85,4 +90,46 @@ func TestSizerEmptyRegexpReturnsMinusOne(t *testing.T) {
 func TestSizerWithInvalidRegexp(t *testing.T) {
 	_, err := computeSize(`[xx`, []byte(`xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`))
 	require.Error(t, err)
+}
+
+func TestCheckSizeMemoryLimitFormats(t *testing.T) {
+	executable, err := os.Executable()
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name, flash, ram string
+	}{
+		{"decimal", "32", "8"},
+		{"decimal with leading zeros", "032", "008"},
+		{"hexadecimal flash", "0x20", "8"},
+		{"hexadecimal RAM", "32", "0X8"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			props := properties.NewMap()
+			props.Set("upload.maximum_size", tc.flash)
+			props.Set("upload.maximum_data_size", tc.ram)
+			props.Set("recipe.size.pattern", fmt.Sprintf(`"%s" -test.run=^TestSizerRecipeOutput$`, executable))
+			props.Set("recipe.size.regex", `^\.text\s+([0-9]+)`)
+			props.Set("recipe.size.regex.data", `^\.data\s+([0-9]+)`)
+			b := Builder{
+				buildProperties: props,
+				logger:          logger.New(io.Discard, io.Discard, logger.VerbosityQuiet, ""),
+				toolEnv:         []string{"ARDUINO_CLI_TEST_SIZER_RECIPE=1"},
+			}
+
+			sizes, err := b.checkSize()
+			require.NoError(t, err)
+			require.Equal(t, ExecutablesFileSections{
+				{Name: "text", Size: 16, MaxSize: 32},
+				{Name: "data", Size: 4, MaxSize: 8},
+			}, sizes)
+		})
+	}
+}
+
+// TestSizerRecipeOutput acts as an offline size tool when invoked by the recipe.
+func TestSizerRecipeOutput(t *testing.T) {
+	if os.Getenv("ARDUINO_CLI_TEST_SIZER_RECIPE") == "1" {
+		fmt.Print(".text 16\n.data 4\n")
+	}
 }

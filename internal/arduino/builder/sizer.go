@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
@@ -126,6 +127,16 @@ func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 	return executableSectionsSize, nil
 }
 
+// parseSizeLimit keeps ordinary board properties decimal (including leading
+// zeroes) and accepts an explicit hexadecimal prefix.
+func parseSizeLimit(value string) (int, error) {
+	if strings.HasPrefix(value, "0x") || strings.HasPrefix(value, "0X") {
+		size, err := strconv.ParseInt(value, 0, strconv.IntSize)
+		return int(size), err
+	}
+	return strconv.Atoi(value)
+}
+
 func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 	properties := b.buildProperties.Clone()
 	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
@@ -137,14 +148,14 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 		return nil, nil
 	}
 
-	maxTextSize, err := strconv.Atoi(maxTextSizeString)
+	maxTextSize, err := parseSizeLimit(maxTextSizeString)
 	if err != nil {
 		return nil, err
 	}
 
 	maxDataSize := -1
 	if maxDataSizeString != "" {
-		maxDataSize, err = strconv.Atoi(maxDataSizeString)
+		maxDataSize, err = parseSizeLimit(maxDataSizeString)
 		if err != nil {
 			return nil, err
 		}
