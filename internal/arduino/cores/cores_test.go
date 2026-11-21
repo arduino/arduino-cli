@@ -18,6 +18,7 @@ package cores
 import (
 	"testing"
 
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -113,4 +114,29 @@ func TestPlatformReleaseToRPCLibraryDependencies(t *testing.T) {
 
 	noLibs := &PlatformRelease{Platform: platform, Version: semver.MustParse("1.0.0")}
 	require.Empty(t, noLibs.ToRPC().GetLibraryDependencies())
+}
+
+func TestPlatformReleaseToRPCBoardOrder(t *testing.T) {
+	platform := &Platform{Package: &Package{Name: "vendor"}, Architecture: "arch"}
+	release := &PlatformRelease{Platform: platform, Version: semver.MustParse("1.0.0"), Boards: map[string]*Board{}}
+	for _, item := range []struct{ id, name string }{{"z", "Zulu"}, {"b", "Alpha"}, {"a", "Alpha"}} {
+		props := properties.NewMap()
+		props.Set("name", item.name)
+		release.Boards[item.id] = &Board{BoardID: item.id, Properties: props, PlatformRelease: release}
+	}
+	for range 100 {
+		boards := release.ToRPC().GetBoards()
+		require.Len(t, boards, 3)
+		require.Equal(t, "vendor:arch:a", boards[0].GetFqbn())
+		require.Equal(t, "vendor:arch:b", boards[1].GetFqbn())
+		require.Equal(t, "vendor:arch:z", boards[2].GetFqbn())
+	}
+	// Uninstalled platforms already have deterministic manifest order.
+	release.Boards = nil
+	release.BoardsManifest = []*BoardManifest{{Name: "Zulu"}, {Name: "Alpha"}}
+	boards := release.ToRPC().GetBoards()
+	require.Equal(t, "Zulu", boards[0].GetName())
+	require.Equal(t, "Alpha", boards[1].GetName())
+	release.BoardsManifest = nil
+	require.Empty(t, release.ToRPC().GetBoards())
 }
