@@ -331,3 +331,30 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 	require.Equal(t, "function", tags[idx].Kind)
 	require.Equal(t, "void funcCombo(void (*(&in)[5])(int));", tags[idx].Prototype)
 }
+
+func TestCTagsParserNonASCIIIdentifiers(t *testing.T) {
+	tags := produceTags(t, "TestCTagsParserNonASCIIIdentifiers.txt")
+
+	// The gcc preprocessing step that precedes ctags rewrites extended
+	// identifiers into universal character name form. The name field of a tag
+	// line holds them unescaped, the search pattern field escaped, so the
+	// pattern has to be unescaped before it is compared against the prototype.
+	require.Equal(t, 4, len(tags))
+
+	require.Equal(t, `w\U000000fcrfelWerfen`, tags[2].FunctionName)
+	require.Equal(t, `void w\U000000fcrfelWerfen() {}`, tags[2].Code)
+	require.Equal(t, `void w\U000000fcrfelWerfen();`, tags[2].Prototype)
+	require.False(t, tags[2].SkipMe)
+
+	require.Equal(t, `\U000000d6ffnen`, tags[3].FunctionName)
+	require.Equal(t, `void \U000000d6ffnen();`, tags[3].Prototype)
+	require.False(t, tags[3].SkipMe)
+}
+
+func TestUnescapeTagPattern(t *testing.T) {
+	require.Equal(t, `void w\U000000fcrfelWerfen() {}`, unescapeTagPattern(`void w\\U000000fcrfelWerfen() {}`))
+	require.Equal(t, `a/b`, unescapeTagPattern(`a\/b`))
+	require.Equal(t, `x$`, unescapeTagPattern(`x\$`))
+	require.Equal(t, `nothing to undo`, unescapeTagPattern(`nothing to undo`))
+	require.Equal(t, `trailing\`, unescapeTagPattern(`trailing\`))
+}

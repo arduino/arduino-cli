@@ -1,0 +1,4 @@
+setup	/tmp/sketch_merged.cpp	/^void setup() {$/;"	kind:function	line:1	signature:()	returntype:void
+loop	/tmp/sketch_merged.cpp	/^void loop() {}$/;"	kind:function	line:5	signature:()	returntype:void
+w\U000000fcrfelWerfen	/tmp/sketch_merged.cpp	/^void w\\U000000fcrfelWerfen() {}$/;"	kind:function	line:6	signature:()	returntype:void
+\U000000d6ffnen	/tmp/sketch_merged.cpp	/^void \\U000000d6ffnen() {}$/;"	kind:function	line:7	signature:()	returntype:void
