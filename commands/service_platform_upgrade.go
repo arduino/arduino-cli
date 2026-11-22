@@ -50,7 +50,7 @@ func PlatformUpgradeStreamResponseToCallbackFunction(ctx context.Context, downlo
 // PlatformUpgrade upgrades a platform package
 func (s *arduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest, stream rpc.ArduinoCoreService_PlatformUpgradeServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	ctx := stream.Context()
+	ctx := s.settings.WithAria2c(stream.Context())
 	downloadCB := func(p *rpc.DownloadProgress) {
 		syncSend.Send(&rpc.PlatformUpgradeResponse{
 			Message: &rpc.PlatformUpgradeResponse_Progress{

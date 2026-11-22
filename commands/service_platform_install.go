@@ -50,7 +50,7 @@ func PlatformInstallStreamResponseToCallbackFunction(ctx context.Context, downlo
 
 // PlatformInstall installs a platform package
 func (s *arduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest, stream rpc.ArduinoCoreService_PlatformInstallServer) error {
-	ctx := stream.Context()
+	ctx := s.settings.WithAria2c(stream.Context())
 	syncSend := NewSynchronizedSend(stream.Send)
 	taskCB := func(p *rpc.TaskProgress) {
 		syncSend.Send(&rpc.PlatformInstallResponse{

@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/cli/configuration"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -115,4 +116,31 @@ func TestConnectionTimeout(t *testing.T) {
 	_, elapsed, err = doRequest(1)
 	require.Error(t, err)
 	require.True(t, elapsed.Seconds() >= 0.5 && elapsed.Seconds() <= 3) // Adding some tolerance just in case...
+}
+
+func TestAria2cEnabled(t *testing.T) {
+	settings := configuration.NewSettings()
+	require.False(t, settings.Aria2cEnabled())
+
+	require.NoError(t, settings.Set("network.aria2c_enabled", true))
+	require.True(t, settings.Aria2cEnabled())
+}
+
+func TestWithAria2c(t *testing.T) {
+	settings := configuration.NewSettings()
+
+	// Disabled by default: context carries a disabled option.
+	opts := httpclient.Aria2cOptionsFromContext(settings.WithAria2c(context.Background()))
+	require.False(t, opts.Enabled)
+	require.Empty(t, opts.UserAgent)
+	require.Empty(t, opts.Proxy)
+
+	// Enabled: context carries user-agent and proxy for aria2c parity.
+	require.NoError(t, settings.Set("network.aria2c_enabled", true))
+	require.NoError(t, settings.Set("network.user_agent_ext", "test-user-agent"))
+	require.NoError(t, settings.Set("network.proxy", "http://proxy:8080"))
+	opts = httpclient.Aria2cOptionsFromContext(settings.WithAria2c(context.Background()))
+	require.True(t, opts.Enabled)
+	require.Contains(t, opts.UserAgent, "test-user-agent")
+	require.Equal(t, "http://proxy:8080", opts.Proxy)
 }

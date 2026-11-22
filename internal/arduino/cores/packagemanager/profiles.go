@@ -45,6 +45,7 @@ func (pmb *Builder) LoadGlobalHardwareForProfile(p *sketch.Profile) []error {
 // LoadHardwareForProfile load the hardware platforms for the given profile.
 // If installMissing is true then possibly missing tools and platforms will be downloaded and installed.
 func (pmb *Builder) LoadHardwareForProfile(ctx context.Context, p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, settings *configuration.Settings) []error {
+	ctx = settings.WithAria2c(ctx)
 	pmb.profile = p
 
 	// Load required platforms

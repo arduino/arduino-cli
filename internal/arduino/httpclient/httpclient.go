@@ -44,6 +44,10 @@ func DownloadFile(ctx context.Context, path *paths.Path, URL string, queryParame
 		}
 	}()
 
+	if downloadWithAria2cIfEnabled(ctx, path, URL, downloadCB, config) {
+		return nil
+	}
+
 	config.PollFunction = downloadCB.Update
 	config.PollInterval = 250 * time.Millisecond
 	if err := downloader.DownloadWithConfig(ctx, path.String(), URL, config); err != nil {

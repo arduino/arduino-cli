@@ -115,7 +115,7 @@ func InitStreamResponseToCallbackFunction(ctx context.Context, cb func(r *rpc.In
 // Failures don't stop the loading process, in case of loading failure the Platform or library
 // is simply skipped and an error gRPC status is sent to responseCallback.
 func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error {
-	ctx := stream.Context()
+	ctx := s.settings.WithAria2c(stream.Context())
 
 	instance := req.GetInstance()
 	if !instances.IsValid(instance) {
@@ -584,11 +584,12 @@ func (s *arduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	}
 
 	// Perform index update
-	config, err := s.settings.DownloaderConfig(stream.Context())
+	ctx := s.settings.WithAria2c(stream.Context())
+	config, err := s.settings.DownloaderConfig(ctx)
 	if err != nil {
 		return err
 	}
-	if err := globals.LibrariesIndexResource.Download(stream.Context(), indexDir, downloadCB, config); err != nil {
+	if err := globals.LibrariesIndexResource.Download(ctx, indexDir, downloadCB, config); err != nil {
 		resultCB(rpc.IndexUpdateReport_STATUS_FAILED)
 		return err
 	}
@@ -642,6 +643,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 
 	failed := false
 	result := &rpc.UpdateIndexResponse_Result{}
+	ctx := s.settings.WithAria2c(stream.Context())
 	for _, u := range urls {
 		URL, err := url.Parse(u)
 		if err != nil {
@@ -694,7 +696,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			}
 		}
 
-		config, err := s.settings.DownloaderConfig(stream.Context())
+		config, err := s.settings.DownloaderConfig(ctx)
 		if err != nil {
 			downloadCB.Start(u, i18n.Tr("Downloading index: %s", filepath.Base(URL.Path)))
 			downloadCB.End(false, i18n.Tr("Invalid network configuration: %s", err))
@@ -706,7 +708,7 @@ func (s *arduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 			indexResource.SignatureURL, _ = url.Parse(u) // should not fail because we already parsed it
 			indexResource.SignatureURL.Path += ".sig"
 		}
-		if err := indexResource.Download(stream.Context(), indexpath, downloadCB, config); err != nil {
+		if err := indexResource.Download(ctx, indexpath, downloadCB, config); err != nil {
 			failed = true
 			result.UpdatedIndexes = append(result.GetUpdatedIndexes(), report(u, rpc.IndexUpdateReport_STATUS_FAILED))
 		} else {

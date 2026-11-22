@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/arduino/httpclient"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/arduino-cli/internal/version"
 	"go.bug.st/downloader/v3"
@@ -79,6 +80,28 @@ func (settings *Settings) ConnectionTimeout() time.Duration {
 // SkipCloudApiForBoardDetection returns whether the cloud API should be ignored for board detection
 func (settings *Settings) SkipCloudApiForBoardDetection() bool {
 	return settings.GetBool("network.cloud_api.skip_board_detection_calls")
+}
+
+// Aria2cEnabled returns whether downloads may opportunistically use the
+// optional external aria2c downloader (with multi-connection support) when
+// the aria2c binary is installed. Downloads fall back to the built-in
+// downloader when aria2c is not installed or fails.
+func (settings *Settings) Aria2cEnabled() bool {
+	return settings.GetBool("network.aria2c_enabled")
+}
+
+// WithAria2c returns a context carrying the user's aria2c downloader
+// preference, so downloads performed with the returned context can
+// opportunistically use aria2c with User-Agent and proxy parity.
+func (settings *Settings) WithAria2c(ctx context.Context) context.Context {
+	opts := httpclient.Aria2cOptions{Enabled: settings.Aria2cEnabled()}
+	if opts.Enabled {
+		opts.UserAgent = settings.UserAgent(ctx)
+		if proxy, err := settings.NetworkProxy(); err == nil && proxy != nil {
+			opts.Proxy = proxy.String()
+		}
+	}
+	return httpclient.ContextWithAria2cOptions(ctx, opts)
 }
 
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
