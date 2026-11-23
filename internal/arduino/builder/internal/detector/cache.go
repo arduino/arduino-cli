@@ -18,6 +18,7 @@ package detector
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/runner"
@@ -28,6 +29,13 @@ import (
 type detectorCache struct {
 	curr    int
 	entries []*detectorCacheEntry
+	// sketchDirectives are the preprocessor directives the merged sketch held when the entries were recorded.
+	sketchDirectives []string
+}
+
+type detectorCacheFile struct {
+	SketchDirectives []string              `json:"sketch_directives"`
+	Entries          []*detectorCacheEntry `json:"entries"`
 }
 
 type detectorCacheEntry struct {
@@ -88,13 +96,54 @@ func (c *detectorCache) Load(cacheFile *paths.Path) error {
 	if err != nil {
 		return err
 	}
-	var entries []*detectorCacheEntry
-	if err := json.Unmarshal(data, &entries); err != nil {
-		return err
+	var file detectorCacheFile
+	if err := json.Unmarshal(data, &file); err != nil {
+		// Caches written before the sketch directives were recorded hold the bare entries
+		if json.Unmarshal(data, &file.Entries) != nil {
+			return err
+		}
 	}
 	c.curr = 0
-	c.entries = entries
+	c.entries = file.Entries
+	c.sketchDirectives = file.SketchDirectives
 	return nil
+}
+
+// SketchDirectivesUnchanged reports whether the merged sketch holds the same preprocessor
+// directives as when the cache was recorded.
+func (c *detectorCache) SketchDirectivesUnchanged(directives []string) bool {
+	return c.sketchDirectives != nil && slices.Equal(c.sketchDirectives, directives)
+}
+
+// SetSketchDirectives records the preprocessor directives of the merged sketch for the next Save.
+func (c *detectorCache) SetSketchDirectives(directives []string) {
+	c.sketchDirectives = directives
+}
+
+// LastPass returns the task of the last recorded pass of the given unit, with the include paths
+// added before it and, among them, the ones its earlier passes found. The task is nil when the
+// unit has no recorded pass or its last one failed.
+func (c *detectorCache) LastPass(unit sourceFile) (includes, found paths.PathList, pass *runner.Task) {
+	var added paths.PathList
+	first := -1
+	for i, entry := range c.entries {
+		if entry.AddedIncludePath != nil {
+			added = append(added, entry.AddedIncludePath)
+		}
+		if entry.CompileTask == nil || !entry.Compile.Equals(unit) {
+			continue
+		}
+		if first < 0 {
+			first = len(added)
+		}
+		pass, includes, found = nil, nil, nil
+		if i+1 < len(c.entries) {
+			if missing := c.entries[i+1].MissingIncludeH; missing != nil && *missing == "" {
+				pass, includes, found = entry.CompileTask, added.Clone(), slices.Clone(added[first:])
+			}
+		}
+	}
+	return includes, found, pass
 }
 
 // ExpectCompile adds a compile entry to the cache and checks if it matches the next expected entry.
@@ -160,7 +209,7 @@ func (c *detectorCache) Save(cacheFile *paths.Path) error {
 	// Cut off the cache if it is not fully consumed
 	c.entries = c.entries[:c.curr]
 
-	data, err := json.MarshalIndent(c.entries, "", "  ")
+	data, err := json.MarshalIndent(detectorCacheFile{SketchDirectives: c.sketchDirectives, Entries: c.entries}, "", "  ")
 	if err != nil {
 		return err
 	}

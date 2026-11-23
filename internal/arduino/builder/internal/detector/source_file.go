@@ -63,6 +63,16 @@ func (f *sourceFile) PrepareBuildPath() error {
 
 // ObjFileIsUpToDate checks if the compile object file is up to date.
 func (f *sourceFile) ObjFileIsUpToDate(log *logrus.Entry) (unchanged bool, err error) {
+	return f.isUpToDate(log, true)
+}
+
+// DepsAreUpToDate checks if the files the source pulled in at the last run are unchanged,
+// whatever happened to the source itself.
+func (f *sourceFile) DepsAreUpToDate(log *logrus.Entry) (unchanged bool, err error) {
+	return f.isUpToDate(log, false)
+}
+
+func (f *sourceFile) isUpToDate(log *logrus.Entry, checkSource bool) (unchanged bool, err error) {
 	if f.DepfilePath == nil {
 		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: object file or dependency file not provided", f.SourcePath)
 		return false, nil
@@ -84,7 +94,7 @@ func (f *sourceFile) ObjFileIsUpToDate(log *logrus.Entry) (unchanged bool, err e
 		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: Could not stat dependency file: %s", f.SourcePath, err)
 		return false, err
 	}
-	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
+	if checkSource && sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
 		log.Tracef("[LD] COMPILE-CHECK: REBUILD %v: %v newer than %v", f.SourcePath, sourceFile, dependencyFile)
 		return false, nil
 	}
