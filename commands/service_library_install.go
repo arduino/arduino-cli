@@ -94,9 +94,9 @@ func (s *arduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		return err
 	}
 
-	if err = s.Init(
-		&rpc.InitRequest{Instance: req.GetInstance()},
-		InitStreamResponseToCallbackFunction(ctx, nil),
+	if err = s.Initialize(
+		&rpc.InitializeRequest{Instance: req.GetInstance(), Message: &rpc.InitializeRequest_Generic_{Generic: &rpc.InitializeRequest_Generic{}}},
+		InitializeStreamResponseToCallbackFunction(ctx, nil),
 	); err != nil {
 		return err
 	}

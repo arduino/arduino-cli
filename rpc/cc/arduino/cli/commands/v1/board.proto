@@ -74,6 +74,29 @@ message BoardIdentificationProperties {
   map<string, string> properties = 1;
 }
 
+message BoardUploadDetailsRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The fully qualified board name of the board you want information about
+  // (e.g., `arduino:avr:uno`).
+  string fqbn = 2;
+  // The protocol to use for uploading to the board.
+  string protocol = 3;
+  // The programmer to use for uploading to the board.
+  string programmer = 4;
+  // Custom upload properties to be used for uploading to the board.
+  repeated string custom_upload_properties = 5;
+  // If set to true, a burn-bootloader operation will be performed instead of a normal upload.
+  bool burn_bootloader = 6;
+}
+
+message BoardUploadDetailsResponse {
+  // The platform properties used for uploading to the board with the specified protocol and configuration.
+  map<string, string> upload_properties = 1;
+  // The upload tools required for uploading to the board with the specified protocol and configuration.
+  repeated ToolsDependencies upload_tools = 2;
+}
+
 message Package {
   // Maintainer of the package.
   string maintainer = 1;

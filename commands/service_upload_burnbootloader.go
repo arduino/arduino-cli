@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
@@ -72,23 +73,29 @@ func (s *arduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 	}
 	defer release()
 
-	if _, err := s.runProgramAction(
+	uploadDetails, err := s.BoardUploadDetails(stream.Context(), &rpc.BoardUploadDetailsRequest{
+		Instance:               req.GetInstance(),
+		Fqbn:                   req.GetFqbn(),
+		Protocol:               req.GetPort().GetProtocol(),
+		Programmer:             req.GetProgrammer(),
+		CustomUploadProperties: req.GetUploadProperties(),
+		BurnBootloader:         true,
+	})
+	if err != nil {
+		return err
+	}
+
+	if _, _, err := s.runProgramAction(
 		stream.Context(),
 		pme,
-		nil, // sketch
-		"",  // importFile
-		"",  // importDir
-		req.GetFqbn(),
 		req.GetPort(),
-		req.GetProgrammer(),
 		req.GetVerbose(),
 		req.GetVerify(),
-		true, // burnBootloader
 		outStream,
 		errStream,
 		req.GetDryRun(),
-		map[string]string{}, // User fields
-		req.GetUploadProperties(),
+		nil, // No user fields
+		properties.NewFromHashmap(uploadDetails.GetUploadProperties()),
 	); err != nil {
 		return err
 	}

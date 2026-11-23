@@ -50,11 +50,13 @@ func main() {
 	}()
 
 	// Initialize the instance
-	initStream := commands.InitStreamResponseToCallbackFunction(ctx, func(r *rpc.InitResponse) error {
+	initStream := commands.InitializeStreamResponseToCallbackFunction(ctx, func(r *rpc.InitializeResponse) error {
 		fmt.Println("INIT> ", r)
 		return nil
 	})
-	if err := srv.Init(&rpc.InitRequest{Instance: instance}, initStream); err != nil {
+	if err := srv.Initialize(
+		&rpc.InitializeRequest{Instance: instance, Message: &rpc.InitializeRequest_Generic_{Generic: &rpc.InitializeRequest_Generic{}}},
+		initStream); err != nil {
 		log.Fatal("Error during initialization:", err)
 	}
 

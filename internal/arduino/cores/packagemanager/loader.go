@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/cmderrors"
 	"github.com/arduino/arduino-cli/internal/arduino/cores"
 	"github.com/arduino/arduino-cli/internal/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -654,6 +655,15 @@ func (pme *Explorer) LoadDiscoveries() []error {
 	return merr
 }
 
+// LoadDiscoveriesForFirmwareUpload loads all discoveries required for firmware
+// upload based on the provided firmware details.
+func (pme *Explorer) LoadDiscoveriesForFirmwareUpload(firmwareDetails *rpc.FirmwareFileDetails) []error {
+	var merr []error
+	configuration := properties.NewFromHashmap(firmwareDetails.GetUploadProperties())
+	merr = append(merr, pme.loadDiscoveryPlatformFromProperties(configuration)...)
+	return merr
+}
+
 // loadDiscovery loads the discovery tool with id, if it cannot be found a non-nil status is returned
 func (pme *Explorer) loadDiscovery(id string) error {
 	tool := pme.GetTool(id)
@@ -681,11 +691,31 @@ func (pme *Explorer) loadBuiltinDiscoveries() []error {
 }
 
 func (pme *Explorer) loadDiscoveries(release *cores.PlatformRelease) []error {
+	// Get the list of tools for discoveries that use direct discovery integration.
+	// See: https://arduino.github.io/arduino-cli/latest/platform-specification/#pluggable-discovery
+	// We need the tools only in that case since we might need some tool's
+	// runtime properties to expand the discovery pattern to run it correctly.
 	var merr []error
-	discoveryProperties := release.Properties.SubTree("pluggable_discovery")
+	configuration := release.Properties.Clone()
+	configuration.Merge(release.RuntimeProperties())
+	if tools, err := pme.FindToolsRequiredFromPlatformRelease(release); err != nil {
+		merr = append(merr, err)
+	} else {
+		for _, tool := range tools {
+			configuration.Merge(tool.RuntimeProperties())
+		}
+	}
 
-	if discoveryProperties.Size() == 0 {
-		return nil
+	merr = append(merr, pme.loadDiscoveryPlatformFromProperties(configuration)...)
+	return merr
+}
+
+func (pme *Explorer) loadDiscoveryPlatformFromProperties(platformProps *properties.Map) []error {
+	var merr []error
+
+	discoveriesProps := platformProps.SubTree("pluggable_discovery")
+	if discoveriesProps.Size() == 0 {
+		return merr
 	}
 
 	// Handles discovery properties formatted like so:
@@ -698,45 +728,26 @@ func (pme *Explorer) loadDiscoveries(release *cores.PlatformRelease) []error {
 	//    "pluggable_discovery.required.1": "PLATFORM:DISCOVERY_ID_2",
 	//
 	// If both indexed and unindexed properties are found the unindexed are ignored
-	for _, id := range discoveryProperties.ExtractSubIndexLists("required") {
+	for _, id := range discoveriesProps.ExtractSubIndexLists("required") {
 		if err := pme.loadDiscovery(id); err != nil {
 			merr = append(merr, err)
 		}
 	}
 
-	discoveryIDs := discoveryProperties.FirstLevelOf()
-	delete(discoveryIDs, "required")
-	// Get the list of tools only if there are discoveries that use Direct discovery integration.
-	// See:
-	// https://arduino.github.io/arduino-cli/latest/platform-specification/#pluggable-discovery
-	// We need the tools only in that case since we might need some tool's
-	// runtime properties to expand the discovery pattern to run it correctly.
-	var tools []*cores.ToolRelease
-	if len(discoveryIDs) > 0 {
-		var err error
-		tools, err = pme.FindToolsRequiredFromPlatformRelease(release)
-		if err != nil {
-			merr = append(merr, err)
-		}
-	}
-
-	// Handles discovery properties formatted like so:
+	// Handles discovery with direct command line pattern like:
 	//
-	// discovery.DISCOVERY_ID.pattern: "COMMAND_TO_EXECUTE"
-	for discoveryID, props := range discoveryIDs {
-		pattern, ok := props.GetOk("pattern")
+	//   "discovery.DISCOVERY_ID.pattern": "COMMAND_TO_EXECUTE"
+	perDiscoveryProps := discoveriesProps.FirstLevelOf()
+	delete(perDiscoveryProps, "required")
+	for discoveryID, discoveryProps := range perDiscoveryProps {
+		pattern, ok := discoveryProps.GetOk("pattern")
 		if !ok {
 			merr = append(merr, errors.New(i18n.Tr("can't find pattern for discovery with id %s", discoveryID)))
 			continue
 		}
-		configuration := release.Properties.Clone()
-		configuration.Merge(release.RuntimeProperties())
-		configuration.Merge(props)
-
-		for _, tool := range tools {
-			configuration.Merge(tool.RuntimeProperties())
-		}
-
+		configuration := platformProps.Clone()
+		configuration.Merge(discoveriesProps)
+		configuration.Merge(discoveryProps)
 		cmd := configuration.ExpandPropsInString(pattern)
 		cmdArgs, _ := properties.SplitQuotedString(cmd, `"'`, true)
 		pme.discoveryManager.Add(discoveryID, cmdArgs...)

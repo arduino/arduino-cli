@@ -40,7 +40,7 @@ func TestBoardListMock(t *testing.T) {
 	{
 		// Create a new instance of the daemon
 		grpcInst := cli.Create()
-		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 			fmt.Printf("INIT> %v\n", ir.GetMessage())
 		}))
 
@@ -62,7 +62,7 @@ func TestBoardListMock(t *testing.T) {
 	{
 		// Create a second instance of the daemon
 		grpcInst := cli.Create()
-		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		require.NoError(t, grpcInst.Initialize(func(ir *commands.InitializeResponse) {
 			fmt.Printf("INIT> %v\n", ir.GetMessage())
 		}))
 

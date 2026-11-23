@@ -46,7 +46,8 @@ func main() {
 	}
 	instance := resp.GetInstance()
 
-	respStream, err := cli.Init(context.Background(), &commands.InitRequest{Instance: instance})
+	respStream, err := cli.Initialize(context.Background(),
+		&commands.InitializeRequest{Instance: instance, Message: &commands.InitializeRequest_Generic_{Generic: &commands.InitializeRequest_Generic{}}})
 	if err != nil {
 		log.Fatal("Init:", err)
 	}
