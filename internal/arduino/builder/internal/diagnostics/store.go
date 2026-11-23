@@ -16,10 +16,14 @@
 package diagnostics
 
 import (
+	"sync"
+
 	"github.com/sirupsen/logrus"
 )
 
+// Store collects the diagnostics of the compilers of a build, which may run at the same time.
 type Store struct {
+	mutex   sync.Mutex
 	results Diagnostics
 }
 
@@ -43,9 +47,13 @@ func (m *Store) Parse(cmdline []string, out []byte) {
 		logrus.Warnf("Error parsing compiler output: %s", err)
 		return
 	}
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	m.results = append(m.results, diags...)
 }
 
 func (m *Store) Diagnostics() Diagnostics {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	return m.results
 }

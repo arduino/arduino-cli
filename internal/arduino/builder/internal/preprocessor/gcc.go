@@ -33,7 +33,7 @@ func GCC(
 	depFile *paths.Path,
 ) *runner.Task {
 	gccBuildProperties := properties.NewMap()
-	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E")
 	gccBuildProperties.Merge(buildProperties)
 	gccBuildProperties.Set("build.library_discovery_phase", "1")
 	gccBuildProperties.SetPath("source_file", sourceFilePath)
@@ -62,6 +62,9 @@ func GCC(
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
 	args = f.Filter(args, f.NotEquals("-MMD"))
+
+	// No reader of the output needs the comments
+	args = f.Filter(args, func(arg string) bool { return arg != "-C" && arg != "-CC" })
 
 	// If a depFile has been specified add the necessary arguments to generate it
 	if depFile != nil {

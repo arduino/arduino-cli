@@ -75,8 +75,11 @@ jobs:
           # Additional certificate definitions can be added to this list.
           - identifier: macOS signing certificate # Text used to identify certificate in notifications.
             certificate-secret: INSTALLER_CERT_MAC_P12 # Name of the secret that contains the certificate.
+            # Certificate-specific arguments to be used in the OpenSSL commands.
+            # See: https://docs.openssl.org/3.6/man1/openssl-pkcs12/#options
+            openssl-arguments: -legacy
             password-secret: INSTALLER_CERT_MAC_PASSWORD # Name of the secret that contains the certificate password.
-            type: pkcs12
+            type: pkcs12 # here you can use `x509` too in case you have a .cer file with a single certificate
           - identifier: Windows signing certificate
             certificate-secret: INSTALLER_CERT_WINDOWS_CER
             # The password for the Windows certificate is not needed, because its not a container, but a single certificate.
@@ -104,8 +107,8 @@ jobs:
         run: |
           (
             openssl ${{ matrix.certificate.type }} \
+              ${{ matrix.certificate.openssl-arguments }} \
               -in "${{ env.CERTIFICATE_PATH }}" \
-              -legacy \
               -noout \
               -passin env:CERTIFICATE_PASSWORD
           ) \
@@ -136,9 +139,9 @@ jobs:
             EXPIRATION_DATE="$(
               (
                 openssl pkcs12 \
+                  ${{ matrix.certificate.openssl-arguments }} \
                   -in ${{ env.CERTIFICATE_PATH }} \
                   -clcerts \
-                  -legacy \
                   -nodes \
                   -passin env:CERTIFICATE_PASSWORD
               ) \
@@ -161,6 +164,7 @@ jobs:
             EXPIRATION_DATE="$(
               (
                 openssl x509 \
+                  ${{ matrix.certificate.openssl-arguments }} \
                   -in ${{ env.CERTIFICATE_PATH }} \
                   -noout \
                   -enddate

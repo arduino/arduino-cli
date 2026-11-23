@@ -24,6 +24,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/cmderrors"
@@ -372,6 +373,22 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			Location: libraries.User,
 		})
 	} else {
+		// Scan the library index only if the code below reads it: a scan reads the whole file.
+		indexedLibs := sync.OnceValue(func() map[string]*librariesindex.Library {
+			names := []string{}
+			for _, libraryRef := range profile.Libraries {
+				if libraryRef.InstallDir == nil {
+					names = append(names, libraryRef.Library)
+				}
+			}
+			if profile.RequireSystemInstalledPlatform() {
+				for _, libDep := range allPlatformsLibraryDependencies {
+					names = append(names, libDep.Name)
+				}
+			}
+			return li.FindIndexedLibraries(names)
+		})
+
 		addProfileLibrary := func(libraryRef *sketch.ProfileLibraryReference) error {
 			if libraryRef.InstallDir != nil {
 				libDir := libraryRef.InstallDir
@@ -398,8 +415,11 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 			if !libDir.IsDir() {
 				// Download library
 				taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Downloading library %s", libraryRef)})
-				libRelease, err := li.FindRelease(libraryRef.Library, libraryRef.Version)
-				if err != nil {
+				var libRelease *librariesindex.Release
+				if indexedLib := indexedLibs()[libraryRef.Library]; indexedLib != nil {
+					libRelease = indexedLib.Releases[libraryRef.Version.NormalizedString()]
+				}
+				if libRelease == nil {
 					taskCallback(&rpc.TaskProgress{Name: i18n.Tr("Library %s not found", libraryRef)})
 					err := &cmderrors.LibraryNotFoundError{Library: libraryRef.Library}
 					responseError(err.GRPCStatus())
@@ -461,13 +481,13 @@ func (s *arduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 				}
 
 				// Find the latest release of the library dependency and add it.
-				latestLibDep, err := li.FindRelease(libDep.Name, nil)
-				if err != nil {
-					return &cmderrors.InvalidArgumentError{Message: i18n.Tr("the platforms requires library %[1]s, but it was not found", libDep.Name), Cause: err}
+				indexedDep := indexedLibs()[libDep.Name]
+				if indexedDep == nil {
+					return &cmderrors.InvalidArgumentError{Message: i18n.Tr("the platforms requires library %[1]s, but it was not found", libDep.Name), Cause: &cmderrors.LibraryNotFoundError{Library: libDep.Name + "@latest"}}
 				}
 				libRef := &sketch.ProfileLibraryReference{
 					Library: libDep.Name,
-					Version: latestLibDep.Version,
+					Version: indexedDep.Latest.Version,
 				}
 				if err := addProfileLibrary(libRef); err != nil {
 					return err
