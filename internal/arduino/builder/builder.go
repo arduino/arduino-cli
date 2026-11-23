@@ -279,6 +279,12 @@ func (b *Builder) Preprocess() ([]byte, error) {
 	b.Progress.AddSubSteps(6)
 	defer b.Progress.RemoveSubSteps()
 
+	closeBuildPath, err := b.openBuildPath()
+	if err != nil {
+		return nil, err
+	}
+	defer closeBuildPath()
+
 	if err := b.preprocess(); err != nil {
 		return nil, err
 	}
@@ -289,13 +295,6 @@ func (b *Builder) Preprocess() ([]byte, error) {
 }
 
 func (b *Builder) preprocess() error {
-	if err := b.buildPath.MkdirAll(); err != nil {
-		return err
-	}
-
-	if err := b.wipeBuildPathIfBuildOptionsChanged(); err != nil {
-		return err
-	}
 	if err := b.createBuildOptionsJSON(); err != nil {
 		return err
 	}
@@ -367,6 +366,12 @@ func (b *Builder) Build() error {
 		1, // size
 	)
 	defer b.Progress.RemoveSubSteps()
+
+	closeBuildPath, err := b.openBuildPath()
+	if err != nil {
+		return err
+	}
+	defer closeBuildPath()
 
 	if err := b.preprocess(); err != nil {
 		return err

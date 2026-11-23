@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/internal/arduino/builder/logger"
+	arduinoutils "github.com/arduino/arduino-cli/internal/arduino/utils"
 	"github.com/arduino/arduino-cli/internal/buildcache"
 	"github.com/arduino/arduino-cli/internal/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -158,7 +159,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 
 	// archive core.a
 	if targetArchivedCore != nil && !b.onlyUpdateCompilationDatabase {
-		err := archiveFile.CopyTo(targetArchivedCore)
+		err := arduinoutils.CopyFileAtomically(archiveFile, targetArchivedCore)
 		if b.logger.VerbosityLevel() == logger.VerbosityVerbose {
 			if err == nil {
 				b.logger.Info(i18n.Tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
