@@ -44,7 +44,19 @@ type IndexResource struct {
 // IndexFileName returns the index file name as it is saved in data dir (package_xxx_index.json).
 // If the URL contains a fragment (e.g. #package_foo_index.json), that fragment is used as-is as
 // the local filename, allowing users to provide a meaningful name for URLs whose path provides none.
+// The returned name is guaranteed to be a plain file name without any directory component.
 func (res *IndexResource) IndexFileName() (string, error) {
+	filename, err := res.indexFileName()
+	if err != nil {
+		return "", err
+	}
+	if err := ValidateFileName(filename); err != nil {
+		return "", &cmderrors.InvalidURLError{Cause: err}
+	}
+	return filename, nil
+}
+
+func (res *IndexResource) indexFileName() (string, error) {
 	if res.URL.Fragment != "" {
 		return res.URL.Fragment, nil
 	}
@@ -88,7 +100,14 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	if err != nil {
 		return err
 	}
-	tmpIndexPath := tmp.Join(downloadFileName)
+	// Ensure the final destination can not escape destDir
+	indexPath, err := safeJoin(destDir, indexFileName)
+	if err != nil {
+		return &cmderrors.InvalidURLError{Cause: err}
+	}
+	// Use a fixed name for the temporary download: downloadFileName comes from the URL
+	// and is used only to detect the format and in progress messages.
+	tmpIndexPath := tmp.Join("downloaded_index")
 	config.DoNotResumeDownload = true // Disable resuming downloads for index files
 	if err := httpclient.DownloadFile(ctx, tmpIndexPath, reqURL.String(), "", i18n.Tr("Downloading index: %s", downloadFileName), downloadCB, config); err != nil {
 		return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index '%s'", &reqURL), Cause: err}
@@ -100,7 +119,9 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	// Expand the index if it is compressed
 	if strings.HasSuffix(downloadFileName, ".tar.bz2") {
 		signatureFileName := indexFileName + ".sig"
-		signaturePath = destDir.Join(signatureFileName)
+		if signaturePath, err = safeJoin(destDir, signatureFileName); err != nil {
+			return &cmderrors.InvalidURLError{Cause: err}
+		}
 
 		// .tar.bz2 archive may contain both index and signature
 
@@ -117,20 +138,22 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		}
 
 		// Look for index.json
-		tmpIndexPath = tmpArchivePath.Join(indexFileName)
+		if tmpIndexPath, err = safeJoin(tmpArchivePath, indexFileName); err != nil {
+			return &cmderrors.InvalidURLError{Cause: err}
+		}
 		if !tmpIndexPath.Exist() {
 			return &cmderrors.NotFoundError{Message: i18n.Tr("Invalid archive: file %[1]s not found in archive %[2]s", indexFileName, tmpArchivePath.Base())}
 		}
 
 		// Look for signature
-		if t := tmpArchivePath.Join(signatureFileName); t.Exist() {
+		if t, err := safeJoin(tmpArchivePath, signatureFileName); err == nil && t.Exist() {
 			tmpSignaturePath = t
 			hasSignature = true
 		} else {
 			logrus.Infof("No signature %s found in package index archive %s", signatureFileName, tmpArchivePath.Base())
 		}
 	} else if strings.HasSuffix(downloadFileName, ".gz") {
-		tmpUnzippedIndexPath := tmp.Join(indexFileName)
+		tmpUnzippedIndexPath := tmp.Join("unzipped_index")
 		if err := paths.GUnzip(tmpIndexPath, tmpUnzippedIndexPath); err != nil {
 			return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Error extracting %s", indexFileName), Cause: err}
 		}
@@ -143,8 +166,12 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 		signatureFileName := path.Base(res.SignatureURL.Path)
 
 		// Download signature
-		signaturePath = destDir.Join(signatureFileName)
-		tmpSignaturePath = tmp.Join(signatureFileName)
+		if signaturePath, err = safeJoin(destDir, signatureFileName); err != nil {
+			return &cmderrors.InvalidURLError{Cause: err}
+		}
+		if tmpSignaturePath, err = safeJoin(tmp, signatureFileName); err != nil {
+			return &cmderrors.InvalidURLError{Cause: err}
+		}
 		config.DoNotResumeDownload = true // Disable resuming downloads for index files
 		if err := httpclient.DownloadFile(ctx, tmpSignaturePath, res.SignatureURL.String(), "", i18n.Tr("Downloading index signature: %s", signatureFileName), downloadCB, config); err != nil {
 			return &cmderrors.FailedDownloadError{Message: i18n.Tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
@@ -170,7 +197,6 @@ func (res *IndexResource) Download(ctx context.Context, destDir *paths.Path, dow
 	// if !validate(tmpIndexPath) { return error }
 
 	// Make a backup copy of old index and signature so the defer function can rollback in case of errors.
-	indexPath := destDir.Join(indexFileName)
 	oldIndex := tmp.Join("old_index")
 	if indexPath.Exist() {
 		if err := indexPath.CopyTo(oldIndex); err != nil {

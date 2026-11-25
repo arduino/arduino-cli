@@ -80,3 +80,52 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	}
 	require.Contains(t, userAgentHeader, goldUserAgentValue)
 }
+
+func TestArchivePathRejectsPathTraversal(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+	downloadDir := tmp.Join("staging")
+
+	for _, name := range []string{
+		"", ".", "..",
+		"../pwned.txt",
+		"../../pwned.txt",
+		"sub/archive.zip",
+		`..\pwned.txt`,
+		tmp.Join("pwned_abs.txt").String(),
+	} {
+		r := &DownloadResource{ArchiveFileName: name, CachePath: "packages"}
+		_, err := r.ArchivePath(downloadDir)
+		require.Error(t, err, "archive file name: %q", name)
+	}
+
+	r := &DownloadResource{ArchiveFileName: "avr-1.8.6.tar.bz2", CachePath: "packages"}
+	p, err := r.ArchivePath(downloadDir)
+	require.NoError(t, err)
+	require.Equal(t, downloadDir.Join("packages", "avr-1.8.6.tar.bz2").String(), p.String())
+}
+
+func TestDownloadRejectsPathTraversal(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+	downloadDir := tmp.Join("staging")
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("PWNED"))
+	}))
+	defer srv.Close()
+
+	settings := configuration.NewSettings()
+	config, err := settings.DownloaderConfig(context.Background())
+	require.NoError(t, err)
+
+	for _, name := range []string{"../../pwned.txt", tmp.Join("pwned_abs.txt").String()} {
+		r := &DownloadResource{ArchiveFileName: name, CachePath: "packages", URL: srv.URL}
+		err = r.Download(context.Background(), downloadDir, config, "", func(*rpc.DownloadProgress) {}, "")
+		require.Error(t, err)
+	}
+	require.NoFileExists(t, tmp.Join("pwned.txt").String())
+	require.NoFileExists(t, tmp.Join("pwned_abs.txt").String())
+}

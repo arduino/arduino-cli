@@ -231,3 +231,52 @@ func TestIndexDownloadWithURLFragment(t *testing.T) {
 	require.True(t, destDir.Join("package_fragment_index.json").Exist(), "expected package_fragment_index.json")
 	require.False(t, destDir.Join("zip.json").Exist(), "unexpected zip.json")
 }
+
+func TestIndexFileNameRejectsPathTraversal(t *testing.T) {
+	for _, rawURL := range []string{
+		"http://example.com/package_index.json#../../pwned.txt",
+		"http://example.com/package_index.json#..",
+		"http://example.com/package_index.json#.",
+		"http://example.com/package_index.json#/abs/path",
+		"http://example.com/package_index.json#sub/file.json",
+		`http://example.com/package_index.json#..\..\pwned.txt`,
+		"http://example.com/package_index.json#..%2F..%2Fpwned.txt",
+		"http://example.com/package_index.json#..%5C..%5Cpwned.txt",
+		"http://example.com/dir/..%5C..%5Cpwned.json",
+	} {
+		u, err := url.Parse(rawURL)
+		require.NoError(t, err)
+		_, err = (&IndexResource{URL: u}).IndexFileName()
+		require.Error(t, err, "url: %s", rawURL)
+	}
+}
+
+func TestIndexDownloadWithPathTraversalFragment(t *testing.T) {
+	ctx := context.Background()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/package_evil_index.json", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "PWNED")
+	})
+	server := &http.Server{Handler: mux}
+	ln, err := net.Listen("tcp", "127.0.0.1:")
+	require.NoError(t, err)
+	defer ln.Close()
+	go server.Serve(ln)
+	defer server.Close()
+
+	root, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer root.RemoveAll()
+	destDir := root.Join("a", "b", "data")
+
+	for _, fragment := range []string{"../../pwned.txt", root.Join("pwned_abs.txt").String()} {
+		u, err := url.Parse("http://" + ln.Addr().String() + "/package_evil_index.json")
+		require.NoError(t, err)
+		u.Fragment = fragment
+		err = (&IndexResource{URL: u}).Download(ctx, destDir, func(*rpc.DownloadProgress) {}, downloader.GetDefaultConfig())
+		require.Error(t, err)
+	}
+	require.NoFileExists(t, root.Join("a", "pwned.txt").String())
+	require.NoFileExists(t, root.Join("pwned_abs.txt").String())
+}

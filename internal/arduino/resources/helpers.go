@@ -25,11 +25,17 @@ import (
 // ArchivePath returns the path of the Archive of the specified DownloadResource relative
 // to the specified downloadDir
 func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, error) {
+	// ArchiveFileName may come from an untrusted package index: ensure it
+	// cannot be used to escape the staging directory.
 	staging := downloadDir.Join(r.CachePath)
+	archivePath, err := safeJoin(staging, r.ArchiveFileName)
+	if err != nil {
+		return nil, err
+	}
 	if err := staging.MkdirAll(); err != nil {
 		return nil, err
 	}
-	return staging.Join(r.ArchiveFileName), nil
+	return archivePath, nil
 }
 
 // IsCached returns true if the specified DownloadResource has already been downloaded
