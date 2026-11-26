@@ -312,6 +312,9 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 
 	b.logIfVerbose(false, i18n.Tr("Detecting libraries used..."))
+	// The library detection keeps the output of its passes on the sketch for the prototype
+	// generation only
+	defer b.libsDetector.RemoveSketchPreprocessedFiles()
 	err := b.libsDetector.FindIncludes(
 		b.ctx,
 		b.buildPath,

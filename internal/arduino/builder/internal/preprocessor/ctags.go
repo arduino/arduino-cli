@@ -39,9 +39,11 @@ import (
 var DebugPreprocessor bool
 
 // PreprocessSketchWithCtags performs preprocessing of the arduino sketch using CTags.
+// gccPreprocessedFile, when given, is the sketch already run through the GCC preprocessor
+// with the same includes, and that run is skipped.
 func PreprocessSketchWithCtags(
 	ctx context.Context,
-	unpreprocessedSourceFile, preprocessedSourceFile *paths.Path,
+	unpreprocessedSourceFile, preprocessedSourceFile, gccPreprocessedFile *paths.Path,
 	sketch *sketch.Sketch, includes paths.PathList,
 	lineOffset int, buildProperties *properties.Map,
 	onlyUpdateCompilationDatabase, verbose bool,
@@ -57,7 +59,14 @@ func PreprocessSketchWithCtags(
 
 	// Run GCC preprocessor
 	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
-	result := GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
+	result := &runner.Result{}
+	if gccPreprocessedFile != nil {
+		if err := gccPreprocessedFile.CopyTo(ctagsTarget); err != nil {
+			return nil, err
+		}
+	} else {
+		result = GCC(unpreprocessedSourceFile, ctagsTarget, includes, buildProperties, nil).Run(ctx)
+	}
 	stdout.Write(result.Stdout)
 	stderr.Write(result.Stderr)
 	if err := result.Error; err != nil {
