@@ -194,7 +194,9 @@ jobs:
           path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
   create-windows-installer:
-    runs-on: windows-sign-pc
+    runs-on:
+      group: WindowsSignPC-Qualcomm
+      labels: windows-sign-pc
     needs: create-nightly-artifacts
 
     defaults:
@@ -251,6 +253,8 @@ jobs:
           path: ${{ env.MSI_FILE }}
 
   publish-nightly:
+    # TEMP: disabled while testing build and sign on the WindowsSignPC-Qualcomm runner group
+    if: false
     runs-on: ubuntu-latest
     environment: production
     needs:
