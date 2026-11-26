@@ -33,27 +33,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - task: Windows_32bit
-            runner: ubuntu-latest
+          # TEMP: only Windows_64bit while testing build and sign on the WindowsSignPC-Qualcomm runner group
           - task: Windows_64bit
-            runner: ubuntu-latest
-          - task: Windows_ARM64
-            runner: ubuntu-latest
-          - task: Linux_32bit
-            runner: ubuntu-latest
-          - task: Linux_64bit
-            runner: ubuntu-latest
-          - task: Linux_ARMv6
-            runner: ubuntu-latest
-          - task: Linux_ARMv7
-            runner: ubuntu-latest
-          - task: Linux_ARM64
-            runner: ubuntu-latest
-          - task: macOS_64bit
-            runner: ubuntu-latest
-          - task: macOS_ARM64
-            runner: ubuntu-24.04-arm
-          - task: jsonschema
             runner: ubuntu-latest
 
     steps:
@@ -85,6 +66,8 @@ jobs:
           path: ${{ env.DIST_DIR }}
 
   notarize-macos:
+    # TEMP: disabled while testing build and sign on the WindowsSignPC-Qualcomm runner group
+    if: false
     name: Notarize ${{ matrix.artifact.name }}
     runs-on: macos-latest
     needs: create-nightly-artifacts
@@ -194,7 +177,9 @@ jobs:
           path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
   create-windows-installer:
-    runs-on: windows-sign-pc
+    runs-on:
+      group: WindowsSignPC-Qualcomm
+      labels: windows-sign-pc
     needs: create-nightly-artifacts
 
     defaults:
@@ -251,6 +236,8 @@ jobs:
           path: ${{ env.MSI_FILE }}
 
   publish-nightly:
+    # TEMP: disabled while testing build and sign on the WindowsSignPC-Qualcomm runner group
+    if: false
     runs-on: ubuntu-latest
     environment: production
     needs:
