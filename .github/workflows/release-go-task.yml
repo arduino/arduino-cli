@@ -194,7 +194,7 @@ jobs:
           bundle_id = "cc.arduino.${{ env.PROJECT_NAME }}"
 
           sign {
-            application_identity = "Developer ID Application: ARDUINO SA (7KT7ZWMCJT)"
+            application_identity = "${{ vars.AC_IDENTITY }}"
           }
 
           # Ask Gon for zip output to force notarization process to take place.
