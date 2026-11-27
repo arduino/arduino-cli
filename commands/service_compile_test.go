@@ -19,9 +19,29 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/arduino/sketch"
+	"github.com/arduino/arduino-cli/internal/buildcache"
+	"github.com/arduino/arduino-cli/internal/inventory"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMaybePurgeBuildCacheUsesConfiguredPath(t *testing.T) {
+	cachePath := paths.New(t.TempDir()).Join("configured-cache")
+	for _, entry := range []string{"cores/old-core", "sketches/old-sketch"} {
+		_, err := buildcache.New(cachePath.Join(paths.New(entry).Parent().String())).GetOrCreate(paths.New(entry).Base())
+		assert.NoError(t, err)
+	}
+
+	const countKey = "build_cache.compilation_count_since_last_purge"
+	previousCount := inventory.Store.GetUint(countKey)
+	inventory.Store.Set(countKey, uint(0))
+	defer inventory.Store.Set(countKey, previousCount)
+
+	maybePurgeBuildCache(1, 0, cachePath)
+
+	assert.False(t, cachePath.Join("cores", "old-core").Exist())
+	assert.False(t, cachePath.Join("sketches", "old-sketch").Exist())
+}
 
 func TestGenBuildPath(t *testing.T) {
 	srv := NewArduinoCoreServer().(*arduinoCoreServerImpl)

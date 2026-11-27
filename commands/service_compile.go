@@ -205,7 +205,8 @@ func (s *arduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		// cache is purged after compilation to not remove entries that might be required
 		defer maybePurgeBuildCache(
 			s.settings.GetCompilationsBeforeBuildCachePurge(),
-			s.settings.GetBuildCacheTTL().Abs())
+			s.settings.GetBuildCacheTTL().Abs(),
+			buildCachePath)
 	}
 	if err = buildPath.MkdirAll(); err != nil {
 		return &cmderrors.PermissionDeniedError{Message: i18n.Tr("Cannot create build directory"), Cause: err}
@@ -444,7 +445,7 @@ func (s *arduinoCoreServerImpl) getDefaultSketchBuildPath(sk *sketch.Sketch, ove
 }
 
 // maybePurgeBuildCache runs the build files cache purge if the policy conditions are met.
-func maybePurgeBuildCache(compilationsBeforePurge uint, cacheTTL time.Duration) {
+func maybePurgeBuildCache(compilationsBeforePurge uint, cacheTTL time.Duration, buildCachePath *paths.Path) {
 	// 0 means never purge
 	if compilationsBeforePurge == 0 {
 		return
@@ -457,8 +458,8 @@ func maybePurgeBuildCache(compilationsBeforePurge uint, cacheTTL time.Duration) 
 		return
 	}
 	inventory.Store.Set("build_cache.compilation_count_since_last_purge", 0)
-	buildcache.New(paths.TempDir().Join("arduino", "cores")).Purge(cacheTTL)
-	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
+	buildcache.New(buildCachePath.Join("cores")).Purge(cacheTTL)
+	buildcache.New(buildCachePath.Join("sketches")).Purge(cacheTTL)
 }
 
 // removeBuildPathFromSketchFiles removes the files contained in the build directory from
